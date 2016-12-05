@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SMILES Parser Demo</title>
+    <link rel="stylesheet" href="../src/smilesDrawer.css">
+    <script src="../src/smiles.js"></script>
+    <script src="../src/smilesDrawer.js"></script>
+</head>
+
+<body>
+    <input id="input" type="text" class="parser" />
+    <div id="output" style="width:500px; height:500px; background-color:#141414">
+    </div>
+    <script>
+        var input = document.getElementById('input');
+        var smilesDrawer = new SmilesDrawer();
+        /*var out = '';
+        for(var i = 0; i < kris.length; i++) {
+            try {
+                var line = '';
+                if(kris[i].indexOf('.') > 0) continue;
+                console.log(kris[i]);
+                var t = performance.now();
+                var data = smiles.parse(kris[i]);
+                line += (performance.now() - t) + ';';
+                t = performance.now();
+                smilesDrawer.draw(data);
+                out += smilesDrawer.printRingInfo(kris[i]);
+
+            }
+            catch(e) {
+
+            }
+        }
+
+        console.log(out);*/
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            var smilesDrawer = new SmilesDrawer();
+            var input = document.getElementById('input');
+            input.addEventListener('input', function() {
+                var t = performance.now();
+                var data = smiles.parse(input.value);
+                smilesDrawer.draw(data, null, false);
+                console.log(performance.now() - t);
+                console.log(smilesDrawer.printRingInfo(input.value));
+            });
+        });
+    </script>
+</body>
+
+</html>
