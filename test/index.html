@@ -11,8 +11,10 @@
 
 <body>
     <input id="input" type="text" class="parser" />
-    <div id="output" style="width:500px; height:500px; background-color:#141414">
+    <br />
+    <div id="output" style="float:left; width:500px; height:500px; background-color:#141414">
     </div>
+    <canvas id="output-canvas" width="500" height="500" style="float:left; background-color:#141414"></canvas>
     <script>
         var input = document.getElementById('input');
         var smilesDrawer = new SmilesDrawer();

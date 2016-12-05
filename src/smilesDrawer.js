@@ -3,6 +3,26 @@ function SmilesDrawer() {
     this.height = 500;
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
+
+    this.canvas = document.getElementById('output-canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.drawingWidth = 0.0;
+    this.drawingHeight = 0.0;
+    this.offsetX = 0.0;
+    this.offsetY = 0.0;
+
+    this.colors = {
+        C: '#fff',
+        O: '#e74c3c',
+        N: '#2980b9',
+        F: '#27ae60',
+        CL: '#16a085',
+        Br: '#d35400',
+        I: '#8e44ad',
+        P: '#d35400',
+        S: '#f1c40f',
+        B: '#e67e22'
+    }
 }
 
 SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
@@ -19,6 +39,9 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
 
     this.backupVertices = [];
     this.backupRings = [];
+
+    // Clear the canvas
+    this.ctx.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight)
 
     this.initSvg();
 
@@ -56,9 +79,44 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
 
         this.resolveSecondaryOverlaps(overlapScore.scores);
 
+        // Figure out the final size of the image
+        var max = { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE };
+        var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE };
+
+        for (var i = 0; i < this.vertices.length; i++) {
+            var p = this.vertices[i].position;
+            if(max.x < p.x) max.x = p.x;
+            if(max.y < p.y) max.y = p.y;
+            if(min.x > p.x) min.x = p.x;
+            if(min.y > p.y) min.y = p.y;
+        }
+
+        // Add padding
+        var padding = 10.0;
+        max.x += padding;
+        max.y += padding;
+        min.x -= padding;
+        min.y -= padding;
+
+        this.drawingWidth = max.x - min.x;
+        this.drawingHeight = max.y - min.y;
+
+        var scaleX = this.canvas.offsetWidth / this.drawingWidth;
+        var scaleY = this.canvas.offsetHeight / this.drawingHeight;
+
+        var scale = (scaleX < scaleY) ? scaleX : scaleY;
+
+        this.ctx.scale(scale, scale);
+
+        this.offsetX = -min.x;
+        this.offsetY = -min.y;
+
         // Do the actual drawing
         this.drawEdges();
         this.drawVertices(this.settings.debug);
+
+        // Reset the canvas context (especially the scale)
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
     var bb = this.root.getBBox();
@@ -902,7 +960,7 @@ SmilesDrawer.prototype.initSvg = function () {
     var target = document.getElementById(this.targetId);
     this.width = target.offsetWidth;
     this.height = target.offsetHeight;
-
+    
     this.svg = this.createElement('svg');
     this.svg.setAttribute('width', this.width);
     this.svg.setAttribute('height', this.height);
@@ -971,6 +1029,28 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
 
     var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
 
+    var l = line.getLeftVector().clone();
+    var r = line.getRightVector().clone();
+
+    l.x += this.offsetX;
+    l.y += this.offsetY;
+
+    r.x += this.offsetX;
+    r.y += this.offsetY;
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(l.x, l.y);
+    this.ctx.lineTo(r.x, r.y);
+    this.ctx.lineCap = 'round';
+    this.ctx.lineWidth = 1.5;
+    var gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
+    gradient.addColorStop(0.4, this.colors[line.getLeftElement().toUpperCase()] || this.colors['C']);
+    gradient.addColorStop(0.6, this.colors[line.getRightElement().toUpperCase()] || this.colors['C']);
+    this.ctx.strokeStyle = gradient;
+    this.ctx.stroke();
+    this.ctx.restore();
+
     // Store angle including the -45 degrees
     var angle = MathHelper.Geom.toDeg(line.getAngle()) - 45.0;
     line.rotateToXAxis();
@@ -991,6 +1071,7 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
     l.setAttribute('y2', right.y);
     l.setAttribute('shape-rendering', 'geometricPrecision');
     l.setAttribute('transform', 'rotate(' + angle + ' ' + left.x + ' ' + left.y + ')');
+
     if (classes) l.setAttribute('class', classes);
     return l;
 }
@@ -999,6 +1080,31 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
     // Return empty line element for debugging, remove this check later, values should not be NaN
     if (isNaN(x) || isNaN(y))
         return;
+    
+    this.ctx.save();
+    var font = '10px Arial';
+    this.ctx.font = font;
+    this.ctx.textAlign = 'start';
+    this.ctx.textBaseline = 'top';
+    this.ctx.fillStyle = '#141414';
+    var dim = this.ctx.measureText(element);
+    dim.height = parseInt(font, 10);
+    var r = (dim.width > dim.height) ? dim.width : dim.height;
+    r /= 2.0;
+    this.ctx.beginPath();
+    this.ctx.arc(x + this.offsetX, y + this.offsetY, r + 1, 0, Math.PI*2, true); 
+    this.ctx.closePath();
+    this.ctx.fill();
+    
+    this.ctx.fillStyle = this.colors[element.toUpperCase() || 'C'];
+    this.ctx.fillText(element, x - dim.width / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
+
+
+
+
+
+
+
 
     var text = this.createElement('text');
     text.setAttribute('x', x);
@@ -1030,6 +1136,8 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
         if (classes) hydrogen.setAttribute('class', classes);
 
         this.root.appendChild(hydrogen);
+
+
     } else if (hydrogen > 1) {
         var bb = text.getBBox();
         var hx = x,
@@ -1069,6 +1177,8 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
         var radius = (bb.width > bb.height) ? bb.width : bb.height;
         this.root.insertBefore(this.circle(radius / 2.0, x, y, 'background'), text);
     }
+
+    this.ctx.restore();
 }
 
 SmilesDrawer.prototype.drawPoint = function (v, text) {
@@ -2695,6 +2805,10 @@ function Vector2(x, y) {
 Vector2.prototype.set = function (x, y) {
     this.x = x;
     this.y = y;
+}
+
+Vector2.prototype.clone = function() {
+    return new Vector2(this.x, this.y);
 }
 
 Vector2.prototype.toString = function () {
