@@ -4,8 +4,8 @@ function SmilesDrawer() {
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
 
-    this.canvas = document.getElementById('output-canvas');
-    this.ctx = this.canvas.getContext('2d');
+    this.canvas;
+    this.ctx;
     this.drawingWidth = 0.0;
     this.drawingHeight = 0.0;
     this.offsetX = 0.0;
@@ -14,20 +14,22 @@ function SmilesDrawer() {
     this.colors = {
         C: '#fff',
         O: '#e74c3c',
-        N: '#2980b9',
+        N: '#3498db',
         F: '#27ae60',
         CL: '#16a085',
-        Br: '#d35400',
+        BR: '#d35400',
         I: '#8e44ad',
         P: '#d35400',
         S: '#f1c40f',
-        B: '#e67e22'
+        B: '#e67e22',
+        SI: '#e67e22'
     }
 }
 
 SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
     this.data = data;
-    this.targetId = targetId || 'output';
+    this.canvas = document.getElementById(targetId);
+    this.ctx = this.canvas.getContext('2d');
 
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
@@ -42,8 +44,6 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
 
     // Clear the canvas
     this.ctx.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight)
-
-    this.initSvg();
 
     this.createVertices(data, null);
 
@@ -60,8 +60,9 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
         this.position();
         var overlapScore = this.getOverlapScore();
 
-        if (overlapScore.total > this.settings.bondLength) {
-            this.settings.defaultDir = -this.settings.defaultDir;
+        var count = 0;
+        while (overlapScore.total > this.settings.bondLength / 2.0 && count < 10) {
+            // this.settings.defaultDir = -this.settings.defaultDir;
             this.clearPositions();
             this.position();
 
@@ -74,7 +75,9 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
             }
 
             // Restore default
-            this.settings.defaultDir = -this.settings.defaultDir;
+            // this.settings.defaultDir = -this.settings.defaultDir;
+
+            count++;
         }
 
         this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -118,15 +121,6 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
         // Reset the canvas context (especially the scale)
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
-
-    var bb = this.root.getBBox();
-
-    var x = bb.x - 5;
-    var y = bb.y - 5
-    var width = bb.width + 10;
-    var height = bb.height + 10;
-
-    this.svg.setAttribute('viewBox', x + ' ' + y + ' ' + width + ' ' + height);
 }
 
 SmilesDrawer.prototype.settings = {
@@ -893,139 +887,31 @@ SmilesDrawer.prototype.getOverlapScore = function () {
     };
 }
 
-SmilesDrawer.prototype.createElement = function (tag) {
-    return document.createElementNS("http://www.w3.org/2000/svg", tag);
-}
-
-SmilesDrawer.prototype.createDropShadow = function () {
-    var filter = this.createElement('filter');
-    filter.setAttribute('id', 'dropShadowFilter');
-    filter.setAttribute('x', '-.25');
-    filter.setAttribute('y', '-.25');
-    filter.setAttribute('width', '1.5');
-    filter.setAttribute('height', '1.5');
-
-    var offset = this.createElement('feOffset');
-    offset.setAttribute('result', 'offOut');
-    offset.setAttribute('in', 'SourceAlpha');
-    offset.setAttribute('dx', '0');
-    offset.setAttribute('dy', '0');
-
-    var colorMatrix = this.createElement('feColorMatrix');
-    colorMatrix.setAttribute('result', 'matrixOut');
-    colorMatrix.setAttribute('in', 'offOut');
-    colorMatrix.setAttribute('type', 'matrix');
-    colorMatrix.setAttribute('values', '1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0');
-
-    var blur = this.createElement('feGaussianBlur');
-    blur.setAttribute('result', 'blurOut');
-    blur.setAttribute('in', 'matrixOut');
-    blur.setAttribute('stdDeviation', '1');
-
-    var blend = this.createElement('feBlend');
-    blend.setAttribute('in', 'SourceGraphic');
-    blend.setAttribute('in2', 'blurOut');
-    blend.setAttribute('mode', 'normal');
-
-
-    filter.appendChild(offset);
-    filter.appendChild(colorMatrix);
-    filter.appendChild(blur);
-    filter.appendChild(blend);
-
-    return filter;
-}
-
-SmilesDrawer.prototype.createGradient = function (id) {
-    var gradient = this.createElement('linearGradient');
-    gradient.setAttribute('id', 'gradient' + id);
-    gradient.setAttribute('x1', '0%');
-    gradient.setAttribute('y1', "0%");
-    gradient.setAttribute('x2', '100%');
-    gradient.setAttribute('y2', "100%");
-
-    var from = this.createElement('stop');
-    from.setAttribute('offset', '35%');
-
-    var to = this.createElement('stop');
-    to.setAttribute('offset', '65%');
-
-    gradient.appendChild(from);
-    gradient.appendChild(to);
-
-    return gradient;
-}
-
-SmilesDrawer.prototype.initSvg = function () {
-    var target = document.getElementById(this.targetId);
-    this.width = target.offsetWidth;
-    this.height = target.offsetHeight;
-    
-    this.svg = this.createElement('svg');
-    this.svg.setAttribute('width', this.width);
-    this.svg.setAttribute('height', this.height);
-    target.innerHTML = '';
-    target.appendChild(this.svg);
-
-    // Add gradients
-    var defs = this.createElement('defs');
-
-    // C
-    defs.appendChild(this.createGradient('CO'));
-    defs.appendChild(this.createGradient('CN'));
-    defs.appendChild(this.createGradient('CS'));
-
-    // O
-    defs.appendChild(this.createGradient('OO'));
-    defs.appendChild(this.createGradient('OC'));
-    defs.appendChild(this.createGradient('ON'));
-    defs.appendChild(this.createGradient('OS'));
-
-    // N
-    defs.appendChild(this.createGradient('NN'));
-    defs.appendChild(this.createGradient('NC'));
-    defs.appendChild(this.createGradient('NO'));
-    defs.appendChild(this.createGradient('NS'));
-
-    // F
-    defs.appendChild(this.createGradient('SS'));
-    defs.appendChild(this.createGradient('SC'));
-    defs.appendChild(this.createGradient('SN'));
-    defs.appendChild(this.createGradient('SO'));
-
-    //
-    defs.appendChild(this.createDropShadow());
-
-
-    this.svg.appendChild(defs);
-
-    // Add group element
-    this.root = this.createElement('g');
-    this.svg.appendChild(this.root);
-
-}
-
-SmilesDrawer.prototype.circle = function (radius, x, y, classes) {
+SmilesDrawer.prototype.circle = function (radius, x, y, classes, fill) {
     // Return empty line element for debugging, remove this check later, values should not be NaN
     if (isNaN(x) || isNaN(y))
-        return this.createElement('circle');
+        return;
 
-    var circle = this.createElement('circle');
-    circle.setAttribute('r', radius);
-    circle.setAttribute('cx', x);
-    circle.setAttribute('cy', y);
-    if (classes) circle.setAttribute('class', classes);
-    return circle;
+    this.ctx.save();
+    this.ctx.lineWidth = 1.5;
+    this.ctx.beginPath();
+    this.ctx.arc(x + this.offsetX, y + this.offsetY, radius, 0, Math.PI * 2, true); 
+    this.ctx.closePath();
+    
+    if(fill) {
+        this.ctx.fillStyle = this.colors['C'];
+        this.ctx.fill();
+    }
+    else {
+        this.ctx.strokeStyle = this.colors['C'];
+        this.ctx.stroke();
+    }
+    this.ctx.restore();
 }
 
 SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, classes) {
-    // The rotation transformation is needed because svg lines cannot have gradients as
-    // strokes, they do not rotate (which sucks). So the line has to be drawn
-    // horizontally and the transformed (rotated) around the source point
-
-    // Return empty line element for debugging, remove this check later, values should not be NaN
     if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2))
-        return this.createElement('line');
+        return;
 
     var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
 
@@ -1050,30 +936,6 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
     this.ctx.strokeStyle = gradient;
     this.ctx.stroke();
     this.ctx.restore();
-
-    // Store angle including the -45 degrees
-    var angle = MathHelper.Geom.toDeg(line.getAngle()) - 45.0;
-    line.rotateToXAxis();
-    line.rotate(Math.PI / 4.0);
-
-    var left = line.getLeftVector();
-    var right = line.getRightVector();
-
-    // Add the right direction for the gradient
-    classes += ' gradient' + line.getLeftElement()
-        .toUpperCase() + line.getRightElement()
-        .toUpperCase();
-
-    var l = this.createElement('line');
-    l.setAttribute('x1', left.x);
-    l.setAttribute('y1', left.y);
-    l.setAttribute('x2', right.x);
-    l.setAttribute('y2', right.y);
-    l.setAttribute('shape-rendering', 'geometricPrecision');
-    l.setAttribute('transform', 'rotate(' + angle + ' ' + left.x + ' ' + left.y + ')');
-
-    if (classes) l.setAttribute('class', classes);
-    return l;
 }
 
 SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydrogen, position, terminal) {
@@ -1105,10 +967,10 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
             hy = y - dim.height / 2.0 + this.offsetY;
         if (position === 'left') hx -= dim.width;
         if (position === 'right') hx += dim.width;
-        if (position === 'up' && terminal) hx += dim.width;
-        if (position === 'down' && terminal) hx += dim.width;
-        if (position === 'up' && !terminal) hy -= dim.height - dim.height / 4;
-        if (position === 'down' && !terminal) hy += dim.height - dim.height / 4;
+        if (position === 'up' && terminal) hx += dim.width + 1.0;
+        if (position === 'down' && terminal) hx += dim.width + 1.0;
+        if (position === 'up' && !terminal) hy -= dim.height - dim.height / 4  + 1.0;
+        if (position === 'down' && !terminal) hy += dim.height - dim.height / 4  + 1.0;
 
         this.ctx.fillText('H', hx, hy);
     } else if (hydrogen > 1) {
@@ -1117,10 +979,10 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
 
         if (position === 'left') hx -= dim.width + dim.width / 1.75;
         if (position === 'right') hx += dim.width;
-        if (position === 'up' && terminal) hx += dim.width;
-        if (position === 'down' && terminal) hx += dim.width;
-        if (position === 'up' && !terminal) hy -= bdimb.height;
-        if (position === 'down' && !terminal) hy += dim.height;
+        if (position === 'up' && terminal) hx += dim.width + 1.0;
+        if (position === 'down' && terminal) hx += dim.width + 1.0;
+        if (position === 'up' && !terminal) hy -= bdimb.height + 1.0;
+        if (position === 'down' && !terminal) hy += dim.height + 1.0;
 
         this.ctx.fillText('H', hx, hy)
 
@@ -1129,85 +991,11 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
         this.ctx.fillText(hydrogen, hx + dim.width / 0.9, hy + dim.height / 1.5);
     }
 
-
-    var text = this.createElement('text');
-    text.setAttribute('x', x);
-    text.setAttribute('y', y);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('alignment-baseline', 'central');
-    text.appendChild(document.createTextNode(element));
-    if (classes) text.setAttribute('class', classes);
-
-    this.root.appendChild(text);
-
-    if (hydrogen === 1) {
-        var bb = text.getBBox();
-        var hx = x,
-            hy = y;
-        if (position === 'left') hx -= bb.width;
-        if (position === 'right') hx += bb.width;
-        if (position === 'up' && terminal) hx += bb.width;
-        if (position === 'down' && terminal) hx += bb.width;
-        if (position === 'up' && !terminal) hy -= bb.height - bb.height / 4;
-        if (position === 'down' && !terminal) hy += bb.height - bb.height / 4;
-
-        var hydrogen = this.createElement('text');
-        hydrogen.setAttribute('x', hx);
-        hydrogen.setAttribute('y', hy);
-        hydrogen.setAttribute('text-anchor', 'middle');
-        hydrogen.setAttribute('alignment-baseline', 'central');
-        hydrogen.appendChild(document.createTextNode('H'));
-        if (classes) hydrogen.setAttribute('class', classes);
-
-        this.root.appendChild(hydrogen);
-
-
-    } else if (hydrogen > 1) {
-        var bb = text.getBBox();
-        var hx = x,
-            hy = y,
-            nx = x,
-            hy = y;
-
-        if (position === 'left') hx -= bb.width + bb.width / 1.75;
-        if (position === 'right') hx += bb.width;
-        if (position === 'up' && terminal) hx += bb.width;
-        if (position === 'down' && terminal) hx += bb.width;
-        if (position === 'up' && !terminal) hy -= bb.height;
-        if (position === 'down' && !terminal) hy += bb.height;
-
-        var hydro = this.createElement('text');
-        hydro.setAttribute('x', hx);
-        hydro.setAttribute('y', hy);
-        hydro.setAttribute('text-anchor', 'middle');
-        hydro.setAttribute('alignment-baseline', 'central');
-        hydro.appendChild(document.createTextNode('H'));
-        if (classes) hydro.setAttribute('class', classes);
-
-        var number = this.createElement('text');
-        number.setAttribute('x', hx + bb.width / 1.25);
-        number.setAttribute('y', hy + bb.height / 3);
-        number.setAttribute('text-anchor', 'middle');
-        number.setAttribute('alignment-baseline', 'central');
-        number.appendChild(document.createTextNode(hydrogen));
-        number.setAttribute('class', classes + ' number');
-
-        this.root.appendChild(hydro);
-        this.root.appendChild(number);
-    }
-
-    if (background) {
-        var bb = text.getBBox();
-        var radius = (bb.width > bb.height) ? bb.width : bb.height;
-        this.root.insertBefore(this.circle(radius / 2.0, x, y, 'background'), text);
-    }
-
     this.ctx.restore();
 }
 
 SmilesDrawer.prototype.drawPoint = function (v, text) {
-    var dot = this.circle(2, v.x, v.y, 'helper');
-    this.root.appendChild(dot);
+    this.circle(2, v.x, v.y, 'helper', true);
 
     if (text) {
         this.text(v.x + 7, v.y + 7, text, 'id');
@@ -1537,10 +1325,10 @@ SmilesDrawer.prototype.drawEdges = function (label) {
                 line.shorten(this.settings.bondLength - this.settings.shortBondLength);
 
                 // The shortened edge
-                this.root.appendChild(this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB, 'edge double-bond'));
+                this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB);
 
                 // The normal edge
-                this.root.appendChild(this.line(a.x, a.y, b.x, b.y, elementA, elementB, 'edge double-bond'));
+                this.line(a.x, a.y, b.x, b.y, elementA, elementB);
             } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
                 // Both lines are the same length here
                 // Add the spacing to the edges (which are of unit length)
@@ -1551,8 +1339,8 @@ SmilesDrawer.prototype.drawEdges = function (label) {
                 var line1 = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
                 var line2 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
 
-                this.root.appendChild(this.line(line1.a.x, line1.a.y, line1.b.x, line1.b.y, elementA, elementB, 'edge double-bond'));
-                this.root.appendChild(this.line(line2.a.x, line2.a.y, line2.b.x, line2.b.y, elementA, elementB, 'edge double-bond'));
+                this.line(line1.a.x, line1.a.y, line1.b.x, line1.b.y, elementA, elementB);
+                this.line(line2.a.x, line2.a.y, line2.b.x, line2.b.y, elementA, elementB);
             } else if (s.sideCount[0] > s.sideCount[1]) {
                 ArrayHelper.each(normals, function (v) {
                     v.multiply(that.settings.bondSpacing)
@@ -1560,8 +1348,8 @@ SmilesDrawer.prototype.drawEdges = function (label) {
 
                 var line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
                 line.shorten(this.settings.bondLength - this.settings.shortBondLength);
-                this.root.appendChild(this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB, 'edge double-bond'));
-                this.root.appendChild(this.line(a.x, a.y, b.x, b.y, elementA, elementB, 'edge double-bond' + gradient));
+                this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB);
+                this.line(a.x, a.y, b.x, b.y, elementA, elementB);
             } else if (s.sideCount[0] < s.sideCount[1]) {
                 ArrayHelper.each(normals, function (v) {
                     v.multiply(that.settings.bondSpacing)
@@ -1569,8 +1357,8 @@ SmilesDrawer.prototype.drawEdges = function (label) {
 
                 var line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
                 line.shorten(this.settings.bondLength - this.settings.shortBondLength);
-                this.root.appendChild(this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB, 'edge double-bond'));
-                this.root.appendChild(this.line(a.x, a.y, b.x, b.y, elementA, elementB, 'edge double-bond'));
+                this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB);
+                this.line(a.x, a.y, b.x, b.y, elementA, elementB);
             } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
                 ArrayHelper.each(normals, function (v) {
                     v.multiply(that.settings.bondSpacing)
@@ -1578,8 +1366,8 @@ SmilesDrawer.prototype.drawEdges = function (label) {
 
                 var line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
                 line.shorten(this.settings.bondLength - this.settings.shortBondLength);
-                this.root.appendChild(this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB, 'edge double-bond'));
-                this.root.appendChild(this.line(a.x, a.y, b.x, b.y, elementA, elementB, 'edge double-bond'));
+                this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB);
+                this.line(a.x, a.y, b.x, b.y, elementA, elementB);
             } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
                 ArrayHelper.each(normals, function (v) {
                     v.multiply(that.settings.bondSpacing)
@@ -1587,13 +1375,29 @@ SmilesDrawer.prototype.drawEdges = function (label) {
 
                 var line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
                 line.shorten(this.settings.bondLength - this.settings.shortBondLength);
-                this.root.appendChild(this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB, 'edge double-bond'));
-                this.root.appendChild(this.line(a.x, a.y, b.x, b.y, elementA, elementB, 'edge double-bond'));
+                this.line(line.a.x, line.a.y, line.b.x, line.b.y, elementA, elementB);
+                this.line(a.x, a.y, b.x, b.y, elementA, elementB);
             } else {
 
             }
+        } 
+        else if(edge.bond === '#') {
+            ArrayHelper.each(normals, function (v) {
+                v.multiply(that.settings.bondSpacing / 1.5)
+            });
+
+            var lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
+            var lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
+
+            lineA.shorten(this.settings.bondLength - this.settings.shortBondLength);
+            lineB.shorten(this.settings.bondLength - this.settings.shortBondLength);
+
+            this.line(lineA.a.x, lineA.a.y, lineA.b.x, lineA.b.y, elementA, elementB);
+            this.line(lineB.a.x, lineB.a.y, lineB.b.x, lineB.b.y, elementA, elementB);
+
+            this.line(a.x, a.y, b.x, b.y, elementA, elementB);
         } else {
-            this.root.appendChild(this.line(a.x, a.y, b.x, b.y, elementA, elementB, 'edge'));
+            this.line(a.x, a.y, b.x, b.y, elementA, elementB);
         }
 
         if (label) {
@@ -1619,9 +1423,6 @@ SmilesDrawer.prototype.drawVertices = function (label) {
         var bondCount = this.getBondCount(vertex);
 
         var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
-        vertex.svg = this.circle(1, vertex.position.x, vertex.position.y, 'vertex');
-
-        this.root.appendChild(vertex.svg);
 
         if (label) {
             var value = vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
@@ -1650,8 +1451,14 @@ SmilesDrawer.prototype.drawVertices = function (label) {
     for (var i = 0; i < this.rings.length; i++) {
         var ring = this.rings[i];
         if (ring.isBenzene(this.vertices)) {
-            var dot = this.circle(ring.radius - 10, ring.center.x, ring.center.y, 'benzene');
-            this.root.appendChild(dot);
+            this.ctx.save();
+            this.ctx.strokeStyle = this.colors['C'];
+            this.ctx.lineWidth = 1.5;
+            this.ctx.beginPath();
+            this.ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, ring.radius - 10, 0, Math.PI * 2, true); 
+            this.ctx.closePath();
+            this.ctx.stroke();
+            this.ctx.restore();
         }
     }
 }
@@ -1883,7 +1690,7 @@ SmilesDrawer.prototype.resolvePrimaryOverlaps = function () {
 
     for (var i = 0; i < overlaps.length; i++) {
         var overlap = overlaps[i];
-
+        
         if (overlap.vertices.length == 1) {
             var a = overlap.vertices[0];
             if (a.getNeighbours().length == 1) {
@@ -1939,15 +1746,17 @@ SmilesDrawer.prototype.resolveSecondaryOverlaps = function (scores) {
                     vertex.position.rotateTo(a.center, flipCenter);
                     a.flipped();
                     if (vertex.flipNeighbour !== null) {
-                        var flipNeighbour = this.vertices[vertex.flipNeighbour];
-                        flipNeighbour.position.rotate(flipNeighbour.backAngle);
+                        // It's better to not straighten the other one, since it will possibly overlap
+                        // var flipNeighbour = this.vertices[vertex.flipNeighbour];
+                        // flipNeighbour.position.rotate(flipNeighbour.backAngle);
                     }
                 } else if (b && b.allowsFlip()) {
                     vertex.position.rotateTo(b.center, flipCenter);
                     b.flipped();
                     if (vertex.flipNeighbour !== null) {
-                        var flipNeighbour = this.vertices[vertex.flipNeighbour];
-                        flipNeighbour.position.rotate(flipNeighbour.backAngle);
+                        // It's better to not straighten the other one, since it will possibly overlap
+                        // var flipNeighbour = this.vertices[vertex.flipNeighbour];
+                        // flipNeighbour.position.rotate(flipNeighbour.backAngle);
                     }
                 }
 
@@ -2081,10 +1890,17 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
         if (neighbours.length == 1) {
             var nextVertex = this.vertices[neighbours[0]];
 
-            // Make a single chain always cis
-            if (!dir) dir = this.settings.defaultDir;
-            nextVertex.angle = MathHelper.Geom.toRad(60) * dir;
-            this.createBonds(nextVertex, vertex, angle + nextVertex.angle, -dir);
+            // Make a single chain always cis except when there's a tribble bond
+            if(vertex.value.bond === '#' || (previous && previous.value.bond === '#')) {
+                nextVertex.angle = angle;
+                this.createBonds(nextVertex, vertex, nextVertex.angle, -dir);
+            }
+            else {
+                var plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+                if (!dir) dir = plusOrMinus;
+                nextVertex.angle = MathHelper.Geom.toRad(60) * dir;
+                this.createBonds(nextVertex, vertex, angle + nextVertex.angle, -dir);
+            }
         } else if (neighbours.length == 2) {
             // Check for the longer subtree - always go with cis for the longer subtree
             var subTreeDepthA = this.getTreeDepth(vertex.id, neighbours[0]);
@@ -2118,11 +1934,29 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
                 this.createBonds(transVertex, vertex, angle + transVertex.angle);
             }
         } else if (neighbours.length == 3) {
-            // The next element in the chain has to go straight, the branches to the left and the right
-            // The next element in the chain is always added after the branches
-            this.createBonds(this.vertices[neighbours[0]], vertex, angle);
-            this.createBonds(this.vertices[neighbours[1]], vertex, angle + MathHelper.Geom.toRad(90));
-            this.createBonds(this.vertices[neighbours[2]], vertex, angle - MathHelper.Geom.toRad(90));
+            // The vertex with the longest sub-tree should always go straight
+            var d1 = this.getTreeDepth(vertex.id, neighbours[0]);
+            var d2 = this.getTreeDepth(vertex.id, neighbours[1]);
+            var d3 = this.getTreeDepth(vertex.id, neighbours[2]);
+            
+            var s = this.vertices[neighbours[0]];
+            var l = this.vertices[neighbours[1]];
+            var r = this.vertices[neighbours[2]];
+
+            if(d2 > d1 && d2 > d3) {
+                s = this.vertices[neighbours[1]];
+                l = this.vertices[neighbours[0]];
+                r = this.vertices[neighbours[2]];
+            }
+            else if(d3 > d1 && d3 > d2) {
+                s = this.vertices[neighbours[2]];
+                l = this.vertices[neighbours[0]];
+                r = this.vertices[neighbours[1]];
+            }
+            
+            this.createBonds(s, vertex, angle);
+            this.createBonds(l, vertex, angle + MathHelper.Geom.toRad(90));
+            this.createBonds(r, vertex, angle - MathHelper.Geom.toRad(90));
         }
     }
 }
