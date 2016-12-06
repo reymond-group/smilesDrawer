@@ -92,7 +92,7 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
         }
 
         // Add padding
-        var padding = 10.0;
+        var padding = 20.0;
         max.x += padding;
         max.y += padding;
         min.x -= padding;
@@ -1100,10 +1100,34 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
     this.ctx.fillText(element, x - dim.width / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
 
 
+    if (hydrogen === 1) {
+        var hx = x - dim.width / 2.0 + this.offsetX,
+            hy = y - dim.height / 2.0 + this.offsetY;
+        if (position === 'left') hx -= dim.width;
+        if (position === 'right') hx += dim.width;
+        if (position === 'up' && terminal) hx += dim.width;
+        if (position === 'down' && terminal) hx += dim.width;
+        if (position === 'up' && !terminal) hy -= dim.height - dim.height / 4;
+        if (position === 'down' && !terminal) hy += dim.height - dim.height / 4;
 
+        this.ctx.fillText('H', hx, hy);
+    } else if (hydrogen > 1) {
+        var hx = x - dim.width / 2.0 + this.offsetX,
+            hy = y - dim.height / 2.0 + this.offsetY;
 
+        if (position === 'left') hx -= dim.width + dim.width / 1.75;
+        if (position === 'right') hx += dim.width;
+        if (position === 'up' && terminal) hx += dim.width;
+        if (position === 'down' && terminal) hx += dim.width;
+        if (position === 'up' && !terminal) hy -= bdimb.height;
+        if (position === 'down' && !terminal) hy += dim.height;
 
+        this.ctx.fillText('H', hx, hy)
 
+        var font = '6px Arial';
+        this.ctx.font = font;
+        this.ctx.fillText(hydrogen, hx + dim.width / 0.9, hy + dim.height / 1.5);
+    }
 
 
     var text = this.createElement('text');
