@@ -49,11 +49,9 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
 
     this.discoverRings();
 
-    /*
     console.log(this.rings);
     console.log(this.ringConnections);
     console.log(this.vertices);
-    */
 
     if (!infoOnly) {
 
@@ -178,10 +176,12 @@ SmilesDrawer.prototype.printRingInfo = function (id) {
 
 SmilesDrawer.prototype.createVertices = function (node, parentId, branch) {
     // Create a new vertex object
+    console.log(node);
     var atom = new Atom(node.atom.element ? node.atom.element : node.atom);
     atom.bond = node.bond;
     atom.branchBond = node.branchBond;
     atom.ringbonds = node.ringbonds;
+    atom.bracket = node.atom.element ? node.atom : null;
 
 
     var vertex = new Vertex(atom);
@@ -341,15 +341,15 @@ SmilesDrawer.prototype.discoverRings = function () {
         ring.neighbours = RingConnection.getNeighbours(this.ringConnections, ring.id);
     }
 
-    // Replace rings contained by a larger bridged ring by a bridged ring
+    // Replace rings contained by a larger bridged ring with a bridged ring
     while (this.rings.length > 0) {
         // Gets stuck with this: C1C2CC3CCCC4C1C2C34 and C1C2C3CC123
-        // somethings wrong with isPartOfBirdgedRing
+        // somethings wrong with isPartOfBridgedRing
         var id = -1;
         for (var i = 0; i < this.rings.length; i++) {
             var ring = this.rings[i];
 
-            if (this.isPartOfBirdgedRing(ring.id)) {
+            if (this.isPartOfBridgedRing(ring.id)) {
                 id = ring.id;
             }
         }
@@ -393,7 +393,7 @@ SmilesDrawer.prototype.getBridgedRingRings = function (id) {
     return ArrayHelper.unique(involvedRings);
 }
 
-SmilesDrawer.prototype.isPartOfBirdgedRing = function (ring) {
+SmilesDrawer.prototype.isPartOfBridgedRing = function (ring) {
     for (var i = 0; i < this.ringConnections.length; i++) {
         if (this.ringConnections[i].rings.contains(ring) &&
             this.ringConnections[i].isBridge()) {
@@ -514,6 +514,7 @@ SmilesDrawer.prototype.createBridgedRing = function (rings, start) {
             this.getRingConnection(connections[j]).updateOther(ring.id, neighbours[i]);
         }
     }
+    
     return ring;
 }
 
@@ -887,7 +888,12 @@ SmilesDrawer.prototype.getOverlapScore = function () {
     };
 }
 
-SmilesDrawer.prototype.circle = function (radius, x, y, classes, fill) {
+SmilesDrawer.prototype.getColor = function(key) {
+    if(key in this.colors) return this.colors[key];
+    return this.colors['C'];
+}
+
+SmilesDrawer.prototype.circle = function (radius, x, y, classes, fill, debug) {
     // Return empty line element for debugging, remove this check later, values should not be NaN
     if (isNaN(x) || isNaN(y))
         return;
@@ -897,15 +903,29 @@ SmilesDrawer.prototype.circle = function (radius, x, y, classes, fill) {
     this.ctx.beginPath();
     this.ctx.arc(x + this.offsetX, y + this.offsetY, radius, 0, Math.PI * 2, true); 
     this.ctx.closePath();
-    
-    if(fill) {
-        this.ctx.fillStyle = this.colors['C'];
-        this.ctx.fill();
+
+    if(debug) {
+        if(fill) {
+            this.ctx.fillStyle = '#ff0000';
+            this.ctx.fill();
+        }
+        else {
+            this.ctx.strokeStyle = '#ff0000';
+            this.ctx.stroke();
+        }
     }
     else {
-        this.ctx.strokeStyle = this.colors['C'];
-        this.ctx.stroke();
+        if(fill) {
+        this.ctx.fillStyle = this.colors['C'];
+        this.ctx.fill();
+        }
+        else {
+            this.ctx.strokeStyle = this.colors['C'];
+            this.ctx.stroke();
+        }
     }
+    
+    
     this.ctx.restore();
 }
 
@@ -938,6 +958,17 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
     this.ctx.restore();
 }
 
+SmilesDrawer.prototype.debugText = function(x, y, text) {
+    this.ctx.save();
+    var font = '5px Arial';
+    this.ctx.font = font;
+    this.ctx.textAlign = 'start';
+    this.ctx.textBaseline = 'top';
+    this.ctx.fillStyle = '#ff0000';
+    this.ctx.fillText(text, x + this.offsetX, y + this.offsetY);
+    this.ctx.restore();
+}
+
 SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydrogen, position, terminal) {
     // Return empty line element for debugging, remove this check later, values should not be NaN
     if (isNaN(x) || isNaN(y))
@@ -958,7 +989,7 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
     this.ctx.closePath();
     this.ctx.fill();
     
-    this.ctx.fillStyle = this.colors[element.toUpperCase() || 'C'];
+    this.ctx.fillStyle = this.getColor(element.toUpperCase());
     this.ctx.fillText(element, x - dim.width / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
 
 
@@ -995,10 +1026,10 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
 }
 
 SmilesDrawer.prototype.drawPoint = function (v, text) {
-    this.circle(2, v.x, v.y, 'helper', true);
+    this.circle(2, v.x, v.y, 'helper', true, true);
 
     if (text) {
-        this.text(v.x + 7, v.y + 7, text, 'id');
+        this.debugText(v.x, v.y, text, 'id', true);
     }
 }
 
@@ -1273,7 +1304,10 @@ SmilesDrawer.prototype.forceLayout = function (vertices, center, start) {
         var vertex = this.vertices[vertices[u]];
         var neighbours = vertex.getNeighbours();
         for (var i = 0; i < neighbours.length; i++) {
-            this.createBonds(this.vertices[neighbours[i]], vertex, MathHelper.Geom.toRad(60));
+            if(vertex.value.isBridge)
+                this.createBonds(this.vertices[neighbours[i]], vertex, MathHelper.Geom.toRad(60));
+            else
+                this.createBonds(this.vertices[neighbours[i]], vertex, center);
         }
     }
 }
@@ -1402,7 +1436,7 @@ SmilesDrawer.prototype.drawEdges = function (label) {
 
         if (label) {
             var midpoint = Vector2.midpoint(a, b);
-            this.text(midpoint.x, midpoint.y, i, 'id');
+            this.debugText(midpoint.x, midpoint.y, 'id: ' + i);
         }
     }
 }
@@ -1426,7 +1460,7 @@ SmilesDrawer.prototype.drawVertices = function (label) {
 
         if (label) {
             var value = vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
-            this.text(vertex.position.x + 7, vertex.position.y + 7, value, 'id');
+            this.debugText(vertex.position.x, vertex.position.y, 'id: ' + value);
         }
 
         if (atom.isTerminal && !label) {
@@ -1627,7 +1661,7 @@ SmilesDrawer.prototype.createRing = function (ring, center, start, previous) {
         for (var j = 0; j < ringMemberNeighbours.length; j++) {
             if (ring.thisOrNeighboursContain(this.rings, ringMemberNeighbours[j])) continue;
             var v = this.vertices[ringMemberNeighbours[j]];
-            this.createBonds(v, ringMember, ring);
+            this.createBonds(v, ringMember, ring.center);
         }
     }
 }
@@ -1805,7 +1839,7 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
         // If the previous atom is in a bridged ring and this one is inside the ring
         var targets = this.getTargets(vertex.id, previous.id, vertex.value.bridgedRing);
 
-        var pos = Vector2.subtract(ringOrAngle.center, previous.position);
+        var pos = Vector2.subtract(ringOrAngle, previous.position);
         pos.normalize();
 
         // Unlike with the ring, do not multiply with radius but with bond length
@@ -1827,10 +1861,10 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
         vertex.previousPosition = previous.position;
         vertex.positioned = true;
     } else if (previous.value.rings.length == 1) {
-        // Here, ringOrAngle is always a ring
+        // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
         // Use the same approach es with rings that are connected at one vertex
         // and draw the atom in the opposite direction of the center.
-        var pos = Vector2.subtract(ringOrAngle.center, previous.position);
+        var pos = Vector2.subtract(ringOrAngle, previous.position);
 
         pos.invert();
         pos.normalize();
@@ -1880,7 +1914,7 @@ SmilesDrawer.prototype.createBonds = function (vertex, previous, ringOrAngle, di
 
         this.createRing(nextRing, nextCenter, vertex);
     } else {
-        // Draw the non-ring vertices connected to this one
+        // Draw the non-ring vertices connected to this one        
         var neighbours = vertex.getNeighbours();
         if (previous) neighbours = ArrayHelper.remove(neighbours, previous.id);
 
@@ -2356,6 +2390,7 @@ function Atom(element, bond) {
     this.isBridgeNode = false;
     this.bridgedRing = null;
     this.anchoredRings = new Array();
+    this.bracket = null;
 }
 
 Atom.prototype.addAnchoredRing = function (ring) {
