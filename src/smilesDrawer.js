@@ -49,9 +49,11 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
 
     this.discoverRings();
 
+    /*
     console.log(this.rings);
     console.log(this.ringConnections);
     console.log(this.vertices);
+    */
 
     if (!infoOnly) {
 
@@ -975,13 +977,15 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
         return;
     
     this.ctx.save();
-    var font = '10px Arial';
-    this.ctx.font = font;
+    var fontLarge = '10px Arial';
+    var fontSmall = '6px Arial';
+
+    this.ctx.font = fontLarge;
     this.ctx.textAlign = 'start';
     this.ctx.textBaseline = 'top';
     this.ctx.fillStyle = '#141414';
     var dim = this.ctx.measureText(element);
-    dim.height = parseInt(font, 10);
+    dim.height = parseInt(fontLarge, 10);
     var r = (dim.width > dim.height) ? dim.width : dim.height;
     r /= 2.0;
     this.ctx.beginPath();
@@ -992,34 +996,41 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
     this.ctx.fillStyle = this.getColor(element.toUpperCase());
     this.ctx.fillText(element, x - dim.width / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
 
+    var hDim = this.ctx.measureText('H');
+    hDim.height = parseInt(fontLarge, 10);
+
 
     if (hydrogen === 1) {
         var hx = x - dim.width / 2.0 + this.offsetX,
             hy = y - dim.height / 2.0 + this.offsetY;
         if (position === 'left') hx -= dim.width;
         if (position === 'right') hx += dim.width;
-        if (position === 'up' && terminal) hx += dim.width + 1.0;
-        if (position === 'down' && terminal) hx += dim.width + 1.0;
-        if (position === 'up' && !terminal) hy -= dim.height - dim.height / 4  + 1.0;
-        if (position === 'down' && !terminal) hy += dim.height - dim.height / 4  + 1.0;
+        if (position === 'up' && terminal) hx += dim.width;
+        if (position === 'down' && terminal) hx += dim.width;
+        if (position === 'up' && !terminal) hy -= dim.height;
+        if (position === 'down' && !terminal) hy += dim.height;
 
         this.ctx.fillText('H', hx, hy);
     } else if (hydrogen > 1) {
         var hx = x - dim.width / 2.0 + this.offsetX,
             hy = y - dim.height / 2.0 + this.offsetY;
 
-        if (position === 'left') hx -= dim.width + dim.width / 1.75;
-        if (position === 'right') hx += dim.width;
-        if (position === 'up' && terminal) hx += dim.width + 1.0;
-        if (position === 'down' && terminal) hx += dim.width + 1.0;
-        if (position === 'up' && !terminal) hy -= bdimb.height + 1.0;
-        if (position === 'down' && !terminal) hy += dim.height + 1.0;
+        this.ctx.font = fontSmall;
+        var cDim = this.ctx.measureText(hydrogen);
+        cDim.height = parseInt(fontSmall, 10);
 
+        if (position === 'left') hx -= hDim.width + cDim.width;
+        if (position === 'right') hx += dim.width;
+        if (position === 'up' && terminal) hx += dim.width;
+        if (position === 'down' && terminal) hx += dim.width;
+        if (position === 'up' && !terminal) hy -= dim.height;
+        if (position === 'down' && !terminal) hy += dim.height;
+
+        this.ctx.font = fontLarge;
         this.ctx.fillText('H', hx, hy)
 
-        var font = '6px Arial';
-        this.ctx.font = font;
-        this.ctx.fillText(hydrogen, hx + dim.width / 0.9, hy + dim.height / 1.5);
+        this.ctx.font = fontSmall;
+        this.ctx.fillText(hydrogen, hx + hDim.width, hy + hDim.height / 2.0);
     }
 
     this.ctx.restore();
@@ -1463,12 +1474,16 @@ SmilesDrawer.prototype.drawVertices = function (label) {
             this.debugText(vertex.position.x, vertex.position.y, 'id: ' + value);
         }
 
+        var hydrogens = SmilesDrawer.maxBonds[element] - bondCount;
+
+        if(atom.bracket) hydrogens = atom.bracket.hcount;
+
         if (atom.isTerminal && !label) {
             var dir = vertex.getTextDirection(this.vertices);
-            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, SmilesDrawer.maxBonds[element] - bondCount, dir, true);
+            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, true);
         } else if (atom.element.toLowerCase() !== 'c' && !label) {
             var dir = vertex.getTextDirection(this.vertices);
-            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, SmilesDrawer.maxBonds[element] - bondCount, dir, false);
+            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, false);
         } else if (atom.element.toLowerCase() != 'c' && !label) {
             this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true);
         }
