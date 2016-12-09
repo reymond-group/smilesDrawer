@@ -22,7 +22,8 @@ function SmilesDrawer() {
         P: '#d35400',
         S: '#f1c40f',
         B: '#e67e22',
-        SI: '#e67e22'
+        SI: '#e67e22',
+        BACKGROUND: '#141414'
     }
 }
 
@@ -178,7 +179,7 @@ SmilesDrawer.prototype.printRingInfo = function (id) {
 
 SmilesDrawer.prototype.createVertices = function (node, parentId, branch) {
     // Create a new vertex object
-    console.log(node);
+    // console.log(node);
     var atom = new Atom(node.atom.element ? node.atom.element : node.atom);
     atom.bond = node.bond;
     atom.branchBond = node.branchBond;
@@ -936,9 +937,34 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
         return;
 
     var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
+    // Add a shadow behind the line
+    var shortLine = line.clone().shorten(6.0);
 
-    var l = line.getLeftVector().clone();
-    var r = line.getRightVector().clone();
+    var l = shortLine.getLeftVector().clone();
+    var r = shortLine.getRightVector().clone();
+
+    l.x += this.offsetX;
+    l.y += this.offsetY;
+
+    r.x += this.offsetX;
+    r.y += this.offsetY;
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(l.x, l.y);
+    this.ctx.lineTo(r.x, r.y);
+    this.ctx.lineCap = 'round';
+    this.ctx.lineWidth = 1.5;
+    this.ctx.shadowColor = this.colors['BACKGROUND'];
+    this.ctx.shadowBlur = 6.0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
+    this.ctx.strokeStyle = this.colors['BACKGROUND'];
+    this.ctx.stroke();
+    this.ctx.restore();
+
+    l = line.getLeftVector().clone();
+    r = line.getRightVector().clone();
 
     l.x += this.offsetX;
     l.y += this.offsetY;
@@ -971,7 +997,7 @@ SmilesDrawer.prototype.debugText = function(x, y, text) {
     this.ctx.restore();
 }
 
-SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydrogen, position, terminal) {
+SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydrogen, position, terminal, charge) {
     // Return empty line element for debugging, remove this check later, values should not be NaN
     if (isNaN(x) || isNaN(y))
         return;
@@ -980,39 +1006,63 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
     var fontLarge = '10px Arial';
     var fontSmall = '6px Arial';
 
-    this.ctx.font = fontLarge;
     this.ctx.textAlign = 'start';
     this.ctx.textBaseline = 'top';
-    this.ctx.fillStyle = '#141414';
+
+    // Charge
+    var chargeWidth = 0;
+    if(charge) {
+        var chargeText = '+';
+        if(charge === 2) chargeText = '2+';
+        if(charge === -1) chargeText = '-';
+        if(charge === -2) chargeText = '2-';
+
+        this.ctx.font = fontSmall;
+        chargeWidth = this.ctx.measureText(chargeText).width;
+    }
+
+    this.ctx.font = fontLarge;
+    
+    this.ctx.fillStyle = this.colors['BACKGROUND'];
     var dim = this.ctx.measureText(element);
+    dim.totalWidth = dim.width + chargeWidth;
     dim.height = parseInt(fontLarge, 10);
-    var r = (dim.width > dim.height) ? dim.width : dim.height;
+    var r = (dim.totalWidth > dim.height) ? dim.totalWidth : dim.height;
     r /= 2.0;
+    
     this.ctx.beginPath();
-    this.ctx.arc(x + this.offsetX, y + this.offsetY, r + 1, 0, Math.PI*2, true); 
+    this.ctx.arc(x + this.offsetX, y + this.offsetY + dim.height / 20.0, r + 1.0, 0, Math.PI*2, true); 
     this.ctx.closePath();
     this.ctx.fill();
     
     this.ctx.fillStyle = this.getColor(element.toUpperCase());
-    this.ctx.fillText(element, x - dim.width / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
+    this.ctx.fillText(element, x - dim.totalWidth / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
 
+    if(charge) {
+        this.ctx.font = fontSmall;
+        this.ctx.fillText(chargeText, x - dim.totalWidth / 2.0 + dim.width + this.offsetX, y - dim.height / 2.0 + this.offsetY);
+    }
+
+
+    this.ctx.font = fontLarge;
+    
     var hDim = this.ctx.measureText('H');
     hDim.height = parseInt(fontLarge, 10);
 
 
     if (hydrogen === 1) {
-        var hx = x - dim.width / 2.0 + this.offsetX,
+        var hx = x - dim.totalWidth / 2.0 + this.offsetX,
             hy = y - dim.height / 2.0 + this.offsetY;
-        if (position === 'left') hx -= dim.width;
-        if (position === 'right') hx += dim.width;
-        if (position === 'up' && terminal) hx += dim.width;
-        if (position === 'down' && terminal) hx += dim.width;
+        if (position === 'left') hx -= dim.totalWidth;
+        if (position === 'right') hx += dim.totalWidth;
+        if (position === 'up' && terminal) hx += dim.totalWidth;
+        if (position === 'down' && terminal) hx += dim.totalWidth;
         if (position === 'up' && !terminal) hy -= dim.height;
         if (position === 'down' && !terminal) hy += dim.height;
 
         this.ctx.fillText('H', hx, hy);
     } else if (hydrogen > 1) {
-        var hx = x - dim.width / 2.0 + this.offsetX,
+        var hx = x - dim.totalWidth / 2.0 + this.offsetX,
             hy = y - dim.height / 2.0 + this.offsetY;
 
         this.ctx.font = fontSmall;
@@ -1020,9 +1070,9 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
         cDim.height = parseInt(fontSmall, 10);
 
         if (position === 'left') hx -= hDim.width + cDim.width;
-        if (position === 'right') hx += dim.width;
-        if (position === 'up' && terminal) hx += dim.width;
-        if (position === 'down' && terminal) hx += dim.width;
+        if (position === 'right') hx += dim.totalWidth;
+        if (position === 'up' && terminal) hx += dim.totalWidth;
+        if (position === 'down' && terminal) hx += dim.totalWidth;
         if (position === 'up' && !terminal) hy -= dim.height;
         if (position === 'down' && !terminal) hy += dim.height;
 
@@ -1475,17 +1525,17 @@ SmilesDrawer.prototype.drawVertices = function (label) {
         }
 
         var hydrogens = SmilesDrawer.maxBonds[element] - bondCount;
-
         if(atom.bracket) hydrogens = atom.bracket.hcount;
+
+        var charge = 0;
+        if(atom.bracket) charge = atom.bracket.charge;
 
         if (atom.isTerminal && !label) {
             var dir = vertex.getTextDirection(this.vertices);
-            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, true);
+            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, true, charge);
         } else if (atom.element.toLowerCase() !== 'c' && !label) {
             var dir = vertex.getTextDirection(this.vertices);
-            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, false);
-        } else if (atom.element.toLowerCase() != 'c' && !label) {
-            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true);
+            this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, false, charge);
         }
     }
 
@@ -2905,6 +2955,10 @@ function Line(a, b, elementA, elementB) {
     this.elementB = elementB;
 }
 
+Line.prototype.clone = function() {
+    return new Line(this.a.clone(), this.b.clone(), this.elementA, this.elementB);
+}
+
 Line.prototype.getLength = function () {
     return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
 }
@@ -2964,6 +3018,8 @@ Line.prototype.rotate = function (theta) {
     var x = Math.cos(theta) * (r.x - l.x) - Math.sin(theta) * (r.y - l.y) + l.x;
     var y = Math.sin(theta) * (r.x - l.x) - Math.cos(theta) * (r.y - l.y) + l.y;
     this.setRightVector(x, y);
+
+    return this;
 }
 
 Line.prototype.shortenA = function (by) {
@@ -2971,6 +3027,8 @@ Line.prototype.shortenA = function (by) {
     f.normalize();
     f.multiply(by);
     this.a.add(f);
+
+    return this;
 }
 
 Line.prototype.shortenB = function (by) {
@@ -2978,6 +3036,8 @@ Line.prototype.shortenB = function (by) {
     f.normalize();
     f.multiply(by);
     this.b.add(f);
+
+    return this;
 }
 
 Line.prototype.shorten = function (by) {
@@ -2986,6 +3046,8 @@ Line.prototype.shorten = function (by) {
     f.multiply(by / 2.0);
     this.b.add(f);
     this.a.subtract(f);
+
+    return this;
 }
 
 function ArrayHelper() {
