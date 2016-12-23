@@ -115,6 +115,14 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
         this.offsetX = -min.x;
         this.offsetY = -min.y;
 
+        // Center
+        if (scaleX < scaleY) {
+            this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+        }
+        else {
+            this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+        }
+
         // Do the actual drawing
         this.drawEdges();
         this.drawVertices(this.settings.debug);
