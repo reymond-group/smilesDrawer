@@ -946,6 +946,7 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
 
     var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
     // Add a shadow behind the line
+    /*
     var shortLine = line.clone().shorten(6.0);
 
     var l = shortLine.getLeftVector().clone();
@@ -970,6 +971,7 @@ SmilesDrawer.prototype.line = function (x1, y1, x2, y2, elementA, elementB, clas
     this.ctx.strokeStyle = this.colors['BACKGROUND'];
     this.ctx.stroke();
     this.ctx.restore();
+    */
 
     l = line.getLeftVector().clone();
     r = line.getRightVector().clone();
@@ -1038,10 +1040,12 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
     var r = (dim.totalWidth > dim.height) ? dim.totalWidth : dim.height;
     r /= 2.0;
     
+    this.ctx.globalCompositeOperation = 'destination-out';
     this.ctx.beginPath();
-    this.ctx.arc(x + this.offsetX, y + this.offsetY + dim.height / 20.0, r + 1.0, 0, Math.PI*2, true); 
+    this.ctx.arc(x + this.offsetX, y + this.offsetY + dim.height / 20.0, r + 1.0, 0, Math.PI * 2, true); 
     this.ctx.closePath();
     this.ctx.fill();
+    this.ctx.globalCompositeOperation = 'source-over';
     
     this.ctx.fillStyle = this.getColor(element.toUpperCase());
     this.ctx.fillText(element, x - dim.totalWidth / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
@@ -1051,12 +1055,10 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
         this.ctx.fillText(chargeText, x - dim.totalWidth / 2.0 + dim.width + this.offsetX, y - dim.height / 2.0 + this.offsetY);
     }
 
-
     this.ctx.font = fontLarge;
     
     var hDim = this.ctx.measureText('H');
     hDim.height = parseInt(fontLarge, 10);
-
 
     if (hydrogen === 1) {
         var hx = x - dim.totalWidth / 2.0 + this.offsetX,
