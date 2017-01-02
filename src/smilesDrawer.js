@@ -25,9 +25,24 @@ function SmilesDrawer() {
         SI: '#e67e22',
         BACKGROUND: '#141414'
     }
+
+    this.colorsLight = {
+        C: '#222',
+        O: '#e74c3c',
+        N: '#3498db',
+        F: '#27ae60',
+        CL: '#16a085',
+        BR: '#d35400',
+        I: '#8e44ad',
+        P: '#d35400',
+        S: '#f1c40f',
+        B: '#e67e22',
+        SI: '#e67e22',
+        BACKGROUND: '#fff'
+    }
 }
 
-SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
+SmilesDrawer.prototype.draw = function (data, targetId, infoOnly, lightTheme) {
     this.data = data;
     this.canvas = document.getElementById(targetId);
     this.ctx = this.canvas.getContext('2d');
@@ -42,6 +57,8 @@ SmilesDrawer.prototype.draw = function (data, targetId, infoOnly) {
 
     this.backupVertices = [];
     this.backupRings = [];
+
+    if(lightTheme) this.colors = this.colorsLight;
 
     // Clear the canvas
     this.ctx.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight)
