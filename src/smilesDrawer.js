@@ -1064,6 +1064,9 @@ SmilesDrawer.prototype.text = function (x, y, element, classes, background, hydr
     this.ctx.fill();
     this.ctx.globalCompositeOperation = 'source-over';
     
+    // Correct vertical text position
+    y -= 2;
+
     this.ctx.fillStyle = this.getColor(element.toUpperCase());
     this.ctx.fillText(element, x - dim.totalWidth / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
 
