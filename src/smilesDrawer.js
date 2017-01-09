@@ -1829,7 +1829,7 @@ SmilesDrawer.prototype.resolvePrimaryOverlaps = function () {
                 for (var j = 0; j < overlap.rings.length; j++) a.flipRings.push(overlap.rings[j]);
             }
         } else if (overlap.vertices.length == 2) {
-            var angle = (2 * Math.PI - this.rings[overlap.rings[0]].getAngle()) / 6.0;
+            var angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
             var a = overlap.vertices[0];
             var b = overlap.vertices[1];
             a.backAngle -= angle;
