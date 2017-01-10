@@ -371,9 +371,8 @@ SmilesDrawer.prototype.discoverRings = function () {
 
     // Replace rings contained by a larger bridged ring with a bridged ring
     while (this.rings.length > 0) {
-        // Gets stuck with this: C1C2CC3CCCC4C1C2C34 and C1C2C3CC123
-        // somethings wrong with isPartOfBridgedRing
         var id = -1;
+        console.log(this.rings.length);
         for (var i = 0; i < this.rings.length; i++) {
             var ring = this.rings[i];
 
@@ -384,7 +383,7 @@ SmilesDrawer.prototype.discoverRings = function () {
 
         if (id === -1) break;
 
-        var ring = this.rings[id];
+        var ring = this.getRing(id);
 
         var involvedRings = this.getBridgedRingRings(ring.id);
 
@@ -405,7 +404,7 @@ SmilesDrawer.prototype.getBridgedRingRings = function (id) {
     var that = this;
 
     var recurse = function (r) {
-        var ring = that.rings[r];
+        var ring = that.getRing(r);
         for (var i = 0; i < ring.neighbours.length; i++) {
             var n = ring.neighbours[i];
             if (involvedRings.indexOf(n) === -1 &&
@@ -1829,7 +1828,7 @@ SmilesDrawer.prototype.resolvePrimaryOverlaps = function () {
                 for (var j = 0; j < overlap.rings.length; j++) a.flipRings.push(overlap.rings[j]);
             }
         } else if (overlap.vertices.length == 2) {
-            var angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
+            var angle = (2 * Math.PI - this.rings[overlap.rings[0]].getAngle()) / 6.0;
             var a = overlap.vertices[0];
             var b = overlap.vertices[1];
             a.backAngle -= angle;
