@@ -154,7 +154,7 @@ SmilesDrawer.prototype.settings = {
     bondLength: 25, // 30,
     bondSpacing: 4,
     defaultDir: -1,
-    debug: true
+    debug: false
 };
 
 SmilesDrawer.prototype.edgeRingCount = function(edgeId) {

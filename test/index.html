@@ -12,7 +12,7 @@
 <body>
     <input id="input" type="text" class="parser" style="width: 490px; padding: 5px; border: 1px solid black; margin-bottom: 5px; font-size: 1.2em;" />
     <br />
-    <canvas id="output-canvas" width="500" height="500" style="background-color:#555555"></canvas>
+    <canvas id="output-canvas" width="500" height="500"></canvas>
     <script>
         var input = document.getElementById('input');
         var smilesDrawer = new SmilesDrawer();
@@ -41,22 +41,21 @@
             var smilesDrawer = new SmilesDrawer();
             var input = document.getElementById('input');
             input.addEventListener('input', function() {
-                var data = smiles.parse(input.value);
-                smilesDrawer.draw(data, 'output-canvas', false);
-                /*
+                // var data = smiles.parse(input.value);
+                // smilesDrawer.draw(data, 'output-canvas', false);
+                
                 var total = 0.0;
 
                 for(var i = 0; i < 100; i++) {
                     var t = performance.now();
                     var data = smiles.parse(input.value);
-                    smilesDrawer.draw(data, 'output-canvas', false);
+                    smilesDrawer.draw(data, 'output-canvas', false, true);
                     total += performance.now() - t;
                 }
                 
                 console.log(total / 100);
 
-                console.log(smilesDrawer.printRingInfo(input.value));
-                */
+                // console.log(smilesDrawer.printRingInfo(input.value));
             });
         });
     </script>
