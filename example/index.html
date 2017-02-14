@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SMILES Parser Demo</title>
+    <link rel="stylesheet" href="../src/smilesDrawer.css">
+    <script src="../dist/smiles-drawer.js"></script>
+</head>
+
+<body>
+    <input id="input" type="text" class="parser" style="width: 490px; padding: 5px; border: 1px solid black; margin-bottom: 5px; font-size: 1.2em;" />
+    <br />
+    <canvas id="output-canvas" width="500" height="500"></canvas>
+    <script>
+        var input = document.getElementById('input');
+        var smilesDrawer = new SmilesDrawer();
+        /*var out = '';
+        for(var i = 0; i < kris.length; i++) {
+            try {
+                var line = '';
+                if(kris[i].indexOf('.') > 0) continue;
+                console.log(kris[i]);
+                var t = performance.now();
+                var data = smiles.parse(kris[i]);
+                line += (performance.now() - t) + ';';
+                t = performance.now();
+                smilesDrawer.draw(data);
+                out += smilesDrawer.printRingInfo(kris[i]);
+
+            }
+            catch(e) {
+
+            }
+        }
+
+        console.log(out);*/
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            var smilesDrawer = new SmilesDrawer();
+            var input = document.getElementById('input');
+            input.addEventListener('input', function() {
+                // var data = smiles.parse(input.value);
+                // smilesDrawer.draw(data, 'output-canvas', false);
+                
+                var total = 0.0;
+
+                for(var i = 0; i < 100; i++) {
+                    var t = performance.now();
+                    var data = smiles.parse(input.value);
+                    smilesDrawer.draw(data, 'output-canvas', false, true);
+                    total += performance.now() - t;
+                }
+                
+                console.log(total / 100);
+
+                // console.log(smilesDrawer.printRingInfo(input.value));
+            });
+        });
+    </script>
+</body>
+
+</html>
