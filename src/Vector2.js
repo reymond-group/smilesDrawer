@@ -1,4 +1,11 @@
+/** A class representing a 2D vector. */
 class Vector2 {
+    /**
+     * The constructor of the class Vector2.
+     *
+     * @param {number} x The initial x coordinate value.
+     * @param {number} y The initial y coordinate value.
+     */
     constructor(x, y) {
         if (arguments.length == 0) {
             this.x = 0;
@@ -12,109 +19,132 @@ class Vector2 {
         }
     }
 
-    set(x, y) {
+    /**
+     * Sets the values of the x and y coordinates of this vector.
+     *
+     * @param {number} [x=0] The value of the x coordinate.
+     * @param {number} [y=0] The value of the y coordinate.
+     */
+    set(x = 0, y = 0) {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Clones this vector and returns the clone.
+     *
+     * @returns {Vector2} The clone of this vector.
+     */
     clone() {
         return new Vector2(this.x, this.y);
     }
 
+    /**
+     * Returns a string representation of this vector.
+     *
+     * @returns {string} A string representation of this vector.
+     */
     toString() {
         return '(' + this.x + ',' + this.y + ')';
     }
 
-    static add(v1, v2) {
-        return new Vector2(v1.x + v2.x, v1.y + v2.y);
+    /**
+     * Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
+     *
+     * @param {Vector2} vec Another vector.
+     */
+    add(vec) {
+        this.x += vec.x;
+        this.y += vec.y;
     }
 
-    add(v) {
-        this.x += v.x;
-        this.y += v.y;
+    /**
+     * Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
+     *
+     * @param {Vector2} vec Another vector.
+     */
+    subtract(vec) {
+        this.x -= vec.x;
+        this.y -= vec.y;
     }
 
-    static subtract(v1, v2) {
-        return new Vector2(v1.x - v2.x, v1.y - v2.y);
+    /**
+     * Divide the x and y coordinate values of this vector by a scalar.
+     *
+     * @param {number} scalar The scalar.
+     */
+    divide(scalar) {
+        this.x /= scalar;
+        this.y /= scalar;
+    }
+    
+    /**
+     * Multiply the x and y coordinate values of this vector by a scalar.
+     *
+     * @param {number} scalar The scalar.
+     */
+    multiply(scalar) {
+        this.x *= scalar;
+        this.y *= scalar;
     }
 
-    subtract(v) {
-        this.x -= v.x;
-        this.y -= v.y;
-    }
-
-    static multiply(v1, v2) {
-        if (v2.x && v2.y)
-            return new Vector2(v1.x * v2.x, v1.y * v2.y);
-        else
-            return new Vector2(v1.x * v2, v1.y * v2);
-    }
-
-    static midpoint(v1, v2) {
-        return new Vector2((v1.x + v2.x) / 2, (v1.y + v2.y) / 2);
-    }
-
-    static normals(v1, v2) {
-        var delta = Vector2.subtract(v2, v1);
-
-        return [
-            new Vector2(-delta.y, delta.x),
-            new Vector2(delta.y, -delta.x)
-        ];
-    }
-
-    multiply(s) {
-        this.x *= s;
-        this.y *= s;
-    }
-
-    static divide(v1, v2) {
-        if (v2.x && v2.y)
-            return new Vector2(v1.x / v2.x, v1.y / v2.y);
-        else
-            return new Vector2(v1.x / v2, v1.y / v2);
-    }
-
-    divide(s) {
-        this.x /= s;
-        this.y /= s;
-    }
-
+    /**
+     * Inverts this vector. Same as multiply(-1.0).
+     *
+     */
     invert() {
         this.x = -this.x;
         this.y = -this.y;
     }
 
-    static dot(v1, v2) {
-        return v1.x * v2.x + v1.y * v2.y;
-    }
-
-    static angle(v1, v2) {
-        var dot = Vector2.dot(v1, v2);
-        return Math.acos(dot / (v1.length() * v2.length()));
-    }
-
+    /**
+     * Returns the angle of this vector in relation to the coordinate system.
+     *
+     * @returns {number} The angle in radians.
+     */
     angle() {
-        // It's atan2(y, x);
         return Math.atan2(this.y, this.x);
     }
 
-    distance(v) {
-        return Math.sqrt((v.x - this.x) * (v.x - this.x) + (v.y - this.y) * (v.y - this.y));
+    /**
+     * Returns the euclidean distance between this vector and another vector.
+     *
+     * @param {Vector2} vec A vector.
+     * @returns {number} The euclidean distance between the two vectors.
+     */
+    distance(vec) {
+        return Math.sqrt((vec.x - this.x) * (vec.x - this.x) + (vec.y - this.y) * (vec.y - this.y));
     }
 
-    distanceSq(v) {
-        return (v.x - this.x) * (v.x - this.x) + (v.y - this.y) * (v.y - this.y);
+    /**
+     * Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).
+     *
+     * @param {Vector2} vec Another vector.
+     * @returns {number} The squared euclidean distance of the two vectors.
+     */
+    distanceSq(vec) {
+        return (vec.x - this.x) * (vec.x - this.x) + (vec.y - this.y) * (vec.y - this.y);
     }
 
-    clockwise(v) {
-        var a = this.y * v.x;
-        var b = this.x * v.y;
+    /**
+     * Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.
+     *
+     * @param {Vector2} vec Another vector.
+     * @returns {number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.
+     */
+    clockwise(vec) {
+        var a = this.y * vec.x;
+        var b = this.x * vec.y;
         if (a > b) return -1;
         if (a === b) return 0;
         return 1;
     }
 
+    /**
+     * Rotates this vector by a given number of radians around the origin of the coordinate system.
+     *
+     * @param {number} angle The angle in radians to rotate the vector.
+     */
     rotate(angle) {
         var tmp = new Vector2();
         tmp.x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
@@ -123,38 +153,67 @@ class Vector2 {
         this.y = tmp.y;
     }
 
-    rotateAround(angle, v) {
+    /**
+     * Rotates this vector around another vector.
+     *
+     * @param {number} angle The angle in radians to rotate the vector.
+     * @param {Vector2} vec The vector which is used as the rotational center.
+     */
+    rotateAround(angle, vec) {
         var s = Math.sin(angle);
         var c = Math.cos(angle);
 
-        this.x -= v.x;
-        this.y -= v.y;
+        this.x -= vec.x;
+        this.y -= vec.y;
 
         var x = this.x * c - this.y * s;
         var y = this.x * s + this.y * c;
 
-        this.x = x + v.x;
-        this.y = y + v.y;
+        this.x = x + vec.x;
+        this.y = y + vec.y;
     }
 
-    rotateTo(v, center, offsetAngle) {
-        offsetAngle = offsetAngle ? offsetAngle : 0.0;
+/**
+ * Rotate a vector around a given center to the same angle as another vector, keeps the distance to the center.
+ *
+ */
 
+    /**
+     * Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.
+     *
+     * @param {Vector2} vec The vector to rotate this vector to.
+     * @param {Vector2} center The rotational center.
+     * @param {number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
+     */
+    rotateTo(vec, center, offsetAngle = 0.0) {
         var a = Vector2.subtract(this, center);
-        var b = Vector2.subtract(v, center);
+        var b = Vector2.subtract(vec, center);
         var angle = Vector2.angle(b, a);
 
         this.rotateAround(angle + offsetAngle, center);
     }
 
-    getRotateToAngle(v, center) {
+    /**
+     * Gets the angles between this vector and another vector around a common center of rotation.
+     *
+     * @param {Vector2} vec Another vector.
+     * @param {Vector2} center The center of rotation.
+     * @returns {number} The angle between this vector and another vector around a center of rotation in radians.
+     */
+    getRotateToAngle(vec, center) {
         var a = Vector2.subtract(this, center);
-        var b = Vector2.subtract(v, center);
+        var b = Vector2.subtract(vec, center);
         var angle = Vector2.angle(b, a);
 
         return angle;
     }
 
+    /**
+     * Checks whether a vector lies within a polygon spanned by a set of vectors.
+     *
+     * @param {array} polygon An array of vectors spanning the polygon.
+     * @returns {boolean} A boolean indicating whether or not this vector is within a polygon.
+     */
     isInPolygon(polygon) {
         var inside = false;
 
@@ -171,31 +230,176 @@ class Vector2 {
         return inside;
     }
 
+    /**
+     * Returns the length of this vector.
+     *
+     * @returns {number} The length of this vector.
+     */
     length() {
         return Math.sqrt((this.x * this.x) + (this.y * this.y));
     }
 
+    /**
+     * Normalizes this vector.
+     *
+     */
     normalize() {
         this.divide(this.length());
     }
 
+    /**
+     * Returns a normalized copy of this vector.
+     *
+     * @returns {Vector2} A normalized copy of this vector.
+     */
     normalized() {
         return Vector2.divide(this, this.length());
     }
 
-    static scalarProjection(v1, v2) {
-        var unit = v2.normalized();
-        return Vector2.dot(v1, unit);
+    /**
+     * Calculates which side of a line spanned by two vectors this vector is.
+     *
+     * @param {Vector2} vecA A vector.
+     * @param {Vector2} vecB A vector.
+     * @returns {number} A number indicating the side of this vector, given a line spanned by two other vectors.
+     */
+    whichSide(vecA, vecB) {
+        return (this.x - vecA.x) * (vecB.y - vecA.y) - (this.y - vecA.y) * (vecB.x - vecA.x);
     }
 
-    whichSide(v1, v2) {
-        return (this.x - v1.x) * (v2.y - v1.y) - (this.y - v1.y) * (v2.x - v1.x);
-    }
-
-    sameSideAs(v1, v2, v3) {
-        var d = this.whichSide(v1, v2);
-        var dRef = v3.whichSide(v1, v2);
+    /**
+     * Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.
+     *
+     * @param {Vector2} vecA A vector spanning the line.
+     * @param {Vector2} vecB A vector spanning the line.
+     * @param {Vector2} vecC A vector to check whether or not it is on the same side as this vector.
+     * @returns {boolean} Returns a boolean indicating whether or not this vector is on the same side as another vector.
+     */
+    sameSideAs(vecA, vecB, vecC) {
+        var d = this.whichSide(vecA, vecB);
+        var dRef = vecC.whichSide(vecA, vecB);
 
         return d < 0 && dRef < 0 || d == 0 && dRef == 0 || d > 0 && dRef > 0;
+    }
+
+    /**
+     * Adds two vectors and returns the result as a new vector.
+     *
+     * @static
+     * @param {Vector2} vecA A summand.
+     * @param {Vector2} vecB A summand.
+     * @returns {Vector2} Returns the sum of two vectors.
+     */
+    static add(vecA, vecB) {
+        return new Vector2(vecA.x + vecB.x, vecA.y + vecB.y);
+    }
+
+    /**
+     * Subtracts one vector from another and returns the result as a new vector.
+     *
+     * @static
+     * @param {Vector2} vecA The minuend.
+     * @param {Vector2} vecB The subtrahend.
+     * @returns {Vector2} Returns the difference of two vectors.
+     */
+    static subtract(vecA, vecB) {
+        return new Vector2(vecA.x - vecB.x, vecA.y - vecB.y);
+    }
+
+    /**
+     * Multiplies two vectors (value by value) and returns the result.
+     *
+     * @static
+     * @param {Vector2} vecA A factor.
+     * @param {Vector2} vecB A factor.
+     * @returns {Vector2} Returns the product of two vectors.
+     */
+    static multiply(vecA, vecB) {
+        if (vecB.x && vecB.y)
+            return new Vector2(vecA.x * vecB.x, vecA.y * vecB.y);
+        else
+            return new Vector2(vecA.x * vecB, vecA.y * vecB);
+    }
+
+    /**
+     * Returns the midpoint of a line spanned by two vectors.
+     *
+     * @static
+     * @param {Vector2} vecA A vector spanning the line.
+     * @param {Vector2} vecB A vector spanning the line.
+     * @returns {Vector2} The midpoint of the line spanned by two vectors.
+     */
+    static midpoint(vecA, vecB) {
+        return new Vector2((vecA.x + vecB.x) / 2, (vecA.y + vecB.y) / 2);
+    }
+
+    /**
+     * Returns the normals of a line spanned by two vectors.
+     *
+     * @static
+     * @param {Vector2} vecA A vector spanning the line.
+     * @param {Vector2} vecB A vector spanning the line.
+     * @returns {array} An array containing the two normals, each represented by a vector.
+     */
+    static normals(vecA, vecB) {
+        var delta = Vector2.subtract(vecB, vecA);
+
+        return [
+            new Vector2(-delta.y, delta.x),
+            new Vector2(delta.y, -delta.x)
+        ];
+    }
+
+    /**
+     * Divides a vector by another vector and returns the result as new vector.
+     *
+     * @static
+     * @param {Vector2} vecA The dividend.
+     * @param {Vector2} vecB The divisor.
+     * @returns {Vector2} The fraction of the two vectors.
+     */
+    static divide(vecA, vecB) {
+        if (vecB.x && vecB.y)
+            return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
+        else
+            return new Vector2(vecA.x / vecB, vecA.y / vecB);
+    }
+
+    /**
+     * Returns the dot product of two vectors.
+     *
+     * @static
+     * @param {Vector2} vecA A vector.
+     * @param {Vector2} vecB A vector.
+     * @returns {number} The dot product of two vectors.
+     */
+    static dot(vecA, vecB) {
+        return vecA.x * vecB.x + vecA.y * vecB.y;
+    }
+
+    /**
+     * Returns the angle between two vectors.
+     *
+     * @static
+     * @param {Vector2} vecA A vector.
+     * @param {Vector2} vecB A vector.
+     * @returns {number} The angle between two vectors in radians.
+     */
+    static angle(vecA, vecB) {
+        var dot = Vector2.dot(vecA, vecB);
+        return Math.acos(dot / (vecA.length() * vecB.length()));
+    }
+    
+    /**
+     * Returns the scalar projection of a vector on another vector.
+     *
+     * @static
+     * @param {Vector2} vecA Thecreate jsdoc babel vector to be projected.
+     * @param {Vector2} vecB The vector to be projection upon.
+     * @returns {number} The scalar component.
+     */
+    static scalarProjection(vecA, vecB) {
+        var unit = vecB.normalized();
+        return Vector2.dot(vecA, unit);
     }
 }

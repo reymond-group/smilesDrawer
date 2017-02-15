@@ -1,0 +1,23 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "opts": {
+        "destination": "./doc"
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "default": {
+            "outputSourceFiles": true
+        },
+        "path": "ink-docstrap",
+        "theme": "cosmo",
+        "navType": "inline",
+        "linenums": true,
+        "dateFormat": "MMMM Do YYYY, h:mm:ss a"
+    }
+}

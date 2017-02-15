@@ -1,18 +1,20 @@
 class Line {
-    constructor(a, b, elementA, elementB) {
-        this.a = a ? a : new Vector2(0, 0);
-        this.b = b ? b : new Vector2(0, 0);
+    constructor(from = new Vector2(0,0), to = new Vector(0, 0), elementFrom = null, elementTo = null) {
+        this.from = from;
+        this.to = to;
 
-        this.elementA = elementA;
-        this.elementB = elementB;
+        this.elementFrom = elementFrom;
+        this.elementTo = elementTo;
     }
 
     clone() {
-        return new Line(this.a.clone(), this.b.clone(), this.elementA, this.elementB);
+        return new Line(this.elementFrom, this.elementTo,
+                        this.from.clone(), this.to.clone());
     }
 
     getLength() {
-        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
+        return Math.sqrt(Math.pow(this.to.x - this.from.x, 2) + 
+                         Math.pow(this.to.y - this.from.y, 2));
     }
 
 
@@ -24,39 +26,39 @@ class Line {
 
     getRightVector() {
         // Return the vector with the larger x value (the right one)
-        if (this.a.x < this.b.x)
-            return this.b;
+        if (this.from.x < this.to.x)
+            return this.to;
         else
-            return this.a;
+            return this.from;
     }
 
     getLeftVector() {
         // Return the vector with the smaller x value (the left one)
-        if (this.a.x < this.b.x)
-            return this.a;
+        if (this.from.x < this.to.x)
+            return this.from;
         else
-            return this.b;
+            return this.to;
     }
 
     getRightElement() {
-        if (this.a.x < this.b.x)
-            return this.elementB;
+        if (this.from.x < this.to.x)
+            return this.elementTo;
         else
-            return this.elementA;
+            return this.elementFrom;
     }
 
     getLeftElement() {
-        if (this.a.x < this.b.x)
-            return this.elementA;
+        if (this.from.x < this.to.x)
+            return this.elementFrom;
         else
-            return this.elementB;
+            return this.elementTo;
     }
 
     setRightVector(x, y) {
-        if (this.a.x < this.b.x)
-            this.b.set(x, y);
+        if (this.from.x < this.to.x)
+            this.to.set(x, y);
         else
-            this.a.set(x, y);
+            this.from.set(x, y);
     }
 
     rotateToXAxis() {
@@ -74,30 +76,30 @@ class Line {
         return this;
     }
 
-    shortenA(by) {
-        var f = Vector2.subtract(this.b, this.a);
+    shortenFrom(by) {
+        var f = Vector2.subtract(this.to, this.from);
         f.normalize();
         f.multiply(by);
-        this.a.add(f);
+        this.from.add(f);
 
         return this;
     }
 
-    shortenB(by) {
-        var f = Vector2.subtract(this.a, this.b);
+    shortenTo(by) {
+        var f = Vector2.subtract(this.from, this.to);
         f.normalize();
         f.multiply(by);
-        this.b.add(f);
+        this.to.add(f);
 
         return this;
     }
 
     shorten(by) {
-        var f = Vector2.subtract(this.a, this.b);
+        var f = Vector2.subtract(this.from, this.to);
         f.normalize();
         f.multiply(by / 2.0);
-        this.b.add(f);
-        this.a.subtract(f);
+        this.to.add(f);
+        this.from.subtract(f);
 
         return this;
     }
