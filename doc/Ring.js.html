@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Ring.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Atom.html">Atom</a><ul class='methods'><li data-type='method'><a href="Atom.html#addAnchoredRing">addAnchoredRing</a></li><li data-type='method'><a href="Atom.html#canRotate">canRotate</a></li><li data-type='method'><a href="Atom.html#getMaxRingbond">getMaxRingbond</a></li><li data-type='method'><a href="Atom.html#getRingbondCount">getRingbondCount</a></li><li data-type='method'><a href="Atom.html#hasRing">hasRing</a></li><li data-type='method'><a href="Atom.html#hasRingbonds">hasRingbonds</a></li><li data-type='method'><a href="Atom.html#haveCommonRingbond">haveCommonRingbond</a></li><li data-type='method'><a href="Atom.html#maxCommonRingbond">maxCommonRingbond</a></li></ul></li><li><a href="Edge.html">Edge</a><ul class='methods'><li data-type='method'><a href="Edge.html#getBondCount">getBondCount</a></li></ul></li><li><a href="Line.html">Line</a><ul class='methods'><li data-type='method'><a href="Line.html#clone">clone</a></li><li data-type='method'><a href="Line.html#getAngle">getAngle</a></li><li data-type='method'><a href="Line.html#getLeftElement">getLeftElement</a></li><li data-type='method'><a href="Line.html#getLeftVector">getLeftVector</a></li><li data-type='method'><a href="Line.html#getLength">getLength</a></li><li data-type='method'><a href="Line.html#getRightElement">getRightElement</a></li><li data-type='method'><a href="Line.html#getRightVector">getRightVector</a></li><li data-type='method'><a href="Line.html#rotate">rotate</a></li><li data-type='method'><a href="Line.html#rotateToXAxis">rotateToXAxis</a></li><li data-type='method'><a href="Line.html#setLeftVector">setLeftVector</a></li><li data-type='method'><a href="Line.html#setRightVector">setRightVector</a></li><li data-type='method'><a href="Line.html#shorten">shorten</a></li><li data-type='method'><a href="Line.html#shortenFrom">shortenFrom</a></li><li data-type='method'><a href="Line.html#shortenTo">shortenTo</a></li></ul></li><li><a href="Pair.html">Pair</a><ul class='methods'><li data-type='method'><a href="Pair.html#.createUniquePairs">createUniquePairs</a></li><li data-type='method'><a href="Pair.html#contains">contains</a></li><li data-type='method'><a href="Pair.html#getHash">getHash</a></li></ul></li><li><a href="Ring.html">Ring</a><ul class='methods'><li data-type='method'><a href="Ring.html#.getRing">getRing</a></li><li data-type='method'><a href="Ring.html#allowsFlip">allowsFlip</a></li><li data-type='method'><a href="Ring.html#clone">clone</a></li><li data-type='method'><a href="Ring.html#contains">contains</a></li><li data-type='method'><a href="Ring.html#eachMember">eachMember</a></li><li data-type='method'><a href="Ring.html#getAngle">getAngle</a></li><li data-type='method'><a href="Ring.html#getOrderedNeighbours">getOrderedNeighbours</a></li><li data-type='method'><a href="Ring.html#getPolygon">getPolygon</a></li><li data-type='method'><a href="Ring.html#getSize">getSize</a></li><li data-type='method'><a href="Ring.html#hasSource">hasSource</a></li><li data-type='method'><a href="Ring.html#hasSourceAndTarget">hasSourceAndTarget</a></li><li data-type='method'><a href="Ring.html#hasTarget">hasTarget</a></li><li data-type='method'><a href="Ring.html#isAromatic">isAromatic</a></li><li data-type='method'><a href="Ring.html#setFlipped">setFlipped</a></li><li data-type='method'><a href="Ring.html#thisOrNeighboursContain">thisOrNeighboursContain</a></li></ul></li><li><a href="Vector2.html">Vector2</a><ul class='methods'><li data-type='method'><a href="Vector2.html#add">add</a></li><li data-type='method'><a href="Vector2.html#angle">angle</a></li><li data-type='method'><a href="Vector2.html#clockwise">clockwise</a></li><li data-type='method'><a href="Vector2.html#clone">clone</a></li><li data-type='method'><a href="Vector2.html#distance">distance</a></li><li data-type='method'><a href="Vector2.html#distanceSq">distanceSq</a></li><li data-type='method'><a href="Vector2.html#divide">divide</a></li><li data-type='method'><a href="Vector2.html#getRotateToAngle">getRotateToAngle</a></li><li data-type='method'><a href="Vector2.html#invert">invert</a></li><li data-type='method'><a href="Vector2.html#isInPolygon">isInPolygon</a></li><li data-type='method'><a href="Vector2.html#length">length</a></li><li data-type='method'><a href="Vector2.html#multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#normalize">normalize</a></li><li data-type='method'><a href="Vector2.html#normalized">normalized</a></li><li data-type='method'><a href="Vector2.html#rotate">rotate</a></li><li data-type='method'><a href="Vector2.html#rotateAround">rotateAround</a></li><li data-type='method'><a href="Vector2.html#rotateTo">rotateTo</a></li><li data-type='method'><a href="Vector2.html#sameSideAs">sameSideAs</a></li><li data-type='method'><a href="Vector2.html#set">set</a></li><li data-type='method'><a href="Vector2.html#subtract">subtract</a></li><li data-type='method'><a href="Vector2.html#toString">toString</a></li><li data-type='method'><a href="Vector2.html#whichSide">whichSide</a></li><li data-type='method'><a href="Vector2.html#.add">add</a></li><li data-type='method'><a href="Vector2.html#.angle">angle</a></li><li data-type='method'><a href="Vector2.html#.divide">divide</a></li><li data-type='method'><a href="Vector2.html#.dot">dot</a></li><li data-type='method'><a href="Vector2.html#.midpoint">midpoint</a></li><li data-type='method'><a href="Vector2.html#.multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#.normals">normals</a></li><li data-type='method'><a href="Vector2.html#.scalarProjection">scalarProjection</a></li><li data-type='method'><a href="Vector2.html#.subtract">subtract</a></li></ul></li><li><a href="Vertex.html">Vertex</a><ul class='methods'><li data-type='method'><a href="Vertex.html#clone">clone</a></li><li data-type='method'><a href="Vertex.html#equals">equals</a></li><li data-type='method'><a href="Vertex.html#getAngle">getAngle</a></li><li data-type='method'><a href="Vertex.html#getCommonNeighbours">getCommonNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNeighbours">getNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNextInRing">getNextInRing</a></li><li data-type='method'><a href="Vertex.html#getSpanningTreeNeighbours">getSpanningTreeNeighbours</a></li><li data-type='method'><a href="Vertex.html#getTextDirection">getTextDirection</a></li><li data-type='method'><a href="Vertex.html#isNeighbour">isNeighbour</a></li><li data-type='method'><a href="Vertex.html#isTerminal">isTerminal</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Ring.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** A class representing a ring */
+class Ring {
+    /**
+     * The constructor for the class Ring.
+     *
+     * @param {number} ringbond The id of the ring-bond shared by the source and target atom defined in the smiles string.
+     * @param {number} sourceId The source vertex id.
+     * @param {number} targetId The target vertex id.
+     */
+    constructor(ringbond, sourceId, targetId) {
+        this.id = null;
+        this.ringbond = ringbond;
+        this.sourceId = sourceId;
+        this.targetId = targetId;
+        this.members = new Array();
+        this.insiders = new Array();
+        this.neighbours = new Array();
+        this.positioned = false;
+        this.center = new Vector2();
+        this.rings = new Array();
+        this.isBridged = false;
+        this.template = null;
+        this.isSpiro = false;
+        this.isFused = false;
+        this.radius = 0.0;
+        this.centralAngle = 0.0;
+        this.canFlip = true;
+    }
+    
+    /**
+     * Clones this ring and returns the clone.
+     *
+     * @returns {Ring} A clone of this ring.
+     */
+    clone() {
+        let clone = new Ring(this.ringbond, this.sourceId, this.target);
+
+        clone.id = this.id;
+        clone.members = ArrayHelper.clone(this.members);
+        clone.insiders = ArrayHelper.clone(this.insiders);
+        clone.neighbours = ArrayHelper.clone(this.neighbours);
+        clone.positioned = this.positioned;
+        clone.center = ArrayHelper.clone(this.center);
+        clone.rings = ArrayHelper.clone(this.rings);
+        clone.isBridged = this.isBridged;
+        clone.template = this.template;
+        clone.isSpiro = this.isSpiro;
+        clone.isFused = this.isFused;
+        clone.radius = this.radius;
+        clone.centralAngle = this.centralAngle;
+        clone.canFlip = this.canFlip;
+
+        return clone;
+    }
+
+    /**
+     * Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.
+     *
+     * @returns {boolean} Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.
+     */
+    allowsFlip() {
+        return this.canFlip &amp;&amp; this.members.length > 4;
+    }
+
+    /**
+     * Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.
+     *
+     */
+    setFlipped() {
+        if (this.members.length &lt; 8) {
+            this.canFlip = false;
+        }
+    }
+
+    /**
+     * Returns the size (number of members) of this ring.
+     *
+     * @returns {number} The size (number of members) of this ring.
+     */
+    getSize() {
+        return this.members.length;
+    }
+
+    /**
+     * Gets the polygon representation (an array of the ring-members positional vectors) of this ring.
+     *
+     * @param {array} vertices An array of vertices representing the current molecule.
+     * @returns {array} An array of the positional vectors of the ring members.
+     */
+    getPolygon(vertices) {
+        let polygon = [];
+
+        for (let i = 0; i &lt; this.members.length; i++) {
+            polygon.push(vertices[this.members[i]].position);
+        }
+
+        return polygon;
+    }
+
+    /**
+     * Returns the angle of this ring in relation to the coordinate system.
+     *
+     * @returns {number} The angle in radians.
+     */
+    getAngle() {
+        return Math.PI - this.centralAngle;
+    }
+
+    /**
+     * Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.
+     *
+     * @param {array} vertices The vertices associated with the current molecule.
+     * @param {function} callback A callback with the current vertex id as a parameter.
+     * @param {number} startVertexId The vertex id of the start vertex.
+     * @param {number} previousVertexId The vertex id of the previous vertex (the loop calling the callback function will run in the opposite direction of this vertex).
+     */
+    eachMember(vertices, callback, startVertexId, previousVertexId) {
+        startVertexId = startVertexId || startVertexId === 0 ? startVertexId : this.members[0];
+        let current = startVertexId;
+        let max = 0;
+
+        while (current != null &amp;&amp; max &lt; 100) {
+            let prev = current;
+            
+            callback(prev);
+            current = vertices[current].getNextInRing(vertices, this.id, previousVertexId);
+            previousVertexId = prev;
+            
+            // Stop while loop when arriving back at the start vertex
+            if (current == startVertexId) {
+                current = null;
+            }
+            
+            // Currently, there can be rings where the start vertex is never
+            // reached again (bridged rings)
+            if (max == 99) {
+                console.log('Smiles-drawer was not able to loop over the members of this ring.', this);
+            }
+
+            max++;
+        }
+    }
+
+    /**
+     * Returns an array containing the neighbouring rings of this ring ordered by ring size.
+     *
+     * @param {array} ringConnections An array of ring connections associated with the current molecule.
+     * @returns {array} An array of neighbouring rings sorted by ring size.
+     */
+    getOrderedNeighbours(ringConnections) {
+        let orderedNeighbours = [];
+
+        for (let i = 0; i &lt; this.neighbours.length; i++) {
+            let vertices = RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
+            
+            orderedNeighbours.push({
+                n: vertices.length,
+                neighbour: this.neighbours[i]
+            });
+        }
+
+        orderedNeighbours.sort(function (a, b) {
+            // Sort highest to lowest
+            return b.n - a.n;
+        });
+
+        return orderedNeighbours;
+    }
+
+    /**
+     * Check whether this ring is aromatic but has no explicit double-bonds defined (e.g. c1ccccc1).
+     *
+     * @param {array} vertices An array of vertices associated with the current molecule.
+     * @returns {boolean} A boolean indicating whether or not this ring is implicitly aromatic (using lowercase letters in smiles).
+     */
+    isAromatic(vertices) {
+        for (let i = 0; i &lt; this.members.length; i++) {
+            let e = vertices[this.members[i]].value.element.charAt(0);
+
+            if (e == e.toUpperCase()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks whether or not this ring contains a member with a given vertex id.
+     *
+     * @param {number} vertexId A vertex id.
+     * @returns {boolean} A boolean indicating whether or not this ring contains a member with the given vertex id.
+     */
+    contains(vertexId) {
+        for (let i = 0; i &lt; this.members.length; i++) {
+            if (this.members[i] == vertexId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.
+     *
+     * @param {array} rings An array of rings associated with this molecule.
+     * @param {number} vertexId A vertex id.
+     * @returns {boolean} A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.
+     */
+    thisOrNeighboursContain(rings, vertexId) {
+        for (let i = 0; i &lt; this.neighbours.length; i++) {
+            if (Ring.getRing(rings, this.neighbours[i]).contains(vertexId)) {
+                return true;
+            }
+        }
+
+        if (this.contains(vertexId)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether or not this ring has a source defined.
+     *
+     * @returns {boolean} A boolean indicating whether or not this ring has a source defined.
+     */
+    hasSource() {
+        return !(this.sourceId === undefined || this.sourceId === null);
+    }
+
+    /**
+     * Checks whether or not this ring has a target defined.
+     *
+     * @returns {boolean} A boolean indicating whether or not this ring has a target defined.
+     */
+    hasTarget() {
+        return !(this.targetId === undefined || this.targetId === null);
+    }
+
+    /**
+     * Checks whether or not this ring has a source and a target defined.
+     *
+     * @returns {boolean} A boolean indicating whether or not this ring has a source and a target defined.
+     */
+    hasSourceAndTarget() {
+        return this.hasSource() &amp;&amp; this.hasTarget();
+    }
+
+    /**
+     * Returns a ring based on a provided ring id.
+     *
+     * @param {array} rings An array of rings associated with the current molecule.
+     * @param {number} id A ring id.
+     * @returns {Ring} A ring with a given id.
+     */
+    static getRing(rings, id) {
+        for (let i = 0; i &lt; rings.length; i++) {
+            if (rings[i].id == id) {
+                return rings[i];
+            }
+        }
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Feb 16 2017 17:14:17 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Vertex.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Atom.html">Atom</a><ul class='methods'><li data-type='method'><a href="Atom.html#addAnchoredRing">addAnchoredRing</a></li><li data-type='method'><a href="Atom.html#canRotate">canRotate</a></li><li data-type='method'><a href="Atom.html#getMaxRingbond">getMaxRingbond</a></li><li data-type='method'><a href="Atom.html#getRingbondCount">getRingbondCount</a></li><li data-type='method'><a href="Atom.html#hasRing">hasRing</a></li><li data-type='method'><a href="Atom.html#hasRingbonds">hasRingbonds</a></li><li data-type='method'><a href="Atom.html#haveCommonRingbond">haveCommonRingbond</a></li><li data-type='method'><a href="Atom.html#maxCommonRingbond">maxCommonRingbond</a></li></ul></li><li><a href="Edge.html">Edge</a><ul class='methods'><li data-type='method'><a href="Edge.html#getBondCount">getBondCount</a></li></ul></li><li><a href="Line.html">Line</a><ul class='methods'><li data-type='method'><a href="Line.html#clone">clone</a></li><li data-type='method'><a href="Line.html#getAngle">getAngle</a></li><li data-type='method'><a href="Line.html#getLeftElement">getLeftElement</a></li><li data-type='method'><a href="Line.html#getLeftVector">getLeftVector</a></li><li data-type='method'><a href="Line.html#getLength">getLength</a></li><li data-type='method'><a href="Line.html#getRightElement">getRightElement</a></li><li data-type='method'><a href="Line.html#getRightVector">getRightVector</a></li><li data-type='method'><a href="Line.html#rotate">rotate</a></li><li data-type='method'><a href="Line.html#rotateToXAxis">rotateToXAxis</a></li><li data-type='method'><a href="Line.html#setLeftVector">setLeftVector</a></li><li data-type='method'><a href="Line.html#setRightVector">setRightVector</a></li><li data-type='method'><a href="Line.html#shorten">shorten</a></li><li data-type='method'><a href="Line.html#shortenFrom">shortenFrom</a></li><li data-type='method'><a href="Line.html#shortenTo">shortenTo</a></li></ul></li><li><a href="Pair.html">Pair</a><ul class='methods'><li data-type='method'><a href="Pair.html#.createUniquePairs">createUniquePairs</a></li><li data-type='method'><a href="Pair.html#contains">contains</a></li><li data-type='method'><a href="Pair.html#getHash">getHash</a></li></ul></li><li><a href="Ring.html">Ring</a><ul class='methods'><li data-type='method'><a href="Ring.html#.getRing">getRing</a></li><li data-type='method'><a href="Ring.html#allowsFlip">allowsFlip</a></li><li data-type='method'><a href="Ring.html#clone">clone</a></li><li data-type='method'><a href="Ring.html#contains">contains</a></li><li data-type='method'><a href="Ring.html#eachMember">eachMember</a></li><li data-type='method'><a href="Ring.html#getAngle">getAngle</a></li><li data-type='method'><a href="Ring.html#getOrderedNeighbours">getOrderedNeighbours</a></li><li data-type='method'><a href="Ring.html#getPolygon">getPolygon</a></li><li data-type='method'><a href="Ring.html#getSize">getSize</a></li><li data-type='method'><a href="Ring.html#hasSource">hasSource</a></li><li data-type='method'><a href="Ring.html#hasSourceAndTarget">hasSourceAndTarget</a></li><li data-type='method'><a href="Ring.html#hasTarget">hasTarget</a></li><li data-type='method'><a href="Ring.html#isAromatic">isAromatic</a></li><li data-type='method'><a href="Ring.html#setFlipped">setFlipped</a></li><li data-type='method'><a href="Ring.html#thisOrNeighboursContain">thisOrNeighboursContain</a></li></ul></li><li><a href="Vector2.html">Vector2</a><ul class='methods'><li data-type='method'><a href="Vector2.html#add">add</a></li><li data-type='method'><a href="Vector2.html#angle">angle</a></li><li data-type='method'><a href="Vector2.html#clockwise">clockwise</a></li><li data-type='method'><a href="Vector2.html#clone">clone</a></li><li data-type='method'><a href="Vector2.html#distance">distance</a></li><li data-type='method'><a href="Vector2.html#distanceSq">distanceSq</a></li><li data-type='method'><a href="Vector2.html#divide">divide</a></li><li data-type='method'><a href="Vector2.html#getRotateToAngle">getRotateToAngle</a></li><li data-type='method'><a href="Vector2.html#invert">invert</a></li><li data-type='method'><a href="Vector2.html#isInPolygon">isInPolygon</a></li><li data-type='method'><a href="Vector2.html#length">length</a></li><li data-type='method'><a href="Vector2.html#multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#normalize">normalize</a></li><li data-type='method'><a href="Vector2.html#normalized">normalized</a></li><li data-type='method'><a href="Vector2.html#rotate">rotate</a></li><li data-type='method'><a href="Vector2.html#rotateAround">rotateAround</a></li><li data-type='method'><a href="Vector2.html#rotateTo">rotateTo</a></li><li data-type='method'><a href="Vector2.html#sameSideAs">sameSideAs</a></li><li data-type='method'><a href="Vector2.html#set">set</a></li><li data-type='method'><a href="Vector2.html#subtract">subtract</a></li><li data-type='method'><a href="Vector2.html#toString">toString</a></li><li data-type='method'><a href="Vector2.html#whichSide">whichSide</a></li><li data-type='method'><a href="Vector2.html#.add">add</a></li><li data-type='method'><a href="Vector2.html#.angle">angle</a></li><li data-type='method'><a href="Vector2.html#.divide">divide</a></li><li data-type='method'><a href="Vector2.html#.dot">dot</a></li><li data-type='method'><a href="Vector2.html#.midpoint">midpoint</a></li><li data-type='method'><a href="Vector2.html#.multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#.normals">normals</a></li><li data-type='method'><a href="Vector2.html#.scalarProjection">scalarProjection</a></li><li data-type='method'><a href="Vector2.html#.subtract">subtract</a></li></ul></li><li><a href="Vertex.html">Vertex</a><ul class='methods'><li data-type='method'><a href="Vertex.html#clone">clone</a></li><li data-type='method'><a href="Vertex.html#equals">equals</a></li><li data-type='method'><a href="Vertex.html#getAngle">getAngle</a></li><li data-type='method'><a href="Vertex.html#getCommonNeighbours">getCommonNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNeighbours">getNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNextInRing">getNextInRing</a></li><li data-type='method'><a href="Vertex.html#getSpanningTreeNeighbours">getSpanningTreeNeighbours</a></li><li data-type='method'><a href="Vertex.html#getTextDirection">getTextDirection</a></li><li data-type='method'><a href="Vertex.html#isNeighbour">isNeighbour</a></li><li data-type='method'><a href="Vertex.html#isTerminal">isTerminal</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Vertex.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** A class representing a vertex */
+class Vertex {
+    /**
+     * The constructor for the class Vertex.
+     *
+     * @param {*} value The value associated with this vertex.
+     * @param {number} [x=0] The initial x coordinate of the positional vector of this vertex.
+     * @param {number} [y=0] The initial y coordinate of the positional vector of this vertex.
+     */
+    constructor(value, x = 0, y = 0) {
+        this.id = null;
+        this.value = value;
+        this.position = new Vector2(x ? x : 0, y ? y : 0);
+        this.previousPosition = new Vector2(0, 0);
+        this.parentVertexId = null;
+        this.children = [];
+        this.spanningTreeChildren = [];
+        this.edges = [];
+        this.positioned = false;
+        this.angle = 0.0;
+        this.backAngle = 0.0;
+        this.flippable = false; // can be flipped into a ring
+        this.flipCenter = null;
+        this.flipNeighbour = null;
+        this.flipRings = new Array();
+    }
+
+    /**
+     * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.
+     *
+     * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
+     */
+    isTerminal() {
+        return (this.parent === null &amp;&amp; this.children.length &lt; 2) || this.children.length === 0;
+    }
+
+    /**
+     * Clones this vertex and returns the clone.
+     *
+     * @returns {Vertex} A clone of this vertex.
+     */
+    clone() {
+        let clone = new Vertex(this.value, this.position.x, this.position.y);
+        clone.id = this.id;
+        clone.previousPosition = new Vector2(this.previousPosition.x, this.previousPosition.y);
+        clone.parentVertexId = this.parentVertexId;
+        clone.children = ArrayHelper.clone(this.children);
+        clone.spanningTreeChildren = ArrayHelper.clone(this.spanningTreeChildren);
+        clone.edges = ArrayHelper.clone(this.edges);
+        clone.positioned = this.positioned;
+        clone.angle = this.angle;
+        clone.backAngle = this.backAngle;
+        clone.flippable = this.flippable;
+        clone.flipCenter = this.flipCenter;
+        clone.flipRings = ArrayHelper.clone(this.flipRings);
+        return clone;
+    }
+
+    /**
+     * Returns true if this vertex and the supplied vertex both have the same id, else returns false.
+     *
+     * @param {Vertex} - The vertex to check.
+     * @returns {boolean} A boolean indicating whether or not the two vertices have the same id.
+     */
+    equals(vertex) {
+        return this.id === vertex.id;
+    }
+    
+    /**
+     * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
+     *
+     * @param {Vertex} [referenceVector=null] - The refernece vector.
+     * @param {boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
+     * @returns {number} The angle of this vertex.
+     */
+    getAngle(referenceVector = null, returnAsDegrees = false) {
+        let u = null;
+        
+        if (!referenceVector) {
+            u = Vector2.subtract(this.position, this.previousPosition);
+        } else {
+            u = Vector2.subtract(this.position, referenceVector);
+        }
+
+        if (returnAsDegrees) {
+            return MathHelper.toDeg(u.angle());
+        }
+
+        return u.angle();
+    }
+
+    /**
+     * Returns the suggested text direction when text is added at the position of this vertex.
+     *
+     * @param {array} vertices The array of vertices for the current molecule.
+     * @returns {string} The suggested direction of the text.
+     */
+    getTextDirection(vertices) {
+        let neighbours = this.getNeighbours();
+        let angles = [];
+        
+        for (let i = 0; i &lt; neighbours.length; i++) {
+            angles.push(this.getAngle(vertices[neighbours[i]].position));
+        }
+
+        let textAngle = MathHelper.meanAngle(angles);
+
+        // Round to 0, 90, 180 or 270 degree
+        let halfPi = Math.PI / 2.0;
+        textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi, 3);
+
+        if (textAngle == 2) {
+            return 'down';
+        } else if (textAngle == -2) {
+            return 'up';
+        } else if (textAngle === 0 || textAngle === -0) {
+            return 'right'; // is checking for -0 necessary?
+        } else if (textAngle == 3 || textAngle == -3) {
+            return 'left';
+        } else {
+            return 'down'; // default to down
+        }
+    }
+
+    /**
+     * Returns an array of ids of neighbouring vertices.
+     *
+     * @param {number} [vertexId=null] If a value is supplied, the vertex with this id is excluded from the returned indices.
+     * @returns {array} An array containing the ids of neighbouring vertices.
+     */
+    getNeighbours(vertexId = null) {
+        let neighbours = [];
+
+        for (let i = 0; i &lt; this.children.length; i++) {
+            if (vertexId === undefined || vertexId != this.children[i]) {
+                neighbours.push(this.children[i]);
+            }
+        }
+
+        if (this.parentVertexId != null) {
+            if (vertexId === undefined || vertexId != this.parentVertexId) {
+                neighbours.push(this.parentVertexId);
+            }
+        }
+
+        return neighbours;
+    }
+
+    /**
+     * Gets the common neighbours of this and another vertex.
+     *
+     * @param {Vertex} vertex The vertex to check for common neighbours.
+     * @returns {array} An array containing common neighbours.
+     */
+    getCommonNeighbours(vertex) {
+        // There can only be one common neighbour of a Vertex
+        // outside of a ring
+        let commonNeighbours = new Array();
+        let neighboursA = this.getNeighbours();
+        let neighboursB = vertex.getNeighbours();
+
+        for (let i = 0; i &lt; neighboursA.length; i++) {
+            for (let j = 0; j &lt; neighboursB.length; j++) {
+                if (neighboursA[i] === neighboursB[j]) {
+                    commonNeighbours.push(neighboursA[i]);
+                }
+            }
+        }
+
+        return commonNeighbours;
+    }
+
+    /**
+     * Checks whether or not a vertex is a neighbour of this vertex.
+     *
+     * @param {number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
+     * @returns {boolean} A boolean indicating whether or not the two vertices are neighbours.
+     */
+    isNeighbour(vertexId) {
+        if (this.parentVertexId === vertexId) {
+            return true;
+        }
+
+        for (let i = 0; i &lt; this.children.length; i++) {
+            if (this.children[i] === vertexId) {
+                return true;
+            }
+        }
+    }
+    
+    /**
+     * Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
+     *
+     * @param {number} [vertexId=null] If supplied, the vertex with this id is excluded from the array returned.
+     * @returns {array} An array containing the ids of the neighbouring vertices.
+     */
+    getSpanningTreeNeighbours(vertexId = null) {
+        let neighbours = [];
+
+        for (let i = 0; i &lt; this.spanningTreeChildren.length; i++) {
+            if (vertexId === undefined || vertexId != this.spanningTreeChildren[i]) {
+                neighbours.push(this.spanningTreeChildren[i]);
+            }
+        }
+
+        if (this.parentVertexId != null) {
+            if (vertexId === undefined || vertexId != this.parentVertexId) {
+                neighbours.push(this.parentVertexId);
+            }
+        }
+
+        return neighbours;
+    }
+
+    /**
+     * Gets the next vertex in the ring in opposide direction to the supplied vertex id.
+     *
+     * @param {array} vertices The array of vertices for the current molecule.
+     * @param {number} ringId The id of the ring containing this vertex.
+     * @param {number} previousVertexId The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.
+     * @returns {number} The id of the next vertex in the ring.
+     */
+    getNextInRing(vertices, ringId, previousVertexId) {
+        let neighbours = this.getNeighbours();
+
+        for (let i = 0; i &lt; neighbours.length; i++) {
+            if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, { value: ringId }) &amp;&amp; 
+                neighbours[i] != previousVertexId) {
+                return neighbours[i];
+            }
+        }
+
+        return null;
+    }
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Feb 16 2017 17:14:17 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

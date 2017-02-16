@@ -1,71 +1,40 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: Ring</title>
+    <meta charset="utf-8">
+    <title>Ring - Documentation</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
-
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
 </head>
-
 <body>
 
-<div class="navbar navbar-default navbar-fixed-top ">
-<div class="container">
-	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">Documentation</a>
-		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-        </button>
-	</div>
-	<div class="navbar-collapse collapse" id="topNavigation">
-		<ul class="nav navbar-nav">
-			
-			<li class="dropdown">
-				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu inline">
-					<li><a href="Atom.html">Atom</a></li><li><a href="Edge.html">Edge</a></li><li><a href="Line.html">Line</a></li><li><a href="Pair.html">Pair</a></li><li><a href="Ring.html">Ring</a></li><li><a href="Vector2.html">Vector2</a></li><li><a href="Vertex.html">Vertex</a></li>
-				</ul>
-			</li>
-			
-		</ul>
-        
-            <div class="col-sm-3 col-md-3">
-                <form class="navbar-form" role="search">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        
-	</div>
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-</div>
-</div>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Atom.html">Atom</a><ul class='methods'><li data-type='method'><a href="Atom.html#addAnchoredRing">addAnchoredRing</a></li><li data-type='method'><a href="Atom.html#canRotate">canRotate</a></li><li data-type='method'><a href="Atom.html#getMaxRingbond">getMaxRingbond</a></li><li data-type='method'><a href="Atom.html#getRingbondCount">getRingbondCount</a></li><li data-type='method'><a href="Atom.html#hasRing">hasRing</a></li><li data-type='method'><a href="Atom.html#hasRingbonds">hasRingbonds</a></li><li data-type='method'><a href="Atom.html#haveCommonRingbond">haveCommonRingbond</a></li><li data-type='method'><a href="Atom.html#maxCommonRingbond">maxCommonRingbond</a></li></ul></li><li><a href="Edge.html">Edge</a><ul class='methods'><li data-type='method'><a href="Edge.html#getBondCount">getBondCount</a></li></ul></li><li><a href="Line.html">Line</a><ul class='methods'><li data-type='method'><a href="Line.html#clone">clone</a></li><li data-type='method'><a href="Line.html#getAngle">getAngle</a></li><li data-type='method'><a href="Line.html#getLeftElement">getLeftElement</a></li><li data-type='method'><a href="Line.html#getLeftVector">getLeftVector</a></li><li data-type='method'><a href="Line.html#getLength">getLength</a></li><li data-type='method'><a href="Line.html#getRightElement">getRightElement</a></li><li data-type='method'><a href="Line.html#getRightVector">getRightVector</a></li><li data-type='method'><a href="Line.html#rotate">rotate</a></li><li data-type='method'><a href="Line.html#rotateToXAxis">rotateToXAxis</a></li><li data-type='method'><a href="Line.html#setLeftVector">setLeftVector</a></li><li data-type='method'><a href="Line.html#setRightVector">setRightVector</a></li><li data-type='method'><a href="Line.html#shorten">shorten</a></li><li data-type='method'><a href="Line.html#shortenFrom">shortenFrom</a></li><li data-type='method'><a href="Line.html#shortenTo">shortenTo</a></li></ul></li><li><a href="Pair.html">Pair</a><ul class='methods'><li data-type='method'><a href="Pair.html#.createUniquePairs">createUniquePairs</a></li><li data-type='method'><a href="Pair.html#contains">contains</a></li><li data-type='method'><a href="Pair.html#getHash">getHash</a></li></ul></li><li><a href="Ring.html">Ring</a><ul class='methods'><li data-type='method'><a href="Ring.html#.getRing">getRing</a></li><li data-type='method'><a href="Ring.html#allowsFlip">allowsFlip</a></li><li data-type='method'><a href="Ring.html#clone">clone</a></li><li data-type='method'><a href="Ring.html#contains">contains</a></li><li data-type='method'><a href="Ring.html#eachMember">eachMember</a></li><li data-type='method'><a href="Ring.html#getAngle">getAngle</a></li><li data-type='method'><a href="Ring.html#getOrderedNeighbours">getOrderedNeighbours</a></li><li data-type='method'><a href="Ring.html#getPolygon">getPolygon</a></li><li data-type='method'><a href="Ring.html#getSize">getSize</a></li><li data-type='method'><a href="Ring.html#hasSource">hasSource</a></li><li data-type='method'><a href="Ring.html#hasSourceAndTarget">hasSourceAndTarget</a></li><li data-type='method'><a href="Ring.html#hasTarget">hasTarget</a></li><li data-type='method'><a href="Ring.html#isAromatic">isAromatic</a></li><li data-type='method'><a href="Ring.html#setFlipped">setFlipped</a></li><li data-type='method'><a href="Ring.html#thisOrNeighboursContain">thisOrNeighboursContain</a></li></ul></li><li><a href="Vector2.html">Vector2</a><ul class='methods'><li data-type='method'><a href="Vector2.html#add">add</a></li><li data-type='method'><a href="Vector2.html#angle">angle</a></li><li data-type='method'><a href="Vector2.html#clockwise">clockwise</a></li><li data-type='method'><a href="Vector2.html#clone">clone</a></li><li data-type='method'><a href="Vector2.html#distance">distance</a></li><li data-type='method'><a href="Vector2.html#distanceSq">distanceSq</a></li><li data-type='method'><a href="Vector2.html#divide">divide</a></li><li data-type='method'><a href="Vector2.html#getRotateToAngle">getRotateToAngle</a></li><li data-type='method'><a href="Vector2.html#invert">invert</a></li><li data-type='method'><a href="Vector2.html#isInPolygon">isInPolygon</a></li><li data-type='method'><a href="Vector2.html#length">length</a></li><li data-type='method'><a href="Vector2.html#multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#normalize">normalize</a></li><li data-type='method'><a href="Vector2.html#normalized">normalized</a></li><li data-type='method'><a href="Vector2.html#rotate">rotate</a></li><li data-type='method'><a href="Vector2.html#rotateAround">rotateAround</a></li><li data-type='method'><a href="Vector2.html#rotateTo">rotateTo</a></li><li data-type='method'><a href="Vector2.html#sameSideAs">sameSideAs</a></li><li data-type='method'><a href="Vector2.html#set">set</a></li><li data-type='method'><a href="Vector2.html#subtract">subtract</a></li><li data-type='method'><a href="Vector2.html#toString">toString</a></li><li data-type='method'><a href="Vector2.html#whichSide">whichSide</a></li><li data-type='method'><a href="Vector2.html#.add">add</a></li><li data-type='method'><a href="Vector2.html#.angle">angle</a></li><li data-type='method'><a href="Vector2.html#.divide">divide</a></li><li data-type='method'><a href="Vector2.html#.dot">dot</a></li><li data-type='method'><a href="Vector2.html#.midpoint">midpoint</a></li><li data-type='method'><a href="Vector2.html#.multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#.normals">normals</a></li><li data-type='method'><a href="Vector2.html#.scalarProjection">scalarProjection</a></li><li data-type='method'><a href="Vector2.html#.subtract">subtract</a></li></ul></li><li><a href="Vertex.html">Vertex</a><ul class='methods'><li data-type='method'><a href="Vertex.html#clone">clone</a></li><li data-type='method'><a href="Vertex.html#equals">equals</a></li><li data-type='method'><a href="Vertex.html#getAngle">getAngle</a></li><li data-type='method'><a href="Vertex.html#getCommonNeighbours">getCommonNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNeighbours">getNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNextInRing">getNextInRing</a></li><li data-type='method'><a href="Vertex.html#getSpanningTreeNeighbours">getSpanningTreeNeighbours</a></li><li data-type='method'><a href="Vertex.html#getTextDirection">getTextDirection</a></li><li data-type='method'><a href="Vertex.html#isNeighbour">isNeighbour</a></li><li data-type='method'><a href="Vertex.html#isTerminal">isTerminal</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Ring</h1>
+    
+
+    
 
 
-<div class="container" id="toc-content">
-<div class="row">
 
-	
-	<div class="col-md-8">
-	
-		<div id="main">
-			
 
-	<h1 class="page-title">Class: Ring</h1>
 <section>
 
 <header>
@@ -79,35 +48,84 @@
     
 </header>
 
-
 <article>
     <div class="container-overview">
     
         
-<hr>
-<dt>
-    <h4 class="name" id="Ring"><span class="type-signature"></span>new Ring(ringbond, sourceId, targetId)</h4>
-    
-    
-</dt>
-<dd>
 
     
-    <div class="description">
-        <p>The constructor for the class Ring.</p>
-    </div>
+    <h2>Constructor</h2>
     
+
+    <h4 class="name" id="Ring"><span class="type-signature"></span>new Ring<span class="signature">(ringbond, sourceId, targetId)</span><span class="type-signature"></span></h4>
 
     
 
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line2">line 2</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>The constructor for the class Ring.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -138,7 +156,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -160,7 +177,6 @@
             
                 
 <span class="param-type">number</span>
-
 
 
             
@@ -186,7 +202,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -201,62 +216,20 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
     
     </div>
@@ -267,7 +240,7 @@
 
     
 
-    
+     
 
     
 
@@ -276,32 +249,80 @@
     
         <h3 class="subsection-title">Methods</h3>
 
-        <dl>
-            
-<hr>
-<dt>
-    <h4 class="name" id=".getRing"><span class="type-signature">&lt;static> </span>getRing(rings, id)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns a ring based on a provided ring id.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
         
+            
 
-<table class="params table table-striped">
+    
+
+    <h4 class="name" id=".getRing"><span class="type-signature">(static) </span>getRing<span class="signature">(rings, id)</span><span class="type-signature"> &rarr; {<a href="Ring.html">Ring</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line259">line 259</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns a ring based on a provided ring id.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -332,7 +353,6 @@
 <span class="param-type">array</span>
 
 
-
             
             </td>
 
@@ -356,7 +376,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -371,69 +390,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A ring with a given id.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -442,100 +421,104 @@
 <span class="param-type"><a href="Ring.html">Ring</a></span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="allowsFlip"><span class="type-signature"></span>allowsFlip()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="allowsFlip"><span class="type-signature"></span>allowsFlip<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line61">line 61</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -544,100 +527,104 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="clone"><span class="type-signature"></span>clone()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Clones this ring and returns the clone.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="clone"><span class="type-signature"></span>clone<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Ring.html">Ring</a>}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line35">line 35</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Clones this ring and returns the clone.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A clone of this ring.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -646,42 +633,86 @@
 <span class="param-type"><a href="Ring.html">Ring</a></span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="contains"><span class="type-signature"></span>contains(vertexId)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Checks whether or not this ring contains a member with a given vertex id.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="contains"><span class="type-signature"></span>contains<span class="signature">(vertexId)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line194">line 194</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Checks whether or not this ring contains a member with a given vertex id.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -712,7 +743,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -727,69 +757,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A boolean indicating whether or not this ring contains a member with the given vertex id.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -798,42 +788,86 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="eachMember"><span class="type-signature"></span>eachMember(vertices, callback, startVertexId, previousVertexId)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="eachMember"><span class="type-signature"></span>eachMember<span class="signature">(vertices, callback, startVertexId, previousVertexId)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line117">line 117</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -864,7 +898,6 @@
 <span class="param-type">array</span>
 
 
-
             
             </td>
 
@@ -886,7 +919,6 @@
             
                 
 <span class="param-type">function</span>
-
 
 
             
@@ -912,7 +944,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -936,7 +967,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -951,147 +981,113 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="getAngle"><span class="type-signature"></span>getAngle()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the angle of this ring in relation to the coordinate system.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="getAngle"><span class="type-signature"></span>getAngle<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line105">line 105</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Returns the angle of this ring in relation to the coordinate system.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The angle in radians.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1100,42 +1096,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="getOrderedNeighbours"><span class="type-signature"></span>getOrderedNeighbours(ringConnections)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns an array containing the neighbouring rings of this ring ordered by ring size.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="getOrderedNeighbours"><span class="type-signature"></span>getOrderedNeighbours<span class="signature">(ringConnections)</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line150">line 150</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns an array containing the neighbouring rings of this ring ordered by ring size.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -1166,7 +1206,6 @@
 <span class="param-type">array</span>
 
 
-
             
             </td>
 
@@ -1181,69 +1220,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>An array of neighbouring rings sorted by ring size.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1252,42 +1251,86 @@
 <span class="param-type">array</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="getPolygon"><span class="type-signature"></span>getPolygon(vertices)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Gets the polygon representation (an array of the ring-members positional vectors) of this ring.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="getPolygon"><span class="type-signature"></span>getPolygon<span class="signature">(vertices)</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line90">line 90</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Gets the polygon representation (an array of the ring-members positional vectors) of this ring.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -1316,7 +1359,6 @@
             
                 
 <span class="param-type">array</span>
-
 
 
             
@@ -1333,69 +1375,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>An array of the positional vectors of the ring members.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1404,100 +1406,104 @@
 <span class="param-type">array</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="getSize"><span class="type-signature"></span>getSize()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the size (number of members) of this ring.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="getSize"><span class="type-signature"></span>getSize<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line80">line 80</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Returns the size (number of members) of this ring.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The size (number of members) of this ring.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1506,100 +1512,104 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="hasSource"><span class="type-signature"></span>hasSource()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Checks whether or not this ring has a source defined.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="hasSource"><span class="type-signature"></span>hasSource<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line230">line 230</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Checks whether or not this ring has a source defined.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A boolean indicating whether or not this ring has a source defined.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1608,100 +1618,104 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="hasSourceAndTarget"><span class="type-signature"></span>hasSourceAndTarget()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Checks whether or not this ring has a source and a target defined.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="hasSourceAndTarget"><span class="type-signature"></span>hasSourceAndTarget<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line248">line 248</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Checks whether or not this ring has a source and a target defined.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A boolean indicating whether or not this ring has a source and a target defined.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1710,100 +1724,104 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="hasTarget"><span class="type-signature"></span>hasTarget()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Checks whether or not this ring has a target defined.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="hasTarget"><span class="type-signature"></span>hasTarget<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line239">line 239</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Checks whether or not this ring has a target defined.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A boolean indicating whether or not this ring has a target defined.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1812,42 +1830,86 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="isAromatic"><span class="type-signature"></span>isAromatic(vertices)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Check whether this ring is aromatic but has no explicit double-bonds defined (e.g. c1ccccc1).</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="isAromatic"><span class="type-signature"></span>isAromatic<span class="signature">(vertices)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line176">line 176</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Check whether this ring is aromatic but has no explicit double-bonds defined (e.g. c1ccccc1).</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -1878,7 +1940,6 @@
 <span class="param-type">array</span>
 
 
-
             
             </td>
 
@@ -1893,69 +1954,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A boolean indicating whether or not this ring is implicitly aromatic (using lowercase letters in smiles).</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1964,120 +1985,170 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="setFlipped"><span class="type-signature"></span>setFlipped()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="setFlipped"><span class="type-signature"></span>setFlipped<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line69">line 69</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.</p>
+</div>
 
-    
 
-    
 
-    
-</dd>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="thisOrNeighboursContain"><span class="type-signature"></span>thisOrNeighboursContain(rings, vertexId)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="thisOrNeighboursContain"><span class="type-signature"></span>thisOrNeighboursContain<span class="signature">(rings, vertexId)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Ring.js.html">Ring.js</a>, <a href="Ring.js.html#line211">line 211</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -2108,7 +2179,6 @@
 <span class="param-type">array</span>
 
 
-
             
             </td>
 
@@ -2132,7 +2202,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -2147,69 +2216,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -2218,17 +2247,13 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
+    
+
 
         
-
-    
-</dd>
-
-        </dl>
     
 
     
@@ -2241,132 +2266,15 @@
 
 
 
-		</div>
-	</div>
-
-	<div class="clearfix"></div>
-
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
-	
-
-</div>
 </div>
 
-
-    <div class="modal fade" id="searchResults">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Search results</h4>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>
-
+<br class="clear">
 
 <footer>
-
-
-<span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
-	
-		on February 16th 2017, 5:04:16 pm
-	
-	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
-</span>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Feb 16 2017 17:14:17 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
-<script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/toc.js"></script>
-
-    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
-
-
-<script>
-$( function () {
-	$( "[id*='$']" ).each( function () {
-		var $this = $( this );
-
-		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	} );
-
-	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
-		var $this = $( this );
-
-		var example = $this.find( "code" );
-		exampleText = example.html();
-		var lang = /{@lang (.*?)}/.exec( exampleText );
-		if ( lang && lang[1] ) {
-			exampleText = exampleText.replace( lang[0], "" );
-			example.html( exampleText );
-			lang = lang[1];
-		} else {
-			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
-			lang = langClassMatch ? langClassMatch[1] : "javascript";
-		}
-
-		if ( lang ) {
-
-			$this
-			.addClass( "sunlight-highlight-" + lang )
-			.addClass( "linenums" )
-			.html( example.html() );
-
-		}
-	} );
-
-	Sunlight.highlightAll( {
-		lineNumbers : true,
-		showMenu : true,
-		enableDoclinks : true
-	} );
-
-	$.catchAnchorLinks( {
-        navbarOffset: 10
-	} );
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
-		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
-		showAndHide : false,
-		smoothScrolling: true
-	} );
-
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-
-    $( "table" ).each( function () {
-      var $this = $( this );
-      $this.addClass('table');
-    } );
-
-} );
-</script>
-
-
-
-<!--Navigation and Symbol Display-->
-
-
-<!--Google Analytics-->
-
-
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            SearcherDisplay.init();
-        });
-    </script>
-
-
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>

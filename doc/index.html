@@ -1,72 +1,38 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
-	<title>Documentation Index</title>
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
-
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
 </head>
-
 <body>
 
-<div class="navbar navbar-default navbar-fixed-top ">
-<div class="container">
-	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">Documentation</a>
-		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-        </button>
-	</div>
-	<div class="navbar-collapse collapse" id="topNavigation">
-		<ul class="nav navbar-nav">
-			
-			<li class="dropdown">
-				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu inline">
-					<li><a href="Atom.html">Atom</a></li><li><a href="Edge.html">Edge</a></li><li><a href="Line.html">Line</a></li><li><a href="Pair.html">Pair</a></li><li><a href="Ring.html">Ring</a></li><li><a href="Vector2.html">Vector2</a></li><li><a href="Vertex.html">Vertex</a></li>
-				</ul>
-			</li>
-			
-		</ul>
-        
-            <div class="col-sm-3 col-md-3">
-                <form class="navbar-form" role="search">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        
-	</div>
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-</div>
-</div>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Atom.html">Atom</a><ul class='methods'><li data-type='method'><a href="Atom.html#addAnchoredRing">addAnchoredRing</a></li><li data-type='method'><a href="Atom.html#canRotate">canRotate</a></li><li data-type='method'><a href="Atom.html#getMaxRingbond">getMaxRingbond</a></li><li data-type='method'><a href="Atom.html#getRingbondCount">getRingbondCount</a></li><li data-type='method'><a href="Atom.html#hasRing">hasRing</a></li><li data-type='method'><a href="Atom.html#hasRingbonds">hasRingbonds</a></li><li data-type='method'><a href="Atom.html#haveCommonRingbond">haveCommonRingbond</a></li><li data-type='method'><a href="Atom.html#maxCommonRingbond">maxCommonRingbond</a></li></ul></li><li><a href="Edge.html">Edge</a><ul class='methods'><li data-type='method'><a href="Edge.html#getBondCount">getBondCount</a></li></ul></li><li><a href="Line.html">Line</a><ul class='methods'><li data-type='method'><a href="Line.html#clone">clone</a></li><li data-type='method'><a href="Line.html#getAngle">getAngle</a></li><li data-type='method'><a href="Line.html#getLeftElement">getLeftElement</a></li><li data-type='method'><a href="Line.html#getLeftVector">getLeftVector</a></li><li data-type='method'><a href="Line.html#getLength">getLength</a></li><li data-type='method'><a href="Line.html#getRightElement">getRightElement</a></li><li data-type='method'><a href="Line.html#getRightVector">getRightVector</a></li><li data-type='method'><a href="Line.html#rotate">rotate</a></li><li data-type='method'><a href="Line.html#rotateToXAxis">rotateToXAxis</a></li><li data-type='method'><a href="Line.html#setLeftVector">setLeftVector</a></li><li data-type='method'><a href="Line.html#setRightVector">setRightVector</a></li><li data-type='method'><a href="Line.html#shorten">shorten</a></li><li data-type='method'><a href="Line.html#shortenFrom">shortenFrom</a></li><li data-type='method'><a href="Line.html#shortenTo">shortenTo</a></li></ul></li><li><a href="Pair.html">Pair</a><ul class='methods'><li data-type='method'><a href="Pair.html#.createUniquePairs">createUniquePairs</a></li><li data-type='method'><a href="Pair.html#contains">contains</a></li><li data-type='method'><a href="Pair.html#getHash">getHash</a></li></ul></li><li><a href="Ring.html">Ring</a><ul class='methods'><li data-type='method'><a href="Ring.html#.getRing">getRing</a></li><li data-type='method'><a href="Ring.html#allowsFlip">allowsFlip</a></li><li data-type='method'><a href="Ring.html#clone">clone</a></li><li data-type='method'><a href="Ring.html#contains">contains</a></li><li data-type='method'><a href="Ring.html#eachMember">eachMember</a></li><li data-type='method'><a href="Ring.html#getAngle">getAngle</a></li><li data-type='method'><a href="Ring.html#getOrderedNeighbours">getOrderedNeighbours</a></li><li data-type='method'><a href="Ring.html#getPolygon">getPolygon</a></li><li data-type='method'><a href="Ring.html#getSize">getSize</a></li><li data-type='method'><a href="Ring.html#hasSource">hasSource</a></li><li data-type='method'><a href="Ring.html#hasSourceAndTarget">hasSourceAndTarget</a></li><li data-type='method'><a href="Ring.html#hasTarget">hasTarget</a></li><li data-type='method'><a href="Ring.html#isAromatic">isAromatic</a></li><li data-type='method'><a href="Ring.html#setFlipped">setFlipped</a></li><li data-type='method'><a href="Ring.html#thisOrNeighboursContain">thisOrNeighboursContain</a></li></ul></li><li><a href="Vector2.html">Vector2</a><ul class='methods'><li data-type='method'><a href="Vector2.html#add">add</a></li><li data-type='method'><a href="Vector2.html#angle">angle</a></li><li data-type='method'><a href="Vector2.html#clockwise">clockwise</a></li><li data-type='method'><a href="Vector2.html#clone">clone</a></li><li data-type='method'><a href="Vector2.html#distance">distance</a></li><li data-type='method'><a href="Vector2.html#distanceSq">distanceSq</a></li><li data-type='method'><a href="Vector2.html#divide">divide</a></li><li data-type='method'><a href="Vector2.html#getRotateToAngle">getRotateToAngle</a></li><li data-type='method'><a href="Vector2.html#invert">invert</a></li><li data-type='method'><a href="Vector2.html#isInPolygon">isInPolygon</a></li><li data-type='method'><a href="Vector2.html#length">length</a></li><li data-type='method'><a href="Vector2.html#multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#normalize">normalize</a></li><li data-type='method'><a href="Vector2.html#normalized">normalized</a></li><li data-type='method'><a href="Vector2.html#rotate">rotate</a></li><li data-type='method'><a href="Vector2.html#rotateAround">rotateAround</a></li><li data-type='method'><a href="Vector2.html#rotateTo">rotateTo</a></li><li data-type='method'><a href="Vector2.html#sameSideAs">sameSideAs</a></li><li data-type='method'><a href="Vector2.html#set">set</a></li><li data-type='method'><a href="Vector2.html#subtract">subtract</a></li><li data-type='method'><a href="Vector2.html#toString">toString</a></li><li data-type='method'><a href="Vector2.html#whichSide">whichSide</a></li><li data-type='method'><a href="Vector2.html#.add">add</a></li><li data-type='method'><a href="Vector2.html#.angle">angle</a></li><li data-type='method'><a href="Vector2.html#.divide">divide</a></li><li data-type='method'><a href="Vector2.html#.dot">dot</a></li><li data-type='method'><a href="Vector2.html#.midpoint">midpoint</a></li><li data-type='method'><a href="Vector2.html#.multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#.normals">normals</a></li><li data-type='method'><a href="Vector2.html#.scalarProjection">scalarProjection</a></li><li data-type='method'><a href="Vector2.html#.subtract">subtract</a></li></ul></li><li><a href="Vertex.html">Vertex</a><ul class='methods'><li data-type='method'><a href="Vertex.html#clone">clone</a></li><li data-type='method'><a href="Vertex.html#equals">equals</a></li><li data-type='method'><a href="Vertex.html#getAngle">getAngle</a></li><li data-type='method'><a href="Vertex.html#getCommonNeighbours">getCommonNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNeighbours">getNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNextInRing">getNextInRing</a></li><li data-type='method'><a href="Vertex.html#getSpanningTreeNeighbours">getSpanningTreeNeighbours</a></li><li data-type='method'><a href="Vertex.html#getTextDirection">getTextDirection</a></li><li data-type='method'><a href="Vertex.html#isNeighbour">isNeighbour</a></li><li data-type='method'><a href="Vertex.html#isTerminal">isTerminal</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
 
 
-<div class="container" id="toc-content">
-<div class="row">
 
-	
-	<div class="col-md-8">
-	
-		<div id="main">
-			
-
-	
-	
+    
 
 
 
@@ -76,16 +42,10 @@
 
 
 
+    
 
 
-	
-	
-
-
-
-
-
-    <section class="readme-section">
+    <section class="readme">
         <article><p><img src="https://github.com/reymond-group/smilesDrawer/blob/master/logo.png?raw=true" alt="Smiles Drawer"></p>
 <h1>Smiles Drawer</h1><h3>Building Smiles Drawer</h3><p>If you decide not to use the ready-to-go scripts in <code>dist</code>, you can (edit and) build the project by running:</p>
 <pre class="prettyprint source"><code>npm install
@@ -97,133 +57,15 @@ gulp</code></pre></article>
 
 
 
-
-		</div>
-	</div>
-
-	<div class="clearfix"></div>
-
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
-	
-
-</div>
 </div>
 
-
-    <div class="modal fade" id="searchResults">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Search results</h4>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>
-
+<br class="clear">
 
 <footer>
-
-
-<span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
-	
-		on February 16th 2017, 5:04:16 pm
-	
-	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
-</span>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Feb 16 2017 17:14:17 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
-<script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/toc.js"></script>
-
-    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
-
-
-<script>
-$( function () {
-	$( "[id*='$']" ).each( function () {
-		var $this = $( this );
-
-		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	} );
-
-	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
-		var $this = $( this );
-
-		var example = $this.find( "code" );
-		exampleText = example.html();
-		var lang = /{@lang (.*?)}/.exec( exampleText );
-		if ( lang && lang[1] ) {
-			exampleText = exampleText.replace( lang[0], "" );
-			example.html( exampleText );
-			lang = lang[1];
-		} else {
-			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
-			lang = langClassMatch ? langClassMatch[1] : "javascript";
-		}
-
-		if ( lang ) {
-
-			$this
-			.addClass( "sunlight-highlight-" + lang )
-			.addClass( "linenums" )
-			.html( example.html() );
-
-		}
-	} );
-
-	Sunlight.highlightAll( {
-		lineNumbers : true,
-		showMenu : true,
-		enableDoclinks : true
-	} );
-
-	$.catchAnchorLinks( {
-        navbarOffset: 10
-	} );
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
-		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
-		showAndHide : false,
-		smoothScrolling: true
-	} );
-
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-
-    $( "table" ).each( function () {
-      var $this = $( this );
-      $this.addClass('table');
-    } );
-
-} );
-</script>
-
-
-
-<!--Navigation and Symbol Display-->
-
-
-<!--Google Analytics-->
-
-
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            SearcherDisplay.init();
-        });
-    </script>
-
-
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>

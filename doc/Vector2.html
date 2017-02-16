@@ -1,71 +1,40 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: Vector2</title>
+    <meta charset="utf-8">
+    <title>Vector2 - Documentation</title>
 
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
-
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
 </head>
-
 <body>
 
-<div class="navbar navbar-default navbar-fixed-top ">
-<div class="container">
-	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">Documentation</a>
-		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-        </button>
-	</div>
-	<div class="navbar-collapse collapse" id="topNavigation">
-		<ul class="nav navbar-nav">
-			
-			<li class="dropdown">
-				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu inline">
-					<li><a href="Atom.html">Atom</a></li><li><a href="Edge.html">Edge</a></li><li><a href="Line.html">Line</a></li><li><a href="Pair.html">Pair</a></li><li><a href="Ring.html">Ring</a></li><li><a href="Vector2.html">Vector2</a></li><li><a href="Vertex.html">Vertex</a></li>
-				</ul>
-			</li>
-			
-		</ul>
-        
-            <div class="col-sm-3 col-md-3">
-                <form class="navbar-form" role="search">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        
-	</div>
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-</div>
-</div>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Atom.html">Atom</a><ul class='methods'><li data-type='method'><a href="Atom.html#addAnchoredRing">addAnchoredRing</a></li><li data-type='method'><a href="Atom.html#canRotate">canRotate</a></li><li data-type='method'><a href="Atom.html#getMaxRingbond">getMaxRingbond</a></li><li data-type='method'><a href="Atom.html#getRingbondCount">getRingbondCount</a></li><li data-type='method'><a href="Atom.html#hasRing">hasRing</a></li><li data-type='method'><a href="Atom.html#hasRingbonds">hasRingbonds</a></li><li data-type='method'><a href="Atom.html#haveCommonRingbond">haveCommonRingbond</a></li><li data-type='method'><a href="Atom.html#maxCommonRingbond">maxCommonRingbond</a></li></ul></li><li><a href="Edge.html">Edge</a><ul class='methods'><li data-type='method'><a href="Edge.html#getBondCount">getBondCount</a></li></ul></li><li><a href="Line.html">Line</a><ul class='methods'><li data-type='method'><a href="Line.html#clone">clone</a></li><li data-type='method'><a href="Line.html#getAngle">getAngle</a></li><li data-type='method'><a href="Line.html#getLeftElement">getLeftElement</a></li><li data-type='method'><a href="Line.html#getLeftVector">getLeftVector</a></li><li data-type='method'><a href="Line.html#getLength">getLength</a></li><li data-type='method'><a href="Line.html#getRightElement">getRightElement</a></li><li data-type='method'><a href="Line.html#getRightVector">getRightVector</a></li><li data-type='method'><a href="Line.html#rotate">rotate</a></li><li data-type='method'><a href="Line.html#rotateToXAxis">rotateToXAxis</a></li><li data-type='method'><a href="Line.html#setLeftVector">setLeftVector</a></li><li data-type='method'><a href="Line.html#setRightVector">setRightVector</a></li><li data-type='method'><a href="Line.html#shorten">shorten</a></li><li data-type='method'><a href="Line.html#shortenFrom">shortenFrom</a></li><li data-type='method'><a href="Line.html#shortenTo">shortenTo</a></li></ul></li><li><a href="Pair.html">Pair</a><ul class='methods'><li data-type='method'><a href="Pair.html#.createUniquePairs">createUniquePairs</a></li><li data-type='method'><a href="Pair.html#contains">contains</a></li><li data-type='method'><a href="Pair.html#getHash">getHash</a></li></ul></li><li><a href="Ring.html">Ring</a><ul class='methods'><li data-type='method'><a href="Ring.html#.getRing">getRing</a></li><li data-type='method'><a href="Ring.html#allowsFlip">allowsFlip</a></li><li data-type='method'><a href="Ring.html#clone">clone</a></li><li data-type='method'><a href="Ring.html#contains">contains</a></li><li data-type='method'><a href="Ring.html#eachMember">eachMember</a></li><li data-type='method'><a href="Ring.html#getAngle">getAngle</a></li><li data-type='method'><a href="Ring.html#getOrderedNeighbours">getOrderedNeighbours</a></li><li data-type='method'><a href="Ring.html#getPolygon">getPolygon</a></li><li data-type='method'><a href="Ring.html#getSize">getSize</a></li><li data-type='method'><a href="Ring.html#hasSource">hasSource</a></li><li data-type='method'><a href="Ring.html#hasSourceAndTarget">hasSourceAndTarget</a></li><li data-type='method'><a href="Ring.html#hasTarget">hasTarget</a></li><li data-type='method'><a href="Ring.html#isAromatic">isAromatic</a></li><li data-type='method'><a href="Ring.html#setFlipped">setFlipped</a></li><li data-type='method'><a href="Ring.html#thisOrNeighboursContain">thisOrNeighboursContain</a></li></ul></li><li><a href="Vector2.html">Vector2</a><ul class='methods'><li data-type='method'><a href="Vector2.html#add">add</a></li><li data-type='method'><a href="Vector2.html#angle">angle</a></li><li data-type='method'><a href="Vector2.html#clockwise">clockwise</a></li><li data-type='method'><a href="Vector2.html#clone">clone</a></li><li data-type='method'><a href="Vector2.html#distance">distance</a></li><li data-type='method'><a href="Vector2.html#distanceSq">distanceSq</a></li><li data-type='method'><a href="Vector2.html#divide">divide</a></li><li data-type='method'><a href="Vector2.html#getRotateToAngle">getRotateToAngle</a></li><li data-type='method'><a href="Vector2.html#invert">invert</a></li><li data-type='method'><a href="Vector2.html#isInPolygon">isInPolygon</a></li><li data-type='method'><a href="Vector2.html#length">length</a></li><li data-type='method'><a href="Vector2.html#multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#normalize">normalize</a></li><li data-type='method'><a href="Vector2.html#normalized">normalized</a></li><li data-type='method'><a href="Vector2.html#rotate">rotate</a></li><li data-type='method'><a href="Vector2.html#rotateAround">rotateAround</a></li><li data-type='method'><a href="Vector2.html#rotateTo">rotateTo</a></li><li data-type='method'><a href="Vector2.html#sameSideAs">sameSideAs</a></li><li data-type='method'><a href="Vector2.html#set">set</a></li><li data-type='method'><a href="Vector2.html#subtract">subtract</a></li><li data-type='method'><a href="Vector2.html#toString">toString</a></li><li data-type='method'><a href="Vector2.html#whichSide">whichSide</a></li><li data-type='method'><a href="Vector2.html#.add">add</a></li><li data-type='method'><a href="Vector2.html#.angle">angle</a></li><li data-type='method'><a href="Vector2.html#.divide">divide</a></li><li data-type='method'><a href="Vector2.html#.dot">dot</a></li><li data-type='method'><a href="Vector2.html#.midpoint">midpoint</a></li><li data-type='method'><a href="Vector2.html#.multiply">multiply</a></li><li data-type='method'><a href="Vector2.html#.normals">normals</a></li><li data-type='method'><a href="Vector2.html#.scalarProjection">scalarProjection</a></li><li data-type='method'><a href="Vector2.html#.subtract">subtract</a></li></ul></li><li><a href="Vertex.html">Vertex</a><ul class='methods'><li data-type='method'><a href="Vertex.html#clone">clone</a></li><li data-type='method'><a href="Vertex.html#equals">equals</a></li><li data-type='method'><a href="Vertex.html#getAngle">getAngle</a></li><li data-type='method'><a href="Vertex.html#getCommonNeighbours">getCommonNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNeighbours">getNeighbours</a></li><li data-type='method'><a href="Vertex.html#getNextInRing">getNextInRing</a></li><li data-type='method'><a href="Vertex.html#getSpanningTreeNeighbours">getSpanningTreeNeighbours</a></li><li data-type='method'><a href="Vertex.html#getTextDirection">getTextDirection</a></li><li data-type='method'><a href="Vertex.html#isNeighbour">isNeighbour</a></li><li data-type='method'><a href="Vertex.html#isTerminal">isTerminal</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Vector2</h1>
+    
+
+    
 
 
-<div class="container" id="toc-content">
-<div class="row">
 
-	
-	<div class="col-md-8">
-	
-		<div id="main">
-			
 
-	<h1 class="page-title">Class: Vector2</h1>
 <section>
 
 <header>
@@ -79,35 +48,84 @@
     
 </header>
 
-
 <article>
     <div class="container-overview">
     
         
-<hr>
-<dt>
-    <h4 class="name" id="Vector2"><span class="type-signature"></span>new Vector2(x, y)</h4>
-    
-    
-</dt>
-<dd>
 
     
-    <div class="description">
-        <p>The constructor of the class Vector2.</p>
-    </div>
+    <h2>Constructor</h2>
     
+
+    <h4 class="name" id="Vector2"><span class="type-signature"></span>new Vector2<span class="signature">(x, y)</span><span class="type-signature"></span></h4>
 
     
 
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line2">line 2</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>The constructor of the class Vector2.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -138,7 +156,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -162,7 +179,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -177,62 +193,20 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
     
     </div>
@@ -243,7 +217,7 @@
 
     
 
-    
+     
 
     
 
@@ -252,32 +226,80 @@
     
         <h3 class="subsection-title">Methods</h3>
 
-        <dl>
-            
-<hr>
-<dt>
-    <h4 class="name" id="add"><span class="type-signature"></span>add(vec)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
         
+            
 
-<table class="params table table-striped">
+    
+
+    <h4 class="name" id="add"><span class="type-signature"></span>add<span class="signature">(vec)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line56">line 56</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -308,7 +330,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -323,147 +344,113 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="angle"><span class="type-signature"></span>angle()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the angle of this vector in relation to the coordinate system.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="angle"><span class="type-signature"></span>angle<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line105">line 105</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Returns the angle of this vector in relation to the coordinate system.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The angle in radians.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -472,42 +459,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="clockwise"><span class="type-signature"></span>clockwise(vec)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="clockwise"><span class="type-signature"></span>clockwise<span class="signature">(vec)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line135">line 135</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -536,7 +567,6 @@
             
                 
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
-
 
 
             
@@ -553,69 +583,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -624,100 +614,104 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="clone"><span class="type-signature"></span>clone()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Clones this vector and returns the clone.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="clone"><span class="type-signature"></span>clone<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Vector2.html">Vector2</a>}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line38">line 38</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Clones this vector and returns the clone.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The clone of this vector.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -726,42 +720,86 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="distance"><span class="type-signature"></span>distance(vec)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the euclidean distance between this vector and another vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="distance"><span class="type-signature"></span>distance<span class="signature">(vec)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line115">line 115</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns the euclidean distance between this vector and another vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -790,7 +828,6 @@
             
                 
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
-
 
 
             
@@ -807,69 +844,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The euclidean distance between the two vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -878,42 +875,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="distanceSq"><span class="type-signature"></span>distanceSq(vec)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="distanceSq"><span class="type-signature"></span>distanceSq<span class="signature">(vec)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line125">line 125</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -944,7 +985,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -959,69 +999,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The squared euclidean distance of the two vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1030,42 +1030,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="divide"><span class="type-signature"></span>divide(scalar)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Divide the x and y coordinate values of this vector by a scalar.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="divide"><span class="type-signature"></span>divide<span class="signature">(scalar)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line76">line 76</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Divide the x and y coordinate values of this vector by a scalar.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -1096,7 +1140,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -1111,89 +1154,95 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="getRotateToAngle"><span class="type-signature"></span>getRotateToAngle(vec, center)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Gets the angles between this vector and another vector around a common center of rotation.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="getRotateToAngle"><span class="type-signature"></span>getRotateToAngle<span class="signature">(vec, center)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line211">line 211</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Gets the angles between this vector and another vector around a common center of rotation.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -1224,7 +1273,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -1248,7 +1296,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -1263,69 +1310,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The angle between this vector and another vector around a center of rotation in radians.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1334,120 +1341,170 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="invert"><span class="type-signature"></span>invert()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Inverts this vector. Same as multiply(-1.0).</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="invert"><span class="type-signature"></span>invert<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line95">line 95</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Inverts this vector. Same as multiply(-1.0).</p>
+</div>
 
-    
 
-    
 
-    
-</dd>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="isInPolygon"><span class="type-signature"></span>isInPolygon(polygon)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Checks whether a vector lies within a polygon spanned by a set of vectors.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="isInPolygon"><span class="type-signature"></span>isInPolygon<span class="signature">(polygon)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line225">line 225</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Checks whether a vector lies within a polygon spanned by a set of vectors.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -1478,7 +1535,6 @@
 <span class="param-type">array</span>
 
 
-
             
             </td>
 
@@ -1493,69 +1549,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A boolean indicating whether or not this vector is within a polygon.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1564,100 +1580,104 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="length"><span class="type-signature"></span>length()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the length of this vector.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="length"><span class="type-signature"></span>length<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line246">line 246</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Returns the length of this vector.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The length of this vector.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1666,42 +1686,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="multiply"><span class="type-signature"></span>multiply(scalar)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Multiply the x and y coordinate values of this vector by a scalar.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="multiply"><span class="type-signature"></span>multiply<span class="signature">(scalar)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line86">line 86</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Multiply the x and y coordinate values of this vector by a scalar.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -1732,7 +1796,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -1747,225 +1810,197 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="normalize"><span class="type-signature"></span>normalize()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Normalizes this vector.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="normalize"><span class="type-signature"></span>normalize<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line254">line 254</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Normalizes this vector.</p>
+</div>
 
-    
 
-    
 
-    
-</dd>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="normalized"><span class="type-signature"></span>normalized()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns a normalized copy of this vector.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="normalized"><span class="type-signature"></span>normalized<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Vector2.html">Vector2</a>}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line263">line 263</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Returns a normalized copy of this vector.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A normalized copy of this vector.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1974,42 +2009,86 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="rotate"><span class="type-signature"></span>rotate(angle)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Rotates this vector by a given number of radians around the origin of the coordinate system.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="rotate"><span class="type-signature"></span>rotate<span class="signature">(angle)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line154">line 154</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Rotates this vector by a given number of radians around the origin of the coordinate system.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -2038,7 +2117,6 @@
             
                 
 <span class="param-type">number</span>
-
 
 
             
@@ -2055,89 +2133,95 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="rotateAround"><span class="type-signature"></span>rotateAround(angle, vec)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Rotates this vector around another vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="rotateAround"><span class="type-signature"></span>rotateAround<span class="signature">(angle, vec)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line170">line 170</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Rotates this vector around another vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -2166,7 +2250,6 @@
             
                 
 <span class="param-type">number</span>
-
 
 
             
@@ -2192,7 +2275,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -2207,89 +2289,95 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="rotateTo"><span class="type-signature"></span>rotateTo(vec, center [, offsetAngle])</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="rotateTo"><span class="type-signature"></span>rotateTo<span class="signature">(vec, center, offsetAngle<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line196">line 196</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -2299,7 +2387,7 @@
         <th>Type</th>
 
         
-        <th>Argument</th>
+        <th>Attributes</th>
         
 
         
@@ -2322,7 +2410,6 @@
             
                 
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
-
 
 
             
@@ -2360,7 +2447,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -2396,7 +2482,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -2415,7 +2500,7 @@
             
                 <td class="default">
                 
-                    0.0
+                    <code>0.0</code>
                 
                 </td>
             
@@ -2427,89 +2512,95 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="sameSideAs"><span class="type-signature"></span>sameSideAs(vecA, vecB, vecC)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="sameSideAs"><span class="type-signature"></span>sameSideAs<span class="signature">(vecA, vecB, vecC)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line286">line 286</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -2540,7 +2631,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -2562,7 +2652,6 @@
             
                 
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
-
 
 
             
@@ -2588,7 +2677,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -2603,69 +2691,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>Returns a boolean indicating whether or not this vector is on the same side as another vector.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -2674,42 +2722,86 @@
 <span class="param-type">boolean</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="set"><span class="type-signature"></span>set( [x] [, y])</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets the values of the x and y coordinates of this vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="set"><span class="type-signature"></span>set<span class="signature">(x<span class="signature-attributes">opt</span>, y<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line28">line 28</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Sets the values of the x and y coordinates of this vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -2719,7 +2811,7 @@
         <th>Type</th>
 
         
-        <th>Argument</th>
+        <th>Attributes</th>
         
 
         
@@ -2744,7 +2836,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -2763,7 +2854,7 @@
             
                 <td class="default">
                 
-                    0
+                    <code>0</code>
                 
                 </td>
             
@@ -2784,7 +2875,6 @@
 <span class="param-type">number</span>
 
 
-
             
             </td>
 
@@ -2803,7 +2893,7 @@
             
                 <td class="default">
                 
-                    0
+                    <code>0</code>
                 
                 </td>
             
@@ -2815,89 +2905,95 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="subtract"><span class="type-signature"></span>subtract(vec)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="subtract"><span class="type-signature"></span>subtract<span class="signature">(vec)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line66">line 66</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -2928,7 +3024,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -2943,147 +3038,113 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-</dd>
+
+
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="toString"><span class="type-signature"></span>toString()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns a string representation of this vector.</p>
-    </div>
-    
 
     
 
-    
+    <h4 class="name" id="toString"><span class="type-signature"></span>toString<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
 
     
-    
 
-    
+
+
+
 <dl class="details">
-    
-
-	
-
-	
-
-	
 
     
-
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line47">line 47</a>
+    </li></ul></dd>
     
 
     
 
     
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
+    
 
+    
 
-	
+    
 
-	
+    
 
-	
+    
 
-	
+    
+
+    
+
+    
 </dl>
 
 
-    
 
-    
 
-    
 
-    
+<div class="description">
+    <p>Returns a string representation of this vector.</p>
+</div>
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A string representation of this vector.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -3092,42 +3153,86 @@
 <span class="param-type">string</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id="whichSide"><span class="type-signature"></span>whichSide(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Calculates which side of a line spanned by two vectors this vector is.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id="whichSide"><span class="type-signature"></span>whichSide<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line274">line 274</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Calculates which side of a line spanned by two vectors this vector is.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -3158,7 +3263,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -3182,7 +3286,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -3197,69 +3300,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>A number indicating the side of this vector, given a line spanned by two other vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -3268,42 +3331,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".add"><span class="type-signature">&lt;static> </span>add(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Adds two vectors and returns the result as a new vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".add"><span class="type-signature">(static) </span>add<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {<a href="Vector2.html">Vector2</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line301">line 301</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Adds two vectors and returns the result as a new vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -3334,7 +3441,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -3358,7 +3464,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -3373,69 +3478,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>Returns the sum of two vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -3444,42 +3509,86 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".angle"><span class="type-signature">&lt;static> </span>angle(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the angle between two vectors.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".angle"><span class="type-signature">(static) </span>angle<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line398">line 398</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns the angle between two vectors.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -3508,7 +3617,6 @@
             
                 
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
-
 
 
             
@@ -3534,7 +3642,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -3549,69 +3656,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The angle between two vectors in radians.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -3620,42 +3687,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".divide"><span class="type-signature">&lt;static> </span>divide(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Divides a vector by another vector and returns the result as new vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".divide"><span class="type-signature">(static) </span>divide<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {<a href="Vector2.html">Vector2</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line370">line 370</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Divides a vector by another vector and returns the result as new vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -3684,7 +3795,6 @@
             
                 
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
-
 
 
             
@@ -3710,7 +3820,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -3725,69 +3834,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The fraction of the two vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -3796,42 +3865,86 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".dot"><span class="type-signature">&lt;static> </span>dot(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the dot product of two vectors.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".dot"><span class="type-signature">(static) </span>dot<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line386">line 386</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns the dot product of two vectors.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -3862,7 +3975,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -3886,7 +3998,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -3901,69 +4012,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The dot product of two vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -3972,42 +4043,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".midpoint"><span class="type-signature">&lt;static> </span>midpoint(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the midpoint of a line spanned by two vectors.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".midpoint"><span class="type-signature">(static) </span>midpoint<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {<a href="Vector2.html">Vector2</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line341">line 341</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns the midpoint of a line spanned by two vectors.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -4038,7 +4153,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4062,7 +4176,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4077,69 +4190,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The midpoint of the line spanned by two vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -4148,42 +4221,86 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".multiply"><span class="type-signature">&lt;static> </span>multiply(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Multiplies two vectors (value by value) and returns the result.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".multiply"><span class="type-signature">(static) </span>multiply<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {<a href="Vector2.html">Vector2</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line325">line 325</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Multiplies two vectors (value by value) and returns the result.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -4214,7 +4331,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4238,7 +4354,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4253,69 +4368,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>Returns the product of two vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -4324,42 +4399,86 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".normals"><span class="type-signature">&lt;static> </span>normals(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the normals of a line spanned by two vectors.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".normals"><span class="type-signature">(static) </span>normals<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line353">line 353</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns the normals of a line spanned by two vectors.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -4390,7 +4509,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4414,7 +4532,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4429,69 +4546,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>An array containing the two normals, each represented by a vector.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -4500,42 +4577,86 @@
 <span class="param-type">array</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".scalarProjection"><span class="type-signature">&lt;static> </span>scalarProjection(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the scalar projection of a vector on another vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".scalarProjection"><span class="type-signature">(static) </span>scalarProjection<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line412">line 412</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns the scalar projection of a vector on another vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -4564,7 +4685,6 @@
             
                 
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
-
 
 
             
@@ -4590,7 +4710,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4605,69 +4724,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>The scalar component.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -4676,42 +4755,86 @@
 <span class="param-type">number</span>
 
 
-
     </dd>
 </dl>
 
-
-        
-
     
-</dd>
+
 
         
             
-<hr>
-<dt>
-    <h4 class="name" id=".subtract"><span class="type-signature">&lt;static> </span>subtract(vecA, vecB)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Subtracts one vector from another and returns the result as a new vector.</p>
-    </div>
-    
 
     
 
+    <h4 class="name" id=".subtract"><span class="type-signature">(static) </span>subtract<span class="signature">(vecA, vecB)</span><span class="type-signature"> &rarr; {<a href="Vector2.html">Vector2</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Vector2.js.html">Vector2.js</a>, <a href="Vector2.js.html#line313">line 313</a>
+    </li></ul></dd>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
 
-<table class="params table table-striped">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Subtracts one vector from another and returns the result as a new vector.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
     <thead>
     <tr>
         
@@ -4742,7 +4865,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4766,7 +4888,6 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
             
             </td>
 
@@ -4781,69 +4902,29 @@
     </tbody>
 </table>
 
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
 
 
 
-	
-
-	
-
-	
-
-	
-</dl>
 
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
-    <h5>Returns:</h5>
-    
-            
+
+
+
+<h5>Returns:</h5>
+
+        
 <div class="param-desc">
     <p>Returns the difference of two vectors.</p>
 </div>
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -4852,17 +4933,13 @@
 <span class="param-type"><a href="Vector2.html">Vector2</a></span>
 
 
-
     </dd>
 </dl>
 
+    
+
 
         
-
-    
-</dd>
-
-        </dl>
     
 
     
@@ -4875,132 +4952,15 @@
 
 
 
-		</div>
-	</div>
-
-	<div class="clearfix"></div>
-
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
-	
-
-</div>
 </div>
 
-
-    <div class="modal fade" id="searchResults">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Search results</h4>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>
-
+<br class="clear">
 
 <footer>
-
-
-<span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
-	
-		on February 16th 2017, 5:04:16 pm
-	
-	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
-</span>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Feb 16 2017 17:14:17 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
-<script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/toc.js"></script>
-
-    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
-
-
-<script>
-$( function () {
-	$( "[id*='$']" ).each( function () {
-		var $this = $( this );
-
-		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	} );
-
-	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
-		var $this = $( this );
-
-		var example = $this.find( "code" );
-		exampleText = example.html();
-		var lang = /{@lang (.*?)}/.exec( exampleText );
-		if ( lang && lang[1] ) {
-			exampleText = exampleText.replace( lang[0], "" );
-			example.html( exampleText );
-			lang = lang[1];
-		} else {
-			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
-			lang = langClassMatch ? langClassMatch[1] : "javascript";
-		}
-
-		if ( lang ) {
-
-			$this
-			.addClass( "sunlight-highlight-" + lang )
-			.addClass( "linenums" )
-			.html( example.html() );
-
-		}
-	} );
-
-	Sunlight.highlightAll( {
-		lineNumbers : true,
-		showMenu : true,
-		enableDoclinks : true
-	} );
-
-	$.catchAnchorLinks( {
-        navbarOffset: 10
-	} );
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
-		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
-		showAndHide : false,
-		smoothScrolling: true
-	} );
-
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-
-    $( "table" ).each( function () {
-      var $this = $( this );
-      $this.addClass('table');
-    } );
-
-} );
-</script>
-
-
-
-<!--Navigation and Symbol Display-->
-
-
-<!--Google Analytics-->
-
-
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            SearcherDisplay.init();
-        });
-    </script>
-
-
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>
