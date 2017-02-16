@@ -1428,28 +1428,31 @@ var SmilesDrawer = function () {
 
             var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
             // Add a shadow behind the line
-            /*
-            var shortLine = line.clone().shorten(6.0);
-             var l = shortLine.getLeftVector().clone();
+
+            var shortLine = line.clone().shorten(8.0);
+
+            var l = shortLine.getLeftVector().clone();
             var r = shortLine.getRightVector().clone();
-             l.x += this.offsetX;
+
+            l.x += this.offsetX;
             l.y += this.offsetY;
-             r.x += this.offsetX;
+
+            r.x += this.offsetX;
             r.y += this.offsetY;
-             this.ctx.save();
+
+            this.ctx.save();
             this.ctx.beginPath();
             this.ctx.moveTo(l.x, l.y);
             this.ctx.lineTo(r.x, r.y);
             this.ctx.lineCap = 'round';
-            this.ctx.lineWidth = 1.5;
+            this.ctx.lineWidth = 3.5;
             this.ctx.shadowColor = this.colors['BACKGROUND'];
-            this.ctx.shadowBlur = 6.0;
+            this.ctx.shadowBlur = 0.0;
             this.ctx.shadowOffsetX = 0;
             this.ctx.shadowOffsetY = 0;
             this.ctx.strokeStyle = this.colors['BACKGROUND'];
             this.ctx.stroke();
             this.ctx.restore();
-            */
 
             var l = line.getLeftVector().clone();
             var r = line.getRightVector().clone();
@@ -2983,7 +2986,7 @@ var Line = function () {
     _createClass(Line, [{
         key: 'clone',
         value: function clone() {
-            return new Line(this.elementFrom, this.elementTo, this.from.clone(), this.to.clone());
+            return new Line(this.from.clone(), this.to.clone(), this.elementFrom, this.elementTo);
         }
 
         /**
