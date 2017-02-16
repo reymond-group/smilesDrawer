@@ -1345,28 +1345,31 @@ var SmilesDrawer = function () {
 
             var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
             // Add a shadow behind the line
-            /*
-            var shortLine = line.clone().shorten(6.0);
-             var l = shortLine.getLeftVector().clone();
+
+            var shortLine = line.clone().shorten(8.0);
+
+            var l = shortLine.getLeftVector().clone();
             var r = shortLine.getRightVector().clone();
-             l.x += this.offsetX;
+
+            l.x += this.offsetX;
             l.y += this.offsetY;
-             r.x += this.offsetX;
+
+            r.x += this.offsetX;
             r.y += this.offsetY;
-             this.ctx.save();
+
+            this.ctx.save();
             this.ctx.beginPath();
             this.ctx.moveTo(l.x, l.y);
             this.ctx.lineTo(r.x, r.y);
             this.ctx.lineCap = 'round';
-            this.ctx.lineWidth = 1.5;
+            this.ctx.lineWidth = 3.5;
             this.ctx.shadowColor = this.colors['BACKGROUND'];
-            this.ctx.shadowBlur = 6.0;
+            this.ctx.shadowBlur = 0.0;
             this.ctx.shadowOffsetX = 0;
             this.ctx.shadowOffsetY = 0;
             this.ctx.strokeStyle = this.colors['BACKGROUND'];
             this.ctx.stroke();
             this.ctx.restore();
-            */
 
             var l = line.getLeftVector().clone();
             var r = line.getRightVector().clone();
@@ -2859,7 +2862,7 @@ var Line = function () {
     _createClass(Line, [{
         key: 'clone',
         value: function clone() {
-            return new Line(this.elementFrom, this.elementTo, this.from.clone(), this.to.clone());
+            return new Line(this.from.clone(), this.to.clone(), this.elementFrom, this.elementTo);
         }
     }, {
         key: 'getLength',
@@ -5086,9 +5089,6 @@ var Vector2 = function () {
     /**
      * The constructor of the class Vector2.
      *
-     * @name constructor
-     * @function
-     * @access public
      * @param {number} x The initial x coordinate value.
      * @param {number} y The initial y coordinate value.
      */
@@ -5110,9 +5110,6 @@ var Vector2 = function () {
     /**
      * Sets the values of the x and y coordinates of this vector.
      *
-     * @name set
-     * @function
-     * @access public
      * @param {number} [x=0] The value of the x coordinate.
      * @param {number} [y=0] The value of the y coordinate.
      */
@@ -5131,9 +5128,6 @@ var Vector2 = function () {
         /**
          * Clones this vector and returns the clone.
          *
-         * @name clone
-         * @function
-         * @access public
          * @returns {Vector2} The clone of this vector.
          */
 
@@ -5146,9 +5140,6 @@ var Vector2 = function () {
         /**
          * Returns a string representation of this vector.
          *
-         * @name toString
-         * @function
-         * @access public
          * @returns {string} A string representation of this vector.
          */
 
@@ -5161,9 +5152,6 @@ var Vector2 = function () {
         /**
          * Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
          *
-         * @name add
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          */
 
@@ -5177,9 +5165,6 @@ var Vector2 = function () {
         /**
          * Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
          *
-         * @name subtract
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          */
 
@@ -5193,9 +5178,6 @@ var Vector2 = function () {
         /**
          * Divide the x and y coordinate values of this vector by a scalar.
          *
-         * @name divide
-         * @function
-         * @access public
          * @param {number} scalar The scalar.
          */
 
@@ -5209,9 +5191,6 @@ var Vector2 = function () {
         /**
          * Multiply the x and y coordinate values of this vector by a scalar.
          *
-         * @name multiply
-         * @function
-         * @access public
          * @param {number} scalar The scalar.
          */
 
@@ -5225,9 +5204,6 @@ var Vector2 = function () {
         /**
          * Inverts this vector. Same as multiply(-1.0).
          *
-         * @name invert
-         * @function
-         * @access public
          */
 
     }, {
@@ -5240,9 +5216,6 @@ var Vector2 = function () {
         /**
          * Returns the angle of this vector in relation to the coordinate system.
          *
-         * @name angle
-         * @function
-         * @access public
          * @returns {number} The angle in radians.
          */
 
@@ -5255,9 +5228,6 @@ var Vector2 = function () {
         /**
          * Returns the euclidean distance between this vector and another vector.
          *
-         * @name distance
-         * @function
-         * @access public
          * @param {Vector2} vec A vector.
          * @returns {number} The euclidean distance between the two vectors.
          */
@@ -5271,9 +5241,6 @@ var Vector2 = function () {
         /**
          * Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).
          *
-         * @name distanceSq
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          * @returns {number} The squared euclidean distance of the two vectors.
          */
@@ -5287,9 +5254,6 @@ var Vector2 = function () {
         /**
          * Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.
          *
-         * @name clockwise
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          * @returns {number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.
          */
@@ -5307,9 +5271,6 @@ var Vector2 = function () {
         /**
          * Rotates this vector by a given number of radians around the origin of the coordinate system.
          *
-         * @name rotate
-         * @function
-         * @access public
          * @param {number} angle The angle in radians to rotate the vector.
          */
 
@@ -5326,9 +5287,6 @@ var Vector2 = function () {
         /**
          * Rotates this vector around another vector.
          *
-         * @name rotateAround
-         * @function
-         * @access public
          * @param {number} angle The angle in radians to rotate the vector.
          * @param {Vector2} vec The vector which is used as the rotational center.
          */
@@ -5357,9 +5315,6 @@ var Vector2 = function () {
         /**
          * Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.
          *
-         * @name rotateTo
-         * @function
-         * @access public
          * @param {Vector2} vec The vector to rotate this vector to.
          * @param {Vector2} center The rotational center.
          * @param {number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
@@ -5380,9 +5335,6 @@ var Vector2 = function () {
         /**
          * Gets the angles between this vector and another vector around a common center of rotation.
          *
-         * @name getRotateToAngle
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          * @param {Vector2} center The center of rotation.
          * @returns {number} The angle between this vector and another vector around a center of rotation in radians.
@@ -5401,9 +5353,6 @@ var Vector2 = function () {
         /**
          * Checks whether a vector lies within a polygon spanned by a set of vectors.
          *
-         * @name isInPolygon
-         * @function
-         * @access public
          * @param {array} polygon An array of vectors spanning the polygon.
          * @returns {boolean} A boolean indicating whether or not this vector is within a polygon.
          */
@@ -5426,9 +5375,6 @@ var Vector2 = function () {
         /**
          * Returns the length of this vector.
          *
-         * @name length
-         * @function
-         * @access public
          * @returns {number} The length of this vector.
          */
 
@@ -5441,9 +5387,6 @@ var Vector2 = function () {
         /**
          * Normalizes this vector.
          *
-         * @name normalize
-         * @function
-         * @access public
          */
 
     }, {
@@ -5455,9 +5398,6 @@ var Vector2 = function () {
         /**
          * Returns a normalized copy of this vector.
          *
-         * @name normalized
-         * @function
-         * @access public
          * @returns {Vector2} A normalized copy of this vector.
          */
 
@@ -5470,9 +5410,6 @@ var Vector2 = function () {
         /**
          * Calculates which side of a line spanned by two vectors this vector is.
          *
-         * @name whichSide
-         * @function
-         * @access public
          * @param {Vector2} vecA A vector.
          * @param {Vector2} vecB A vector.
          * @returns {number} A number indicating the side of this vector, given a line spanned by two other vectors.
@@ -5487,9 +5424,6 @@ var Vector2 = function () {
         /**
          * Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.
          *
-         * @name sameSideAs
-         * @function
-         * @access public
          * @param {Vector2} vecA A vector spanning the line.
          * @param {Vector2} vecB A vector spanning the line.
          * @param {Vector2} vecC A vector to check whether or not it is on the same side as this vector.
@@ -5508,9 +5442,6 @@ var Vector2 = function () {
         /**
          * Adds two vectors and returns the result as a new vector.
          *
-         * @name add
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A summand.
          * @param {Vector2} vecB A summand.
@@ -5526,9 +5457,6 @@ var Vector2 = function () {
         /**
          * Subtracts one vector from another and returns the result as a new vector.
          *
-         * @name subtract
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA The minuend.
          * @param {Vector2} vecB The subtrahend.
@@ -5544,9 +5472,6 @@ var Vector2 = function () {
         /**
          * Multiplies two vectors (value by value) and returns the result.
          *
-         * @name multiply
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A factor.
          * @param {Vector2} vecB A factor.
@@ -5562,9 +5487,6 @@ var Vector2 = function () {
         /**
          * Returns the midpoint of a line spanned by two vectors.
          *
-         * @name midpoint
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A vector spanning the line.
          * @param {Vector2} vecB A vector spanning the line.
@@ -5580,9 +5502,6 @@ var Vector2 = function () {
         /**
          * Returns the normals of a line spanned by two vectors.
          *
-         * @name normals
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A vector spanning the line.
          * @param {Vector2} vecB A vector spanning the line.
@@ -5600,9 +5519,6 @@ var Vector2 = function () {
         /**
          * Divides a vector by another vector and returns the result as new vector.
          *
-         * @name divide
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA The dividend.
          * @param {Vector2} vecB The divisor.
@@ -5618,9 +5534,6 @@ var Vector2 = function () {
         /**
          * Returns the dot product of two vectors.
          *
-         * @name dot
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A vector.
          * @param {Vector2} vecB A vector.
@@ -5636,9 +5549,6 @@ var Vector2 = function () {
         /**
          * Returns the angle between two vectors.
          *
-         * @name angle
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A vector.
          * @param {Vector2} vecB A vector.
@@ -5655,11 +5565,8 @@ var Vector2 = function () {
         /**
          * Returns the scalar projection of a vector on another vector.
          *
-         * @name scalarProjection
-         * @function
-         * @access public
          * @static
-         * @param {Vector2} vecA The vector to be projected.
+         * @param {Vector2} vecA Thecreate jsdoc babel vector to be projected.
          * @param {Vector2} vecB The vector to be projection upon.
          * @returns {number} The scalar component.
          */
@@ -5682,9 +5589,6 @@ var Vertex = function () {
     /**
      * The constructor for the class Vertex.
      *
-     * @name constructor
-     * @function
-     * @access public
      * @param {*} value The value associated with this vertex.
      * @param {number} [x=0] The initial x coordinate of the positional vector of this vertex.
      * @param {number} [y=0] The initial y coordinate of the positional vector of this vertex.
@@ -5715,9 +5619,6 @@ var Vertex = function () {
     /**
      * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.
      *
-     * @name isTerminal
-     * @function
-     * @access public
      * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
      */
 
@@ -5731,9 +5632,6 @@ var Vertex = function () {
         /**
          * Clones this vertex and returns the clone.
          *
-         * @name clone
-         * @function
-         * @access public
          * @returns {Vertex} A clone of this vertex.
          */
 
@@ -5759,9 +5657,6 @@ var Vertex = function () {
         /**
          * Returns true if this vertex and the supplied vertex both have the same id, else returns false.
          *
-         * @name equals
-         * @function
-         * @access public
          * @param {Vertex} - The vertex to check.
          * @returns {boolean} A boolean indicating whether or not the two vertices have the same id.
          */
@@ -5775,9 +5670,6 @@ var Vertex = function () {
         /**
          * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
          *
-         * @name getAngle
-         * @function
-         * @access public
          * @param {Vertex} [referenceVector=null] - The refernece vector.
          * @param {boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
          * @returns {number} The angle of this vertex.
@@ -5807,9 +5699,6 @@ var Vertex = function () {
         /**
          * Returns the suggested text direction when text is added at the position of this vertex.
          *
-         * @name getTextDirection
-         * @function
-         * @access public
          * @param {array} vertices The array of vertices for the current molecule.
          * @returns {string} The suggested direction of the text.
          */
@@ -5846,9 +5735,6 @@ var Vertex = function () {
         /**
          * Returns an array of ids of neighbouring vertices.
          *
-         * @name getNeighbours
-         * @function
-         * @access public
          * @param {number} [vertexId=null] If a value is supplied, the vertex with this id is excluded from the returned indices.
          * @returns {array} An array containing the ids of neighbouring vertices.
          */
@@ -5878,9 +5764,6 @@ var Vertex = function () {
         /**
          * Gets the common neighbours of this and another vertex.
          *
-         * @name getCommonNeighbours
-         * @function
-         * @access public
          * @param {Vertex} vertex The vertex to check for common neighbours.
          * @returns {array} An array containing common neighbours.
          */
@@ -5908,9 +5791,6 @@ var Vertex = function () {
         /**
          * Checks whether or not a vertex is a neighbour of this vertex.
          *
-         * @name isNeighbour
-         * @function
-         * @access public
          * @param {number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
          * @returns {boolean} A boolean indicating whether or not the two vertices are neighbours.
          */
@@ -5932,9 +5812,6 @@ var Vertex = function () {
         /**
          * Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
          *
-         * @name getSpanningTreeNeighbours
-         * @function
-         * @access public
          * @param {number} [vertexId=null] If supplied, the vertex with this id is excluded from the array returned.
          * @returns {array} An array containing the ids of the neighbouring vertices.
          */
@@ -5964,9 +5841,6 @@ var Vertex = function () {
         /**
          * Gets the next vertex in the ring in opposide direction to the supplied vertex id.
          *
-         * @name getNextInRing
-         * @function
-         * @access public
          * @param {array} vertices The array of vertices for the current molecule.
          * @param {number} ringId The id of the ring containing this vertex.
          * @param {number} previousVertexId The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.

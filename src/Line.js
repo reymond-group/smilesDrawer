@@ -8,8 +8,7 @@ class Line {
     }
 
     clone() {
-        return new Line(this.elementFrom, this.elementTo,
-                        this.from.clone(), this.to.clone());
+        return new Line(this.from.clone(), this.to.clone(), this.elementFrom, this.elementTo);
     }
 
     getLength() {

@@ -1047,8 +1047,8 @@ class SmilesDrawer {
         
         var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
         // Add a shadow behind the line
-        /*
-        var shortLine = line.clone().shorten(6.0);
+        
+        var shortLine = line.clone().shorten(8.0);
 
         var l = shortLine.getLeftVector().clone();
         var r = shortLine.getRightVector().clone();
@@ -1064,15 +1064,15 @@ class SmilesDrawer {
         this.ctx.moveTo(l.x, l.y);
         this.ctx.lineTo(r.x, r.y);
         this.ctx.lineCap = 'round';
-        this.ctx.lineWidth = 1.5;
+        this.ctx.lineWidth = 3.5;
         this.ctx.shadowColor = this.colors['BACKGROUND'];
-        this.ctx.shadowBlur = 6.0;
+        this.ctx.shadowBlur = 0.0;
         this.ctx.shadowOffsetX = 0;
         this.ctx.shadowOffsetY = 0;
         this.ctx.strokeStyle = this.colors['BACKGROUND'];
         this.ctx.stroke();
         this.ctx.restore();
-        */
+        
 
         var l = line.getLeftVector().clone();
         var r = line.getRightVector().clone();
