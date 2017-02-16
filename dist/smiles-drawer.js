@@ -179,14 +179,25 @@ var ArrayHelper = function () {
     return ArrayHelper;
 }();
 
+/** A class representing an atom */
+
+
 var Atom = function () {
-    function Atom(element, bond) {
+    /**
+     * The constructor of the class Atom.
+     *
+     * @param {string} element The one-letter code of the element.
+     * @param {string} [bondType='-'] The type of the bond associated with this atom.
+     */
+    function Atom(element) {
+        var bondType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '-';
+
         _classCallCheck(this, Atom);
 
         this.element = element;
         this.ringbonds = new Array();
         this.rings = new Array();
-        this.bond = '-';
+        this.bondType = bondType;
         this.isTerminal = false;
         this.isBridge = false;
         this.isBridgeNode = false;
@@ -195,70 +206,143 @@ var Atom = function () {
         this.bracket = null;
     }
 
+    /**
+     * Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
+     *
+     * @param {number} ringId A ring id.
+     */
+
+
     _createClass(Atom, [{
         key: 'addAnchoredRing',
-        value: function addAnchoredRing(ring) {
-            if (!ArrayHelper.contains(this.anchoredRings, {
-                value: ring.id
-            })) this.anchoredRings.push(ring.id);
+        value: function addAnchoredRing(ringId) {
+            if (!ArrayHelper.contains(this.anchoredRings, { value: ringId })) {
+                this.anchoredRings.push(ringId);
+            }
         }
+
+        /**
+         * Returns the number of ringbonds (breaks in rings to generate the MST of the smiles) within this atom is connected to.
+         *
+         * @returns {number} The number of ringbonds this atom is connected to.
+         */
+
     }, {
         key: 'getRingbondCount',
         value: function getRingbondCount() {
             return this.ringbonds.length;
         }
+
+        /**
+         * Check whether or not this atom is rotatable. The atom is deemed rotatable if it is neither a member of a ring nor participating in a bond other than a single bond. TODO: Check the chemistry.
+         *
+         * @returns {boolean} A boolean indicating whether or not this atom is rotatable.
+         */
+
     }, {
         key: 'canRotate',
         value: function canRotate() {
-            return this.bond == '-' && this.rings.length == 0;
+            return this.bondType === '-' && this.rings.length == 0;
         }
+
+        /**
+         * Returns whether or not this atom participates in ringbonds (breaks in the ring in the MST).
+         *
+         * @returns {boolean} A boolean indicating whether or not this atom is associated with a ringbond.
+         */
+
     }, {
         key: 'hasRingbonds',
         value: function hasRingbonds() {
             return this.ringbonds.length > 0;
         }
+
+        /**
+         * Returns the id of the ringbond with the highest id.
+         *
+         * @returns {number} The highest ringbond id associated with this atom.
+         */
+
     }, {
         key: 'getMaxRingbond',
         value: function getMaxRingbond() {
             var max = 0;
             for (var i = 0; i < this.ringbonds.length; i++) {
-                if (this.ringbonds[i].id > max) max = this.ringbonds[i].id;
-            }return max;
-        }
-    }, {
-        key: 'hasRing',
-        value: function hasRing(ring) {
-            for (var i = 0; i < this.rings; i++) {
-                if (ring === this.rings[i]) return true;
+                if (this.ringbonds[i].id > max) {
+                    max = this.ringbonds[i].id;
+                }
             }
 
-            return false;
+            return max;
         }
+
+        /**
+         * Checks whether or not this atom is a member of a given ring.
+         *
+         * @param {number} ringId A ring id.
+         * @returns {boolean} A boolean indicating whether or not this atom is a member of a given ring.
+         */
+
     }, {
-        key: 'haveCommonRingbond',
-        value: function haveCommonRingbond(a, b) {
-            for (var i = 0; i < a.ringbonds.length; i++) {
-                for (var j = 0; j < b.ringbonds.length; j++) {
-                    if (a.ringbonds[i].id == b.ringbonds[j].id) return true;
+        key: 'hasRing',
+        value: function hasRing(ringId) {
+            for (var i = 0; i < this.rings; i++) {
+                if (ringId === this.rings[i]) {
+                    return true;
                 }
             }
 
             return false;
         }
+
+        /**
+         * Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.
+         *
+         * @param {Atom} atomA An atom.
+         * @param {Atom} atomB An atom.
+         * @returns {boolean} A boolean indicating whether or not two atoms share a common ringbond.
+         */
+
+    }, {
+        key: 'haveCommonRingbond',
+        value: function haveCommonRingbond(atomA, atomB) {
+            for (var i = 0; i < atomA.ringbonds.length; i++) {
+                for (var j = 0; j < atomB.ringbonds.length; j++) {
+                    if (atomA.ringbonds[i].id == atomB.ringbonds[j].id) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Get the highest numbered ringbond shared by two atoms. A ringbond is a break in a ring created when generating the spanning tree of a structure.
+         *
+         * @param {Atom} atomA An atom.
+         * @param {Atom} atomB An atom.
+         * @returns {number} The number of the maximum ringbond shared by two atoms.
+         */
+
     }, {
         key: 'maxCommonRingbond',
-        value: function maxCommonRingbond(a, b) {
+        value: function maxCommonRingbond(atomA, atomB) {
             var commonMax = 0;
             var maxA = 0;
             var maxB = 0;
 
-            for (var i = 0; i < a.ringbonds.length; i++) {
-                if (a.ringbonds[i].id > maxA) maxA = a.ringbonds[i].id;
+            for (var i = 0; i < atomA.ringbonds.length; i++) {
+                if (atomA.ringbonds[i].id > maxA) {
+                    maxA = atomA.ringbonds[i].id;
+                }
 
-                for (var j = 0; j < b.ringbonds.length; j++) {
-                    if (b.ringbonds[j].id > maxB) maxB = b.ringbonds[j].id;
-
-                    if (maxA == maxB) commonMax = maxA;
+                for (var j = 0; j < atomB.ringbonds.length; j++) {
+                    if (atomB.ringbonds[j].id > maxB) {
+                        maxB = atomB.ringbonds[j].id;
+                    } else if (maxA == maxB) {
+                        commonMax = maxA;
+                    }
                 }
             }
 
@@ -443,8 +527,8 @@ var SmilesDrawer = function () {
         key: 'edgeRingCount',
         value: function edgeRingCount(edgeId) {
             var edge = this.edges[edgeId];
-            var a = this.vertices[edge.source];
-            var b = this.vertices[edge.target];
+            var a = this.vertices[edge.sourceId];
+            var b = this.vertices[edge.targetId];
 
             return Math.min(a.value.rings.length, b.value.rings.length);
         }
@@ -510,8 +594,7 @@ var SmilesDrawer = function () {
         key: 'createVertices',
         value: function createVertices(node, parentVertexId, branch) {
             // Create a new vertex object
-            var atom = new Atom(node.atom.element ? node.atom.element : node.atom);
-            atom.bond = node.bond;
+            var atom = new Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
             atom.branchBond = node.branchBond;
             atom.ringbonds = node.ringbonds;
             atom.bracket = node.atom.element ? node.atom : null;
@@ -534,9 +617,9 @@ var SmilesDrawer = function () {
                 // Add edge between this node and its parent
                 var edge = new Edge(parentVertexId, vertex.id, 1);
                 if (branch) {
-                    edge.bond = vertex.value.branchBond;
+                    edge.bondType = vertex.value.branchBond;
                 } else {
-                    edge.bond = this.vertices[parentVertexId].value.bond;
+                    edge.bondType = this.vertices[parentVertexId].value.bondType;
                 }
 
                 var edgeId = this.addEdge(edge);
@@ -567,7 +650,7 @@ var SmilesDrawer = function () {
                     if (vertexA.value.ringbonds[i].id == vertexB.value.ringbonds[j].id) {
                         // If the bonds are equal, it doesn't matter which bond is returned.
                         // if they are not equal, return the one that is not the default ("-")
-                        if (vertexA.value.ringbonds[i].bond == '-') {
+                        if (vertexA.value.ringbonds[i].bondType == '-') {
                             return vertexB.value.ringbonds[j].bond;
                         } else {
                             return vertexA.value.ringbonds[i].bond;
@@ -636,7 +719,7 @@ var SmilesDrawer = function () {
                         that.addRing(ring);
 
                         // Annotate the ring (add ring members to ring and rings to vertices)
-                        var path = that.annotateRing(ring.id, ring.source, ring.target);
+                        var path = that.annotateRing(ring.id, ring.sourceId, ring.targetId);
 
                         for (var j = 0; j < path.length; j++) {
                             ring.members.push(path[j]);
@@ -701,7 +784,7 @@ var SmilesDrawer = function () {
                 var ring = this.getRing(id);
                 var involvedRings = this.getBridgedRingRings(ring.id);
 
-                this.createBridgedRing(involvedRings, ring.source);
+                this.createBridgedRing(involvedRings, ring.sourceId);
 
                 // Remove the rings
                 for (var i = 0; i < involvedRings.length; i++) {
@@ -913,13 +996,13 @@ var SmilesDrawer = function () {
         }
     }, {
         key: 'annotateRing',
-        value: function annotateRing(ring, source, target) {
-            var prev = this.dijkstra(source, target);
+        value: function annotateRing(ring, sourceId, targetId) {
+            var prev = this.dijkstra(sourceId, targetId);
 
             // Backtrack from target to source
             var tmp = [];
             var path = [];
-            var u = target;
+            var u = targetId;
 
             while (u != null) {
                 tmp.push(u);
@@ -935,7 +1018,7 @@ var SmilesDrawer = function () {
         }
     }, {
         key: 'dijkstra',
-        value: function dijkstra(source, target) {
+        value: function dijkstra(sourceId, targetId) {
             // First initialize q which contains all the vertices
             // including their neighbours, their id and a visited boolean
             var prev = new Array(this.vertices.length);
@@ -945,7 +1028,7 @@ var SmilesDrawer = function () {
 
             // Initialize arrays for the algorithm
             for (var i = 0; i < this.vertices.length; i++) {
-                dist[i] = i == source ? 0 : Number.MAX_VALUE;
+                dist[i] = i == sourceId ? 0 : Number.MAX_VALUE;
                 prev[i] = null;
                 visited[i] = false;
                 neighbours[i] = this.vertices[i].getNeighbours();
@@ -956,7 +1039,7 @@ var SmilesDrawer = function () {
                 var u = this.getMinDist(dist, visited);
 
                 // if u is the target, we're done
-                if (u == target) {
+                if (u == targetId) {
                     return prev;
                 }
 
@@ -968,7 +1051,7 @@ var SmilesDrawer = function () {
 
                     // Do not move directly from the source to the target
                     // this should never happen, so just continue
-                    if (u == source && v == target || u == target && v == source) {
+                    if (u == sourceId && v == targetId || u == targetId && v == sourceId) {
                         continue;
                     }
 
@@ -1017,7 +1100,7 @@ var SmilesDrawer = function () {
             var smallestCommonRing = null;
 
             for (var i = 0; i < commonRings.length; i++) {
-                var size = this.getRing(commonRings[i]).size();
+                var size = this.getRing(commonRings[i]).getSize();
                 if (size < minSize) {
                     minSize = size;
                     smallestCommonRing = this.getRing(commonRings[i]);
@@ -1034,7 +1117,7 @@ var SmilesDrawer = function () {
             var largestCommonRing = null;
 
             for (var i = 0; i < commonRings.length; i++) {
-                var size = this.getRing(commonRings[i]).size();
+                var size = this.getRing(commonRings[i]).getSize();
                 if (size > maxSize) {
                     maxSize = size;
                     largestCommonRing = this.getRing(commonRings[i]);
@@ -1066,7 +1149,7 @@ var SmilesDrawer = function () {
             for (var i = 0; i < this.edges.length; i++) {
                 var edge = this.edges[i];
 
-                if (edge.source == a && edge.target == b || edge.target == a && edge.source == b) {
+                if (edge.sourceId == a && edge.targetId == b || edge.targetId == a && edge.sourceId == b) {
                     return edge.weight;
                 }
             }
@@ -1581,7 +1664,7 @@ var SmilesDrawer = function () {
             for (var i = 0; i < this.edges.length; i++) {
                 var edge = this.edges[i];
 
-                if (edge.source === a && edge.target === b || edge.source === b && edge.target === a) {
+                if (edge.sourceId === a && edge.targetId === b || edge.sourceId === b && edge.targetId === a) {
                     return true;
                 }
             }
@@ -1819,8 +1902,8 @@ var SmilesDrawer = function () {
 
             for (var i = 0; i < this.edges.length; i++) {
                 var edge = this.edges[i];
-                var vertexA = this.vertices[edge.source];
-                var vertexB = this.vertices[edge.target];
+                var vertexA = this.vertices[edge.sourceId];
+                var vertexB = this.vertices[edge.targetId];
                 var elementA = vertexA.value.element;
                 var elementB = vertexB.value.element;
                 var a = vertexA.position;
@@ -1835,7 +1918,7 @@ var SmilesDrawer = function () {
                     v.add(a);
                 });
 
-                if (edge.bond == '=' || this.matchRingBonds(vertexA, vertexB) == '=') {
+                if (edge.bondType === '=' || this.matchRingBonds(vertexA, vertexB) === '=') {
                     // Always draw double bonds inside the ring
                     var inRing = this.areVerticesInSameRing(vertexA, vertexB);
                     var s = this.chooseSide(vertexA, vertexB, sides);
@@ -1863,7 +1946,7 @@ var SmilesDrawer = function () {
                         line.shorten(this.settings.bondLength - this.settings.shortBondLength);
 
                         // The shortened edge
-                        this.line(line.from.x, line.to.y, line.to.x, line.from.y, elementA, elementB);
+                        this.line(line.from.x, line.from.y, line.to.x, line.to.y, elementA, elementB);
 
                         // The normal edge
                         this.line(a.x, a.y, b.x, b.y, elementA, elementB);
@@ -1877,8 +1960,8 @@ var SmilesDrawer = function () {
                         var line1 = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
                         var line2 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
 
-                        this.line(line1.a.x, line1.a.y, line1.b.x, line1.b.y, elementA, elementB);
-                        this.line(line2.a.x, line2.a.y, line2.b.x, line2.b.y, elementA, elementB);
+                        this.line(line1.from.x, line1.from.y, line1.to.x, line1.to.y, elementA, elementB);
+                        this.line(line2.from.x, line2.from.y, line2.to.x, line2.to.y, elementA, elementB);
                     } else if (s.sideCount[0] > s.sideCount[1]) {
                         ArrayHelper.each(normals, function (v) {
                             v.multiply(that.settings.bondSpacing);
@@ -1916,7 +1999,7 @@ var SmilesDrawer = function () {
                         this.line(line.from.x, line.from.y, line.to.x, line.to.y, elementA, elementB);
                         this.line(a.x, a.y, b.x, b.y, elementA, elementB);
                     } else {}
-                } else if (edge.bond === '#') {
+                } else if (edge.bondType === '#') {
                     ArrayHelper.each(normals, function (v) {
                         v.multiply(that.settings.bondSpacing / 1.5);
                     });
@@ -1927,8 +2010,8 @@ var SmilesDrawer = function () {
                     lineA.shorten(this.settings.bondLength - this.settings.shortBondLength);
                     lineB.shorten(this.settings.bondLength - this.settings.shortBondLength);
 
-                    this.line(lineA.a.x, lineA.a.y, lineA.b.x, lineA.b.y, elementA, elementB);
-                    this.line(lineB.a.x, lineB.a.y, lineB.b.x, lineB.b.y, elementA, elementB);
+                    this.line(lineA.from.x, lineA.from.y, lineA.to.x, lineA.to.y, elementA, elementB);
+                    this.line(lineB.from.x, lineB.from.y, lineB.to.x, lineB.to.y, elementA, elementB);
 
                     this.line(a.x, a.y, b.x, b.y, elementA, elementB);
                 } else {
@@ -1988,7 +2071,7 @@ var SmilesDrawer = function () {
             for (var i = 0; i < this.rings.length; i++) {
                 var ring = this.rings[i];
 
-                if (ring.isBenzene(this.vertices)) {
+                if (ring.isAromatic(this.vertices)) {
                     this.ctx.save();
                     this.ctx.strokeStyle = this.colors['C'];
                     this.ctx.lineWidth = 1.5;
@@ -2065,10 +2148,10 @@ var SmilesDrawer = function () {
             center = center ? center : new Vector2(0, 0);
             var startingAngle = start ? Vector2.subtract(start.position, center).angle() : 0;
 
-            var radius = MathHelper.polyCircumradius(that.settings.bondLength, ring.size());
+            var radius = MathHelper.polyCircumradius(that.settings.bondLength, ring.getSize());
             ring.radius = radius;
 
-            var angle = MathHelper.centralAngle(ring.size());
+            var angle = MathHelper.centralAngle(ring.getSize());
             ring.centralAngle = angle;
 
             var a = startingAngle;
@@ -2096,7 +2179,7 @@ var SmilesDrawer = function () {
 
             // Anchor the ring to one of it's members, so that the ring center will always
             // be tied to a single vertex when doing repositionings
-            this.vertices[ring.members[0]].value.addAnchoredRing(ring);
+            this.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
 
             ring.positioned = true;
             ring.center = center;
@@ -2130,8 +2213,8 @@ var SmilesDrawer = function () {
                     });
 
                     // Set length from middle of side to center (the apothem)
-                    var r = MathHelper.polyCircumradius(that.settings.bondLength, neighbour.size());
-                    var apothem = MathHelper.apothem(r, neighbour.size());
+                    var r = MathHelper.polyCircumradius(that.settings.bondLength, neighbour.getSize());
+                    var apothem = MathHelper.apothem(r, neighbour.getSize());
 
                     ArrayHelper.each(normals, function (v) {
                         v.multiply(apothem);
@@ -2172,7 +2255,7 @@ var SmilesDrawer = function () {
                     nextCenter.normalize();
 
                     // Get the distance from the vertex to the center
-                    var r = MathHelper.polyCircumradius(that.settings.bondLength, neighbour.size());
+                    var r = MathHelper.polyCircumradius(that.settings.bondLength, neighbour.getSize());
                     nextCenter.multiply(r);
                     nextCenter.add(vertexA.position);
                     this.createRing(neighbour, nextCenter, vertexA);
@@ -2330,7 +2413,7 @@ var SmilesDrawer = function () {
 
                         if (a && a.allowsFlip()) {
                             vertex.position.rotateTo(a.center, flipCenter);
-                            a.flipped();
+                            a.setFlipped();
 
                             if (vertex.flipNeighbour !== null) {
                                 // It's better to not straighten the other one, since it will possibly overlap
@@ -2339,7 +2422,7 @@ var SmilesDrawer = function () {
                             }
                         } else if (b && b.allowsFlip()) {
                             vertex.position.rotateTo(b.center, flipCenter);
-                            b.flipped();
+                            b.setFlipped();
 
                             if (vertex.flipNeighbour !== null) {
                                 // It's better to not straighten the other one, since it will possibly overlap
@@ -2461,13 +2544,13 @@ var SmilesDrawer = function () {
 
             // Go to next vertex
             // If two rings are connected by a bond ...
-            if (Ring.contains(this.rings, vertex.id)) {
+            if (vertex.value.rings.length > 0) {
                 var nextRing = this.getRing(vertex.value.rings[0]);
                 var nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
                 nextCenter.invert();
                 nextCenter.normalize();
 
-                var r = MathHelper.polyCircumradius(this.settings.bondLength, nextRing.size());
+                var r = MathHelper.polyCircumradius(this.settings.bondLength, nextRing.getSize());
                 nextCenter.multiply(r);
                 nextCenter.add(vertex.position);
                 this.createRing(nextRing, nextCenter, vertex);
@@ -2485,7 +2568,7 @@ var SmilesDrawer = function () {
                     var nextVertex = this.vertices[neighbours[0]];
 
                     // Make a single chain always cis except when there's a tribble bond
-                    if (vertex.value.bond === '#' || previous && previous.value.bond === '#') {
+                    if (vertex.value.bondType === '#' || previous && previous.value.bondType === '#') {
                         nextVertex.angle = angle;
                         this.createBonds(nextVertex, vertex, nextVertex.angle, -dir);
                     } else {
@@ -2653,8 +2736,8 @@ var SmilesDrawer = function () {
     }, {
         key: 'isEdgeInRing',
         value: function isEdgeInRing(edge) {
-            var source = this.vertices[edge.source];
-            var target = this.vertices[edge.target];
+            var source = this.vertices[edge.sourceId];
+            var target = this.vertices[edge.targetId];
 
             return this.areVerticesInSameRing(source, target);
         }
@@ -2672,7 +2755,7 @@ var SmilesDrawer = function () {
     }, {
         key: 'isEdgeInAromaticRing',
         value: function isEdgeInAromaticRing(edge) {
-            return this.isVertexInAromaticRing(edge.source) && this.isVertexInAromaticRing(edge.target);
+            return this.isVertexInAromaticRing(edge.sourceId) && this.isVertexInAromaticRing(edge.targetId);
         }
     }, {
         key: 'isVertexInAromaticRing',
@@ -2684,8 +2767,8 @@ var SmilesDrawer = function () {
     }, {
         key: 'getEdgeNormals',
         value: function getEdgeNormals(edge) {
-            var a = this.vertices[edge.source].position;
-            var b = this.vertices[edge.target].position;
+            var a = this.vertices[edge.sourceId].position;
+            var b = this.vertices[edge.targetId].position;
 
             // Get the normals for the edge
             var normals = Vector2.normals(a, b);
@@ -2806,23 +2889,47 @@ var SmilesDrawer = function () {
     return SmilesDrawer;
 }();
 
+/** A class representing an edge */
+
+
 var Edge = function () {
-    function Edge(source, target, weight) {
+    /**
+     * The constructor for the class Edge.
+     *
+     * @param {number} sourceId A vertex id.
+     * @param {number} targetId A vertex id.
+     * @param {number} weight The weight of the edge.
+     */
+    function Edge(sourceId, targetId, weight) {
         _classCallCheck(this, Edge);
 
         this.id = null;
-        this.source = source;
-        this.target = target;
+        this.sourceId = sourceId;
+        this.targetId = targetId;
         this.weight = weight;
-        this.bond = '-';
+        this.bondType = '-';
         this.isInAromaticRing = false;
     }
+
+    /**
+     * Returns the number of bonds associated with the bond type of this edge.
+     *
+     * @returns {number} The number of bonds associated with this edge.
+     */
+
 
     _createClass(Edge, [{
         key: 'getBondCount',
         value: function getBondCount() {
-            return Edge.bonds[this.bond];
+            return Edge.bonds[this.bondType];
         }
+
+        /**
+         * An object mapping the bond type to the number of bonds.
+         *
+         * @returns {object} The object containing the map.
+         */
+
     }], [{
         key: 'bonds',
         get: function get() {
@@ -2840,7 +2947,18 @@ var Edge = function () {
     return Edge;
 }();
 
+/** A class representing a line */
+
+
 var Line = function () {
+    /**
+     * The constructor for the class Line.
+     *
+     * @param {Vector2} [from=new Vector2(0, 0)] A vector marking the beginning of the line.
+     * @param {Vector2} [to=new Vector2(0, 0)] A vector marking the end of the line.
+     * @param {string} [elementFrom=null] A one-letter representation of the element associated with the vector marking the beginning of the line.
+     * @param {string} [elementTo=null] A one-letter representation of the element associated with the vector marking the end of the line.
+     */
     function Line() {
         var from = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Vector2(0, 0);
         var to = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Vector(0, 0);
@@ -2851,21 +2969,41 @@ var Line = function () {
 
         this.from = from;
         this.to = to;
-
         this.elementFrom = elementFrom;
         this.elementTo = elementTo;
     }
+
+    /**
+     * Clones this line and returns the clone.
+     *
+     * @returns {Line} A clone of this line.
+     */
+
 
     _createClass(Line, [{
         key: 'clone',
         value: function clone() {
             return new Line(this.elementFrom, this.elementTo, this.from.clone(), this.to.clone());
         }
+
+        /**
+         * Returns the length of this line.
+         *
+         * @returns {number} The length of this line.
+         */
+
     }, {
         key: 'getLength',
         value: function getLength() {
             return Math.sqrt(Math.pow(this.to.x - this.from.x, 2) + Math.pow(this.to.y - this.from.y, 2));
         }
+
+        /**
+         * Returns the angle of the line in relation to the coordinate system (the x-axis).
+         *
+         * @returns {number} The angle in radians.
+         */
+
     }, {
         key: 'getAngle',
         value: function getAngle() {
@@ -2873,39 +3011,136 @@ var Line = function () {
             var diff = Vector2.subtract(this.getRightVector(), this.getLeftVector());
             return diff.angle();
         }
+
+        /**
+         * Returns the right vector (the vector with the larger x value).
+         *
+         * @returns {Vector2} The right vector.
+         */
+
     }, {
         key: 'getRightVector',
         value: function getRightVector() {
             // Return the vector with the larger x value (the right one)
-            if (this.from.x < this.to.x) return this.to;else return this.from;
+            if (this.from.x < this.to.x) {
+                return this.to;
+            } else {
+                return this.from;
+            }
         }
+
+        /**
+         * Returns the left vector (the vector with the smaller x value).
+         *
+         * @returns {Vector2} The left vector.
+         */
+
     }, {
         key: 'getLeftVector',
         value: function getLeftVector() {
             // Return the vector with the smaller x value (the left one)
-            if (this.from.x < this.to.x) return this.from;else return this.to;
+            if (this.from.x < this.to.x) {
+                return this.from;
+            } else {
+                return this.to;
+            }
         }
+
+        /**
+         * Returns the element associated with the right vector (the vector with the larger x value).
+         *
+         * @returns {string} The element associated with the right vector.
+         */
+
     }, {
         key: 'getRightElement',
         value: function getRightElement() {
-            if (this.from.x < this.to.x) return this.elementTo;else return this.elementFrom;
+            if (this.from.x < this.to.x) {
+                return this.elementTo;
+            } else {
+                return this.elementFrom;
+            }
         }
+
+        /**
+         * Returns the element associated with the left vector (the vector with the smaller x value).
+         *
+         * @returns {string} The element associated with the left vector.
+         */
+
     }, {
         key: 'getLeftElement',
         value: function getLeftElement() {
-            if (this.from.x < this.to.x) return this.elementFrom;else return this.elementTo;
+            if (this.from.x < this.to.x) {
+                return this.elementFrom;
+            } else {
+                return this.elementTo;
+            }
         }
+
+        /**
+         * Set the value of the right vector.
+         *
+         * @param {number} x The x value.
+         * @param {number} y The y value.
+         * @returns {Line} This line.
+         */
+
     }, {
         key: 'setRightVector',
         value: function setRightVector(x, y) {
-            if (this.from.x < this.to.x) this.to.set(x, y);else this.from.set(x, y);
+            if (this.from.x < this.to.x) {
+                this.to.set(x, y);
+            } else {
+                this.from.set(x, y);
+            }
+
+            return this;
         }
+
+        /**
+         * Set the value of the left vector.
+         *
+         * @param {number} x The x value.
+         * @param {number} y The y value.
+         * @returns {Line} This line.
+         */
+
+    }, {
+        key: 'setLeftVector',
+        value: function setLeftVector(x, y) {
+            if (this.from.x < this.to.x) {
+                this.from.set(x, y);
+            } else {
+                this.to.set(x, y);
+            }
+
+            return this;
+        }
+
+        /**
+         * Rotates this line to be aligned with the x-axis. The center of rotation is the left vector.
+         *
+         * @returns {Line} This line.
+         */
+
     }, {
         key: 'rotateToXAxis',
         value: function rotateToXAxis() {
             var left = this.getLeftVector();
+
             this.setRightVector(left.x + this.getLength(), left.y);
+
+            return this;
         }
+
+        /**
+         * Rotate the line by a given value (in radians). The center of rotation is the left vector.
+         *
+         * @param {number} theta The angle (in radians) to rotate the line.
+         * @returns {Line} This line.
+         */
+
     }, {
         key: 'rotate',
         value: function rotate(theta) {
@@ -2913,36 +3148,67 @@ var Line = function () {
             var r = this.getRightVector();
             var x = Math.cos(theta) * (r.x - l.x) - Math.sin(theta) * (r.y - l.y) + l.x;
             var y = Math.sin(theta) * (r.x - l.x) - Math.cos(theta) * (r.y - l.y) + l.y;
+
             this.setRightVector(x, y);
 
             return this;
         }
+
+        /**
+         * Shortens this line from the "from" direction by a given value (in pixels).
+         *
+         * @param {number} by The length in pixels to shorten the vector by.
+         * @returns {Line} This line.
+         */
+
     }, {
         key: 'shortenFrom',
         value: function shortenFrom(by) {
             var f = Vector2.subtract(this.to, this.from);
+
             f.normalize();
             f.multiply(by);
+
             this.from.add(f);
 
             return this;
         }
+
+        /**
+         * Shortens this line from the "to" direction by a given value (in pixels).
+         *
+         * @param {number} by The length in pixels to shorten the vector by.
+         * @returns {Line} This line.
+         */
+
     }, {
         key: 'shortenTo',
         value: function shortenTo(by) {
             var f = Vector2.subtract(this.from, this.to);
+
             f.normalize();
             f.multiply(by);
+
             this.to.add(f);
 
             return this;
         }
+
+        /**
+         * Shortens this line from both directions by a given value (in pixels).
+         *
+         * @param {number} by The length in pixels to shorten the vector by.
+         * @returns {Line} This line.
+         */
+
     }, {
         key: 'shorten',
         value: function shorten(by) {
             var f = Vector2.subtract(this.from, this.to);
+
             f.normalize();
             f.multiply(by / 2.0);
+
             this.to.add(f);
             this.from.subtract(f);
 
@@ -3011,13 +3277,29 @@ var MathHelper = function () {
     return MathHelper;
 }();
 
+/** A class representing a pair */
+
+
 var Pair = function () {
+    /**
+     * The constructor for the class Pair.
+     *
+     * @param {*} first The first element of the pair.
+     * @param {*} second The second element of the pair.
+     */
     function Pair(first, second) {
         _classCallCheck(this, Pair);
 
         this.first = first;
         this.second = second;
     }
+
+    /**
+     * Returns a unique hash for this pair. Uses the cantor pairing function.
+     *
+     * @returns {number} The hash.
+     */
+
 
     _createClass(Pair, [{
         key: 'getHash',
@@ -3029,11 +3311,28 @@ var Pair = function () {
             // the order into account
             return 0.5 * (this.first + this.second) * (this.first + this.second + 1) + (this.first + this.second);
         }
+
+        /**
+         * Checks whether or not this pair contains an object. Uses '===' to compare.
+         *
+         * @param {*} item An string or a number (current limitation).
+         * @returns {boolean} A boolean representing whether or not this pair contains a given value.
+         */
+
     }, {
         key: 'contains',
         value: function contains(item) {
             return this.first === item || this.second === item;
         }
+
+        /**
+         * Creates unique paris from an array. The array must contain unique values.
+         *
+         * @static
+         * @param {array} array An array containing unique values.
+         * @returns {array} An array containing unique pairs created from the provided array.
+         */
+
     }], [{
         key: 'createUniquePairs',
         value: function createUniquePairs(array) {
@@ -3045,6 +3344,7 @@ var Pair = function () {
 
                 for (var j = i + 1; j < array.length; j++) {
                     var b = array[j];
+
                     pairs.push(new Pair(a, b));
                 }
             }
@@ -3056,14 +3356,24 @@ var Pair = function () {
     return Pair;
 }();
 
+/** A class representing a ring */
+
+
 var Ring = function () {
-    function Ring(ringbond, source, target) {
+    /**
+     * The constructor for the class Ring.
+     *
+     * @param {number} ringbond The id of the ring-bond shared by the source and target atom defined in the smiles string.
+     * @param {number} sourceId The source vertex id.
+     * @param {number} targetId The target vertex id.
+     */
+    function Ring(ringbond, sourceId, targetId) {
         _classCallCheck(this, Ring);
 
         this.id = null;
         this.ringbond = ringbond;
-        this.source = source;
-        this.target = target;
+        this.sourceId = sourceId;
+        this.targetId = targetId;
         this.members = new Array();
         this.insiders = new Array();
         this.neighbours = new Array();
@@ -3076,13 +3386,20 @@ var Ring = function () {
         this.isFused = false;
         this.radius = 0.0;
         this.centralAngle = 0.0;
-        this.flip = true;
+        this.canFlip = true;
     }
+
+    /**
+     * Clones this ring and returns the clone.
+     *
+     * @returns {Ring} A clone of this ring.
+     */
+
 
     _createClass(Ring, [{
         key: 'clone',
         value: function clone() {
-            var clone = new Ring(this.ringbond, this.source, this.target);
+            var clone = new Ring(this.ringbond, this.sourceId, this.target);
 
             clone.id = this.id;
             clone.members = ArrayHelper.clone(this.members);
@@ -3097,25 +3414,55 @@ var Ring = function () {
             clone.isFused = this.isFused;
             clone.radius = this.radius;
             clone.centralAngle = this.centralAngle;
-            clone.flip = this.flip;
+            clone.canFlip = this.canFlip;
 
             return clone;
         }
+
+        /**
+         * Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.
+         *
+         * @returns {boolean} Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.
+         */
+
     }, {
         key: 'allowsFlip',
         value: function allowsFlip() {
-            return this.flip && this.members.length > 4;
+            return this.canFlip && this.members.length > 4;
         }
+
+        /**
+         * Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.
+         *
+         */
+
     }, {
-        key: 'flipped',
-        value: function flipped() {
-            if (this.members.length < 8) this.flip = false;
+        key: 'setFlipped',
+        value: function setFlipped() {
+            if (this.members.length < 8) {
+                this.canFlip = false;
+            }
         }
+
+        /**
+         * Returns the size (number of members) of this ring.
+         *
+         * @returns {number} The size (number of members) of this ring.
+         */
+
     }, {
-        key: 'size',
-        value: function size() {
+        key: 'getSize',
+        value: function getSize() {
             return this.members.length;
         }
+
+        /**
+         * Gets the polygon representation (an array of the ring-members positional vectors) of this ring.
+         *
+         * @param {array} vertices An array of vertices representing the current molecule.
+         * @returns {array} An array of the positional vectors of the ring members.
+         */
+
     }, {
         key: 'getPolygon',
         value: function getPolygon(vertices) {
@@ -3127,37 +3474,72 @@ var Ring = function () {
 
             return polygon;
         }
+
+        /**
+         * Returns the angle of this ring in relation to the coordinate system.
+         *
+         * @returns {number} The angle in radians.
+         */
+
     }, {
         key: 'getAngle',
         value: function getAngle() {
             return Math.PI - this.centralAngle;
         }
+
+        /**
+         * Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.
+         *
+         * @param {array} vertices The vertices associated with the current molecule.
+         * @param {function} callback A callback with the current vertex id as a parameter.
+         * @param {number} startVertexId The vertex id of the start vertex.
+         * @param {number} previousVertexId The vertex id of the previous vertex (the loop calling the callback function will run in the opposite direction of this vertex).
+         */
+
     }, {
         key: 'eachMember',
-        value: function eachMember(vertices, func, start, previous) {
-            var start = start || start === 0 ? start : this.members[0];
-            var current = start;
+        value: function eachMember(vertices, callback, startVertexId, previousVertexId) {
+            startVertexId = startVertexId || startVertexId === 0 ? startVertexId : this.members[0];
+            var current = startVertexId;
             var max = 0;
 
             while (current != null && max < 100) {
                 var prev = current;
-                func(prev);
 
-                current = vertices[current].getNextInRing(vertices, this.id, previous);
-                previous = prev;
-                if (current == start) {
+                callback(prev);
+                current = vertices[current].getNextInRing(vertices, this.id, previousVertexId);
+                previousVertexId = prev;
+
+                // Stop while loop when arriving back at the start vertex
+                if (current == startVertexId) {
                     current = null;
                 }
-                if (max == 99) console.log('crap');
+
+                // Currently, there can be rings where the start vertex is never
+                // reached again (bridged rings)
+                if (max == 99) {
+                    console.log('Smiles-drawer was not able to loop over the members of this ring.', this);
+                }
+
                 max++;
             }
         }
+
+        /**
+         * Returns an array containing the neighbouring rings of this ring ordered by ring size.
+         *
+         * @param {array} ringConnections An array of ring connections associated with the current molecule.
+         * @returns {array} An array of neighbouring rings sorted by ring size.
+         */
+
     }, {
         key: 'getOrderedNeighbours',
         value: function getOrderedNeighbours(ringConnections) {
             var orderedNeighbours = [];
+
             for (var i = 0; i < this.neighbours.length; i++) {
                 var vertices = RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
+
                 orderedNeighbours.push({
                     n: vertices.length,
                     neighbour: this.neighbours[i]
@@ -3171,9 +3553,17 @@ var Ring = function () {
 
             return orderedNeighbours;
         }
+
+        /**
+         * Check whether this ring is aromatic but has no explicit double-bonds defined (e.g. c1ccccc1).
+         *
+         * @param {array} vertices An array of vertices associated with the current molecule.
+         * @returns {boolean} A boolean indicating whether or not this ring is implicitly aromatic (using lowercase letters in smiles).
+         */
+
     }, {
-        key: 'isBenzene',
-        value: function isBenzene(vertices) {
+        key: 'isAromatic',
+        value: function isAromatic(vertices) {
             for (var i = 0; i < this.members.length; i++) {
                 var e = vertices[this.members[i]].value.element.charAt(0);
 
@@ -3184,56 +3574,102 @@ var Ring = function () {
 
             return true;
         }
+
+        /**
+         * Checks whether or not this ring contains a member with a given vertex id.
+         *
+         * @param {number} vertexId A vertex id.
+         * @returns {boolean} A boolean indicating whether or not this ring contains a member with the given vertex id.
+         */
+
     }, {
         key: 'contains',
-        value: function contains(vertex) {
+        value: function contains(vertexId) {
             for (var i = 0; i < this.members.length; i++) {
-                if (this.members[i] == vertex) return true;
+                if (this.members[i] == vertexId) {
+                    return true;
+                }
             }
 
             return false;
         }
+
+        /**
+         * Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.
+         *
+         * @param {array} rings An array of rings associated with this molecule.
+         * @param {number} vertexId A vertex id.
+         * @returns {boolean} A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.
+         */
+
     }, {
         key: 'thisOrNeighboursContain',
-        value: function thisOrNeighboursContain(rings, vertex) {
+        value: function thisOrNeighboursContain(rings, vertexId) {
             for (var i = 0; i < this.neighbours.length; i++) {
-                if (Ring.getRing(rings, this.neighbours[i]).contains(vertex)) return true;
+                if (Ring.getRing(rings, this.neighbours[i]).contains(vertexId)) {
+                    return true;
+                }
             }
 
-            if (this.contains(vertex)) return true;
+            if (this.contains(vertexId)) {
+                return true;
+            }
 
             return false;
         }
+
+        /**
+         * Checks whether or not this ring has a source defined.
+         *
+         * @returns {boolean} A boolean indicating whether or not this ring has a source defined.
+         */
+
     }, {
         key: 'hasSource',
         value: function hasSource() {
-            return !(this.source === undefined || this.source === null);
+            return !(this.sourceId === undefined || this.sourceId === null);
         }
+
+        /**
+         * Checks whether or not this ring has a target defined.
+         *
+         * @returns {boolean} A boolean indicating whether or not this ring has a target defined.
+         */
+
     }, {
         key: 'hasTarget',
         value: function hasTarget() {
-            return !(this.target === undefined || this.target === null);
+            return !(this.targetId === undefined || this.targetId === null);
         }
+
+        /**
+         * Checks whether or not this ring has a source and a target defined.
+         *
+         * @returns {boolean} A boolean indicating whether or not this ring has a source and a target defined.
+         */
+
     }, {
         key: 'hasSourceAndTarget',
         value: function hasSourceAndTarget() {
             return this.hasSource() && this.hasTarget();
         }
-    }, {
+
+        /**
+         * Returns a ring based on a provided ring id.
+         *
+         * @param {array} rings An array of rings associated with the current molecule.
+         * @param {number} id A ring id.
+         * @returns {Ring} A ring with a given id.
+         */
+
+    }], [{
         key: 'getRing',
         value: function getRing(rings, id) {
             for (var i = 0; i < rings.length; i++) {
-                if (rings[i].id == id) return rings[i];
+                if (rings[i].id == id) {
+                    return rings[i];
+                }
             }
-        }
-    }], [{
-        key: 'contains',
-        value: function contains(rings, vertex) {
-            for (var i = 0; i < rings.length; i++) {
-                if (rings[i].contains(vertex)) return true;
-            }
-
-            return false;
         }
     }]);
 
@@ -5086,9 +5522,6 @@ var Vector2 = function () {
     /**
      * The constructor of the class Vector2.
      *
-     * @name constructor
-     * @function
-     * @access public
      * @param {number} x The initial x coordinate value.
      * @param {number} y The initial y coordinate value.
      */
@@ -5110,9 +5543,6 @@ var Vector2 = function () {
     /**
      * Sets the values of the x and y coordinates of this vector.
      *
-     * @name set
-     * @function
-     * @access public
      * @param {number} [x=0] The value of the x coordinate.
      * @param {number} [y=0] The value of the y coordinate.
      */
@@ -5131,9 +5561,6 @@ var Vector2 = function () {
         /**
          * Clones this vector and returns the clone.
          *
-         * @name clone
-         * @function
-         * @access public
          * @returns {Vector2} The clone of this vector.
          */
 
@@ -5146,9 +5573,6 @@ var Vector2 = function () {
         /**
          * Returns a string representation of this vector.
          *
-         * @name toString
-         * @function
-         * @access public
          * @returns {string} A string representation of this vector.
          */
 
@@ -5161,9 +5585,6 @@ var Vector2 = function () {
         /**
          * Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
          *
-         * @name add
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          */
 
@@ -5177,9 +5598,6 @@ var Vector2 = function () {
         /**
          * Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
          *
-         * @name subtract
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          */
 
@@ -5193,9 +5611,6 @@ var Vector2 = function () {
         /**
          * Divide the x and y coordinate values of this vector by a scalar.
          *
-         * @name divide
-         * @function
-         * @access public
          * @param {number} scalar The scalar.
          */
 
@@ -5209,9 +5624,6 @@ var Vector2 = function () {
         /**
          * Multiply the x and y coordinate values of this vector by a scalar.
          *
-         * @name multiply
-         * @function
-         * @access public
          * @param {number} scalar The scalar.
          */
 
@@ -5225,9 +5637,6 @@ var Vector2 = function () {
         /**
          * Inverts this vector. Same as multiply(-1.0).
          *
-         * @name invert
-         * @function
-         * @access public
          */
 
     }, {
@@ -5240,9 +5649,6 @@ var Vector2 = function () {
         /**
          * Returns the angle of this vector in relation to the coordinate system.
          *
-         * @name angle
-         * @function
-         * @access public
          * @returns {number} The angle in radians.
          */
 
@@ -5255,9 +5661,6 @@ var Vector2 = function () {
         /**
          * Returns the euclidean distance between this vector and another vector.
          *
-         * @name distance
-         * @function
-         * @access public
          * @param {Vector2} vec A vector.
          * @returns {number} The euclidean distance between the two vectors.
          */
@@ -5271,9 +5674,6 @@ var Vector2 = function () {
         /**
          * Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).
          *
-         * @name distanceSq
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          * @returns {number} The squared euclidean distance of the two vectors.
          */
@@ -5287,9 +5687,6 @@ var Vector2 = function () {
         /**
          * Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.
          *
-         * @name clockwise
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          * @returns {number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.
          */
@@ -5299,17 +5696,19 @@ var Vector2 = function () {
         value: function clockwise(vec) {
             var a = this.y * vec.x;
             var b = this.x * vec.y;
-            if (a > b) return -1;
-            if (a === b) return 0;
+
+            if (a > b) {
+                return -1;
+            } else if (a === b) {
+                return 0;
+            }
+
             return 1;
         }
 
         /**
          * Rotates this vector by a given number of radians around the origin of the coordinate system.
          *
-         * @name rotate
-         * @function
-         * @access public
          * @param {number} angle The angle in radians to rotate the vector.
          */
 
@@ -5317,8 +5716,10 @@ var Vector2 = function () {
         key: 'rotate',
         value: function rotate(angle) {
             var tmp = new Vector2();
+
             tmp.x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
             tmp.y = this.x * Math.sin(angle) + this.y * Math.cos(angle);
+
             this.x = tmp.x;
             this.y = tmp.y;
         }
@@ -5326,9 +5727,6 @@ var Vector2 = function () {
         /**
          * Rotates this vector around another vector.
          *
-         * @name rotateAround
-         * @function
-         * @access public
          * @param {number} angle The angle in radians to rotate the vector.
          * @param {Vector2} vec The vector which is used as the rotational center.
          */
@@ -5357,9 +5755,6 @@ var Vector2 = function () {
         /**
          * Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.
          *
-         * @name rotateTo
-         * @function
-         * @access public
          * @param {Vector2} vec The vector to rotate this vector to.
          * @param {Vector2} center The rotational center.
          * @param {number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
@@ -5380,9 +5775,6 @@ var Vector2 = function () {
         /**
          * Gets the angles between this vector and another vector around a common center of rotation.
          *
-         * @name getRotateToAngle
-         * @function
-         * @access public
          * @param {Vector2} vec Another vector.
          * @param {Vector2} center The center of rotation.
          * @returns {number} The angle between this vector and another vector around a center of rotation in radians.
@@ -5401,9 +5793,6 @@ var Vector2 = function () {
         /**
          * Checks whether a vector lies within a polygon spanned by a set of vectors.
          *
-         * @name isInPolygon
-         * @function
-         * @access public
          * @param {array} polygon An array of vectors spanning the polygon.
          * @returns {boolean} A boolean indicating whether or not this vector is within a polygon.
          */
@@ -5426,9 +5815,6 @@ var Vector2 = function () {
         /**
          * Returns the length of this vector.
          *
-         * @name length
-         * @function
-         * @access public
          * @returns {number} The length of this vector.
          */
 
@@ -5441,9 +5827,6 @@ var Vector2 = function () {
         /**
          * Normalizes this vector.
          *
-         * @name normalize
-         * @function
-         * @access public
          */
 
     }, {
@@ -5455,9 +5838,6 @@ var Vector2 = function () {
         /**
          * Returns a normalized copy of this vector.
          *
-         * @name normalized
-         * @function
-         * @access public
          * @returns {Vector2} A normalized copy of this vector.
          */
 
@@ -5470,9 +5850,6 @@ var Vector2 = function () {
         /**
          * Calculates which side of a line spanned by two vectors this vector is.
          *
-         * @name whichSide
-         * @function
-         * @access public
          * @param {Vector2} vecA A vector.
          * @param {Vector2} vecB A vector.
          * @returns {number} A number indicating the side of this vector, given a line spanned by two other vectors.
@@ -5487,9 +5864,6 @@ var Vector2 = function () {
         /**
          * Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.
          *
-         * @name sameSideAs
-         * @function
-         * @access public
          * @param {Vector2} vecA A vector spanning the line.
          * @param {Vector2} vecB A vector spanning the line.
          * @param {Vector2} vecC A vector to check whether or not it is on the same side as this vector.
@@ -5508,9 +5882,6 @@ var Vector2 = function () {
         /**
          * Adds two vectors and returns the result as a new vector.
          *
-         * @name add
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A summand.
          * @param {Vector2} vecB A summand.
@@ -5526,9 +5897,6 @@ var Vector2 = function () {
         /**
          * Subtracts one vector from another and returns the result as a new vector.
          *
-         * @name subtract
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA The minuend.
          * @param {Vector2} vecB The subtrahend.
@@ -5544,9 +5912,6 @@ var Vector2 = function () {
         /**
          * Multiplies two vectors (value by value) and returns the result.
          *
-         * @name multiply
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A factor.
          * @param {Vector2} vecB A factor.
@@ -5556,15 +5921,16 @@ var Vector2 = function () {
     }, {
         key: 'multiply',
         value: function multiply(vecA, vecB) {
-            if (vecB.x && vecB.y) return new Vector2(vecA.x * vecB.x, vecA.y * vecB.y);else return new Vector2(vecA.x * vecB, vecA.y * vecB);
+            if (vecB.x && vecB.y) {
+                return new Vector2(vecA.x * vecB.x, vecA.y * vecB.y);
+            }
+
+            return new Vector2(vecA.x * vecB, vecA.y * vecB);
         }
 
         /**
          * Returns the midpoint of a line spanned by two vectors.
          *
-         * @name midpoint
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A vector spanning the line.
          * @param {Vector2} vecB A vector spanning the line.
@@ -5580,9 +5946,6 @@ var Vector2 = function () {
         /**
          * Returns the normals of a line spanned by two vectors.
          *
-         * @name normals
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A vector spanning the line.
          * @param {Vector2} vecB A vector spanning the line.
@@ -5600,9 +5963,6 @@ var Vector2 = function () {
         /**
          * Divides a vector by another vector and returns the result as new vector.
          *
-         * @name divide
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA The dividend.
          * @param {Vector2} vecB The divisor.
@@ -5612,15 +5972,16 @@ var Vector2 = function () {
     }, {
         key: 'divide',
         value: function divide(vecA, vecB) {
-            if (vecB.x && vecB.y) return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);else return new Vector2(vecA.x / vecB, vecA.y / vecB);
+            if (vecB.x && vecB.y) {
+                return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
+            }
+
+            return new Vector2(vecA.x / vecB, vecA.y / vecB);
         }
 
         /**
          * Returns the dot product of two vectors.
          *
-         * @name dot
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A vector.
          * @param {Vector2} vecB A vector.
@@ -5636,9 +5997,6 @@ var Vector2 = function () {
         /**
          * Returns the angle between two vectors.
          *
-         * @name angle
-         * @function
-         * @access public
          * @static
          * @param {Vector2} vecA A vector.
          * @param {Vector2} vecB A vector.
@@ -5649,17 +6007,15 @@ var Vector2 = function () {
         key: 'angle',
         value: function angle(vecA, vecB) {
             var dot = Vector2.dot(vecA, vecB);
+
             return Math.acos(dot / (vecA.length() * vecB.length()));
         }
 
         /**
          * Returns the scalar projection of a vector on another vector.
          *
-         * @name scalarProjection
-         * @function
-         * @access public
          * @static
-         * @param {Vector2} vecA The vector to be projected.
+         * @param {Vector2} vecA Thecreate jsdoc babel vector to be projected.
          * @param {Vector2} vecB The vector to be projection upon.
          * @returns {number} The scalar component.
          */
@@ -5668,6 +6024,7 @@ var Vector2 = function () {
         key: 'scalarProjection',
         value: function scalarProjection(vecA, vecB) {
             var unit = vecB.normalized();
+
             return Vector2.dot(vecA, unit);
         }
     }]);
@@ -5682,9 +6039,6 @@ var Vertex = function () {
     /**
      * The constructor for the class Vertex.
      *
-     * @name constructor
-     * @function
-     * @access public
      * @param {*} value The value associated with this vertex.
      * @param {number} [x=0] The initial x coordinate of the positional vector of this vertex.
      * @param {number} [y=0] The initial y coordinate of the positional vector of this vertex.
@@ -5715,9 +6069,6 @@ var Vertex = function () {
     /**
      * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.
      *
-     * @name isTerminal
-     * @function
-     * @access public
      * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
      */
 
@@ -5731,9 +6082,6 @@ var Vertex = function () {
         /**
          * Clones this vertex and returns the clone.
          *
-         * @name clone
-         * @function
-         * @access public
          * @returns {Vertex} A clone of this vertex.
          */
 
@@ -5759,9 +6107,6 @@ var Vertex = function () {
         /**
          * Returns true if this vertex and the supplied vertex both have the same id, else returns false.
          *
-         * @name equals
-         * @function
-         * @access public
          * @param {Vertex} - The vertex to check.
          * @returns {boolean} A boolean indicating whether or not the two vertices have the same id.
          */
@@ -5775,9 +6120,6 @@ var Vertex = function () {
         /**
          * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
          *
-         * @name getAngle
-         * @function
-         * @access public
          * @param {Vertex} [referenceVector=null] - The refernece vector.
          * @param {boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
          * @returns {number} The angle of this vertex.
@@ -5807,9 +6149,6 @@ var Vertex = function () {
         /**
          * Returns the suggested text direction when text is added at the position of this vertex.
          *
-         * @name getTextDirection
-         * @function
-         * @access public
          * @param {array} vertices The array of vertices for the current molecule.
          * @returns {string} The suggested direction of the text.
          */
@@ -5846,9 +6185,6 @@ var Vertex = function () {
         /**
          * Returns an array of ids of neighbouring vertices.
          *
-         * @name getNeighbours
-         * @function
-         * @access public
          * @param {number} [vertexId=null] If a value is supplied, the vertex with this id is excluded from the returned indices.
          * @returns {array} An array containing the ids of neighbouring vertices.
          */
@@ -5878,9 +6214,6 @@ var Vertex = function () {
         /**
          * Gets the common neighbours of this and another vertex.
          *
-         * @name getCommonNeighbours
-         * @function
-         * @access public
          * @param {Vertex} vertex The vertex to check for common neighbours.
          * @returns {array} An array containing common neighbours.
          */
@@ -5908,9 +6241,6 @@ var Vertex = function () {
         /**
          * Checks whether or not a vertex is a neighbour of this vertex.
          *
-         * @name isNeighbour
-         * @function
-         * @access public
          * @param {number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
          * @returns {boolean} A boolean indicating whether or not the two vertices are neighbours.
          */
@@ -5932,9 +6262,6 @@ var Vertex = function () {
         /**
          * Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
          *
-         * @name getSpanningTreeNeighbours
-         * @function
-         * @access public
          * @param {number} [vertexId=null] If supplied, the vertex with this id is excluded from the array returned.
          * @returns {array} An array containing the ids of the neighbouring vertices.
          */
@@ -5964,9 +6291,6 @@ var Vertex = function () {
         /**
          * Gets the next vertex in the ring in opposide direction to the supplied vertex id.
          *
-         * @name getNextInRing
-         * @function
-         * @access public
          * @param {array} vertices The array of vertices for the current molecule.
          * @param {number} ringId The id of the ring containing this vertex.
          * @param {number} previousVertexId The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.

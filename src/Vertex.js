@@ -40,7 +40,7 @@ class Vertex {
      * @returns {Vertex} A clone of this vertex.
      */
     clone() {
-        var clone = new Vertex(this.value, this.position.x, this.position.y);
+        let clone = new Vertex(this.value, this.position.x, this.position.y);
         clone.id = this.id;
         clone.previousPosition = new Vector2(this.previousPosition.x, this.previousPosition.y);
         clone.parentVertexId = this.parentVertexId;
@@ -74,7 +74,7 @@ class Vertex {
      * @returns {number} The angle of this vertex.
      */
     getAngle(referenceVector = null, returnAsDegrees = false) {
-        var u = null;
+        let u = null;
         
         if (!referenceVector) {
             u = Vector2.subtract(this.position, this.previousPosition);
@@ -96,17 +96,17 @@ class Vertex {
      * @returns {string} The suggested direction of the text.
      */
     getTextDirection(vertices) {
-        var neighbours = this.getNeighbours();
-        var angles = [];
+        let neighbours = this.getNeighbours();
+        let angles = [];
         
-        for (var i = 0; i < neighbours.length; i++) {
+        for (let i = 0; i < neighbours.length; i++) {
             angles.push(this.getAngle(vertices[neighbours[i]].position));
         }
 
-        var textAngle = MathHelper.meanAngle(angles);
+        let textAngle = MathHelper.meanAngle(angles);
 
         // Round to 0, 90, 180 or 270 degree
-        var halfPi = Math.PI / 2.0;
+        let halfPi = Math.PI / 2.0;
         textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi, 3);
 
         if (textAngle == 2) {
@@ -129,9 +129,9 @@ class Vertex {
      * @returns {array} An array containing the ids of neighbouring vertices.
      */
     getNeighbours(vertexId = null) {
-        var neighbours = [];
+        let neighbours = [];
 
-        for (var i = 0; i < this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             if (vertexId === undefined || vertexId != this.children[i]) {
                 neighbours.push(this.children[i]);
             }
@@ -155,12 +155,12 @@ class Vertex {
     getCommonNeighbours(vertex) {
         // There can only be one common neighbour of a Vertex
         // outside of a ring
-        var commonNeighbours = new Array();
-        var neighboursA = this.getNeighbours();
-        var neighboursB = vertex.getNeighbours();
+        let commonNeighbours = new Array();
+        let neighboursA = this.getNeighbours();
+        let neighboursB = vertex.getNeighbours();
 
-        for (var i = 0; i < neighboursA.length; i++) {
-            for (var j = 0; j < neighboursB.length; j++) {
+        for (let i = 0; i < neighboursA.length; i++) {
+            for (let j = 0; j < neighboursB.length; j++) {
                 if (neighboursA[i] === neighboursB[j]) {
                     commonNeighbours.push(neighboursA[i]);
                 }
@@ -181,7 +181,7 @@ class Vertex {
             return true;
         }
 
-        for (var i = 0; i < this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             if (this.children[i] === vertexId) {
                 return true;
             }
@@ -195,9 +195,9 @@ class Vertex {
      * @returns {array} An array containing the ids of the neighbouring vertices.
      */
     getSpanningTreeNeighbours(vertexId = null) {
-        var neighbours = [];
+        let neighbours = [];
 
-        for (var i = 0; i < this.spanningTreeChildren.length; i++) {
+        for (let i = 0; i < this.spanningTreeChildren.length; i++) {
             if (vertexId === undefined || vertexId != this.spanningTreeChildren[i]) {
                 neighbours.push(this.spanningTreeChildren[i]);
             }
@@ -221,9 +221,9 @@ class Vertex {
      * @returns {number} The id of the next vertex in the ring.
      */
     getNextInRing(vertices, ringId, previousVertexId) {
-        var neighbours = this.getNeighbours();
+        let neighbours = this.getNeighbours();
 
-        for (var i = 0; i < neighbours.length; i++) {
+        for (let i = 0; i < neighbours.length; i++) {
             if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, { value: ringId }) && 
                 neighbours[i] != previousVertexId) {
                 return neighbours[i];

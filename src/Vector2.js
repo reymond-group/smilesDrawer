@@ -133,10 +133,16 @@ class Vector2 {
      * @returns {number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.
      */
     clockwise(vec) {
-        var a = this.y * vec.x;
-        var b = this.x * vec.y;
-        if (a > b) return -1;
-        if (a === b) return 0;
+        let a = this.y * vec.x;
+        let b = this.x * vec.y;
+        
+        if (a > b) {
+            return -1;
+        }
+        else if (a === b) {
+            return 0;
+        }
+
         return 1;
     }
 
@@ -146,9 +152,11 @@ class Vector2 {
      * @param {number} angle The angle in radians to rotate the vector.
      */
     rotate(angle) {
-        var tmp = new Vector2();
+        let tmp = new Vector2();
+        
         tmp.x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
         tmp.y = this.x * Math.sin(angle) + this.y * Math.cos(angle);
+        
         this.x = tmp.x;
         this.y = tmp.y;
     }
@@ -160,14 +168,14 @@ class Vector2 {
      * @param {Vector2} vec The vector which is used as the rotational center.
      */
     rotateAround(angle, vec) {
-        var s = Math.sin(angle);
-        var c = Math.cos(angle);
+        let s = Math.sin(angle);
+        let c = Math.cos(angle);
 
         this.x -= vec.x;
         this.y -= vec.y;
 
-        var x = this.x * c - this.y * s;
-        var y = this.x * s + this.y * c;
+        let x = this.x * c - this.y * s;
+        let y = this.x * s + this.y * c;
 
         this.x = x + vec.x;
         this.y = y + vec.y;
@@ -186,9 +194,9 @@ class Vector2 {
      * @param {number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
      */
     rotateTo(vec, center, offsetAngle = 0.0) {
-        var a = Vector2.subtract(this, center);
-        var b = Vector2.subtract(vec, center);
-        var angle = Vector2.angle(b, a);
+        let a = Vector2.subtract(this, center);
+        let b = Vector2.subtract(vec, center);
+        let angle = Vector2.angle(b, a);
 
         this.rotateAround(angle + offsetAngle, center);
     }
@@ -201,9 +209,9 @@ class Vector2 {
      * @returns {number} The angle between this vector and another vector around a center of rotation in radians.
      */
     getRotateToAngle(vec, center) {
-        var a = Vector2.subtract(this, center);
-        var b = Vector2.subtract(vec, center);
-        var angle = Vector2.angle(b, a);
+        let a = Vector2.subtract(this, center);
+        let b = Vector2.subtract(vec, center);
+        let angle = Vector2.angle(b, a);
 
         return angle;
     }
@@ -215,13 +223,13 @@ class Vector2 {
      * @returns {boolean} A boolean indicating whether or not this vector is within a polygon.
      */
     isInPolygon(polygon) {
-        var inside = false;
+        let inside = false;
 
         // Its not always a given, that the polygon is convex (-> sugars)
-        for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
             if (((polygon[i].y > this.y) != (polygon[j].y > this.y)) &&
-                    (this.x < (polygon[j].x - polygon[i].x) * (this.y - polygon[i].y) /
-                    (polygon[j].y - polygon[i].y) + polygon[i].x)) {
+                (this.x < (polygon[j].x - polygon[i].x) * (this.y - polygon[i].y) /
+                (polygon[j].y - polygon[i].y) + polygon[i].x)) {
                 inside = !inside;
             }
         }
@@ -276,8 +284,8 @@ class Vector2 {
      * @returns {boolean} Returns a boolean indicating whether or not this vector is on the same side as another vector.
      */
     sameSideAs(vecA, vecB, vecC) {
-        var d = this.whichSide(vecA, vecB);
-        var dRef = vecC.whichSide(vecA, vecB);
+        let d = this.whichSide(vecA, vecB);
+        let dRef = vecC.whichSide(vecA, vecB);
 
         return d < 0 && dRef < 0 || d == 0 && dRef == 0 || d > 0 && dRef > 0;
     }
@@ -315,10 +323,11 @@ class Vector2 {
      * @returns {Vector2} Returns the product of two vectors.
      */
     static multiply(vecA, vecB) {
-        if (vecB.x && vecB.y)
+        if (vecB.x && vecB.y) {
             return new Vector2(vecA.x * vecB.x, vecA.y * vecB.y);
-        else
-            return new Vector2(vecA.x * vecB, vecA.y * vecB);
+        }
+
+        return new Vector2(vecA.x * vecB, vecA.y * vecB);
     }
 
     /**
@@ -342,7 +351,7 @@ class Vector2 {
      * @returns {array} An array containing the two normals, each represented by a vector.
      */
     static normals(vecA, vecB) {
-        var delta = Vector2.subtract(vecB, vecA);
+        let delta = Vector2.subtract(vecB, vecA);
 
         return [
             new Vector2(-delta.y, delta.x),
@@ -359,10 +368,11 @@ class Vector2 {
      * @returns {Vector2} The fraction of the two vectors.
      */
     static divide(vecA, vecB) {
-        if (vecB.x && vecB.y)
+        if (vecB.x && vecB.y) {
             return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
-        else
-            return new Vector2(vecA.x / vecB, vecA.y / vecB);
+        }
+
+        return new Vector2(vecA.x / vecB, vecA.y / vecB);
     }
 
     /**
@@ -386,7 +396,8 @@ class Vector2 {
      * @returns {number} The angle between two vectors in radians.
      */
     static angle(vecA, vecB) {
-        var dot = Vector2.dot(vecA, vecB);
+        let dot = Vector2.dot(vecA, vecB);
+        
         return Math.acos(dot / (vecA.length() * vecB.length()));
     }
     
@@ -399,7 +410,8 @@ class Vector2 {
      * @returns {number} The scalar component.
      */
     static scalarProjection(vecA, vecB) {
-        var unit = vecB.normalized();
+        let unit = vecB.normalized();
+        
         return Vector2.dot(vecA, unit);
     }
 }

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>Documentation Class: Vertex</title>
+	<title>Documentation Class: Ring</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -65,16 +65,16 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: Vertex</h1>
+	<h1 class="page-title">Class: Ring</h1>
 <section>
 
 <header>
     
         <h2>
-        Vertex
+        Ring
         </h2>
         
-            <div class="class-description"><p>A class representing a vertex</p></div>
+            <div class="class-description"><p>A class representing a ring</p></div>
         
     
 </header>
@@ -86,7 +86,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="Vertex"><span class="type-signature"></span>new Vertex(value [, x] [, y])</h4>
+    <h4 class="name" id="Ring"><span class="type-signature"></span>new Ring(ringbond, sourceId, targetId)</h4>
     
     
 </dt>
@@ -94,7 +94,7 @@
 
     
     <div class="description">
-        <p>The constructor for the class Vertex.</p>
+        <p>The constructor for the class Ring.</p>
     </div>
     
 
@@ -117,11 +117,7 @@
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -133,43 +129,7 @@
 
         <tr>
             
-                <td class="name"><code>value</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>The value associated with this vertex.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>ringbond</code></td>
             
 
             <td class="type">
@@ -183,33 +143,17 @@
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                    0
-                
-                </td>
-            
 
-            <td class="description last"><p>The initial x coordinate of the positional vector of this vertex.</p></td>
+            <td class="description last"><p>The id of the ring-bond shared by the source and target atom defined in the smiles string.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>y</code></td>
+                <td class="name"><code>sourceId</code></td>
             
 
             <td class="type">
@@ -223,26 +167,34 @@
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
 
-                
+            
 
+            <td class="description last"><p>The source vertex id.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetId</code></td>
+            
+
+            <td class="type">
+            
                 
-                </td>
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
             
 
             
-                <td class="default">
-                
-                    0
-                
-                </td>
-            
 
-            <td class="description last"><p>The initial y coordinate of the positional vector of this vertex.</p></td>
+            <td class="description last"><p>The target vertex id.</p></td>
         </tr>
 
     
@@ -328,6 +280,284 @@
             
 <hr>
 <dt>
+    <h4 class="name" id=".getRing"><span class="type-signature">&lt;static> </span>getRing(rings, id)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Returns a ring based on a provided ring id.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>rings</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An array of rings associated with the current molecule.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A ring id.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A ring with a given id.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Ring.html">Ring</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="allowsFlip"><span class="type-signature"></span>allowsFlip()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="clone"><span class="type-signature"></span>clone()</h4>
     
     
@@ -336,7 +566,7 @@
 
     
     <div class="description">
-        <p>Clones this vertex and returns the clone.</p>
+        <p>Clones this ring and returns the clone.</p>
     </div>
     
 
@@ -402,7 +632,7 @@
     
             
 <div class="param-desc">
-    <p>A clone of this vertex.</p>
+    <p>A clone of this ring.</p>
 </div>
 
 
@@ -413,7 +643,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="Vertex.html">Vertex</a></span>
+<span class="param-type"><a href="Ring.html">Ring</a></span>
 
 
 
@@ -430,7 +660,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="equals"><span class="type-signature"></span>equals(vertex)</h4>
+    <h4 class="name" id="contains"><span class="type-signature"></span>contains(vertexId)</h4>
     
     
 </dt>
@@ -438,7 +668,7 @@
 
     
     <div class="description">
-        <p>Returns true if this vertex and the supplied vertex both have the same id, else returns false.</p>
+        <p>Checks whether or not this ring contains a member with a given vertex id.</p>
     </div>
     
 
@@ -462,526 +692,6 @@
 
         
 
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>vertex</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Vertex.html">Vertex</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The vertex to check.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>A boolean indicating whether or not the two vertices have the same id.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getAngle"><span class="type-signature"></span>getAngle( [referenceVector] [, returnAsDegrees])</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>referenceVector</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Vertex.html">Vertex</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p>The refernece vector.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>returnAsDegrees</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-
-            <td class="description last"><p>If true, returns angle in degrees, else in radians.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>The angle of this vertex.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">number</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getCommonNeighbours"><span class="type-signature"></span>getCommonNeighbours(vertex)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Gets the common neighbours of this and another vertex.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>vertex</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Vertex.html">Vertex</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The vertex to check for common neighbours.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>An array containing common neighbours.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">array</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getNeighbours"><span class="type-signature"></span>getNeighbours( [vertexId])</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns an array of ids of neighbouring vertices.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1007,26 +717,10 @@
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
 
-            <td class="description last"><p>If a value is supplied, the vertex with this id is excluded from the returned indices.</p></td>
+            <td class="description last"><p>A vertex id.</p></td>
         </tr>
 
     
@@ -1090,7 +784,7 @@
     
             
 <div class="param-desc">
-    <p>An array containing the ids of neighbouring vertices.</p>
+    <p>A boolean indicating whether or not this ring contains a member with the given vertex id.</p>
 </div>
 
 
@@ -1101,7 +795,7 @@
     </dt>
     <dd>
         
-<span class="param-type">array</span>
+<span class="param-type">boolean</span>
 
 
 
@@ -1118,7 +812,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getNextInRing"><span class="type-signature"></span>getNextInRing(vertices, ringId, previousVertexId)</h4>
+    <h4 class="name" id="eachMember"><span class="type-signature"></span>eachMember(vertices, callback, startVertexId, previousVertexId)</h4>
     
     
 </dt>
@@ -1126,7 +820,7 @@
 
     
     <div class="description">
-        <p>Gets the next vertex in the ring in opposide direction to the supplied vertex id.</p>
+        <p>Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.</p>
     </div>
     
 
@@ -1178,14 +872,38 @@
 
             
 
-            <td class="description last"><p>The array of vertices for the current molecule.</p></td>
+            <td class="description last"><p>The vertices associated with the current molecule.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>ringId</code></td>
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A callback with the current vertex id as a parameter.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>startVertexId</code></td>
             
 
             <td class="type">
@@ -1202,7 +920,7 @@
 
             
 
-            <td class="description last"><p>The id of the ring containing this vertex.</p></td>
+            <td class="description last"><p>The vertex id of the start vertex.</p></td>
         </tr>
 
     
@@ -1226,7 +944,7 @@
 
             
 
-            <td class="description last"><p>The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.</p></td>
+            <td class="description last"><p>The vertex id of the previous vertex (the loop calling the callback function will run in the opposite direction of this vertex).</p></td>
         </tr>
 
     
@@ -1286,11 +1004,89 @@
     
 
     
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getAngle"><span class="type-signature"></span>getAngle()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Returns the angle of this ring in relation to the coordinate system.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
     <h5>Returns:</h5>
     
             
 <div class="param-desc">
-    <p>The id of the next vertex in the ring.</p>
+    <p>The angle in radians.</p>
 </div>
 
 
@@ -1318,7 +1114,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getSpanningTreeNeighbours"><span class="type-signature"></span>getSpanningTreeNeighbours( [vertexId])</h4>
+    <h4 class="name" id="getOrderedNeighbours"><span class="type-signature"></span>getOrderedNeighbours(ringConnections)</h4>
     
     
 </dt>
@@ -1326,7 +1122,7 @@
 
     
     <div class="description">
-        <p>Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.</p>
+        <p>Returns an array containing the neighbouring rings of this ring ordered by ring size.</p>
     </div>
     
 
@@ -1349,11 +1145,7 @@
         <th>Type</th>
 
         
-        <th>Argument</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1365,13 +1157,13 @@
 
         <tr>
             
-                <td class="name"><code>vertexId</code></td>
+                <td class="name"><code>ringConnections</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">array</span>
 
 
 
@@ -1379,26 +1171,10 @@
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
 
-            <td class="description last"><p>If supplied, the vertex with this id is excluded from the array returned.</p></td>
+            <td class="description last"><p>An array of ring connections associated with the current molecule.</p></td>
         </tr>
 
     
@@ -1462,7 +1238,7 @@
     
             
 <div class="param-desc">
-    <p>An array containing the ids of the neighbouring vertices.</p>
+    <p>An array of neighbouring rings sorted by ring size.</p>
 </div>
 
 
@@ -1490,7 +1266,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getTextDirection"><span class="type-signature"></span>getTextDirection(vertices)</h4>
+    <h4 class="name" id="getPolygon"><span class="type-signature"></span>getPolygon(vertices)</h4>
     
     
 </dt>
@@ -1498,7 +1274,7 @@
 
     
     <div class="description">
-        <p>Returns the suggested text direction when text is added at the position of this vertex.</p>
+        <p>Gets the polygon representation (an array of the ring-members positional vectors) of this ring.</p>
     </div>
     
 
@@ -1550,7 +1326,7 @@
 
             
 
-            <td class="description last"><p>The array of vertices for the current molecule.</p></td>
+            <td class="description last"><p>An array of vertices representing the current molecule.</p></td>
         </tr>
 
     
@@ -1614,7 +1390,7 @@
     
             
 <div class="param-desc">
-    <p>The suggested direction of the text.</p>
+    <p>An array of the positional vectors of the ring members.</p>
 </div>
 
 
@@ -1625,7 +1401,7 @@
     </dt>
     <dd>
         
-<span class="param-type">string</span>
+<span class="param-type">array</span>
 
 
 
@@ -1642,7 +1418,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="isNeighbour"><span class="type-signature"></span>isNeighbour(vertexId)</h4>
+    <h4 class="name" id="getSize"><span class="type-signature"></span>getSize()</h4>
     
     
 </dt>
@@ -1650,7 +1426,415 @@
 
     
     <div class="description">
-        <p>Checks whether or not a vertex is a neighbour of this vertex.</p>
+        <p>Returns the size (number of members) of this ring.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The size (number of members) of this ring.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="hasSource"><span class="type-signature"></span>hasSource()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Checks whether or not this ring has a source defined.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A boolean indicating whether or not this ring has a source defined.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="hasSourceAndTarget"><span class="type-signature"></span>hasSourceAndTarget()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Checks whether or not this ring has a source and a target defined.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A boolean indicating whether or not this ring has a source and a target defined.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="hasTarget"><span class="type-signature"></span>hasTarget()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Checks whether or not this ring has a target defined.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A boolean indicating whether or not this ring has a target defined.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="isAromatic"><span class="type-signature"></span>isAromatic(vertices)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Check whether this ring is aromatic but has no explicit double-bonds defined (e.g. c1ccccc1).</p>
     </div>
     
 
@@ -1685,13 +1869,13 @@
 
         <tr>
             
-                <td class="name"><code>vertexId</code></td>
+                <td class="name"><code>vertices</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">array</span>
 
 
 
@@ -1702,7 +1886,7 @@
 
             
 
-            <td class="description last"><p>The id of the vertex to check if it is a neighbour of this vertex.</p></td>
+            <td class="description last"><p>An array of vertices associated with the current molecule.</p></td>
         </tr>
 
     
@@ -1766,7 +1950,7 @@
     
             
 <div class="param-desc">
-    <p>A boolean indicating whether or not the two vertices are neighbours.</p>
+    <p>A boolean indicating whether or not this ring is implicitly aromatic (using lowercase letters in smiles).</p>
 </div>
 
 
@@ -1794,7 +1978,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="isTerminal"><span class="type-signature"></span>isTerminal()</h4>
+    <h4 class="name" id="setFlipped"><span class="type-signature"></span>setFlipped()</h4>
     
     
 </dt>
@@ -1802,7 +1986,7 @@
 
     
     <div class="description">
-        <p>Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.</p>
+        <p>Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.</p>
     </div>
     
 
@@ -1864,11 +2048,163 @@
     
 
     
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="thisOrNeighboursContain"><span class="type-signature"></span>thisOrNeighboursContain(rings, vertexId)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>rings</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An array of rings associated with this molecule.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>vertexId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A vertex id.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
     <h5>Returns:</h5>
     
             
 <div class="param-desc">
-    <p>A boolean indicating whether or not this vertex is terminal.</p>
+    <p>A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.</p>
 </div>
 
 
