@@ -40,7 +40,7 @@ class Ring {
         clone.insiders = ArrayHelper.clone(this.insiders);
         clone.neighbours = ArrayHelper.clone(this.neighbours);
         clone.positioned = this.positioned;
-        clone.center = ArrayHelper.clone(this.center);
+        clone.center = this.center.clone();
         clone.rings = ArrayHelper.clone(this.rings);
         clone.isBridged = this.isBridged;
         clone.template = this.template;

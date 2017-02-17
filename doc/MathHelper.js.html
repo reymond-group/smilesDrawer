@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>RingConnection.js - Documentation</title>
+    <title>MathHelper.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">RingConnection.js</h1>
+    <h1 class="page-title">MathHelper.js</h1>
     
 
     
@@ -37,149 +37,106 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** A class representing a ring connection */
-class RingConnection {
+            <pre class="prettyprint source linenums"><code>/** A static class containing helper functions for math-related tasks. */
+class MathHelper {
     /**
-     * The constructor for the class RingConnection.
-     *
-     * @param {number} firstRing A ring.
-     * @param {number} secondRing A ring.
-     */
-    constructor(firstRing, secondRing) {
-        this.id = null;
-        this.rings = new Pair(firstRing.id, secondRing.id);
-        this.vertices = [];
-
-        for (let m = 0; m &lt; firstRing.members.length; m++) {
-            let c = firstRing.members[m];
-
-            for (let n = 0; n &lt; secondRing.members.length; n++) {
-                let d = secondRing.members[n];
-
-                if (c === d) {
-                    this.addVertex(c);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adding a vertex to the ring connection.
-     *
-     * @param {number} vertexId A vertex id.
-     */
-    addVertex(vertexId) {
-        if (!ArrayHelper.contains(this.vertices, { value: vertexId })) {
-            this.vertices.push(vertexId);
-        }
-    }
-
-    /**
-     * Checks whether or not this ring connection is a bridge in a bridged ring.
-     *
-     * @param {array} vertices The array of vertices associated with the current molecule.
-     * @returns {boolean} A boolean indicating whether or not this ring connection is a bridge.
-     */
-    isBridge(vertices) {
-        if (this.vertices.length > 2) { 
-            return true;
-        }
-
-        for (let i = 0; i &lt; this.vertices.length; i++) {
-            let vertexId = this.vertices[i];
-            
-            if(vertices[vertexId].value.rings.length > 2) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Update the ring id of this ring connection that is not the ring id supplied as the second argument.
-     *
-     * @param {number} ringId A ring id. The new ring id to be set.
-     * @param {number} otherRingId A ring id. The id that is NOT to be updated.
-     */
-    updateOther(ringId, otherRingId) {
-        if (this.rings.first === otherRingId) {
-            this.rings.second = ringId;
-        } else {
-            this.rings.first = ringId;
-        }
-    }
-
-    /**
-     * Checks whether or not two rings are connected by a bridged bond.
+     * Rounds a value to a given number of decimals.
      *
      * @static
-     * @param {array} ringConnections An array of ring connections containing the ring connections associated with the current molecule.
-     * @param {array} vertices An array of vertices containing the vertices associated with the current molecule.
-     * @param {number} firstRingId A ring id.
-     * @param {number} secondRingId A ring id.
-     * @returns {boolean} A boolean indicating whether or not two rings ar connected by a bridged bond.
+     * @param {number} value A number.
+     * @param {number} decimals The number of decimals.
+     * @returns {number} A number rounded to a given number of decimals.
      */
-    static isBridge(ringConnections, vertices, firstRingId, secondRingId) {
-        let ringConnection = null;
+    static round(value, decimals) {
+        decimals = decimals ? decimals : 1;
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    }
+
+    /**
+     * Returns the means of the angles contained in an array. In radians.
+     *
+     * @static
+     * @param {array} arr An array containing angles (in radians).
+     * @returns {number} The mean angle in radians.
+     */
+    static meanAngle(arr) {
+        let sin = 0.0;
+        let cos = 0.0;
         
-        for (let i = 0; i &lt; ringConnections.length; i++) {
-            ringConnection = ringConnections[i];
-            
-            let rings = ringConnection.rings;
-            
-            if (rings.first === firstRingId &amp;&amp; rings.second === secondRingId ||
-                rings.first === secondRingId &amp;&amp; rings.second === firstRingId) {
-                return ringConnection.isBridge(vertices);
-            }
+        for (let i = 0; i &lt; arr.length; i++) {
+            sin += Math.sin(arr[i]);
+            cos += Math.cos(arr[i]);
         }
 
-        return false;
+        return Math.atan2(sin / arr.length, cos / arr.length);
     }
 
     /**
-     * Retruns the neighbouring rings of a given ring.
+     * Returns the inner angle of a n-sided regular polygon.
      *
      * @static
-     * @param {array} ringConnections An array of ring connections containing ring connections associated with the current molecule.
-     * @param {number} ringId A ring id.
-     * @returns {array} An array of ring ids of neighbouring rings.
+     * @param {number} n Number of sides of a regular polygon.
+     * @returns {number} The inner angle of a given regular polygon.
      */
-    static getNeighbours(ringConnections, ringId) {
-        let neighbours = [];
-
-        for (let i = 0; i &lt; ringConnections.length; i++) {
-            let pair = ringConnections[i].rings;
-            
-            if (pair.first === ringId) {
-                neighbours.push(pair.second);
-            } else if (pair.second === ringId) {
-                neighbours.push(pair.first);
-            }
-        }
-
-        return neighbours;
+    static innerAngle(n) {
+        return MathHelper.toRad((n - 2) * 180 / n);
     }
 
     /**
-     * Returns an array of vertex ids associated with a given ring connection.
+     * Returns the circumradius of a n-sided regular polygon with a given side-length.
      *
      * @static
-     * @param {array} ringConnections An array of ring connections containing ring connections associated with the current molecule.
-     * @param {number} firstRingId A ring id.
-     * @param {number} secondRingId A ring id.
-     * @returns {array} An array of vertex ids associated with the ring connection.
+     * @param {number} s The side length of the regular polygon.
+     * @param {number} n The number of sides.
+     * @returns {number} The circumradius of the regular polygon.
      */
-    static getVertices(ringConnections, firstRingId, secondRingId) {
-        for (let i = 0; i &lt; ringConnections.length; i++) {
-            let rc = ringConnections[i];
-            
-            if (rc.rings.first == firstRingId &amp;&amp; rc.rings.second == secondRingId ||
-                rc.rings.first == secondRingId &amp;&amp; rc.rings.second == firstRingId) {
-                
-                return rc.vertices;
-            }
-        }
+    static polyCircumradius(s, n) {
+        return s / (2 * Math.sin(Math.PI / n));
+    }
+
+    /**
+     * Returns the apothem of a regular n-sided polygon based on its radius.
+     *
+     * @static
+     * @param {number} r The radius.
+     * @param {number} n The number of edges of the regular polygon.
+     * @returns {number} The apothem of a n-sided polygon based on its radius.
+     */
+    static apothem(r, n) {
+        return r * Math.cos(Math.PI / n);
+    }
+
+    /**
+     * The central angle of a n-sided regular polygon. In radians.
+     *
+     * @static
+     * @param {number} n The number of sides of the regular polygon.
+     * @returns {number} The central angle of the n-sided polygon in radians.
+     */
+    static centralAngle(n) {
+        return MathHelper.toRad(360 / n);
+    }
+
+    /**
+     * Convertes radians to degrees.
+     *
+     * @static
+     * @param {number} rad An angle in radians.
+     * @returns {number} The angle in degrees.
+     */
+    static toDeg(rad) {
+        return rad * 180 / Math.PI;
+    }
+
+    /**
+     * Converts degrees to radians.
+     *
+     * @static
+     * @param {number} deg An angle in degrees.
+     * @returns {number} The angle in radians.
+     */
+    static toRad(deg) {
+        return deg * Math.PI / 180;
     }
 }
 </code></pre>

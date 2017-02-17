@@ -3,8 +3,14 @@
 ## Classes
 
 <dl>
+<dt><a href="#ArrayHelper">ArrayHelper</a></dt>
+<dd><p>A static class containing helper functions for array-related tasks.</p>
+</dd>
 <dt><a href="#Atom">Atom</a></dt>
 <dd><p>A class representing an atom</p>
+</dd>
+<dt><a href="#SmilesDrawer">SmilesDrawer</a></dt>
+<dd><p>The main class of the application representing the smiles drawer</p>
 </dd>
 <dt><a href="#Edge">Edge</a></dt>
 <dd><p>A class representing an edge</p>
@@ -12,11 +18,17 @@
 <dt><a href="#Line">Line</a></dt>
 <dd><p>A class representing a line</p>
 </dd>
+<dt><a href="#MathHelper">MathHelper</a></dt>
+<dd><p>A static class containing helper functions for math-related tasks.</p>
+</dd>
 <dt><a href="#Pair">Pair</a></dt>
 <dd><p>A class representing a pair</p>
 </dd>
 <dt><a href="#Ring">Ring</a></dt>
 <dd><p>A class representing a ring</p>
+</dd>
+<dt><a href="#RingConnection">RingConnection</a></dt>
+<dd><p>A class representing a ring connection</p>
 </dd>
 <dt><a href="#Vector2">Vector2</a></dt>
 <dd><p>A class representing a 2D vector.</p>
@@ -25,6 +37,194 @@
 <dd><p>A class representing a vertex</p>
 </dd>
 </dl>
+
+<a name="ArrayHelper"></a>
+
+## ArrayHelper
+A static class containing helper functions for array-related tasks.
+
+**Kind**: global class  
+
+* [ArrayHelper](#ArrayHelper)
+    * [.clone(arr)](#ArrayHelper.clone) ⇒ <code>array</code> &#124; <code>object</code>
+    * [.print(arr)](#ArrayHelper.print) ⇒ <code>string</code>
+    * [.each(arr, callback)](#ArrayHelper.each)
+    * [.get(arr, property, value)](#ArrayHelper.get) ⇒ <code>\*</code>
+    * [.contains(arr, options)](#ArrayHelper.contains) ⇒ <code>boolean</code>
+    * [.intersection(arrA, arrB)](#ArrayHelper.intersection) ⇒ <code>array</code>
+    * [.unique(arr)](#ArrayHelper.unique) ⇒ <code>array</code>
+    * [.count(arr, value)](#ArrayHelper.count) ⇒ <code>number</code>
+    * [.toggle(arr, value)](#ArrayHelper.toggle) ⇒ <code>array</code>
+    * [.remove(arr, value)](#ArrayHelper.remove) ⇒ <code>array</code>
+    * [.removeAll(arrA, arrB)](#ArrayHelper.removeAll) ⇒ <code>array</code>
+    * [.merge(arrA, arrB)](#ArrayHelper.merge) ⇒ <code>array</code>
+    * [.containsAll(arrA, arrB)](#ArrayHelper.containsAll) ⇒ <code>boolean</code>
+
+<a name="ArrayHelper.clone"></a>
+
+### ArrayHelper.clone(arr) ⇒ <code>array</code> &#124; <code>object</code>
+Clone an array or an object. If an object is passed, a shallow clone will be created.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> &#124; <code>object</code> - A clone of the array or object.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> &#124; <code>object</code> | The array or object to be cloned. |
+
+<a name="ArrayHelper.print"></a>
+
+### ArrayHelper.print(arr) ⇒ <code>string</code>
+Returns a string representation of an array. If the array contains objects with an id property, the id property is printed for each of the elements.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>string</code> - A string representation of the array.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+
+<a name="ArrayHelper.each"></a>
+
+### ArrayHelper.each(arr, callback)
+Run a function for each element in the array. The element is supplied as an argument for the callback function
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+| callback | <code>function</code> | The callback function that is called for each element. |
+
+<a name="ArrayHelper.get"></a>
+
+### ArrayHelper.get(arr, property, value) ⇒ <code>\*</code>
+Return the array element from an array containing objects, where a property of the object is set to a given value.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>\*</code> - The array element matching the value.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+| property | <code>string</code> &#124; <code>number</code> | A property contained within an object in the array. |
+| value | <code>string</code> &#124; <code>number</code> | The value of the property. |
+
+<a name="ArrayHelper.contains"></a>
+
+### ArrayHelper.contains(arr, options) ⇒ <code>boolean</code>
+Checks whether or not an array contains a given value. the options object passed as a second argument can contain three properties. value: The value to be searched for. property: The property that is to be searched for a given value. func: A function that is used as a callback to return either true or false in order to do a custom comparison.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>boolean</code> - A boolean whether or not the array contains a value.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+| options | <code>object</code> | See method description. |
+
+<a name="ArrayHelper.intersection"></a>
+
+### ArrayHelper.intersection(arrA, arrB) ⇒ <code>array</code>
+Returns an array containing the intersection between two arrays. That is, values that are common to both arrays.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - The intersecting vlaues.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arrA | <code>array</code> | An array. |
+| arrB | <code>array</code> | An array. |
+
+<a name="ArrayHelper.unique"></a>
+
+### ArrayHelper.unique(arr) ⇒ <code>array</code>
+Returns an array of unique elements contained in an array.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - An array of unique elements contained within the array supplied as an argument.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+
+<a name="ArrayHelper.count"></a>
+
+### ArrayHelper.count(arr, value) ⇒ <code>number</code>
+Count the number of occurences of a value in an array.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>number</code> - The number of occurences of a value in the array.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+| value | <code>\*</code> | A value to be counted. |
+
+<a name="ArrayHelper.toggle"></a>
+
+### ArrayHelper.toggle(arr, value) ⇒ <code>array</code>
+Toggles the value of an array. If a value is not contained in an array, the array returned will contain all the values of the original array including the value. If a value is contained in an array, the array returned will contain all the values of the original array excluding the value.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - The toggled array.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+| value | <code>\*</code> | A value to be toggled. |
+
+<a name="ArrayHelper.remove"></a>
+
+### ArrayHelper.remove(arr, value) ⇒ <code>array</code>
+Remove a value from an array.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - A new array with the element with a given value removed.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+| value | <code>\*</code> | A value to be removed. |
+
+<a name="ArrayHelper.removeAll"></a>
+
+### ArrayHelper.removeAll(arrA, arrB) ⇒ <code>array</code>
+Remove all elements contained in one array from another array.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - The filtered array.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arrA | <code>array</code> | The array to be filtered. |
+| arrB | <code>array</code> | The array containing elements that will be removed from the other array. |
+
+<a name="ArrayHelper.merge"></a>
+
+### ArrayHelper.merge(arrA, arrB) ⇒ <code>array</code>
+Merges two arrays and returns the result. The second array will be appended to the second array.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - The merged array.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arrA | <code>array</code> | An array. |
+| arrB | <code>array</code> | An array. |
+
+<a name="ArrayHelper.containsAll"></a>
+
+### ArrayHelper.containsAll(arrA, arrB) ⇒ <code>boolean</code>
+Checks whether or not an array contains all the elements of another array, without regard to the order.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not both array contain the same elements.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arrA | <code>array</code> | An array. |
+| arrB | <code>array</code> | An array. |
 
 <a name="Atom"></a>
 
@@ -132,6 +332,176 @@ Get the highest numbered ringbond shared by two atoms. A ringbond is a break in 
 | atomA | <code>[Atom](#Atom)</code> | An atom. |
 | atomB | <code>[Atom](#Atom)</code> | An atom. |
 
+<a name="SmilesDrawer"></a>
+
+## SmilesDrawer
+The main class of the application representing the smiles drawer
+
+**Kind**: global class  
+
+* [SmilesDrawer](#SmilesDrawer)
+    * [new SmilesDrawer(options)](#new_SmilesDrawer_new)
+    * [.extend()](#SmilesDrawer+extend)
+    * [.draw(data, targetId, themeName, infoOnly)](#SmilesDrawer+draw)
+    * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
+    * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
+    * [.getFusedRings()](#SmilesDrawer+getFusedRings) ⇒ <code>array</code>
+    * [.getSpiros()](#SmilesDrawer+getSpiros) ⇒ <code>array</code>
+    * [.printRingInfo()](#SmilesDrawer+printRingInfo) ⇒ <code>string</code>
+    * [.initGraph(node, parentVertexId, isBranch)](#SmilesDrawer+initGraph)
+    * [.getRingbondType(vertexA, vertexB)](#SmilesDrawer+getRingbondType) ⇒ <code>string</code> &#124; <code>null</code>
+    * [.initRings()](#SmilesDrawer+initRings)
+    * [.getBridgedRingRings(ringId)](#SmilesDrawer+getBridgedRingRings) ⇒ <code>array</code>
+    * [.isPartOfBridgedRing(ringId)](#SmilesDrawer+isPartOfBridgedRing) ⇒ <code>boolean</code>
+    * [.createBridgedRing(ringIds, sourceVertexId)](#SmilesDrawer+createBridgedRing) ⇒ <code>[Ring](#Ring)</code>
+    * [.getTargets()](#SmilesDrawer+getTargets)
+
+<a name="new_SmilesDrawer_new"></a>
+
+### new SmilesDrawer(options)
+The constructor for the class SmilesDrawer.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>object</code> | An object containing custom values for different options. It is merged with the default options. |
+
+<a name="SmilesDrawer+extend"></a>
+
+### smilesDrawer.extend()
+A helper method to extend the default options with user supplied ones.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+<a name="SmilesDrawer+draw"></a>
+
+### smilesDrawer.draw(data, targetId, themeName, infoOnly)
+Draws the parsed smiles data to a canvas element.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| data | <code>object</code> |  | The tree returned by the smiles parser. |
+| targetId | <code>string</code> |  | The id of the HTML canvas element the structure is drawn to. |
+| themeName | <code>string</code> | <code>&quot;&#x27;dark&#x27;&quot;</code> | The name of the theme to use. Built-in themes are 'light' and 'dark'. |
+| infoOnly | <code>boolean</code> | <code>false</code> | Only output info on the molecule without drawing anything to the canvas. |
+
+<a name="SmilesDrawer+edgeRingCount"></a>
+
+### smilesDrawer.edgeRingCount(edgeId) ⇒ <code>number</code>
+Returns the number of rings this edge is a part of.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The number of rings the provided edge is part of.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| edgeId | <code>number</code> | The id of an edge. |
+
+<a name="SmilesDrawer+getBridgedRings"></a>
+
+### smilesDrawer.getBridgedRings() ⇒ <code>array</code>
+Returns an array containing the bridged rings associated with this  molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array containing all bridged rings associated with this molecule.  
+<a name="SmilesDrawer+getFusedRings"></a>
+
+### smilesDrawer.getFusedRings() ⇒ <code>array</code>
+Returns an array containing all fused rings associated with this molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array containing all fused rings associated with this molecule.  
+<a name="SmilesDrawer+getSpiros"></a>
+
+### smilesDrawer.getSpiros() ⇒ <code>array</code>
+Returns an array containing all spiros associated with this molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array containing all spiros associated with this molecule.  
+<a name="SmilesDrawer+printRingInfo"></a>
+
+### smilesDrawer.printRingInfo() ⇒ <code>string</code>
+Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings); Insiders Count (the number of vertices contained within a bridged ring)
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>string</code> - A string as described in the method description.  
+<a name="SmilesDrawer+initGraph"></a>
+
+### smilesDrawer.initGraph(node, parentVertexId, isBranch)
+Initializes the graph (vertices and edges) based on the tree supplied by the smiles parser.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| node | <code>object</code> |  | The current node in the parse tree. |
+| parentVertexId | <code>number</code> | <code></code> | The id of the previous vertex. |
+| isBranch | <code>boolean</code> | <code>false</code> | Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C). |
+
+<a name="SmilesDrawer+getRingbondType"></a>
+
+### smilesDrawer.getRingbondType(vertexA, vertexB) ⇒ <code>string</code> &#124; <code>null</code>
+Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond represents the break in a ring introduced when creating the MST. If the two vertices supplied as arguments are not part of a common ringbond, the method returns null.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>string</code> &#124; <code>null</code> - Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
+| vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
+
+<a name="SmilesDrawer+initRings"></a>
+
+### smilesDrawer.initRings()
+Initializes rings and ringbonds for the current molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+<a name="SmilesDrawer+getBridgedRingRings"></a>
+
+### smilesDrawer.getBridgedRingRings(ringId) ⇒ <code>array</code>
+Returns all rings connected by bridged bonds starting from the ring with the supplied ring id.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array containing all ring ids of rings part of a bridged ring system.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringId | <code>number</code> | A ring id. |
+
+<a name="SmilesDrawer+isPartOfBridgedRing"></a>
+
+### smilesDrawer.isPartOfBridgedRing(ringId) ⇒ <code>boolean</code>
+Checks whether or not a ring is part of a bridged ring.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not the supplied ring (by id) is part of a bridged ring system.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringId | <code>number</code> | A ring id. |
+
+<a name="SmilesDrawer+createBridgedRing"></a>
+
+### smilesDrawer.createBridgedRing(ringIds, sourceVertexId) ⇒ <code>[Ring](#Ring)</code>
+Creates a bridged ring.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Ring](#Ring)</code> - The bridged ring.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringIds | <code>array</code> | An array of ids of rings involved in the bridged ring. |
+| sourceVertexId | <code>number</code> | The vertex id to start the bridged ring discovery from. |
+
+<a name="SmilesDrawer+getTargets"></a>
+
+### smilesDrawer.getTargets()
+Inside a bridged ring, find the target atoms of the ring further atoms have to
+connect to.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="Edge"></a>
 
 ## Edge
@@ -338,6 +708,122 @@ Shortens this line from both directions by a given value (in pixels).
 | Param | Type | Description |
 | --- | --- | --- |
 | by | <code>number</code> | The length in pixels to shorten the vector by. |
+
+<a name="MathHelper"></a>
+
+## MathHelper
+A static class containing helper functions for math-related tasks.
+
+**Kind**: global class  
+
+* [MathHelper](#MathHelper)
+    * [.round(value, decimals)](#MathHelper.round) ⇒ <code>number</code>
+    * [.meanAngle(arr)](#MathHelper.meanAngle) ⇒ <code>number</code>
+    * [.innerAngle(n)](#MathHelper.innerAngle) ⇒ <code>number</code>
+    * [.polyCircumradius(s, n)](#MathHelper.polyCircumradius) ⇒ <code>number</code>
+    * [.apothem(r, n)](#MathHelper.apothem) ⇒ <code>number</code>
+    * [.centralAngle(n)](#MathHelper.centralAngle) ⇒ <code>number</code>
+    * [.toDeg(rad)](#MathHelper.toDeg) ⇒ <code>number</code>
+    * [.toRad(deg)](#MathHelper.toRad) ⇒ <code>number</code>
+
+<a name="MathHelper.round"></a>
+
+### MathHelper.round(value, decimals) ⇒ <code>number</code>
+Rounds a value to a given number of decimals.
+
+**Kind**: static method of <code>[MathHelper](#MathHelper)</code>  
+**Returns**: <code>number</code> - A number rounded to a given number of decimals.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>number</code> | A number. |
+| decimals | <code>number</code> | The number of decimals. |
+
+<a name="MathHelper.meanAngle"></a>
+
+### MathHelper.meanAngle(arr) ⇒ <code>number</code>
+Returns the means of the angles contained in an array. In radians.
+
+**Kind**: static method of <code>[MathHelper](#MathHelper)</code>  
+**Returns**: <code>number</code> - The mean angle in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array containing angles (in radians). |
+
+<a name="MathHelper.innerAngle"></a>
+
+### MathHelper.innerAngle(n) ⇒ <code>number</code>
+Returns the inner angle of a n-sided regular polygon.
+
+**Kind**: static method of <code>[MathHelper](#MathHelper)</code>  
+**Returns**: <code>number</code> - The inner angle of a given regular polygon.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| n | <code>number</code> | Number of sides of a regular polygon. |
+
+<a name="MathHelper.polyCircumradius"></a>
+
+### MathHelper.polyCircumradius(s, n) ⇒ <code>number</code>
+Returns the circumradius of a n-sided regular polygon with a given side-length.
+
+**Kind**: static method of <code>[MathHelper](#MathHelper)</code>  
+**Returns**: <code>number</code> - The circumradius of the regular polygon.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| s | <code>number</code> | The side length of the regular polygon. |
+| n | <code>number</code> | The number of sides. |
+
+<a name="MathHelper.apothem"></a>
+
+### MathHelper.apothem(r, n) ⇒ <code>number</code>
+Returns the apothem of a regular n-sided polygon based on its radius.
+
+**Kind**: static method of <code>[MathHelper](#MathHelper)</code>  
+**Returns**: <code>number</code> - The apothem of a n-sided polygon based on its radius.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| r | <code>number</code> | The radius. |
+| n | <code>number</code> | The number of edges of the regular polygon. |
+
+<a name="MathHelper.centralAngle"></a>
+
+### MathHelper.centralAngle(n) ⇒ <code>number</code>
+The central angle of a n-sided regular polygon. In radians.
+
+**Kind**: static method of <code>[MathHelper](#MathHelper)</code>  
+**Returns**: <code>number</code> - The central angle of the n-sided polygon in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| n | <code>number</code> | The number of sides of the regular polygon. |
+
+<a name="MathHelper.toDeg"></a>
+
+### MathHelper.toDeg(rad) ⇒ <code>number</code>
+Convertes radians to degrees.
+
+**Kind**: static method of <code>[MathHelper](#MathHelper)</code>  
+**Returns**: <code>number</code> - The angle in degrees.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| rad | <code>number</code> | An angle in radians. |
+
+<a name="MathHelper.toRad"></a>
+
+### MathHelper.toRad(deg) ⇒ <code>number</code>
+Converts degrees to radians.
+
+**Kind**: static method of <code>[MathHelper](#MathHelper)</code>  
+**Returns**: <code>number</code> - The angle in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| deg | <code>number</code> | An angle in degrees. |
 
 <a name="Pair"></a>
 
@@ -577,6 +1063,112 @@ Returns a ring based on a provided ring id.
 | --- | --- | --- |
 | rings | <code>array</code> | An array of rings associated with the current molecule. |
 | id | <code>number</code> | A ring id. |
+
+<a name="RingConnection"></a>
+
+## RingConnection
+A class representing a ring connection
+
+**Kind**: global class  
+
+* [RingConnection](#RingConnection)
+    * [new RingConnection(firstRing, secondRing)](#new_RingConnection_new)
+    * _instance_
+        * [.addVertex(vertexId)](#RingConnection+addVertex)
+        * [.isBridge(vertices)](#RingConnection+isBridge) ⇒ <code>boolean</code>
+        * [.updateOther(ringId, otherRingId)](#RingConnection+updateOther)
+    * _static_
+        * [.isBridge(ringConnections, vertices, firstRingId, secondRingId)](#RingConnection.isBridge) ⇒ <code>boolean</code>
+        * [.getNeighbours(ringConnections, ringId)](#RingConnection.getNeighbours) ⇒ <code>array</code>
+        * [.getVertices(ringConnections, firstRingId, secondRingId)](#RingConnection.getVertices) ⇒ <code>array</code>
+
+<a name="new_RingConnection_new"></a>
+
+### new RingConnection(firstRing, secondRing)
+The constructor for the class RingConnection.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| firstRing | <code>number</code> | A ring. |
+| secondRing | <code>number</code> | A ring. |
+
+<a name="RingConnection+addVertex"></a>
+
+### ringConnection.addVertex(vertexId)
+Adding a vertex to the ring connection.
+
+**Kind**: instance method of <code>[RingConnection](#RingConnection)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>number</code> | A vertex id. |
+
+<a name="RingConnection+isBridge"></a>
+
+### ringConnection.isBridge(vertices) ⇒ <code>boolean</code>
+Checks whether or not this ring connection is a bridge in a bridged ring.
+
+**Kind**: instance method of <code>[RingConnection](#RingConnection)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not this ring connection is a bridge.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>array</code> | The array of vertices associated with the current molecule. |
+
+<a name="RingConnection+updateOther"></a>
+
+### ringConnection.updateOther(ringId, otherRingId)
+Update the ring id of this ring connection that is not the ring id supplied as the second argument.
+
+**Kind**: instance method of <code>[RingConnection](#RingConnection)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringId | <code>number</code> | A ring id. The new ring id to be set. |
+| otherRingId | <code>number</code> | A ring id. The id that is NOT to be updated. |
+
+<a name="RingConnection.isBridge"></a>
+
+### RingConnection.isBridge(ringConnections, vertices, firstRingId, secondRingId) ⇒ <code>boolean</code>
+Checks whether or not two rings are connected by a bridged bond.
+
+**Kind**: static method of <code>[RingConnection](#RingConnection)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not two rings ar connected by a bridged bond.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnections | <code>array</code> | An array of ring connections containing the ring connections associated with the current molecule. |
+| vertices | <code>array</code> | An array of vertices containing the vertices associated with the current molecule. |
+| firstRingId | <code>number</code> | A ring id. |
+| secondRingId | <code>number</code> | A ring id. |
+
+<a name="RingConnection.getNeighbours"></a>
+
+### RingConnection.getNeighbours(ringConnections, ringId) ⇒ <code>array</code>
+Retruns the neighbouring rings of a given ring.
+
+**Kind**: static method of <code>[RingConnection](#RingConnection)</code>  
+**Returns**: <code>array</code> - An array of ring ids of neighbouring rings.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnections | <code>array</code> | An array of ring connections containing ring connections associated with the current molecule. |
+| ringId | <code>number</code> | A ring id. |
+
+<a name="RingConnection.getVertices"></a>
+
+### RingConnection.getVertices(ringConnections, firstRingId, secondRingId) ⇒ <code>array</code>
+Returns an array of vertex ids associated with a given ring connection.
+
+**Kind**: static method of <code>[RingConnection](#RingConnection)</code>  
+**Returns**: <code>array</code> - An array of vertex ids associated with the ring connection.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnections | <code>array</code> | An array of ring connections containing ring connections associated with the current molecule. |
+| firstRingId | <code>number</code> | A ring id. |
+| secondRingId | <code>number</code> | A ring id. |
 
 <a name="Vector2"></a>
 

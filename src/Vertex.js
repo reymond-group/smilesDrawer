@@ -31,7 +31,7 @@ class Vertex {
      * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
      */
     isTerminal() {
-        return (this.parent === null && this.children.length < 2) || this.children.length === 0;
+        return (this.parentVertexId === null && this.children.length < 2) || this.children.length === 0;
     }
 
     /**

@@ -37,7 +37,7 @@
         console.log(out);*/
 
         document.addEventListener("DOMContentLoaded", function(event) {
-            var smilesDrawer = new SmilesDrawer();
+            var smilesDrawer = new SmilesDrawer({ debug: true });
             var input = document.getElementById('input');
             input.addEventListener('input', function() {
                 // var data = smiles.parse(input.value);
@@ -48,7 +48,7 @@
                 for(var i = 0; i < 1; i++) {
                     var t = performance.now();
                     var data = smiles.parse(input.value);
-                    smilesDrawer.draw(data, 'output-canvas', false, true);
+                    smilesDrawer.draw(data, 'output-canvas', 'light', false);
                     total += performance.now() - t;
                 }
                 

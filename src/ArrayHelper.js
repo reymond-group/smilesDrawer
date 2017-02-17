@@ -1,8 +1,18 @@
+/** A static class containing helper functions for array-related tasks. */
 class ArrayHelper {
-    static clone(array) {
-        var out = Array.isArray(array) ? [] : {};
-        for (var key in array) {
-            var value = array[key];
+    /**
+     * Clone an array or an object. If an object is passed, a shallow clone will be created.
+     *
+     * @static
+     * @param {array|object} arr The array or object to be cloned.
+     * @returns {array|object} A clone of the array or object.
+     */
+    static clone(arr) {
+        let out = Array.isArray(arr) ? [] : {};
+        
+        for (let key in arr) {
+            let value = arr[key];
+            
             if (typeof value.clone === 'function') {
                 out[key] = value.clone();
             }
@@ -10,16 +20,26 @@ class ArrayHelper {
                 out[key] = (typeof value === 'object') ? ArrayHelper.clone(value) : value;
             }
         }
+        
         return out;
     }
 
-    static print(array) {
-        if (array.length == 0) return '';
+    /**
+     * Returns a string representation of an array. If the array contains objects with an id property, the id property is printed for each of the elements.
+     *
+     * @static
+     * @param {array} arr An array.
+     * @returns {string} A string representation of the array.
+     */
+    static print(arr) {
+        if (arr.length == 0) {
+            return '';
+        }
 
-        var s = '(';
+        let s = '(';
 
-        for (var i = 0; i < array.length; i++) {
-            s += array[i].id + ', ';
+        for (let i = 0; i < arr.length; i++) {
+            s += arr[i].id ? arr[i].id + ', ' : arr[i] + ', ';
         }
 
         s = s.substring(0, s.length - 2);
@@ -27,73 +47,141 @@ class ArrayHelper {
         return s + ')';
     }
 
-    static each(array, func) {
-        for (var i = 0; i < array.length; i++) {
-            func(array[i]);
+    /**
+     * Run a function for each element in the array. The element is supplied as an argument for the callback function
+     *
+     * @static
+     * @param {array} arr An array.
+     * @param {function} callback The callback function that is called for each element.
+     */
+    static each(arr, callback) {
+        for (let i = 0; i < arr.length; i++) {
+            callback(arr[i]);
         }
     }
 
-    static get(array, property, value) {
-        for (var i = 0; i < array.length; i++) {
-            if (array[i][property] == value) return array[i];
+    /**
+     * Return the array element from an array containing objects, where a property of the object is set to a given value.
+     *
+     * @static
+     * @param {array} arr An array.
+     * @param {string|number} property A property contained within an object in the array.
+     * @param {string|number} value The value of the property.
+     * @returns {*} The array element matching the value.
+     */
+    static get(arr, property, value) {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i][property] == value) {
+                return arr[i];
+            }
         }
     }
 
-    static contains(array, options) {
+    /**
+     * Checks whether or not an array contains a given value. the options object passed as a second argument can contain three properties. value: The value to be searched for. property: The property that is to be searched for a given value. func: A function that is used as a callback to return either true or false in order to do a custom comparison.
+     *
+     * @static
+     * @param {array} arr An array.
+     * @param {object} options See method description.
+     * @returns {boolean} A boolean whether or not the array contains a value.
+     */
+    static contains(arr, options) {
         if (!options.property && !options.func) {
-            for (var i = 0; i < array.length; i++) {
-                if (array[i] == options.value) return true;
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] == options.value) {
+                    return true;
+                }
             }
         } else if (options.func) {
-            for (var i = 0; i < array.length; i++) {
-                if (options.func(array[i])) return true;
+            for (let i = 0; i < arr.length; i++) {
+                if (options.func(arr[i])) {
+                    return true;
+                }
             }
         } else {
-            for (var i = 0; i < array.length; i++) {
-                if (array[i][options.property] == options.value) return true;
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i][options.property] == options.value) {
+                    return true;
+                }
             }
         }
 
         return false;
     }
 
+    /**
+     * Returns an array containing the intersection between two arrays. That is, values that are common to both arrays.
+     *
+     * @static
+     * @param {array} arrA An array.
+     * @param {array} arrB An array.
+     * @returns {array} The intersecting vlaues.
+     */
     static intersection(arrA, arrB) {
-        var intersection = new Array();
-        for (var i = 0; i < arrA.length; i++) {
-            for (var j = 0; j < arrB.length; j++) {
-                if (arrA[i] == arrB[j]) intersection.push(arrA[i]);
+        let intersection = new Array();
+        
+        for (let i = 0; i < arrA.length; i++) {
+            for (let j = 0; j < arrB.length; j++) {
+                if (arrA[i] === arrB[j]) {
+                    intersection.push(arrA[i]);
+                }
             }
         }
 
         return intersection;
     }
 
+    /**
+     * Returns an array of unique elements contained in an array.
+     *
+     * @static
+     * @param {array} arr An array.
+     * @returns {array} An array of unique elements contained within the array supplied as an argument.
+     */
     static unique(arr) {
-        var contains = {};
+        let contains = {};
         return arr.filter(function (i) {
             // using !== instead of hasOwnProperty (http://andrew.hedges.name/experiments/in/)
             return contains[i] !== undefined ? false : (contains[i] = true);
         });
     }
 
-    static count(array, value) {
-        var count = 0;
+    /**
+     * Count the number of occurences of a value in an array.
+     *
+     * @static
+     * @param {array} arr An array.
+     * @param {*} value A value to be counted.
+     * @returns {number} The number of occurences of a value in the array.
+     */
+    static count(arr, value) {
+        let count = 0;
 
-        for (var i = 0; i < array.length; i++) {
-            if (array[i] == value) count++;
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] === value) {
+                count++;
+            }
         }
 
         return count;
     }
 
-    static toggle(array, value) {
-        var newArray = [];
+    /**
+     * Toggles the value of an array. If a value is not contained in an array, the array returned will contain all the values of the original array including the value. If a value is contained in an array, the array returned will contain all the values of the original array excluding the value.
+     *
+     * @static
+     * @param {array} arr An array.
+     * @param {*} value A value to be toggled.
+     * @returns {array} The toggled array.
+     */
+    static toggle(arr, value) {
+        let newArr = [];
 
-        var removed = false;
-        for (var i = 0; i < array.length; i++) {
+        let removed = false;
+        for (let i = 0; i < arr.length; i++) {
             // Do not copy value if it exists
-            if (!(array[i] == value)) {
-                newArray.push(array[i]);
+            if (arr[i] !== value) {
+                newArr.push(arr[i]);
             } else {
                 // The element was not copied to the new array, which
                 // means it was removed
@@ -104,49 +192,86 @@ class ArrayHelper {
         // If the element was not removed, then it was not in the array
         // so add it
         if (!removed) {
-            newArray.push(value);
+            newArr.push(value);
         }
 
-        return newArray;
+        return newArr;
     }
 
-    static remove(array, item) {
-        var tmp = [];
+    /**
+     * Remove a value from an array.
+     *
+     * @static
+     * @param {array} arr An array.
+     * @param {*} value A value to be removed.
+     * @returns {array} A new array with the element with a given value removed.
+     */
+    static remove(arr, value) {
+        let tmp = [];
 
-        for (var i = 0; i < array.length; i++) {
-            if (array[i] != item) tmp.push(array[i]);
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] !== value) {
+                tmp.push(arr[i]);
+            }
         }
 
         return tmp;
     }
 
-    static removeAll(array1, array2) {
-        return array1.filter(function (item) {
-            return array2.indexOf(item) === -1;
+    /**
+     * Remove all elements contained in one array from another array.
+     *
+     * @static
+     * @param {array} arrA The array to be filtered.
+     * @param {array} arrB The array containing elements that will be removed from the other array.
+     * @returns {array} The filtered array.
+     */
+    static removeAll(arrA, arrB) {
+        return arrA.filter(function (item) {
+            return arrB.indexOf(item) === -1;
         });
     }
 
-    static merge(array1, array2) {
-        var array = new Array(array1.length + array2.length);
+    /**
+     * Merges two arrays and returns the result. The second array will be appended to the second array.
+     *
+     * @static
+     * @param {array} arrA An array.
+     * @param {array} arrB An array.
+     * @returns {array} The merged array.
+     */
+    static merge(arrA, arrB) {
+        let arr = new Array(arrA.length + arrB.length);
 
-        for (var i = 0; i < array1.length; i++) {
-            array[i] = array1[i];
+        for (let i = 0; i < arrA.length; i++) {
+            arr[i] = arrA[i];
         }
 
-        for (var i = 0; i < array2.length; i++) {
-            array[array1.length + i] = array2[i];
+        for (let i = 0; i < arrB.length; i++) {
+            arr[arrA.length + i] = arrB[i];
         }
 
-        return array;
+        return arr;
     }
 
-    static containsAll(array1, array2) {
-        var containing = 0;
-        for (var i = 0; i < array1.length; i++) {
-            for (var j = 0; j < array2.length; j++) {
-                if (array1[i] === array2[j]) containing++;
+    /**
+     * Checks whether or not an array contains all the elements of another array, without regard to the order.
+     *
+     * @static
+     * @param {array} arrA An array.
+     * @param {array} arrB An array.
+     * @returns {boolean} A boolean indicating whether or not both array contain the same elements.
+     */
+    static containsAll(arrA, arrB) {
+        let containing = 0;
+        for (let i = 0; i < arrA.length; i++) {
+            for (let j = 0; j < arrB.length; j++) {
+                if (arrA[i] === arrB[j]) {
+                    containing++;
+                }
             }
         }
-        return containing == array2.length;
+
+        return containing === arrB.length;
     }
 }
