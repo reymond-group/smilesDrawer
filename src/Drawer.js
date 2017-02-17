@@ -424,7 +424,7 @@ class SmilesDrawer {
                     that.addRing(ring);
 
                     // Annotate the ring (add ring members to ring and rings to vertices)
-                    let path = that.annotateRing(ring.id, ring.sourceId, ring.targetId);
+                    let path = that.getRingVertices(ring.sourceId, ring.targetId);
 
                     for (let j = 0; j < path.length; j++) {
                         ring.members.push(path[j]);
@@ -686,33 +686,20 @@ class SmilesDrawer {
         return ring;
     }
 
-    ringCounter(node, rings) {
-        for (var i = 0; i < node.getRingbondCount(); i++) {
-            var ring = node.ringbonds[i].id;
-            
-            if (!this.arrayContains(rings, { value: ring })) {
-                rings.push(ring);
-            }
-        }
-
-        for (var i = 0; i < node.branchCount; i++) {
-            this.ringCounter(node.branches[i], rings);
-        }
-
-        if (node.hasNext) {
-            this.ringCounter(node.next, rings);
-        }
-
-        return rings;
-    }
-
-    annotateRing(ring, sourceId, targetId) {
-        var prev = this.dijkstra(sourceId, targetId);
+    /**
+     * Returns an array of vertices that are members of the ring specified by the source and target vertex ids. It is assumed that those two vertices share the ringbond (the break introduced when creating the smiles MST).
+     *
+     * @param {number} sourceId A vertex id.
+     * @param {number} targetId A vertex id.
+     * @returns {array} An array of vertex ids.
+     */
+    getRingVertices(sourceId, targetId) {
+        let prev = this.dijkstra(sourceId, targetId);
 
         // Backtrack from target to source
-        var tmp = [];
-        var path = [];
-        var u = targetId;
+        let tmp = [];
+        let path = [];
+        let u = targetId;
 
         while (u != null) {
             tmp.push(u);
@@ -720,23 +707,30 @@ class SmilesDrawer {
         }
 
         // Reverse the backtrack path to get forward path
-        for (var i = tmp.length - 1; i >= 0; i--) {
+        for (let i = tmp.length - 1; i >= 0; i--) {
             path.push(tmp[i]);
         }
 
         return path;
     }
 
+    /**
+     * Dijkstras algorithm for finding the shortest path between two vertices.
+     *
+     * @param {number} sourceId The id of the source vertex.
+     * @param {number} targetId The id of the target vertex.
+     * @returns {array} The path (vertex ids) from the source to the target vertex.
+     */
     dijkstra(sourceId, targetId) {
         // First initialize q which contains all the vertices
         // including their neighbours, their id and a visited boolean
-        var prev = new Array(this.vertices.length);
-        var dist = new Array(this.vertices.length);
-        var visited = new Array(this.vertices.length);
-        var neighbours = new Array(this.vertices.length);
+        let prev = new Array(this.vertices.length);
+        let dist = new Array(this.vertices.length);
+        let visited = new Array(this.vertices.length);
+        let neighbours = new Array(this.vertices.length);
 
         // Initialize arrays for the algorithm
-        for (var i = 0; i < this.vertices.length; i++) {
+        for (let i = 0; i < this.vertices.length; i++) {
             dist[i] = i == sourceId ? 0 : Number.MAX_VALUE;
             prev[i] = null;
             visited[i] = false;
@@ -745,7 +739,7 @@ class SmilesDrawer {
 
         // Dijkstras alogrithm
         while (ArrayHelper.count(visited, false) > 0) {
-            var u = this.getMinDist(dist, visited);
+            let u = this.getMinDist(dist, visited);
 
             // if u is the target, we're done
             if (u == targetId) {
@@ -754,9 +748,9 @@ class SmilesDrawer {
 
             visited[u] = true; // this "removes" the node from q
 
-            for (var i = 0; i < neighbours[u].length; i++) {
-                var v = neighbours[u][i];
-                var tmp = dist[u] + this.getEdgeWeight(u, v);
+            for (let i = 0; i < neighbours[u].length; i++) {
+                let v = neighbours[u][i];
+                let tmp = dist[u] + this.getEdgeWeight(u, v);
 
                 // Do not move directly from the source to the target
                 // this should never happen, so just continue
@@ -772,71 +766,18 @@ class SmilesDrawer {
         }
     }
 
-    areVerticesInSameRing(vertexA, vertexB) {
-        // This is a little bit lighter (without the array and push) than
-        // getCommonRings().length > 0
-        for (var i = 0; i < vertexA.value.rings.length; i++) {
-            for (var j = 0; j < vertexB.value.rings.length; j++) {
-                if (vertexA.value.rings[i] == vertexB.value.rings[j]) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    getCommonRings(vertexA, vertexB) {
-        var commonRings = [];
-
-        for (var i = 0; i < vertexA.value.rings.length; i++) {
-            for (var j = 0; j < vertexB.value.rings.length; j++) {
-                if (vertexA.value.rings[i] == vertexB.value.rings[j]) {
-                    commonRings.push(vertexA.value.rings[i]);
-                }
-            }
-        }
-
-        return commonRings;
-    }
-
-    getSmallestCommonRing(vertexA, vertexB) {
-        var commonRings = this.getCommonRings(vertexA, vertexB);
-        var minSize = Number.MAX_VALUE;
-        var smallestCommonRing = null;
-
-        for (var i = 0; i < commonRings.length; i++) {
-            var size = this.getRing(commonRings[i]).getSize();
-            if (size < minSize) {
-                minSize = size;
-                smallestCommonRing = this.getRing(commonRings[i]);
-            }
-        }
-
-        return smallestCommonRing;
-    }
-
-    getLargestCommonRing(vertexA, vertexB) {
-        var commonRings = this.getCommonRings(vertexA, vertexB);
-        var maxSize = 0;
-        var largestCommonRing = null;
-
-        for (var i = 0; i < commonRings.length; i++) {
-            var size = this.getRing(commonRings[i]).getSize();
-            if (size > maxSize) {
-                maxSize = size;
-                largestCommonRing = this.getRing(commonRings[i]);
-            }
-        }
-
-        return largestCommonRing;
-    }
-
+    /**
+     * Gets the minimal distance from an array containing distances.
+     *
+     * @param {array} dist An array of distances.
+     * @param {array} visited An array indicated whether or not a vertex has been visited.
+     * @returns {number} The id with the minimal distance.
+     */
     getMinDist(dist, visited) {
-        var min = Number.MAX_VALUE;
-        var v = null;
+        let min = Number.MAX_VALUE;
+        let v = null;
 
-        for (var i = 0; i < dist.length; i++) {
+        for (let i = 0; i < dist.length; i++) {
             if (visited[i]) {
                 continue;
             }
@@ -849,32 +790,138 @@ class SmilesDrawer {
         return v;
     }
 
-    getEdgeWeight(a, b) {
-        for (var i = 0; i < this.edges.length; i++) {
-            var edge = this.edges[i];
+
+
+    /**
+     * Checks whether or not tow vertices are in the same ring.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {boolean} A boolean indicating whether or not the two vertices are in the same ring.
+     */
+    areVerticesInSameRing(vertexA, vertexB) {
+        // This is a little bit lighter (without the array and push) than
+        // getCommonRings().length > 0
+        for (let i = 0; i < vertexA.value.rings.length; i++) {
+            for (let j = 0; j < vertexB.value.rings.length; j++) {
+                if (vertexA.value.rings[i] == vertexB.value.rings[j]) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns an array of ring ids shared by both vertices.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {array} An array of ids of rings shared by the two vertices.
+     */
+    getCommonRings(vertexA, vertexB) {
+        let commonRings = [];
+
+        for (let i = 0; i < vertexA.value.rings.length; i++) {
+            for (let j = 0; j < vertexB.value.rings.length; j++) {
+                if (vertexA.value.rings[i] == vertexB.value.rings[j]) {
+                    commonRings.push(vertexA.value.rings[i]);
+                }
+            }
+        }
+
+        return commonRings;
+    }
+
+    /**
+     * Returns the smallest ring shared by the two vertices.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {Ring|null} If a smallest common ring exists, that ring, else null.
+     */
+    getSmallestCommonRing(vertexA, vertexB) {
+        let commonRings = this.getCommonRings(vertexA, vertexB);
+        let minSize = Number.MAX_VALUE;
+        let smallestCommonRing = null;
+
+        for (let i = 0; i < commonRings.length; i++) {
+            let size = this.getRing(commonRings[i]).getSize();
             
-            if (edge.sourceId == a && edge.targetId == b || edge.targetId == a && edge.sourceId == b) {
+            if (size < minSize) {
+                minSize = size;
+                smallestCommonRing = this.getRing(commonRings[i]);
+            }
+        }
+
+        return smallestCommonRing;
+    }
+
+    /**
+     * Returns the largest ring shared by the two vertices.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {Ring|null} If a largest common ring exists, that ring, else null.
+     */
+    getLargestCommonRing(vertexA, vertexB) {
+        let commonRings = this.getCommonRings(vertexA, vertexB);
+        let maxSize = 0;
+        let largestCommonRing = null;
+
+        for (let i = 0; i < commonRings.length; i++) {
+            let size = this.getRing(commonRings[i]).getSize();
+            
+            if (size > maxSize) {
+                maxSize = size;
+                largestCommonRing = this.getRing(commonRings[i]);
+            }
+        }
+
+        return largestCommonRing;
+    }
+
+    /**
+     * Returns the weight of the edge between two given vertices.
+     *
+     * @param {number} vertexIdA A vertex id.
+     * @param {number} vertexIdB A vertex id.
+     * @returns {number|null} The weight of the edge or, if no edge can be found, null.
+     */
+    getEdgeWeight(vertexIdA, vertexIdB) {
+        for (let i = 0; i < this.edges.length; i++) {
+            let edge = this.edges[i];
+            
+            if (edge.sourceId == vertexIdA && edge.targetId == vertexIdB || 
+                edge.targetId == vertexIdA && edge.sourceId == vertexIdB) {
                 return edge.weight;
             }
         }
+        
+        return null;
     }
 
-    addVertex(vertex) {
-        vertex.id = this.vertices.length;
-        this.vertices.push(vertex);
-        return vertex.id;
-    }
+    /**
+     * Returns an array of vertices positioned at a specified location.
+     *
+     * @param {Vector2} position The position to search for vertices.
+     * @param {number} radius The radius within to search.
+     * @param {number} excludeVertexId A vertex id to be excluded from the search results.
+     * @returns {array} An array containing vertex ids in a given location.
+     */
+    getVerticesAt(position, radius, excludeVertexId) {
+        let locals = new Array();
 
-    getVerticesAt(position, radius, exclude) {
-        var locals = new Array();
-
-        for (var i = 0; i < this.vertices.length; i++) {
-            var vertex = this.vertices[i];
-            if (vertex.id === exclude || !vertex.positioned) {
+        for (let i = 0; i < this.vertices.length; i++) {
+            let vertex = this.vertices[i];
+            
+            if (vertex.id === excludeVertexId || !vertex.positioned) {
                 continue;
             }
 
-            var distance = position.distance(vertex.position);
+            let distance = position.distance(vertex.position);
+           
             if (distance <= radius) {
                 locals.push(vertex.id);
             }
@@ -883,26 +930,36 @@ class SmilesDrawer {
         return locals;
     }
 
-    getBranch(vertex, previous) {
-        var vertices = new Array();
-        var rings = new Array();
-        var that = this;
+    /**
+     * Returns the rings and vertices contained in a sub-graph.
+     *
+     * @param {number} vertexId The vertex id to start the sub-graph search from
+     * @param {number} previousId The vertex id in the opposite of which the search will be started.
+     * @returns {object} An object containing two arrays, one with the vertices in the subgraph and one with the rings in the subgraph.
+     */
+    getBranch(vertexId, previousId) {
+        let vertices = new Array();
+        let rings = new Array();
+        let that = this;
         
-        var recurse = function (v, p) {
-            var vertex = that.vertices[v];
-            for (var i = 0; i < vertex.value.rings.length; i++) {
+        let recurse = function (v, p) {
+            let vertex = that.vertices[v];
+            
+            for (let i = 0; i < vertex.value.rings.length; i++) {
                 rings.push(vertex.value.rings[i]);
             }
 
-            for (var i = 0; i < vertex.children.length; i++) {
-                var child = vertex.children[i];
+            for (let i = 0; i < vertex.children.length; i++) {
+                let child = vertex.children[i];
+                
                 if (child !== p && !ArrayHelper.contains(vertices, { value: child })) {
                     vertices.push(child);
                     recurse(child, v);
                 }
             }
 
-            var parentVertexId = vertex.parentVertexId;
+            let parentVertexId = vertex.parentVertexId;
+            
             if (parentVertexId !== p && parentVertexId !== null && 
                 !ArrayHelper.contains(vertices, { value: parentVertexId })) {
                 vertices.push(parentVertexId);
@@ -910,8 +967,8 @@ class SmilesDrawer {
             }
         }
 
-        vertices.push(vertex);
-        recurse(vertex, previous);
+        vertices.push(vertexId);
+        recurse(vertexId, previousId);
 
         return {
             vertices: vertices,
@@ -919,15 +976,42 @@ class SmilesDrawer {
         };
     }
 
+    /**
+     * Add a vertex to this representation of a molcule.
+     *
+     * @param {Vertex} vertex A new vertex.
+     * @returns {number} The vertex id of the new vertex.
+     */
+    addVertex(vertex) {
+        vertex.id = this.vertices.length;
+        this.vertices.push(vertex);
+        
+        return vertex.id;
+    }
+
+    /**
+     * Add an edge to this representation of a molecule.
+     *
+     * @param {Edge} edge A new edge.
+     * @returns {number} The edge id of the new edge.
+     */
     addEdge(edge) {
         edge.id = this.edges.length;
         this.edges.push(edge);
+        
         return edge.id;
     }
 
+    /**
+     * Add a ring to this representation of a molecule.
+     *
+     * @param {Ring} ring A new ring.
+     * @returns {number} The ring id of the new ring.
+     */
     addRing(ring) {
         ring.id = this.ringIdCounter++;
         this.rings.push(ring);
+        
         return ring.id;
     }
 
