@@ -39,12 +39,11 @@ To get a simple input box which lets the user enter a SMILES and then display it
                 // Draw to the canvas
                 smilesDrawer.draw(data, 'example-canvas', 'light', false);
             });
-
         </script>
     </body>
 </html>
 ```
-
+See the example folder for a more complete example.
 ### Options
 
 ### [Documentation](/doc/all.md)
