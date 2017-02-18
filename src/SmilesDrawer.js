@@ -1486,7 +1486,7 @@ class SmilesDrawer {
             let angle = vertex.getAngle(null, true) - 60;
             for (let i = 0; i < neighbours.length; i++) {
                 if (vertex.value.isBridge || (parentVertex !== undefined && parentVertex.value.isBridge)) {
-                    this.createBonds(this.vertices[neighbours[i]], vertex, MathHelper.toRad(angle));
+                    this.createNextBond(this.vertices[neighbours[i]], vertex, MathHelper.toRad(angle));
                 } else if (this.vertices[neighbours[i]].value.rings.length === 0) {
                     // If there is a spiro, this will be handeled in create ring
                     // This here positiones the vertices going away from the outer ring
@@ -1494,7 +1494,7 @@ class SmilesDrawer {
                         center = this.getSubringCenter(ring, vertex);
                     }
 
-                    this.createBonds(this.vertices[neighbours[i]], vertex, center);
+                    this.createNextBond(this.vertices[neighbours[i]], vertex, center);
                 }
 
                 angle += 120;
@@ -1724,7 +1724,7 @@ class SmilesDrawer {
             }
         }
 
-        this.createBonds(this.vertices[startVertex]);
+        this.createNextBond(this.vertices[startVertex]);
 
         // Atoms bonded to the same ring atom
         this.resolvePrimaryOverlaps();
@@ -1768,27 +1768,36 @@ class SmilesDrawer {
     }
 
     // TODO: This needs some cleaning up
-    createRing(ring, center, start, previous) {
-        var that = this;
 
+    /**
+     * Creates a new ring, that is, positiones all the vertices inside a ring.
+     *
+     * @param {Ring} ring The ring to position.
+     * @param {Vector2} center The center of the ring to be created.
+     * @param {Vector|null} [startVector=null] The first vector to be positioned inside the ring.
+     * @param {Vertex|null} [previousVertex=null] The last vertex that was positioned.
+     */
+    createRing(ring, center, startVector = null, previousVertex = null) {
         if (ring.positioned) {
             return;
         }
 
-        var orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
-
         center = center ? center : new Vector2(0, 0);
-        var startingAngle = start ? Vector2.subtract(start.position, center).angle() : 0;
 
-        var radius = MathHelper.polyCircumradius(that.opts.bondLength, ring.getSize());
+        let orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
+        let startingAngle = startVector ? Vector2.subtract(startVector.position, center).angle() : 0;
+
+        let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
         ring.radius = radius;
         
-        var angle = MathHelper.centralAngle(ring.getSize());
+        let angle = MathHelper.centralAngle(ring.getSize());
         ring.centralAngle = angle;
         
-        var a = startingAngle;
+        let a = startingAngle;
+        
+        let that = this;
         ring.eachMember(this.vertices, function (v) {
-            var vertex = that.vertices[v];
+            let vertex = that.vertices[v];
             
             if (!vertex.positioned) {
                 vertex.position.x = center.x + Math.cos(a) * radius;
@@ -1800,13 +1809,13 @@ class SmilesDrawer {
             if(!ring.isBridged || ring.rings.length < 3) {
                 vertex.positioned = true;
             }
-        }, (start) ? start.id : null, (previous) ? previous.id : null);
+        }, (startVector) ? startVector.id : null, (previousVertex) ? previousVertex.id : null);
 
         // If the ring is bridged, then draw the vertices inside the ring
         // using a force based approach
         if (ring.isBridged) {
-            var allVertices = ArrayHelper.merge(ring.members, ring.insiders);
-            this.forceLayout(allVertices, center, start.id, ring);
+            let allVertices = ArrayHelper.merge(ring.members, ring.insiders);
+            this.forceLayout(allVertices, center, startVector.id, ring);
         }
 
         // Anchor the ring to one of it's members, so that the ring center will always
@@ -1816,28 +1825,28 @@ class SmilesDrawer {
         ring.positioned = true;
         ring.center = center;
         // Draw neighbours in decreasing order of connectivity
-        for (var i = 0; i < orderedNeighbours.length; i++) {
-            var neighbour = this.getRing(orderedNeighbours[i].neighbour);
+        for (let i = 0; i < orderedNeighbours.length; i++) {
+            let neighbour = this.getRing(orderedNeighbours[i].neighbour);
             
             if (neighbour.positioned) {
                 continue;
             }
 
-            var vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
+            let vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
             
             if (vertices.length == 2) {
                 // This ring is a fused ring
                 ring.isFused = true;
                 neighbour.isFused = true;
 
-                var vertexA = this.vertices[vertices[0]];
-                var vertexB = this.vertices[vertices[1]];
+                let vertexA = this.vertices[vertices[0]];
+                let vertexB = this.vertices[vertices[1]];
 
                 // Get middle between vertex A and B
-                var midpoint = Vector2.midpoint(vertexA.position, vertexB.position);
+                let midpoint = Vector2.midpoint(vertexA.position, vertexB.position);
 
                 // Get the normals to the line between A and B
-                var normals = Vector2.normals(vertexA.position, vertexB.position);
+                let normals = Vector2.normals(vertexA.position, vertexB.position);
 
                 // Normalize the normals
                 ArrayHelper.each(normals, function (v) {
@@ -1845,8 +1854,8 @@ class SmilesDrawer {
                 });
 
                 // Set length from middle of side to center (the apothem)
-                var r = MathHelper.polyCircumradius(that.opts.bondLength, neighbour.getSize());
-                var apothem = MathHelper.apothem(r, neighbour.getSize());
+                let r = MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
+                let apothem = MathHelper.apothem(r, neighbour.getSize());
                 
                 ArrayHelper.each(normals, function (v) {
                     v.multiply(apothem)
@@ -1859,15 +1868,15 @@ class SmilesDrawer {
 
                 // Check if the center of the next ring lies within another ring and
                 // select the normal accordingly
-                var nextCenter = normals[0];
+                let nextCenter = normals[0];
                 
                 if (this.isPointInRing(nextCenter)) {
                     nextCenter = normals[1];
                 }
 
                 // Get the vertex (A or B) which is in clock-wise direction of the other
-                var posA = Vector2.subtract(vertexA.position, nextCenter);
-                var posB = Vector2.subtract(vertexB.position, nextCenter);
+                let posA = Vector2.subtract(vertexA.position, nextCenter);
+                let posB = Vector2.subtract(vertexB.position, nextCenter);
 
                 if (posA.clockwise(posB) === -1) {
                     this.createRing(neighbour, nextCenter, vertexA, vertexB);
@@ -1879,15 +1888,15 @@ class SmilesDrawer {
                 ring.isSpiro = true;
                 neighbour.isSpiro = true;
 
-                var vertexA = this.vertices[vertices[0]];
+                let vertexA = this.vertices[vertices[0]];
                 
                 // Get the vector pointing from the shared vertex to the new center
-                var nextCenter = Vector2.subtract(center, vertexA.position);
+                let nextCenter = Vector2.subtract(center, vertexA.position);
                 nextCenter.invert();
                 nextCenter.normalize();
 
                 // Get the distance from the vertex to the center
-                var r = MathHelper.polyCircumradius(that.opts.bondLength, neighbour.getSize());
+                let r = MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
                 nextCenter.multiply(r);
                 nextCenter.add(vertexA.position);
                 this.createRing(neighbour, nextCenter, vertexA);
@@ -1895,44 +1904,56 @@ class SmilesDrawer {
         }
 
         // Next, draw atoms that are not part of a ring that are directly attached to this ring
-        for (var i = 0; i < ring.members.length; i++) {
-            var ringMember = this.vertices[ring.members[i]];
-            var ringMemberNeighbours = ringMember.getNeighbours();
+        for (let i = 0; i < ring.members.length; i++) {
+            let ringMember = this.vertices[ring.members[i]];
+            let ringMemberNeighbours = ringMember.getNeighbours();
 
             // If there are multiple, the ovlerap will be resolved in the appropriate step
-            for (var j = 0; j < ringMemberNeighbours.length; j++) {
+            for (let j = 0; j < ringMemberNeighbours.length; j++) {
                 if (ring.thisOrNeighboursContain(this.rings, ringMemberNeighbours[j])) {
                     continue;
                 }
                 
-                var v = this.vertices[ringMemberNeighbours[j]];
-                this.createBonds(v, ringMember, ring.center);
+                let v = this.vertices[ringMemberNeighbours[j]];
+                this.createNextBond(v, ringMember, ring.center);
             }
         }
     }
 
+    /**
+     * Rotate an entire subtree by an angle around a center.
+     *
+     * @param {number} vertexId A vertex id (the root of the sub-tree).
+     * @param {number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
+     * @param {number} angle An angle in randians.
+     * @param {Vector2} center The rotational center.
+     */
     rotateSubtree(vertexId, parentVertexId, angle, center) {
-        var that = this;
+        let that = this;
         
-        this.traverseTree(parentVertexId, vertexId, function (vertex) {
+        this.traverseTree(vertexId, parentVertexId, function (vertex) {
             vertex.position.rotateAround(angle, center);
 
-            for (var i = 0; i < vertex.value.anchoredRings.length; i++) {
+            for (let i = 0; i < vertex.value.anchoredRings.length; i++) {
                 that.rings[vertex.value.anchoredRings[i]].center.rotateAround(angle, center);
             }
         });
     }
 
+    /**
+     * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
+     *
+     */
     resolvePrimaryOverlaps() {
-        var overlaps = [];
-        var sharedSideChains = []; // side chains attached to an atom shared by two rings
-        var done = new Array(this.vertices.length);
+        let overlaps = [];
+        let sharedSideChains = []; // side chains attached to an atom shared by two rings
+        let done = new Array(this.vertices.length);
 
-        for (var i = 0; i < this.rings.length; i++) {
-            var ring = this.rings[i];
+        for (let i = 0; i < this.rings.length; i++) {
+            let ring = this.rings[i];
             
-            for (var j = 0; j < ring.members.length; j++) {
-                var vertex = this.vertices[ring.members[j]];
+            for (let j = 0; j < ring.members.length; j++) {
+                let vertex = this.vertices[ring.members[j]];
 
                 if (done[vertex.id]) {
                     continue;
@@ -1942,7 +1963,7 @@ class SmilesDrawer {
 
                 // Look for rings where there are atoms with two bonds outside the ring (overlaps)
                 if (vertex.getNeighbours().length > 2) {
-                    var rings = [];
+                    let rings = [];
                     
                     for (var k = 0; k < vertex.value.rings.length; k++) {
                         rings.push(vertex.value.rings[k]);
@@ -1957,10 +1978,10 @@ class SmilesDrawer {
 
                 // Side chains attached to an atom shared by two rings
                 if (vertex.value.rings.length == 2 && vertex.getNeighbours().length == 4) {
-                    var nrn = this.getNonRingNeighbours(vertex.id)[0];
+                    let nrn = this.getNonRingNeighbours(vertex.id)[0];
                     
                     if (nrn && nrn.getNeighbours().length > 1) {
-                        var other = this.getCommonRingbondNeighbour(vertex);
+                        let other = this.getCommonRingbondNeighbour(vertex);
                         sharedSideChains.push({
                             common: vertex,
                             other: other,
@@ -1971,30 +1992,34 @@ class SmilesDrawer {
             }
         }
 
-        for (var i = 0; i < sharedSideChains.length; i++) {
-            var chain = sharedSideChains[i];
-            var angle = -chain.vertex.position.getRotateToAngle(chain.other.position, chain.common.position);
+        for (let i = 0; i < sharedSideChains.length; i++) {
+            let chain = sharedSideChains[i];
+            let angle = -chain.vertex.position.getRotateToAngle(chain.other.position, chain.common.position);
             this.rotateSubtree(chain.vertex.id, chain.common.id, angle + Math.PI, chain.common.position);
         }
 
-        for (var i = 0; i < overlaps.length; i++) {
-            var overlap = overlaps[i];
+        for (let i = 0; i < overlaps.length; i++) {
+            let overlap = overlaps[i];
             
             if (overlap.vertices.length == 1) {
-                var a = overlap.vertices[0];
+                let a = overlap.vertices[0];
                 
                 if (a.getNeighbours().length == 1) {
                     a.flippable = true;
                     a.flipCenter = overlap.common.id;
 
-                    for (var j = 0; j < overlap.rings.length; j++) a.flipRings.push(overlap.rings[j]);
+                    for (let j = 0; j < overlap.rings.length; j++) {
+                        a.flipRings.push(overlap.rings[j]);
+                    }
                 }
             } else if (overlap.vertices.length == 2) {
-                var angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
-                var a = overlap.vertices[0];
-                var b = overlap.vertices[1];
+                let angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
+                let a = overlap.vertices[0];
+                let b = overlap.vertices[1];
+                
                 a.backAngle -= angle;
                 b.backAngle += angle;
+                
                 this.rotateSubtree(a.id, overlap.common.id, angle, overlap.common.position);
                 this.rotateSubtree(b.id, overlap.common.id, -angle, overlap.common.position);
 
@@ -2003,7 +2028,7 @@ class SmilesDrawer {
                     a.flipCenter = overlap.common.id;
                     a.flipNeighbour = b.id;
                     
-                    for (var j = 0; j < overlap.rings.length; j++) {
+                    for (let j = 0; j < overlap.rings.length; j++) {
                         a.flipRings.push(overlap.rings[j]);
                     }
                 }
@@ -2012,7 +2037,7 @@ class SmilesDrawer {
                     b.flipCenter = overlap.common.id;
                     b.flipNeighbour = a.id;
                     
-                    for (var j = 0; j < overlap.rings.length; j++) {
+                    for (let j = 0; j < overlap.rings.length; j++) {
                         b.flipRings.push(overlap.rings[j]);
                     }
                 }
@@ -2020,20 +2045,25 @@ class SmilesDrawer {
         }
     }
 
+    /**
+     * Resolve secondary overlaps. Those overlaps are due to the structure turning back on itself.
+     *
+     * @param {array} scores An array of objects sorted descending by score. An object is in the form of { id: 0, score: 22 }.
+     */
     resolveSecondaryOverlaps(scores) {
-        for (var i = 0; i < scores.length; i++) {
+        for (let i = 0; i < scores.length; i++) {
             if (scores[i].score > this.opts.bondLength / 5) {
-                var vertex = this.vertices[scores[i].id];
+                let vertex = this.vertices[scores[i].id];
 
                 if (vertex.flippable) {
                     // Rings that get concatenated in to a bridge one, will be undefined here ...
-                    var a = vertex.flipRings[0] ? this.rings[vertex.flipRings[0]] : null;
-                    var b = vertex.flipRings[1] ? this.rings[vertex.flipRings[1]] : null;
-                    var flipCenter = this.vertices[vertex.flipCenter].position;
+                    let a = vertex.flipRings[0] ? this.rings[vertex.flipRings[0]] : null;
+                    let b = vertex.flipRings[1] ? this.rings[vertex.flipRings[1]] : null;
+                    let flipCenter = this.vertices[vertex.flipCenter].position;
 
                     // Make a always the bigger ring than b
                     if (a && b) {
-                        var tmp = (a.members.length > b.members.length) ? a : b;
+                        let tmp = (a.members.length > b.members.length) ? a : b;
                         b = (a.members.length < b.members.length) ? a : b;
                         a = tmp;
                     }
@@ -2066,9 +2096,15 @@ class SmilesDrawer {
         }
     }
 
-    // Since javascript overloading is a pain, the attribute ringOrAngle is an angle or a ring
-    // depending on the context of the caller
-    createBonds(vertex, previous, ringOrAngle, dir) {
+    /**
+     * Positiones the next vertex thus creating a bond.
+     *
+     * @param {Vertex} vertex A vertex.
+     * @param {Vertex} previousVertex The previous vertex which has been positioned.
+     * @param {ring|number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
+     * @param {number} dir Either 1 or -1 to break ties (if no angle can be elucidated.
+     */
+    createNextBond(vertex, previousVertex, ringOrAngle, dir) {
         if (vertex.positioned) {
             return;
         }
@@ -2076,128 +2112,125 @@ class SmilesDrawer {
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of
         // two rings, point away from the middle of the centers of the two rings
-        if (!previous) {
+        if (!previousVertex) {
             // Here, ringOrAngle is always an angle
 
             // Add a (dummy) previous position if there is no previous vertex defined
             // Since the first vertex is at (0, 0), create a vector at (bondLength, 0)
             // and rotate it by 90°
-            var dummy = new Vector2(this.opts.bondLength, 0);
+            let dummy = new Vector2(this.opts.bondLength, 0);
             dummy.rotate(MathHelper.toRad(-120));
 
             vertex.previousPosition = dummy;
             vertex.position = new Vector2(this.opts.bondLength, 0);
             vertex.angle = MathHelper.toRad(-120);
             vertex.positioned = true;
-        } else if (previous.value.rings.length == 0 && !vertex.value.isBridge) {
+        } else if (previousVertex.value.rings.length == 0 && !vertex.value.isBridge) {
             // Here, ringOrAngle is always an angle
 
             // If the previous vertex was not part of a ring, draw a bond based
             // on the global angle of the previous bond
-            var v = new Vector2(this.opts.bondLength, 0);
+            let v = new Vector2(this.opts.bondLength, 0);
             v.rotate(ringOrAngle);
-            v.add(previous.position);
+            v.add(previousVertex.position);
 
             vertex.position = v;
-            vertex.previousPosition = previous.position;
+            vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
-        } else if (previous.value.isBridgeNode && vertex.value.isBridge) {
+        } else if (previousVertex.value.isBridgeNode && vertex.value.isBridge) {
             // If the previous atom is in a bridged ring and this one is inside the ring
-            var targets = this.getTargets(vertex.id, previous.id, vertex.value.bridgedRing);
-
-            var pos = Vector2.subtract(ringOrAngle, previous.position);
+            let pos = Vector2.subtract(ringOrAngle, previousVertex.position);
             pos.normalize();
 
             // Unlike with the ring, do not multiply with radius but with bond length
             pos.multiply(this.opts.bondLength);
-            vertex.position.add(previous.position);
+            vertex.position.add(previousVertex.position);
             vertex.position.add(pos);
 
-            vertex.previousPosition = previous.position;
+            vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (vertex.value.isBridge) {
             // The previous atom is in a bridged ring and this one is in it as well
-            var targets = this.getTargets(vertex.id, previous.id, vertex.value.bridgedRing);
-            var v = new Vector2(this.opts.bondLength, 0);
+            let v = new Vector2(this.opts.bondLength, 0);
             v.rotate(ringOrAngle);
-            v.add(previous.position);
+            v.add(previousVertex.position);
 
             vertex.position = v;
-            vertex.previousPosition = previous.position;
+            vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
-        } else if (previous.value.rings.length == 1) {
+        } else if (previousVertex.value.rings.length == 1) {
             // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
             // Use the same approach es with rings that are connected at one vertex
             // and draw the atom in the opposite direction of the center.
-            var pos = Vector2.subtract(ringOrAngle, previous.position);
+            let pos = Vector2.subtract(ringOrAngle, previousVertex.position);
 
             pos.invert();
             pos.normalize();
             // Unlike with the ring, do not multiply with radius but with bond length
             pos.multiply(this.opts.bondLength);
             
-            vertex.position.add(previous.position);
+            vertex.position.add(previousVertex.position);
             vertex.position.add(pos);
-            vertex.previousPosition = previous.position;
+            vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
-        } else if (previous.value.rings.length == 2) {
+        } else if (previousVertex.value.rings.length == 2) {
             // Here, ringOrAngle is always a ring
-            var ringA = this.getRing(previous.value.rings[0]);
-            var ringB = this.getRing(previous.value.rings[1]);
+            let ringA = this.getRing(previousVertex.value.rings[0]);
+            let ringB = this.getRing(previousVertex.value.rings[1]);
 
             // Project the current vertex onto the vector between the two centers to
             // get the direction
-            var a = Vector2.subtract(ringB.center, ringA.center);
-            var b = Vector2.subtract(previous.position, ringA.center);
-            var s = Vector2.scalarProjection(b, a);
+            let a = Vector2.subtract(ringB.center, ringA.center);
+            let b = Vector2.subtract(previousVertex.position, ringA.center);
+            let s = Vector2.scalarProjection(b, a);
             
             a.normalize();
             a.multiply(s);
             a.add(ringA.center);
 
-            var pos = Vector2.subtract(a, previous.position);
+            let pos = Vector2.subtract(a, previousVertex.position);
             pos.invert();
             pos.normalize();
             pos.multiply(this.opts.bondLength);
             
-            vertex.position.add(previous.position);
+            vertex.position.add(previousVertex.position);
             vertex.position.add(pos);
-            vertex.previousPosition = previous.position;
+            vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         }
 
         // Go to next vertex
         // If two rings are connected by a bond ...
         if (vertex.value.rings.length > 0) {
-            var nextRing = this.getRing(vertex.value.rings[0]);
-            var nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
+            let nextRing = this.getRing(vertex.value.rings[0]);
+            let nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
             nextCenter.invert();
             nextCenter.normalize();
 
-            var r = MathHelper.polyCircumradius(this.opts.bondLength, nextRing.getSize());
+            let r = MathHelper.polyCircumradius(this.opts.bondLength, nextRing.getSize());
             nextCenter.multiply(r);
             nextCenter.add(vertex.position);
             this.createRing(nextRing, nextCenter, vertex);
         } else {
             // Draw the non-ring vertices connected to this one        
-            var neighbours = vertex.getNeighbours();
+            let neighbours = vertex.getNeighbours();
             
-            if (previous) {
-                neighbours = ArrayHelper.remove(neighbours, previous.id);
+            if (previousVertex) {
+                neighbours = ArrayHelper.remove(neighbours, previousVertex.id);
             }
 
-            var angle = vertex.getAngle();
+            let angle = vertex.getAngle();
 
             if (neighbours.length == 1) {
-                var nextVertex = this.vertices[neighbours[0]];
+                let nextVertex = this.vertices[neighbours[0]];
 
                 // Make a single chain always cis except when there's a tribble bond
-                if(vertex.value.bondType === '#' || (previous && previous.value.bondType === '#')) {
+                if(vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) {
                     nextVertex.angle = angle;
-                    this.createBonds(nextVertex, vertex, nextVertex.angle, -dir);
+                    this.createNextBond(nextVertex, vertex, nextVertex.angle, -dir);
                 }
                 else {
-                    var plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+                    let plusOrMinus = Math.random() < 0.5 ? -1 : 1;
 
                     if (this.direction !== 0) {
                         plusOrMinus = this.direction;
@@ -2208,15 +2241,15 @@ class SmilesDrawer {
                     }
                     
                     nextVertex.angle = MathHelper.toRad(60) * dir;
-                    this.createBonds(nextVertex, vertex, angle + nextVertex.angle, -dir);
+                    this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, -dir);
                 }
             } else if (neighbours.length == 2) {
                 // Check for the longer subtree - always go with cis for the longer subtree
-                var subTreeDepthA = this.getTreeDepth(vertex.id, neighbours[0]);
-                var subTreeDepthB = this.getTreeDepth(vertex.id, neighbours[1]);
+                let subTreeDepthA = this.getTreeDepth(neighbours[0], vertex.id);
+                let subTreeDepthB = this.getTreeDepth(neighbours[1], vertex.id);
 
-                var cis = 0;
-                var trans = 1;
+                let cis = 0;
+                let trans = 1;
 
                 if (subTreeDepthA > subTreeDepthB) {
                     cis = 1;
@@ -2224,33 +2257,33 @@ class SmilesDrawer {
                 }
 
                 if (vertex.position.clockwise(vertex.previousPosition) === 1) {
-                    var cisVertex = this.vertices[neighbours[cis]];
-                    var transVertex = this.vertices[neighbours[trans]];
+                    let cisVertex = this.vertices[neighbours[cis]];
+                    let transVertex = this.vertices[neighbours[trans]];
 
                     transVertex.angle = MathHelper.toRad(60);
                     cisVertex.angle = -MathHelper.toRad(60);
 
-                    this.createBonds(transVertex, vertex, angle + transVertex.angle);
-                    this.createBonds(cisVertex, vertex, angle + cisVertex.angle);
+                    this.createNextBond(transVertex, vertex, angle + transVertex.angle);
+                    this.createNextBond(cisVertex, vertex, angle + cisVertex.angle);
                 } else {
-                    var cisVertex = this.vertices[neighbours[cis]];
-                    var transVertex = this.vertices[neighbours[trans]];
+                    let cisVertex = this.vertices[neighbours[cis]];
+                    let transVertex = this.vertices[neighbours[trans]];
 
                     transVertex.angle = -MathHelper.toRad(60);
                     cisVertex.angle = MathHelper.toRad(60);
 
-                    this.createBonds(cisVertex, vertex, angle + cisVertex.angle);
-                    this.createBonds(transVertex, vertex, angle + transVertex.angle);
+                    this.createNextBond(cisVertex, vertex, angle + cisVertex.angle);
+                    this.createNextBond(transVertex, vertex, angle + transVertex.angle);
                 }
             } else if (neighbours.length == 3) {
                 // The vertex with the longest sub-tree should always go straight
-                var d1 = this.getTreeDepth(vertex.id, neighbours[0]);
-                var d2 = this.getTreeDepth(vertex.id, neighbours[1]);
-                var d3 = this.getTreeDepth(vertex.id, neighbours[2]);
+                let d1 = this.getTreeDepth(neighbours[0], vertex.id);
+                let d2 = this.getTreeDepth(neighbours[1], vertex.id);
+                let d3 = this.getTreeDepth(neighbours[2], vertex.id);
                 
-                var s = this.vertices[neighbours[0]];
-                var l = this.vertices[neighbours[1]];
-                var r = this.vertices[neighbours[2]];
+                let s = this.vertices[neighbours[0]];
+                let l = this.vertices[neighbours[1]];
+                let r = this.vertices[neighbours[2]];
 
                 if(d2 > d1 && d2 > d3) {
                     s = this.vertices[neighbours[1]];
@@ -2263,20 +2296,20 @@ class SmilesDrawer {
                     r = this.vertices[neighbours[1]];
                 }
                 
-                this.createBonds(s, vertex, angle);
-                this.createBonds(l, vertex, angle + MathHelper.toRad(90));
-                this.createBonds(r, vertex, angle - MathHelper.toRad(90));
+                this.createNextBond(s, vertex, angle);
+                this.createNextBond(l, vertex, angle + MathHelper.toRad(90));
+                this.createNextBond(r, vertex, angle - MathHelper.toRad(90));
             } else if (neighbours.length == 4) {
                 // The vertex with the longest sub-tree should always go to the reflected opposide direction
-                var d1 = this.getTreeDepth(vertex.id, neighbours[0]);
-                var d2 = this.getTreeDepth(vertex.id, neighbours[1]);
-                var d3 = this.getTreeDepth(vertex.id, neighbours[2]);
-                var d4 = this.getTreeDepth(vertex.id, neighbours[3]);
+                let d1 = this.getTreeDepth(neighbours[0], vertex.id);
+                let d2 = this.getTreeDepth(neighbours[1], vertex.id);
+                let d3 = this.getTreeDepth(neighbours[2], vertex.id);
+                let d4 = this.getTreeDepth(neighbours[3], vertex.id);
 
-                var w = this.vertices[neighbours[0]];
-                var x = this.vertices[neighbours[1]];
-                var y = this.vertices[neighbours[2]];
-                var z = this.vertices[neighbours[3]];
+                let w = this.vertices[neighbours[0]];
+                let x = this.vertices[neighbours[1]];
+                let y = this.vertices[neighbours[2]];
+                let z = this.vertices[neighbours[3]];
 
                 if(d2 > d1 && d2 > d3 && d2 > d4) {
                     w = this.vertices[neighbours[1]];
@@ -2297,61 +2330,45 @@ class SmilesDrawer {
                     z = this.vertices[neighbours[2]];
                 }
 
-                this.createBonds(w, vertex, angle - MathHelper.toRad(36));
-                this.createBonds(x, vertex, angle + MathHelper.toRad(36));
-                this.createBonds(y, vertex, angle - MathHelper.toRad(108));
-                this.createBonds(z, vertex, angle + MathHelper.toRad(108));
+                this.createNextBond(w, vertex, angle - MathHelper.toRad(36));
+                this.createNextBond(x, vertex, angle + MathHelper.toRad(36));
+                this.createNextBond(y, vertex, angle - MathHelper.toRad(108));
+                this.createNextBond(z, vertex, angle + MathHelper.toRad(108));
             }
         }
     }
 
     /**
-    * Inside a bridged ring, find the target atoms of the ring further atoms have to
-    * connect to.
-    **/
-    getTargets(vertex, previous, ring) {
-        var that = this;
-        var targets = new Array();
-
-        // TODO: This recursion can go into a loop if there is a "ring" inside a bridged ring
-        var recurse = function (v, p) {
-            var neighbours = that.vertices[v].getNeighbours();
-
-            for (var i = 0; i < neighbours.length; i++) {
-                var neighbour = that.vertices[neighbours[i]];
-                
-                if (neighbour.id === p) {
-                    continue;
-                } else if (neighbour.value.isBridge) {
-                    recurse(neighbour.id, v);
-                } else if (neighbour.value.hasRing(ring)) {
-                    targets.push(neighbour.id);
-                }
-            }
-        };
-
-        recurse(vertex, previous);
-        return targets;
-    }
-
-    // Gets the vertex sharing the edge that is the common bond of two rings
+     * Gets the vetex sharing the edge that is the common bond of two rings.
+     *
+     * @param {Vertex} vertex A vertex.
+     * @returns {number|null} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
+     */
     getCommonRingbondNeighbour(vertex) {
-        var neighbours = vertex.getNeighbours();
+        let neighbours = vertex.getNeighbours();
         
-        for (var i = 0; i < neighbours.length; i++) {
-            var neighbour = this.vertices[neighbours[i]];
+        for (let i = 0; i < neighbours.length; i++) {
+            let neighbour = this.vertices[neighbours[i]];
             
             if (ArrayHelper.containsAll(neighbour.value.rings, vertex.value.rings)) {
                 return neighbour;
             }
         }
+
+        return null;
     }
 
-    isPointInRing(v) {
-        for (var i = 0; i < this.rings.length; i++) {
-            var polygon = this.rings[i].getPolygon(this.vertices);
+    /**
+     * Check if a vector is inside any ring.
+     *
+     * @param {Vector2} vec A vector.
+     * @returns {boolean} A boolean indicating whether or not the point (vector) is inside any of the rings associated with the current molecule.
+     */
+    isPointInRing(vec) {
+        for (let i = 0; i < this.rings.length; i++) {
+            let polygon = this.rings[i].getPolygon(this.vertices);
             
-            if (v.isInPolygon(polygon)) {
+            if (vec.isInPolygon(polygon)) {
                 return true;
             }
         }
@@ -2359,15 +2376,27 @@ class SmilesDrawer {
         return false;
     }
 
+    /**
+     * Check whether or not an edge is part of a ring.
+     *
+     * @param {Edge} edge An edge.
+     * @returns {boolean} A boolean indicating whether or not the edge is part of a ring.
+     */
     isEdgeInRing(edge) {
-        var source = this.vertices[edge.sourceId];
-        var target = this.vertices[edge.targetId];
+        let source = this.vertices[edge.sourceId];
+        let target = this.vertices[edge.targetId];
 
         return this.areVerticesInSameRing(source, target);
     }
 
+    /**
+     * Check whether or not a ring is an explicity defined aromatic ring (lower case smiles).
+     *
+     * @param {Ring} ring A ring.
+     * @returns {boolean} A boolean indicating whether or not a ring is explicitly defined as aromatic.
+     */
     isRingAromatic(ring) {
-        for (var i = 0; i < ring.members.length; i++) {
+        for (let i = 0; i < ring.members.length; i++) {
             if (!this.isVertexInAromaticRing(ring.members[i])) {
                 return false;
             }
@@ -2376,23 +2405,41 @@ class SmilesDrawer {
         return true;
     }
 
+    /**
+     * Checks whether or not an edge is part of an explicit aromatic ring (lower case smiles).
+     *
+     * @param {Edge} edge An edge.
+     * @returns {boolean} A boolean indicating whether or not the vertex is part of an explicit aromatic ring.
+     */
     isEdgeInAromaticRing(edge) {
         return this.isVertexInAromaticRing(edge.sourceId) &&
             this.isVertexInAromaticRing(edge.targetId);
     }
 
-    isVertexInAromaticRing(vertex) {
-        var element = this.vertices[vertex].value.element;
+    /**
+     * Checks whether or not a vertex is part of an explicit aromatic ring (lower case smiles).
+     *
+     * @param {number} vertexId A vertex id.
+     * @returns {boolean} A boolean indicating whether or not the vertex is part of an explicit aromatic ring.
+     */
+    isVertexInAromaticRing(vertexId) {
+        var element = this.vertices[vertexId].value.element;
         
-        return element == element.toLowerCase()
+        return element == element.toLowerCase();
     }
 
+    /**
+     * Get the normals of an edge.
+     *
+     * @param {Edge} edge An edge.
+     * @returns {array} An array containing two vectors, representing the normals.
+     */
     getEdgeNormals(edge) {
-        var a = this.vertices[edge.sourceId].position;
-        var b = this.vertices[edge.targetId].position;
+        let v1 = this.vertices[edge.sourceId].position;
+        let v2 = this.vertices[edge.targetId].position;
 
         // Get the normals for the edge
-        var normals = Vector2.normals(a, b);
+        let normals = Vector2.normals(v1, v2);
 
         // Normalize the normals
         ArrayHelper.each(normals, function (v) {
@@ -2402,28 +2449,20 @@ class SmilesDrawer {
         return normals;
     }
 
-    getNormals(a, b) {
-        var a = a.position;
-        var b = b.position;
+    /**
+     * Get the depth of a subtree in the direction opposite to the vertex specified as the parent vertex.
+     *
+     * @param {number} vertexId A vertex id.
+     * @param {number} parentVertexId The id of a neighbouring vertex.
+     * @returns {number} The depth of the sub-tree.
+     */
+    getTreeDepth(vertexId, parentVertexId) {
+        let neighbours = this.vertices[vertexId].getSpanningTreeNeighbours(parentVertexId);
+        let max = 0;
 
-        // Get the normals for the edge
-        var normals = Vector2.normals(a, b);
-
-        // Normalize the normals
-        ArrayHelper.each(normals, function (v) {
-            v.normalize()
-        });
-
-        return normals;
-    }
-
-    getTreeDepth(parentVertexId, vertexId) {
-        var neighbours = this.vertices[vertexId].getSpanningTreeNeighbours(parentVertexId);
-        var max = 0;
-
-        for (var i = 0; i < neighbours.length; i++) {
-            var childId = neighbours[i];
-            var d = this.getTreeDepth(vertexId, childId);
+        for (let i = 0; i < neighbours.length; i++) {
+            let childId = neighbours[i];
+            let d = this.getTreeDepth(childId, vertexId);
             
             if (d > max) {
                 max = d;
@@ -2433,66 +2472,56 @@ class SmilesDrawer {
         return max + 1;
     }
 
-    traverseTree(parentVertexId, vertexId, callback) {
-        var vertex = this.vertices[vertexId];
-        var neighbours = vertex.getSpanningTreeNeighbours(parentVertexId);
+    /**
+     * Traverse a sub-tree in the graph.
+     *
+     * @param {number} vertexId A vertex id.
+     * @param {number} parentVertexId A neighbouring vertex.
+     * @param {function} callback The callback function that is called with each visited as an argument.
+     */
+    traverseTree(vertexId, parentVertexId, callback) {
+        let vertex = this.vertices[vertexId];
+        let neighbours = vertex.getSpanningTreeNeighbours(parentVertexId);
 
         callback(vertex);
 
-        for (var i = 0; i < neighbours.length; i++) {
-            this.traverseTree(vertexId, neighbours[i], callback);
+        for (let i = 0; i < neighbours.length; i++) {
+            this.traverseTree(neighbours[i], vertexId, callback);
         }
     }
 
-    getMaxDepth(v, previous, depth) {
-        depth = depth ? depth : 0;
-
-        var neighbours = v.getNeighbours();
-        var max = 0;
-
-        for (var i = 0; i < neighbours.length; i++) {
-            if (neighbours[i] == previous.id) {
-                continue;
-            }
-
-            var next = this.vertices[neighbours[i]];
-            var d = 0;
-            
-            // If there is a ring, make it very expensive and stop recursion
-            if (next.value.getRingbondCount() > 0) {
-                d = 100;
-            } else {
-                d = this.getMaxDepth(this.vertices[neighbours[i]], v, depth + 1);
-            }
-
-            if (d > max) {
-                max = d;
-            }
-        }
-
-        return max;
-    }
-
+    /**
+     * Gets the number of bonds of a vertex.
+     *
+     * @param {Vertex} vertex A vertex.
+     * @returns {number} The number of bonds the vertex participates in.
+     */
     getBondCount(vertex) {
-        var count = 0;
+        let count = 0;
 
-        for (var i = 0; i < vertex.edges.length; i++) {
+        for (let i = 0; i < vertex.edges.length; i++) {
             count += this.edges[vertex.edges[i]].getBondCount();
         }
 
         return count;
     }
 
-    getNonRingNeighbours(v) {
-        var nrneighbours = [];
-        var vertex = this.vertices[v];
-        var neighbours = vertex.getNeighbours();
+    /**
+     * Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
+     *
+     * @param {number} vertexId A vertex id.
+     * @returns {array} An array of vertices.
+     */
+    getNonRingNeighbours(vertexId) {
+        let nrneighbours = [];
+        let vertex = this.vertices[vertexId];
+        let neighbours = vertex.getNeighbours();
 
-        for (var i = 0; i < neighbours.length; i++) {
-            var neighbour = this.vertices[neighbours[i]];
-            var lenIntersections = ArrayHelper.intersection(vertex.value.rings, neighbour.value.rings).length;
+        for (let i = 0; i < neighbours.length; i++) {
+            let neighbour = this.vertices[neighbours[i]];
+            let nIntersections = ArrayHelper.intersection(vertex.value.rings, neighbour.value.rings).length;
             
-            if (lenIntersections === 0 && neighbour.value.isBridge == false) {
+            if (nIntersections === 0 && neighbour.value.isBridge == false) {
                 nrneighbours.push(neighbour);
             }
         }
