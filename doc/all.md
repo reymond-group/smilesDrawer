@@ -9,6 +9,9 @@
 <dt><a href="#Atom">Atom</a></dt>
 <dd><p>A class representing an atom</p>
 </dd>
+<dt><a href="#CanvasWrapper">CanvasWrapper</a></dt>
+<dd><p>A class wrapping a canvas element</p>
+</dd>
 <dt><a href="#SmilesDrawer">SmilesDrawer</a></dt>
 <dd><p>The main class of the application representing the smiles drawer</p>
 </dd>
@@ -332,6 +335,166 @@ Get the highest numbered ringbond shared by two atoms. A ringbond is a break in 
 | atomA | <code>[Atom](#Atom)</code> | An atom. |
 | atomB | <code>[Atom](#Atom)</code> | An atom. |
 
+<a name="CanvasWrapper"></a>
+
+## CanvasWrapper
+A class wrapping a canvas element
+
+**Kind**: global class  
+
+* [CanvasWrapper](#CanvasWrapper)
+    * [new CanvasWrapper(targetId, theme)](#new_CanvasWrapper_new)
+    * [.setTheme(theme)](#CanvasWrapper+setTheme)
+    * [.scale(vertices)](#CanvasWrapper+scale)
+    * [.reset()](#CanvasWrapper+reset)
+    * [.getColor(key)](#CanvasWrapper+getColor) ⇒ <code>string</code>
+    * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#CanvasWrapper+drawCircle)
+    * [.drawLine(line)](#CanvasWrapper+drawLine)
+    * [.drawDebugText(x, y, text)](#CanvasWrapper+drawDebugText)
+    * [.drawText(x, y, hydrogens, direction, isTerminal, charge)](#CanvasWrapper+drawText)
+    * [.drawDebugPoint(x, y, [debugText], [color])](#CanvasWrapper+drawDebugPoint)
+    * [.drawAromaticityRing(ring)](#CanvasWrapper+drawAromaticityRing)
+    * [.clear()](#CanvasWrapper+clear)
+
+<a name="new_CanvasWrapper_new"></a>
+
+### new CanvasWrapper(targetId, theme)
+The constructor for the class CanvasWrapper.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| targetId | <code>string</code> | The canvas id. |
+| theme | <code>object</code> | A theme from the smiles drawer options. |
+
+<a name="CanvasWrapper+setTheme"></a>
+
+### canvasWrapper.setTheme(theme)
+Sets a provided theme.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| theme | <code>object</code> | A theme from the smiles drawer options. |
+
+<a name="CanvasWrapper+scale"></a>
+
+### canvasWrapper.scale(vertices)
+Scale the canvas based on vertex positions.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>array</code> | An array of vertices containing the vertices associated with the current molecule. |
+
+<a name="CanvasWrapper+reset"></a>
+
+### canvasWrapper.reset()
+Resets the transform of the canvas.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+<a name="CanvasWrapper+getColor"></a>
+
+### canvasWrapper.getColor(key) ⇒ <code>string</code>
+Returns the hex code of a color associated with a key from the current theme.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+**Returns**: <code>string</code> - A color hex value.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>string</code> | The color key in the theme (e.g. C, N, BACKGROUND, ...). |
+
+<a name="CanvasWrapper+drawCircle"></a>
+
+### canvasWrapper.drawCircle(x, y, radius, color, [fill], [debug], [debugText])
+Draws a circle to a canvas context.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| x | <code>number</code> |  | The x coordinate of the circles center. |
+| y | <code>number</code> |  | The y coordinate of the circles center. |
+| radius | <code>number</code> |  | The radius of the circle |
+| color | <code>string</code> |  | A hex encoded color. |
+| [fill] | <code>boolean</code> | <code>true</code> | Whether to fill or stroke the circle. |
+| [debug] | <code>boolean</code> | <code>false</code> | Draw in debug mode. |
+| [debugText] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | A debug message. |
+
+<a name="CanvasWrapper+drawLine"></a>
+
+### canvasWrapper.drawLine(line)
+Draw a line to a canvas.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| line | <code>[Line](#Line)</code> | A line. |
+
+<a name="CanvasWrapper+drawDebugText"></a>
+
+### canvasWrapper.drawDebugText(x, y, text)
+Draws a debug text message at a given position
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| x | <code>number</code> | The x coordinate. |
+| y | <code>number</code> | The y coordinate. |
+| text | <code>string</code> | The debug text. |
+
+<a name="CanvasWrapper+drawText"></a>
+
+### canvasWrapper.drawText(x, y, hydrogens, direction, isTerminal, charge)
+Draw a text to the canvas.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| x | <code>number</code> | The x position of the text. |
+| y | <code>number</code> | The y position of the text. |
+| hydrogens | <code>number</code> | The number of hydrogen atoms. |
+| direction | <code>string</code> | The direction of the text in relation to the associated vertex. |
+| isTerminal | <code>boolean</code> | A boolean indicating whether or not the vertex is terminal. |
+| charge | <code>string</code> | The charge of the atom. |
+
+<a name="CanvasWrapper+drawDebugPoint"></a>
+
+### canvasWrapper.drawDebugPoint(x, y, [debugText], [color])
+Draws a dubug dot at a given coordinate and adds text.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| x | <code>number</code> |  | The x coordinate. |
+| y | <code>number</code> |  | The y coordindate. |
+| [debugText] | <code>string</code> | <code>&quot;&#x27;&#x27;&quot;</code> | A string. |
+| [color] | <code>string</code> | <code>&quot;&#x27;#f00&#x27;&quot;</code> | A color in hex form. |
+
+<a name="CanvasWrapper+drawAromaticityRing"></a>
+
+### canvasWrapper.drawAromaticityRing(ring)
+Draws a ring inside a provided ring, indicating aromaticity.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ring | <code>[Ring](#Ring)</code> | A ring. |
+
+<a name="CanvasWrapper+clear"></a>
+
+### canvasWrapper.clear()
+Clear the canvas.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
 <a name="SmilesDrawer"></a>
 
 ## SmilesDrawer
@@ -354,6 +517,35 @@ The main class of the application representing the smiles drawer
     * [.getBridgedRingRings(ringId)](#SmilesDrawer+getBridgedRingRings) ⇒ <code>array</code>
     * [.isPartOfBridgedRing(ringId)](#SmilesDrawer+isPartOfBridgedRing) ⇒ <code>boolean</code>
     * [.createBridgedRing(ringIds, sourceVertexId)](#SmilesDrawer+createBridgedRing) ⇒ <code>[Ring](#Ring)</code>
+    * [.getRingVertices(sourceId, targetId)](#SmilesDrawer+getRingVertices) ⇒ <code>array</code>
+    * [.dijkstra(sourceId, targetId)](#SmilesDrawer+dijkstra) ⇒ <code>array</code>
+    * [.getMinDist(dist, visited)](#SmilesDrawer+getMinDist) ⇒ <code>number</code>
+    * [.areVerticesInSameRing(vertexA, vertexB)](#SmilesDrawer+areVerticesInSameRing) ⇒ <code>boolean</code>
+    * [.getCommonRings(vertexA, vertexB)](#SmilesDrawer+getCommonRings) ⇒ <code>array</code>
+    * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer+getSmallestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+    * [.getLargestCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+    * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer+getVerticesAt) ⇒ <code>array</code>
+    * [.getBranch(vertexId, previousId)](#SmilesDrawer+getBranch) ⇒ <code>object</code>
+    * [.addVertex(vertex)](#SmilesDrawer+addVertex) ⇒ <code>number</code>
+    * [.addEdge(edge)](#SmilesDrawer+addEdge) ⇒ <code>number</code>
+    * [.addRing(ring)](#SmilesDrawer+addRing) ⇒ <code>number</code>
+    * [.removeRing(ringId)](#SmilesDrawer+removeRing)
+    * [.getRing(ringId)](#SmilesDrawer+getRing) ⇒ <code>[Ring](#Ring)</code>
+    * [.addRingConnection(ringConnection)](#SmilesDrawer+addRingConnection) ⇒ <code>number</code>
+    * [.removeRingConnection(ringConnectionId)](#SmilesDrawer+removeRingConnection)
+    * [.removeRingConnectionsBetween(vertexIdA, vertexIdB)](#SmilesDrawer+removeRingConnectionsBetween)
+    * [.getRingConnections(ringId, ringIds)](#SmilesDrawer+getRingConnections) ⇒ <code>array</code>
+    * [.getOverlapScore()](#SmilesDrawer+getOverlapScore) ⇒ <code>object</code>
+    * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer+chooseSide) ⇒ <code>object</code>
+    * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer+areConnected) ⇒ <code>boolean</code>
+    * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer+getEdgeWeight) ⇒ <code>number</code> &#124; <code>null</code>
+    * [.forceLayout(vertices, center, startVertexId, ring)](#SmilesDrawer+forceLayout)
+    * [.getSubringCenter(ring, vertex)](#SmilesDrawer+getSubringCenter) ⇒ <code>[Vector2](#Vector2)</code>
+    * [.drawEdges(debug)](#SmilesDrawer+drawEdges)
+    * [.drawVertices(debug)](#SmilesDrawer+drawVertices)
+    * [.position()](#SmilesDrawer+position)
+    * [.clearPositions()](#SmilesDrawer+clearPositions)
+    * [.restorePositions()](#SmilesDrawer+restorePositions)
     * [.getTargets()](#SmilesDrawer+getTargets)
 
 <a name="new_SmilesDrawer_new"></a>
@@ -495,6 +687,352 @@ Creates a bridged ring.
 | ringIds | <code>array</code> | An array of ids of rings involved in the bridged ring. |
 | sourceVertexId | <code>number</code> | The vertex id to start the bridged ring discovery from. |
 
+<a name="SmilesDrawer+getRingVertices"></a>
+
+### smilesDrawer.getRingVertices(sourceId, targetId) ⇒ <code>array</code>
+Returns an array of vertices that are members of the ring specified by the source and target vertex ids. It is assumed that those two vertices share the ringbond (the break introduced when creating the smiles MST).
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array of vertex ids.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sourceId | <code>number</code> | A vertex id. |
+| targetId | <code>number</code> | A vertex id. |
+
+<a name="SmilesDrawer+dijkstra"></a>
+
+### smilesDrawer.dijkstra(sourceId, targetId) ⇒ <code>array</code>
+Dijkstras algorithm for finding the shortest path between two vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - The path (vertex ids) from the source to the target vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sourceId | <code>number</code> | The id of the source vertex. |
+| targetId | <code>number</code> | The id of the target vertex. |
+
+<a name="SmilesDrawer+getMinDist"></a>
+
+### smilesDrawer.getMinDist(dist, visited) ⇒ <code>number</code>
+Gets the minimal distance from an array containing distances.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The id with the minimal distance.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| dist | <code>array</code> | An array of distances. |
+| visited | <code>array</code> | An array indicated whether or not a vertex has been visited. |
+
+<a name="SmilesDrawer+areVerticesInSameRing"></a>
+
+### smilesDrawer.areVerticesInSameRing(vertexA, vertexB) ⇒ <code>boolean</code>
+Checks whether or not tow vertices are in the same ring.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not the two vertices are in the same ring.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
+| vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
+
+<a name="SmilesDrawer+getCommonRings"></a>
+
+### smilesDrawer.getCommonRings(vertexA, vertexB) ⇒ <code>array</code>
+Returns an array of ring ids shared by both vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array of ids of rings shared by the two vertices.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
+| vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
+
+<a name="SmilesDrawer+getSmallestCommonRing"></a>
+
+### smilesDrawer.getSmallestCommonRing(vertexA, vertexB) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+Returns the smallest ring shared by the two vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Ring](#Ring)</code> &#124; <code>null</code> - If a smallest common ring exists, that ring, else null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
+| vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
+
+<a name="SmilesDrawer+getLargestCommonRing"></a>
+
+### smilesDrawer.getLargestCommonRing(vertexA, vertexB) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+Returns the largest ring shared by the two vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Ring](#Ring)</code> &#124; <code>null</code> - If a largest common ring exists, that ring, else null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
+| vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
+
+<a name="SmilesDrawer+getVerticesAt"></a>
+
+### smilesDrawer.getVerticesAt(position, radius, excludeVertexId) ⇒ <code>array</code>
+Returns an array of vertices positioned at a specified location.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array containing vertex ids in a given location.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| position | <code>[Vector2](#Vector2)</code> | The position to search for vertices. |
+| radius | <code>number</code> | The radius within to search. |
+| excludeVertexId | <code>number</code> | A vertex id to be excluded from the search results. |
+
+<a name="SmilesDrawer+getBranch"></a>
+
+### smilesDrawer.getBranch(vertexId, previousId) ⇒ <code>object</code>
+Returns the rings and vertices contained in a sub-graph.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>object</code> - An object containing two arrays, one with the vertices in the subgraph and one with the rings in the subgraph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>number</code> | The vertex id to start the sub-graph search from |
+| previousId | <code>number</code> | The vertex id in the opposite of which the search will be started. |
+
+<a name="SmilesDrawer+addVertex"></a>
+
+### smilesDrawer.addVertex(vertex) ⇒ <code>number</code>
+Add a vertex to this representation of a molcule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The vertex id of the new vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertex | <code>[Vertex](#Vertex)</code> | A new vertex. |
+
+<a name="SmilesDrawer+addEdge"></a>
+
+### smilesDrawer.addEdge(edge) ⇒ <code>number</code>
+Add an edge to this representation of a molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The edge id of the new edge.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| edge | <code>[Edge](#Edge)</code> | A new edge. |
+
+<a name="SmilesDrawer+addRing"></a>
+
+### smilesDrawer.addRing(ring) ⇒ <code>number</code>
+Add a ring to this representation of a molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The ring id of the new ring.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ring | <code>[Ring](#Ring)</code> | A new ring. |
+
+<a name="SmilesDrawer+removeRing"></a>
+
+### smilesDrawer.removeRing(ringId)
+Removes a ring from the array of rings associated with the current molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringId | <code>number</code> | A ring id. |
+
+<a name="SmilesDrawer+getRing"></a>
+
+### smilesDrawer.getRing(ringId) ⇒ <code>[Ring](#Ring)</code>
+Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Ring](#Ring)</code> - A ring associated with the current molecule.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringId | <code>number</code> | A ring id. |
+
+<a name="SmilesDrawer+addRingConnection"></a>
+
+### smilesDrawer.addRingConnection(ringConnection) ⇒ <code>number</code>
+Add a ring connection to this representation of a molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The ring connection id of the new ring connection.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnection | <code>[RingConnection](#RingConnection)</code> | A new ringConnection. |
+
+<a name="SmilesDrawer+removeRingConnection"></a>
+
+### smilesDrawer.removeRingConnection(ringConnectionId)
+Removes a ring connection from the array of rings connections associated with the current molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnectionId | <code>number</code> | A ring connection id. |
+
+<a name="SmilesDrawer+removeRingConnectionsBetween"></a>
+
+### smilesDrawer.removeRingConnectionsBetween(vertexIdA, vertexIdB)
+Removes all ring connections between two vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>number</code> | A vertex id. |
+| vertexIdB | <code>number</code> | A vertex id. |
+
+<a name="SmilesDrawer+getRingConnections"></a>
+
+### smilesDrawer.getRingConnections(ringId, ringIds) ⇒ <code>array</code>
+Get the ring connections associated with a ring, the ring connections between two rings or the ring connections between one ring and multiple other rings.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array of ring connection ids.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| ringId | <code>number</code> |  | A ring id. |
+| ringIds | <code>number</code> &#124; <code>array</code> &#124; <code>null</code> | <code></code> | A ring id, an array of ring ids or null. |
+
+<a name="SmilesDrawer+getOverlapScore"></a>
+
+### smilesDrawer.getOverlapScore() ⇒ <code>object</code>
+Returns the overlap score of the current molecule based on its positioned vertices. The higher the score, the more overlaps occur in the structure drawing.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>object</code> - Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }  
+<a name="SmilesDrawer+chooseSide"></a>
+
+### smilesDrawer.chooseSide(vertexA, vertexB, sides) ⇒ <code>object</code>
+When drawing a double bond, choose the side to place the double bond. E.g. a double bond should always been drawn inside a ring.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>object</code> - Returns an object containing the following information: {
+            totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
+            totalPosition: Same as position, but based on entire molecule,
+            sideCount: Counts the sides of each neighbour, is an array [ a, b ],
+            position: which side to position the second bond, is 0 or 1, represents the index in the normal array. This is based on only the neighbours
+            anCount: the number of neighbours of vertexA,
+            bnCount: the number of neighbours of vertexB
+        }  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
+| vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
+| sides | <code>array</code> | An array containing the two normals of the line spanned by the two provided vertices. |
+
+<a name="SmilesDrawer+areConnected"></a>
+
+### smilesDrawer.areConnected(vertexIdA, vertexIdA) ⇒ <code>boolean</code>
+Checks whether or not two vertices are connected.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not two vertices are connected.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>number</code> | A vertex id. |
+| vertexIdA | <code>number</code> | A vertex id. |
+
+<a name="SmilesDrawer+getEdgeWeight"></a>
+
+### smilesDrawer.getEdgeWeight(vertexIdA, vertexIdB) ⇒ <code>number</code> &#124; <code>null</code>
+Returns the weight of the edge between two given vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> &#124; <code>null</code> - The weight of the edge or, if no edge can be found, null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>number</code> | A vertex id. |
+| vertexIdB | <code>number</code> | A vertex id. |
+
+<a name="SmilesDrawer+forceLayout"></a>
+
+### smilesDrawer.forceLayout(vertices, center, startVertexId, ring)
+Applies a force-based layout to a set of provided vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>array</code> | An array containing vertices to be placed using the force based layout. |
+| center | <code>[Vector2](#Vector2)</code> | The center of the layout. |
+| startVertexId | <code>number</code> | A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex. |
+| ring | <code>[Ring](#Ring)</code> | The bridged ring associated with this force-based layout. |
+
+<a name="SmilesDrawer+getSubringCenter"></a>
+
+### smilesDrawer.getSubringCenter(ring, vertex) ⇒ <code>[Vector2](#Vector2)</code>
+Gets the center of a ring contained within a bridged ring and containing a given vertex.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - The center of the subring that contains the provided vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ring | <code>[Ring](#Ring)</code> | A bridged ring. |
+| vertex | <code>[Vertex](#Vertex)</code> | A vertex. |
+
+<a name="SmilesDrawer+drawEdges"></a>
+
+### smilesDrawer.drawEdges(debug)
+Draw the actual edges as bonds to the canvas.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| debug | <code>boolean</code> | A boolean indicating whether or not to draw debug helpers. |
+
+<a name="SmilesDrawer+drawVertices"></a>
+
+### smilesDrawer.drawVertices(debug)
+Draws the vertices representing atoms to the canvas.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| debug | <code>boolean</code> | A boolean indicating whether or not to draw debug messages to the canvas. |
+
+<a name="SmilesDrawer+position"></a>
+
+### smilesDrawer.position()
+Position the vertices according to their bonds and properties.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+<a name="SmilesDrawer+clearPositions"></a>
+
+### smilesDrawer.clearPositions()
+Reset the positions of rings and vertices. The previous positions will be backed up.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+<a name="SmilesDrawer+restorePositions"></a>
+
+### smilesDrawer.restorePositions()
+Restore the positions backed up during the last clearPositions() call.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer+getTargets"></a>
 
 ### smilesDrawer.getTargets()

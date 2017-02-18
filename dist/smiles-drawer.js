@@ -503,6 +503,453 @@ var Atom = function () {
     return Atom;
 }();
 
+/** A class wrapping a canvas element */
+
+
+var CanvasWrapper = function () {
+    /**
+     * The constructor for the class CanvasWrapper.
+     *
+     * @param {string} targetId The canvas id.
+     * @param {object} theme A theme from the smiles drawer options.
+     */
+    function CanvasWrapper(targetId, theme) {
+        _classCallCheck(this, CanvasWrapper);
+
+        this.canvas = document.getElementById(targetId);
+        this.ctx = this.canvas.getContext('2d');
+        this.colors = theme;
+
+        this.drawingWidth = 0.0;
+        this.drawingHeight = 0.0;
+        this.offsetX = 0.0;
+        this.offsetY = 0.0;
+
+        this.clear();
+    }
+
+    /**
+     * Sets a provided theme.
+     *
+     * @param {object} theme A theme from the smiles drawer options.
+     */
+
+
+    _createClass(CanvasWrapper, [{
+        key: 'setTheme',
+        value: function setTheme(theme) {
+            this.colors = theme;
+        }
+
+        /**
+         * Scale the canvas based on vertex positions.
+         *
+         * @param {array} vertices An array of vertices containing the vertices associated with the current molecule.
+         */
+
+    }, {
+        key: 'scale',
+        value: function scale(vertices) {
+            // Figure out the final size of the image
+            var max = { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE };
+            var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE };
+
+            for (var i = 0; i < vertices.length; i++) {
+                var p = vertices[i].position;
+                if (max.x < p.x) max.x = p.x;
+                if (max.y < p.y) max.y = p.y;
+                if (min.x > p.x) min.x = p.x;
+                if (min.y > p.y) min.y = p.y;
+            }
+
+            // Add padding
+            var padding = 20.0;
+            max.x += padding;
+            max.y += padding;
+            min.x -= padding;
+            min.y -= padding;
+
+            this.drawingWidth = max.x - min.x;
+            this.drawingHeight = max.y - min.y;
+
+            var scaleX = this.canvas.offsetWidth / this.drawingWidth;
+            var scaleY = this.canvas.offsetHeight / this.drawingHeight;
+
+            var scale = scaleX < scaleY ? scaleX : scaleY;
+
+            this.ctx.scale(scale, scale);
+
+            this.offsetX = -min.x;
+            this.offsetY = -min.y;
+
+            // Center
+            if (scaleX < scaleY) {
+                this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+            } else {
+                this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+            }
+        }
+
+        /**
+         * Resets the transform of the canvas.
+         *
+         */
+
+    }, {
+        key: 'reset',
+        value: function reset() {
+            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+
+        /**
+         * Returns the hex code of a color associated with a key from the current theme.
+         *
+         * @param {string} key The color key in the theme (e.g. C, N, BACKGROUND, ...).
+         * @returns {string} A color hex value.
+         */
+
+    }, {
+        key: 'getColor',
+        value: function getColor(key) {
+            key = key.toUpperCase();
+
+            if (key in this.colors) {
+                return this.colors[key];
+            }
+
+            return this.colors['C'];
+        }
+
+        /**
+         * Draws a circle to a canvas context.
+         * @param {number} x The x coordinate of the circles center.
+         * @param {number} y The y coordinate of the circles center.
+         * @param {number} radius The radius of the circle
+         * @param {string} color A hex encoded color.
+         * @param {boolean} [fill=true] Whether to fill or stroke the circle.
+         * @param {boolean} [debug=false] Draw in debug mode.
+         * @param {string} [debugText=''] A debug message.
+         */
+
+    }, {
+        key: 'drawCircle',
+        value: function drawCircle(x, y, radius, color) {
+            var fill = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+            var debug = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+            var debugText = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : '';
+
+            if (isNaN(x) || isNaN(y)) {
+                return;
+            }
+
+            var ctx = this.ctx;
+            var offsetX = this.offsetX;
+            var offsetY = this.offsetY;
+
+            ctx.save();
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2, true);
+            ctx.closePath();
+
+            if (debug) {
+                if (fill) {
+                    ctx.fillStyle = '#f00';
+                    ctx.fill();
+                } else {
+                    ctx.strokeStyle = '#f00';
+                    ctx.stroke();
+                }
+
+                this.drawDebugText(x, y, debugText);
+            } else {
+                if (fill) {
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                } else {
+                    ctx.strokeStyle = color;
+                    ctx.stroke();
+                }
+            }
+
+            ctx.restore();
+        }
+
+        /**
+         * Draw a line to a canvas.
+         *
+         * @param {Line} line A line.
+         */
+
+    }, {
+        key: 'drawLine',
+        value: function drawLine(line) {
+            if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
+                return;
+            }
+
+            var ctx = this.ctx;
+            var offsetX = this.offsetX;
+            var offsetY = this.offsetY;
+
+            // Add a shadow behind the line
+            var shortLine = line.clone().shorten(8.0);
+
+            var l = shortLine.getLeftVector().clone();
+            var r = shortLine.getRightVector().clone();
+
+            l.x += offsetX;
+            l.y += offsetY;
+
+            r.x += offsetX;
+            r.y += offsetY;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(l.x, l.y);
+            ctx.lineTo(r.x, r.y);
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 3.5;
+            ctx.shadowColor = this.getColor('BACKGROUND');
+            ctx.shadowBlur = 0.0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.strokeStyle = this.getColor('BACKGROUND');
+            ctx.stroke();
+            ctx.restore();
+
+            l = line.getLeftVector().clone();
+            r = line.getRightVector().clone();
+
+            l.x += offsetX;
+            l.y += offsetY;
+
+            r.x += offsetX;
+            r.y += offsetY;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(l.x, l.y);
+            ctx.lineTo(r.x, r.y);
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 1.5;
+
+            var gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
+            gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || this.getColor('C'));
+            gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
+
+            ctx.strokeStyle = gradient;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /**
+         * Draws a debug text message at a given position
+         *
+         * @param {number} x The x coordinate.
+         * @param {number} y The y coordinate.
+         * @param {string} text The debug text.
+         */
+
+    }, {
+        key: 'drawDebugText',
+        value: function drawDebugText(x, y, text) {
+            var ctx = this.ctx;
+            ctx.save();
+
+            ctx.font = '5px Arial';
+            ctx.textAlign = 'start';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#ff0000';
+            ctx.fillText(text, x + this.offsetX, y + this.offsetY);
+            ctx.restore();
+        }
+
+        /**
+         * Draw a text to the canvas.
+         *
+         * @param {number} x The x position of the text.
+         * @param {number} y The y position of the text.
+         * @param {number} hydrogens The number of hydrogen atoms.
+         * @param {string} direction The direction of the text in relation to the associated vertex.
+         * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
+         * @param {string} charge The charge of the atom.
+         */
+
+    }, {
+        key: 'drawText',
+        value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge) {
+            // Return empty line element for debugging, remove this check later, values should not be NaN
+            if (isNaN(x) || isNaN(y)) {
+                return;
+            }
+
+            var ctx = this.ctx;
+            var offsetX = this.offsetX;
+            var offsetY = this.offsetY;
+
+            ctx.save();
+
+            var fontLarge = '10px Arial';
+            var fontSmall = '6px Arial';
+
+            ctx.textAlign = 'start';
+            ctx.textBaseline = 'top';
+
+            // Charge
+            var chargeText = '+';
+            var chargeWidth = 0;
+            if (charge) {
+                if (charge === 2) {
+                    chargeText = '2+';
+                } else if (charge === -1) {
+                    chargeText = '-';
+                } else if (charge === -2) {
+                    chargeText = '2-';
+                }
+
+                ctx.font = fontSmall;
+                chargeWidth = ctx.measureText(chargeText).width;
+            }
+
+            ctx.font = fontLarge;
+            ctx.fillStyle = this.getColor(elementName);
+
+            var dim = ctx.measureText(elementName);
+            dim.totalWidth = dim.width + chargeWidth;
+            dim.height = parseInt(fontLarge, 10);
+
+            var r = dim.totalWidth > dim.height ? dim.totalWidth : dim.height;
+            r /= 2.0;
+
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x + offsetX, y + offsetY + dim.height / 20.0, r + 1.0, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+
+            // Correct vertical text position
+            y -= 2;
+
+            ctx.fillStyle = this.getColor(elementName);
+            ctx.fillText(elementName, x - dim.totalWidth / 2.0 + offsetX, y - dim.height / 2.0 + offsetY);
+
+            if (charge) {
+                ctx.font = fontSmall;
+                ctx.fillText(chargeText, x - dim.totalWidth / 2.0 + dim.width + offsetX, y - dim.height / 2.0 + offsetY);
+            }
+
+            ctx.font = fontLarge;
+
+            var hDim = ctx.measureText('H');
+            hDim.height = parseInt(fontLarge, 10);
+
+            if (hydrogens === 1) {
+                var hx = x - dim.totalWidth / 2.0 + offsetX;
+                var hy = y - dim.height / 2.0 + offsetY;
+
+                if (direction === 'left') {
+                    hx -= dim.totalWidth;
+                } else if (direction === 'right') {
+                    hx += dim.totalWidth;
+                } else if (direction === 'up' && isTerminal) {
+                    hx += dim.totalWidth;
+                } else if (direction === 'down' && isTerminal) {
+                    hx += dim.totalWidth;
+                } else if (direction === 'up' && !isTerminal) {
+                    hy -= dim.height;
+                } else if (direction === 'down' && !isTerminal) {
+                    hy += dim.height;
+                }
+
+                ctx.fillText('H', hx, hy);
+            } else if (hydrogens > 1) {
+                var _hx = x - dim.totalWidth / 2.0 + offsetX;
+                var _hy = y - dim.height / 2.0 + offsetY;
+
+                ctx.font = fontSmall;
+                var cDim = ctx.measureText(hydrogens);
+                cDim.height = parseInt(fontSmall, 10);
+
+                if (direction === 'left') {
+                    _hx -= hDim.width + cDim.width;
+                } else if (direction === 'right') {
+                    _hx += dim.totalWidth;
+                } else if (direction === 'up' && isTerminal) {
+                    _hx += dim.totalWidth;
+                } else if (direction === 'down' && isTerminal) {
+                    _hx += dim.totalWidth;
+                } else if (direction === 'up' && !isTerminal) {
+                    _hy -= dim.height;
+                } else if (direction === 'down' && !isTerminal) {
+                    _hy += dim.height;
+                }
+
+                ctx.font = fontLarge;
+                ctx.fillText('H', _hx, _hy);
+
+                ctx.font = fontSmall;
+                ctx.fillText(hydrogens, _hx + hDim.width, _hy + hDim.height / 2.0);
+            }
+
+            ctx.restore();
+        }
+
+        /**
+         * Draws a dubug dot at a given coordinate and adds text.
+         *
+         * @param {number} x The x coordinate.
+         * @param {number} y The y coordindate.
+         * @param {string} [debugText=''] A string.
+         * @param {string} [color='#f00'] A color in hex form.
+         */
+
+    }, {
+        key: 'drawDebugPoint',
+        value: function drawDebugPoint(x, y) {
+            var debugText = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+            var color = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '#f00';
+
+            this.drawCircle(x, y, 2, color, true, true, debugText);
+        }
+
+        /**
+         * Draws a ring inside a provided ring, indicating aromaticity.
+         *
+         * @param {Ring} ring A ring.
+         */
+
+    }, {
+        key: 'drawAromaticityRing',
+        value: function drawAromaticityRing(ring) {
+            var ctx = this.ctx;
+
+            ctx.save();
+            ctx.strokeStyle = this.getColor('C');
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, ring.radius - 10, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /**
+         * Clear the canvas.
+         *
+         */
+
+    }, {
+        key: 'clear',
+        value: function clear() {
+            this.ctx.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight);
+        }
+    }]);
+
+    return CanvasWrapper;
+}();
+
 /** The main class of the application representing the smiles drawer */
 
 
@@ -515,17 +962,10 @@ var SmilesDrawer = function () {
     function SmilesDrawer(options) {
         _classCallCheck(this, SmilesDrawer);
 
-        this.width = 800;
-        this.height = 500;
         this.ringIdCounter = 0;
         this.ringConnectionIdCounter = 0;
-
-        this.canvas;
-        this.ctx;
-        this.drawingWidth = 0.0;
-        this.drawingHeight = 0.0;
-        this.offsetX = 0.0;
-        this.offsetY = 0.0;
+        this.canvasWrapper = null;
+        this.direction = 1;
 
         this.maxBonds = {
             'c': 4,
@@ -636,8 +1076,7 @@ var SmilesDrawer = function () {
             var infoOnly = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
             this.data = data;
-            this.canvas = document.getElementById(targetId);
-            this.ctx = this.canvas.getContext('2d');
+            this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName]);
 
             this.ringIdCounter = 0;
             this.ringConnectionIdCounter = 0;
@@ -650,20 +1089,21 @@ var SmilesDrawer = function () {
             this.backupVertices = [];
             this.backupRings = [];
 
-            this.colors = this.opts.themes[themeName];
-
-            // Clear the canvas
-            this.ctx.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight);
             this.initGraph(data);
             this.initRings();
 
             if (!infoOnly) {
                 this.position();
                 var overlapScore = this.getOverlapScore();
-
                 var count = 0;
-                while (overlapScore.total > this.opts.bondLength / 2.0 && count < 10) {
-                    // this.opts.defaultDir = -this.opts.defaultDir;
+
+                while (overlapScore.total > this.opts.bondLength / 10.0 && count < 22) {
+                    if (this.direction === 1) {
+                        this.direction = -1;
+                    } else if (this.direction === -1) {
+                        this.direction = 0;
+                    }
+
                     this.clearPositions();
                     this.position();
 
@@ -675,59 +1115,19 @@ var SmilesDrawer = function () {
                         this.restorePositions();
                     }
 
-                    // Restore default
-                    // this.opts.defaultDir = -this.opts.defaultDir;
-
                     count++;
                 }
 
                 this.resolveSecondaryOverlaps(overlapScore.scores);
 
-                // Figure out the final size of the image
-                var max = { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE };
-                var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE };
-
-                for (var i = 0; i < this.vertices.length; i++) {
-                    var p = this.vertices[i].position;
-                    if (max.x < p.x) max.x = p.x;
-                    if (max.y < p.y) max.y = p.y;
-                    if (min.x > p.x) min.x = p.x;
-                    if (min.y > p.y) min.y = p.y;
-                }
-
-                // Add padding
-                var padding = 20.0;
-                max.x += padding;
-                max.y += padding;
-                min.x -= padding;
-                min.y -= padding;
-
-                this.drawingWidth = max.x - min.x;
-                this.drawingHeight = max.y - min.y;
-
-                var scaleX = this.canvas.offsetWidth / this.drawingWidth;
-                var scaleY = this.canvas.offsetHeight / this.drawingHeight;
-
-                var scale = scaleX < scaleY ? scaleX : scaleY;
-
-                this.ctx.scale(scale, scale);
-
-                this.offsetX = -min.x;
-                this.offsetY = -min.y;
-
-                // Center
-                if (scaleX < scaleY) {
-                    this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
-                } else {
-                    this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
-                }
+                // Set the canvas to the appropriate size
+                this.canvasWrapper.scale(this.vertices);
 
                 // Do the actual drawing
-                this.drawEdges();
+                this.drawEdges(this.opts.debug);
                 this.drawVertices(this.opts.debug);
 
-                // Reset the canvas context (especially the scale)
-                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+                this.canvasWrapper.reset();
             }
         }
 
@@ -966,7 +1366,7 @@ var SmilesDrawer = function () {
                         that.addRing(ring);
 
                         // Annotate the ring (add ring members to ring and rings to vertices)
-                        var path = that.annotateRing(ring.id, ring.sourceId, ring.targetId);
+                        var path = that.getRingVertices(ring.sourceId, ring.targetId);
 
                         for (var j = 0; j < path.length; j++) {
                             ring.members.push(path[j]);
@@ -1218,7 +1618,7 @@ var SmilesDrawer = function () {
             // Remove all the ring connections no longer used
             for (var _i14 = 0; _i14 < ringIds.length; _i14++) {
                 for (var _j4 = _i14 + 1; _j4 < ringIds.length; _j4++) {
-                    this.removeRingConnectionBetween(ringIds[_i14], ringIds[_j4]);
+                    this.removeRingConnectionsBetween(ringIds[_i14], ringIds[_j4]);
                 }
             }
 
@@ -1233,30 +1633,18 @@ var SmilesDrawer = function () {
 
             return ring;
         }
+
+        /**
+         * Returns an array of vertices that are members of the ring specified by the source and target vertex ids. It is assumed that those two vertices share the ringbond (the break introduced when creating the smiles MST).
+         *
+         * @param {number} sourceId A vertex id.
+         * @param {number} targetId A vertex id.
+         * @returns {array} An array of vertex ids.
+         */
+
     }, {
-        key: 'ringCounter',
-        value: function ringCounter(node, rings) {
-            for (var i = 0; i < node.getRingbondCount(); i++) {
-                var ring = node.ringbonds[i].id;
-
-                if (!this.arrayContains(rings, { value: ring })) {
-                    rings.push(ring);
-                }
-            }
-
-            for (var i = 0; i < node.branchCount; i++) {
-                this.ringCounter(node.branches[i], rings);
-            }
-
-            if (node.hasNext) {
-                this.ringCounter(node.next, rings);
-            }
-
-            return rings;
-        }
-    }, {
-        key: 'annotateRing',
-        value: function annotateRing(ring, sourceId, targetId) {
+        key: 'getRingVertices',
+        value: function getRingVertices(sourceId, targetId) {
             var prev = this.dijkstra(sourceId, targetId);
 
             // Backtrack from target to source
@@ -1276,6 +1664,15 @@ var SmilesDrawer = function () {
 
             return path;
         }
+
+        /**
+         * Dijkstras algorithm for finding the shortest path between two vertices.
+         *
+         * @param {number} sourceId The id of the source vertex.
+         * @param {number} targetId The id of the target vertex.
+         * @returns {array} The path (vertex ids) from the source to the target vertex.
+         */
+
     }, {
         key: 'dijkstra',
         value: function dijkstra(sourceId, targetId) {
@@ -1305,8 +1702,8 @@ var SmilesDrawer = function () {
 
                 visited[u] = true; // this "removes" the node from q
 
-                for (var i = 0; i < neighbours[u].length; i++) {
-                    var v = neighbours[u][i];
+                for (var _i16 = 0; _i16 < neighbours[u].length; _i16++) {
+                    var v = neighbours[u][_i16];
                     var tmp = dist[u] + this.getEdgeWeight(u, v);
 
                     // Do not move directly from the source to the target
@@ -1322,70 +1719,15 @@ var SmilesDrawer = function () {
                 }
             }
         }
-    }, {
-        key: 'areVerticesInSameRing',
-        value: function areVerticesInSameRing(vertexA, vertexB) {
-            // This is a little bit lighter (without the array and push) than
-            // getCommonRings().length > 0
-            for (var i = 0; i < vertexA.value.rings.length; i++) {
-                for (var j = 0; j < vertexB.value.rings.length; j++) {
-                    if (vertexA.value.rings[i] == vertexB.value.rings[j]) {
-                        return true;
-                    }
-                }
-            }
 
-            return false;
-        }
-    }, {
-        key: 'getCommonRings',
-        value: function getCommonRings(vertexA, vertexB) {
-            var commonRings = [];
+        /**
+         * Gets the minimal distance from an array containing distances.
+         *
+         * @param {array} dist An array of distances.
+         * @param {array} visited An array indicated whether or not a vertex has been visited.
+         * @returns {number} The id with the minimal distance.
+         */
 
-            for (var i = 0; i < vertexA.value.rings.length; i++) {
-                for (var j = 0; j < vertexB.value.rings.length; j++) {
-                    if (vertexA.value.rings[i] == vertexB.value.rings[j]) {
-                        commonRings.push(vertexA.value.rings[i]);
-                    }
-                }
-            }
-
-            return commonRings;
-        }
-    }, {
-        key: 'getSmallestCommonRing',
-        value: function getSmallestCommonRing(vertexA, vertexB) {
-            var commonRings = this.getCommonRings(vertexA, vertexB);
-            var minSize = Number.MAX_VALUE;
-            var smallestCommonRing = null;
-
-            for (var i = 0; i < commonRings.length; i++) {
-                var size = this.getRing(commonRings[i]).getSize();
-                if (size < minSize) {
-                    minSize = size;
-                    smallestCommonRing = this.getRing(commonRings[i]);
-                }
-            }
-
-            return smallestCommonRing;
-        }
-    }, {
-        key: 'getLargestCommonRing',
-        value: function getLargestCommonRing(vertexA, vertexB) {
-            var commonRings = this.getCommonRings(vertexA, vertexB);
-            var maxSize = 0;
-            var largestCommonRing = null;
-
-            for (var i = 0; i < commonRings.length; i++) {
-                var size = this.getRing(commonRings[i]).getSize();
-                if (size > maxSize) {
-                    maxSize = size;
-                    largestCommonRing = this.getRing(commonRings[i]);
-                }
-            }
-
-            return largestCommonRing;
-        }
     }, {
         key: 'getMinDist',
         value: function getMinDist(dist, visited) {
@@ -1403,36 +1745,132 @@ var SmilesDrawer = function () {
 
             return v;
         }
-    }, {
-        key: 'getEdgeWeight',
-        value: function getEdgeWeight(a, b) {
-            for (var i = 0; i < this.edges.length; i++) {
-                var edge = this.edges[i];
 
-                if (edge.sourceId == a && edge.targetId == b || edge.targetId == a && edge.sourceId == b) {
-                    return edge.weight;
+        /**
+         * Checks whether or not tow vertices are in the same ring.
+         *
+         * @param {Vertex} vertexA A vertex.
+         * @param {Vertex} vertexB A vertex.
+         * @returns {boolean} A boolean indicating whether or not the two vertices are in the same ring.
+         */
+
+    }, {
+        key: 'areVerticesInSameRing',
+        value: function areVerticesInSameRing(vertexA, vertexB) {
+            // This is a little bit lighter (without the array and push) than
+            // getCommonRings().length > 0
+            for (var i = 0; i < vertexA.value.rings.length; i++) {
+                for (var j = 0; j < vertexB.value.rings.length; j++) {
+                    if (vertexA.value.rings[i] == vertexB.value.rings[j]) {
+                        return true;
+                    }
                 }
             }
+
+            return false;
         }
+
+        /**
+         * Returns an array of ring ids shared by both vertices.
+         *
+         * @param {Vertex} vertexA A vertex.
+         * @param {Vertex} vertexB A vertex.
+         * @returns {array} An array of ids of rings shared by the two vertices.
+         */
+
     }, {
-        key: 'addVertex',
-        value: function addVertex(vertex) {
-            vertex.id = this.vertices.length;
-            this.vertices.push(vertex);
-            return vertex.id;
+        key: 'getCommonRings',
+        value: function getCommonRings(vertexA, vertexB) {
+            var commonRings = [];
+
+            for (var i = 0; i < vertexA.value.rings.length; i++) {
+                for (var j = 0; j < vertexB.value.rings.length; j++) {
+                    if (vertexA.value.rings[i] == vertexB.value.rings[j]) {
+                        commonRings.push(vertexA.value.rings[i]);
+                    }
+                }
+            }
+
+            return commonRings;
         }
+
+        /**
+         * Returns the smallest ring shared by the two vertices.
+         *
+         * @param {Vertex} vertexA A vertex.
+         * @param {Vertex} vertexB A vertex.
+         * @returns {Ring|null} If a smallest common ring exists, that ring, else null.
+         */
+
+    }, {
+        key: 'getSmallestCommonRing',
+        value: function getSmallestCommonRing(vertexA, vertexB) {
+            var commonRings = this.getCommonRings(vertexA, vertexB);
+            var minSize = Number.MAX_VALUE;
+            var smallestCommonRing = null;
+
+            for (var i = 0; i < commonRings.length; i++) {
+                var size = this.getRing(commonRings[i]).getSize();
+
+                if (size < minSize) {
+                    minSize = size;
+                    smallestCommonRing = this.getRing(commonRings[i]);
+                }
+            }
+
+            return smallestCommonRing;
+        }
+
+        /**
+         * Returns the largest ring shared by the two vertices.
+         *
+         * @param {Vertex} vertexA A vertex.
+         * @param {Vertex} vertexB A vertex.
+         * @returns {Ring|null} If a largest common ring exists, that ring, else null.
+         */
+
+    }, {
+        key: 'getLargestCommonRing',
+        value: function getLargestCommonRing(vertexA, vertexB) {
+            var commonRings = this.getCommonRings(vertexA, vertexB);
+            var maxSize = 0;
+            var largestCommonRing = null;
+
+            for (var i = 0; i < commonRings.length; i++) {
+                var size = this.getRing(commonRings[i]).getSize();
+
+                if (size > maxSize) {
+                    maxSize = size;
+                    largestCommonRing = this.getRing(commonRings[i]);
+                }
+            }
+
+            return largestCommonRing;
+        }
+
+        /**
+        * Returns an array of vertices positioned at a specified location.
+        *
+        * @param {Vector2} position The position to search for vertices.
+        * @param {number} radius The radius within to search.
+        * @param {number} excludeVertexId A vertex id to be excluded from the search results.
+        * @returns {array} An array containing vertex ids in a given location.
+        */
+
     }, {
         key: 'getVerticesAt',
-        value: function getVerticesAt(position, radius, exclude) {
+        value: function getVerticesAt(position, radius, excludeVertexId) {
             var locals = new Array();
 
             for (var i = 0; i < this.vertices.length; i++) {
                 var vertex = this.vertices[i];
-                if (vertex.id === exclude || !vertex.positioned) {
+
+                if (vertex.id === excludeVertexId || !vertex.positioned) {
                     continue;
                 }
 
                 var distance = position.distance(vertex.position);
+
                 if (distance <= radius) {
                     locals.push(vertex.id);
                 }
@@ -1440,21 +1878,32 @@ var SmilesDrawer = function () {
 
             return locals;
         }
+
+        /**
+         * Returns the rings and vertices contained in a sub-graph.
+         *
+         * @param {number} vertexId The vertex id to start the sub-graph search from
+         * @param {number} previousId The vertex id in the opposite of which the search will be started.
+         * @returns {object} An object containing two arrays, one with the vertices in the subgraph and one with the rings in the subgraph.
+         */
+
     }, {
         key: 'getBranch',
-        value: function getBranch(vertex, previous) {
+        value: function getBranch(vertexId, previousId) {
             var vertices = new Array();
             var rings = new Array();
             var that = this;
 
             var recurse = function recurse(v, p) {
                 var vertex = that.vertices[v];
+
                 for (var i = 0; i < vertex.value.rings.length; i++) {
                     rings.push(vertex.value.rings[i]);
                 }
 
-                for (var i = 0; i < vertex.children.length; i++) {
-                    var child = vertex.children[i];
+                for (var _i17 = 0; _i17 < vertex.children.length; _i17++) {
+                    var child = vertex.children[_i17];
+
                     if (child !== p && !ArrayHelper.contains(vertices, { value: child })) {
                         vertices.push(child);
                         recurse(child, v);
@@ -1462,91 +1911,165 @@ var SmilesDrawer = function () {
                 }
 
                 var parentVertexId = vertex.parentVertexId;
+
                 if (parentVertexId !== p && parentVertexId !== null && !ArrayHelper.contains(vertices, { value: parentVertexId })) {
                     vertices.push(parentVertexId);
                     recurse(parentVertexId, v);
                 }
             };
 
-            vertices.push(vertex);
-            recurse(vertex, previous);
+            vertices.push(vertexId);
+            recurse(vertexId, previousId);
 
             return {
                 vertices: vertices,
                 rings: ArrayHelper.unique(rings)
             };
         }
+
+        /**
+         * Add a vertex to this representation of a molcule.
+         *
+         * @param {Vertex} vertex A new vertex.
+         * @returns {number} The vertex id of the new vertex.
+         */
+
+    }, {
+        key: 'addVertex',
+        value: function addVertex(vertex) {
+            vertex.id = this.vertices.length;
+            this.vertices.push(vertex);
+
+            return vertex.id;
+        }
+
+        /**
+         * Add an edge to this representation of a molecule.
+         *
+         * @param {Edge} edge A new edge.
+         * @returns {number} The edge id of the new edge.
+         */
+
     }, {
         key: 'addEdge',
         value: function addEdge(edge) {
             edge.id = this.edges.length;
             this.edges.push(edge);
+
             return edge.id;
         }
+
+        /**
+         * Add a ring to this representation of a molecule.
+         *
+         * @param {Ring} ring A new ring.
+         * @returns {number} The ring id of the new ring.
+         */
+
     }, {
         key: 'addRing',
         value: function addRing(ring) {
             ring.id = this.ringIdCounter++;
             this.rings.push(ring);
+
             return ring.id;
         }
+
+        /**
+         * Removes a ring from the array of rings associated with the current molecule.
+         *
+         * @param {number} ringId A ring id.
+         */
+
     }, {
         key: 'removeRing',
-        value: function removeRing(ring) {
+        value: function removeRing(ringId) {
             this.rings = this.rings.filter(function (item) {
-                return item.id !== ring;
+                return item.id !== ringId;
             });
 
             // Also remove ring connections involving this ring
             this.ringConnections = this.ringConnections.filter(function (item) {
-                return item.rings.first !== ring && item.rings.second !== ring;
+                return item.rings.first !== ringId && item.rings.second !== ringId;
             });
 
             // Remove the ring as neighbour of other rings
             for (var i = 0; i < this.rings.length; i++) {
                 var r = this.rings[i];
                 r.neighbours = r.neighbours.filter(function (item) {
-                    return item !== ring;
+                    return item !== ringId;
                 });
             }
         }
+
+        /**
+         * Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.
+         *
+         * @param {number} ringId A ring id.
+         * @returns {Ring} A ring associated with the current molecule.
+         */
+
     }, {
         key: 'getRing',
-        value: function getRing(id) {
+        value: function getRing(ringId) {
             for (var i = 0; i < this.rings.length; i++) {
-                if (this.rings[i].id == id) {
+                if (this.rings[i].id == ringId) {
                     return this.rings[i];
                 }
             }
         }
+
+        /**
+         * Add a ring connection to this representation of a molecule.
+         *
+         * @param {RingConnection} ringConnection A new ringConnection.
+         * @returns {number} The ring connection id of the new ring connection.
+         */
+
     }, {
         key: 'addRingConnection',
         value: function addRingConnection(ringConnection) {
             ringConnection.id = this.ringConnectionIdCounter++;
             this.ringConnections.push(ringConnection);
+
             return ringConnection.id;
         }
+
+        /**
+         * Removes a ring connection from the array of rings connections associated with the current molecule.
+         *
+         * @param {number} ringConnectionId A ring connection id.
+         */
+
     }, {
         key: 'removeRingConnection',
-        value: function removeRingConnection(ringConnection) {
+        value: function removeRingConnection(ringConnectionId) {
             this.ringConnections = this.ringConnections.filter(function (item) {
-                return item.id !== ringConnection;
+                return item.id !== ringConnectionId;
             });
         }
+
+        /**
+         * Removes all ring connections between two vertices.
+         *
+         * @param {number} vertexIdA A vertex id.
+         * @param {number} vertexIdB A vertex id.
+         */
+
     }, {
-        key: 'removeRingConnectionBetween',
-        value: function removeRingConnectionBetween(a, b) {
+        key: 'removeRingConnectionsBetween',
+        value: function removeRingConnectionsBetween(vertexIdA, vertexIdB) {
             var toRemove = new Array();
             for (var i = 0; i < this.ringConnections.length; i++) {
                 var ringConnection = this.ringConnections[i];
 
-                if (ringConnection.rings.first === a && ringConnection.rings.second === b || ringConnection.rings.first === b && ringConnection.rings.second === a) {
+                if (ringConnection.rings.first === vertexIdA && ringConnection.rings.second === vertexIdB || ringConnection.rings.first === vertexIdB && ringConnection.rings.second === vertexIdA) {
                     toRemove.push(ringConnection.id);
                 }
             }
 
-            for (var i = 0; i < toRemove.length; i++) {
-                this.removeRingConnection(toRemove[i]);
+            for (var _i18 = 0; _i18 < toRemove.length; _i18++) {
+                this.removeRingConnection(toRemove[_i18]);
             }
         }
     }, {
@@ -1558,41 +2081,60 @@ var SmilesDrawer = function () {
                 }
             }
         }
+
+        /**
+         * Get the ring connections associated with a ring, the ring connections between two rings or the ring connections between one ring and multiple other rings.
+         *
+         * @param {number} ringId A ring id.
+         * @param {number|array|null} ringIds=null A ring id, an array of ring ids or null.
+         * @returns {array} An array of ring connection ids.
+         */
+
     }, {
         key: 'getRingConnections',
-        value: function getRingConnections(a, b) {
+        value: function getRingConnections(ringId) {
+            var ringIds = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
             var ringConnections = new Array();
 
-            if (arguments.length === 1) {
+            if (ringIds === null) {
                 for (var i = 0; i < this.ringConnections.length; i++) {
                     var ringConnection = this.ringConnections[i];
 
-                    if (ringConnection.rings.first === a || ringConnection.rings.second === a) {
+                    if (ringConnection.rings.first === ringId || ringConnection.rings.second === ringId) {
                         ringConnections.push(ringConnection.id);
                     }
                 }
-            } else if (b.constructor !== Array) {
-                for (var i = 0; i < this.ringConnections.length; i++) {
-                    var ringConnection = this.ringConnections[i];
+            } else if (ringIds.constructor !== Array) {
+                for (var _i19 = 0; _i19 < this.ringConnections.length; _i19++) {
+                    var _ringConnection = this.ringConnections[_i19];
 
-                    if (ringConnection.rings.first === a && ringConnection.rings.second === b || ringConnection.rings.first === b && ringConnection.rings.second === a) {
-                        ringConnections.push(ringConnection.id);
+                    if (_ringConnection.rings.first === ringId && _ringConnection.rings.second === ringIds || _ringConnection.rings.first === ringIds && _ringConnection.rings.second === ringId) {
+                        ringConnections.push(_ringConnection.id);
                     }
                 }
             } else {
-                for (var i = 0; i < this.ringConnections.length; i++) {
-                    for (var j = 0; j < b.length; j++) {
-                        var c = b[j];
-                        var ringConnection = this.ringConnections[i];
+                for (var _i20 = 0; _i20 < this.ringConnections.length; _i20++) {
+                    for (var j = 0; j < ringIds.length; j++) {
+                        var id = ringIds[j];
+                        var _ringConnection2 = this.ringConnections[_i20];
 
-                        if (ringConnection.rings.first === a && ringConnection.rings.second === c || ringConnection.rings.first === c && ringConnection.rings.second === a) {
-                            ringConnections.push(ringConnection.id);
+                        if (_ringConnection2.rings.first === ringId && _ringConnection2.rings.second === id || _ringConnection2.rings.first === id && _ringConnection2.rings.second === ringId) {
+                            ringConnections.push(_ringConnection2.id);
                         }
                     }
                 }
             }
+
             return ringConnections;
         }
+
+        /**
+         * Returns the overlap score of the current molecule based on its positioned vertices. The higher the score, the more overlaps occur in the structure drawing.
+         *
+         * @returns {object} Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }
+         */
+
     }, {
         key: 'getOverlapScore',
         value: function getOverlapScore() {
@@ -1603,16 +2145,17 @@ var SmilesDrawer = function () {
                 overlapScores[i] = 0;
             }
 
-            for (var i = 0; i < this.vertices.length; i++) {
-                for (var j = i + 1; j < this.vertices.length; j++) {
-                    var a = this.vertices[i];
+            for (var _i21 = 0; _i21 < this.vertices.length; _i21++) {
+                for (var j = _i21 + 1; j < this.vertices.length; j++) {
+                    var a = this.vertices[_i21];
                     var b = this.vertices[j];
 
                     var dist = Vector2.subtract(a.position, b.position).length();
+
                     if (dist < this.opts.bondLength) {
                         var weighted = this.opts.bondLength - dist;
                         total += weighted;
-                        overlapScores[i] += weighted;
+                        overlapScores[_i21] += weighted;
                         overlapScores[j] += weighted;
                     }
                 }
@@ -1620,10 +2163,10 @@ var SmilesDrawer = function () {
 
             var sortable = [];
 
-            for (var i = 0; i < this.vertices.length; i++) {
+            for (var _i22 = 0; _i22 < this.vertices.length; _i22++) {
                 sortable.push({
-                    id: i,
-                    score: overlapScores[i]
+                    id: _i22,
+                    score: overlapScores[_i22]
                 });
             }
 
@@ -1636,242 +2179,23 @@ var SmilesDrawer = function () {
                 scores: sortable
             };
         }
-    }, {
-        key: 'getColor',
-        value: function getColor(key) {
-            if (key in this.colors) {
-                return this.colors[key];
+
+        /**
+         * When drawing a double bond, choose the side to place the double bond. E.g. a double bond should always been drawn inside a ring.
+         *
+         * @param {Vertex} vertexA A vertex.
+         * @param {Vertex} vertexB A vertex.
+         * @param {array} sides An array containing the two normals of the line spanned by the two provided vertices.
+         * @returns {object} Returns an object containing the following information: {
+                totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
+                totalPosition: Same as position, but based on entire molecule,
+                sideCount: Counts the sides of each neighbour, is an array [ a, b ],
+                position: which side to position the second bond, is 0 or 1, represents the index in the normal array. This is based on only the neighbours
+                anCount: the number of neighbours of vertexA,
+                bnCount: the number of neighbours of vertexB
             }
+         */
 
-            return this.colors['C'];
-        }
-    }, {
-        key: 'circle',
-        value: function circle(radius, x, y, classes, fill, debug) {
-            // Return empty line element for debugging, remove this check later, values should not be NaN
-            if (isNaN(x) || isNaN(y)) {
-                return;
-            }
-
-            this.ctx.save();
-            this.ctx.lineWidth = 1.5;
-            this.ctx.beginPath();
-            this.ctx.arc(x + this.offsetX, y + this.offsetY, radius, 0, Math.PI * 2, true);
-            this.ctx.closePath();
-
-            if (debug) {
-                if (fill) {
-                    this.ctx.fillStyle = '#ff0000';
-                    this.ctx.fill();
-                } else {
-                    this.ctx.strokeStyle = '#ff0000';
-                    this.ctx.stroke();
-                }
-            } else {
-                if (fill) {
-                    this.ctx.fillStyle = this.colors['C'];
-                    this.ctx.fill();
-                } else {
-                    this.ctx.strokeStyle = this.colors['C'];
-                    this.ctx.stroke();
-                }
-            }
-
-            this.ctx.restore();
-        }
-    }, {
-        key: 'line',
-        value: function line(x1, y1, x2, y2, elementA, elementB, classes) {
-            if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
-                return;
-            }
-
-            var line = new Line(new Vector2(x1, y1), new Vector2(x2, y2), elementA, elementB);
-            // Add a shadow behind the line
-
-            var shortLine = line.clone().shorten(8.0);
-
-            var l = shortLine.getLeftVector().clone();
-            var r = shortLine.getRightVector().clone();
-
-            l.x += this.offsetX;
-            l.y += this.offsetY;
-
-            r.x += this.offsetX;
-            r.y += this.offsetY;
-
-            this.ctx.save();
-            this.ctx.beginPath();
-            this.ctx.moveTo(l.x, l.y);
-            this.ctx.lineTo(r.x, r.y);
-            this.ctx.lineCap = 'round';
-            this.ctx.lineWidth = 3.5;
-            this.ctx.shadowColor = this.colors['BACKGROUND'];
-            this.ctx.shadowBlur = 0.0;
-            this.ctx.shadowOffsetX = 0;
-            this.ctx.shadowOffsetY = 0;
-            this.ctx.strokeStyle = this.colors['BACKGROUND'];
-            this.ctx.stroke();
-            this.ctx.restore();
-
-            var l = line.getLeftVector().clone();
-            var r = line.getRightVector().clone();
-
-            l.x += this.offsetX;
-            l.y += this.offsetY;
-
-            r.x += this.offsetX;
-            r.y += this.offsetY;
-
-            this.ctx.save();
-            this.ctx.beginPath();
-            this.ctx.moveTo(l.x, l.y);
-            this.ctx.lineTo(r.x, r.y);
-            this.ctx.lineCap = 'round';
-            this.ctx.lineWidth = 1.5;
-            var gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
-            gradient.addColorStop(0.4, this.colors[line.getLeftElement().toUpperCase()] || this.colors['C']);
-            gradient.addColorStop(0.6, this.colors[line.getRightElement().toUpperCase()] || this.colors['C']);
-            this.ctx.strokeStyle = gradient;
-            this.ctx.stroke();
-            this.ctx.restore();
-        }
-    }, {
-        key: 'debugText',
-        value: function debugText(x, y, text) {
-            this.ctx.save();
-            var font = '5px Arial';
-            this.ctx.font = font;
-            this.ctx.textAlign = 'start';
-            this.ctx.textBaseline = 'top';
-            this.ctx.fillStyle = '#ff0000';
-            this.ctx.fillText(text, x + this.offsetX, y + this.offsetY);
-            this.ctx.restore();
-        }
-    }, {
-        key: 'text',
-        value: function text(x, y, element, classes, background, hydrogen, position, terminal, charge) {
-            // Return empty line element for debugging, remove this check later, values should not be NaN
-            if (isNaN(x) || isNaN(y)) {
-                return;
-            }
-
-            this.ctx.save();
-            var fontLarge = '10px Arial';
-            var fontSmall = '6px Arial';
-
-            this.ctx.textAlign = 'start';
-            this.ctx.textBaseline = 'top';
-
-            // Charge
-            var chargeWidth = 0;
-            if (charge) {
-                var chargeText = '+';
-
-                if (charge === 2) {
-                    chargeText = '2+';
-                } else if (charge === -1) {
-                    chargeText = '-';
-                } else if (charge === -2) {
-                    chargeText = '2-';
-                }
-
-                this.ctx.font = fontSmall;
-                chargeWidth = this.ctx.measureText(chargeText).width;
-            }
-
-            this.ctx.font = fontLarge;
-            this.ctx.fillStyle = this.colors['BACKGROUND'];
-
-            var dim = this.ctx.measureText(element);
-            dim.totalWidth = dim.width + chargeWidth;
-            dim.height = parseInt(fontLarge, 10);
-
-            var r = dim.totalWidth > dim.height ? dim.totalWidth : dim.height;
-            r /= 2.0;
-
-            this.ctx.globalCompositeOperation = 'destination-out';
-            this.ctx.beginPath();
-            this.ctx.arc(x + this.offsetX, y + this.offsetY + dim.height / 20.0, r + 1.0, 0, Math.PI * 2, true);
-            this.ctx.closePath();
-            this.ctx.fill();
-            this.ctx.globalCompositeOperation = 'source-over';
-
-            // Correct vertical text position
-            y -= 2;
-
-            this.ctx.fillStyle = this.getColor(element.toUpperCase());
-            this.ctx.fillText(element, x - dim.totalWidth / 2.0 + this.offsetX, y - dim.height / 2.0 + this.offsetY);
-
-            if (charge) {
-                this.ctx.font = fontSmall;
-                this.ctx.fillText(chargeText, x - dim.totalWidth / 2.0 + dim.width + this.offsetX, y - dim.height / 2.0 + this.offsetY);
-            }
-
-            this.ctx.font = fontLarge;
-
-            var hDim = this.ctx.measureText('H');
-            hDim.height = parseInt(fontLarge, 10);
-
-            if (hydrogen === 1) {
-                var hx = x - dim.totalWidth / 2.0 + this.offsetX;
-                var hy = y - dim.height / 2.0 + this.offsetY;
-
-                if (position === 'left') {
-                    hx -= dim.totalWidth;
-                } else if (position === 'right') {
-                    hx += dim.totalWidth;
-                } else if (position === 'up' && terminal) {
-                    hx += dim.totalWidth;
-                } else if (position === 'down' && terminal) {
-                    hx += dim.totalWidth;
-                } else if (position === 'up' && !terminal) {
-                    hy -= dim.height;
-                } else if (position === 'down' && !terminal) {
-                    hy += dim.height;
-                }
-
-                this.ctx.fillText('H', hx, hy);
-            } else if (hydrogen > 1) {
-                var hx = x - dim.totalWidth / 2.0 + this.offsetX;
-                var hy = y - dim.height / 2.0 + this.offsetY;
-
-                this.ctx.font = fontSmall;
-                var cDim = this.ctx.measureText(hydrogen);
-                cDim.height = parseInt(fontSmall, 10);
-
-                if (position === 'left') {
-                    hx -= hDim.width + cDim.width;
-                } else if (position === 'right') {
-                    hx += dim.totalWidth;
-                } else if (position === 'up' && terminal) {
-                    hx += dim.totalWidth;
-                } else if (position === 'down' && terminal) {
-                    hx += dim.totalWidth;
-                } else if (position === 'up' && !terminal) {
-                    hy -= dim.height;
-                } else if (position === 'down' && !terminal) {
-                    hy += dim.height;
-                }
-
-                this.ctx.font = fontLarge;
-                this.ctx.fillText('H', hx, hy);
-
-                this.ctx.font = fontSmall;
-                this.ctx.fillText(hydrogen, hx + hDim.width, hy + hDim.height / 2.0);
-            }
-
-            this.ctx.restore();
-        }
-    }, {
-        key: 'drawPoint',
-        value: function drawPoint(v, text) {
-            this.circle(2, v.x, v.y, 'helper', true, true);
-
-            if (text) {
-                this.debugText(v.x, v.y, text, 'id', true);
-            }
-        }
     }, {
         key: 'chooseSide',
         value: function chooseSide(vertexA, vertexB, sides) {
@@ -1902,10 +2226,10 @@ var SmilesDrawer = function () {
             // from the above side counts
             var totalSideCount = [0, 0];
 
-            for (var i = 0; i < this.vertices.length; i++) {
-                var v = this.vertices[i].position;
+            for (var _i23 = 0; _i23 < this.vertices.length; _i23++) {
+                var _v = this.vertices[_i23].position;
 
-                if (v.sameSideAs(vertexA.position, vertexB.position, sides[0])) {
+                if (_v.sameSideAs(vertexA.position, vertexB.position, sides[0])) {
                     totalSideCount[0]++;
                 } else {
                     totalSideCount[1]++;
@@ -1921,21 +2245,62 @@ var SmilesDrawer = function () {
                 bnCount: bnCount
             };
         }
+
+        /**
+         * Checks whether or not two vertices are connected.
+         *
+         * @param {number} vertexIdA A vertex id.
+         * @param {number} vertexIdA A vertex id.
+         * @returns {boolean} A boolean indicating whether or not two vertices are connected.
+         */
+
     }, {
-        key: 'connected',
-        value: function connected(a, b) {
+        key: 'areConnected',
+        value: function areConnected(vertexIdA, vertexIdB) {
             for (var i = 0; i < this.edges.length; i++) {
                 var edge = this.edges[i];
 
-                if (edge.sourceId === a && edge.targetId === b || edge.sourceId === b && edge.targetId === a) {
+                if (edge.sourceId === vertexIdA && edge.targetId === vertexIdB || edge.sourceId === vertexIdB && edge.targetId === vertexIdA) {
                     return true;
                 }
             }
             return false;
         }
+
+        /**
+         * Returns the weight of the edge between two given vertices.
+         *
+         * @param {number} vertexIdA A vertex id.
+         * @param {number} vertexIdB A vertex id.
+         * @returns {number|null} The weight of the edge or, if no edge can be found, null.
+         */
+
+    }, {
+        key: 'getEdgeWeight',
+        value: function getEdgeWeight(vertexIdA, vertexIdB) {
+            for (var i = 0; i < this.edges.length; i++) {
+                var edge = this.edges[i];
+
+                if (edge.sourceId == vertexIdA && edge.targetId == vertexIdB || edge.targetId == vertexIdA && edge.sourceId == vertexIdB) {
+                    return edge.weight;
+                }
+            }
+
+            return null;
+        }
+
+        /**
+         * Applies a force-based layout to a set of provided vertices.
+         *
+         * @param {array} vertices An array containing vertices to be placed using the force based layout.
+         * @param {Vector2} center The center of the layout.
+         * @param {number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
+         * @param {Ring} ring The bridged ring associated with this force-based layout.
+         */
+
     }, {
         key: 'forceLayout',
-        value: function forceLayout(vertices, center, start, ring) {
+        value: function forceLayout(vertices, center, startVertexId, ring) {
             // Constants
             var l = this.opts.bondLength;
             var kr = 6000; // repulsive force
@@ -1972,30 +2337,30 @@ var SmilesDrawer = function () {
 
             vertices = ArrayHelper.merge(vertices, tmp);
 
-            // this.vertices[start].positioned = false;
+            // this.vertices[startVertexId].positioned = false;
 
             // Place vertices randomly around center
-            for (var _i16 = 0; _i16 < vertices.length; _i16++) {
-                var _vertex4 = this.vertices[vertices[_i16]];
+            for (var _i24 = 0; _i24 < vertices.length; _i24++) {
+                var _vertex4 = this.vertices[vertices[_i24]];
 
                 if (!_vertex4.positioned) {
                     _vertex4.position.x = center.x + Math.random();
                     _vertex4.position.y = center.y + Math.random();
                 }
 
-                //if(ring.rings.length > 2 && ring.members.length > 6 && vertex.id !== start)
+                //if(ring.rings.length > 2 && ring.members.length > 6 && vertex.id !== startVertexId)
                 //  vertex.positioned = false;
             }
 
             var forces = {};
 
-            for (var _i17 = 0; _i17 < vertices.length; _i17++) {
-                forces[vertices[_i17]] = new Vector2();
+            for (var _i25 = 0; _i25 < vertices.length; _i25++) {
+                forces[vertices[_i25]] = new Vector2();
             }
 
             for (var n = 0; n < 1000; n++) {
-                for (var _i18 = 0; _i18 < vertices.length; _i18++) {
-                    forces[vertices[_i18]].set(0, 0);
+                for (var _i26 = 0; _i26 < vertices.length; _i26++) {
+                    forces[vertices[_i26]].set(0, 0);
                 }
 
                 // Repulsive forces
@@ -2035,23 +2400,23 @@ var SmilesDrawer = function () {
                 if (ring.rings.length > 2) {
                     var ringCenters = new Array(ring.rings.length);
 
-                    for (var _i19 = 0; _i19 < ring.rings.length; _i19++) {
-                        ringCenters[_i19] = new Vector2();
+                    for (var _i27 = 0; _i27 < ring.rings.length; _i27++) {
+                        ringCenters[_i27] = new Vector2();
 
-                        for (var j = 0; j < ring.rings[_i19].members.length; j++) {
-                            ringCenters[_i19].x += this.vertices[ring.rings[_i19].members[j]].position.x;
-                            ringCenters[_i19].y += this.vertices[ring.rings[_i19].members[j]].position.y;
+                        for (var j = 0; j < ring.rings[_i27].members.length; j++) {
+                            ringCenters[_i27].x += this.vertices[ring.rings[_i27].members[j]].position.x;
+                            ringCenters[_i27].y += this.vertices[ring.rings[_i27].members[j]].position.y;
                         }
 
-                        ringCenters[_i19].x /= ring.rings[_i19].members.length;
-                        ringCenters[_i19].y /= ring.rings[_i19].members.length;
+                        ringCenters[_i27].x /= ring.rings[_i27].members.length;
+                        ringCenters[_i27].y /= ring.rings[_i27].members.length;
 
-                        ring.rings[_i19].center.set(ringCenters[_i19].x, ringCenters[_i19].y);
+                        ring.rings[_i27].center.set(ringCenters[_i27].x, ringCenters[_i27].y);
 
-                        for (var _u2 = 0; _u2 < ring.rings[_i19].members.length; _u2++) {
-                            var _vertexA = this.vertices[ring.rings[_i19].members[_u2]];
-                            var _dx = ringCenters[_i19].x - _vertexA.position.x;
-                            var _dy = ringCenters[_i19].y - _vertexA.position.y;
+                        for (var _u2 = 0; _u2 < ring.rings[_i27].members.length; _u2++) {
+                            var _vertexA = this.vertices[ring.rings[_i27].members[_u2]];
+                            var _dx = ringCenters[_i27].x - _vertexA.position.x;
+                            var _dy = ringCenters[_i27].y - _vertexA.position.y;
 
                             if (_dx === 0 || _dy === 0) {
                                 continue;
@@ -2061,7 +2426,7 @@ var SmilesDrawer = function () {
                             var _d = Math.sqrt(_dSq);
                             var _force = kr / _dSq;
 
-                            if (ring.rings[_i19].members.length === 5 || ring.rings[_i19].members.length === 6) {
+                            if (ring.rings[_i27].members.length === 5 || ring.rings[_i27].members.length === 6) {
                                 _force *= 10;
                             }
 
@@ -2080,8 +2445,8 @@ var SmilesDrawer = function () {
                 for (var _u3 = 0; _u3 < vertices.length - 1; _u3++) {
                     var _vertexA2 = this.vertices[vertices[_u3]];
 
-                    for (var _v = _u3 + 1; _v < vertices.length; _v++) {
-                        var _vertexB = this.vertices[vertices[_v]];
+                    for (var _v2 = _u3 + 1; _v2 < vertices.length; _v2++) {
+                        var _vertexB = this.vertices[vertices[_v2]];
 
                         if (!_vertexA2.isNeighbour(_vertexB.id)) {
                             continue;
@@ -2176,24 +2541,32 @@ var SmilesDrawer = function () {
                 var _neighbours = _vertex7.getNeighbours();
 
                 var angle = _vertex7.getAngle(null, true) - 60;
-                for (var _i20 = 0; _i20 < _neighbours.length; _i20++) {
+                for (var _i28 = 0; _i28 < _neighbours.length; _i28++) {
                     if (_vertex7.value.isBridge || parentVertex !== undefined && parentVertex.value.isBridge) {
-                        console.log('angle', _neighbours[_i20]);
-                        this.createBonds(this.vertices[_neighbours[_i20]], _vertex7, MathHelper.toRad(angle));
-                    } else if (this.vertices[_neighbours[_i20]].value.rings.length === 0) {
+                        this.createBonds(this.vertices[_neighbours[_i28]], _vertex7, MathHelper.toRad(angle));
+                    } else if (this.vertices[_neighbours[_i28]].value.rings.length === 0) {
                         // If there is a spiro, this will be handeled in create ring
                         // This here positiones the vertices going away from the outer ring
                         if (ring.rings.length > 2) {
                             center = this.getSubringCenter(ring, _vertex7);
                         }
 
-                        this.createBonds(this.vertices[_neighbours[_i20]], _vertex7, center);
+                        this.createBonds(this.vertices[_neighbours[_i28]], _vertex7, center);
                     }
 
                     angle += 120;
                 }
             }
         }
+
+        /**
+         * Gets the center of a ring contained within a bridged ring and containing a given vertex.
+         *
+         * @param {Ring} ring A bridged ring.
+         * @param {Vertex} vertex A vertex.
+         * @returns {Vector2} The center of the subring that contains the provided vertex.
+         */
+
     }, {
         key: 'getSubringCenter',
         value: function getSubringCenter(ring, vertex) {
@@ -2201,7 +2574,6 @@ var SmilesDrawer = function () {
                 var subring = ring.rings[i];
                 for (var j = 0; j < subring.members.length; j++) {
                     if (subring.members[j] === vertex.id) {
-                        console.log('returning subring center', subring.center);
                         return subring.center;
                     }
                 }
@@ -2209,20 +2581,29 @@ var SmilesDrawer = function () {
 
             return ring.center;
         }
+
+        /**
+         * Draw the actual edges as bonds to the canvas.
+         *
+         * @param {boolean} debug A boolean indicating whether or not to draw debug helpers.
+         */
+
     }, {
         key: 'drawEdges',
-        value: function drawEdges(label) {
+        value: function drawEdges(debug) {
+            var _this = this;
+
             var that = this;
 
-            for (var i = 0; i < this.edges.length; i++) {
-                var edge = this.edges[i];
-                var vertexA = this.vertices[edge.sourceId];
-                var vertexB = this.vertices[edge.targetId];
+            var _loop = function _loop(i) {
+                var edge = _this.edges[i];
+                var vertexA = _this.vertices[edge.sourceId];
+                var vertexB = _this.vertices[edge.targetId];
                 var elementA = vertexA.value.element;
                 var elementB = vertexB.value.element;
                 var a = vertexA.position;
                 var b = vertexB.position;
-                var normals = this.getEdgeNormals(edge);
+                var normals = _this.getEdgeNormals(edge);
                 var gradient = 'gradient' + vertexA.value.element.toUpperCase() + vertexB.value.element.toUpperCase();
 
                 // Create a point on each side of the line
@@ -2232,16 +2613,16 @@ var SmilesDrawer = function () {
                     v.add(a);
                 });
 
-                if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=') {
+                if (edge.bondType === '=' || _this.getRingbondType(vertexA, vertexB) === '=') {
                     // Always draw double bonds inside the ring
-                    var inRing = this.areVerticesInSameRing(vertexA, vertexB);
-                    var s = this.chooseSide(vertexA, vertexB, sides);
+                    var inRing = _this.areVerticesInSameRing(vertexA, vertexB);
+                    var s = _this.chooseSide(vertexA, vertexB, sides);
 
                     if (inRing) {
                         // Always draw double bonds inside a ring
                         // if the bond is shared by two rings, it is drawn in the larger
                         // problem: smaller ring is aromatic, bond is still drawn in larger -> fix this
-                        var lcr = this.getLargestCommonRing(vertexA, vertexB);
+                        var lcr = _this.getLargestCommonRing(vertexA, vertexB);
                         var center = lcr.center;
 
                         ArrayHelper.each(normals, function (v) {
@@ -2250,20 +2631,20 @@ var SmilesDrawer = function () {
 
                         // Choose the normal that is on the same side as the center
                         var line = null;
-                        console.log('center', center);
+
                         if (center.sameSideAs(vertexA.position, vertexB.position, Vector2.add(a, normals[0]))) {
-                            line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
+                            line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
                         } else {
-                            line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
+                            line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
                         }
 
-                        line.shorten(this.opts.bondLength - this.opts.shortBondLength);
+                        line.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
 
                         // The shortened edge
-                        this.line(line.from.x, line.from.y, line.to.x, line.to.y, elementA, elementB);
+                        _this.canvasWrapper.drawLine(line);
 
                         // The normal edge
-                        this.line(a.x, a.y, b.x, b.y, elementA, elementB);
+                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                     } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
                         // Both lines are the same length here
                         // Add the spacing to the edges (which are of unit length)
@@ -2271,114 +2652,75 @@ var SmilesDrawer = function () {
                             v.multiply(that.opts.bondSpacing / 2);
                         });
 
-                        var line1 = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
-                        var line2 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
+                        var lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                        var lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-                        this.line(line1.from.x, line1.from.y, line1.to.x, line1.to.y, elementA, elementB);
-                        this.line(line2.from.x, line2.from.y, line2.to.x, line2.to.y, elementA, elementB);
+                        _this.canvasWrapper.drawLine(lineA);
+                        _this.canvasWrapper.drawLine(lineB);
                     } else if (s.sideCount[0] > s.sideCount[1]) {
                         ArrayHelper.each(normals, function (v) {
                             v.multiply(that.opts.bondSpacing);
                         });
 
-                        var line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
-                        line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                        this.line(line.from.x, line.from.y, line.to.x, line.to.y, elementA, elementB);
-                        this.line(a.x, a.y, b.x, b.y, elementA, elementB);
+                        var _line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                        _line.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+                        _this.canvasWrapper.drawLine(_line);
+                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                     } else if (s.sideCount[0] < s.sideCount[1]) {
                         ArrayHelper.each(normals, function (v) {
                             v.multiply(that.opts.bondSpacing);
                         });
 
-                        var line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
-                        line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                        this.line(line.from.x, line.from.y, line.to.x, line.to.y, elementA, elementB);
-                        this.line(a.x, a.y, b.x, b.y, elementA, elementB);
+                        var _line2 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+                        _line2.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+                        _this.canvasWrapper.drawLine(_line2);
+                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                     } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
                         ArrayHelper.each(normals, function (v) {
                             v.multiply(that.opts.bondSpacing);
                         });
 
-                        var line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
-                        line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                        this.line(line.from.x, line.from.y, line.to.x, line.to.y, elementA, elementB);
-                        this.line(a.x, a.y, b.x, b.y, elementA, elementB);
+                        var _line3 = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                        _line3.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+                        _this.canvasWrapper.drawLine(_line3);
+                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                     } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
                         ArrayHelper.each(normals, function (v) {
                             v.multiply(that.opts.bondSpacing);
                         });
 
-                        var line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
-                        line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                        this.line(line.from.x, line.from.y, line.to.x, line.to.y, elementA, elementB);
-                        this.line(a.x, a.y, b.x, b.y, elementA, elementB);
+                        var _line4 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+                        _line4.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+                        _this.canvasWrapper.drawLine(_line4);
+                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                     } else {}
                 } else if (edge.bondType === '#') {
                     ArrayHelper.each(normals, function (v) {
                         v.multiply(that.opts.bondSpacing / 1.5);
                     });
 
-                    var lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]));
-                    var lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]));
+                    var _lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                    var _lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-                    lineA.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                    lineB.shorten(this.opts.bondLength - this.opts.shortBondLength);
+                    _lineA.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+                    _lineB.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
 
-                    this.line(lineA.from.x, lineA.from.y, lineA.to.x, lineA.to.y, elementA, elementB);
-                    this.line(lineB.from.x, lineB.from.y, lineB.to.x, lineB.to.y, elementA, elementB);
+                    _this.canvasWrapper.drawLine(_lineA);
+                    _this.canvasWrapper.drawLine(_lineB);
 
-                    this.line(a.x, a.y, b.x, b.y, elementA, elementB);
+                    _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                 } else {
-                    this.line(a.x, a.y, b.x, b.y, elementA, elementB);
+                    _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                 }
 
-                if (label) {
+                if (debug) {
                     var midpoint = Vector2.midpoint(a, b);
-                    this.debugText(midpoint.x, midpoint.y, 'id: ' + i);
+                    _this.canvasWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + i);
                 }
-            }
-        }
-    }, {
-        key: 'drawVertices',
-        value: function drawVertices(label) {
-            for (var i = 0; i < this.vertices.length; i++) {
-                var vertex = this.vertices[i];
-                var atom = vertex.value;
-                var bondCount = this.getBondCount(vertex);
+            };
 
-                var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
-
-                if (label) {
-                    var value = vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
-                    this.debugText(vertex.position.x, vertex.position.y, 'id: ' + value);
-                }
-
-                var hydrogens = this.maxBonds[element] - bondCount;
-
-                if (atom.bracket) {
-                    hydrogens = atom.bracket.hcount;
-                }
-
-                var charge = 0;
-
-                if (atom.bracket) {
-                    charge = atom.bracket.charge;
-                }
-
-                if (vertex.isTerminal()) {
-                    var dir = vertex.getTextDirection(this.vertices);
-                    this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, true, charge);
-                } else if (atom.element.toLowerCase() !== 'c') {
-                    var dir = vertex.getTextDirection(this.vertices);
-                    this.text(vertex.position.x, vertex.position.y, element, 'element ' + atom.element.toLowerCase(), true, hydrogens, dir, false, charge);
-                }
-            }
-
-            // Draw the ring centers for debug purposes
-            if (this.opts.debug) {
-                for (var i = 0; i < this.rings.length; i++) {
-                    this.drawPoint(this.rings[i].center, 'id: ' + this.rings[i].id);
-                }
+            for (var i = 0; i < this.edges.length; i++) {
+                _loop(i);
             }
 
             // Draw ring for benzenes
@@ -2386,17 +2728,60 @@ var SmilesDrawer = function () {
                 var ring = this.rings[i];
 
                 if (ring.isAromatic(this.vertices)) {
-                    this.ctx.save();
-                    this.ctx.strokeStyle = this.colors['C'];
-                    this.ctx.lineWidth = 1.5;
-                    this.ctx.beginPath();
-                    this.ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, ring.radius - 10, 0, Math.PI * 2, true);
-                    this.ctx.closePath();
-                    this.ctx.stroke();
-                    this.ctx.restore();
+                    this.canvasWrapper.drawAromaticityRing(ring);
                 }
             }
         }
+
+        /**
+         * Draws the vertices representing atoms to the canvas.
+         *
+         * @param {boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
+         */
+
+    }, {
+        key: 'drawVertices',
+        value: function drawVertices(debug) {
+            for (var i = 0; i < this.vertices.length; i++) {
+                var vertex = this.vertices[i];
+                var atom = vertex.value;
+                var charge = 0;
+                var bondCount = this.getBondCount(vertex);
+                var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
+                var hydrogens = this.maxBonds[element] - bondCount;
+                var dir = vertex.getTextDirection(this.vertices);
+                var isTerminal = vertex.isTerminal();
+                var isCarbon = atom.element.toLowerCase() === 'c';
+
+                if (atom.bracket) {
+                    hydrogens = atom.bracket.hcount;
+                    charge = atom.bracket.charge;
+                }
+
+                if (!isCarbon || isTerminal) {
+                    this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge);
+                }
+
+                if (debug) {
+                    var value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
+                    this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
+                }
+            }
+
+            // Draw the ring centers for debug purposes
+            if (this.opts.debug) {
+                for (var _i29 = 0; _i29 < this.rings.length; _i29++) {
+                    var center = this.rings[_i29].center;
+                    this.canvasWrapper.drawDebugPoint(center.x, center.y, 'r: ' + this.rings[_i29].id);
+                }
+            }
+        }
+
+        /**
+         * Position the vertices according to their bonds and properties.
+         *
+         */
+
     }, {
         key: 'position',
         value: function position() {
@@ -2414,6 +2799,12 @@ var SmilesDrawer = function () {
             // Atoms bonded to the same ring atom
             this.resolvePrimaryOverlaps();
         }
+
+        /**
+         * Reset the positions of rings and vertices. The previous positions will be backed up.
+         *
+         */
+
     }, {
         key: 'clearPositions',
         value: function clearPositions() {
@@ -2427,13 +2818,19 @@ var SmilesDrawer = function () {
                 vertex.position = new Vector2();
             }
 
-            for (var i = 0; i < this.rings.length; i++) {
-                var ring = this.rings[i];
+            for (var _i30 = 0; _i30 < this.rings.length; _i30++) {
+                var ring = this.rings[_i30];
                 this.backupRings.push(ring.clone());
                 ring.positioned = false;
                 ring.center = new Vector2();
             }
         }
+
+        /**
+         * Restore the positions backed up during the last clearPositions() call.
+         *
+         */
+
     }, {
         key: 'restorePositions',
         value: function restorePositions() {
@@ -2441,8 +2838,8 @@ var SmilesDrawer = function () {
                 this.vertices[i] = this.backupVertices[i];
             }
 
-            for (var i = 0; i < this.backupRings.length; i++) {
-                this.rings[i] = this.backupRings[i];
+            for (var _i31 = 0; _i31 < this.backupRings.length; _i31++) {
+                this.rings[_i31] = this.backupRings[_i31];
             }
         }
 
@@ -2887,6 +3284,10 @@ var SmilesDrawer = function () {
                         this.createBonds(nextVertex, vertex, nextVertex.angle, -dir);
                     } else {
                         var plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+
+                        if (this.direction !== 0) {
+                            plusOrMinus = this.direction;
+                        }
 
                         if (!dir) {
                             dir = plusOrMinus;
@@ -3732,12 +4133,12 @@ var Pair = function () {
             var pairs = [];
 
             for (var i = 0; i < array.length; i++) {
-                var a = array[i];
+                var _a = array[i];
 
                 for (var j = i + 1; j < array.length; j++) {
-                    var b = array[j];
+                    var _b = array[j];
 
-                    pairs.push(new Pair(a, b));
+                    pairs.push(new Pair(_a, _b));
                 }
             }
 
