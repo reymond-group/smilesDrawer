@@ -24,7 +24,6 @@ class SmilesDrawer {
             shortBondLength: 20, // 25,
             bondLength: 25, // 30,
             bondSpacing: 4,
-            defaultDir: -1,
             debug: false,
             themes: {
                 dark: {

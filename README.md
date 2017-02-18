@@ -26,15 +26,15 @@ To get a simple input box which lets the user enter a SMILES and then display it
 
         <script src="/dist/smiles-drawer.min.js"></script>
         <script>
-            var input = document.getElementById('example-input');
-            var options = {};
+            let input = document.getElementById('example-input');
+            let options = {};
             
             // Initialize the drawer
-            var smilesDrawer = new SmilesDrawer(options);
+            let smilesDrawer = new SmilesDrawer(options);
             
             input.addEventListener('input', function() {
                 // Parse the input
-                var data = smiles.parse(input.value);
+                let data = smiles.parse(input.value);
 
                 // Draw to the canvas
                 smilesDrawer.draw(data, 'example-canvas', 'light', false);
@@ -45,6 +45,60 @@ To get a simple input box which lets the user enter a SMILES and then display it
 ```
 See the example folder for a more complete example.
 ### Options
+The options are supplied to the constructor as shown in the example above.
+```
+let options = { ... };
+let smilesDrawer = new SmilesDrawer(options);
+```
+The following options are available:
 
+| Option | Identifier | Data Type | Default Value |
+|---|---|---|---|
+| Bond length | bondLength | number | 25 |
+| Short bond length (e.g. double bonds in rings) | shortBondLength  | number | 20 |
+| Bond spacing (e.g. space between double bonds | bondSpacing | number | 4 |
+| Debug (draw debug information to canvas | debug | boolean | false |
+| Color themes | themes | object | see below |
+
+
+The default options are defined as follows:
+```
+{
+    shortBondLength: 20,
+    bondLength: 25,
+    bondSpacing: 4,
+    debug: false,
+    themes: {
+        dark: {
+            C: '#fff',
+            O: '#e74c3c',
+            N: '#3498db',
+            F: '#27ae60',
+            CL: '#16a085',
+            BR: '#d35400',
+            I: '#8e44ad',
+            P: '#d35400',
+            S: '#f1c40f',
+            B: '#e67e22',
+            SI: '#e67e22',
+            BACKGROUND: '#141414'
+        },
+        light: {
+            C: '#222',
+            O: '#e74c3c',
+            N: '#3498db',
+            F: '#27ae60',
+            CL: '#16a085',
+            BR: '#d35400',
+            I: '#8e44ad',
+            P: '#d35400',
+            S: '#f1c40f',
+            B: '#e67e22',
+            SI: '#e67e22',
+            BACKGROUND: '#fff'
+        }
+    }
+};
+```
 ### [Documentation](/doc/all.md)
 The documentation can be found in the docs folder. A markdown version is available [here](/doc/all.md).
