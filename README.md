@@ -6,3 +6,9 @@ If you decide not to use the ready-to-go scripts in `dist`, you can (edit and) b
 npm install
 gulp
 ```
+
+### Getting started
+...
+
+### Documentation
+The documentation can be found in the docs folder. A markdown version is available [here](/docs/all.md).
