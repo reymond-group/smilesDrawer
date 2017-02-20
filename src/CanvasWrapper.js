@@ -227,7 +227,7 @@ class CanvasWrapper {
         let ctx = this.ctx;
         ctx.save();
         
-        ctx.font = '5px Arial';
+        ctx.font = '5px Droid Sans, sans-serif';
         ctx.textAlign = 'start';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#ff0000';
@@ -257,8 +257,8 @@ class CanvasWrapper {
 
         ctx.save();
 
-        let fontLarge = '10px Arial';
-        let fontSmall = '6px Arial';
+        let fontLarge = '10px Droid Sans, sans-serif';
+        let fontSmall = '6px Droid Sans, sans-serif';
 
         ctx.textAlign = 'start';
         ctx.textBaseline = 'top';
@@ -298,7 +298,7 @@ class CanvasWrapper {
         ctx.globalCompositeOperation = 'source-over';
 
         // Correct vertical text position
-        y -= 2;
+        // y -= 2;
 
         ctx.fillStyle = this.getColor(elementName);
         ctx.fillText(elementName, x - dim.totalWidth / 2.0 + offsetX, 

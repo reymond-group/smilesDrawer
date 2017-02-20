@@ -9,7 +9,7 @@ gulp
 
 ### Getting Started
 To get a simple input box which lets the user enter a SMILES and then display it in a canvas, the following minimal example is sufficient.
-
+In order to have nice consistent font rendering you have to include the droid sans font from google fonts.
 ```
 <!doctype html>
 <html>
@@ -19,6 +19,8 @@ To get a simple input box which lets the user enter a SMILES and then display it
         <title>Smiles Drawer Example</title>
         <meta name="description" content="A minimal smiles drawer example.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+        <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
     </head>
     <body>
         <input id="example-input" name="example-input" />
