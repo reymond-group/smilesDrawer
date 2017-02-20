@@ -757,7 +757,7 @@ var CanvasWrapper = function () {
             var ctx = this.ctx;
             ctx.save();
 
-            ctx.font = '5px Arial';
+            ctx.font = '5px Droid Sans, sans-serif';
             ctx.textAlign = 'start';
             ctx.textBaseline = 'top';
             ctx.fillStyle = '#ff0000';
@@ -790,8 +790,8 @@ var CanvasWrapper = function () {
 
             ctx.save();
 
-            var fontLarge = '10px Arial';
-            var fontSmall = '6px Arial';
+            var fontLarge = '10px Droid Sans, sans-serif';
+            var fontSmall = '6px Droid Sans, sans-serif';
 
             ctx.textAlign = 'start';
             ctx.textBaseline = 'top';
@@ -830,7 +830,7 @@ var CanvasWrapper = function () {
             ctx.globalCompositeOperation = 'source-over';
 
             // Correct vertical text position
-            y -= 2;
+            // y -= 2;
 
             ctx.fillStyle = this.getColor(elementName);
             ctx.fillText(elementName, x - dim.totalWidth / 2.0 + offsetX, y - dim.height / 2.0 + offsetY);
@@ -3775,7 +3775,6 @@ var SmilesDrawer = function () {
             shortBondLength: 20, // 25,
             bondLength: 25, // 30,
             bondSpacing: 4,
-            defaultDir: -1,
             debug: false,
             themes: {
                 dark: {
