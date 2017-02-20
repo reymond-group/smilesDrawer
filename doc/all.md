@@ -1179,6 +1179,10 @@ The main class of the application representing the smiles drawer
     * [.getFusedRings()](#SmilesDrawer+getFusedRings) ⇒ <code>array</code>
     * [.getSpiros()](#SmilesDrawer+getSpiros) ⇒ <code>array</code>
     * [.printRingInfo()](#SmilesDrawer+printRingInfo) ⇒ <code>string</code>
+    * [.getTotalOverlapScore()](#SmilesDrawer+getTotalOverlapScore) ⇒ <code>number</code>
+    * [.getRingCount()](#SmilesDrawer+getRingCount) ⇒ <code>number</code>
+    * [.hasBridgedRing()](#SmilesDrawer+hasBridgedRing) ⇒ <code>boolean</code>
+    * [.getHeavyAtomCount()](#SmilesDrawer+getHeavyAtomCount) ⇒ <code>number</code>
     * [.initGraph(node, parentVertexId, isBranch)](#SmilesDrawer+initGraph)
     * [.getRingbondType(vertexA, vertexB)](#SmilesDrawer+getRingbondType) ⇒ <code>string</code> &#124; <code>null</code>
     * [.initRings()](#SmilesDrawer+initRings)
@@ -1301,6 +1305,34 @@ Returns a string containing a semicolon and new-line separated list of ring prop
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 **Returns**: <code>string</code> - A string as described in the method description.  
+<a name="SmilesDrawer+getTotalOverlapScore"></a>
+
+### smilesDrawer.getTotalOverlapScore() ⇒ <code>number</code>
+Returns the total overlap score of the current molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The overlap score.  
+<a name="SmilesDrawer+getRingCount"></a>
+
+### smilesDrawer.getRingCount() ⇒ <code>number</code>
+Returns the ring count of the current molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The ring count.  
+<a name="SmilesDrawer+hasBridgedRing"></a>
+
+### smilesDrawer.hasBridgedRing() ⇒ <code>boolean</code>
+Checks whether or not the current molecule contains a bridged ring.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not the current molecule contains a bridged ring.  
+<a name="SmilesDrawer+getHeavyAtomCount"></a>
+
+### smilesDrawer.getHeavyAtomCount() ⇒ <code>number</code>
+Returns the number of heavy atoms (non-hydrogen) in the current molecule.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The heavy atom count.  
 <a name="SmilesDrawer+initGraph"></a>
 
 ### smilesDrawer.initGraph(node, parentVertexId, isBranch)

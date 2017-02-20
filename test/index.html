@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Smiles Drawer Example</title>
+        <meta name="description" content="A minimal smiles drawer example.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <canvas id="example-canvas" width="500" height="500"></canvas>
+
+        <script src="../dist/smiles-drawer.min.js"></script>
+        <script src="schembl.js"></script>
+        <script>
+            let options = {};
+
+            // Initialize the drawer
+            let smilesDrawer = new SmilesDrawer(options);
+            let nErrors = 0;
+            let nSuccesses = 0;
+            let totalSpeed = 0;
+            let totalOverlap = 0;
+            let str = 'time,overlap,rings,hac,bridged\n';
+
+            for (let i = 0; i < schembl.length; i++) {
+                console.log(i);
+                try {
+                    let t = performance.now();
+                    let data = smiles.parse(schembl[i]);
+                    
+                    smilesDrawer.draw(data, 'example-canvas', 'light', false);
+                    
+                    let td = performance.now() - t;
+                    totalSpeed += td;
+                    totalOverlap += smilesDrawer.getTotalOverlapScore();
+                    nSuccesses++;
+                    str += td + ',' + smilesDrawer.getTotalOverlapScore() + ',' + 
+                           smilesDrawer.getRingCount() + ',' + 
+                           smilesDrawer.getHeavyAtomCount() + ',' +
+                           smilesDrawer.hasBridgedRing() + '\n'; 
+                } catch (exception) {
+                    nErrors++;
+                }
+            }
+
+            console.log(str);
+            console.log('Failed count: ' + nErrors);
+            console.log('Success count: ' + nSuccesses);
+            console.log('Success rate: ' + (nSuccesses / schembl.length));
+            console.log('Avg speed: ' + totalSpeed / nSuccesses);
+            console.log('Avg overlap: ' + totalOverlap / nSuccesses);
+        </script>
+    </body>
+</html>

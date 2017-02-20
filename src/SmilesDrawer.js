@@ -10,6 +10,7 @@ class SmilesDrawer {
         this.ringConnectionIdCounter = 0;
         this.canvasWrapper = null;
         this.direction = 1;
+        this.totalOverlapScore = 0;
 
         this.maxBonds = {
             'c': 4,
@@ -153,7 +154,8 @@ class SmilesDrawer {
             }
 
             this.resolveSecondaryOverlaps(overlapScore.scores);
-
+            this.totalOverlapScore = this.getOverlapScore().total;
+            
             // Set the canvas to the appropriate size
             this.canvasWrapper.scale(this.vertices);
 
@@ -251,6 +253,56 @@ class SmilesDrawer {
         }
 
         return result;
+    }
+
+    /**
+     * Returns the total overlap score of the current molecule.
+     *
+     * @returns {number} The overlap score.
+     */
+    getTotalOverlapScore() {
+        return this.totalOverlapScore;
+    }
+
+    /**
+     * Returns the ring count of the current molecule.
+     *
+     * @returns {number} The ring count.
+     */
+    getRingCount() {
+        return this.rings.length;
+    }
+
+    /**
+     * Checks whether or not the current molecule contains a bridged ring.
+     *
+     * @returns {boolean} A boolean indicating whether or not the current molecule contains a bridged ring.
+     */
+    hasBridgedRing() {
+        for (let i = 0; i < this.rings.length; i++) {
+            if (this.rings[i].isBridged) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the number of heavy atoms (non-hydrogen) in the current molecule.
+     *
+     * @returns {number} The heavy atom count.
+     */
+    getHeavyAtomCount() {
+        let hac = 0;
+        
+        for (let i = 0; i < this.vertices.length; i++) {
+            if (this.vertices[i].value.element.toLowerCase() !== 'h') {
+                hac++;
+            }
+        }
+
+        return hac;
     }
 
     /**

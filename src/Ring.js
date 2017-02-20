@@ -135,6 +135,7 @@ class Ring {
             // reached again (bridged rings)
             if (max == 99) {
                 console.log('Smiles-drawer was not able to loop over the members of this ring.', this);
+                throw 'Smiles-drawer was not able to loop over the members of this ring.'; 
             }
 
             max++;

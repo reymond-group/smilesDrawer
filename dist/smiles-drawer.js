@@ -1658,6 +1658,7 @@ var Ring = function () {
                 // reached again (bridged rings)
                 if (max == 99) {
                     console.log('Smiles-drawer was not able to loop over the members of this ring.', this);
+                    throw 'Smiles-drawer was not able to loop over the members of this ring.';
                 }
 
                 max++;
@@ -3761,6 +3762,7 @@ var SmilesDrawer = function () {
         this.ringConnectionIdCounter = 0;
         this.canvasWrapper = null;
         this.direction = 1;
+        this.totalOverlapScore = 0;
 
         this.maxBonds = {
             'c': 4,
@@ -3775,7 +3777,6 @@ var SmilesDrawer = function () {
             shortBondLength: 20, // 25,
             bondLength: 25, // 30,
             bondSpacing: 4,
-            defaultDir: -1,
             debug: false,
             themes: {
                 dark: {
@@ -3914,6 +3915,7 @@ var SmilesDrawer = function () {
                 }
 
                 this.resolveSecondaryOverlaps(overlapScore.scores);
+                this.totalOverlapScore = this.getOverlapScore().total;
 
                 // Set the canvas to the appropriate size
                 this.canvasWrapper.scale(this.vertices);
@@ -4027,6 +4029,68 @@ var SmilesDrawer = function () {
             }
 
             return result;
+        }
+
+        /**
+         * Returns the total overlap score of the current molecule.
+         *
+         * @returns {number} The overlap score.
+         */
+
+    }, {
+        key: 'getTotalOverlapScore',
+        value: function getTotalOverlapScore() {
+            return this.totalOverlapScore;
+        }
+
+        /**
+         * Returns the ring count of the current molecule.
+         *
+         * @returns {number} The ring count.
+         */
+
+    }, {
+        key: 'getRingCount',
+        value: function getRingCount() {
+            return this.rings.length;
+        }
+
+        /**
+         * Checks whether or not the current molecule contains a bridged ring.
+         *
+         * @returns {boolean} A boolean indicating whether or not the current molecule contains a bridged ring.
+         */
+
+    }, {
+        key: 'hasBridgedRing',
+        value: function hasBridgedRing() {
+            for (var i = 0; i < this.rings.length; i++) {
+                if (this.rings[i].isBridged) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Returns the number of heavy atoms (non-hydrogen) in the current molecule.
+         *
+         * @returns {number} The heavy atom count.
+         */
+
+    }, {
+        key: 'getHeavyAtomCount',
+        value: function getHeavyAtomCount() {
+            var hac = 0;
+
+            for (var i = 0; i < this.vertices.length; i++) {
+                if (this.vertices[i].value.element.toLowerCase() !== 'h') {
+                    hac++;
+                }
+            }
+
+            return hac;
         }
 
         /**
