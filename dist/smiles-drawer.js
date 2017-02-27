@@ -345,6 +345,7 @@ var Atom = function () {
         _classCallCheck(this, Atom);
 
         this.element = element;
+        this.explicit = false;
         this.ringbonds = new Array();
         this.rings = new Array();
         this.bondType = bondType;
@@ -970,6 +971,7 @@ var Edge = function () {
         this.weight = weight;
         this.bondType = '-';
         this.isInAromaticRing = false;
+        this.center = false;
     }
 
     /**
@@ -5149,6 +5151,28 @@ var SmilesDrawer = function () {
         }
 
         /**
+         * Returns the edge between two given vertices.
+         *
+         * @param {number} vertexIdA A vertex id.
+         * @param {number} vertexIdB A vertex id.
+         * @returns {number|null} The edge or, if no edge can be found, null.
+         */
+
+    }, {
+        key: 'getEdge',
+        value: function getEdge(vertexIdA, vertexIdB) {
+            for (var i = 0; i < this.edges.length; i++) {
+                var edge = this.edges[i];
+
+                if (edge.sourceId == vertexIdA && edge.targetId == vertexIdB || edge.targetId == vertexIdA && edge.sourceId == vertexIdB) {
+                    return edge;
+                }
+            }
+
+            return null;
+        }
+
+        /**
          * Applies a force-based layout to a set of provided vertices.
          *
          * @param {array} vertices An array containing vertices to be placed using the force based layout.
@@ -5467,6 +5491,7 @@ var SmilesDrawer = function () {
 
                 // Create a point on each side of the line
                 var sides = ArrayHelper.clone(normals);
+
                 ArrayHelper.each(sides, function (v) {
                     v.multiply(10);
                     v.add(a);
@@ -5504,6 +5529,19 @@ var SmilesDrawer = function () {
 
                         // The normal edge
                         _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
+                    } else if (edge.center) {
+                        ArrayHelper.each(normals, function (v) {
+                            v.multiply(that.opts.bondSpacing / 2.0);
+                        });
+
+                        var lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                        var lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+
+                        lineA.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+                        lineB.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+
+                        _this.canvasWrapper.drawLine(lineA);
+                        _this.canvasWrapper.drawLine(lineB);
                     } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
                         // Both lines are the same length here
                         // Add the spacing to the edges (which are of unit length)
@@ -5511,17 +5549,18 @@ var SmilesDrawer = function () {
                             v.multiply(that.opts.bondSpacing / 2);
                         });
 
-                        var lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
-                        var lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+                        var _lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                        var _lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-                        _this.canvasWrapper.drawLine(lineA);
-                        _this.canvasWrapper.drawLine(lineB);
+                        _this.canvasWrapper.drawLine(_lineA);
+                        _this.canvasWrapper.drawLine(_lineB);
                     } else if (s.sideCount[0] > s.sideCount[1]) {
                         ArrayHelper.each(normals, function (v) {
                             v.multiply(that.opts.bondSpacing);
                         });
 
                         var _line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+
                         _line.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
                         _this.canvasWrapper.drawLine(_line);
                         _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
@@ -5531,6 +5570,7 @@ var SmilesDrawer = function () {
                         });
 
                         var _line2 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+
                         _line2.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
                         _this.canvasWrapper.drawLine(_line2);
                         _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
@@ -5540,6 +5580,7 @@ var SmilesDrawer = function () {
                         });
 
                         var _line3 = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+
                         _line3.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
                         _this.canvasWrapper.drawLine(_line3);
                         _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
@@ -5549,6 +5590,7 @@ var SmilesDrawer = function () {
                         });
 
                         var _line4 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+
                         _line4.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
                         _this.canvasWrapper.drawLine(_line4);
                         _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
@@ -5558,14 +5600,14 @@ var SmilesDrawer = function () {
                         v.multiply(that.opts.bondSpacing / 1.5);
                     });
 
-                    var _lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
-                    var _lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+                    var _lineA2 = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                    var _lineB2 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-                    _lineA.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
-                    _lineB.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+                    _lineA2.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
+                    _lineB2.shorten(_this.opts.bondLength - _this.opts.shortBondLength);
 
-                    _this.canvasWrapper.drawLine(_lineA);
-                    _this.canvasWrapper.drawLine(_lineB);
+                    _this.canvasWrapper.drawLine(_lineA2);
+                    _this.canvasWrapper.drawLine(_lineB2);
 
                     _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                 } else {
@@ -5617,7 +5659,7 @@ var SmilesDrawer = function () {
                     charge = atom.bracket.charge;
                 }
 
-                if (!isCarbon || isTerminal) {
+                if (!isCarbon || atom.explicit || isTerminal) {
                     this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge);
                 }
 
@@ -6182,7 +6224,15 @@ var SmilesDrawer = function () {
                     var nextVertex = this.vertices[neighbours[0]];
 
                     // Make a single chain always cis except when there's a tribble bond
-                    if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#') {
+                    if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#' || vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
+                        vertex.value.explicit = true;
+
+                        var straightEdge1 = this.getEdge(vertex.id, previousVertex.id);
+                        var straightEdge2 = this.getEdge(vertex.id, nextVertex.id);
+
+                        straightEdge1.center = true;
+                        straightEdge2.center = true;
+
                         nextVertex.angle = angle;
                         this.createNextBond(nextVertex, vertex, nextVertex.angle, -dir);
                     } else {

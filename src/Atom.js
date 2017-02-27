@@ -8,6 +8,7 @@ class Atom {
      */
     constructor(element, bondType = '-') {
         this.element = element;
+        this.explicit = false;
         this.ringbonds = new Array();
         this.rings = new Array();
         this.bondType = bondType;

@@ -1284,6 +1284,26 @@ class SmilesDrawer {
         
         return null;
     }
+    
+    /**
+     * Returns the edge between two given vertices.
+     *
+     * @param {number} vertexIdA A vertex id.
+     * @param {number} vertexIdB A vertex id.
+     * @returns {number|null} The edge or, if no edge can be found, null.
+     */
+    getEdge(vertexIdA, vertexIdB) {
+        for (let i = 0; i < this.edges.length; i++) {
+            let edge = this.edges[i];
+            
+            if (edge.sourceId == vertexIdA && edge.targetId == vertexIdB || 
+                edge.targetId == vertexIdA && edge.sourceId == vertexIdB) {
+                return edge;
+            }
+        }
+        
+        return null;
+    }
 
     /**
      * Applies a force-based layout to a set of provided vertices.
@@ -1594,6 +1614,7 @@ class SmilesDrawer {
 
             // Create a point on each side of the line
             let sides = ArrayHelper.clone(normals);
+            
             ArrayHelper.each(sides, function (v) {
                 v.multiply(10);
                 v.add(a)
@@ -1612,7 +1633,7 @@ class SmilesDrawer {
                     let center = lcr.center;
 
                     ArrayHelper.each(normals, function (v) {
-                        v.multiply(that.opts.bondSpacing)
+                        v.multiply(that.opts.bondSpacing);
                     });
 
                     // Choose the normal that is on the same side as the center
@@ -1631,6 +1652,19 @@ class SmilesDrawer {
 
                     // The normal edge
                     this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
+                } else if (edge.center) {
+                    ArrayHelper.each(normals, function (v) {
+                        v.multiply(that.opts.bondSpacing / 2.0)
+                    });
+
+                    let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                    let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+
+                    lineA.shorten(this.opts.bondLength - this.opts.shortBondLength);
+                    lineB.shorten(this.opts.bondLength - this.opts.shortBondLength);
+
+                    this.canvasWrapper.drawLine(lineA);
+                    this.canvasWrapper.drawLine(lineB);
                 } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
                     // Both lines are the same length here
                     // Add the spacing to the edges (which are of unit length)
@@ -1649,6 +1683,7 @@ class SmilesDrawer {
                     });
 
                     let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                    
                     line.shorten(this.opts.bondLength - this.opts.shortBondLength);
                     this.canvasWrapper.drawLine(line);
                     this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
@@ -1658,6 +1693,7 @@ class SmilesDrawer {
                     });
 
                     let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+                    
                     line.shorten(this.opts.bondLength - this.opts.shortBondLength);
                     this.canvasWrapper.drawLine(line);
                     this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
@@ -1667,6 +1703,7 @@ class SmilesDrawer {
                     });
 
                     let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+                    
                     line.shorten(this.opts.bondLength - this.opts.shortBondLength);
                     this.canvasWrapper.drawLine(line);
                     this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
@@ -1676,6 +1713,7 @@ class SmilesDrawer {
                     });
 
                     let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+                    
                     line.shorten(this.opts.bondLength - this.opts.shortBondLength);
                     this.canvasWrapper.drawLine(line);
                     this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
@@ -1740,7 +1778,7 @@ class SmilesDrawer {
                 charge = atom.bracket.charge;
             }
 
-            if (!isCarbon || isTerminal) {
+            if (!isCarbon || atom.explicit || isTerminal) {
                 this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
                         element, hydrogens, dir, isTerminal, charge)
             }
@@ -2276,7 +2314,16 @@ class SmilesDrawer {
                 let nextVertex = this.vertices[neighbours[0]];
 
                 // Make a single chain always cis except when there's a tribble bond
-                if(vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) {
+                if((vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) ||
+                    vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
+                    vertex.value.explicit = true;
+                    
+                    let straightEdge1 = this.getEdge(vertex.id, previousVertex.id);
+                    let straightEdge2 = this.getEdge(vertex.id, nextVertex.id);
+                    
+                    straightEdge1.center = true;
+                    straightEdge2.center = true;
+
                     nextVertex.angle = angle;
                     this.createNextBond(nextVertex, vertex, nextVertex.angle, -dir);
                 }

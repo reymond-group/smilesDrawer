@@ -14,6 +14,7 @@ class Edge {
         this.weight = weight;
         this.bondType = '-';
         this.isInAromaticRing = false;
+        this.center = false;
     }
 
     /**

@@ -1211,6 +1211,7 @@ The main class of the application representing the smiles drawer
     * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer+chooseSide) ⇒ <code>object</code>
     * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer+areConnected) ⇒ <code>boolean</code>
     * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer+getEdgeWeight) ⇒ <code>number</code> &#124; <code>null</code>
+    * [.getEdge(vertexIdA, vertexIdB)](#SmilesDrawer+getEdge) ⇒ <code>number</code> &#124; <code>null</code>
     * [.forceLayout(vertices, center, startVertexId, ring)](#SmilesDrawer+forceLayout)
     * [.getSubringCenter(ring, vertex)](#SmilesDrawer+getSubringCenter) ⇒ <code>[Vector2](#Vector2)</code>
     * [.drawEdges(debug)](#SmilesDrawer+drawEdges)
@@ -1675,6 +1676,19 @@ Returns the weight of the edge between two given vertices.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 **Returns**: <code>number</code> &#124; <code>null</code> - The weight of the edge or, if no edge can be found, null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>number</code> | A vertex id. |
+| vertexIdB | <code>number</code> | A vertex id. |
+
+<a name="SmilesDrawer+getEdge"></a>
+
+### smilesDrawer.getEdge(vertexIdA, vertexIdB) ⇒ <code>number</code> &#124; <code>null</code>
+Returns the edge between two given vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> &#124; <code>null</code> - The edge or, if no edge can be found, null.  
 
 | Param | Type | Description |
 | --- | --- | --- |
