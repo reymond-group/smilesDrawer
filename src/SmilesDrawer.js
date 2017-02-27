@@ -132,7 +132,7 @@ class SmilesDrawer {
             var overlapScore = this.getOverlapScore();
             var count = 0;
             
-            while ((overlapScore.total > (this.opts.bondLength / 10.0)) && count < 22) {
+            while ((overlapScore.total > (this.opts.bondLength / 10.0)) && count < 10) {
                 if (this.direction === 1) {
                     this.direction = -1;
                 } else if (this.direction === -1) {

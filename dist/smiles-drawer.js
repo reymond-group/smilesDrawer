@@ -5425,6 +5425,7 @@ var SmilesDrawer = function () {
 
                 var angle = _vertex7.getAngle(null, true) - 60;
                 for (var _i28 = 0; _i28 < _neighbours.length; _i28++) {
+                    console.log(_i28, _neighbours[_i28], this.vertices[_neighbours[_i28]]);
                     if (_vertex7.value.isBridge || parentVertex !== undefined && parentVertex.value.isBridge) {
                         this.createNextBond(this.vertices[_neighbours[_i28]], _vertex7, MathHelper.toRad(angle));
                     } else if (this.vertices[_neighbours[_i28]].value.rings.length === 0) {
