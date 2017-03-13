@@ -1319,6 +1319,8 @@ class SmilesDrawer {
      * @param {Ring} ring The bridged ring associated with this force-based layout.
      */
     forceLayout(vertices, center, startVertexId, ring) {
+        console.log(ring);
+        
         // Constants
         let l = this.opts.bondLength;
         let kr = 6000; // repulsive force
@@ -1376,7 +1378,7 @@ class SmilesDrawer {
             forces[vertices[i]] = new Vector2();
         }
 
-        for (let n = 0; n < 1000; n++) {
+        for (let n = 0; n < 5000; n++) {
             
             for (let i = 0; i < vertices.length; i++) {
                 forces[vertices[i]].set(0, 0);
@@ -1453,7 +1455,7 @@ class SmilesDrawer {
                         }
 
                         if (ring.rings[i].members.length > 10) {
-                            continue;
+                            //continue;
                         }
 
                         let fx = force * dx / d;

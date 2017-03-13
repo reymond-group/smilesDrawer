@@ -5189,6 +5189,8 @@ var SmilesDrawer = function () {
     }, {
         key: 'forceLayout',
         value: function forceLayout(vertices, center, startVertexId, ring) {
+            console.log(ring);
+
             // Constants
             var l = this.opts.bondLength;
             var kr = 6000; // repulsive force
@@ -5246,7 +5248,7 @@ var SmilesDrawer = function () {
                 forces[vertices[_i25]] = new Vector2();
             }
 
-            for (var n = 0; n < 1000; n++) {
+            for (var n = 0; n < 5000; n++) {
 
                 for (var _i26 = 0; _i26 < vertices.length; _i26++) {
                     forces[vertices[_i26]].set(0, 0);
@@ -5323,7 +5325,7 @@ var SmilesDrawer = function () {
                             }
 
                             if (ring.rings[_i27].members.length > 10) {
-                                continue;
+                                //continue;
                             }
 
                             var _fx = _force * _dx / _d;
