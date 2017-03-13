@@ -5191,15 +5191,6 @@ var SmilesDrawer = function () {
         value: function forceLayout(vertices, center, startVertexId, ring) {
             // Constants
             var l = this.opts.bondLength;
-            var kr = 6000; // repulsive force
-            var ks = 5; // spring
-            var g = 0.5; // gravity (to center)
-
-            if (ring.rings.length > 2) {
-                kr = 750;
-                ks = 1.5;
-                g = 0;
-            }
 
             // On bridged bonds, add the remaining neighbours to the vertices
             // to be positioned using the force layout
@@ -5257,9 +5248,9 @@ var SmilesDrawer = function () {
                 var index = vertices.length + _i26;
 
                 for (var _j7 = 0; _j7 < r.members.length; _j7++) {
-                    var id = r.members[_j7];
-                    adjMatrix[id][index] = 2;
-                    adjMatrix[index][id] = 2;
+                    var id = idToV[r.members[_j7]];
+                    adjMatrix[id][index] = r.members.length;
+                    adjMatrix[index][id] = r.members.length;
                 }
             }
 
@@ -5287,7 +5278,7 @@ var SmilesDrawer = function () {
 
             console.log(adjMatrix);
 
-            for (var n = 0; n < 5000; n++) {
+            for (var n = 0; n < 1000; n++) {
 
                 for (var _i28 = 0; _i28 < totalLength; _i28++) {
                     forces[_i28].set(0, 0);
@@ -5306,7 +5297,8 @@ var SmilesDrawer = function () {
                         var dSq = dx * dx + dy * dy;
                         var d = Math.sqrt(dSq);
 
-                        var force = -kr / dSq;
+                        var force = 1000 / dSq;
+
                         var fx = force * dx / d;
                         var fy = force * dy / d;
 
@@ -5325,7 +5317,7 @@ var SmilesDrawer = function () {
                 // Attractive forces
                 for (var _u2 = 0; _u2 < totalLength - 1; _u2++) {
                     for (var _v2 = _u2 + 1; _v2 < totalLength; _v2++) {
-                        if (adjMatrix[_u2][_v2] === 0) {
+                        if (adjMatrix[_u2][_v2] !== 1) {
                             continue;
                         }
 
@@ -5338,7 +5330,7 @@ var SmilesDrawer = function () {
 
                         var _d = Math.sqrt(_dx * _dx + _dy * _dy);
 
-                        var _force = ks * (_d - l);
+                        var _force = 2.0 * Math.log(_d);
 
                         if (_d < l) {
                             _force *= 0.5;
@@ -5381,7 +5373,7 @@ var SmilesDrawer = function () {
                 */
 
                 // Move the vertex
-                for (var _u3 = 0; _u3 < vertices.length; _u3++) {
+                for (var _u3 = 0; _u3 < totalLength; _u3++) {
                     if (positioned[_u3]) {
                         continue;
                     }
@@ -5390,13 +5382,6 @@ var SmilesDrawer = function () {
                     var _dy2 = 0.1 * forces[_u3].y;
 
                     var _dSq = _dx2 * _dx2 + _dy2 * _dy2;
-
-                    // Avoid oscillations
-                    if (_dSq > 500) {
-                        var s = Math.sqrt(500 / _dSq);
-                        _dx2 = _dx2 * s;
-                        _dy2 = _dy2 * s;
-                    }
 
                     positions[_u3].x += _dx2;
                     positions[_u3].y += _dy2;

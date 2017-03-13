@@ -1321,15 +1321,6 @@ class SmilesDrawer {
     forceLayout(vertices, center, startVertexId, ring) {
         // Constants
         let l = this.opts.bondLength;
-        let kr = 6000; // repulsive force
-        let ks = 5; // spring
-        let g = 0.5; // gravity (to center)
-
-        if(ring.rings.length > 2) {
-            kr = 750;
-            ks = 1.5;
-            g = 0;
-        }
 
         // On bridged bonds, add the remaining neighbours to the vertices
         // to be positioned using the force layout
@@ -1387,9 +1378,9 @@ class SmilesDrawer {
             let index = vertices.length + i;
 
             for (let j = 0; j < r.members.length; j++) {
-                let id = r.members[j];
-                adjMatrix[id][index] = 2;
-                adjMatrix[index][id] = 2;
+                let id = idToV[r.members[j]];
+                adjMatrix[id][index] = r.members.length;
+                adjMatrix[index][id] = r.members.length;
             }
         }
         
@@ -1417,7 +1408,7 @@ class SmilesDrawer {
         
         console.log(adjMatrix);
 
-        for (let n = 0; n < 5000; n++) {
+        for (let n = 0; n < 1000; n++) {
             
             for (let i = 0; i < totalLength; i++) {
                 forces[i].set(0, 0);
@@ -1436,7 +1427,8 @@ class SmilesDrawer {
                     let dSq = dx * dx + dy * dy;
                     let d = Math.sqrt(dSq);
 
-                    let force = kr / dSq;
+                    let force = 1000 / dSq;
+
                     let fx = force * dx / d;
                     let fy = force * dy / d;
 
@@ -1455,7 +1447,7 @@ class SmilesDrawer {
             // Attractive forces
             for (let u = 0; u < totalLength - 1; u++) {
                 for (let v = u + 1; v < totalLength; v++) {
-                    if (adjMatrix[u][v] === 0) {
+                    if (adjMatrix[u][v] !== 1) {
                         continue;
                     }
 
@@ -1468,15 +1460,14 @@ class SmilesDrawer {
 
                     let d = Math.sqrt(dx * dx + dy * dy);
 
-                    let force = ks * (d - l);
+                    let force = 2.0 * Math.log(d);
                     
-                    /*
                     if(d < l) {
                         force *= 0.5;
                     } else {
                         force *= 2.0;
                     }
-                    */
+                    
 
                     let fx = force * dx / d;
                     let fy = force * dy / d;
@@ -1516,7 +1507,7 @@ class SmilesDrawer {
             */
 
             // Move the vertex
-            for (let u = 0; u < vertices.length; u++) {
+            for (let u = 0; u < totalLength; u++) {
                 if (positioned[u]) {
                     continue;
                 }
@@ -1525,14 +1516,6 @@ class SmilesDrawer {
                 let dy = 0.1 * forces[u].y;
 
                 let dSq = dx * dx + dy * dy;
-
-                // Avoid oscillations
-                if (dSq > 500) {
-                    let s = Math.sqrt(500 / dSq);
-                    dx = dx * s;
-                    dy = dy * s;
-                }
-
 
                 positions[u].x += dx;
                 positions[u].y += dy;
