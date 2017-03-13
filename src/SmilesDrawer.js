@@ -1319,12 +1319,6 @@ class SmilesDrawer {
      * @param {Ring} ring The bridged ring associated with this force-based layout.
      */
     forceLayout(vertices, center, startVertexId, ring) {
-        
-
-        // Add fake edges to the ring center
-
-
-        
         // Constants
         let l = this.opts.bondLength;
         let kr = 6000; // repulsive force
@@ -1398,31 +1392,21 @@ class SmilesDrawer {
                 adjMatrix[index][id] = 2;
             }
         }
-
-        console.log(adjMatrix)
-        // this.vertices[startVertexId].positioned = false;
-
-        // Place vertices randomly around center
-        for (let i = 0; i < vertices.length; i++) {
-            
-            //if(ring.rings.length > 2 && ring.members.length > 6 && vertex.id !== startVertexId)
-            //  vertex.positioned = false;
-        }
-
+        
         let forces = new Array(totalLength);
         let positions = new Array(totalLength);
         let positioned = new Array(totalLength);
         
         for (let i = 0; i < totalLength; i++) {
             forces[i] = new Vector2();
-            positions[i] = new Vector2(center.x + Math.random(), center.y + Math.random());
+            positions[i] = new Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
             positioned[i] = false;
 
             if (i >= vertices.length) {
                 continue;
             }
 
-            let vertex = this.vertices[idToV[i]];
+            let vertex = this.vertices[vToId[i]];
             
             if (vertex.positioned) {
                 positions[i].x = vertex.position.x;
@@ -1430,8 +1414,8 @@ class SmilesDrawer {
                 positioned[i] = true;
             }
         }
-
-        console.log(positions);
+        
+        console.log(adjMatrix);
 
         for (let n = 0; n < 5000; n++) {
             
@@ -1441,7 +1425,7 @@ class SmilesDrawer {
 
             // Repulsive forces
             for (let u = 0; u < totalLength - 1; u++) {
-                for (let v = u + 1; v < vertices.length; v++) {
+                for (let v = u + 1; v < totalLength; v++) {
                     let dx = positions[v].x - positions[u].x;
                     let dy = positions[v].y - positions[u].y;
 
@@ -1468,73 +1452,15 @@ class SmilesDrawer {
                 }
             }
 
-            // Fake repulsive forces between edges
-
-
-            // Repulsive forces ring centers
-            /*
-            if (ring.rings.length > 2) {
-                let ringCenters = new Array(ring.rings.length);
-                
-                for (let i = 0; i < ring.rings.length; i++) {
-                    ringCenters[i] = new Vector2();
-                    
-                    for (let j = 0; j < ring.rings[i].members.length; j++) {
-                        ringCenters[i].x += this.vertices[ring.rings[i].members[j]].position.x;
-                        ringCenters[i].y += this.vertices[ring.rings[i].members[j]].position.y;
-                    }
-
-                    ringCenters[i].x /= ring.rings[i].members.length;
-                    ringCenters[i].y /= ring.rings[i].members.length;
-
-                    ring.rings[i].center.set(ringCenters[i].x, ringCenters[i].y);
-                    
-                    for (let u = 0; u < ring.rings[i].members.length; u++) {
-                        let vertexA = this.vertices[ring.rings[i].members[u]];
-                        let dx = ringCenters[i].x - vertexA.position.x;
-                        let dy = ringCenters[i].y - vertexA.position.y;
-
-                        if (dx === 0 || dy === 0) {
-                            continue;
-                        }
-
-                        let dSq = dx * dx + dy * dy;
-                        let d = Math.sqrt(dSq);
-                        let force = kr / dSq;
-                        
-                        if (ring.rings[i].members.length === 5 || ring.rings[i].members.length === 6) {
-                            force *= 20;
-                        }
-
-                        if (ring.rings[i].members.length > 10) {
-                            //continue;
-                        }
-
-                        let fx = force * dx / d;
-                        let fy = force * dy / d;
-
-                        if (!vertexA.positioned) {
-                            forces[vertexA.id].x -= fx;
-                            forces[vertexA.id].y -= fy;
-                        }
-                    }
-                }
-            }
-            */
-
             // Attractive forces
-            for (let u = 0; u < vertices.length - 1; u++) {
-                let vertexA = this.vertices[vertices[u]];
-                
-                for (let v = u + 1; v < vertices.length; v++) {
-                    let vertexB = this.vertices[vertices[v]];
-                    
-                    if (!vertexA.isNeighbour(vertexB.id)) {
+            for (let u = 0; u < totalLength - 1; u++) {
+                for (let v = u + 1; v < totalLength; v++) {
+                    if (adjMatrix[u][v] === 0) {
                         continue;
                     }
 
-                    let dx = vertexB.position.x - vertexA.position.x;
-                    let dy = vertexB.position.y - vertexA.position.y;
+                    let dx = positions[v].x - positions[u].x;
+                    let dy = positions[v].y - positions[u].y;
 
                     if (dx === 0 || dy === 0) {
                         continue;
@@ -1543,34 +1469,35 @@ class SmilesDrawer {
                     let d = Math.sqrt(dx * dx + dy * dy);
 
                     let force = ks * (d - l);
-
+                    
+                    /*
                     if(d < l) {
                         force *= 0.5;
                     } else {
                         force *= 2.0;
                     }
+                    */
 
                     let fx = force * dx / d;
                     let fy = force * dy / d;
 
-                    if (!vertexA.positioned) {
-                        forces[vertexA.id].x += fx;
-                        forces[vertexA.id].y += fy;
+                    if (!positioned[u]) {
+                        forces[u].x += fx;
+                        forces[u].y += fy;
                     }
 
-                    if (!vertexB.positioned) {
-                        forces[vertexB.id].x -= fx;
-                        forces[vertexB.id].y -= fy;
+                    if (!positioned[v]) {
+                        forces[v].x -= fx;
+                        forces[v].y -= fy;
                     }
                 }
             }
 
             // Gravity
-
-            for (let u = 0; u < vertices.length; u++) {
-                let vertex = this.vertices[vertices[u]];
-                let dx = center.x - vertex.position.x;
-                let dy = center.y - vertex.position.y;
+            /*
+            for (let u = 0; u < totalLength; u++) {
+                let dx = center.x - positions[u].x;
+                let dy = center.y - positions[u].y;
 
                 if (dx === 0 || dy === 0) {
                     continue;
@@ -1581,22 +1508,21 @@ class SmilesDrawer {
                 let fx = force * dx / d;
                 let fy = force * dy / d;
 
-                if (!vertex.positioned) {
-                    forces[vertex.id].x += fx;
-                    forces[vertex.id].y += fy;
+                if (!positioned[u]) {
+                    forces[u].x += fx;
+                    forces[u].y += fy;
                 }
             }
+            */
 
             // Move the vertex
             for (let u = 0; u < vertices.length; u++) {
-                let vertex = this.vertices[vertices[u]];
-                
-                if (vertex.positioned) {
+                if (positioned[u]) {
                     continue;
                 }
 
-                let dx = 0.1 * forces[vertex.id].x;
-                let dy = 0.1 * forces[vertex.id].y;
+                let dx = 0.1 * forces[u].x;
+                let dy = 0.1 * forces[u].y;
 
                 let dSq = dx * dx + dy * dy;
 
@@ -1608,13 +1534,16 @@ class SmilesDrawer {
                 }
 
 
-                vertex.position.x += dx;
-                vertex.position.y += dy;
+                positions[u].x += dx;
+                positions[u].y += dy;
             }
         }
 
         for (let u = 0; u < vertices.length; u++) {
-            this.vertices[vertices[u]].positioned = true;
+            if (!positioned[u]) {
+                this.vertices[vToId[u]].position = positions[u];
+                this.vertices[vToId[u]].positioned = true;
+            }
         }
 
         for (let u = 0; u < vertices.length; u++) {
