@@ -1319,7 +1319,11 @@ class SmilesDrawer {
      * @param {Ring} ring The bridged ring associated with this force-based layout.
      */
     forceLayout(vertices, center, startVertexId, ring) {
-        console.log(ring);
+        
+
+        // Add fake edges to the ring center
+
+
         
         // Constants
         let l = this.opts.bondLength;
@@ -1356,43 +1360,90 @@ class SmilesDrawer {
         }
 
         vertices = ArrayHelper.merge(vertices, tmp);
+        
+        // Create adjencency matrix
+        let totalLength = vertices.length + ring.rings.length;
+        let vToId = new Array(vertices.length);
+        let idToV = {};
+        let adjMatrix = new Array(totalLength);
+        
+        for (let i = 0; i < totalLength; i++) {
+            adjMatrix[i] = new Array(totalLength);
 
+            for (let j = 0; j < totalLength; j++) {
+                adjMatrix[i][j] = 0;
+            }
+        }
+
+        for (let i = 0; i < vertices.length; i++) {
+            vToId[i] = this.vertices[vertices[i]].id; 
+            idToV[vToId[i]] = i;
+            
+            for (let j = 0; j < vertices.length; j++) {
+                let edge = this.getEdge(vToId[i], this.vertices[vertices[j]].id);
+                
+                if (edge !== null)  {
+                    adjMatrix[i][j] = 1;
+                }
+            }
+        }
+        
+        for (let i = 0; i < ring.rings.length; i++) {
+            let r = ring.rings[i];
+            let index = vertices.length + i;
+
+            for (let j = 0; j < r.members.length; j++) {
+                let id = r.members[j];
+                adjMatrix[id][index] = 2;
+                adjMatrix[index][id] = 2;
+            }
+        }
+
+        console.log(adjMatrix)
         // this.vertices[startVertexId].positioned = false;
 
         // Place vertices randomly around center
         for (let i = 0; i < vertices.length; i++) {
-            let vertex = this.vertices[vertices[i]];
             
-            if (!vertex.positioned) {
-                vertex.position.x = center.x + Math.random();
-                vertex.position.y = center.y + Math.random();
-            }
-
             //if(ring.rings.length > 2 && ring.members.length > 6 && vertex.id !== startVertexId)
             //  vertex.positioned = false;
         }
 
-        let forces = {};
+        let forces = new Array(totalLength);
+        let positions = new Array(totalLength);
+        let positioned = new Array(totalLength);
         
-        for (let i = 0; i < vertices.length; i++) {
-            forces[vertices[i]] = new Vector2();
+        for (let i = 0; i < totalLength; i++) {
+            forces[i] = new Vector2();
+            positions[i] = new Vector2(center.x + Math.random(), center.y + Math.random());
+            positioned[i] = false;
+
+            if (i >= vertices.length) {
+                continue;
+            }
+
+            let vertex = this.vertices[idToV[i]];
+            
+            if (vertex.positioned) {
+                positions[i].x = vertex.position.x;
+                positions[i].y = vertex.position.y;
+                positioned[i] = true;
+            }
         }
+
+        console.log(positions);
 
         for (let n = 0; n < 5000; n++) {
             
-            for (let i = 0; i < vertices.length; i++) {
-                forces[vertices[i]].set(0, 0);
+            for (let i = 0; i < totalLength; i++) {
+                forces[i].set(0, 0);
             }
 
             // Repulsive forces
-            for (let u = 0; u < vertices.length - 1; u++) {
-                let vertexA = this.vertices[vertices[u]];
-                
+            for (let u = 0; u < totalLength - 1; u++) {
                 for (let v = u + 1; v < vertices.length; v++) {
-                    let vertexB = this.vertices[vertices[v]];
-
-                    let dx = vertexB.position.x - vertexA.position.x;
-                    let dy = vertexB.position.y - vertexA.position.y;
+                    let dx = positions[v].x - positions[u].x;
+                    let dy = positions[v].y - positions[u].y;
 
                     if (dx === 0 || dy === 0) {
                         continue;
@@ -1405,14 +1456,14 @@ class SmilesDrawer {
                     let fx = force * dx / d;
                     let fy = force * dy / d;
 
-                    if (!vertexA.positioned) {
-                        forces[vertexA.id].x -= fx;
-                        forces[vertexA.id].y -= fy;
+                    if (!positioned[u]) {
+                        forces[u].x -= fx;
+                        forces[u].y -= fy;
                     }
 
-                    if (!vertexB.positioned) {
-                        forces[vertexB.id].x += fx;
-                        forces[vertexB.id].y += fy;
+                    if (!positioned[v]) {
+                        forces[v].x += fx;
+                        forces[v].y += fy;
                     }
                 }
             }
@@ -1421,6 +1472,7 @@ class SmilesDrawer {
 
 
             // Repulsive forces ring centers
+            /*
             if (ring.rings.length > 2) {
                 let ringCenters = new Array(ring.rings.length);
                 
@@ -1468,6 +1520,7 @@ class SmilesDrawer {
                     }
                 }
             }
+            */
 
             // Attractive forces
             for (let u = 0; u < vertices.length - 1; u++) {
