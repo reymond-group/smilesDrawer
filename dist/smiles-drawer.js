@@ -3776,10 +3776,11 @@ var SmilesDrawer = function () {
         };
 
         this.defaultOptions = {
-            shortBondLength: 20, // 25,
-            bondLength: 25, // 30,
+            shortBondLength: 15, // 25,
+            bondLength: 22, // 30,
             bondSpacing: 4,
             debug: false,
+            drawingIterations: 10,
             themes: {
                 dark: {
                     C: '#fff',
@@ -3894,26 +3895,30 @@ var SmilesDrawer = function () {
                 this.position();
                 var overlapScore = this.getOverlapScore();
                 var count = 0;
+                var bridgedRingCount = this.getBridgedRings().length;
 
-                while (overlapScore.total > this.opts.bondLength / 10.0 && count < 22) {
-                    if (this.direction === 1) {
-                        this.direction = -1;
-                    } else if (this.direction === -1) {
-                        this.direction = 0;
+                // Only redraw if there are no bridged rings ...
+                if (bridgedRingCount === 0) {
+                    while (overlapScore.total > this.opts.bondLength / 10.0 && count < this.opts.drawingIterations) {
+                        if (this.direction === 1) {
+                            this.direction = -1;
+                        } else if (this.direction === -1) {
+                            this.direction = 0;
+                        }
+
+                        this.clearPositions();
+                        this.position();
+
+                        var newOverlapScore = this.getOverlapScore();
+
+                        if (newOverlapScore.total < overlapScore.total) {
+                            overlapScore = newOverlapScore;
+                        } else {
+                            this.restorePositions();
+                        }
+
+                        count++;
                     }
-
-                    this.clearPositions();
-                    this.position();
-
-                    var newOverlapScore = this.getOverlapScore();
-
-                    if (newOverlapScore.total < overlapScore.total) {
-                        overlapScore = newOverlapScore;
-                    } else {
-                        this.restorePositions();
-                    }
-
-                    count++;
                 }
 
                 this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -5191,7 +5196,7 @@ var SmilesDrawer = function () {
             var g = 0.5; // gravity (to center)
 
             if (ring.rings.length > 2) {
-                kr = 1000;
+                kr = 750;
                 ks = 1.5;
                 g = 0;
             }
@@ -5242,6 +5247,7 @@ var SmilesDrawer = function () {
             }
 
             for (var n = 0; n < 1000; n++) {
+
                 for (var _i26 = 0; _i26 < vertices.length; _i26++) {
                     forces[vertices[_i26]].set(0, 0);
                 }
@@ -5279,6 +5285,9 @@ var SmilesDrawer = function () {
                     }
                 }
 
+                // Fake repulsive forces between edges
+
+
                 // Repulsive forces ring centers
                 if (ring.rings.length > 2) {
                     var ringCenters = new Array(ring.rings.length);
@@ -5310,7 +5319,11 @@ var SmilesDrawer = function () {
                             var _force = kr / _dSq;
 
                             if (ring.rings[_i27].members.length === 5 || ring.rings[_i27].members.length === 6) {
-                                _force *= 10;
+                                _force *= 20;
+                            }
+
+                            if (ring.rings[_i27].members.length > 10) {
+                                continue;
                             }
 
                             var _fx = _force * _dx / _d;
@@ -5425,7 +5438,6 @@ var SmilesDrawer = function () {
 
                 var angle = _vertex7.getAngle(null, true) - 60;
                 for (var _i28 = 0; _i28 < _neighbours.length; _i28++) {
-                    console.log(_i28, _neighbours[_i28], this.vertices[_neighbours[_i28]]);
                     if (_vertex7.value.isBridge || parentVertex !== undefined && parentVertex.value.isBridge) {
                         this.createNextBond(this.vertices[_neighbours[_i28]], _vertex7, MathHelper.toRad(angle));
                     } else if (this.vertices[_neighbours[_i28]].value.rings.length === 0) {

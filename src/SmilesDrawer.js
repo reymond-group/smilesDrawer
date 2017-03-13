@@ -22,10 +22,11 @@ class SmilesDrawer {
         };
 
         this.defaultOptions = {
-            shortBondLength: 20, // 25,
-            bondLength: 25, // 30,
+            shortBondLength: 15, // 25,
+            bondLength: 22, // 30,
             bondSpacing: 4,
             debug: false,
+            drawingIterations: 10,
             themes: {
                 dark: {
                     C: '#fff',
@@ -131,26 +132,30 @@ class SmilesDrawer {
             this.position();
             var overlapScore = this.getOverlapScore();
             var count = 0;
-            
-            while ((overlapScore.total > (this.opts.bondLength / 10.0)) && count < 10) {
-                if (this.direction === 1) {
-                    this.direction = -1;
-                } else if (this.direction === -1) {
-                    this.direction = 0;
+            var bridgedRingCount = this.getBridgedRings().length;        
+
+            // Only redraw if there are no bridged rings ...
+            if (bridgedRingCount === 0) {
+                while ((overlapScore.total > (this.opts.bondLength / 10.0)) && count < this.opts.drawingIterations) {
+                    if (this.direction === 1) {
+                        this.direction = -1;
+                    } else if (this.direction === -1) {
+                        this.direction = 0;
+                    }
+                    
+                    this.clearPositions();
+                    this.position();
+
+                    var newOverlapScore = this.getOverlapScore();
+
+                    if (newOverlapScore.total < overlapScore.total) {
+                        overlapScore = newOverlapScore;
+                    } else {
+                        this.restorePositions();
+                    }
+
+                    count++;
                 }
-                
-                this.clearPositions();
-                this.position();
-
-                var newOverlapScore = this.getOverlapScore();
-
-                if (newOverlapScore.total < overlapScore.total) {
-                    overlapScore = newOverlapScore;
-                } else {
-                    this.restorePositions();
-                }
-
-                count++;
             }
 
             this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -1321,7 +1326,7 @@ class SmilesDrawer {
         let g = 0.5; // gravity (to center)
 
         if(ring.rings.length > 2) {
-            kr = 1000;
+            kr = 750;
             ks = 1.5;
             g = 0;
         }
@@ -1372,6 +1377,7 @@ class SmilesDrawer {
         }
 
         for (let n = 0; n < 1000; n++) {
+            
             for (let i = 0; i < vertices.length; i++) {
                 forces[vertices[i]].set(0, 0);
             }
@@ -1409,14 +1415,17 @@ class SmilesDrawer {
                 }
             }
 
+            // Fake repulsive forces between edges
+
+
             // Repulsive forces ring centers
-            if(ring.rings.length > 2) {
+            if (ring.rings.length > 2) {
                 let ringCenters = new Array(ring.rings.length);
                 
-                for(let i = 0; i < ring.rings.length; i++) {
+                for (let i = 0; i < ring.rings.length; i++) {
                     ringCenters[i] = new Vector2();
                     
-                    for(let j = 0; j < ring.rings[i].members.length; j++) {
+                    for (let j = 0; j < ring.rings[i].members.length; j++) {
                         ringCenters[i].x += this.vertices[ring.rings[i].members[j]].position.x;
                         ringCenters[i].y += this.vertices[ring.rings[i].members[j]].position.y;
                     }
@@ -1426,7 +1435,7 @@ class SmilesDrawer {
 
                     ring.rings[i].center.set(ringCenters[i].x, ringCenters[i].y);
                     
-                    for(let u = 0; u < ring.rings[i].members.length; u++) {
+                    for (let u = 0; u < ring.rings[i].members.length; u++) {
                         let vertexA = this.vertices[ring.rings[i].members[u]];
                         let dx = ringCenters[i].x - vertexA.position.x;
                         let dy = ringCenters[i].y - vertexA.position.y;
@@ -1439,8 +1448,12 @@ class SmilesDrawer {
                         let d = Math.sqrt(dSq);
                         let force = kr / dSq;
                         
-                        if(ring.rings[i].members.length === 5 || ring.rings[i].members.length === 6) {
-                            force *= 10;
+                        if (ring.rings[i].members.length === 5 || ring.rings[i].members.length === 6) {
+                            force *= 20;
+                        }
+
+                        if (ring.rings[i].members.length > 10) {
+                            continue;
                         }
 
                         let fx = force * dx / d;
