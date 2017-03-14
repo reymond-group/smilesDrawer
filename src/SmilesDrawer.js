@@ -1351,6 +1351,7 @@ class SmilesDrawer {
         let vToId = new Array(vertices.length);
         let idToV = {};
         let adjMatrix = new Array(totalLength);
+        let edges = new Array();
         
         for (let i = 0; i < totalLength; i++) {
             adjMatrix[i] = new Array(totalLength);
@@ -1359,29 +1360,24 @@ class SmilesDrawer {
                 adjMatrix[i][j] = 0;
             }
         }
-        
-        let edges = new Array();
 
         for (let i = 0; i < vertices.length; i++) {
             vToId[i] = this.vertices[vertices[i]].id; 
             idToV[vToId[i]] = i;
-            
-            for (let j = 0; j < vertices.length; j++) {
+        }
+
+        for (let i = 0; i < vertices.length - 1; i++) { 
+            for (let j = i; j < vertices.length; j++) {
                 let edge = this.getEdge(vToId[i], this.vertices[vertices[j]].id);
                 
                 if (edge !== null)  {
                     adjMatrix[i][j] = l;
+                    adjMatrix[j][i] = l;
                     edges.push([i, j]);
                 }
             }
         }
 
-        let edgeMidpoints = new Array(edges.length);
-
-        for(let i = 0; i < edgeMidpoints.length; i++) {
-            edgeMidpoints = new Vector2();
-        }
-        
         for (let i = 0; i < ring.rings.length; i++) {
             let r = ring.rings[i];
             let index = vertices.length + i;
@@ -1394,6 +1390,38 @@ class SmilesDrawer {
                 adjMatrix[index][id] = radius;
             }
         }
+
+        for (let i = 0; i < edges.length; i++) {
+            for (let j = 0; j < totalLength; j++) {
+                adjMatrix[j].push(0);
+            }
+
+            adjMatrix.push(new Array());
+        
+            for (let j = 0; j < totalLength + edges.length; j++) {
+                adjMatrix[totalLength + i].push(0);
+            }
+        }
+
+        // Connect ring centers with edges 
+        for (let i = 0; i < ring.rings.length; i++) {
+            let ringIndex = vertices.length + i;
+            let ringSize = ring.rings[i].getSize();
+            
+            for (let j = 0; j < edges.length; j++) {
+                let a = edges[j][0];
+
+                // If the vertex and the ring are connected, so must the edge be
+                if (adjMatrix[ringIndex][a] !== 0) {
+                    let apothem = MathHelper.apothem(adjMatrix[ringIndex][a], ringSize);
+                    
+                    adjMatrix[ringIndex][totalLength + j] = apothem;
+                    adjMatrix[totalLength + j][ringIndex] = apothem;
+                }
+            }
+        }
+        
+        totalLength += edges.length;
         
         let forces = new Array(totalLength);
         let positions = new Array(totalLength);
@@ -1401,7 +1429,7 @@ class SmilesDrawer {
         
         for (let i = 0; i < totalLength; i++) {
             forces[i] = new Vector2();
-            positions[i] = new Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
+            positions[i] = new Vector2(center.x + Math.random() * l * 5, center.y + Math.random() * l * 5);
             positioned[i] = false;
 
             if (i >= vertices.length) {
@@ -1413,16 +1441,30 @@ class SmilesDrawer {
             if (vertex.positioned) {
                 positions[i].x = vertex.position.x;
                 positions[i].y = vertex.position.y;
-                positioned[i] = true;
+                if (ring.rings.length === 2) {
+                    positioned[i] = true;
+                }
             }
         }
         
-        console.log(adjMatrix);
+        let k = 8.0;
+        let c = 0.01;
+        let maxMove = 0.5;
+        let maxDist = 2000.0;
 
         for (let n = 0; n < 1000; n++) {
             
             for (let i = 0; i < totalLength; i++) {
                 forces[i].set(0, 0);
+            }
+
+            // Set the positions of the edge midpoints
+            for (let i = 0; i < edges.length; i++) {
+                let index = totalLength - edges.length + i;
+                let a = positions[edges[i][0]];
+                let b = positions[edges[i][1]];
+
+                positions[index] = Vector2.midpoint(a, b)
             }
 
             // Repulsive forces
@@ -1436,10 +1478,25 @@ class SmilesDrawer {
                     }
 
                     let dSq = dx * dx + dy * dy;
+
+                    if (dSq < 0.01) {
+                        dx = 0.1 * Math.random() + 0.1;
+                        dy = 0.1 * Math.random() + 0.1;
+
+                        dSq = dx * dx + dy * dy;
+                    }
+
                     let d = Math.sqrt(dSq);
 
-                    let force = 1000 / dSq;
-                    
+                    if (d > maxDist) continue;
+
+                    let force = k * k / d;
+
+                    if ((u >= vertices.length && u < totalLength - edges.length || v >= vertices.length && v < totalLength - edges.length) &&
+                        adjMatrix[u][v] > 0 && ring.rings.length > 2) {
+                        force = k * k / Math.log(d);
+                    }
+
                     let fx = force * dx / d;
                     let fy = force * dy / d;
 
@@ -1468,17 +1525,36 @@ class SmilesDrawer {
                     if (dx === 0 || dy === 0) {
                         continue;
                     }
+                    
+                    let dSq = dx * dx + dy * dy;
+                
+                    if (dSq < 0.01) {
+                        dx = 0.1 * Math.random() + 0.1;
+                        dy = 0.1 * Math.random() + 0.1;
 
-                    let d = Math.sqrt(dx * dx + dy * dy);
+                        dSq = dx * dx + dy * dy;
+                    }
 
-                    let force = 2.0 * Math.log(d);
+                    let d = Math.sqrt(dSq);
+
+                    if (d > maxDist) {
+                        d = maxDist;
+                        dSq = d * d;
+                    }
+
+                    let force = (dSq - k * k) / k;
+
+                    // force *= Math.log(1) * 0.1 + 1;
+                    
+                    
                     let dOptimal = adjMatrix[u][v];
                     
                     if (d < dOptimal) {
-                        force *= 0.5;
+                        force *= 0.1;
                     } else {
-                        force *= 2.0;
+                        force *= 1.5;
                     }
+
 
                     let fx = force * dx / d;
                     let fy = force * dy / d;
@@ -1495,27 +1571,20 @@ class SmilesDrawer {
                 }
             }
 
-            // Gravity
-            /*
-            for (let u = 0; u < totalLength; u++) {
-                let dx = center.x - positions[u].x;
-                let dy = center.y - positions[u].y;
+            // Add the edge forces to the vertices
+            for (let i = 0; i < edges.length; i++) {
+                let index = vertices.length + ring.rings.length + i;
+                let force = forces[index];
 
-                if (dx === 0 || dy === 0) {
-                    continue;
-                }
+                let a = edges[i][0];
+                let b = edges[i][1];
 
-                let d = Math.sqrt(dx * dx + dy * dy);
-                let force = g * (1 / d);
-                let fx = force * dx / d;
-                let fy = force * dy / d;
+                forces[a].x += force.x;
+                forces[a].y += force.y;
 
-                if (!positioned[u]) {
-                    forces[u].x += fx;
-                    forces[u].y += fy;
-                }
+                forces[b].x += force.x;
+                forces[b].y += force.y;
             }
-            */
 
             // Move the vertex
             for (let u = 0; u < totalLength; u++) {
@@ -1523,29 +1592,23 @@ class SmilesDrawer {
                     continue;
                 }
 
-                let dx = 0.1 * forces[u].x;
-                let dy = 0.1 * forces[u].y;
+                let dx = c * forces[u].x;
+                let dy = c * forces[u].y;
+
+                if (dx > maxMove) dx = maxMove;
+                if (dx < -maxMove) dx = -maxMove;
+                if (dy > maxMove) dy = maxMove;
+                if (dy < -maxMove) dy = - maxMove;
 
                 let dSq = dx * dx + dy * dy;
-
-                // Avoid oscillations
-                if (dSq > 500) {
-                    let s = Math.sqrt(500 / dSq);
-                    dx = dx * s;
-                    dy = dy * s;
-                }
+                
 
                 positions[u].x += dx;
                 positions[u].y += dy;
             }
 
             // Set the positions of the edge midpoints
-            for (let i = 0; i < edges.length; i++) {
-                let a = positions[edges[i][0]];
-                let b = positions[edges[i][1]];
-
-
-            }
+            
         }
 
         for (let i = 0; i < totalLength; i++) {
@@ -1560,13 +1623,17 @@ class SmilesDrawer {
             }
         }
 
+        /*
         for (let i = 0; i < totalLength; i++) {
             if (i < vertices.length) {
                 this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
             } else if (i < vertices.length + ring.rings.length) { 
                 this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'c');
+            } else {
+                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'm');
             }
         }
+        */
 
         for (let u = 0; u < vertices.length; u++) {
             let vertex = this.vertices[vertices[u]];
