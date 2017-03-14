@@ -1359,6 +1359,8 @@ class SmilesDrawer {
                 adjMatrix[i][j] = 0;
             }
         }
+        
+        let edges = new Array();
 
         for (let i = 0; i < vertices.length; i++) {
             vToId[i] = this.vertices[vertices[i]].id; 
@@ -1368,9 +1370,16 @@ class SmilesDrawer {
                 let edge = this.getEdge(vToId[i], this.vertices[vertices[j]].id);
                 
                 if (edge !== null)  {
-                    adjMatrix[i][j] = 1;
+                    adjMatrix[i][j] = l;
+                    edges.push([i, j]);
                 }
             }
+        }
+
+        let edgeMidpoints = new Array(edges.length);
+
+        for(let i = 0; i < edgeMidpoints.length; i++) {
+            edgeMidpoints = new Vector2();
         }
         
         for (let i = 0; i < ring.rings.length; i++) {
@@ -1379,8 +1388,10 @@ class SmilesDrawer {
 
             for (let j = 0; j < r.members.length; j++) {
                 let id = idToV[r.members[j]];
-                adjMatrix[id][index] = r.members.length;
-                adjMatrix[index][id] = r.members.length;
+                let radius = MathHelper.polyCircumradius(l, r.getSize());
+                
+                adjMatrix[id][index] = radius;
+                adjMatrix[index][id] = radius;
             }
         }
         
@@ -1428,7 +1439,7 @@ class SmilesDrawer {
                     let d = Math.sqrt(dSq);
 
                     let force = 1000 / dSq;
-
+                    
                     let fx = force * dx / d;
                     let fy = force * dy / d;
 
@@ -1447,7 +1458,7 @@ class SmilesDrawer {
             // Attractive forces
             for (let u = 0; u < totalLength - 1; u++) {
                 for (let v = u + 1; v < totalLength; v++) {
-                    if (adjMatrix[u][v] !== 1) {
+                    if (adjMatrix[u][v] <= 0) {
                         continue;
                     }
 
@@ -1461,13 +1472,13 @@ class SmilesDrawer {
                     let d = Math.sqrt(dx * dx + dy * dy);
 
                     let force = 2.0 * Math.log(d);
+                    let dOptimal = adjMatrix[u][v];
                     
-                    if(d < l) {
+                    if (d < dOptimal) {
                         force *= 0.5;
                     } else {
                         force *= 2.0;
                     }
-                    
 
                     let fx = force * dx / d;
                     let fy = force * dy / d;
@@ -1517,15 +1528,43 @@ class SmilesDrawer {
 
                 let dSq = dx * dx + dy * dy;
 
+                // Avoid oscillations
+                if (dSq > 500) {
+                    let s = Math.sqrt(500 / dSq);
+                    dx = dx * s;
+                    dy = dy * s;
+                }
+
                 positions[u].x += dx;
                 positions[u].y += dy;
             }
+
+            // Set the positions of the edge midpoints
+            for (let i = 0; i < edges.length; i++) {
+                let a = positions[edges[i][0]];
+                let b = positions[edges[i][1]];
+
+
+            }
         }
 
-        for (let u = 0; u < vertices.length; u++) {
-            if (!positioned[u]) {
-                this.vertices[vToId[u]].position = positions[u];
-                this.vertices[vToId[u]].positioned = true;
+        for (let i = 0; i < totalLength; i++) {
+            if (i < vertices.length) { 
+                if (!positioned[i]) {
+                    this.vertices[vToId[i]].position = positions[i];
+                    this.vertices[vToId[i]].positioned = true;
+                }
+            } else if (i < vertices.length + ring.rings.length) {
+                let index = i - vertices.length;
+                ring.rings[index].center = positions[i];
+            }
+        }
+
+        for (let i = 0; i < totalLength; i++) {
+            if (i < vertices.length) {
+                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
+            } else if (i < vertices.length + ring.rings.length) { 
+                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'c');
             }
         }
 
