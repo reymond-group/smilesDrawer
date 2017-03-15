@@ -26,6 +26,7 @@ class SmilesDrawer {
             bondLength: 22, // 30,
             bondSpacing: 4,
             debug: false,
+            allowFlips: false,
             drawingIterations: 10,
             themes: {
                 dark: {
@@ -2299,28 +2300,33 @@ class SmilesDrawer {
                     // Make a always the bigger ring than b
                     if (a && b) {
                         let tmp = (a.members.length > b.members.length) ? a : b;
+                        
                         b = (a.members.length < b.members.length) ? a : b;
                         a = tmp;
                     }
-
-                    if (a && a.allowsFlip()) {
-                        vertex.position.rotateTo(a.center, flipCenter);
-                        a.setFlipped();
-                        
-                        if (vertex.flipNeighbour !== null) {
-                            // It's better to not straighten the other one, since it will possibly overlap
-                            // var flipNeighbour = this.vertices[vertex.flipNeighbour];
-                            // flipNeighbour.position.rotate(flipNeighbour.backAngle);
+                    
+                    if (this.opts.allowFlips) {
+                        if (a && a.allowsFlip()) {
+                            vertex.position.rotateTo(a.center, flipCenter);
+                            a.setFlipped();
+                            
+                            if (vertex.flipNeighbour !== null) {
+                                // It's better to not straighten the other one, since it will possibly overlap
+                                // var flipNeighbour = this.vertices[vertex.flipNeighbour];
+                                // flipNeighbour.position.rotate(flipNeighbour.backAngle);
+                            }
+                        } else if (b && b.allowsFlip()) {
+                            vertex.position.rotateTo(b.center, flipCenter);
+                            b.setFlipped();
+                            
+                            if (vertex.flipNeighbour !== null) {
+                                // It's better to not straighten the other one, since it will possibly overlap
+                                // var flipNeighbour = this.vertices[vertex.flipNeighbour];
+                                // flipNeighbour.position.rotate(flipNeighbour.backAngle);
+                            }
                         }
-                    } else if (b && b.allowsFlip()) {
-                        vertex.position.rotateTo(b.center, flipCenter);
-                        b.setFlipped();
-                        
-                        if (vertex.flipNeighbour !== null) {
-                            // It's better to not straighten the other one, since it will possibly overlap
-                            // var flipNeighbour = this.vertices[vertex.flipNeighbour];
-                            // flipNeighbour.position.rotate(flipNeighbour.backAngle);
-                        }
+                    } else {
+                        vertex.position.rotateAround(0.5, vertex.previousPosition);         
                     }
 
                     // Only do a refresh of the remaining!

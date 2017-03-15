@@ -3787,6 +3787,7 @@ var SmilesDrawer = function () {
             bondLength: 22, // 30,
             bondSpacing: 4,
             debug: false,
+            allowFlips: false,
             drawingIterations: 10,
             themes: {
                 dark: {
@@ -5553,15 +5554,17 @@ var SmilesDrawer = function () {
                 }
             }
 
-            for (var _i37 = 0; _i37 < totalLength; _i37++) {
-                if (_i37 < vertices.length) {
-                    this.canvasWrapper.drawDebugText(positions[_i37].x, positions[_i37].y, 'v');
-                } else if (_i37 < vertices.length + ring.rings.length) {
-                    this.canvasWrapper.drawDebugText(positions[_i37].x, positions[_i37].y, 'c');
+            /*
+            for (let i = 0; i < totalLength; i++) {
+                if (i < vertices.length) {
+                    this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
+                } else if (i < vertices.length + ring.rings.length) { 
+                    this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'c');
                 } else {
-                    this.canvasWrapper.drawDebugText(positions[_i37].x, positions[_i37].y, 'm');
+                    this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'm');
                 }
             }
+            */
 
             for (var _u4 = 0; _u4 < vertices.length; _u4++) {
                 var _vertex5 = this.vertices[vertices[_u4]];
@@ -5569,17 +5572,17 @@ var SmilesDrawer = function () {
                 var _neighbours = _vertex5.getNeighbours();
 
                 var angle = _vertex5.getAngle(null, true) - 60;
-                for (var _i38 = 0; _i38 < _neighbours.length; _i38++) {
+                for (var _i37 = 0; _i37 < _neighbours.length; _i37++) {
                     if (_vertex5.value.isBridge || parentVertex !== undefined && parentVertex.value.isBridge) {
-                        this.createNextBond(this.vertices[_neighbours[_i38]], _vertex5, MathHelper.toRad(angle));
-                    } else if (this.vertices[_neighbours[_i38]].value.rings.length === 0) {
+                        this.createNextBond(this.vertices[_neighbours[_i37]], _vertex5, MathHelper.toRad(angle));
+                    } else if (this.vertices[_neighbours[_i37]].value.rings.length === 0) {
                         // If there is a spiro, this will be handeled in create ring
                         // This here positiones the vertices going away from the outer ring
                         if (ring.rings.length > 2) {
                             center = this.getSubringCenter(ring, _vertex5);
                         }
 
-                        this.createNextBond(this.vertices[_neighbours[_i38]], _vertex5, center);
+                        this.createNextBond(this.vertices[_neighbours[_i37]], _vertex5, center);
                     }
 
                     angle += 120;
@@ -5816,9 +5819,9 @@ var SmilesDrawer = function () {
 
             // Draw the ring centers for debug purposes
             if (this.opts.debug) {
-                for (var _i39 = 0; _i39 < this.rings.length; _i39++) {
-                    var center = this.rings[_i39].center;
-                    this.canvasWrapper.drawDebugPoint(center.x, center.y, 'r: ' + this.rings[_i39].id);
+                for (var _i38 = 0; _i38 < this.rings.length; _i38++) {
+                    var center = this.rings[_i38].center;
+                    this.canvasWrapper.drawDebugPoint(center.x, center.y, 'r: ' + this.rings[_i38].id);
                 }
             }
         }
@@ -5864,8 +5867,8 @@ var SmilesDrawer = function () {
                 vertex.position = new Vector2();
             }
 
-            for (var _i40 = 0; _i40 < this.rings.length; _i40++) {
-                var ring = this.rings[_i40];
+            for (var _i39 = 0; _i39 < this.rings.length; _i39++) {
+                var ring = this.rings[_i39];
                 this.backupRings.push(ring.clone());
                 ring.positioned = false;
                 ring.center = new Vector2();
@@ -5884,8 +5887,8 @@ var SmilesDrawer = function () {
                 this.vertices[i] = this.backupVertices[i];
             }
 
-            for (var _i41 = 0; _i41 < this.backupRings.length; _i41++) {
-                this.rings[_i41] = this.backupRings[_i41];
+            for (var _i40 = 0; _i40 < this.backupRings.length; _i40++) {
+                this.rings[_i40] = this.backupRings[_i40];
             }
         }
 
@@ -6037,8 +6040,8 @@ var SmilesDrawer = function () {
             }
 
             // Next, draw atoms that are not part of a ring that are directly attached to this ring
-            for (var _i42 = 0; _i42 < ring.members.length; _i42++) {
-                var ringMember = this.vertices[ring.members[_i42]];
+            for (var _i41 = 0; _i41 < ring.members.length; _i41++) {
+                var ringMember = this.vertices[ring.members[_i41]];
                 var ringMemberNeighbours = ringMember.getNeighbours();
 
                 // If there are multiple, the ovlerap will be resolved in the appropriate step
@@ -6131,14 +6134,14 @@ var SmilesDrawer = function () {
                 }
             }
 
-            for (var _i43 = 0; _i43 < sharedSideChains.length; _i43++) {
-                var chain = sharedSideChains[_i43];
+            for (var _i42 = 0; _i42 < sharedSideChains.length; _i42++) {
+                var chain = sharedSideChains[_i42];
                 var angle = -chain.vertex.position.getRotateToAngle(chain.other.position, chain.common.position);
                 this.rotateSubtree(chain.vertex.id, chain.common.id, angle + Math.PI, chain.common.position);
             }
 
-            for (var _i44 = 0; _i44 < overlaps.length; _i44++) {
-                var overlap = overlaps[_i44];
+            for (var _i43 = 0; _i43 < overlaps.length; _i43++) {
+                var overlap = overlaps[_i43];
 
                 if (overlap.vertices.length == 1) {
                     var _a3 = overlap.vertices[0];
@@ -6206,28 +6209,33 @@ var SmilesDrawer = function () {
                         // Make a always the bigger ring than b
                         if (_a5 && _b3) {
                             var tmp = _a5.members.length > _b3.members.length ? _a5 : _b3;
+
                             _b3 = _a5.members.length < _b3.members.length ? _a5 : _b3;
                             _a5 = tmp;
                         }
 
-                        if (_a5 && _a5.allowsFlip()) {
-                            vertex.position.rotateTo(_a5.center, flipCenter);
-                            _a5.setFlipped();
+                        if (this.opts.allowFlips) {
+                            if (_a5 && _a5.allowsFlip()) {
+                                vertex.position.rotateTo(_a5.center, flipCenter);
+                                _a5.setFlipped();
 
-                            if (vertex.flipNeighbour !== null) {
-                                // It's better to not straighten the other one, since it will possibly overlap
-                                // var flipNeighbour = this.vertices[vertex.flipNeighbour];
-                                // flipNeighbour.position.rotate(flipNeighbour.backAngle);
-                            }
-                        } else if (_b3 && _b3.allowsFlip()) {
-                            vertex.position.rotateTo(_b3.center, flipCenter);
-                            _b3.setFlipped();
+                                if (vertex.flipNeighbour !== null) {
+                                    // It's better to not straighten the other one, since it will possibly overlap
+                                    // var flipNeighbour = this.vertices[vertex.flipNeighbour];
+                                    // flipNeighbour.position.rotate(flipNeighbour.backAngle);
+                                }
+                            } else if (_b3 && _b3.allowsFlip()) {
+                                vertex.position.rotateTo(_b3.center, flipCenter);
+                                _b3.setFlipped();
 
-                            if (vertex.flipNeighbour !== null) {
-                                // It's better to not straighten the other one, since it will possibly overlap
-                                // var flipNeighbour = this.vertices[vertex.flipNeighbour];
-                                // flipNeighbour.position.rotate(flipNeighbour.backAngle);
+                                if (vertex.flipNeighbour !== null) {
+                                    // It's better to not straighten the other one, since it will possibly overlap
+                                    // var flipNeighbour = this.vertices[vertex.flipNeighbour];
+                                    // flipNeighbour.position.rotate(flipNeighbour.backAngle);
+                                }
                             }
+                        } else {
+                            vertex.position.rotateAround(0.5, vertex.previousPosition);
                         }
 
                         // Only do a refresh of the remaining!
