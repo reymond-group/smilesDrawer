@@ -5404,7 +5404,7 @@ var SmilesDrawer = function () {
                         var force = k * k / d;
 
                         if (n > 250 && (isRingCenter[_u] || isRingCenter[v])) {
-                            force *= ringSize[_u] * ringSize[v];
+                            // force *= ringSize[u] * ringSize[v];
                         }
 
                         var fx = force * dx / d;

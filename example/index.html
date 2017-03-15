@@ -12,49 +12,76 @@
     <input id="input" type="text" class="parser" style="width: 490px; padding: 5px; border: 1px solid black; margin-bottom: 5px; font-size: 1.2em;" />
     <br />
     <canvas id="output-canvas" width="500" height="500"></canvas>
+    <br />
+    <div>
+        <label><input id="debug" name="debug" type="checkbox">Debug</label>
+    </div>
+    <div>
+        <label for="bondLength">Bond Length</label>
+        <input type="range" id="bondLength" name="bondLength" value="16"
+               min="1" max="99" step="1" />
+    </div>
+    <div>
+        <label for="shortBondLength">Short Bond Length</label>
+        <input type="range" id="shortBondLength" name="shortBondLength" value="9"
+               min="1" max="22" step="1" />
+    </div>
+    <div>
+        <label for="bondSpacing">Bond Spacing</label>
+        <input type="range" id="bondSpacing" name="bondSpacing" value="4"
+               min="1" max="99" step="1" />
+    </div>
     <script>
         var input = document.getElementById('input');
-        var smilesDrawer = new SmilesDrawer();
-        /*var out = '';
-        for(var i = 0; i < kris.length; i++) {
-            try {
-                var line = '';
-                if(kris[i].indexOf('.') > 0) continue;
-                console.log(kris[i]);
-                var t = performance.now();
-                var data = smiles.parse(kris[i]);
-                line += (performance.now() - t) + ';';
-                t = performance.now();
-                smilesDrawer.draw(data);
-                out += smilesDrawer.printRingInfo(kris[i]);
+        var debugCheckbox = document.getElementById('debug');
+        var bondLengthInput = document.getElementById('bondLength');
+        var shortBondLengthInput = document.getElementById('shortBondLength');
+        var bondSpacingInput = document.getElementById('bondSpacing');
 
-            }
-            catch(e) {
-
-            }
+        var options = { 
+            debug: false,
+            bondLength: 16,
+            shortBondLength: 9,
+            bondSpacing: 4
         }
 
-        console.log(out);*/
+        var smilesDrawer = new SmilesDrawer(options);
+        var input = document.getElementById('input');
 
-        document.addEventListener("DOMContentLoaded", function(event) {
-            var smilesDrawer = new SmilesDrawer({ debug: true });
-            var input = document.getElementById('input');
+        function draw() {
+            var data = smiles.parse(input.value);
+            smilesDrawer.draw(data, 'output-canvas', 'light', false);
+        }
+
+        function updateOptions() {
+            smilesDrawer = new SmilesDrawer(options);
+            draw();
+        }
+
+        document.addEventListener('DOMContentLoaded', function(event) {
             input.addEventListener('input', function() {
-                // var data = smiles.parse(input.value);
-                // smilesDrawer.draw(data, 'output-canvas', false);
-                
-                var total = 0.0;
+                draw();
+            });
 
-                for(var i = 0; i < 1; i++) {
-                    var t = performance.now();
-                    var data = smiles.parse(input.value);
-                    smilesDrawer.draw(data, 'output-canvas', 'light', false);
-                    total += performance.now() - t;
-                }
-                
-                console.log(total);
+            debugCheckbox.addEventListener('click', function() {
+               options.debug = debugCheckbox.checked ? true : false;
+               updateOptions();
+            });
 
-                // console.log(smilesDrawer.printRingInfo(input.value));
+            bondLengthInput.addEventListener('input', function() {
+                options.bondLength = parseInt(bondLengthInput.value);
+                shortBondLengthInput.max = options.bondLength;
+                updateOptions();
+            });
+
+            shortBondLengthInput.addEventListener('input', function() {
+                options.shortBondLength = parseInt(shortBondLengthInput.value);
+                updateOptions();
+            });
+
+            bondSpacingInput.addEventListener('input', function() {
+                options.bondSpacing = parseInt(bondSpacingInput.value);
+                updateOptions();
             });
         });
     </script>

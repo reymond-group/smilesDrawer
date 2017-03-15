@@ -1530,7 +1530,7 @@ class SmilesDrawer {
                     let force = k * k / d;
 
                     if (n > 250 && (isRingCenter[u] || isRingCenter[v])) {
-                        force *= ringSize[u] * ringSize[v];
+                        // force *= ringSize[u] * ringSize[v];
                     }
 
                     let fx = force * dx / d;
