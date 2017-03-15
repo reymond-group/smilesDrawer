@@ -1319,6 +1319,7 @@ class SmilesDrawer {
      * @param {Ring} ring The bridged ring associated with this force-based layout.
      */
     forceLayout(vertices, center, startVertexId, ring) {
+        return;
         // Constants
         let l = this.opts.bondLength;
 
@@ -1456,6 +1457,7 @@ class SmilesDrawer {
             
             if (vertex.positioned && ring.rings.length === 2) {
                 positioned[i] = true;
+                console.log('Positioned', vertex.id);
             }
         }
         
@@ -1639,7 +1641,7 @@ class SmilesDrawer {
             }
 
             // Place the ring centers in the middle of the members
-            if (n > 400) {
+            if (n > 400 && ring.rings.length > 2) {
                 for (let i = 0; i < ring.rings.length; i++) {
                     let r = ring.rings[i];
                     let center = new Vector2();
@@ -2006,6 +2008,8 @@ class SmilesDrawer {
         if (ring.positioned) {
             return;
         }
+            
+        console.log(ring, center, startVector, previousVertex);
 
         center = center ? center : new Vector2(0, 0);
 
@@ -2021,18 +2025,20 @@ class SmilesDrawer {
         let a = startingAngle;
         
         let that = this;
+
         ring.eachMember(this.vertices, function (v) {
             let vertex = that.vertices[v];
-            
+
             if (!vertex.positioned) {
                 vertex.position.x = center.x + Math.cos(a) * radius;
                 vertex.position.y = center.y + Math.sin(a) * radius;
             }
 
             a += angle;
-
+            
             if(!ring.isBridged || ring.rings.length < 3) {
                 vertex.positioned = true;
+                console.log(vertex.id + ' positioned');
             }
         }, (startVector) ? startVector.id : null, (previousVertex) ? previousVertex.id : null);
 
@@ -2058,7 +2064,8 @@ class SmilesDrawer {
             }
 
             let vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
-            
+            console.log(this.ringConnections);
+            console.log(vertices); 
             if (vertices.length == 2) {
                 // This ring is a fused ring
                 ring.isFused = true;
@@ -2333,6 +2340,8 @@ class SmilesDrawer {
         if (vertex.positioned) {
             return;
         }
+
+        console.log('Placing ' + vertex.id);
 
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of
