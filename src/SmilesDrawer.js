@@ -682,13 +682,15 @@ class SmilesDrawer {
             }
         }
 
-        // Update the ring connections
+        // Update the ring connections and add this ring to the neighbours neighbours
         for (let i = 0; i < neighbours.length; i++) {
             let connections = this.getRingConnections(neighbours[i], ringIds);
             
             for (let j = 0; j < connections.length; j++) {
                 this.getRingConnection(connections[j]).updateOther(ring.id, neighbours[i]);
             }
+
+            this.getRing(neighbours[i]).neighbours.push(ring.id);
         }
         
         return ring;
@@ -1319,7 +1321,6 @@ class SmilesDrawer {
      * @param {Ring} ring The bridged ring associated with this force-based layout.
      */
     forceLayout(vertices, center, startVertexId, ring) {
-        return;
         // Constants
         let l = this.opts.bondLength;
 
@@ -1442,6 +1443,18 @@ class SmilesDrawer {
         let forces = new Array(totalLength);
         let positions = new Array(totalLength);
         let positioned = new Array(totalLength);
+        let isRingCenter = new Array(totalLength);
+        let ringSize = new Array(totalLength); 
+
+        for (let i = 0; i < totalLength; i++) {
+            isRingCenter[i] = i >= vertices.length && i < edgeOffset;
+
+            if (isRingCenter[i]) {
+                ringSize[i] = ring.rings[i - vertices.length].members.length;
+            } else {
+                ringSize[i] = 1;
+            }
+        }
         
         for (let i = 0; i < totalLength; i++) {
             forces[i] = new Vector2();
@@ -1457,14 +1470,13 @@ class SmilesDrawer {
             
             if (vertex.positioned && ring.rings.length === 2) {
                 positioned[i] = true;
-                console.log('Positioned', vertex.id);
             }
         }
         
         let k = 8.0;
         let c = 0.01;
         let maxMove = 5.5;
-        let maxDist = 2000.0;
+        let maxDist = 5000.0;
 
         for (let n = 0; n < 500; n++) {
             
@@ -1484,11 +1496,11 @@ class SmilesDrawer {
             // Repulsive forces
             for (let u = 0; u < totalLength - 1; u++) {
                 for (let v = u + 1; v < totalLength; v++) {
-                    if (n < 250 && u < vertices.length && u > edgeOffset && v < vertices.length && v > edgeOffset) {
+                    if (n < 250 && !(isRingCenter[u] && isRingCenter[v])) {
                         continue;
                     }
 
-                    if (n > 250 && u > vertices.length && u < edgeOffset && v > vertices.length && v < edgeOffset) {
+                    if (n > 250 && isRingCenter[u] && isRingCenter[v]) {
                         continue;
                     }
 
@@ -1510,16 +1522,15 @@ class SmilesDrawer {
 
                     let d = Math.sqrt(dSq);
 
-                    if (d > maxDist) continue;
+                    if (d > maxDist) {
+                        continue;
+                    }
 
                     let force = k * k / d;
 
-                    /*
-                    if ((u >= vertices.length && u < totalLength - edges.length || v >= vertices.length && v < totalLength - edges.length) &&
-                        adjMatrix[u][v] > 0 && ring.rings.length > 2) {
-                        force = k * k / Math.log(d);
+                    if (n > 250 && (isRingCenter[u] || isRingCenter[v])) {
+                        force *= ringSize[u] * ringSize[v];
                     }
-                    */
 
                     let fx = force * dx / d;
                     let fy = force * dy / d;
@@ -1543,15 +1554,14 @@ class SmilesDrawer {
                         continue;
                     }
 
-                    if (n < 250 && u < vertices.length && u > edgeOffset && v < vertices.length && v > edgeOffset) {
+                    if (n < 250 && !(isRingCenter[u] && isRingCenter[v])) {
                         continue;
                     }
 
-                    if (n > 250 && u > vertices.length && u < edgeOffset && v > vertices.length && v < edgeOffset) {
+                    if (n > 250 && isRingCenter[u] && isRingCenter[v]) {
                         continue;
                     }
-
-
+                    
                     let dx = positions[v].x - positions[u].x;
                     let dy = positions[v].y - positions[u].y;
 
@@ -1576,10 +1586,6 @@ class SmilesDrawer {
                     }
 
                     let force = (dSq - k * k) / k;
-
-                    // force *= Math.log(1) * 0.1 + 1;
-                    
-                    
                     let dOptimal = adjMatrix[u][v];
                     
                     if (d < dOptimal) {
@@ -1641,7 +1647,8 @@ class SmilesDrawer {
             }
 
             // Place the ring centers in the middle of the members
-            if (n > 400 && ring.rings.length > 2) {
+            if (n > 300 && ring.rings.length > 2) {
+                maxMove = 0.5;
                 for (let i = 0; i < ring.rings.length; i++) {
                     let r = ring.rings[i];
                     let center = new Vector2();
@@ -2008,8 +2015,6 @@ class SmilesDrawer {
         if (ring.positioned) {
             return;
         }
-            
-        console.log(ring, center, startVector, previousVertex);
 
         center = center ? center : new Vector2(0, 0);
 
@@ -2038,7 +2043,6 @@ class SmilesDrawer {
             
             if(!ring.isBridged || ring.rings.length < 3) {
                 vertex.positioned = true;
-                console.log(vertex.id + ' positioned');
             }
         }, (startVector) ? startVector.id : null, (previousVertex) ? previousVertex.id : null);
 
@@ -2064,8 +2068,7 @@ class SmilesDrawer {
             }
 
             let vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
-            console.log(this.ringConnections);
-            console.log(vertices); 
+            
             if (vertices.length == 2) {
                 // This ring is a fused ring
                 ring.isFused = true;
@@ -2340,8 +2343,6 @@ class SmilesDrawer {
         if (vertex.positioned) {
             return;
         }
-
-        console.log('Placing ' + vertex.id);
 
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of

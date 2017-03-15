@@ -11,7 +11,7 @@
         <canvas id="example-canvas" width="500" height="500"></canvas>
 
         <script src="../dist/smiles-drawer.min.js"></script>
-        <script src="schembl.js"></script>
+        <script src="drugbank.js"></script>
         <script>
             let options = {};
 
@@ -23,11 +23,11 @@
             let totalOverlap = 0;
             let str = 'time,overlap,rings,hac,bridged\n';
 
-            for (let i = 0; i < schembl.length; i++) {
+            for (let i = 0; i < drugbank.length; i++) {
                 console.log(i);
                 try {
                     let t = performance.now();
-                    let data = smiles.parse(schembl[i]);
+                    let data = smiles.parse(drugbank[i]);
                     
                     smilesDrawer.draw(data, 'example-canvas', 'light', false);
                     
@@ -38,7 +38,9 @@
                     str += td + ',' + smilesDrawer.getTotalOverlapScore() + ',' + 
                            smilesDrawer.getRingCount() + ',' + 
                            smilesDrawer.getHeavyAtomCount() + ',' +
-                           smilesDrawer.hasBridgedRing() + '\n'; 
+                           smilesDrawer.hasBridgedRing() + '\n';
+                    
+                    // if (td > 1000) console.log(schembl[i]);
                 } catch (exception) {
                     nErrors++;
                 }
@@ -47,7 +49,7 @@
             console.log(str);
             console.log('Failed count: ' + nErrors);
             console.log('Success count: ' + nSuccesses);
-            console.log('Success rate: ' + (nSuccesses / schembl.length));
+            console.log('Success rate: ' + (nSuccesses / drugbank.length));
             console.log('Avg speed: ' + totalSpeed / nSuccesses);
             console.log('Avg overlap: ' + totalOverlap / nSuccesses);
         </script>
