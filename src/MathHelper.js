@@ -67,6 +67,12 @@ class MathHelper {
         return r * Math.cos(Math.PI / n);
     }
 
+    static apothemFromSideLength(s, n) {
+        let r = MathHelper.polyCircumradius(s, n);
+        
+        return MathHelper.apothem(r, n);
+    }
+
     /**
      * The central angle of a n-sided regular polygon. In radians.
      *
