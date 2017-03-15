@@ -1409,8 +1409,9 @@ class SmilesDrawer {
 
         // Connect ring centers with edges 
         for (let i = 0; i < ring.rings.length; i++) {
+            let r = ring.rings[i];
             let ringIndex = vertices.length + i;
-            let ringSize = ring.rings[i].getSize();
+            let ringSize = r.getSize();
             
             for (let j = 0; j < edges.length; j++) {
                 let a = edges[j][0];
@@ -1426,8 +1427,17 @@ class SmilesDrawer {
 
             // Connecting ring centers, let them have a distance of apothem + apothem
             for (let j = 0; j < ring.rings.length; j++) {
+                let r2 = ring.rings[j];
+                
+                // If they do not share a vertex, they are not connected
+                let intersection = ArrayHelper.intersection(r.members, r2.members).length;
+
+                if (intersection === 0) {
+                    continue;
+                }
+
                 let ringIndex2 = vertices.length + j;
-                let ringSize2 = ring.rings[j].getSize();
+                let ringSize2 = r2.getSize();
                 let dist = MathHelper.apothemFromSideLength(l, ringSize) + MathHelper.apothemFromSideLength(l, ringSize2);
                 
                 adjMatrix[ringIndex][ringIndex2] = dist;
@@ -1477,7 +1487,7 @@ class SmilesDrawer {
         let k = 8.0;
         let c = 0.01;
         let maxMove = 5.5;
-        let maxDist = 5000.0;
+        let maxDist = l;
 
         for (let n = 0; n < 500; n++) {
             
@@ -1523,14 +1533,14 @@ class SmilesDrawer {
 
                     let d = Math.sqrt(dSq);
 
-                    if (d > maxDist) {
+                    if (d > adjMatrix[u][v]) {
                         continue;
                     }
 
                     let force = k * k / d;
 
                     if (n > 250 && (isRingCenter[u] || isRingCenter[v])) {
-                        // force *= ringSize[u] * ringSize[v];
+                        force *= ringSize[u] * ringSize[v];
                     }
 
                     let fx = force * dx / d;
@@ -1648,8 +1658,7 @@ class SmilesDrawer {
             }
 
             // Place the ring centers in the middle of the members
-            if (n > 300 && ring.rings.length > 2) {
-                maxMove = 0.5;
+            if (n > 200 && ring.rings.length > 2) {
                 for (let i = 0; i < ring.rings.length; i++) {
                     let r = ring.rings[i];
                     let center = new Vector2();
@@ -1683,17 +1692,17 @@ class SmilesDrawer {
             }
         }
 
-        /*
+        
         for (let i = 0; i < totalLength; i++) {
             if (i < vertices.length) {
-                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
+                // this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
             } else if (i < vertices.length + ring.rings.length) { 
                 this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'c');
             } else {
-                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'm');
+                // this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'm');
             }
         }
-        */
+        
 
         for (let u = 0; u < vertices.length; u++) {
             let vertex = this.vertices[vertices[u]];
