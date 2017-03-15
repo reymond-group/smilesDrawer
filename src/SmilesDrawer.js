@@ -1965,6 +1965,9 @@ class SmilesDrawer {
         for(let i = 0; i < this.rings.length; i++) {
             if(this.rings[i].isBridged) {
                 startVertex = this.rings[i].members[i];
+                if (this.vertices[startVertex].value.rings.length === 1) {
+                    break;
+                }
             }
         }
 
