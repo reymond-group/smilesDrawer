@@ -706,17 +706,15 @@ var CanvasWrapper = function () {
             r.y += offsetY;
 
             ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
             ctx.moveTo(l.x, l.y);
             ctx.lineTo(r.x, r.y);
             ctx.lineCap = 'round';
             ctx.lineWidth = 3.5;
-            ctx.shadowColor = this.getColor('BACKGROUND');
-            ctx.shadowBlur = 0.0;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
             ctx.strokeStyle = this.getColor('BACKGROUND');
             ctx.stroke();
+            ctx.globalCompositeOperation = 'source-over';
             ctx.restore();
 
             l = line.getLeftVector().clone();
@@ -3901,32 +3899,35 @@ var SmilesDrawer = function () {
 
             if (!infoOnly) {
                 this.position();
+
                 var overlapScore = this.getOverlapScore();
                 var count = 0;
                 var bridgedRingCount = this.getBridgedRings().length;
-
+                var iterations = this.opts.drawingIterations;
                 // Only redraw if there are no bridged rings ...
-                if (bridgedRingCount === 0) {
-                    while (overlapScore.total > this.opts.bondLength / 10.0 && count < this.opts.drawingIterations) {
-                        if (this.direction === 1) {
-                            this.direction = -1;
-                        } else if (this.direction === -1) {
-                            this.direction = 0;
-                        }
+                if (bridgedRingCount > 0) {
+                    iterations = 2;
+                }
 
-                        this.clearPositions();
-                        this.position();
-
-                        var newOverlapScore = this.getOverlapScore();
-
-                        if (newOverlapScore.total < overlapScore.total) {
-                            overlapScore = newOverlapScore;
-                        } else {
-                            this.restorePositions();
-                        }
-
-                        count++;
+                while (overlapScore.total > this.opts.bondLength / 20.0 && count < iterations) {
+                    if (this.direction === 1) {
+                        this.direction = -1;
+                    } else if (this.direction === -1) {
+                        this.direction = 0;
                     }
+
+                    this.clearPositions();
+                    this.position();
+
+                    var newOverlapScore = this.getOverlapScore();
+
+                    if (newOverlapScore.total < overlapScore.total) {
+                        overlapScore = newOverlapScore;
+                    } else {
+                        this.restorePositions();
+                    }
+
+                    count++;
                 }
 
                 this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -4756,6 +4757,68 @@ var SmilesDrawer = function () {
         }
 
         /**
+         * Returns the closest vertex (connected as well as unconnected).
+         *
+         * @param {Vertex} vertex The vertex of which to find the closest other vertex.
+         * @returns {Vertex} The closest vertex.
+         */
+
+    }, {
+        key: 'getClosestVertex',
+        value: function getClosestVertex(vertex) {
+            var minDist = 99999;
+            var minVertex = null;
+
+            for (var i = 0; i < this.vertices.length; i++) {
+                var v = this.vertices[i];
+
+                if (v.id === vertex.id) {
+                    continue;
+                }
+
+                var distSq = vertex.position.distanceSq(v.position);
+
+                if (distSq < minDist) {
+                    minDist = distSq;
+                    minVertex = v;
+                }
+            }
+
+            return minVertex;
+        }
+
+        /**
+         * Returns the closest vertex (connected as well as unconnected), which is an endpoint.
+         *
+         * @param {Vertex} vertex The vertex of which to find the closest other vertex.
+         * @returns {Vertex} The closest endpoint vertex.
+         */
+
+    }, {
+        key: 'getClosestEndpointVertex',
+        value: function getClosestEndpointVertex(vertex) {
+            var minDist = 99999;
+            var minVertex = null;
+
+            for (var i = 0; i < this.vertices.length; i++) {
+                var v = this.vertices[i];
+
+                if (v.id === vertex.id || v.getNeighbours().length > 1) {
+                    continue;
+                }
+
+                var distSq = vertex.position.distanceSq(v.position);
+
+                if (distSq < minDist) {
+                    minDist = distSq;
+                    minVertex = v;
+                }
+            }
+
+            return minVertex;
+        }
+
+        /**
          * Returns the rings and vertices contained in a sub-graph.
          *
          * @param {number} vertexId The vertex id to start the sub-graph search from
@@ -5358,10 +5421,10 @@ var SmilesDrawer = function () {
                 }
             }
 
-            var k = 8.0;
+            var k = l / 2.0;
             var c = 0.01;
-            var maxMove = 5.5;
-            var maxDist = l;
+            var maxMove = l / 2.0;
+            var maxDist = l * 2.0;
 
             for (var n = 0; n < 500; n++) {
 
@@ -5476,7 +5539,7 @@ var SmilesDrawer = function () {
                         if (_d < dOptimal) {
                             _force *= 0.1;
                         } else {
-                            _force *= 1.5;
+                            _force *= 2.5;
                         }
 
                         var _fx = _force * _dx / _d;
@@ -6127,20 +6190,6 @@ var SmilesDrawer = function () {
                             vertices: this.getNonRingNeighbours(vertex.id)
                         });
                     }
-
-                    // Side chains attached to an atom shared by two rings
-                    if (vertex.value.rings.length == 2 && vertex.getNeighbours().length == 4) {
-                        var nrn = this.getNonRingNeighbours(vertex.id)[0];
-
-                        if (nrn && nrn.getNeighbours().length > 1) {
-                            var other = this.getCommonRingbondNeighbour(vertex);
-                            sharedSideChains.push({
-                                common: vertex,
-                                other: other,
-                                vertex: nrn
-                            });
-                        }
-                    }
                 }
             }
 
@@ -6245,7 +6294,13 @@ var SmilesDrawer = function () {
                                 }
                             }
                         } else {
-                            vertex.position.rotateAround(0.5, vertex.previousPosition);
+                            // Rotate away from closest vertices parents position 
+
+                            // TODO: Not working every time ...
+                            var closest = this.getClosestEndpointVertex(vertex);
+                            var dir = vertex.position.clockwise(closest.previousPosition);
+
+                            vertex.position.rotateAround(-0.5 * dir, vertex.previousPosition);
                         }
 
                         // Only do a refresh of the remaining!
@@ -6400,10 +6455,10 @@ var SmilesDrawer = function () {
                         nextVertex.angle = angle;
                         this.createNextBond(nextVertex, vertex, nextVertex.angle, -dir);
                     } else {
-                        var plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+                        var plusOrMinus = this.direction;
 
-                        if (this.direction !== 0) {
-                            plusOrMinus = this.direction;
+                        if (this.direction === 0) {
+                            plusOrMinus = Math.random() < 0.5 ? -1 : 1;
                         }
 
                         if (!dir) {

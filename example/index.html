@@ -31,26 +31,39 @@
         <input type="range" id="bondSpacing" name="bondSpacing" value="4"
                min="1" max="99" step="1" />
     </div>
+    <div>
+        <label for="k">K</label>
+        <input type="range" id="k" name="k" value="8"
+               min="1" max="99" step="1" />
+    </div>
     <script>
         var input = document.getElementById('input');
         var debugCheckbox = document.getElementById('debug');
         var bondLengthInput = document.getElementById('bondLength');
         var shortBondLengthInput = document.getElementById('shortBondLength');
         var bondSpacingInput = document.getElementById('bondSpacing');
+        var kInput = document.getElementById('k');
 
         var options = { 
             debug: false,
             bondLength: 16,
             shortBondLength: 9,
-            bondSpacing: 4
+            bondSpacing: 4,
+            k: 8
         }
 
         var smilesDrawer = new SmilesDrawer(options);
         var input = document.getElementById('input');
 
         function draw() {
+            let t = performance.now();
+    
             var data = smiles.parse(input.value);
             smilesDrawer.draw(data, 'output-canvas', 'light', false);
+
+            let td = performance.now() - t;
+
+            console.log(td);
         }
 
         function updateOptions() {
@@ -81,6 +94,11 @@
 
             bondSpacingInput.addEventListener('input', function() {
                 options.bondSpacing = parseInt(bondSpacingInput.value);
+                updateOptions();
+            });
+
+            kInput.addEventListener('input', function() {
+                options.k = parseInt(kInput.value);
                 updateOptions();
             });
         });

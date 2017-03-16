@@ -1197,6 +1197,8 @@ The main class of the application representing the smiles drawer
     * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer+getSmallestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
     * [.getLargestCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
     * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer+getVerticesAt) ⇒ <code>array</code>
+    * [.getClosestVertex(vertex)](#SmilesDrawer+getClosestVertex) ⇒ <code>[Vertex](#Vertex)</code>
+    * [.getClosestEndpointVertex(vertex)](#SmilesDrawer+getClosestEndpointVertex) ⇒ <code>[Vertex](#Vertex)</code>
     * [.getBranch(vertexId, previousId)](#SmilesDrawer+getBranch) ⇒ <code>object</code>
     * [.addVertex(vertex)](#SmilesDrawer+addVertex) ⇒ <code>number</code>
     * [.addEdge(edge)](#SmilesDrawer+addEdge) ⇒ <code>number</code>
@@ -1507,6 +1509,30 @@ Returns an array of vertices positioned at a specified location.
 | position | <code>[Vector2](#Vector2)</code> | The position to search for vertices. |
 | radius | <code>number</code> | The radius within to search. |
 | excludeVertexId | <code>number</code> | A vertex id to be excluded from the search results. |
+
+<a name="SmilesDrawer+getClosestVertex"></a>
+
+### smilesDrawer.getClosestVertex(vertex) ⇒ <code>[Vertex](#Vertex)</code>
+Returns the closest vertex (connected as well as unconnected).
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Vertex](#Vertex)</code> - The closest vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertex | <code>[Vertex](#Vertex)</code> | The vertex of which to find the closest other vertex. |
+
+<a name="SmilesDrawer+getClosestEndpointVertex"></a>
+
+### smilesDrawer.getClosestEndpointVertex(vertex) ⇒ <code>[Vertex](#Vertex)</code>
+Returns the closest vertex (connected as well as unconnected), which is an endpoint.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Vertex](#Vertex)</code> - The closest endpoint vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertex | <code>[Vertex](#Vertex)</code> | The vertex of which to find the closest other vertex. |
 
 <a name="SmilesDrawer+getBranch"></a>
 

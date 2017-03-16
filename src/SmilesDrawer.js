@@ -131,32 +131,35 @@ class SmilesDrawer {
 
         if (!infoOnly) {
             this.position();
-            var overlapScore = this.getOverlapScore();
-            var count = 0;
-            var bridgedRingCount = this.getBridgedRings().length;        
-
+            
+            let overlapScore = this.getOverlapScore();
+            let count = 0;
+            let bridgedRingCount = this.getBridgedRings().length;        
+            let iterations = this.opts.drawingIterations;
             // Only redraw if there are no bridged rings ...
-            if (bridgedRingCount === 0) {
-                while ((overlapScore.total > (this.opts.bondLength / 10.0)) && count < this.opts.drawingIterations) {
-                    if (this.direction === 1) {
-                        this.direction = -1;
-                    } else if (this.direction === -1) {
-                        this.direction = 0;
-                    }
-                    
-                    this.clearPositions();
-                    this.position();
-
-                    var newOverlapScore = this.getOverlapScore();
-
-                    if (newOverlapScore.total < overlapScore.total) {
-                        overlapScore = newOverlapScore;
-                    } else {
-                        this.restorePositions();
-                    }
-
-                    count++;
+            if (bridgedRingCount > 0) {
+                iterations = 2;
+            }
+           
+            while ((overlapScore.total > (this.opts.bondLength / 20.0)) && count < iterations) {
+                if (this.direction === 1) {
+                    this.direction = -1;
+                } else if (this.direction === -1) {
+                    this.direction = 0;
                 }
+                
+                this.clearPositions();
+                this.position();
+
+                var newOverlapScore = this.getOverlapScore();
+
+                if (newOverlapScore.total < overlapScore.total) {
+                    overlapScore = newOverlapScore;
+                } else {
+                    this.restorePositions();
+                }
+
+                count++;
             }
 
             this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -922,6 +925,62 @@ class SmilesDrawer {
     }
 
     /**
+     * Returns the closest vertex (connected as well as unconnected).
+     *
+     * @param {Vertex} vertex The vertex of which to find the closest other vertex.
+     * @returns {Vertex} The closest vertex.
+     */
+    getClosestVertex(vertex) {
+        let minDist = 99999;
+        let minVertex = null;
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            let v = this.vertices[i];
+
+            if (v.id === vertex.id) {
+                continue;
+            }
+
+            let distSq = vertex.position.distanceSq(v.position);
+
+            if (distSq < minDist) {
+                minDist = distSq;
+                minVertex = v;
+            }
+        }
+
+        return minVertex;
+    }
+
+    /**
+     * Returns the closest vertex (connected as well as unconnected), which is an endpoint.
+     *
+     * @param {Vertex} vertex The vertex of which to find the closest other vertex.
+     * @returns {Vertex} The closest endpoint vertex.
+     */
+    getClosestEndpointVertex(vertex) {
+        let minDist = 99999;
+        let minVertex = null;
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            let v = this.vertices[i];
+
+            if (v.id === vertex.id || v.getNeighbours().length > 1) {
+                continue;
+            }
+
+            let distSq = vertex.position.distanceSq(v.position);
+
+            if (distSq < minDist) {
+                minDist = distSq;
+                minVertex = v;
+            }
+        }
+
+        return minVertex;
+    }
+
+    /**
      * Returns the rings and vertices contained in a sub-graph.
      *
      * @param {number} vertexId The vertex id to start the sub-graph search from
@@ -1484,10 +1543,10 @@ class SmilesDrawer {
             }
         }
         
-        let k = 8.0;
+        let k = l / 2.0;
         let c = 0.01;
-        let maxMove = 5.5;
-        let maxDist = l;
+        let maxMove = l / 2.0;
+        let maxDist = l * 2.0;
 
         for (let n = 0; n < 500; n++) {
             
@@ -1602,7 +1661,7 @@ class SmilesDrawer {
                     if (d < dOptimal) {
                         force *= 0.1;
                     } else {
-                        force *= 1.5;
+                        force *= 2.5;
                     }
 
 
@@ -2223,20 +2282,6 @@ class SmilesDrawer {
                         vertices: this.getNonRingNeighbours(vertex.id)
                     });
                 }
-
-                // Side chains attached to an atom shared by two rings
-                if (vertex.value.rings.length == 2 && vertex.getNeighbours().length == 4) {
-                    let nrn = this.getNonRingNeighbours(vertex.id)[0];
-                    
-                    if (nrn && nrn.getNeighbours().length > 1) {
-                        let other = this.getCommonRingbondNeighbour(vertex);
-                        sharedSideChains.push({
-                            common: vertex,
-                            other: other,
-                            vertex: nrn
-                        });
-                    }
-                }
             }
         }
 
@@ -2338,7 +2383,13 @@ class SmilesDrawer {
                             }
                         }
                     } else {
-                        vertex.position.rotateAround(0.5, vertex.previousPosition);         
+                        // Rotate away from closest vertices parents position 
+                        
+                        // TODO: Not working every time ...
+                        let closest = this.getClosestEndpointVertex(vertex);
+                        let dir = vertex.position.clockwise(closest.previousPosition);
+
+                        vertex.position.rotateAround(-0.5 * dir, vertex.previousPosition);
                     }
 
                     // Only do a refresh of the remaining!
@@ -2492,10 +2543,10 @@ class SmilesDrawer {
                     this.createNextBond(nextVertex, vertex, nextVertex.angle, -dir);
                 }
                 else {
-                    let plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+                    let plusOrMinus = this.direction;
 
-                    if (this.direction !== 0) {
-                        plusOrMinus = this.direction;
+                    if (this.direction === 0) {
+                        plusOrMinus = Math.random() < 0.5 ? -1 : 1;
                     }
                     
                     if (!dir) {

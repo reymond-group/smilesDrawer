@@ -175,17 +175,15 @@ class CanvasWrapper {
         r.y += offsetY;
 
         ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
         ctx.moveTo(l.x, l.y);
         ctx.lineTo(r.x, r.y);
         ctx.lineCap = 'round';
         ctx.lineWidth = 3.5;
-        ctx.shadowColor = this.getColor('BACKGROUND');
-        ctx.shadowBlur = 0.0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
         ctx.strokeStyle = this.getColor('BACKGROUND');
         ctx.stroke();
+        ctx.globalCompositeOperation = 'source-over';
         ctx.restore();
 
 
