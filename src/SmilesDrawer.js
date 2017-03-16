@@ -113,7 +113,7 @@ class SmilesDrawer {
      */
     draw(data, targetId, themeName = 'dark', infoOnly = false) {
         this.data = data;
-        this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName]); 
+        this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName], this.opts.bondLength); 
         
         this.ringIdCounter = 0;
         this.ringConnectionIdCounter = 0;
@@ -129,7 +129,7 @@ class SmilesDrawer {
         this.initGraph(data);
         this.initRings();
 
-        this.annotateChirality();
+        // this.annotateChirality();
 
         if (!infoOnly) {
             this.position();
@@ -1576,6 +1576,11 @@ class SmilesDrawer {
                         continue;
                     }
 
+                    if (ring.rings.length < 3 && 
+                        (isRingCenter[u] || isRingCenter[v])) {
+                        continue;
+                    }
+
                     let dx = positions[v].x - positions[u].x;
                     let dy = positions[v].y - positions[u].y;
 
@@ -1753,16 +1758,17 @@ class SmilesDrawer {
             }
         }
 
-        
+        /*
         for (let i = 0; i < totalLength; i++) {
             if (i < vertices.length) {
-                // this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
+                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
             } else if (i < vertices.length + ring.rings.length) { 
                 this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'c');
             } else {
-                // this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'm');
+                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'm');
             }
         }
+        */
         
 
         for (let u = 0; u < vertices.length; u++) {
@@ -2395,9 +2401,15 @@ class SmilesDrawer {
                         
                         // TODO: Not working every time ...
                         let closest = this.getClosestEndpointVertex(vertex);
-                        let dir = vertex.position.clockwise(closest.previousPosition);
 
-                        vertex.position.rotateAround(-0.5 * dir, vertex.previousPosition);
+                        if (closest) {
+                            let dir = vertex.position.clockwise(closest.previousPosition);
+                            vertex.position.rotateAround(-0.5 * dir, vertex.previousPosition);
+                        } else if (a && a.allowsFlip()) {
+                            // No other options that to flip ...
+                            vertex.position.rotateTo(a.center, flipCenter);
+                            a.setFlipped();
+                        }
                     }
 
                     // Only do a refresh of the remaining!
@@ -2622,7 +2634,6 @@ class SmilesDrawer {
                     l = this.vertices[neighbours[0]];
                     r = this.vertices[neighbours[1]];
                 }
-                console.log(this.getTreeDepth(l.id, vertex.id));
                 
                 if (this.getTreeDepth(l.id, vertex.id) === 1 && 
                     this.getTreeDepth(r.id, vertex.id) === 1) { 
@@ -2886,16 +2897,15 @@ class SmilesDrawer {
                 vertex.getNeighbours().length === 4 ||
                 vertex.value.bracket &&
                 vertex.value.bracket.hcount > 0 && vertex.getNeighbours().length === 3) {
+                
                 let chirality = vertex.value.bracket.chirality;
-                console.log(vertex); 
+                
                 if (chirality === null) {
                     continue;
                 }
 
                 let neighbours = vertex.getNeighbours();
                 let orderedNeighbours = Atom.sortByAtomicNumber(vertex, neighbours, this.vertices, this.rings);
-                
-                console.log(orderedNeighbours);
 
                 if (chirality === '@' && vertex.value.bracket.hcount === 1) {
                     let edge = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);

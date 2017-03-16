@@ -6,7 +6,7 @@ class CanvasWrapper {
      * @param {string} targetId The canvas id.
      * @param {object} theme A theme from the smiles drawer options.
      */
-    constructor(targetId, theme) {
+    constructor(targetId, theme, bondLength) {
         this.canvas = document.getElementById(targetId);
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;

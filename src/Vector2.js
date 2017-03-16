@@ -181,11 +181,6 @@ class Vector2 {
         this.y = y + vec.y;
     }
 
-/**
- * Rotate a vector around a given center to the same angle as another vector, keeps the distance to the center.
- *
- */
-
     /**
      * Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.
      *
@@ -194,6 +189,9 @@ class Vector2 {
      * @param {number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
      */
     rotateTo(vec, center, offsetAngle = 0.0) {
+        // Problem if this is first position
+        this.x += 0.001;
+        this.y -= 0.001;
         let a = Vector2.subtract(this, center);
         let b = Vector2.subtract(vec, center);
         let angle = Vector2.angle(b, a);
@@ -397,7 +395,7 @@ class Vector2 {
      */
     static angle(vecA, vecB) {
         let dot = Vector2.dot(vecA, vecB);
-        
+
         return Math.acos(dot / (vecA.length() * vecB.length()));
     }
     
