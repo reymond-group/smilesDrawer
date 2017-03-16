@@ -151,8 +151,9 @@ class CanvasWrapper {
      * Draw a line to a canvas.
      *
      * @param {Line} line A line.
+     * @param {string|null} color An optional color value to override the default. 
      */
-    drawLine(line) {
+    drawLine(line, color) {
         if (isNaN(line.from.x) || isNaN(line.from.y) || 
                 isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
@@ -210,6 +211,11 @@ class CanvasWrapper {
                 this.getColor('C'));
 
         ctx.strokeStyle = gradient;
+
+        if (color) {
+            ctx.strokeStyle = color;
+        }
+
         ctx.stroke();
         ctx.restore();
     }

@@ -238,14 +238,17 @@ A class representing an atom
 
 * [Atom](#Atom)
     * [new Atom(element, [bondType])](#new_Atom_new)
-    * [.addAnchoredRing(ringId)](#Atom+addAnchoredRing)
-    * [.getRingbondCount()](#Atom+getRingbondCount) ⇒ <code>number</code>
-    * [.canRotate()](#Atom+canRotate) ⇒ <code>boolean</code>
-    * [.hasRingbonds()](#Atom+hasRingbonds) ⇒ <code>boolean</code>
-    * [.getMaxRingbond()](#Atom+getMaxRingbond) ⇒ <code>number</code>
-    * [.hasRing(ringId)](#Atom+hasRing) ⇒ <code>boolean</code>
-    * [.haveCommonRingbond(atomA, atomB)](#Atom+haveCommonRingbond) ⇒ <code>boolean</code>
-    * [.maxCommonRingbond(atomA, atomB)](#Atom+maxCommonRingbond) ⇒ <code>number</code>
+    * _instance_
+        * [.addAnchoredRing(ringId)](#Atom+addAnchoredRing)
+        * [.getRingbondCount()](#Atom+getRingbondCount) ⇒ <code>number</code>
+        * [.canRotate()](#Atom+canRotate) ⇒ <code>boolean</code>
+        * [.hasRingbonds()](#Atom+hasRingbonds) ⇒ <code>boolean</code>
+        * [.getMaxRingbond()](#Atom+getMaxRingbond) ⇒ <code>number</code>
+        * [.hasRing(ringId)](#Atom+hasRing) ⇒ <code>boolean</code>
+        * [.haveCommonRingbond(atomA, atomB)](#Atom+haveCommonRingbond) ⇒ <code>boolean</code>
+        * [.maxCommonRingbond(atomA, atomB)](#Atom+maxCommonRingbond) ⇒ <code>number</code>
+    * _static_
+        * [.sortByAtomicNumber(root, neighbours, vertices, rings)](#Atom.sortByAtomicNumber) ⇒ <code>array</code>
 
 <a name="new_Atom_new"></a>
 
@@ -335,6 +338,21 @@ Get the highest numbered ringbond shared by two atoms. A ringbond is a break in 
 | atomA | <code>[Atom](#Atom)</code> | An atom. |
 | atomB | <code>[Atom](#Atom)</code> | An atom. |
 
+<a name="Atom.sortByAtomicNumber"></a>
+
+### Atom.sortByAtomicNumber(root, neighbours, vertices, rings) ⇒ <code>array</code>
+Sorts an array of vertices by their respecitve atomic number.
+
+**Kind**: static method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>array</code> - The array sorted by atomic number.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| root | <code>[Vertex](#Vertex)</code> | The central vertex |
+| neighbours | <code>array</code> | An array of vertex ids. |
+| vertices | <code>array</code> | An array containing the vertices associated with the current molecule. |
+| rings | <code>array</code> | An array containing the rings associated with the current molecule. |
+
 <a name="CanvasWrapper"></a>
 
 ## CanvasWrapper
@@ -349,7 +367,7 @@ A class wrapping a canvas element
     * [.reset()](#CanvasWrapper+reset)
     * [.getColor(key)](#CanvasWrapper+getColor) ⇒ <code>string</code>
     * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#CanvasWrapper+drawCircle)
-    * [.drawLine(line)](#CanvasWrapper+drawLine)
+    * [.drawLine(line, color)](#CanvasWrapper+drawLine)
     * [.drawDebugText(x, y, text)](#CanvasWrapper+drawDebugText)
     * [.drawText(x, y, hydrogens, direction, isTerminal, charge)](#CanvasWrapper+drawText)
     * [.drawDebugPoint(x, y, [debugText], [color])](#CanvasWrapper+drawDebugPoint)
@@ -426,7 +444,7 @@ Draws a circle to a canvas context.
 
 <a name="CanvasWrapper+drawLine"></a>
 
-### canvasWrapper.drawLine(line)
+### canvasWrapper.drawLine(line, color)
 Draw a line to a canvas.
 
 **Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
@@ -434,6 +452,7 @@ Draw a line to a canvas.
 | Param | Type | Description |
 | --- | --- | --- |
 | line | <code>[Line](#Line)</code> | A line. |
+| color | <code>string</code> &#124; <code>null</code> | An optional color value to override the default. |
 
 <a name="CanvasWrapper+drawDebugText"></a>
 

@@ -15,6 +15,7 @@ class Edge {
         this.bondType = '-';
         this.isInAromaticRing = false;
         this.center = false;
+        this.chiral = '';
     }
 
     /**
