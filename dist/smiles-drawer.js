@@ -3983,7 +3983,7 @@ var SmilesDrawer = function () {
             bondSpacing: 4,
             debug: false,
             allowFlips: false,
-            drawingIterations: 10,
+            drawingIterations: 20,
             themes: {
                 dark: {
                     C: '#fff',
@@ -4127,6 +4127,7 @@ var SmilesDrawer = function () {
                     }
 
                     count++;
+                    console.log(count, newOverlapScore);
                 }
 
                 this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -6700,8 +6701,8 @@ var SmilesDrawer = function () {
 
                     // TODO: There must be a more deterministic method
                     if (this.direction === 0) {
-                        cis = Math.random() < 0.5 ? 0 : 1;
-                        trans = 1 - cis;
+                        //cis = Math.random() < 0.5 ? 0 : 1;
+                        //trans = 1 - cis;
                     }
 
                     if (vertex.position.clockwise(vertex.previousPosition) === 1) {
@@ -6742,7 +6743,6 @@ var SmilesDrawer = function () {
                         l = this.vertices[neighbours[0]];
                         _r3 = this.vertices[neighbours[1]];
                     }
-                    console.log(this.getTreeDepth(l.id, vertex.id));
 
                     if (this.getTreeDepth(l.id, vertex.id) === 1 && this.getTreeDepth(_r3.id, vertex.id) === 1) {
                         // TODO: Make method, since this is used above as well.
@@ -7032,16 +7032,15 @@ var SmilesDrawer = function () {
                 var vertex = this.vertices[i];
 
                 if (vertex.value.bracket && vertex.value.element.toLowerCase() === 'c' && vertex.getNeighbours().length === 4 || vertex.value.bracket && vertex.value.bracket.hcount > 0 && vertex.getNeighbours().length === 3) {
+
                     var chirality = vertex.value.bracket.chirality;
-                    console.log(vertex);
+
                     if (chirality === null) {
                         continue;
                     }
 
                     var neighbours = vertex.getNeighbours();
                     var orderedNeighbours = Atom.sortByAtomicNumber(vertex, neighbours, this.vertices, this.rings);
-
-                    console.log(orderedNeighbours);
 
                     if (chirality === '@' && vertex.value.bracket.hcount === 1) {
                         var _edge = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
@@ -7301,11 +7300,6 @@ var Vector2 = function () {
             this.x = x + vec.x;
             this.y = y + vec.y;
         }
-
-        /**
-         * Rotate a vector around a given center to the same angle as another vector, keeps the distance to the center.
-         *
-         */
 
         /**
          * Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.

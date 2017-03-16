@@ -27,7 +27,7 @@ class SmilesDrawer {
             bondSpacing: 4,
             debug: false,
             allowFlips: false,
-            drawingIterations: 10,
+            drawingIterations: 20,
             themes: {
                 dark: {
                     C: '#fff',
@@ -149,7 +149,7 @@ class SmilesDrawer {
                 } else if (this.direction === -1) {
                     this.direction = 0;
                 }
-                
+
                 this.clearPositions();
                 this.position();
 
@@ -2564,7 +2564,7 @@ class SmilesDrawer {
                 }
                 else {
                     let plusOrMinus = this.direction;
-
+                    
                     if (this.direction === 0) {
                         plusOrMinus = Math.random() < 0.5 ? -1 : 1;
                     }
