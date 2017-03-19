@@ -62,6 +62,7 @@ A static class containing helper functions for array-related tasks.
     * [.removeAll(arrA, arrB)](#ArrayHelper.removeAll) ⇒ <code>array</code>
     * [.merge(arrA, arrB)](#ArrayHelper.merge) ⇒ <code>array</code>
     * [.containsAll(arrA, arrB)](#ArrayHelper.containsAll) ⇒ <code>boolean</code>
+    * [.sortByAtomicNumberDesc(arr)](#ArrayHelper.sortByAtomicNumberDesc) ⇒ <code>array</code>
 
 <a name="ArrayHelper.clone"></a>
 
@@ -229,6 +230,18 @@ Checks whether or not an array contains all the elements of another array, witho
 | arrA | <code>array</code> | An array. |
 | arrB | <code>array</code> | An array. |
 
+<a name="ArrayHelper.sortByAtomicNumberDesc"></a>
+
+### ArrayHelper.sortByAtomicNumberDesc(arr) ⇒ <code>array</code>
+Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - The sorted array.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array of objects { atomicNumber: 6, vertexId: 2 }. |
+
 <a name="Atom"></a>
 
 ## Atom
@@ -247,8 +260,13 @@ A class representing an atom
         * [.hasRing(ringId)](#Atom+hasRing) ⇒ <code>boolean</code>
         * [.haveCommonRingbond(atomA, atomB)](#Atom+haveCommonRingbond) ⇒ <code>boolean</code>
         * [.maxCommonRingbond(atomA, atomB)](#Atom+maxCommonRingbond) ⇒ <code>number</code>
+        * [.getOrder(center)](#Atom+getOrder) ⇒ <code>number</code>
+        * [.setOrder(The, The)](#Atom+setOrder)
+        * [.getAtomicNumber()](#Atom+getAtomicNumber) ⇒ <code>number</code>
     * _static_
         * [.sortByAtomicNumber(root, neighbours, vertices, rings)](#Atom.sortByAtomicNumber) ⇒ <code>array</code>
+        * [.hasDuplicateAtomicNumbers(sortedAtomicNumbers)](#Atom.hasDuplicateAtomicNumbers) ⇒ <code>boolean</code>
+        * [.getDuplicateAtomicNumbers(sortedAtomicNumbers)](#Atom.getDuplicateAtomicNumbers) ⇒ <code>array</code>
 
 <a name="new_Atom_new"></a>
 
@@ -338,6 +356,37 @@ Get the highest numbered ringbond shared by two atoms. A ringbond is a break in 
 | atomA | <code>[Atom](#Atom)</code> | An atom. |
 | atomB | <code>[Atom](#Atom)</code> | An atom. |
 
+<a name="Atom+getOrder"></a>
+
+### atom.getOrder(center) ⇒ <code>number</code>
+Returns the order of this atom given a central atom.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>number</code> - The order of this atom in respect to the center atom.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| center | <code>number</code> | The id of the central atom in respect to which the order is defined. |
+
+<a name="Atom+setOrder"></a>
+
+### atom.setOrder(The, The)
+Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| The | <code>number</code> | id of the central atom in respect to which the order is defined. |
+| The | <code>number</code> | order of this atom. |
+
+<a name="Atom+getAtomicNumber"></a>
+
+### atom.getAtomicNumber() ⇒ <code>number</code>
+Get the atomic number of this atom.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>number</code> - The atomic number of this atom.  
 <a name="Atom.sortByAtomicNumber"></a>
 
 ### Atom.sortByAtomicNumber(root, neighbours, vertices, rings) ⇒ <code>array</code>
@@ -353,6 +402,30 @@ Sorts an array of vertices by their respecitve atomic number.
 | vertices | <code>array</code> | An array containing the vertices associated with the current molecule. |
 | rings | <code>array</code> | An array containing the rings associated with the current molecule. |
 
+<a name="Atom.hasDuplicateAtomicNumbers"></a>
+
+### Atom.hasDuplicateAtomicNumbers(sortedAtomicNumbers) ⇒ <code>boolean</code>
+Checks wheter or not two atoms have the same atomic number
+
+**Kind**: static method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not there are duplicate atomic numbers.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortedAtomicNumbers | <code>array</code> | An array of objects { atomicNumber: 6, vertexId: 2 }. |
+
+<a name="Atom.getDuplicateAtomicNumbers"></a>
+
+### Atom.getDuplicateAtomicNumbers(sortedAtomicNumbers) ⇒ <code>array</code>
+Returns sets of duplicate atomic numbers.
+
+**Kind**: static method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>array</code> - An array of arrays containing the indices of duplicate atomic numbers.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sortedAtomicNumbers | <code>array</code> | An array of objects { atomicNumber: 6, vertexId: 2 }. |
+
 <a name="CanvasWrapper"></a>
 
 ## CanvasWrapper
@@ -361,13 +434,15 @@ A class wrapping a canvas element
 **Kind**: global class  
 
 * [CanvasWrapper](#CanvasWrapper)
-    * [new CanvasWrapper(targetId, theme)](#new_CanvasWrapper_new)
+    * [new CanvasWrapper(targetId, theme, bondLenght, bondSpacing)](#new_CanvasWrapper_new)
     * [.setTheme(theme)](#CanvasWrapper+setTheme)
     * [.scale(vertices)](#CanvasWrapper+scale)
     * [.reset()](#CanvasWrapper+reset)
     * [.getColor(key)](#CanvasWrapper+getColor) ⇒ <code>string</code>
     * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#CanvasWrapper+drawCircle)
-    * [.drawLine(line, color)](#CanvasWrapper+drawLine)
+    * [.drawLine(line)](#CanvasWrapper+drawLine)
+    * [.drawWedge(line, width)](#CanvasWrapper+drawWedge)
+    * [.drawDashedWedge(line, width)](#CanvasWrapper+drawDashedWedge)
     * [.drawDebugText(x, y, text)](#CanvasWrapper+drawDebugText)
     * [.drawText(x, y, hydrogens, direction, isTerminal, charge)](#CanvasWrapper+drawText)
     * [.drawDebugPoint(x, y, [debugText], [color])](#CanvasWrapper+drawDebugPoint)
@@ -376,7 +451,7 @@ A class wrapping a canvas element
 
 <a name="new_CanvasWrapper_new"></a>
 
-### new CanvasWrapper(targetId, theme)
+### new CanvasWrapper(targetId, theme, bondLenght, bondSpacing)
 The constructor for the class CanvasWrapper.
 
 
@@ -384,6 +459,8 @@ The constructor for the class CanvasWrapper.
 | --- | --- | --- |
 | targetId | <code>string</code> | The canvas id. |
 | theme | <code>object</code> | A theme from the smiles drawer options. |
+| bondLenght | <code>number</code> | The bond length. |
+| bondSpacing | <code>number</code> | The bond spacing. |
 
 <a name="CanvasWrapper+setTheme"></a>
 
@@ -444,7 +521,7 @@ Draws a circle to a canvas context.
 
 <a name="CanvasWrapper+drawLine"></a>
 
-### canvasWrapper.drawLine(line, color)
+### canvasWrapper.drawLine(line)
 Draw a line to a canvas.
 
 **Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
@@ -452,7 +529,30 @@ Draw a line to a canvas.
 | Param | Type | Description |
 | --- | --- | --- |
 | line | <code>[Line](#Line)</code> | A line. |
-| color | <code>string</code> &#124; <code>null</code> | An optional color value to override the default. |
+
+<a name="CanvasWrapper+drawWedge"></a>
+
+### canvasWrapper.drawWedge(line, width)
+Draw a wedge on the canvas.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| line | <code>[Line](#Line)</code> |  | A line. |
+| width | <code>number</code> | <code>3</code> | The wedge width. |
+
+<a name="CanvasWrapper+drawDashedWedge"></a>
+
+### canvasWrapper.drawDashedWedge(line, width)
+Draw a dashed wedge on the canvas.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| line | <code>[Line](#Line)</code> |  | A line. |
+| width | <code>number</code> | <code>6</code> | The wedge width. |
 
 <a name="CanvasWrapper+drawDebugText"></a>
 
@@ -562,7 +662,7 @@ A class representing a line
 **Kind**: global class  
 
 * [Line](#Line)
-    * [new Line([from], [to], [elementFrom], [elementTo])](#new_Line_new)
+    * [new Line([from], [to], [elementFrom], [elementTo], [chiralFrom], [chiralTo])](#new_Line_new)
     * [.clone()](#Line+clone) ⇒ <code>[Line](#Line)</code>
     * [.getLength()](#Line+getLength) ⇒ <code>number</code>
     * [.getAngle()](#Line+getAngle) ⇒ <code>number</code>
@@ -570,17 +670,22 @@ A class representing a line
     * [.getLeftVector()](#Line+getLeftVector) ⇒ <code>[Vector2](#Vector2)</code>
     * [.getRightElement()](#Line+getRightElement) ⇒ <code>string</code>
     * [.getLeftElement()](#Line+getLeftElement) ⇒ <code>string</code>
+    * [.getRightChiral()](#Line+getRightChiral) ⇒ <code>boolean</code>
+    * [.getLeftChiral()](#Line+getLeftChiral) ⇒ <code>boolean</code>
     * [.setRightVector(x, y)](#Line+setRightVector) ⇒ <code>[Line](#Line)</code>
     * [.setLeftVector(x, y)](#Line+setLeftVector) ⇒ <code>[Line](#Line)</code>
     * [.rotateToXAxis()](#Line+rotateToXAxis) ⇒ <code>[Line](#Line)</code>
     * [.rotate(theta)](#Line+rotate) ⇒ <code>[Line](#Line)</code>
     * [.shortenFrom(by)](#Line+shortenFrom) ⇒ <code>[Line](#Line)</code>
     * [.shortenTo(by)](#Line+shortenTo) ⇒ <code>[Line](#Line)</code>
+    * [.shortenRight(by)](#Line+shortenRight) ⇒ <code>[Line](#Line)</code>
+    * [.shortenLeft(by)](#Line+shortenLeft) ⇒ <code>[Line](#Line)</code>
     * [.shorten(by)](#Line+shorten) ⇒ <code>[Line](#Line)</code>
+    * [.getNormals()](#Line+getNormals) ⇒ <code>array</code>
 
 <a name="new_Line_new"></a>
 
-### new Line([from], [to], [elementFrom], [elementTo])
+### new Line([from], [to], [elementFrom], [elementTo], [chiralFrom], [chiralTo])
 The constructor for the class Line.
 
 
@@ -590,6 +695,8 @@ The constructor for the class Line.
 | [to] | <code>[Vector2](#Vector2)</code> | <code>new Vector2(0, 0)</code> | A vector marking the end of the line. |
 | [elementFrom] | <code>string</code> | <code>null</code> | A one-letter representation of the element associated with the vector marking the beginning of the line. |
 | [elementTo] | <code>string</code> | <code>null</code> | A one-letter representation of the element associated with the vector marking the end of the line. |
+| [chiralFrom] | <code>boolean</code> | <code>false</code> | Whether or not the from atom is a chiral center. |
+| [chiralTo] | <code>boolean</code> | <code>false</code> | Whether or not the to atom is a chiral center. |
 
 <a name="Line+clone"></a>
 
@@ -640,6 +747,20 @@ Returns the element associated with the left vector (the vector with the smaller
 
 **Kind**: instance method of <code>[Line](#Line)</code>  
 **Returns**: <code>string</code> - The element associated with the left vector.  
+<a name="Line+getRightChiral"></a>
+
+### line.getRightChiral() ⇒ <code>boolean</code>
+Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.
+
+**Kind**: instance method of <code>[Line](#Line)</code>  
+**Returns**: <code>boolean</code> - Whether or not the atom associated with the right vector is a chiral center.  
+<a name="Line+getLeftChiral"></a>
+
+### line.getLeftChiral() ⇒ <code>boolean</code>
+Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.
+
+**Kind**: instance method of <code>[Line](#Line)</code>  
+**Returns**: <code>boolean</code> - Whether or not the atom  associated with the left vector is a chiral center.  
 <a name="Line+setRightVector"></a>
 
 ### line.setRightVector(x, y) ⇒ <code>[Line](#Line)</code>
@@ -709,6 +830,30 @@ Shortens this line from the "to" direction by a given value (in pixels).
 | --- | --- | --- |
 | by | <code>number</code> | The length in pixels to shorten the vector by. |
 
+<a name="Line+shortenRight"></a>
+
+### line.shortenRight(by) ⇒ <code>[Line](#Line)</code>
+Shorten the right side.
+
+**Kind**: instance method of <code>[Line](#Line)</code>  
+**Returns**: <code>[Line](#Line)</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| by | <code>number</code> | The length in pixels to shorten the vector by. |
+
+<a name="Line+shortenLeft"></a>
+
+### line.shortenLeft(by) ⇒ <code>[Line](#Line)</code>
+Shorten the left side.
+
+**Kind**: instance method of <code>[Line](#Line)</code>  
+**Returns**: <code>[Line](#Line)</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| by | <code>number</code> | The length in pixels to shorten the vector by. |
+
 <a name="Line+shorten"></a>
 
 ### line.shorten(by) ⇒ <code>[Line](#Line)</code>
@@ -721,6 +866,13 @@ Shortens this line from both directions by a given value (in pixels).
 | --- | --- | --- |
 | by | <code>number</code> | The length in pixels to shorten the vector by. |
 
+<a name="Line+getNormals"></a>
+
+### line.getNormals() ⇒ <code>array</code>
+Returns the normals of this line.
+
+**Kind**: instance method of <code>[Line](#Line)</code>  
+**Returns**: <code>array</code> - An array containing the two normals as vertices.  
 <a name="MathHelper"></a>
 
 ## MathHelper
@@ -1253,7 +1405,7 @@ The main class of the application representing the smiles drawer
     * [.isVertexInAromaticRing(vertexId)](#SmilesDrawer+isVertexInAromaticRing) ⇒ <code>boolean</code>
     * [.getEdgeNormals(edge)](#SmilesDrawer+getEdgeNormals) ⇒ <code>array</code>
     * [.getTreeDepth(vertexId, parentVertexId)](#SmilesDrawer+getTreeDepth) ⇒ <code>number</code>
-    * [.traverseTree(vertexId, parentVertexId, callback)](#SmilesDrawer+traverseTree)
+    * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])](#SmilesDrawer+traverseTree)
     * [.getBondCount(vertex)](#SmilesDrawer+getBondCount) ⇒ <code>number</code>
     * [.getNonRingNeighbours(vertexId)](#SmilesDrawer+getNonRingNeighbours) ⇒ <code>array</code>
 
@@ -1965,16 +2117,18 @@ Get the depth of a subtree in the direction opposite to the vertex specified as 
 
 <a name="SmilesDrawer+traverseTree"></a>
 
-### smilesDrawer.traverseTree(vertexId, parentVertexId, callback)
+### smilesDrawer.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])
 Traverse a sub-tree in the graph.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexId | <code>number</code> | A vertex id. |
-| parentVertexId | <code>number</code> | A neighbouring vertex. |
-| callback | <code>function</code> | The callback function that is called with each visited as an argument. |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| vertexId | <code>number</code> |  | A vertex id. |
+| parentVertexId | <code>number</code> |  | A neighbouring vertex. |
+| callback | <code>function</code> |  | The callback function that is called with each visited as an argument. |
+| [maxDepth] | <code>number</code> | <code></code> | The maximum depth of the recursion. If null, there is no limit. |
+| [ignoreFirst] | <code>boolean</code> | <code>false</code> | Whether or not to ignore the starting vertex supplied as vertexId in the callback. |
 
 <a name="SmilesDrawer+getBondCount"></a>
 
@@ -2010,25 +2164,25 @@ A class representing a 2D vector.
 * [Vector2](#Vector2)
     * [new Vector2(x, y)](#new_Vector2_new)
     * _instance_
-        * [.set([x], [y])](#Vector2+set)
+        * [.set([x], [y])](#Vector2+set) ⇒ <code>[Vector2](#Vector2)</code>
         * [.clone()](#Vector2+clone) ⇒ <code>[Vector2](#Vector2)</code>
         * [.toString()](#Vector2+toString) ⇒ <code>string</code>
-        * [.add(vec)](#Vector2+add)
-        * [.subtract(vec)](#Vector2+subtract)
-        * [.divide(scalar)](#Vector2+divide)
-        * [.multiply(scalar)](#Vector2+multiply)
-        * [.invert()](#Vector2+invert)
+        * [.add(vec)](#Vector2+add) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.subtract(vec)](#Vector2+subtract) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.divide(scalar)](#Vector2+divide) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.multiply(scalar)](#Vector2+multiply) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.invert()](#Vector2+invert) ⇒ <code>[Vector2](#Vector2)</code>
         * [.angle()](#Vector2+angle) ⇒ <code>number</code>
         * [.distance(vec)](#Vector2+distance) ⇒ <code>number</code>
         * [.distanceSq(vec)](#Vector2+distanceSq) ⇒ <code>number</code>
         * [.clockwise(vec)](#Vector2+clockwise) ⇒ <code>number</code>
-        * [.rotate(angle)](#Vector2+rotate)
-        * [.rotateAround(angle, vec)](#Vector2+rotateAround)
-        * [.rotateTo(vec, center, [offsetAngle])](#Vector2+rotateTo)
+        * [.rotate(angle)](#Vector2+rotate) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.rotateAround(angle, vec)](#Vector2+rotateAround) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.rotateTo(vec, center, [offsetAngle])](#Vector2+rotateTo) ⇒ <code>[Vector2](#Vector2)</code>
         * [.getRotateToAngle(vec, center)](#Vector2+getRotateToAngle) ⇒ <code>number</code>
         * [.isInPolygon(polygon)](#Vector2+isInPolygon) ⇒ <code>boolean</code>
         * [.length()](#Vector2+length) ⇒ <code>number</code>
-        * [.normalize()](#Vector2+normalize)
+        * [.normalize()](#Vector2+normalize) ⇒ <code>[Vector2](#Vector2)</code>
         * [.normalized()](#Vector2+normalized) ⇒ <code>[Vector2](#Vector2)</code>
         * [.whichSide(vecA, vecB)](#Vector2+whichSide) ⇒ <code>number</code>
         * [.sameSideAs(vecA, vecB, vecC)](#Vector2+sameSideAs) ⇒ <code>boolean</code>
@@ -2036,6 +2190,7 @@ A class representing a 2D vector.
         * [.add(vecA, vecB)](#Vector2.add) ⇒ <code>[Vector2](#Vector2)</code>
         * [.subtract(vecA, vecB)](#Vector2.subtract) ⇒ <code>[Vector2](#Vector2)</code>
         * [.multiply(vecA, vecB)](#Vector2.multiply) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.multiplyScalar(vec, scalar)](#Vector2.multiplyScalar) ⇒ <code>[Vector2](#Vector2)</code>
         * [.midpoint(vecA, vecB)](#Vector2.midpoint) ⇒ <code>[Vector2](#Vector2)</code>
         * [.normals(vecA, vecB)](#Vector2.normals) ⇒ <code>array</code>
         * [.divide(vecA, vecB)](#Vector2.divide) ⇒ <code>[Vector2](#Vector2)</code>
@@ -2056,10 +2211,11 @@ The constructor of the class Vector2.
 
 <a name="Vector2+set"></a>
 
-### vector2.set([x], [y])
+### vector2.set([x], [y]) ⇒ <code>[Vector2](#Vector2)</code>
 Sets the values of the x and y coordinates of this vector.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -2082,10 +2238,11 @@ Returns a string representation of this vector.
 **Returns**: <code>string</code> - A string representation of this vector.  
 <a name="Vector2+add"></a>
 
-### vector2.add(vec)
+### vector2.add(vec) ⇒ <code>[Vector2](#Vector2)</code>
 Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2093,10 +2250,11 @@ Add the x and y coordinate values of a vector to the x and y coordinate values o
 
 <a name="Vector2+subtract"></a>
 
-### vector2.subtract(vec)
+### vector2.subtract(vec) ⇒ <code>[Vector2](#Vector2)</code>
 Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2104,10 +2262,11 @@ Subtract the x and y coordinate values of a vector from the x and y coordinate v
 
 <a name="Vector2+divide"></a>
 
-### vector2.divide(scalar)
+### vector2.divide(scalar) ⇒ <code>[Vector2](#Vector2)</code>
 Divide the x and y coordinate values of this vector by a scalar.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2115,10 +2274,11 @@ Divide the x and y coordinate values of this vector by a scalar.
 
 <a name="Vector2+multiply"></a>
 
-### vector2.multiply(scalar)
+### vector2.multiply(scalar) ⇒ <code>[Vector2](#Vector2)</code>
 Multiply the x and y coordinate values of this vector by a scalar.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2126,10 +2286,11 @@ Multiply the x and y coordinate values of this vector by a scalar.
 
 <a name="Vector2+invert"></a>
 
-### vector2.invert()
+### vector2.invert() ⇒ <code>[Vector2](#Vector2)</code>
 Inverts this vector. Same as multiply(-1.0).
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 <a name="Vector2+angle"></a>
 
 ### vector2.angle() ⇒ <code>number</code>
@@ -2175,10 +2336,11 @@ Checks whether or not this vector is in a clockwise or counter-clockwise rotatio
 
 <a name="Vector2+rotate"></a>
 
-### vector2.rotate(angle)
+### vector2.rotate(angle) ⇒ <code>[Vector2](#Vector2)</code>
 Rotates this vector by a given number of radians around the origin of the coordinate system.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2186,10 +2348,11 @@ Rotates this vector by a given number of radians around the origin of the coordi
 
 <a name="Vector2+rotateAround"></a>
 
-### vector2.rotateAround(angle, vec)
+### vector2.rotateAround(angle, vec) ⇒ <code>[Vector2](#Vector2)</code>
 Rotates this vector around another vector.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2198,10 +2361,11 @@ Rotates this vector around another vector.
 
 <a name="Vector2+rotateTo"></a>
 
-### vector2.rotateTo(vec, center, [offsetAngle])
+### vector2.rotateTo(vec, center, [offsetAngle]) ⇒ <code>[Vector2](#Vector2)</code>
 Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -2243,10 +2407,11 @@ Returns the length of this vector.
 **Returns**: <code>number</code> - The length of this vector.  
 <a name="Vector2+normalize"></a>
 
-### vector2.normalize()
+### vector2.normalize() ⇒ <code>[Vector2](#Vector2)</code>
 Normalizes this vector.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
 <a name="Vector2+normalized"></a>
 
 ### vector2.normalized() ⇒ <code>[Vector2](#Vector2)</code>
@@ -2319,6 +2484,19 @@ Multiplies two vectors (value by value) and returns the result.
 | --- | --- | --- |
 | vecA | <code>[Vector2](#Vector2)</code> | A factor. |
 | vecB | <code>[Vector2](#Vector2)</code> | A factor. |
+
+<a name="Vector2.multiplyScalar"></a>
+
+### Vector2.multiplyScalar(vec, scalar) ⇒ <code>[Vector2](#Vector2)</code>
+Multiplies two vectors (value by value) and returns the result.
+
+**Kind**: static method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns the product of two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>[Vector2](#Vector2)</code> | A factor. |
+| scalar | <code>number</code> | A scalar factor. |
 
 <a name="Vector2.midpoint"></a>
 

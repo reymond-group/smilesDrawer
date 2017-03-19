@@ -5,11 +5,15 @@ class CanvasWrapper {
      *
      * @param {string} targetId The canvas id.
      * @param {object} theme A theme from the smiles drawer options.
+     * @param {number} bondLenght The bond length.
+     * @param {number} bondSpacing The bond spacing.
      */
-    constructor(targetId, theme, bondLength) {
+    constructor(targetId, theme, bondLength, bondSpacing) {
         this.canvas = document.getElementById(targetId);
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;
+        this.bondLength = bondLength;
+        this.bondSpacing = bondSpacing;
         
         this.drawingWidth = 0.0;
         this.drawingHeight = 0.0;
@@ -151,9 +155,8 @@ class CanvasWrapper {
      * Draw a line to a canvas.
      *
      * @param {Line} line A line.
-     * @param {string|null} color An optional color value to override the default. 
      */
-    drawLine(line, color) {
+    drawLine(line) {
         if (isNaN(line.from.x) || isNaN(line.from.y) || 
                 isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
@@ -175,6 +178,8 @@ class CanvasWrapper {
         r.x += offsetX;
         r.y += offsetY;
 
+        // Draw the "shadow"
+        /*
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
@@ -186,8 +191,7 @@ class CanvasWrapper {
         ctx.stroke();
         ctx.globalCompositeOperation = 'source-over';
         ctx.restore();
-
-
+        */
         l = line.getLeftVector().clone();
         r = line.getRightVector().clone();
 
@@ -211,12 +215,184 @@ class CanvasWrapper {
                 this.getColor('C'));
 
         ctx.strokeStyle = gradient;
-
-        if (color) {
-            ctx.strokeStyle = color;
+        
+        ctx.stroke();
+        ctx.restore();
+    }
+    
+    /**
+     * Draw a wedge on the canvas.
+     *
+     * @param {Line} line A line.
+     * @param {number} width The wedge width.
+     */
+    drawWedge(line, width = 3.0) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) || 
+                isNaN(line.to.x) || isNaN(line.to.y)) {
+            return;
         }
 
+        let ctx = this.ctx;
+        let offsetX = this.offsetX;
+        let offsetY = this.offsetY;
+
+        // Add a shadow behind the line
+        let shortLine = line.clone().shorten(8.0);
+
+        let l = shortLine.getLeftVector().clone();
+        let r = shortLine.getRightVector().clone();
+
+        l.x += offsetX;
+        l.y += offsetY;
+
+        r.x += offsetX;
+        r.y += offsetY;
+        
+        l = line.getLeftVector().clone();
+        r = line.getRightVector().clone();
+
+        l.x += offsetX;
+        l.y += offsetY;
+
+        r.x += offsetX;
+        r.y += offsetY;
+        
+        ctx.save();
+
+        let normals = Vector2.normals(l, r);
+        
+        normals[0].normalize();
+        normals[1].normalize();
+
+        let isRightChiralCenter = line.getRightChiral();
+        
+        let start = l;
+        let end = r;
+
+        if(isRightChiralCenter) {
+            start = r;
+            end = l;
+        }
+        
+        let t = Vector2.add(start, Vector2.multiply(normals[0], 0.75));
+        let u = Vector2.add(end, Vector2.multiply(normals[0], width));
+        let v = Vector2.add(end, Vector2.multiply(normals[1], width));
+        let w = Vector2.add(start, Vector2.multiply(normals[1], 0.75));
+
+        ctx.beginPath();
+        ctx.moveTo(t.x, t.y);
+        ctx.lineTo(u.x, u.y);
+        ctx.lineTo(v.x, v.y);
+        ctx.lineTo(w.x, w.y);
+
+        let gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
+        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || 
+                this.getColor('C'));
+        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || 
+                this.getColor('C'));
+    
+        ctx.fillStyle = gradient;
+
+        ctx.fill();
+        ctx.restore();
+    }
+
+    /**
+     * Draw a dashed wedge on the canvas.
+     *
+     * @param {Line} line A line.
+     * @param {number} width The wedge width.
+     */
+    drawDashedWedge(line, width = 6.0) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) || 
+                isNaN(line.to.x) || isNaN(line.to.y)) {
+            return;
+        }
+
+        let ctx = this.ctx;
+        let offsetX = this.offsetX;
+        let offsetY = this.offsetY;
+        
+        let l = line.getLeftVector().clone();
+        let r = line.getRightVector().clone();
+
+        l.x += offsetX;
+        l.y += offsetY;
+
+        r.x += offsetX;
+        r.y += offsetY;
+        
+        ctx.save();
+
+        let normals = Vector2.normals(l, r);
+        
+        normals[0].normalize();
+        normals[1].normalize();
+
+        let isRightChiralCenter = line.getRightChiral();
+        
+        let start;
+        let end;
+        let sStart;
+        let sEnd;
+
+        let shortLine = line.clone();
+
+        if(isRightChiralCenter) {
+            start = r;
+            end = l;
+
+            shortLine.shortenRight(3.0);
+
+            sStart = shortLine.getRightVector().clone();
+            sEnd = shortLine.getLeftVector().clone();
+        } else {
+            start = l;
+            end = r;
+
+            shortLine.shortenLeft(3.0);
+
+            sStart = shortLine.getLeftVector().clone();
+            sEnd = shortLine.getRightVector().clone();
+        }
+
+        sStart.x += offsetX;
+        sStart.y += offsetY;
+        sEnd.x += offsetX;
+        sEnd.y += offsetY;
+        
+        let t = Vector2.add(start, Vector2.multiply(normals[0], 0.75));
+        let u = Vector2.add(end, Vector2.multiply(normals[0], width / 2.0));
+        let v = Vector2.add(end, Vector2.multiply(normals[1], width / 2.0));
+        let w = Vector2.add(start, Vector2.multiply(normals[1], 0.75));
+
+        ctx.beginPath();
+        ctx.moveTo(t.x, t.y);
+        ctx.lineTo(u.x, u.y);
+        ctx.lineTo(v.x, v.y);
+        ctx.lineTo(w.x, w.y);
+
+        let gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
+        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || 
+                this.getColor('C'));
+        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || 
+                this.getColor('C'));
+    
+        ctx.fillStyle = gradient;
+
+        ctx.fill();
+        
+        // Now dash it
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.moveTo(sStart.x, sStart.y);
+        ctx.lineTo(sEnd.x, sEnd.y);
+        ctx.lineCap = 'butt';
+        ctx.lineWidth = width;
+        ctx.setLineDash([1, 1]);
+        ctx.strokeStyle = this.getColor('BACKGROUND');
         ctx.stroke();
+        ctx.globalCompositeOperation = 'source-over';
         ctx.restore();
     }
 
@@ -395,7 +571,7 @@ class CanvasWrapper {
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, 
-                ring.radius - 10, 0, Math.PI * 2, true); 
+                ring.radius - this.bondLength / 3.0, 0, Math.PI * 2, true); 
         ctx.closePath();
         ctx.stroke();
         ctx.restore();

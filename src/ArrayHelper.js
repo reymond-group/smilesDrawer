@@ -274,4 +274,32 @@ class ArrayHelper {
 
         return containing === arrB.length;
     }
+    
+    /**
+     * Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...
+     *
+     * @param {array} arr An array of objects { atomicNumber: 6, vertexId: 2 }.
+     * @returns {array} The sorted array.
+     */
+    static sortByAtomicNumberDesc(arr) {
+        let map = arr.map(function(e, i) {
+            return { index: i, value: e.atomicNumber.split('.').map(Number) };
+        });
+
+        map.sort(function(a, b) {
+            let min = Math.min(b.value.length, a.value.length);
+            let i = 0;
+            
+            while(i < min && b.value[i] === a.value[i]) {
+                i++;
+            }
+
+            return i === min ? b.value.length - a.value.length : b.value[i] - a.value[i];
+        });
+
+        return map.map(function(e) {
+            return arr[e.index];
+        });
+    }
+
 }

@@ -19,6 +19,7 @@ class Atom {
         this.anchoredRings = new Array();
         this.bracket = null;
         this.chiral = 0;
+        this.order = {};
     }
 
     /**
@@ -140,6 +141,35 @@ class Atom {
     }
 
     /**
+     * Returns the order of this atom given a central atom.
+     * 
+     * @param {number} center The id of the central atom in respect to which the order is defined.
+     * @returns {number} The order of this atom in respect to the center atom.
+     */
+    getOrder(center) {
+        return this.order[center];
+    }
+
+    /**
+     * Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
+     *
+     * @param {number} The id of the central atom in respect to which the order is defined.
+     * @param {number} The order of this atom.
+     */
+    setOrder(center, order) {
+        this.order[center] = order;
+    }
+
+    /**
+     * Get the atomic number of this atom.
+     * 
+     * @returns {number} The atomic number of this atom.
+     */
+    getAtomicNumber() {
+        return Atom.atomicNumbers[this.element];
+    }
+
+    /**
      * Sorts an array of vertices by their respecitve atomic number.
      *
      * @param {Vertex} root The central vertex
@@ -148,56 +178,73 @@ class Atom {
      * @param {array} rings An array containing the rings associated with the current molecule.
      * @returns {array} The array sorted by atomic number.
      */
-    static sortByAtomicNumber(root, neighbours, vertices, rings) {
-        let orderedVertices = new Array(vertices.length);
-        let firstInRing = true;
-        let allNeighboursInRing = true;
-
-        for (let i = 0; i < neighbours.length; i++) {
-            if (vertices[neighbours[i]].value.rings.length === 0) {
-                allNeighboursInRing = false;
-            }
-        }
-
+    static sortByAtomicNumber(neighbours, vertices) {
+        let orderedVertices = new Array(neighbours.length);
+        
         for (let i = 0; i < neighbours.length; i++) {
             let vertex = vertices[neighbours[i]];
             let val = Atom.atomicNumbers[vertex.value.element];
-             
-
-            // Add a penality of 100 if the vertex is in a ring
-            if (vertex.value.rings.length > 0) {
-                let intersection = ArrayHelper.intersection(vertex.value.rings, root.value.rings);
-                
-                if (intersection.length === 3) {
-                    val += 200;
-                } else if (intersection.length === 2) {
-                    val += 150;
-                } else if (intersection.length === 1) {
-                    if (neighbours.length < 4) {
-                        if (firstInRing && !allNeighboursInRing) {
-                            val = val - (100 + rings[intersection[0]].getSize());
-                            firstInRing = false;
-                        } else {
-                            val = val + 100 + rings[intersection[0]].getSize();                
-                        }
-                    } else {
-                        val = val - (100 + rings[intersection[0]].getSize());
-                    }
-                }
-            }
 
             orderedVertices[i] = {
-                atomicNumber: val,
+                atomicNumber: val.toString(),
                 vertexId: vertex.id
             };
         }
 
-        orderedVertices.sort(function (a, b) {
-            // Sort highest to lowest
-            return b.atomicNumber - a.atomicNumber;
-        });
+        return ArrayHelper.sortByAtomicNumberDesc(orderedVertices);
+    }
 
-        return orderedVertices;
+    /**
+     * Checks wheter or not two atoms have the same atomic number
+     *
+     * @param {array} sortedAtomicNumbers An array of objects { atomicNumber: 6, vertexId: 2 }.
+     * @returns {boolean} A boolean indicating whether or not there are duplicate atomic numbers.
+     */
+    static hasDuplicateAtomicNumbers(sortedAtomicNumbers) {
+        let found = {};
+        
+        for (let i = 0; i < sortedAtomicNumbers.length; i++) {
+            let v = sortedAtomicNumbers[i];
+
+            if (found[v.atomicNumber] !== undefined) {
+                return true;
+            }
+
+            found[v.atomicNumber] = true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns sets of duplicate atomic numbers.
+     *
+     * @param {array} sortedAtomicNumbers An array of objects { atomicNumber: 6, vertexId: 2 }.
+     * @returns {array} An array of arrays containing the indices of duplicate atomic numbers.
+     */
+    static getDuplicateAtomicNumbers(sortedAtomicNumbers) {
+        let duplicates = {};
+        let dpl = [];
+
+        for (let i = 0; i < sortedAtomicNumbers.length; i++) {
+            let v = sortedAtomicNumbers[i];
+
+            if (duplicates[v.atomicNumber] === undefined) {
+                duplicates[v.atomicNumber] = [];
+            }
+
+            duplicates[v.atomicNumber].push(i);
+        }
+
+        for (let key in duplicates) {
+            let arr = duplicates[key];
+
+            if (arr.length > 1) {
+                dpl.push(arr);
+            }
+        }
+
+        return dpl;
     }
 }
 

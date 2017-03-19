@@ -324,6 +324,36 @@ var ArrayHelper = function () {
 
             return containing === arrB.length;
         }
+
+        /**
+         * Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...
+         *
+         * @param {array} arr An array of objects { atomicNumber: 6, vertexId: 2 }.
+         * @returns {array} The sorted array.
+         */
+
+    }, {
+        key: 'sortByAtomicNumberDesc',
+        value: function sortByAtomicNumberDesc(arr) {
+            var map = arr.map(function (e, i) {
+                return { index: i, value: e.atomicNumber.split('.').map(Number) };
+            });
+
+            map.sort(function (a, b) {
+                var min = Math.min(b.value.length, a.value.length);
+                var i = 0;
+
+                while (i < min && b.value[i] === a.value[i]) {
+                    i++;
+                }
+
+                return i === min ? b.value.length - a.value.length : b.value[i] - a.value[i];
+            });
+
+            return map.map(function (e) {
+                return arr[e.index];
+            });
+        }
     }]);
 
     return ArrayHelper;
@@ -356,6 +386,7 @@ var Atom = function () {
         this.anchoredRings = new Array();
         this.bracket = null;
         this.chiral = 0;
+        this.order = {};
     }
 
     /**
@@ -502,6 +533,44 @@ var Atom = function () {
         }
 
         /**
+         * Returns the order of this atom given a central atom.
+         * 
+         * @param {number} center The id of the central atom in respect to which the order is defined.
+         * @returns {number} The order of this atom in respect to the center atom.
+         */
+
+    }, {
+        key: 'getOrder',
+        value: function getOrder(center) {
+            return this.order[center];
+        }
+
+        /**
+         * Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
+         *
+         * @param {number} The id of the central atom in respect to which the order is defined.
+         * @param {number} The order of this atom.
+         */
+
+    }, {
+        key: 'setOrder',
+        value: function setOrder(center, order) {
+            this.order[center] = order;
+        }
+
+        /**
+         * Get the atomic number of this atom.
+         * 
+         * @returns {number} The atomic number of this atom.
+         */
+
+    }, {
+        key: 'getAtomicNumber',
+        value: function getAtomicNumber() {
+            return Atom.atomicNumbers[this.element];
+        }
+
+        /**
          * Sorts an array of vertices by their respecitve atomic number.
          *
          * @param {Vertex} root The central vertex
@@ -513,55 +582,79 @@ var Atom = function () {
 
     }], [{
         key: 'sortByAtomicNumber',
-        value: function sortByAtomicNumber(root, neighbours, vertices, rings) {
-            var orderedVertices = new Array(vertices.length);
-            var firstInRing = true;
-            var allNeighboursInRing = true;
+        value: function sortByAtomicNumber(neighbours, vertices) {
+            var orderedVertices = new Array(neighbours.length);
 
             for (var i = 0; i < neighbours.length; i++) {
-                if (vertices[neighbours[i]].value.rings.length === 0) {
-                    allNeighboursInRing = false;
-                }
-            }
-
-            for (var _i4 = 0; _i4 < neighbours.length; _i4++) {
-                var vertex = vertices[neighbours[_i4]];
+                var vertex = vertices[neighbours[i]];
                 var val = Atom.atomicNumbers[vertex.value.element];
 
-                // Add a penality of 100 if the vertex is in a ring
-                if (vertex.value.rings.length > 0) {
-                    var intersection = ArrayHelper.intersection(vertex.value.rings, root.value.rings);
-
-                    if (intersection.length === 3) {
-                        val += 200;
-                    } else if (intersection.length === 2) {
-                        val += 150;
-                    } else if (intersection.length === 1) {
-                        if (neighbours.length < 4) {
-                            if (firstInRing && !allNeighboursInRing) {
-                                val = val - (100 + rings[intersection[0]].getSize());
-                                firstInRing = false;
-                            } else {
-                                val = val + 100 + rings[intersection[0]].getSize();
-                            }
-                        } else {
-                            val = val - (100 + rings[intersection[0]].getSize());
-                        }
-                    }
-                }
-
-                orderedVertices[_i4] = {
-                    atomicNumber: val,
+                orderedVertices[i] = {
+                    atomicNumber: val.toString(),
                     vertexId: vertex.id
                 };
             }
 
-            orderedVertices.sort(function (a, b) {
-                // Sort highest to lowest
-                return b.atomicNumber - a.atomicNumber;
-            });
+            return ArrayHelper.sortByAtomicNumberDesc(orderedVertices);
+        }
 
-            return orderedVertices;
+        /**
+         * Checks wheter or not two atoms have the same atomic number
+         *
+         * @param {array} sortedAtomicNumbers An array of objects { atomicNumber: 6, vertexId: 2 }.
+         * @returns {boolean} A boolean indicating whether or not there are duplicate atomic numbers.
+         */
+
+    }, {
+        key: 'hasDuplicateAtomicNumbers',
+        value: function hasDuplicateAtomicNumbers(sortedAtomicNumbers) {
+            var found = {};
+
+            for (var i = 0; i < sortedAtomicNumbers.length; i++) {
+                var v = sortedAtomicNumbers[i];
+
+                if (found[v.atomicNumber] !== undefined) {
+                    return true;
+                }
+
+                found[v.atomicNumber] = true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Returns sets of duplicate atomic numbers.
+         *
+         * @param {array} sortedAtomicNumbers An array of objects { atomicNumber: 6, vertexId: 2 }.
+         * @returns {array} An array of arrays containing the indices of duplicate atomic numbers.
+         */
+
+    }, {
+        key: 'getDuplicateAtomicNumbers',
+        value: function getDuplicateAtomicNumbers(sortedAtomicNumbers) {
+            var duplicates = {};
+            var dpl = [];
+
+            for (var i = 0; i < sortedAtomicNumbers.length; i++) {
+                var v = sortedAtomicNumbers[i];
+
+                if (duplicates[v.atomicNumber] === undefined) {
+                    duplicates[v.atomicNumber] = [];
+                }
+
+                duplicates[v.atomicNumber].push(i);
+            }
+
+            for (var key in duplicates) {
+                var arr = duplicates[key];
+
+                if (arr.length > 1) {
+                    dpl.push(arr);
+                }
+            }
+
+            return dpl;
         }
     }]);
 
@@ -703,13 +796,17 @@ var CanvasWrapper = function () {
      *
      * @param {string} targetId The canvas id.
      * @param {object} theme A theme from the smiles drawer options.
+     * @param {number} bondLenght The bond length.
+     * @param {number} bondSpacing The bond spacing.
      */
-    function CanvasWrapper(targetId, theme, bondLength) {
+    function CanvasWrapper(targetId, theme, bondLength, bondSpacing) {
         _classCallCheck(this, CanvasWrapper);
 
         this.canvas = document.getElementById(targetId);
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;
+        this.bondLength = bondLength;
+        this.bondSpacing = bondSpacing;
 
         this.drawingWidth = 0.0;
         this.drawingHeight = 0.0;
@@ -870,12 +967,11 @@ var CanvasWrapper = function () {
          * Draw a line to a canvas.
          *
          * @param {Line} line A line.
-         * @param {string|null} color An optional color value to override the default. 
          */
 
     }, {
         key: 'drawLine',
-        value: function drawLine(line, color) {
+        value: function drawLine(line) {
             if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
                 return;
             }
@@ -896,6 +992,8 @@ var CanvasWrapper = function () {
             r.x += offsetX;
             r.y += offsetY;
 
+            // Draw the "shadow"
+            /*
             ctx.save();
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
@@ -907,7 +1005,7 @@ var CanvasWrapper = function () {
             ctx.stroke();
             ctx.globalCompositeOperation = 'source-over';
             ctx.restore();
-
+            */
             l = line.getLeftVector().clone();
             r = line.getRightVector().clone();
 
@@ -930,11 +1028,187 @@ var CanvasWrapper = function () {
 
             ctx.strokeStyle = gradient;
 
-            if (color) {
-                ctx.strokeStyle = color;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /**
+         * Draw a wedge on the canvas.
+         *
+         * @param {Line} line A line.
+         * @param {number} width The wedge width.
+         */
+
+    }, {
+        key: 'drawWedge',
+        value: function drawWedge(line) {
+            var width = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3.0;
+
+            if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
+                return;
             }
 
+            var ctx = this.ctx;
+            var offsetX = this.offsetX;
+            var offsetY = this.offsetY;
+
+            // Add a shadow behind the line
+            var shortLine = line.clone().shorten(8.0);
+
+            var l = shortLine.getLeftVector().clone();
+            var r = shortLine.getRightVector().clone();
+
+            l.x += offsetX;
+            l.y += offsetY;
+
+            r.x += offsetX;
+            r.y += offsetY;
+
+            l = line.getLeftVector().clone();
+            r = line.getRightVector().clone();
+
+            l.x += offsetX;
+            l.y += offsetY;
+
+            r.x += offsetX;
+            r.y += offsetY;
+
+            ctx.save();
+
+            var normals = Vector2.normals(l, r);
+
+            normals[0].normalize();
+            normals[1].normalize();
+
+            var isRightChiralCenter = line.getRightChiral();
+
+            var start = l;
+            var end = r;
+
+            if (isRightChiralCenter) {
+                start = r;
+                end = l;
+            }
+
+            var t = Vector2.add(start, Vector2.multiply(normals[0], 0.75));
+            var u = Vector2.add(end, Vector2.multiply(normals[0], width));
+            var v = Vector2.add(end, Vector2.multiply(normals[1], width));
+            var w = Vector2.add(start, Vector2.multiply(normals[1], 0.75));
+
+            ctx.beginPath();
+            ctx.moveTo(t.x, t.y);
+            ctx.lineTo(u.x, u.y);
+            ctx.lineTo(v.x, v.y);
+            ctx.lineTo(w.x, w.y);
+
+            var gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
+            gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || this.getColor('C'));
+            gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
+
+            ctx.fillStyle = gradient;
+
+            ctx.fill();
+            ctx.restore();
+        }
+
+        /**
+         * Draw a dashed wedge on the canvas.
+         *
+         * @param {Line} line A line.
+         * @param {number} width The wedge width.
+         */
+
+    }, {
+        key: 'drawDashedWedge',
+        value: function drawDashedWedge(line) {
+            var width = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 6.0;
+
+            if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
+                return;
+            }
+
+            var ctx = this.ctx;
+            var offsetX = this.offsetX;
+            var offsetY = this.offsetY;
+
+            var l = line.getLeftVector().clone();
+            var r = line.getRightVector().clone();
+
+            l.x += offsetX;
+            l.y += offsetY;
+
+            r.x += offsetX;
+            r.y += offsetY;
+
+            ctx.save();
+
+            var normals = Vector2.normals(l, r);
+
+            normals[0].normalize();
+            normals[1].normalize();
+
+            var isRightChiralCenter = line.getRightChiral();
+
+            var start = void 0;
+            var end = void 0;
+            var sStart = void 0;
+            var sEnd = void 0;
+
+            var shortLine = line.clone();
+
+            if (isRightChiralCenter) {
+                start = r;
+                end = l;
+
+                shortLine.shortenRight(3.0);
+
+                sStart = shortLine.getRightVector().clone();
+                sEnd = shortLine.getLeftVector().clone();
+            } else {
+                start = l;
+                end = r;
+
+                shortLine.shortenLeft(3.0);
+
+                sStart = shortLine.getLeftVector().clone();
+                sEnd = shortLine.getRightVector().clone();
+            }
+
+            sStart.x += offsetX;
+            sStart.y += offsetY;
+            sEnd.x += offsetX;
+            sEnd.y += offsetY;
+
+            var t = Vector2.add(start, Vector2.multiply(normals[0], 0.75));
+            var u = Vector2.add(end, Vector2.multiply(normals[0], width / 2.0));
+            var v = Vector2.add(end, Vector2.multiply(normals[1], width / 2.0));
+            var w = Vector2.add(start, Vector2.multiply(normals[1], 0.75));
+
+            ctx.beginPath();
+            ctx.moveTo(t.x, t.y);
+            ctx.lineTo(u.x, u.y);
+            ctx.lineTo(v.x, v.y);
+            ctx.lineTo(w.x, w.y);
+
+            var gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
+            gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || this.getColor('C'));
+            gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
+
+            ctx.fillStyle = gradient;
+
+            ctx.fill();
+
+            // Now dash it
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.moveTo(sStart.x, sStart.y);
+            ctx.lineTo(sEnd.x, sEnd.y);
+            ctx.lineCap = 'butt';
+            ctx.lineWidth = width;
+            ctx.setLineDash([1, 1]);
+            ctx.strokeStyle = this.getColor('BACKGROUND');
             ctx.stroke();
+            ctx.globalCompositeOperation = 'source-over';
             ctx.restore();
         }
 
@@ -1124,7 +1398,7 @@ var CanvasWrapper = function () {
             ctx.strokeStyle = this.getColor('C');
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, ring.radius - 10, 0, Math.PI * 2, true);
+            ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, ring.radius - this.bondLength / 3.0, 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.stroke();
             ctx.restore();
@@ -1216,12 +1490,16 @@ var Line = function () {
      * @param {Vector2} [to=new Vector2(0, 0)] A vector marking the end of the line.
      * @param {string} [elementFrom=null] A one-letter representation of the element associated with the vector marking the beginning of the line.
      * @param {string} [elementTo=null] A one-letter representation of the element associated with the vector marking the end of the line.
+     * @param {boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
+     * @param {boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
      */
     function Line() {
         var from = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Vector2(0, 0);
         var to = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Vector(0, 0);
         var elementFrom = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
         var elementTo = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+        var chiralFrom = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+        var chiralTo = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
         _classCallCheck(this, Line);
 
@@ -1229,6 +1507,8 @@ var Line = function () {
         this.to = to;
         this.elementFrom = elementFrom;
         this.elementTo = elementTo;
+        this.chiralFrom = chiralFrom;
+        this.chiralTo = chiralTo;
     }
 
     /**
@@ -1333,6 +1613,38 @@ var Line = function () {
                 return this.elementFrom;
             } else {
                 return this.elementTo;
+            }
+        }
+
+        /**
+         * Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.
+         *
+         * @returns {boolean} Whether or not the atom associated with the right vector is a chiral center.
+         */
+
+    }, {
+        key: 'getRightChiral',
+        value: function getRightChiral() {
+            if (this.from.x < this.to.x) {
+                return this.chiralTo;
+            } else {
+                return this.chiralFrom;
+            }
+        }
+
+        /**
+         * Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.
+         *
+         * @returns {boolean} Whether or not the atom  associated with the left vector is a chiral center.
+         */
+
+    }, {
+        key: 'getLeftChiral',
+        value: function getLeftChiral() {
+            if (this.from.x < this.to.x) {
+                return this.chiralFrom;
+            } else {
+                return this.chiralTo;
             }
         }
 
@@ -1453,6 +1765,44 @@ var Line = function () {
         }
 
         /**
+         * Shorten the right side.
+         *
+         * @param {number} by The length in pixels to shorten the vector by.
+         * @returns {Line} Returns itself.
+         */
+
+    }, {
+        key: 'shortenRight',
+        value: function shortenRight(by) {
+            if (this.from.x < this.to.x) {
+                this.shortenTo(by);
+            } else {
+                this.shortenFrom(by);
+            }
+
+            return this;
+        }
+
+        /**
+         * Shorten the left side.
+         * 
+         * @param {number} by The length in pixels to shorten the vector by.
+         * @returns {Line} Returns itself.
+         */
+
+    }, {
+        key: 'shortenLeft',
+        value: function shortenLeft(by) {
+            if (this.from.x < this.to.x) {
+                this.shortenFrom(by);
+            } else {
+                this.shortenTo(by);
+            }
+
+            return this;
+        }
+
+        /**
          * Shortens this line from both directions by a given value (in pixels).
          *
          * @param {number} by The length in pixels to shorten the vector by.
@@ -1471,6 +1821,20 @@ var Line = function () {
             this.from.subtract(f);
 
             return this;
+        }
+
+        /**
+         * Returns the normals of this line.
+         *
+         * @returns {array} An array containing the two normals as vertices.
+         */
+
+    }, {
+        key: 'getNormals',
+        value: function getNormals() {
+            var delta = Vector2.subtract(from, to);
+
+            return [new Vector2(-delta.y, delta.x), new Vector2(delta.y, -delta.x)];
         }
     }]);
 
@@ -3984,6 +4348,7 @@ var SmilesDrawer = function () {
             debug: false,
             allowFlips: false,
             drawingIterations: 20,
+            isomeric: true,
             themes: {
                 dark: {
                     C: '#fff',
@@ -4078,7 +4443,7 @@ var SmilesDrawer = function () {
             var infoOnly = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
             this.data = data;
-            this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName], this.opts.bondLength);
+            this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName], this.opts.bondLength, this.opts.bondSpacing);
 
             this.ringIdCounter = 0;
             this.ringConnectionIdCounter = 0;
@@ -4094,7 +4459,7 @@ var SmilesDrawer = function () {
             this.initGraph(data);
             this.initRings();
 
-            // this.annotateChirality();
+            this.annotateChirality();
 
             if (!infoOnly) {
                 this.position();
@@ -4127,7 +4492,6 @@ var SmilesDrawer = function () {
                     }
 
                     count++;
-                    console.log(count, newOverlapScore);
                 }
 
                 this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -4320,14 +4684,16 @@ var SmilesDrawer = function () {
     }, {
         key: 'initGraph',
         value: function initGraph(node) {
-            var parentVertexId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-            var isBranch = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+            var order = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+            var parentVertexId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+            var isBranch = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
             // Create a new vertex object
             var atom = new Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
             atom.branchBond = node.branchBond;
             atom.ringbonds = node.ringbonds;
             atom.bracket = node.atom.element ? node.atom : null;
+            atom.setOrder(parentVertexId, order);
 
             var vertex = new Vertex(atom);
             var parentVertex = this.vertices[parentVertexId];
@@ -4358,12 +4724,24 @@ var SmilesDrawer = function () {
                 parentVertex.edges.push(edgeId);
             }
 
-            for (var i = 0; i < node.branchCount; i++) {
-                this.initGraph(node.branches[i], vertex.id, true);
+            if (atom.bracket && this.opts.isomeric) {
+                for (var i = 0; i < atom.bracket.hcount; i++) {
+                    this.initGraph({ atom: { element: 'H', bond: '-' }, ringbonds: [] }, i + 1, vertex.id);
+                }
+            }
+
+            var offset = node.ringbondCount + 1;
+
+            if (atom.bracket) {
+                offset += atom.bracket.hcount;
+            }
+
+            for (var _i4 = 0; _i4 < node.branchCount; _i4++) {
+                this.initGraph(node.branches[_i4], _i4 + offset, vertex.id, true);
             }
 
             if (node.hasNext) {
-                this.initGraph(node.next, vertex.id);
+                this.initGraph(node.next, node.branchCount + offset, vertex.id);
             }
         }
 
@@ -4431,11 +4809,14 @@ var SmilesDrawer = function () {
                         var source = vertex.id;
                         var edgeId = that.addEdge(new Edge(source, target, 1));
 
-                        that.vertices[source].children.push(target);
-                        that.vertices[target].children.push(source);
+                        var sourceVertex = that.vertices[source];
+                        var targetVertex = that.vertices[target];
 
-                        that.vertices[source].edges.push(edgeId);
-                        that.vertices[target].edges.push(edgeId);
+                        sourceVertex.children.push(target);
+                        targetVertex.children.push(source);
+
+                        sourceVertex.edges.push(edgeId);
+                        targetVertex.edges.push(edgeId);
 
                         var ring = new Ring(ringbondId, source, target);
                         that.addRing(ring);
@@ -4449,6 +4830,14 @@ var SmilesDrawer = function () {
                         }
 
                         openBonds[ringbondId] = undefined;
+
+                        // Add the order to the new neighbour, this is used for chirality
+                        // visualization
+                        var targetOffset = targetVertex.value.bracket ? targetVertex.value.bracket.hcount : 0;
+                        var sourceOffset = sourceVertex.value.bracket ? sourceVertex.value.bracket.hcount : 0;
+
+                        targetVertex.value.setOrder(source, r + 1 + sourceOffset);
+                        sourceVertex.value.setOrder(target, r + 1 + targetOffset);
                     }
                 }
             }
@@ -6035,12 +6424,15 @@ var SmilesDrawer = function () {
 
                     _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
                 } else {
-                    if (edge.chiral == 'up') {
-                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB), '#FFFF00');
-                    } else if (edge.chiral == 'down') {
-                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB), '#0000FF');
+                    var isChiralCenterA = vertexA.value.bracket && vertexA.value.bracket.chirality;
+                    var isChiralCenterB = vertexB.value.bracket && vertexB.value.bracket.chirality;
+
+                    if (edge.chiral === 'up') {
+                        _this.canvasWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+                    } else if (edge.chiral === 'down') {
+                        _this.canvasWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
                     } else {
-                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
+                        _this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
                     }
                 }
 
@@ -6701,8 +7093,8 @@ var SmilesDrawer = function () {
 
                     // TODO: There must be a more deterministic method
                     if (this.direction === 0) {
-                        //cis = Math.random() < 0.5 ? 0 : 1;
-                        //trans = 1 - cis;
+                        cis = Math.random() < 0.5 ? 0 : 1;
+                        trans = 1 - cis;
                     }
 
                     if (vertex.position.clockwise(vertex.previousPosition) === 1) {
@@ -6712,8 +7104,8 @@ var SmilesDrawer = function () {
                         transVertex.angle = MathHelper.toRad(60);
                         cisVertex.angle = -MathHelper.toRad(60);
 
-                        this.createNextBond(transVertex, vertex, angle + transVertex.angle);
-                        this.createNextBond(cisVertex, vertex, angle + cisVertex.angle);
+                        this.createNextBond(transVertex, vertex, angle + transVertex.angle, -dir);
+                        this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, -dir);
                     } else {
                         var _cisVertex = this.vertices[neighbours[cis]];
                         var _transVertex = this.vertices[neighbours[trans]];
@@ -6721,8 +7113,8 @@ var SmilesDrawer = function () {
                         _transVertex.angle = -MathHelper.toRad(60);
                         _cisVertex.angle = MathHelper.toRad(60);
 
-                        this.createNextBond(_cisVertex, vertex, angle + _cisVertex.angle);
-                        this.createNextBond(_transVertex, vertex, angle + _transVertex.angle);
+                        this.createNextBond(_cisVertex, vertex, angle + _cisVertex.angle, -dir);
+                        this.createNextBond(_transVertex, vertex, angle + _transVertex.angle, -dir);
                     }
                 } else if (neighbours.length == 3) {
                     // The vertex with the longest sub-tree should always go straight
@@ -6759,8 +7151,16 @@ var SmilesDrawer = function () {
                         _s.angle = MathHelper.toRad(60) * dir;
 
                         this.createNextBond(_s, vertex, angle + _s.angle, -dir);
-                        this.createNextBond(l, vertex, angle + MathHelper.toRad(30) * -dir);
-                        this.createNextBond(_r3, vertex, angle + MathHelper.toRad(90) * -dir);
+
+                        // If it's chiral, the order changes - for anticlockwise, switch the draw order around
+                        // to keep the drawing the same
+                        if (vertex.value.bracket && vertex.value.bracket.chirality === '@@') {
+                            this.createNextBond(_r3, vertex, angle + MathHelper.toRad(30) * -dir);
+                            this.createNextBond(l, vertex, angle + MathHelper.toRad(90) * -dir);
+                        } else {
+                            this.createNextBond(l, vertex, angle + MathHelper.toRad(30) * -dir);
+                            this.createNextBond(_r3, vertex, angle + MathHelper.toRad(90) * -dir);
+                        }
                     } else {
                         this.createNextBond(_s, vertex, angle);
                         this.createNextBond(l, vertex, angle + MathHelper.toRad(90));
@@ -6966,18 +7366,39 @@ var SmilesDrawer = function () {
          * @param {number} vertexId A vertex id.
          * @param {number} parentVertexId A neighbouring vertex.
          * @param {function} callback The callback function that is called with each visited as an argument.
+         * @param {number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
+         * @param {boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
          */
 
     }, {
         key: 'traverseTree',
         value: function traverseTree(vertexId, parentVertexId, callback) {
-            var vertex = this.vertices[vertexId];
-            var neighbours = vertex.getSpanningTreeNeighbours(parentVertexId);
+            var maxDepth = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+            var ignoreFirst = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+            var depth = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
+            var visited = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : [];
 
-            callback(vertex);
+            if (maxDepth !== null && depth > maxDepth + 1) {
+                return;
+            }
+
+            for (var j = 0; j < visited.length; j++) {
+                if (visited[j] === vertexId) {
+                    return;
+                }
+            }
+
+            visited.push(vertexId);
+
+            var vertex = this.vertices[vertexId];
+            var neighbours = vertex.getNeighbours(parentVertexId);
+
+            if (!ignoreFirst || depth > 1) {
+                callback(vertex);
+            }
 
             for (var i = 0; i < neighbours.length; i++) {
-                this.traverseTree(neighbours[i], vertexId, callback);
+                this.traverseTree(neighbours[i], vertexId, callback, maxDepth, ignoreFirst, depth + 1, visited);
             }
         }
 
@@ -7025,6 +7446,41 @@ var SmilesDrawer = function () {
 
             return nrneighbours;
         }
+
+        /*
+        getChiralOrder(vertexIds, chiralCenterVertexId) {
+            let sortedVertexIds = Atom.sortByAtomicNumber(vertexIds, this.vertices);
+            
+            // Initial check whether there are duplicates, if not, all good to go
+            if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
+                return sortedVertexIds;
+            }
+             let done = new Array(vertexIds.length);
+            let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
+            
+            let maxDepth = 1;
+            for (let i = 0; i < duplicates.length; i++) {
+                let dupl = duplicates[i];
+                
+                for (let j = 0; j < dupl.length; j++) {
+                    let index = dupl[j];
+                    let vertexId = sortedVertexIds[index].vertexId;
+                    let total = 0;
+                    
+                    console.log(vertexId, chiralCenterVertexId);
+                    this.traverseTree(vertexId, chiralCenterVertexId, function(vertex) {
+                        console.log(vertex);
+                        total += vertex.value.getAtomicNumber();
+                    }, maxDepth, true);
+                     sortedVertexIds[index].atomicNumber += '.' + total;
+                }
+            }
+             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+            console.log(sortedVertexIds);
+            return sortedVertexIds;
+        }
+        */
+
     }, {
         key: 'annotateChirality',
         value: function annotateChirality() {
@@ -7040,26 +7496,53 @@ var SmilesDrawer = function () {
                     }
 
                     var neighbours = vertex.getNeighbours();
-                    var orderedNeighbours = Atom.sortByAtomicNumber(vertex, neighbours, this.vertices, this.rings);
+                    var orderedNeighbours = new Array(neighbours.length);
 
-                    if (chirality === '@' && vertex.value.bracket.hcount === 1) {
-                        var _edge = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
-                        _edge.chiral = 'down';
-                    } else if (chirality === '@@' && vertex.value.bracket.hcount === 1) {
-                        var _edge2 = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
-                        _edge2.chiral = 'up';
-                    } else if (chirality === '@') {
-                        var edgeUp = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
-                        var edgeDown = this.getEdge(orderedNeighbours[2].vertexId, vertex.id);
+                    this.vertices[vertex.parentVertexId].value.setOrder(vertex.id, 0);
 
-                        edgeUp.chiral = 'up';
-                        edgeDown.chiral = 'down';
+                    for (var j = 0; j < neighbours.length; j++) {
+                        var neighbourId = neighbours[j];
+
+                        if (neighbourId === vertex.parentVertexId) {
+                            orderedNeighbours[0] = neighbourId;
+                            continue;
+                        }
+
+                        orderedNeighbours[this.vertices[neighbourId].value.getOrder(vertex.id)] = neighbourId;
+                    }
+
+                    if (chirality === '@') {
+                        var edgeUp = this.getEdge(orderedNeighbours[3], vertex.id);
+
+                        // If the bond already points down here, there is no need to point up
+                        // into the other direction
+                        if (!(edgeUp.chiral === 'down')) {
+                            edgeUp.chiral = 'up';
+                        }
+
+                        var edgeDown = this.getEdge(orderedNeighbours[1], vertex.id);
+
+                        // If the bond already points up here, there is no need to point down
+                        // into the other direction
+                        if (!(edgeDown.chiral === 'up')) {
+                            edgeDown.chiral = 'down';
+                        }
                     } else if (chirality === '@@') {
-                        var _edgeUp = this.getEdge(orderedNeighbours[2].vertexId, vertex.id);
-                        var _edgeDown = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
+                        var _edgeUp = this.getEdge(orderedNeighbours[1], vertex.id);
 
-                        _edgeUp.chiral = 'up';
-                        _edgeDown.chiral = 'down';
+                        // If the bond already points down here, there is no need to point up
+                        // into the other direction
+                        if (!(_edgeUp.chiral === 'down')) {
+                            _edgeUp.chiral = 'up';
+                        }
+
+                        var _edgeDown = this.getEdge(orderedNeighbours[3], vertex.id);
+
+                        // If the bond already points up here, there is no need to point down
+                        // into the other direction
+                        if (!(_edgeDown.chiral === 'up')) {
+                            _edgeDown.chiral = 'down';
+                        }
                     }
                 }
             }
@@ -7099,6 +7582,7 @@ var Vector2 = function () {
      *
      * @param {number} [x=0] The value of the x coordinate.
      * @param {number} [y=0] The value of the y coordinate.
+     * @returns {Vector2} Returns itself.
      */
 
 
@@ -7110,6 +7594,8 @@ var Vector2 = function () {
 
             this.x = x;
             this.y = y;
+
+            return this;
         }
 
         /**
@@ -7140,6 +7626,7 @@ var Vector2 = function () {
          * Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
          *
          * @param {Vector2} vec Another vector.
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
@@ -7147,12 +7634,15 @@ var Vector2 = function () {
         value: function add(vec) {
             this.x += vec.x;
             this.y += vec.y;
+
+            return this;
         }
 
         /**
          * Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
          *
          * @param {Vector2} vec Another vector.
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
@@ -7160,12 +7650,15 @@ var Vector2 = function () {
         value: function subtract(vec) {
             this.x -= vec.x;
             this.y -= vec.y;
+
+            return this;
         }
 
         /**
          * Divide the x and y coordinate values of this vector by a scalar.
          *
          * @param {number} scalar The scalar.
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
@@ -7173,12 +7666,15 @@ var Vector2 = function () {
         value: function divide(scalar) {
             this.x /= scalar;
             this.y /= scalar;
+
+            return this;
         }
 
         /**
          * Multiply the x and y coordinate values of this vector by a scalar.
          *
          * @param {number} scalar The scalar.
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
@@ -7186,11 +7682,14 @@ var Vector2 = function () {
         value: function multiply(scalar) {
             this.x *= scalar;
             this.y *= scalar;
+
+            return this;
         }
 
         /**
          * Inverts this vector. Same as multiply(-1.0).
          *
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
@@ -7198,6 +7697,8 @@ var Vector2 = function () {
         value: function invert() {
             this.x = -this.x;
             this.y = -this.y;
+
+            return this;
         }
 
         /**
@@ -7264,6 +7765,7 @@ var Vector2 = function () {
          * Rotates this vector by a given number of radians around the origin of the coordinate system.
          *
          * @param {number} angle The angle in radians to rotate the vector.
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
@@ -7276,6 +7778,8 @@ var Vector2 = function () {
 
             this.x = tmp.x;
             this.y = tmp.y;
+
+            return this;
         }
 
         /**
@@ -7283,6 +7787,7 @@ var Vector2 = function () {
          *
          * @param {number} angle The angle in radians to rotate the vector.
          * @param {Vector2} vec The vector which is used as the rotational center.
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
@@ -7299,6 +7804,8 @@ var Vector2 = function () {
 
             this.x = x + vec.x;
             this.y = y + vec.y;
+
+            return this;
         }
 
         /**
@@ -7307,6 +7814,7 @@ var Vector2 = function () {
          * @param {Vector2} vec The vector to rotate this vector to.
          * @param {Vector2} center The rotational center.
          * @param {number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
@@ -7322,6 +7830,8 @@ var Vector2 = function () {
             var angle = Vector2.angle(b, a);
 
             this.rotateAround(angle + offsetAngle, center);
+
+            return this;
         }
 
         /**
@@ -7379,12 +7889,15 @@ var Vector2 = function () {
         /**
          * Normalizes this vector.
          *
+         * @returns {Vector2} Returns itself.
          */
 
     }, {
         key: 'normalize',
         value: function normalize() {
             this.divide(this.length());
+
+            return this;
         }
 
         /**
@@ -7478,6 +7991,21 @@ var Vector2 = function () {
             }
 
             return new Vector2(vecA.x * vecB, vecA.y * vecB);
+        }
+
+        /**
+         * Multiplies two vectors (value by value) and returns the result.
+         *
+         * @static
+         * @param {Vector2} vec A factor.
+         * @param {number} scalar A scalar factor.
+         * @returns {Vector2} Returns the product of two vectors.
+         */
+
+    }, {
+        key: 'multiplyScalar',
+        value: function multiplyScalar(vec, scalar) {
+            return new Vector2(vec).multiply(scalar);
         }
 
         /**

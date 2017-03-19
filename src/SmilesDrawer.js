@@ -28,6 +28,7 @@ class SmilesDrawer {
             debug: false,
             allowFlips: false,
             drawingIterations: 20,
+            isomeric: true,
             themes: {
                 dark: {
                     C: '#fff',
@@ -113,7 +114,7 @@ class SmilesDrawer {
      */
     draw(data, targetId, themeName = 'dark', infoOnly = false) {
         this.data = data;
-        this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName], this.opts.bondLength); 
+        this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName], this.opts.bondLength, this.opts.bondSpacing); 
         
         this.ringIdCounter = 0;
         this.ringConnectionIdCounter = 0;
@@ -129,7 +130,7 @@ class SmilesDrawer {
         this.initGraph(data);
         this.initRings();
 
-        // this.annotateChirality();
+        this.annotateChirality();
 
         if (!infoOnly) {
             this.position();
@@ -323,13 +324,13 @@ class SmilesDrawer {
      * @param {number} parentVertexId=null The id of the previous vertex.
      * @param {boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
      */
-    initGraph(node, parentVertexId = null, isBranch = false) {
+    initGraph(node, order = 0, parentVertexId = null, isBranch = false) {
         // Create a new vertex object
         let atom = new Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
         atom.branchBond = node.branchBond;
         atom.ringbonds = node.ringbonds;
         atom.bracket = node.atom.element ? node.atom : null;
-
+        atom.setOrder(parentVertexId, order);
 
         let vertex = new Vertex(atom);
         let parentVertex = this.vertices[parentVertexId];
@@ -359,14 +360,25 @@ class SmilesDrawer {
             vertex.edges.push(edgeId);
             parentVertex.edges.push(edgeId);
         }
+        
+        if (atom.bracket && this.opts.isomeric) {
+            for (let i = 0; i < atom.bracket.hcount; i++) {
+                this.initGraph({ atom: { element: 'H', bond: '-' }, ringbonds: [] }, i + 1, vertex.id);
+            }
+        }
 
+        let offset = node.ringbondCount + 1;
 
+        if (atom.bracket) {
+            offset += atom.bracket.hcount;
+        }
+        
         for (let i = 0; i < node.branchCount; i++) {
-            this.initGraph(node.branches[i], vertex.id, true);
+            this.initGraph(node.branches[i], i + offset, vertex.id, true);
         }
 
         if (node.hasNext) {
-            this.initGraph(node.next, vertex.id);
+            this.initGraph(node.next, node.branchCount + offset, vertex.id);
         }
     }
 
@@ -427,12 +439,15 @@ class SmilesDrawer {
                     let target = openBonds[ringbondId];
                     let source = vertex.id;
                     let edgeId = that.addEdge(new Edge(source, target, 1));
-                    
-                    that.vertices[source].children.push(target);
-                    that.vertices[target].children.push(source);
 
-                    that.vertices[source].edges.push(edgeId);
-                    that.vertices[target].edges.push(edgeId);
+                    let sourceVertex = that.vertices[source];
+                    let targetVertex = that.vertices[target];
+                    
+                    sourceVertex.children.push(target);
+                    targetVertex.children.push(source);
+
+                    sourceVertex.edges.push(edgeId);
+                    targetVertex.edges.push(edgeId);
 
                     let ring = new Ring(ringbondId, source, target);
                     that.addRing(ring);
@@ -446,6 +461,14 @@ class SmilesDrawer {
                     }
 
                     openBonds[ringbondId] = undefined;
+
+                    // Add the order to the new neighbour, this is used for chirality
+                    // visualization
+                    let targetOffset = targetVertex.value.bracket ? targetVertex.value.bracket.hcount : 0;
+                    let sourceOffset = sourceVertex.value.bracket ? sourceVertex.value.bracket.hcount : 0;
+
+                    targetVertex.value.setOrder(source, r + 1 + sourceOffset);
+                    sourceVertex.value.setOrder(target, r + 1 + targetOffset);
                 }
             }
         }
@@ -1959,12 +1982,15 @@ class SmilesDrawer {
 
                 this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
             } else {
-                if (edge.chiral == 'up') {
-                    this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB), '#FFFF00');
-                } else if (edge.chiral == 'down') {
-                    this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB), '#0000FF');
+                let isChiralCenterA = vertexA.value.bracket && vertexA.value.bracket.chirality;
+                let isChiralCenterB = vertexB.value.bracket && vertexB.value.bracket.chirality;
+                
+                if (edge.chiral === 'up') {
+                    this.canvasWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+                } else if (edge.chiral === 'down') {
+                    this.canvasWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
                 } else {
-                    this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
+                    this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
                 }
             }
 
@@ -2580,7 +2606,7 @@ class SmilesDrawer {
                 // Check for the longer subtree - always go with cis for the longer subtree
                 let subTreeDepthA = this.getTreeDepth(neighbours[0], vertex.id);
                 let subTreeDepthB = this.getTreeDepth(neighbours[1], vertex.id);
-
+                
                 let cis = 0;
                 let trans = 1;
 
@@ -2602,8 +2628,8 @@ class SmilesDrawer {
                     transVertex.angle = MathHelper.toRad(60);
                     cisVertex.angle = -MathHelper.toRad(60);
 
-                    this.createNextBond(transVertex, vertex, angle + transVertex.angle);
-                    this.createNextBond(cisVertex, vertex, angle + cisVertex.angle);
+                    this.createNextBond(transVertex, vertex, angle + transVertex.angle, -dir);
+                    this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, -dir);
                 } else {
                     let cisVertex = this.vertices[neighbours[cis]];
                     let transVertex = this.vertices[neighbours[trans]];
@@ -2611,8 +2637,8 @@ class SmilesDrawer {
                     transVertex.angle = -MathHelper.toRad(60);
                     cisVertex.angle = MathHelper.toRad(60);
 
-                    this.createNextBond(cisVertex, vertex, angle + cisVertex.angle);
-                    this.createNextBond(transVertex, vertex, angle + transVertex.angle);
+                    this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, -dir);
+                    this.createNextBond(transVertex, vertex, angle + transVertex.angle, -dir);
                 }
             } else if (neighbours.length == 3) {
                 // The vertex with the longest sub-tree should always go straight
@@ -2651,8 +2677,16 @@ class SmilesDrawer {
                     s.angle = MathHelper.toRad(60) * dir;
                 
                     this.createNextBond(s, vertex, angle + s.angle, -dir);
-                    this.createNextBond(l, vertex, angle + MathHelper.toRad(30) * -dir);
-                    this.createNextBond(r, vertex, angle + MathHelper.toRad(90) * -dir);
+
+                    // If it's chiral, the order changes - for anticlockwise, switch the draw order around
+                    // to keep the drawing the same
+                    if (vertex.value.bracket && vertex.value.bracket.chirality === '@@') {
+                        this.createNextBond(r, vertex, angle + MathHelper.toRad(30) * -dir);
+                        this.createNextBond(l, vertex, angle + MathHelper.toRad(90) * -dir); 
+                    } else {
+                        this.createNextBond(l, vertex, angle + MathHelper.toRad(30) * -dir);
+                        this.createNextBond(r, vertex, angle + MathHelper.toRad(90) * -dir);
+                    }
                 } else {
                     this.createNextBond(s, vertex, angle);
                     this.createNextBond(l, vertex, angle + MathHelper.toRad(90));
@@ -2837,15 +2871,31 @@ class SmilesDrawer {
      * @param {number} vertexId A vertex id.
      * @param {number} parentVertexId A neighbouring vertex.
      * @param {function} callback The callback function that is called with each visited as an argument.
+     * @param {number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
+     * @param {boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
      */
-    traverseTree(vertexId, parentVertexId, callback) {
-        let vertex = this.vertices[vertexId];
-        let neighbours = vertex.getSpanningTreeNeighbours(parentVertexId);
+    traverseTree(vertexId, parentVertexId, callback, maxDepth = null, ignoreFirst = false, depth = 1, visited = []) {
+        if (maxDepth !== null && depth > maxDepth + 1) {
+            return;
+        }
 
-        callback(vertex);
+        for (let j = 0; j < visited.length; j++) {
+            if (visited[j] === vertexId) {
+                return;
+            }
+        }
+
+        visited.push(vertexId);
+
+        let vertex = this.vertices[vertexId];
+        let neighbours = vertex.getNeighbours(parentVertexId);
+
+        if (!ignoreFirst || depth > 1) {
+            callback(vertex);
+        }
 
         for (let i = 0; i < neighbours.length; i++) {
-            this.traverseTree(neighbours[i], vertexId, callback);
+            this.traverseTree(neighbours[i], vertexId, callback, maxDepth, ignoreFirst, depth + 1, visited);
         }
     }
 
@@ -2888,6 +2938,43 @@ class SmilesDrawer {
         return nrneighbours;
     }
 
+    /*
+    getChiralOrder(vertexIds, chiralCenterVertexId) {
+        let sortedVertexIds = Atom.sortByAtomicNumber(vertexIds, this.vertices);
+        
+        // Initial check whether there are duplicates, if not, all good to go
+        if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
+            return sortedVertexIds;
+        }
+
+        let done = new Array(vertexIds.length);
+        let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
+        
+        let maxDepth = 1;
+        for (let i = 0; i < duplicates.length; i++) {
+            let dupl = duplicates[i];
+            
+            for (let j = 0; j < dupl.length; j++) {
+                let index = dupl[j];
+                let vertexId = sortedVertexIds[index].vertexId;
+                let total = 0;
+                
+                console.log(vertexId, chiralCenterVertexId);
+                this.traverseTree(vertexId, chiralCenterVertexId, function(vertex) {
+                    console.log(vertex);
+                    total += vertex.value.getAtomicNumber();
+                }, maxDepth, true);
+
+                sortedVertexIds[index].atomicNumber += '.' + total;
+            }
+        }
+
+        sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+        console.log(sortedVertexIds);
+        return sortedVertexIds;
+    }
+    */
+
     annotateChirality() {
         for (let i = 0; i < this.vertices.length; i++) {
             let vertex = this.vertices[i];
@@ -2905,27 +2992,55 @@ class SmilesDrawer {
                 }
 
                 let neighbours = vertex.getNeighbours();
-                let orderedNeighbours = Atom.sortByAtomicNumber(vertex, neighbours, this.vertices, this.rings);
+                let orderedNeighbours = new Array(neighbours.length);
 
-                if (chirality === '@' && vertex.value.bracket.hcount === 1) {
-                    let edge = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
-                    edge.chiral = 'down';
-
-                } else if (chirality === '@@' && vertex.value.bracket.hcount === 1) {
-                    let edge = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
-                    edge.chiral = 'up';
-                } else if (chirality === '@') {
-                    let edgeUp = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
-                    let edgeDown = this.getEdge(orderedNeighbours[2].vertexId, vertex.id);
+                this.vertices[vertex.parentVertexId].value.setOrder(vertex.id, 0);
+                
+                for (let j = 0; j < neighbours.length; j++) {
+                    let neighbourId = neighbours[j];
                     
-                    edgeUp.chiral = 'up';
-                    edgeDown.chiral = 'down';
+                    if (neighbourId === vertex.parentVertexId) {
+                        orderedNeighbours[0] = neighbourId;
+                        continue;
+                    }
+
+                    orderedNeighbours[this.vertices[neighbourId].value.getOrder(vertex.id)] = neighbourId;
+                }
+                
+                if (chirality === '@') {
+                    let edgeUp = this.getEdge(orderedNeighbours[3], vertex.id);
+                   
+                    // If the bond already points down here, there is no need to point up
+                    // into the other direction
+                    if (!(edgeUp.chiral === 'down')) {
+                        edgeUp.chiral = 'up';
+                    }
+                    
+                    
+                    let edgeDown = this.getEdge(orderedNeighbours[1], vertex.id);
+                    
+                    // If the bond already points up here, there is no need to point down
+                    // into the other direction
+                    if (!(edgeDown.chiral === 'up')) {
+                        edgeDown.chiral = 'down';
+                    }
                 } else if (chirality === '@@') {
-                    let edgeUp = this.getEdge(orderedNeighbours[2].vertexId, vertex.id);
-                    let edgeDown = this.getEdge(orderedNeighbours[1].vertexId, vertex.id);
+                    let edgeUp = this.getEdge(orderedNeighbours[1], vertex.id);
+                   
+                    // If the bond already points down here, there is no need to point up
+                    // into the other direction
+                    if (!(edgeUp.chiral === 'down')) {
+                        edgeUp.chiral = 'up';
+                    }
                     
-                    edgeUp.chiral = 'up';
-                    edgeDown.chiral = 'down';
+                    
+                    let edgeDown = this.getEdge(orderedNeighbours[3], vertex.id);
+                    
+                    // If the bond already points up here, there is no need to point down
+                    // into the other direction
+                    if (!(edgeDown.chiral === 'up')) {
+                        edgeDown.chiral = 'down';
+                    }
                 }
             }
         }

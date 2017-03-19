@@ -24,10 +24,13 @@ class Vector2 {
      *
      * @param {number} [x=0] The value of the x coordinate.
      * @param {number} [y=0] The value of the y coordinate.
+     * @returns {Vector2} Returns itself.
      */
     set(x = 0, y = 0) {
         this.x = x;
         this.y = y;
+
+        return this;
     }
 
     /**
@@ -52,49 +55,64 @@ class Vector2 {
      * Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
      *
      * @param {Vector2} vec Another vector.
+     * @returns {Vector2} Returns itself.
      */
     add(vec) {
         this.x += vec.x;
         this.y += vec.y;
+
+        return this;
     }
 
     /**
      * Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
      *
      * @param {Vector2} vec Another vector.
+     * @returns {Vector2} Returns itself.
      */
     subtract(vec) {
         this.x -= vec.x;
         this.y -= vec.y;
+
+        return this;
     }
 
     /**
      * Divide the x and y coordinate values of this vector by a scalar.
      *
      * @param {number} scalar The scalar.
+     * @returns {Vector2} Returns itself.
      */
     divide(scalar) {
         this.x /= scalar;
         this.y /= scalar;
+
+        return this;
     }
     
     /**
      * Multiply the x and y coordinate values of this vector by a scalar.
      *
      * @param {number} scalar The scalar.
+     * @returns {Vector2} Returns itself.
      */
     multiply(scalar) {
         this.x *= scalar;
         this.y *= scalar;
+
+        return this;
     }
 
     /**
      * Inverts this vector. Same as multiply(-1.0).
      *
+     * @returns {Vector2} Returns itself.
      */
     invert() {
         this.x = -this.x;
         this.y = -this.y;
+
+        return this;
     }
 
     /**
@@ -150,6 +168,7 @@ class Vector2 {
      * Rotates this vector by a given number of radians around the origin of the coordinate system.
      *
      * @param {number} angle The angle in radians to rotate the vector.
+     * @returns {Vector2} Returns itself.
      */
     rotate(angle) {
         let tmp = new Vector2();
@@ -159,6 +178,8 @@ class Vector2 {
         
         this.x = tmp.x;
         this.y = tmp.y;
+
+        return this;
     }
 
     /**
@@ -166,6 +187,7 @@ class Vector2 {
      *
      * @param {number} angle The angle in radians to rotate the vector.
      * @param {Vector2} vec The vector which is used as the rotational center.
+     * @returns {Vector2} Returns itself.
      */
     rotateAround(angle, vec) {
         let s = Math.sin(angle);
@@ -179,6 +201,8 @@ class Vector2 {
 
         this.x = x + vec.x;
         this.y = y + vec.y;
+
+        return this;
     }
 
     /**
@@ -187,6 +211,7 @@ class Vector2 {
      * @param {Vector2} vec The vector to rotate this vector to.
      * @param {Vector2} center The rotational center.
      * @param {number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
+     * @returns {Vector2} Returns itself.
      */
     rotateTo(vec, center, offsetAngle = 0.0) {
         // Problem if this is first position
@@ -197,6 +222,8 @@ class Vector2 {
         let angle = Vector2.angle(b, a);
 
         this.rotateAround(angle + offsetAngle, center);
+
+        return this;
     }
 
     /**
@@ -248,9 +275,12 @@ class Vector2 {
     /**
      * Normalizes this vector.
      *
+     * @returns {Vector2} Returns itself.
      */
     normalize() {
         this.divide(this.length());
+
+        return this;
     }
 
     /**
@@ -326,6 +356,18 @@ class Vector2 {
         }
 
         return new Vector2(vecA.x * vecB, vecA.y * vecB);
+    }
+
+    /**
+     * Multiplies two vectors (value by value) and returns the result.
+     *
+     * @static
+     * @param {Vector2} vec A factor.
+     * @param {number} scalar A scalar factor.
+     * @returns {Vector2} Returns the product of two vectors.
+     */
+    static multiplyScalar(vec, scalar) {
+        return new Vector2(vec).multiply(scalar);
     }
 
     /**

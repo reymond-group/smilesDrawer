@@ -7,12 +7,16 @@ class Line {
      * @param {Vector2} [to=new Vector2(0, 0)] A vector marking the end of the line.
      * @param {string} [elementFrom=null] A one-letter representation of the element associated with the vector marking the beginning of the line.
      * @param {string} [elementTo=null] A one-letter representation of the element associated with the vector marking the end of the line.
+     * @param {boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
+     * @param {boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
      */
-    constructor(from = new Vector2(0,0), to = new Vector(0, 0), elementFrom = null, elementTo = null) {
+    constructor(from = new Vector2(0,0), to = new Vector(0, 0), elementFrom = null, elementTo = null, chiralFrom = false, chiralTo = false) {
         this.from = from;
         this.to = to;
         this.elementFrom = elementFrom;
         this.elementTo = elementTo;
+        this.chiralFrom = chiralFrom;
+        this.chiralTo = chiralTo;
     }
 
     /**
@@ -97,6 +101,32 @@ class Line {
             return this.elementFrom;
         } else {
             return this.elementTo;
+        }
+    }
+
+    /**
+     * Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.
+     *
+     * @returns {boolean} Whether or not the atom associated with the right vector is a chiral center.
+     */
+    getRightChiral() {
+        if (this.from.x < this.to.x) {
+            return this.chiralTo;
+        } else {
+            return this.chiralFrom;
+        }
+    }
+
+    /**
+     * Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.
+     *
+     * @returns {boolean} Whether or not the atom  associated with the left vector is a chiral center.
+     */
+    getLeftChiral() {
+        if (this.from.x < this.to.x) {
+            return this.chiralFrom;
+        } else {
+            return this.chiralTo;
         }
     }
 
@@ -199,6 +229,38 @@ class Line {
     }
 
     /**
+     * Shorten the right side.
+     *
+     * @param {number} by The length in pixels to shorten the vector by.
+     * @returns {Line} Returns itself.
+     */
+    shortenRight(by) {
+        if (this.from.x < this.to.x) {
+            this.shortenTo(by);
+        } else {
+            this.shortenFrom(by);
+        }
+
+        return this;
+    }
+    
+    /**
+     * Shorten the left side.
+     * 
+     * @param {number} by The length in pixels to shorten the vector by.
+     * @returns {Line} Returns itself.
+     */
+    shortenLeft(by) {
+        if (this.from.x < this.to.x) {
+            this.shortenFrom(by);
+        } else {
+            this.shortenTo(by);
+        }
+
+        return this;
+    }
+
+    /**
      * Shortens this line from both directions by a given value (in pixels).
      *
      * @param {number} by The length in pixels to shorten the vector by.
@@ -214,5 +276,19 @@ class Line {
         this.from.subtract(f);
 
         return this;
+    }
+
+    /**
+     * Returns the normals of this line.
+     *
+     * @returns {array} An array containing the two normals as vertices.
+     */
+    getNormals() {
+        let delta = Vector2.subtract(from, to);
+
+        return [
+            new Vector2(-delta.y, delta.x),
+            new Vector2(delta.y, -delta.x)
+        ];
     }
 }
