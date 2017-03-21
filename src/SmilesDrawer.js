@@ -145,6 +145,8 @@ class SmilesDrawer {
             }
            
             while ((overlapScore.total > (this.opts.bondLength / 20.0)) && count < iterations) {
+                console.log('positioning');
+                
                 if (this.direction === 1) {
                     this.direction = -1;
                 } else if (this.direction === -1) {
