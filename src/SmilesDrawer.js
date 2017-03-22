@@ -1691,7 +1691,7 @@ class SmilesDrawer {
                     let dOptimal = adjMatrix[u][v];
                     
                     if (d < dOptimal) {
-                        force *= 0.1;
+                        force *= 0.25;
                     } else {
                         force *= 2.5;
                     }

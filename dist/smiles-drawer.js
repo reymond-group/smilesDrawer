@@ -382,6 +382,7 @@ var Atom = function () {
         this.isTerminal = false;
         this.isBridge = false;
         this.isBridgeNode = false;
+        this.originalRings = new Array();
         this.bridgedRing = null;
         this.anchoredRings = new Array();
         this.bracket = null;
@@ -6132,7 +6133,7 @@ var SmilesDrawer = function () {
                         var dOptimal = adjMatrix[_u2][_v2];
 
                         if (_d < dOptimal) {
-                            _force *= 0.1;
+                            _force *= 0.25;
                         } else {
                             _force *= 2.5;
                         }

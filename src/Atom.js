@@ -15,6 +15,7 @@ class Atom {
         this.isTerminal = false;
         this.isBridge = false;
         this.isBridgeNode = false;
+        this.originalRings = new Array();
         this.bridgedRing = null;
         this.anchoredRings = new Array();
         this.bracket = null;
