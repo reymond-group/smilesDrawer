@@ -144,9 +144,7 @@ class SmilesDrawer {
                 iterations = 2;
             }
            
-            while ((overlapScore.total > (this.opts.bondLength / 20.0)) && count < iterations) {
-                console.log('positioning');
-                
+            while(overlapScore.total > (this.opts.bondLength / 20.0) && count < iterations) {
                 if (this.direction === 1) {
                     this.direction = -1;
                 } else if (this.direction === -1) {
@@ -2290,6 +2288,51 @@ class SmilesDrawer {
     }
 
     /**
+     * Returns the current (positioned vertices so far) center of mass.
+     * 
+     * @returns {Vector2} The current center of mass.
+     */
+    getCurrentCenterOfMass() {
+        let total = new Vector2();
+        let count = 0;
+        
+        for (let i = 0; i < this.vertices.length; i++) {
+            let vertex = this.vertices[i];
+
+            if (vertex.positioned) {
+                total.add(vertex.position);
+                count++;
+            }
+        }
+
+        return total.divide(count);
+    }
+
+    /**
+     * Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
+     *
+     * @param {Vector2} vec The point at which to look for neighbours.
+     * @param {number} [r=currentBondLength*2.0] The radius of vertices to include.
+     * @returns {Vector2} The current center of mass.
+     */
+    getCurrentCenterOfMassInNeigbourhood(vec, r = this.opts.bondLength * 2.0) {
+        let total = new Vector2();
+        let count = 0;
+        let rSq = r * r;
+        
+        for (let i = 0; i < this.vertices.length; i++) {
+            let vertex = this.vertices[i];
+
+            if (vertex.positioned && vec.distanceSq(vertex.position) < rSq) {
+                total.add(vertex.position);
+                count++;
+            }
+        }
+
+        return total.divide(count);
+    }
+
+    /**
      * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
      *
      */
@@ -2589,9 +2632,33 @@ class SmilesDrawer {
 
                     nextVertex.angle = angle;
                     this.createNextBond(nextVertex, vertex, nextVertex.angle, -dir);
-                }
-                else {
-                    let plusOrMinus = this.direction;
+                } else if (previousVertex && previousVertex.value.rings.length > 0) {
+                    // If coming out of a ring, always draw away from the center of mass
+                    let proposedAngleA = MathHelper.toRad(60);
+                    let proposedAngleB = -proposedAngleA;
+
+                    let proposedVectorA = new Vector2(this.opts.bondLength, 0);
+                    let proposedVectorB = new Vector2(this.opts.bondLength, 0);
+                    
+                    proposedVectorA.rotate(proposedAngleA).add(vertex.position);
+                    proposedVectorB.rotate(proposedAngleB).add(vertex.position);
+
+                    // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
+                    let centerOfMass = this.getCurrentCenterOfMass();
+                    let distanceA = proposedVectorA.distance(centerOfMass);
+                    let distanceB = proposedVectorB.distance(centerOfMass);
+
+                    nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
+                    
+                    if (nextVertex.angle > 0) {
+                        dir = -1;
+                    } else {
+                        dir = 1;
+                    }
+                    
+                    this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
+                } else {
+                    /*let plusOrMinus = this.direction;
                     
                     if (this.direction === 0) {
                         plusOrMinus = Math.random() < 0.5 ? -1 : 1;
@@ -2600,9 +2667,38 @@ class SmilesDrawer {
                     if (!dir) {
                         dir = plusOrMinus;
                     }
-                    
+                                  
                     nextVertex.angle = MathHelper.toRad(60) * dir;
-                    this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, -dir);
+                    */
+                    
+                    if (!dir) {
+                        let proposedAngleA = MathHelper.toRad(60);
+                        let proposedAngleB = -proposedAngleA;
+
+                        let proposedVectorA = new Vector2(this.opts.bondLength, 0);
+                        let proposedVectorB = new Vector2(this.opts.bondLength, 0);
+                        
+                        proposedVectorA.rotate(proposedAngleA).add(vertex.position);
+                        proposedVectorB.rotate(proposedAngleB).add(vertex.position);
+
+                        // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
+                        let centerOfMass = this.getCurrentCenterOfMass();
+                        let distanceA = proposedVectorA.distance(centerOfMass);
+                        let distanceB = proposedVectorB.distance(centerOfMass);
+
+                        nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
+                        
+                        if (nextVertex.angle > 0) {
+                            dir = -1;
+                        } else {
+                            dir = 1;
+                        }
+                    } else {
+                        nextVertex.angle = MathHelper.toRad(60) * dir;
+                        dir = -dir;
+                    }
+                    
+                    this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
                 }
             } else if (neighbours.length == 2) {
                 // Check for the longer subtree - always go with cis for the longer subtree
@@ -2618,10 +2714,12 @@ class SmilesDrawer {
                 }
                 
                 // TODO: There must be a more deterministic method
+                /*
                 if (this.direction === 0) {
                     cis = Math.random() < 0.5 ? 0 : 1;
                     trans = 1 - cis;
                 }
+                */
 
                 if (vertex.position.clockwise(vertex.previousPosition) === 1) {
                     let cisVertex = this.vertices[neighbours[cis]];

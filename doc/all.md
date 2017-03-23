@@ -1394,6 +1394,8 @@ The main class of the application representing the smiles drawer
     * [.restorePositions()](#SmilesDrawer+restorePositions)
     * [.createRing(ring, center, [startVector], [previousVertex])](#SmilesDrawer+createRing)
     * [.rotateSubtree(vertexId, parentVertexId, angle, center)](#SmilesDrawer+rotateSubtree)
+    * [.getCurrentCenterOfMass()](#SmilesDrawer+getCurrentCenterOfMass) ⇒ <code>[Vector2](#Vector2)</code>
+    * [.getCurrentCenterOfMassInNeigbourhood(vec, [r])](#SmilesDrawer+getCurrentCenterOfMassInNeigbourhood) ⇒ <code>[Vector2](#Vector2)</code>
     * [.resolvePrimaryOverlaps()](#SmilesDrawer+resolvePrimaryOverlaps)
     * [.resolveSecondaryOverlaps(scores)](#SmilesDrawer+resolveSecondaryOverlaps)
     * [.createNextBond(vertex, previousVertex, ringOrAngle, dir)](#SmilesDrawer+createNextBond)
@@ -1986,6 +1988,26 @@ Rotate an entire subtree by an angle around a center.
 | parentVertexId | <code>number</code> | A vertex id in the previous direction of the subtree that is to rotate. |
 | angle | <code>number</code> | An angle in randians. |
 | center | <code>[Vector2](#Vector2)</code> | The rotational center. |
+
+<a name="SmilesDrawer+getCurrentCenterOfMass"></a>
+
+### smilesDrawer.getCurrentCenterOfMass() ⇒ <code>[Vector2](#Vector2)</code>
+Returns the current (positioned vertices so far) center of mass.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - The current center of mass.  
+<a name="SmilesDrawer+getCurrentCenterOfMassInNeigbourhood"></a>
+
+### smilesDrawer.getCurrentCenterOfMassInNeigbourhood(vec, [r]) ⇒ <code>[Vector2](#Vector2)</code>
+Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - The current center of mass.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| vec | <code>[Vector2](#Vector2)</code> |  | The point at which to look for neighbours. |
+| [r] | <code>number</code> | <code>currentBondLength*2.0</code> | The radius of vertices to include. |
 
 <a name="SmilesDrawer+resolvePrimaryOverlaps"></a>
 

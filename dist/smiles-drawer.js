@@ -4475,8 +4475,6 @@ var SmilesDrawer = function () {
                 }
 
                 while (overlapScore.total > this.opts.bondLength / 20.0 && count < iterations) {
-                    console.log('positioning');
-
                     if (this.direction === 1) {
                         this.direction = -1;
                     } else if (this.direction === -1) {
@@ -6760,6 +6758,59 @@ var SmilesDrawer = function () {
         }
 
         /**
+         * Returns the current (positioned vertices so far) center of mass.
+         * 
+         * @returns {Vector2} The current center of mass.
+         */
+
+    }, {
+        key: 'getCurrentCenterOfMass',
+        value: function getCurrentCenterOfMass() {
+            var total = new Vector2();
+            var count = 0;
+
+            for (var i = 0; i < this.vertices.length; i++) {
+                var vertex = this.vertices[i];
+
+                if (vertex.positioned) {
+                    total.add(vertex.position);
+                    count++;
+                }
+            }
+
+            return total.divide(count);
+        }
+
+        /**
+         * Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
+         *
+         * @param {Vector2} vec The point at which to look for neighbours.
+         * @param {number} [r=currentBondLength*2.0] The radius of vertices to include.
+         * @returns {Vector2} The current center of mass.
+         */
+
+    }, {
+        key: 'getCurrentCenterOfMassInNeigbourhood',
+        value: function getCurrentCenterOfMassInNeigbourhood(vec) {
+            var r = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.opts.bondLength * 2.0;
+
+            var total = new Vector2();
+            var count = 0;
+            var rSq = r * r;
+
+            for (var i = 0; i < this.vertices.length; i++) {
+                var vertex = this.vertices[i];
+
+                if (vertex.positioned && vec.distanceSq(vertex.position) < rSq) {
+                    total.add(vertex.position);
+                    count++;
+                }
+            }
+
+            return total.divide(count);
+        }
+
+        /**
          * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
          *
          */
@@ -7067,19 +7118,73 @@ var SmilesDrawer = function () {
 
                         nextVertex.angle = angle;
                         this.createNextBond(nextVertex, vertex, nextVertex.angle, -dir);
-                    } else {
-                        var plusOrMinus = this.direction;
+                    } else if (previousVertex && previousVertex.value.rings.length > 0) {
+                        // If coming out of a ring, always draw away from the center of mass
+                        var proposedAngleA = MathHelper.toRad(60);
+                        var proposedAngleB = -proposedAngleA;
 
+                        var proposedVectorA = new Vector2(this.opts.bondLength, 0);
+                        var proposedVectorB = new Vector2(this.opts.bondLength, 0);
+
+                        proposedVectorA.rotate(proposedAngleA).add(vertex.position);
+                        proposedVectorB.rotate(proposedAngleB).add(vertex.position);
+
+                        // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
+                        var centerOfMass = this.getCurrentCenterOfMass();
+                        var distanceA = proposedVectorA.distance(centerOfMass);
+                        var distanceB = proposedVectorB.distance(centerOfMass);
+
+                        nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
+
+                        if (nextVertex.angle > 0) {
+                            dir = -1;
+                        } else {
+                            dir = 1;
+                        }
+
+                        this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
+                    } else {
+                        /*let plusOrMinus = this.direction;
+                        
                         if (this.direction === 0) {
                             plusOrMinus = Math.random() < 0.5 ? -1 : 1;
                         }
-
+                        
                         if (!dir) {
                             dir = plusOrMinus;
                         }
-
+                                      
                         nextVertex.angle = MathHelper.toRad(60) * dir;
-                        this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, -dir);
+                        */
+
+                        if (!dir) {
+                            var _proposedAngleA = MathHelper.toRad(60);
+                            var _proposedAngleB = -_proposedAngleA;
+
+                            var _proposedVectorA = new Vector2(this.opts.bondLength, 0);
+                            var _proposedVectorB = new Vector2(this.opts.bondLength, 0);
+
+                            _proposedVectorA.rotate(_proposedAngleA).add(vertex.position);
+                            _proposedVectorB.rotate(_proposedAngleB).add(vertex.position);
+
+                            // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
+                            var _centerOfMass = this.getCurrentCenterOfMass();
+                            var _distanceA = _proposedVectorA.distance(_centerOfMass);
+                            var _distanceB = _proposedVectorB.distance(_centerOfMass);
+
+                            nextVertex.angle = _distanceA < _distanceB ? _proposedAngleB : _proposedAngleA;
+
+                            if (nextVertex.angle > 0) {
+                                dir = -1;
+                            } else {
+                                dir = 1;
+                            }
+                        } else {
+                            nextVertex.angle = MathHelper.toRad(60) * dir;
+                            dir = -dir;
+                        }
+
+                        this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
                     }
                 } else if (neighbours.length == 2) {
                     // Check for the longer subtree - always go with cis for the longer subtree
@@ -7095,10 +7200,12 @@ var SmilesDrawer = function () {
                     }
 
                     // TODO: There must be a more deterministic method
+                    /*
                     if (this.direction === 0) {
                         cis = Math.random() < 0.5 ? 0 : 1;
                         trans = 1 - cis;
                     }
+                    */
 
                     if (vertex.position.clockwise(vertex.previousPosition) === 1) {
                         var cisVertex = this.vertices[neighbours[cis]];
@@ -7141,14 +7248,14 @@ var SmilesDrawer = function () {
 
                     if (this.getTreeDepth(l.id, vertex.id) === 1 && this.getTreeDepth(_r3.id, vertex.id) === 1) {
                         // TODO: Make method, since this is used above as well.
-                        var _plusOrMinus = this.direction;
+                        var plusOrMinus = this.direction;
 
                         if (this.direction === 0) {
-                            _plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+                            plusOrMinus = Math.random() < 0.5 ? -1 : 1;
                         }
 
                         if (!dir) {
-                            dir = _plusOrMinus;
+                            dir = plusOrMinus;
                         }
 
                         _s.angle = MathHelper.toRad(60) * dir;
