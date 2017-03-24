@@ -4349,7 +4349,7 @@ var SmilesDrawer = function () {
             debug: false,
             allowFlips: false,
             drawingIterations: 20,
-            isomeric: true,
+            isomeric: false,
             themes: {
                 dark: {
                     C: '#fff',
@@ -4460,7 +4460,9 @@ var SmilesDrawer = function () {
             this.initGraph(data);
             this.initRings();
 
-            this.annotateChirality();
+            if (this.opts.isomeric) {
+                this.annotateChirality();
+            }
 
             if (!infoOnly) {
                 this.position();
@@ -4472,27 +4474,6 @@ var SmilesDrawer = function () {
                 // Only redraw if there are no bridged rings ...
                 if (bridgedRingCount > 0) {
                     iterations = 2;
-                }
-
-                while (overlapScore.total > this.opts.bondLength / 20.0 && count < iterations) {
-                    if (this.direction === 1) {
-                        this.direction = -1;
-                    } else if (this.direction === -1) {
-                        this.direction = 0;
-                    }
-
-                    this.clearPositions();
-                    this.position();
-
-                    var newOverlapScore = this.getOverlapScore();
-
-                    if (newOverlapScore.total < overlapScore.total) {
-                        overlapScore = newOverlapScore;
-                    } else {
-                        this.restorePositions();
-                    }
-
-                    count++;
                 }
 
                 this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -5063,12 +5044,15 @@ var SmilesDrawer = function () {
 
             this.addRing(ring);
 
+            this.vertices[sourceVertexId].value.anchoredRings.push(ring.id);
+
             // Atoms inside the ring are no longer part of a ring but are now
             // associated with the bridged ring
             for (var _i13 = 0; _i13 < insideRing.length; _i13++) {
                 var _vertex2 = this.vertices[insideRing[_i13]];
 
                 _vertex2.value.rings = new Array();
+                _vertex2.value.anchoredRings = new Array();
                 _vertex2.value.bridgedRing = ring.id;
             }
 
@@ -6509,19 +6493,22 @@ var SmilesDrawer = function () {
     }, {
         key: 'position',
         value: function position() {
-            var startVertex = 0;
+            var startVertex = this.vertices[0];
 
             // If there is a bridged ring, alwas start with the bridged ring
             for (var i = 0; i < this.rings.length; i++) {
                 if (this.rings[i].isBridged) {
-                    startVertex = this.rings[i].members[i];
-                    if (this.vertices[startVertex].value.rings.length === 1) {
-                        break;
+                    for (var j = 0; j < this.rings[i].members.length; j++) {
+                        startVertex = this.vertices[this.rings[i].members[j]];
+
+                        if (startVertex.value.rings.length === 1) {
+                            break;
+                        }
                     }
                 }
             }
 
-            this.createNextBond(this.vertices[startVertex]);
+            this.createNextBond(startVertex);
 
             // Atoms bonded to the same ring atom
             this.resolvePrimaryOverlaps();
@@ -7110,10 +7097,12 @@ var SmilesDrawer = function () {
                     if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#' || vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
                         vertex.value.explicit = true;
 
-                        var straightEdge1 = this.getEdge(vertex.id, previousVertex.id);
-                        var straightEdge2 = this.getEdge(vertex.id, nextVertex.id);
+                        if (previousVertex) {
+                            var straightEdge1 = this.getEdge(vertex.id, previousVertex.id);
+                            straightEdge1.center = true;
+                        }
 
-                        straightEdge1.center = true;
+                        var straightEdge2 = this.getEdge(vertex.id, nextVertex.id);
                         straightEdge2.center = true;
 
                         nextVertex.angle = angle;
@@ -7144,19 +7133,6 @@ var SmilesDrawer = function () {
 
                         this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
                     } else {
-                        /*let plusOrMinus = this.direction;
-                        
-                        if (this.direction === 0) {
-                            plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-                        }
-                        
-                        if (!dir) {
-                            dir = plusOrMinus;
-                        }
-                                      
-                        nextVertex.angle = MathHelper.toRad(60) * dir;
-                        */
-
                         if (!dir) {
                             var _proposedAngleA = MathHelper.toRad(60);
                             var _proposedAngleB = -_proposedAngleA;
@@ -7167,7 +7143,6 @@ var SmilesDrawer = function () {
                             _proposedVectorA.rotate(_proposedAngleA).add(vertex.position);
                             _proposedVectorB.rotate(_proposedAngleB).add(vertex.position);
 
-                            // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
                             var _centerOfMass = this.getCurrentCenterOfMass();
                             var _distanceA = _proposedVectorA.distance(_centerOfMass);
                             var _distanceB = _proposedVectorB.distance(_centerOfMass);
@@ -7198,14 +7173,6 @@ var SmilesDrawer = function () {
                         cis = 1;
                         trans = 0;
                     }
-
-                    // TODO: There must be a more deterministic method
-                    /*
-                    if (this.direction === 0) {
-                        cis = Math.random() < 0.5 ? 0 : 1;
-                        trans = 1 - cis;
-                    }
-                    */
 
                     if (vertex.position.clockwise(vertex.previousPosition) === 1) {
                         var cisVertex = this.vertices[neighbours[cis]];
@@ -7247,18 +7214,35 @@ var SmilesDrawer = function () {
                     }
 
                     if (this.getTreeDepth(l.id, vertex.id) === 1 && this.getTreeDepth(_r3.id, vertex.id) === 1) {
-                        // TODO: Make method, since this is used above as well.
-                        var plusOrMinus = this.direction;
-
-                        if (this.direction === 0) {
-                            plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-                        }
 
                         if (!dir) {
-                            dir = plusOrMinus;
+                            var _proposedAngleA2 = MathHelper.toRad(60);
+                            var _proposedAngleB2 = -_proposedAngleA2;
+
+                            var _proposedVectorA2 = new Vector2(this.opts.bondLength, 0);
+                            var _proposedVectorB2 = new Vector2(this.opts.bondLength, 0);
+
+                            _proposedVectorA2.rotate(_proposedAngleA2).add(vertex.position);
+                            _proposedVectorB2.rotate(_proposedAngleB2).add(vertex.position);
+
+                            // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
+                            var _centerOfMass2 = this.getCurrentCenterOfMass();
+                            var _distanceA2 = _proposedVectorA2.distance(_centerOfMass2);
+                            var _distanceB2 = _proposedVectorB2.distance(_centerOfMass2);
+
+                            _s.angle = _distanceA2 < _distanceB2 ? _proposedAngleB2 : _proposedAngleA2;
+
+                            if (_s.angle > 0) {
+                                dir = -1;
+                            } else {
+                                dir = 1;
+                            }
+                        } else {
+                            _s.angle = MathHelper.toRad(60) * dir;
+                            dir = -dir;
                         }
 
-                        _s.angle = MathHelper.toRad(60) * dir;
+                        // s.angle = MathHelper.toRad(60) * dir;
 
                         this.createNextBond(_s, vertex, angle + _s.angle, -dir);
 

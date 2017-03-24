@@ -14,7 +14,7 @@
         <script src="drugbank.js"></script>
         <script>
             let options = {};
-
+            
             // Initialize the drawer
             let smilesDrawer = new SmilesDrawer(options);
             let nErrors = 0;
@@ -22,7 +22,8 @@
             let totalSpeed = 0;
             let totalOverlap = 0;
             let str = 'time,overlap,rings,hac,bridged\n';
-
+            
+            let failed = '';
             for (let i = 0; i < drugbank.length; i++) {
                 console.log(i);
                 try {
@@ -43,10 +44,13 @@
                     // if (td > 1000) console.log(schembl[i]);
                 } catch (exception) {
                     nErrors++;
+                    failed += drugbank[i] + '\n';
                 }
             }
 
             console.log(str);
+            console.log(failed);
+            
             console.log('Failed count: ' + nErrors);
             console.log('Success count: ' + nSuccesses);
             console.log('Success rate: ' + (nSuccesses / drugbank.length));

@@ -28,7 +28,7 @@ class SmilesDrawer {
             debug: false,
             allowFlips: false,
             drawingIterations: 20,
-            isomeric: true,
+            isomeric: false,
             themes: {
                 dark: {
                     C: '#fff',
@@ -129,8 +129,10 @@ class SmilesDrawer {
 
         this.initGraph(data);
         this.initRings();
-
-        this.annotateChirality();
+        
+        if (this.opts.isomeric) {
+            this.annotateChirality();
+        }
 
         if (!infoOnly) {
             this.position();
@@ -142,27 +144,6 @@ class SmilesDrawer {
             // Only redraw if there are no bridged rings ...
             if (bridgedRingCount > 0) {
                 iterations = 2;
-            }
-           
-            while(overlapScore.total > (this.opts.bondLength / 20.0) && count < iterations) {
-                if (this.direction === 1) {
-                    this.direction = -1;
-                } else if (this.direction === -1) {
-                    this.direction = 0;
-                }
-
-                this.clearPositions();
-                this.position();
-
-                var newOverlapScore = this.getOverlapScore();
-
-                if (newOverlapScore.total < overlapScore.total) {
-                    overlapScore = newOverlapScore;
-                } else {
-                    this.restorePositions();
-                }
-
-                count++;
             }
 
             this.resolveSecondaryOverlaps(overlapScore.scores);
@@ -687,12 +668,15 @@ class SmilesDrawer {
 
         this.addRing(ring);
 
+        this.vertices[sourceVertexId].value.anchoredRings.push(ring.id);
+
         // Atoms inside the ring are no longer part of a ring but are now
         // associated with the bridged ring
         for (let i = 0; i < insideRing.length; i++) {
             let vertex = this.vertices[insideRing[i]];
             
             vertex.value.rings = new Array();
+            vertex.value.anchoredRings = new Array();
             vertex.value.bridgedRing = ring.id;
         }
 
@@ -2058,19 +2042,22 @@ class SmilesDrawer {
      *
      */
     position() {
-        var startVertex = 0;
+        let startVertex = this.vertices[0];
 
         // If there is a bridged ring, alwas start with the bridged ring
-        for(let i = 0; i < this.rings.length; i++) {
-            if(this.rings[i].isBridged) {
-                startVertex = this.rings[i].members[i];
-                if (this.vertices[startVertex].value.rings.length === 1) {
-                    break;
+        for (let i = 0; i < this.rings.length; i++) {
+            if (this.rings[i].isBridged) {
+                for (let j = 0; j < this.rings[i].members.length; j++) {
+                    startVertex = this.vertices[this.rings[i].members[j]];
+                    
+                    if (startVertex.value.rings.length === 1) {
+                        break;
+                    }
                 }
             }
         }
 
-        this.createNextBond(this.vertices[startVertex]);
+        this.createNextBond(startVertex);
 
         // Atoms bonded to the same ring atom
         this.resolvePrimaryOverlaps();
@@ -2624,10 +2611,12 @@ class SmilesDrawer {
                     vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
                     vertex.value.explicit = true;
                     
-                    let straightEdge1 = this.getEdge(vertex.id, previousVertex.id);
-                    let straightEdge2 = this.getEdge(vertex.id, nextVertex.id);
+                    if (previousVertex) {
+                        let straightEdge1 = this.getEdge(vertex.id, previousVertex.id);
+                        straightEdge1.center = true;
+                    }
                     
-                    straightEdge1.center = true;
+                    let straightEdge2 = this.getEdge(vertex.id, nextVertex.id);    
                     straightEdge2.center = true;
 
                     nextVertex.angle = angle;
@@ -2658,19 +2647,6 @@ class SmilesDrawer {
                     
                     this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
                 } else {
-                    /*let plusOrMinus = this.direction;
-                    
-                    if (this.direction === 0) {
-                        plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-                    }
-                    
-                    if (!dir) {
-                        dir = plusOrMinus;
-                    }
-                                  
-                    nextVertex.angle = MathHelper.toRad(60) * dir;
-                    */
-                    
                     if (!dir) {
                         let proposedAngleA = MathHelper.toRad(60);
                         let proposedAngleB = -proposedAngleA;
@@ -2681,7 +2657,6 @@ class SmilesDrawer {
                         proposedVectorA.rotate(proposedAngleA).add(vertex.position);
                         proposedVectorB.rotate(proposedAngleB).add(vertex.position);
 
-                        // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
                         let centerOfMass = this.getCurrentCenterOfMass();
                         let distanceA = proposedVectorA.distance(centerOfMass);
                         let distanceB = proposedVectorB.distance(centerOfMass);
@@ -2712,14 +2687,6 @@ class SmilesDrawer {
                     cis = 1;
                     trans = 0;
                 }
-                
-                // TODO: There must be a more deterministic method
-                /*
-                if (this.direction === 0) {
-                    cis = Math.random() < 0.5 ? 0 : 1;
-                    trans = 1 - cis;
-                }
-                */
 
                 if (vertex.position.clockwise(vertex.previousPosition) === 1) {
                     let cisVertex = this.vertices[neighbours[cis]];
@@ -2763,18 +2730,35 @@ class SmilesDrawer {
                 
                 if (this.getTreeDepth(l.id, vertex.id) === 1 && 
                     this.getTreeDepth(r.id, vertex.id) === 1) { 
-                    // TODO: Make method, since this is used above as well.
-                    let plusOrMinus = this.direction;
-
-                    if (this.direction === 0) {
-                        plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-                    }
                     
                     if (!dir) {
-                        dir = plusOrMinus;
+                        let proposedAngleA = MathHelper.toRad(60);
+                        let proposedAngleB = -proposedAngleA;
+
+                        let proposedVectorA = new Vector2(this.opts.bondLength, 0);
+                        let proposedVectorB = new Vector2(this.opts.bondLength, 0);
+                        
+                        proposedVectorA.rotate(proposedAngleA).add(vertex.position);
+                        proposedVectorB.rotate(proposedAngleB).add(vertex.position);
+
+                        // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
+                        let centerOfMass = this.getCurrentCenterOfMass();
+                        let distanceA = proposedVectorA.distance(centerOfMass);
+                        let distanceB = proposedVectorB.distance(centerOfMass);
+
+                        s.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
+                        
+                        if (s.angle > 0) {
+                            dir = -1;
+                        } else {
+                            dir = 1;
+                        }
+                    } else {
+                        s.angle = MathHelper.toRad(60) * dir;
+                        dir = -dir;
                     }
 
-                    s.angle = MathHelper.toRad(60) * dir;
+                    // s.angle = MathHelper.toRad(60) * dir;
                 
                     this.createNextBond(s, vertex, angle + s.angle, -dir);
 
