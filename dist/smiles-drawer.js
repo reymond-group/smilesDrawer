@@ -480,6 +480,34 @@ var Atom = function () {
         }
 
         /**
+         * Backs up the current rings.
+         */
+
+    }, {
+        key: 'backupRings',
+        value: function backupRings() {
+            this.originalRings = [];
+
+            for (var i = 0; i < this.rings.length; i++) {
+                this.originalRings.push(this.rings[i]);
+            }
+        }
+
+        /**
+         * Restores the most recent backed up rings.
+         */
+
+    }, {
+        key: 'restoreRings',
+        value: function restoreRings() {
+            this.rings = [];
+
+            for (var i = 0; i < this.originalRings.length; i++) {
+                this.rings.push(this.originalRings[i]);
+            }
+        }
+
+        /**
          * Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.
          *
          * @param {Atom} atomA An atom.
@@ -2264,10 +2292,10 @@ var Ring = function () {
         }
 
         /**
-         * Check whether this ring is aromatic but has no explicit double-bonds defined (e.g. c1ccccc1).
+         * Check whether this ring is explicitly aromatic (e.g. c1ccccc1).
          *
          * @param {array} vertices An array of vertices associated with the current molecule.
-         * @returns {boolean} A boolean indicating whether or not this ring is implicitly aromatic (using lowercase letters in smiles).
+         * @returns {boolean} A boolean indicating whether or not this ring is explicitly aromatic (using lowercase letters in smiles).
          */
 
     }, {
@@ -2276,12 +2304,48 @@ var Ring = function () {
             for (var i = 0; i < this.members.length; i++) {
                 var e = vertices[this.members[i]].value.element.charAt(0);
 
-                if (e == e.toUpperCase()) {
+                if (e === e.toUpperCase()) {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        /**
+         * Check whether this ring is an implicitly defined benzene-like (e.g. C1=CC=CC=C1) with 6 members and 3 double bonds.
+         *
+         * @param {array} vertices An array of vertices associated with the current molecule.
+         * @returns {boolean} A boolean indicating whether or not this ring is an implicitly defined benzene-like.
+         */
+
+    }, {
+        key: 'isBenzeneLike',
+        value: function isBenzeneLike(vertices) {
+            return this.getDoubleBondCount(vertices) === 3 && this.members.length === 6;
+        }
+
+        /**
+         * Get the number of double bonds inside this ring.
+         *
+         * @param {array} vertices An array of vertices associated with the current molecule.
+         * @returns {number} The number of double bonds inside this ring.
+         */
+
+    }, {
+        key: 'getDoubleBondCount',
+        value: function getDoubleBondCount(vertices) {
+            var doubleBondCount = 0;
+
+            for (var i = 0; i < this.members.length; i++) {
+                var bondType = vertices[this.members[i]].value.bondType;
+
+                if (bondType === '=') {
+                    doubleBondCount++;
+                }
+            }
+
+            return doubleBondCount;
         }
 
         /**
@@ -4454,8 +4518,8 @@ var SmilesDrawer = function () {
             this.rings = [];
             this.ringConnections = [];
 
-            this.backupVertices = [];
-            this.backupRings = [];
+            this.originalRings = [];
+            this.originalRingConnections = [];
 
             this.initGraph(data);
             this.initRings();
@@ -4467,14 +4531,10 @@ var SmilesDrawer = function () {
             if (!infoOnly) {
                 this.position();
 
+                // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
+                this.restoreRingInformation();
+
                 var overlapScore = this.getOverlapScore();
-                var count = 0;
-                var bridgedRingCount = this.getBridgedRings().length;
-                var iterations = this.opts.drawingIterations;
-                // Only redraw if there are no bridged rings ...
-                if (bridgedRingCount > 0) {
-                    iterations = 2;
-                }
 
                 this.resolveSecondaryOverlaps(overlapScore.scores);
                 this.totalOverlapScore = this.getOverlapScore().total;
@@ -4847,6 +4907,11 @@ var SmilesDrawer = function () {
                 var _ring = this.rings[_i6];
                 _ring.neighbours = RingConnection.getNeighbours(this.ringConnections, _ring.id);
             }
+
+            // Backup the ring information to restore after placing the bridged ring.
+            // This is needed in order to identify aromatic rings and stuff like this in
+            // rings that are member of the superring.
+            this.backupRingInformation();
 
             // Replace rings contained by a larger bridged ring with a bridged ring
             while (this.rings.length > 0) {
@@ -5293,6 +5358,38 @@ var SmilesDrawer = function () {
                 if (size > maxSize) {
                     maxSize = size;
                     largestCommonRing = this.getRing(commonRings[i]);
+                }
+            }
+
+            return largestCommonRing;
+        }
+
+        /**
+         * Returns the aromatic or largest ring shared by the two vertices.
+         *
+         * @param {Vertex} vertexA A vertex.
+         * @param {Vertex} vertexB A vertex.
+         * @returns {Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
+         */
+
+    }, {
+        key: 'getLargestOrAromaticCommonRing',
+        value: function getLargestOrAromaticCommonRing(vertexA, vertexB) {
+            var commonRings = this.getCommonRings(vertexA, vertexB);
+            var maxSize = 0;
+            var largestCommonRing = null;
+
+            for (var i = 0; i < commonRings.length; i++) {
+                var ring = this.getRing(commonRings[i]);
+                var size = ring.getSize();
+
+                if (ring.isBenzeneLike(this.vertices)) {
+                    return ring;
+                }
+
+                if (size > maxSize) {
+                    maxSize = size;
+                    largestCommonRing = ring;
                 }
             }
 
@@ -6204,18 +6301,6 @@ var SmilesDrawer = function () {
                 }
             }
 
-            /*
-            for (let i = 0; i < totalLength; i++) {
-                if (i < vertices.length) {
-                    this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
-                } else if (i < vertices.length + ring.rings.length) { 
-                    this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'c');
-                } else {
-                    this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'm');
-                }
-            }
-            */
-
             for (var _u4 = 0; _u4 < vertices.length; _u4++) {
                 var _vertex5 = this.vertices[vertices[_u4]];
                 var parentVertex = this.vertices[_vertex5.parentVertexId];
@@ -6285,7 +6370,6 @@ var SmilesDrawer = function () {
                 var a = vertexA.position;
                 var b = vertexB.position;
                 var normals = _this.getEdgeNormals(edge);
-                var gradient = 'gradient' + vertexA.value.element.toUpperCase() + vertexB.value.element.toUpperCase();
 
                 // Create a point on each side of the line
                 var sides = ArrayHelper.clone(normals);
@@ -6304,7 +6388,7 @@ var SmilesDrawer = function () {
                         // Always draw double bonds inside a ring
                         // if the bond is shared by two rings, it is drawn in the larger
                         // problem: smaller ring is aromatic, bond is still drawn in larger -> fix this
-                        var lcr = _this.getLargestCommonRing(vertexA, vertexB);
+                        var lcr = _this.getLargestOrAromaticCommonRing(vertexA, vertexB);
                         var center = lcr.center;
 
                         ArrayHelper.each(normals, function (v) {
@@ -6522,19 +6606,19 @@ var SmilesDrawer = function () {
     }, {
         key: 'clearPositions',
         value: function clearPositions() {
-            this.backupVertices = [];
-            this.backupRings = [];
+            this.vertexPositionsBackup = [];
+            this.ringPositionsBackup = [];
 
             for (var i = 0; i < this.vertices.length; i++) {
                 var vertex = this.vertices[i];
-                this.backupVertices.push(vertex.clone());
+                this.vertexPositionsBackup.push(vertex.position.clone());
                 vertex.positioned = false;
                 vertex.position = new Vector2();
             }
 
             for (var _i40 = 0; _i40 < this.rings.length; _i40++) {
                 var ring = this.rings[_i40];
-                this.backupRings.push(ring.clone());
+                this.ringPositionsBackup.push(ring.center.clone());
                 ring.positioned = false;
                 ring.center = new Vector2();
             }
@@ -6548,12 +6632,74 @@ var SmilesDrawer = function () {
     }, {
         key: 'restorePositions',
         value: function restorePositions() {
-            for (var i = 0; i < this.backupVertices.length; i++) {
-                this.vertices[i] = this.backupVertices[i];
+            for (var i = 0; i < this.vertexPositionsBackup.length; i++) {
+                this.vertices[i].position = this.vertexPositionsBackup[i];
+                this.vertices[i].positioned = true;
             }
 
-            for (var _i41 = 0; _i41 < this.backupRings.length; _i41++) {
-                this.rings[_i41] = this.backupRings[_i41];
+            for (var _i41 = 0; _i41 < this.ringPositionsBackup.length; _i41++) {
+                this.rings[_i41].center = this.ringPositionsBackup[_i41];
+                this.rings[_i41].positioned = true;
+            }
+        }
+
+        /**
+         * Stores the current information associated with rings.
+         * 
+         */
+
+    }, {
+        key: 'backupRingInformation',
+        value: function backupRingInformation() {
+            this.originalRings = [];
+            this.originalRingConnections = [];
+
+            for (var i = 0; i < this.rings.length; i++) {
+                this.originalRings.push(this.rings[i]);
+            }
+
+            for (var _i42 = 0; _i42 < this.ringConnections.length; _i42++) {
+                this.originalRingConnections.push(this.ringConnections[_i42]);
+            }
+
+            for (var _i43 = 0; _i43 < this.vertices.length; _i43++) {
+                this.vertices[_i43].value.backupRings();
+            }
+        }
+
+        /**
+         * Restores the most recently backed up information associated with rings.
+         * 
+         */
+
+    }, {
+        key: 'restoreRingInformation',
+        value: function restoreRingInformation() {
+            // Get the subring centers from the bridged rings
+            var bridgedRings = this.getBridgedRings();
+
+            this.rings = [];
+            this.ringConnections = [];
+
+            for (var i = 0; i < bridgedRings.length; i++) {
+                var bridgedRing = bridgedRings[i];
+
+                for (var j = 0; j < bridgedRing.rings.length; j++) {
+                    var ring = bridgedRing.rings[j];
+                    this.originalRings[ring.id].center = ring.center;
+                }
+            }
+
+            for (var _i44 = 0; _i44 < this.originalRings.length; _i44++) {
+                this.rings.push(this.originalRings[_i44]);
+            }
+
+            for (var _i45 = 0; _i45 < this.originalRingConnections.length; _i45++) {
+                this.ringConnections.push(this.originalRingConnections[_i45]);
+            }
+
+            for (var _i46 = 0; _i46 < this.vertices.length; _i46++) {
+                this.vertices[_i46].value.restoreRings();
             }
         }
 
@@ -6705,8 +6851,8 @@ var SmilesDrawer = function () {
             }
 
             // Next, draw atoms that are not part of a ring that are directly attached to this ring
-            for (var _i42 = 0; _i42 < ring.members.length; _i42++) {
-                var ringMember = this.vertices[ring.members[_i42]];
+            for (var _i47 = 0; _i47 < ring.members.length; _i47++) {
+                var ringMember = this.vertices[ring.members[_i47]];
                 var ringMemberNeighbours = ringMember.getNeighbours();
 
                 // If there are multiple, the ovlerap will be resolved in the appropriate step
@@ -6838,14 +6984,14 @@ var SmilesDrawer = function () {
                 }
             }
 
-            for (var _i43 = 0; _i43 < sharedSideChains.length; _i43++) {
-                var chain = sharedSideChains[_i43];
+            for (var _i48 = 0; _i48 < sharedSideChains.length; _i48++) {
+                var chain = sharedSideChains[_i48];
                 var angle = -chain.vertex.position.getRotateToAngle(chain.other.position, chain.common.position);
                 this.rotateSubtree(chain.vertex.id, chain.common.id, angle + Math.PI, chain.common.position);
             }
 
-            for (var _i44 = 0; _i44 < overlaps.length; _i44++) {
-                var overlap = overlaps[_i44];
+            for (var _i49 = 0; _i49 < overlaps.length; _i49++) {
+                var overlap = overlaps[_i49];
 
                 if (overlap.vertices.length == 1) {
                     var _a3 = overlap.vertices[0];

@@ -258,6 +258,8 @@ A class representing an atom
         * [.hasRingbonds()](#Atom+hasRingbonds) ⇒ <code>boolean</code>
         * [.getMaxRingbond()](#Atom+getMaxRingbond) ⇒ <code>number</code>
         * [.hasRing(ringId)](#Atom+hasRing) ⇒ <code>boolean</code>
+        * [.backupRings()](#Atom+backupRings)
+        * [.restoreRings()](#Atom+restoreRings)
         * [.haveCommonRingbond(atomA, atomB)](#Atom+haveCommonRingbond) ⇒ <code>boolean</code>
         * [.maxCommonRingbond(atomA, atomB)](#Atom+maxCommonRingbond) ⇒ <code>number</code>
         * [.getOrder(center)](#Atom+getOrder) ⇒ <code>number</code>
@@ -330,6 +332,18 @@ Checks whether or not this atom is a member of a given ring.
 | --- | --- | --- |
 | ringId | <code>number</code> | A ring id. |
 
+<a name="Atom+backupRings"></a>
+
+### atom.backupRings()
+Backs up the current rings.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+<a name="Atom+restoreRings"></a>
+
+### atom.restoreRings()
+Restores the most recent backed up rings.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
 <a name="Atom+haveCommonRingbond"></a>
 
 ### atom.haveCommonRingbond(atomA, atomB) ⇒ <code>boolean</code>
@@ -1065,6 +1079,8 @@ A class representing a ring
         * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#Ring+eachMember)
         * [.getOrderedNeighbours(ringConnections)](#Ring+getOrderedNeighbours) ⇒ <code>array</code>
         * [.isAromatic(vertices)](#Ring+isAromatic) ⇒ <code>boolean</code>
+        * [.isBenzeneLike(vertices)](#Ring+isBenzeneLike) ⇒ <code>boolean</code>
+        * [.getDoubleBondCount(vertices)](#Ring+getDoubleBondCount) ⇒ <code>number</code>
         * [.contains(vertexId)](#Ring+contains) ⇒ <code>boolean</code>
         * [.thisOrNeighboursContain(rings, vertexId)](#Ring+thisOrNeighboursContain) ⇒ <code>boolean</code>
         * [.hasSource()](#Ring+hasSource) ⇒ <code>boolean</code>
@@ -1160,10 +1176,34 @@ Returns an array containing the neighbouring rings of this ring ordered by ring 
 <a name="Ring+isAromatic"></a>
 
 ### ring.isAromatic(vertices) ⇒ <code>boolean</code>
-Check whether this ring is aromatic but has no explicit double-bonds defined (e.g. c1ccccc1).
+Check whether this ring is explicitly aromatic (e.g. c1ccccc1).
 
 **Kind**: instance method of <code>[Ring](#Ring)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not this ring is implicitly aromatic (using lowercase letters in smiles).  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not this ring is explicitly aromatic (using lowercase letters in smiles).  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>array</code> | An array of vertices associated with the current molecule. |
+
+<a name="Ring+isBenzeneLike"></a>
+
+### ring.isBenzeneLike(vertices) ⇒ <code>boolean</code>
+Check whether this ring is an implicitly defined benzene-like (e.g. C1=CC=CC=C1) with 6 members and 3 double bonds.
+
+**Kind**: instance method of <code>[Ring](#Ring)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not this ring is an implicitly defined benzene-like.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>array</code> | An array of vertices associated with the current molecule. |
+
+<a name="Ring+getDoubleBondCount"></a>
+
+### ring.getDoubleBondCount(vertices) ⇒ <code>number</code>
+Get the number of double bonds inside this ring.
+
+**Kind**: instance method of <code>[Ring](#Ring)</code>  
+**Returns**: <code>number</code> - The number of double bonds inside this ring.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1367,6 +1407,7 @@ The main class of the application representing the smiles drawer
     * [.getCommonRings(vertexA, vertexB)](#SmilesDrawer+getCommonRings) ⇒ <code>array</code>
     * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer+getSmallestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
     * [.getLargestCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+    * [.getLargestOrAromaticCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestOrAromaticCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
     * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer+getVerticesAt) ⇒ <code>array</code>
     * [.getClosestVertex(vertex)](#SmilesDrawer+getClosestVertex) ⇒ <code>[Vertex](#Vertex)</code>
     * [.getClosestEndpointVertex(vertex)](#SmilesDrawer+getClosestEndpointVertex) ⇒ <code>[Vertex](#Vertex)</code>
@@ -1392,6 +1433,8 @@ The main class of the application representing the smiles drawer
     * [.position()](#SmilesDrawer+position)
     * [.clearPositions()](#SmilesDrawer+clearPositions)
     * [.restorePositions()](#SmilesDrawer+restorePositions)
+    * [.backupRingInformation()](#SmilesDrawer+backupRingInformation)
+    * [.restoreRingInformation()](#SmilesDrawer+restoreRingInformation)
     * [.createRing(ring, center, [startVector], [previousVertex])](#SmilesDrawer+createRing)
     * [.rotateSubtree(vertexId, parentVertexId, angle, center)](#SmilesDrawer+rotateSubtree)
     * [.getCurrentCenterOfMass()](#SmilesDrawer+getCurrentCenterOfMass) ⇒ <code>[Vector2](#Vector2)</code>
@@ -1663,6 +1706,19 @@ Returns the largest ring shared by the two vertices.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 **Returns**: <code>[Ring](#Ring)</code> &#124; <code>null</code> - If a largest common ring exists, that ring, else null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
+| vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
+
+<a name="SmilesDrawer+getLargestOrAromaticCommonRing"></a>
+
+### smilesDrawer.getLargestOrAromaticCommonRing(vertexA, vertexB) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+Returns the aromatic or largest ring shared by the two vertices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>[Ring](#Ring)</code> &#124; <code>null</code> - If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1959,6 +2015,18 @@ Reset the positions of rings and vertices. The previous positions will be backed
 
 ### smilesDrawer.restorePositions()
 Restore the positions backed up during the last clearPositions() call.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+<a name="SmilesDrawer+backupRingInformation"></a>
+
+### smilesDrawer.backupRingInformation()
+Stores the current information associated with rings.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+<a name="SmilesDrawer+restoreRingInformation"></a>
+
+### smilesDrawer.restoreRingInformation()
+Restores the most recently backed up information associated with rings.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer+createRing"></a>

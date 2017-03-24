@@ -124,9 +124,9 @@ class SmilesDrawer {
         this.rings = [];
         this.ringConnections = [];
 
-        this.backupVertices = [];
-        this.backupRings = [];
-
+        this.originalRings = [];
+        this.originalRingConnections = [];
+        
         this.initGraph(data);
         this.initRings();
         
@@ -136,15 +136,11 @@ class SmilesDrawer {
 
         if (!infoOnly) {
             this.position();
+
+            // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
+            this.restoreRingInformation();
             
             let overlapScore = this.getOverlapScore();
-            let count = 0;
-            let bridgedRingCount = this.getBridgedRings().length;        
-            let iterations = this.opts.drawingIterations;
-            // Only redraw if there are no bridged rings ...
-            if (bridgedRingCount > 0) {
-                iterations = 2;
-            }
 
             this.resolveSecondaryOverlaps(overlapScore.scores);
             this.totalOverlapScore = this.getOverlapScore().total;
@@ -477,6 +473,11 @@ class SmilesDrawer {
             let ring = this.rings[i];
             ring.neighbours = RingConnection.getNeighbours(this.ringConnections, ring.id);
         }
+
+        // Backup the ring information to restore after placing the bridged ring.
+        // This is needed in order to identify aromatic rings and stuff like this in
+        // rings that are member of the superring.
+        this.backupRingInformation();
 
         // Replace rings contained by a larger bridged ring with a bridged ring
         while (this.rings.length > 0) {
@@ -813,8 +814,6 @@ class SmilesDrawer {
         return v;
     }
 
-
-
     /**
      * Checks whether or not tow vertices are in the same ring.
      *
@@ -899,6 +898,35 @@ class SmilesDrawer {
             if (size > maxSize) {
                 maxSize = size;
                 largestCommonRing = this.getRing(commonRings[i]);
+            }
+        }
+
+        return largestCommonRing;
+    }
+
+    /**
+     * Returns the aromatic or largest ring shared by the two vertices.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
+     */
+    getLargestOrAromaticCommonRing(vertexA, vertexB) {
+        let commonRings = this.getCommonRings(vertexA, vertexB);
+        let maxSize = 0;
+        let largestCommonRing = null;
+
+        for (let i = 0; i < commonRings.length; i++) {
+            let ring = this.getRing(commonRings[i]);
+            let size = ring.getSize();
+
+            if (ring.isBenzeneLike(this.vertices)) {
+                return ring;
+            }
+            
+            if (size > maxSize) {
+                maxSize = size;
+                largestCommonRing = ring;
             }
         }
 
@@ -1763,20 +1791,7 @@ class SmilesDrawer {
                 let index = i - vertices.length;
                 ring.rings[index].center = positions[i];
             }
-        }
-
-        /*
-        for (let i = 0; i < totalLength; i++) {
-            if (i < vertices.length) {
-                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'v');
-            } else if (i < vertices.length + ring.rings.length) { 
-                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'c');
-            } else {
-                this.canvasWrapper.drawDebugText(positions[i].x, positions[i].y, 'm');
-            }
-        }
-        */
-        
+        }        
 
         for (let u = 0; u < vertices.length; u++) {
             let vertex = this.vertices[vertices[u]];
@@ -1839,7 +1854,6 @@ class SmilesDrawer {
             let a = vertexA.position;
             let b = vertexB.position;
             let normals = this.getEdgeNormals(edge);
-            let gradient = 'gradient' + vertexA.value.element.toUpperCase() + vertexB.value.element.toUpperCase();
 
             // Create a point on each side of the line
             let sides = ArrayHelper.clone(normals);
@@ -1853,12 +1867,12 @@ class SmilesDrawer {
                 // Always draw double bonds inside the ring
                 let inRing = this.areVerticesInSameRing(vertexA, vertexB);
                 let s = this.chooseSide(vertexA, vertexB, sides);
-
+                
                 if (inRing) {
                     // Always draw double bonds inside a ring
                     // if the bond is shared by two rings, it is drawn in the larger
                     // problem: smaller ring is aromatic, bond is still drawn in larger -> fix this
-                    let lcr = this.getLargestCommonRing(vertexA, vertexB);
+                    let lcr = this.getLargestOrAromaticCommonRing(vertexA, vertexB);
                     let center = lcr.center;
 
                     ArrayHelper.each(normals, function (v) {
@@ -1987,7 +2001,7 @@ class SmilesDrawer {
         // Draw ring for benzenes
         for (let i = 0; i < this.rings.length; i++) {
             let ring = this.rings[i];
-            
+
             if (ring.isAromatic(this.vertices)) {
                 this.canvasWrapper.drawAromaticityRing(ring);
             }
@@ -2068,19 +2082,19 @@ class SmilesDrawer {
      *
      */
     clearPositions() {
-        this.backupVertices = [];
-        this.backupRings = [];
+        this.vertexPositionsBackup = [];
+        this.ringPositionsBackup = [];
 
         for (let i = 0; i < this.vertices.length; i++) {
             let vertex = this.vertices[i];
-            this.backupVertices.push(vertex.clone());
+            this.vertexPositionsBackup.push(vertex.position.clone());
             vertex.positioned = false;
             vertex.position = new Vector2();
         }
 
         for (let i = 0; i < this.rings.length; i++) {
             var ring = this.rings[i];
-            this.backupRings.push(ring.clone());
+            this.ringPositionsBackup.push(ring.center.clone());
             ring.positioned = false;
             ring.center = new Vector2();
         }
@@ -2090,13 +2104,69 @@ class SmilesDrawer {
      * Restore the positions backed up during the last clearPositions() call.
      *
      */
-    restorePositions() {
-        for (let i = 0; i < this.backupVertices.length; i++) {
-            this.vertices[i] = this.backupVertices[i];
+    restorePositions() {        
+        for (let i = 0; i < this.vertexPositionsBackup.length; i++) {
+            this.vertices[i].position = this.vertexPositionsBackup[i];
+            this.vertices[i].positioned = true;
         }
 
-        for (let i = 0; i < this.backupRings.length; i++) {
-            this.rings[i] = this.backupRings[i];
+        for (let i = 0; i < this.ringPositionsBackup.length; i++) {
+            this.rings[i].center = this.ringPositionsBackup[i];
+            this.rings[i].positioned = true;
+        }
+    }
+
+    /**
+     * Stores the current information associated with rings.
+     * 
+     */
+    backupRingInformation() {
+        this.originalRings = [];
+        this.originalRingConnections = [];
+
+        for (let i = 0; i < this.rings.length; i++) {
+            this.originalRings.push(this.rings[i]);
+        }
+
+        for (let i = 0; i < this.ringConnections.length; i++) {
+            this.originalRingConnections.push(this.ringConnections[i]);
+        }
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            this.vertices[i].value.backupRings();
+        }
+    }
+
+    /**
+     * Restores the most recently backed up information associated with rings.
+     * 
+     */
+    restoreRingInformation() {
+        // Get the subring centers from the bridged rings
+        let bridgedRings = this.getBridgedRings();
+
+        this.rings = [];
+        this.ringConnections = [];
+
+        for (let i = 0; i < bridgedRings.length; i++) {
+            let bridgedRing = bridgedRings[i];
+
+            for (let j = 0; j < bridgedRing.rings.length; j++) {
+                let ring = bridgedRing.rings[j];
+                this.originalRings[ring.id].center = ring.center;
+            }
+        }
+
+        for (let i = 0; i < this.originalRings.length; i++) {
+            this.rings.push(this.originalRings[i]);
+        }
+
+        for (let i = 0; i < this.originalRingConnections.length; i++) {
+            this.ringConnections.push(this.originalRingConnections[i]);
+        }
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            this.vertices[i].value.restoreRings();
         }
     }
 

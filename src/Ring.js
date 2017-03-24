@@ -169,21 +169,51 @@ class Ring {
     }
 
     /**
-     * Check whether this ring is aromatic but has no explicit double-bonds defined (e.g. c1ccccc1).
+     * Check whether this ring is explicitly aromatic (e.g. c1ccccc1).
      *
      * @param {array} vertices An array of vertices associated with the current molecule.
-     * @returns {boolean} A boolean indicating whether or not this ring is implicitly aromatic (using lowercase letters in smiles).
+     * @returns {boolean} A boolean indicating whether or not this ring is explicitly aromatic (using lowercase letters in smiles).
      */
     isAromatic(vertices) {
         for (let i = 0; i < this.members.length; i++) {
             let e = vertices[this.members[i]].value.element.charAt(0);
 
-            if (e == e.toUpperCase()) {
+            if (e === e.toUpperCase()) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Check whether this ring is an implicitly defined benzene-like (e.g. C1=CC=CC=C1) with 6 members and 3 double bonds.
+     *
+     * @param {array} vertices An array of vertices associated with the current molecule.
+     * @returns {boolean} A boolean indicating whether or not this ring is an implicitly defined benzene-like.
+     */
+    isBenzeneLike(vertices) {
+        return this.getDoubleBondCount(vertices) === 3 && this.members.length === 6;
+    }
+
+    /**
+     * Get the number of double bonds inside this ring.
+     *
+     * @param {array} vertices An array of vertices associated with the current molecule.
+     * @returns {number} The number of double bonds inside this ring.
+     */
+    getDoubleBondCount(vertices) {
+        let doubleBondCount = 0;
+
+        for (let i = 0; i < this.members.length; i++) {
+            let bondType = vertices[this.members[i]].value.bondType;
+
+            if (bondType === '=') {
+                doubleBondCount++;
+            }
+        }
+
+        return doubleBondCount;
     }
 
     /**

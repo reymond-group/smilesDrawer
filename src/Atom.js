@@ -94,6 +94,28 @@ class Atom {
     }
 
     /**
+     * Backs up the current rings.
+     */
+    backupRings() {
+        this.originalRings = [];
+
+        for (let i = 0; i < this.rings.length; i++) {
+            this.originalRings.push(this.rings[i]);
+        }
+    }
+
+    /**
+     * Restores the most recent backed up rings.
+     */
+    restoreRings() {
+        this.rings = [];
+        
+        for (let i = 0; i < this.originalRings.length; i++) {
+            this.rings.push(this.originalRings[i]);
+        }
+    }
+
+    /**
      * Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.
      *
      * @param {Atom} atomA An atom.
