@@ -142,7 +142,7 @@ class SmilesDrawer {
             
             let overlapScore = this.getOverlapScore();
 
-            this.resolveSecondaryOverlaps(overlapScore.scores);
+            // this.resolveSecondaryOverlaps(overlapScore.scores);
             this.totalOverlapScore = this.getOverlapScore().total;
             
             // Set the canvas to the appropriate size
@@ -1240,6 +1240,30 @@ class SmilesDrawer {
     }
 
     /**
+     * Check whether or not the two vertices specified span a bond which is a ring connection (fused rings).
+     * 
+     * @param {number} vertexIdA A vertex id.
+     * @param {number} vertexIdB A vertex id.
+     * @returns {boolean} Returns a boolean indicating whether or not the two vertices specify a ringbond.
+     */
+    isRingConnection(vertexIdA, vertexIdB) {
+        for (let i = 0; i < this.ringConnections.length; i++) {
+            let ringConnection = this.ringConnections[i];
+            
+            if (ringConnection.vertices.length !== 2) {
+                continue;
+            }
+
+            if (ringConnection.vertices[0] === vertexIdA && ringConnection.vertices[1] === vertexIdB ||
+                ringConnection.vertices[0] === vertexIdB && ringConnection.vertices[1] === vertexIdA) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the overlap score of the current molecule based on its positioned vertices. The higher the score, the more overlaps occur in the structure drawing.
      *
      * @returns {object} Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }
@@ -2191,13 +2215,11 @@ class SmilesDrawer {
         let startingAngle = startVector ? Vector2.subtract(startVector.position, center).angle() : 0;
 
         let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
-        ring.radius = radius;
-        
         let angle = MathHelper.centralAngle(ring.getSize());
+
         ring.centralAngle = angle;
         
         let a = startingAngle;
-        
         let that = this;
 
         ring.eachMember(this.vertices, function (v) {
@@ -2228,6 +2250,7 @@ class SmilesDrawer {
 
         ring.positioned = true;
         ring.center = center;
+
         // Draw neighbours in decreasing order of connectivity
         for (let i = 0; i < orderedNeighbours.length; i++) {
             let neighbour = this.getRing(orderedNeighbours[i].neighbour);
@@ -2319,6 +2342,7 @@ class SmilesDrawer {
                 }
                 
                 let v = this.vertices[ringMemberNeighbours[j]];
+
                 this.createNextBond(v, ringMember, ring.center);
             }
         }
@@ -2435,7 +2459,7 @@ class SmilesDrawer {
 
         for (let i = 0; i < overlaps.length; i++) {
             let overlap = overlaps[i];
-            
+
             if (overlap.vertices.length == 1) {
                 let a = overlap.vertices[0];
                 
@@ -2446,6 +2470,28 @@ class SmilesDrawer {
                     for (let j = 0; j < overlap.rings.length; j++) {
                         a.flipRings.push(overlap.rings[j]);
                     }
+                }
+
+                // If the vertex comes out of two rings, it has to be rotated to point straight away (angles between it and both rings the same)
+                if (overlap.rings.length === 2) {
+                    let neighbours = overlap.common.getNeighbours();
+                    let positions = [];
+
+                    for (let j = 0; j < neighbours.length; j++) {
+                        let vertex = this.vertices[neighbours[j]];
+
+                        if (!this.isRingConnection(vertex.id, overlap.common.id) && vertex.id !== a.id) {
+                            positions.push(vertex.position);
+                        }
+                    }
+
+                    let midpoint = Vector2.midpoint(positions[0], positions[1]);
+                    let angle = a.position.getRotateToAngle(midpoint, overlap.common.position);
+
+                    // Problem: [H][C@@]12CC=C(C3=CC=CN=C3)[C@@]1(C)CC[C@@]1([H])[C@@]2([H])CC=C2C[C@@H](O)CC[C@]12C
+                    
+                    angle *= a.position.clockwise(midpoint);
+                    this.rotateSubtree(a.id, overlap.common.id, angle, overlap.common.position);
                 }
             } else if (overlap.vertices.length == 2) {
                 let angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
@@ -2626,6 +2672,7 @@ class SmilesDrawer {
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (previousVertex.value.rings.length == 2) {
+            console.log(vertex);
             // Here, ringOrAngle is always a ring
             let ringA = this.getRing(previousVertex.value.rings[0]);
             let ringB = this.getRing(previousVertex.value.rings[1]);
@@ -2647,6 +2694,7 @@ class SmilesDrawer {
             
             vertex.position.add(previousVertex.position);
             vertex.position.add(pos);
+
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         }
@@ -2673,7 +2721,7 @@ class SmilesDrawer {
 
             let angle = vertex.getAngle();
 
-            if (neighbours.length == 1) {
+            if (neighbours.length === 1) {
                 let nextVertex = this.vertices[neighbours[0]];
 
                 // Make a single chain always cis except when there's a tribble bond
@@ -2745,7 +2793,7 @@ class SmilesDrawer {
                     
                     this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
                 }
-            } else if (neighbours.length == 2) {
+            } else if (neighbours.length === 2) {
                 // Check for the longer subtree - always go with cis for the longer subtree
                 let subTreeDepthA = this.getTreeDepth(neighbours[0], vertex.id);
                 let subTreeDepthB = this.getTreeDepth(neighbours[1], vertex.id);
@@ -2777,7 +2825,7 @@ class SmilesDrawer {
                     this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, -dir);
                     this.createNextBond(transVertex, vertex, angle + transVertex.angle, -dir);
                 }
-            } else if (neighbours.length == 3) {
+            } else if (neighbours.length === 3) {
                 // The vertex with the longest sub-tree should always go straight
                 let d1 = this.getTreeDepth(neighbours[0], vertex.id);
                 let d2 = this.getTreeDepth(neighbours[1], vertex.id);
@@ -2799,7 +2847,8 @@ class SmilesDrawer {
                 }
                 
                 if (this.getTreeDepth(l.id, vertex.id) === 1 && 
-                    this.getTreeDepth(r.id, vertex.id) === 1) { 
+                    this.getTreeDepth(r.id, vertex.id) === 1 &&
+                    this.getTreeDepth(s.id, vertex.id) > 1) { 
                     
                     if (!dir) {
                         let proposedAngleA = MathHelper.toRad(60);
@@ -2835,18 +2884,18 @@ class SmilesDrawer {
                     // If it's chiral, the order changes - for anticlockwise, switch the draw order around
                     // to keep the drawing the same
                     if (vertex.value.bracket && vertex.value.bracket.chirality === '@@') {
-                        this.createNextBond(r, vertex, angle + MathHelper.toRad(30) * -dir);
-                        this.createNextBond(l, vertex, angle + MathHelper.toRad(90) * -dir); 
+                        this.createNextBond(r, vertex, angle + MathHelper.toRad(30) * dir);
+                        this.createNextBond(l, vertex, angle + MathHelper.toRad(90) * dir); 
                     } else {
-                        this.createNextBond(l, vertex, angle + MathHelper.toRad(30) * -dir);
-                        this.createNextBond(r, vertex, angle + MathHelper.toRad(90) * -dir);
+                        this.createNextBond(l, vertex, angle + MathHelper.toRad(30) * dir);
+                        this.createNextBond(r, vertex, angle + MathHelper.toRad(90) * dir);
                     }
                 } else {
                     this.createNextBond(s, vertex, angle);
                     this.createNextBond(l, vertex, angle + MathHelper.toRad(90));
                     this.createNextBond(r, vertex, angle - MathHelper.toRad(90));
                 }
-            } else if (neighbours.length == 4) {
+            } else if (neighbours.length === 4) {
                 // The vertex with the longest sub-tree should always go to the reflected opposide direction
                 let d1 = this.getTreeDepth(neighbours[0], vertex.id);
                 let d2 = this.getTreeDepth(neighbours[1], vertex.id);
@@ -2913,9 +2962,17 @@ class SmilesDrawer {
      */
     isPointInRing(vec) {
         for (let i = 0; i < this.rings.length; i++) {
-            let polygon = this.rings[i].getPolygon(this.vertices);
-            
-            if (vec.isInPolygon(polygon)) {
+            let ring = this.rings[i];
+
+            if (!ring.positioned) {
+                continue;
+            }
+
+            let polygon = ring.getPolygon(this.vertices);
+            let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
+            let radiusSq = radius * radius;
+
+            if (vec.distanceSq(ring.center) < radiusSq) {
                 return true;
             }
         }

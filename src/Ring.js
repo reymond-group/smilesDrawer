@@ -22,7 +22,6 @@ class Ring {
         this.template = null;
         this.isSpiro = false;
         this.isFused = false;
-        this.radius = 0.0;
         this.centralAngle = 0.0;
         this.canFlip = true;
     }
@@ -46,7 +45,6 @@ class Ring {
         clone.template = this.template;
         clone.isSpiro = this.isSpiro;
         clone.isFused = this.isFused;
-        clone.radius = this.radius;
         clone.centralAngle = this.centralAngle;
         clone.canFlip = this.canFlip;
 

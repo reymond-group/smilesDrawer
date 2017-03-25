@@ -237,7 +237,7 @@ class Vector2 {
         let a = Vector2.subtract(this, center);
         let b = Vector2.subtract(vec, center);
         let angle = Vector2.angle(b, a);
-
+        
         return angle;
     }
 

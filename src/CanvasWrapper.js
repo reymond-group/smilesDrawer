@@ -519,7 +519,9 @@ class CanvasWrapper {
             let hy = y - dim.height / 2.0 + offsetY;
 
             ctx.font = fontSmall;
+
             let cDim = ctx.measureText(hydrogens);
+
             cDim.height = parseInt(fontSmall, 10);
 
             if (direction === 'left') {
@@ -564,14 +566,15 @@ class CanvasWrapper {
      * @param {Ring} ring A ring.
      */
     drawAromaticityRing(ring) {
-        var ctx = this.ctx;
+        let ctx = this.ctx;
+        let radius = MathHelper.polyCircumradius(this.bondLength, ring.getSize());
 
         ctx.save();
         ctx.strokeStyle = this.getColor('C');
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, 
-                ring.radius - this.bondLength / 3.0, 0, Math.PI * 2, true); 
+                radius - this.bondLength / 3.0 - this.bondSpacing, 0, Math.PI * 2, true); 
         ctx.closePath();
         ctx.stroke();
         ctx.restore();
