@@ -142,7 +142,7 @@ class SmilesDrawer {
             
             let overlapScore = this.getOverlapScore();
 
-            // this.resolveSecondaryOverlaps(overlapScore.scores);
+            this.resolveSecondaryOverlaps(overlapScore.scores);
             this.totalOverlapScore = this.getOverlapScore().total;
             
             // Set the canvas to the appropriate size
@@ -2488,8 +2488,6 @@ class SmilesDrawer {
                     let midpoint = Vector2.midpoint(positions[0], positions[1]);
                     let angle = a.position.getRotateToAngle(midpoint, overlap.common.position);
 
-                    // Problem: [H][C@@]12CC=C(C3=CC=CN=C3)[C@@]1(C)CC[C@@]1([H])[C@@]2([H])CC=C2C[C@@H](O)CC[C@]12C
-                    
                     angle *= a.position.clockwise(midpoint);
                     this.rotateSubtree(a.id, overlap.common.id, angle, overlap.common.position);
                 }
@@ -2536,8 +2534,24 @@ class SmilesDrawer {
             if (scores[i].score > this.opts.bondLength / 5) {
                 let vertex = this.vertices[scores[i].id];
 
+                if (vertex.isTerminal()) {
+                    let closest = this.getClosestEndpointVertex(vertex);
+
+                    if (closest) {
+                        // If one of the vertices is the first one, the previous vertex is not the central vertex but the dummy
+                        // so take the next rather than the previous, which is vertex 1
+                        let closestPreviousPosition = closest.id === 0 ? this.vertices[1].position : closest.previousPosition;
+                        let vertexPreviousPosition = vertex.id === 0 ? this.vertices[1].position : vertex.previousPosition;
+
+                        vertex.position.rotateAwayFrom(closestPreviousPosition, vertexPreviousPosition, MathHelper.toRad(20));
+                    } else if (a && a.allowsFlip()) {
+                        // No other options that to flip ...
+                        vertex.position.rotateTo(a.center, flipCenter);
+                        a.setFlipped();
+                    }
+                }
+
                 if (vertex.flippable) {
-                    // Rings that get concatenated in to a bridge one, will be undefined here ...
                     let a = vertex.flipRings[0] ? this.rings[vertex.flipRings[0]] : null;
                     let b = vertex.flipRings[1] ? this.rings[vertex.flipRings[1]] : null;
                     let flipCenter = this.vertices[vertex.flipCenter].position;
@@ -2571,19 +2585,7 @@ class SmilesDrawer {
                             }
                         }
                     } else {
-                        // Rotate away from closest vertices parents position 
-                        
-                        // TODO: Not working every time ...
-                        let closest = this.getClosestEndpointVertex(vertex);
 
-                        if (closest) {
-                            let dir = vertex.position.clockwise(closest.previousPosition);
-                            vertex.position.rotateAround(-0.5 * dir, vertex.previousPosition);
-                        } else if (a && a.allowsFlip()) {
-                            // No other options that to flip ...
-                            vertex.position.rotateTo(a.center, flipCenter);
-                            a.setFlipped();
-                        }
                     }
 
                     // Only do a refresh of the remaining!
@@ -2672,7 +2674,6 @@ class SmilesDrawer {
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (previousVertex.value.rings.length == 2) {
-            console.log(vertex);
             // Here, ringOrAngle is always a ring
             let ringA = this.getRing(previousVertex.value.rings[0]);
             let ringB = this.getRing(previousVertex.value.rings[1]);

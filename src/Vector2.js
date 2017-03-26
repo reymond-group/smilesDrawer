@@ -227,6 +227,28 @@ class Vector2 {
     }
 
     /**
+     * Rotates the vector away from a specified vector around a center.
+     * 
+     * @param {Vector2} vec The vector this one is rotated away from.
+     * @param {Vector2} center The rotational center.
+     * @param {number} angle The angle by which to rotate.
+     */
+    rotateAwayFrom(vec, center, angle) {
+        this.rotateAround(angle, center);
+        
+        let distSqA = this.distanceSq(vec);
+        
+        this.rotateAround(-2.0 * angle, center);
+
+        let distSqB = this.distanceSq(vec);
+
+        // If it was rotated towards the other vertex, rotate in other direction by same amount.
+        if (distSqB < distSqA) {
+            this.rotateAround(2.0 * angle, center);
+        }
+    }
+
+    /**
      * Gets the angles between this vector and another vector around a common center of rotation.
      *
      * @param {Vector2} vec Another vector.
@@ -238,7 +260,7 @@ class Vector2 {
         let b = Vector2.subtract(vec, center);
         let angle = Vector2.angle(b, a);
         
-        return angle;
+        return Number.isNaN(angle) ? 0.0 : angle;
     }
 
     /**
