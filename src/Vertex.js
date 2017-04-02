@@ -18,6 +18,8 @@ class Vertex {
         this.edges = [];
         this.positioned = false;
         this.angle = 0.0;
+        this.globalAngle = 0.0;
+        this.dir = 1.0;
         this.backAngle = 0.0;
         this.flippable = false; // can be flipped into a ring
         this.flipCenter = null;
@@ -144,6 +146,21 @@ class Vertex {
         }
 
         return neighbours;
+    }
+
+    /**
+     * Returns the number of neighbours of this vertex.
+     *
+     * @returns {number} The number of neighbours.
+     */
+    getNeighbourCount() {
+        let count = this.children.length;
+
+        if (this.parentVertexId !== null) {
+            count += 1;
+        }
+
+        return count;
     }
 
     /**

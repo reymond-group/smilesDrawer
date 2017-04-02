@@ -1421,6 +1421,7 @@ The main class of the application representing the smiles drawer
     * [.removeRingConnection(ringConnectionId)](#SmilesDrawer+removeRingConnection)
     * [.removeRingConnectionsBetween(vertexIdA, vertexIdB)](#SmilesDrawer+removeRingConnectionsBetween)
     * [.getRingConnections(ringId, ringIds)](#SmilesDrawer+getRingConnections) ⇒ <code>array</code>
+    * [.isRingConnection(vertexIdA, vertexIdB)](#SmilesDrawer+isRingConnection) ⇒ <code>boolean</code>
     * [.getOverlapScore()](#SmilesDrawer+getOverlapScore) ⇒ <code>object</code>
     * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer+chooseSide) ⇒ <code>object</code>
     * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer+areConnected) ⇒ <code>boolean</code>
@@ -1437,6 +1438,7 @@ The main class of the application representing the smiles drawer
     * [.restoreRingInformation()](#SmilesDrawer+restoreRingInformation)
     * [.createRing(ring, center, [startVector], [previousVertex])](#SmilesDrawer+createRing)
     * [.rotateSubtree(vertexId, parentVertexId, angle, center)](#SmilesDrawer+rotateSubtree)
+    * [.getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores)](#SmilesDrawer+getSubtreeOverlapScore) ⇒ <code>number</code>
     * [.getCurrentCenterOfMass()](#SmilesDrawer+getCurrentCenterOfMass) ⇒ <code>[Vector2](#Vector2)</code>
     * [.getCurrentCenterOfMassInNeigbourhood(vec, [r])](#SmilesDrawer+getCurrentCenterOfMassInNeigbourhood) ⇒ <code>[Vector2](#Vector2)</code>
     * [.resolvePrimaryOverlaps()](#SmilesDrawer+resolvePrimaryOverlaps)
@@ -1445,6 +1447,7 @@ The main class of the application representing the smiles drawer
     * [.getCommonRingbondNeighbour(vertex)](#SmilesDrawer+getCommonRingbondNeighbour) ⇒ <code>number</code> &#124; <code>null</code>
     * [.isPointInRing(vec)](#SmilesDrawer+isPointInRing) ⇒ <code>boolean</code>
     * [.isEdgeInRing(edge)](#SmilesDrawer+isEdgeInRing) ⇒ <code>boolean</code>
+    * [.isEdgeRotatable(edge)](#SmilesDrawer+isEdgeRotatable) ⇒ <code>boolean</code>
     * [.isRingAromatic(ring)](#SmilesDrawer+isRingAromatic) ⇒ <code>boolean</code>
     * [.isEdgeInAromaticRing(edge)](#SmilesDrawer+isEdgeInAromaticRing) ⇒ <code>boolean</code>
     * [.isVertexInAromaticRing(vertexId)](#SmilesDrawer+isVertexInAromaticRing) ⇒ <code>boolean</code>
@@ -1663,7 +1666,7 @@ Gets the minimal distance from an array containing distances.
 <a name="SmilesDrawer+areVerticesInSameRing"></a>
 
 ### smilesDrawer.areVerticesInSameRing(vertexA, vertexB) ⇒ <code>boolean</code>
-Checks whether or not tow vertices are in the same ring.
+Checks whether or not two vertices are in the same ring.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 **Returns**: <code>boolean</code> - A boolean indicating whether or not the two vertices are in the same ring.  
@@ -1883,6 +1886,19 @@ Get the ring connections associated with a ring, the ring connections between tw
 | ringId | <code>number</code> |  | A ring id. |
 | ringIds | <code>number</code> &#124; <code>array</code> &#124; <code>null</code> | <code></code> | A ring id, an array of ring ids or null. |
 
+<a name="SmilesDrawer+isRingConnection"></a>
+
+### smilesDrawer.isRingConnection(vertexIdA, vertexIdB) ⇒ <code>boolean</code>
+Check whether or not the two vertices specified span a bond which is a ring connection (fused rings).
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>boolean</code> - Returns a boolean indicating whether or not the two vertices specify a ringbond.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>number</code> | A vertex id. |
+| vertexIdB | <code>number</code> | A vertex id. |
+
 <a name="SmilesDrawer+getOverlapScore"></a>
 
 ### smilesDrawer.getOverlapScore() ⇒ <code>object</code>
@@ -2057,6 +2073,20 @@ Rotate an entire subtree by an angle around a center.
 | angle | <code>number</code> | An angle in randians. |
 | center | <code>[Vector2](#Vector2)</code> | The rotational center. |
 
+<a name="SmilesDrawer+getSubtreeOverlapScore"></a>
+
+### smilesDrawer.getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores) ⇒ <code>number</code>
+Gets the overlap score of a subtree.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>number</code> - The overlap score of the subtree.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>number</code> | A vertex id (the root of the sub-tree). |
+| parentVertexId | <code>number</code> | A vertex id in the previous direction of the subtree. |
+| vertexOverlapScores | <code>Array</code> | An array containing the vertex overlap scores indexed by vertex id. |
+
 <a name="SmilesDrawer+getCurrentCenterOfMass"></a>
 
 ### smilesDrawer.getCurrentCenterOfMass() ⇒ <code>[Vector2](#Vector2)</code>
@@ -2139,6 +2169,18 @@ Check whether or not an edge is part of a ring.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 **Returns**: <code>boolean</code> - A boolean indicating whether or not the edge is part of a ring.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| edge | <code>[Edge](#Edge)</code> | An edge. |
+
+<a name="SmilesDrawer+isEdgeRotatable"></a>
+
+### smilesDrawer.isEdgeRotatable(edge) ⇒ <code>boolean</code>
+Check whether or not an edge is rotatable.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not the edge is rotatable.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2269,6 +2311,9 @@ A class representing a 2D vector.
         * [.rotate(angle)](#Vector2+rotate) ⇒ <code>[Vector2](#Vector2)</code>
         * [.rotateAround(angle, vec)](#Vector2+rotateAround) ⇒ <code>[Vector2](#Vector2)</code>
         * [.rotateTo(vec, center, [offsetAngle])](#Vector2+rotateTo) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.rotateAwayFrom(vec, center, angle)](#Vector2+rotateAwayFrom)
+        * [.getRotateAwayFromAngle(vec, center, angle)](#Vector2+getRotateAwayFromAngle) ⇒ <code>number</code>
+        * [.getRotateTowardsAngle(vec, center, angle)](#Vector2+getRotateTowardsAngle) ⇒ <code>number</code>
         * [.getRotateToAngle(vec, center)](#Vector2+getRotateToAngle) ⇒ <code>number</code>
         * [.isInPolygon(polygon)](#Vector2+isInPolygon) ⇒ <code>boolean</code>
         * [.length()](#Vector2+length) ⇒ <code>number</code>
@@ -2286,6 +2331,7 @@ A class representing a 2D vector.
         * [.divide(vecA, vecB)](#Vector2.divide) ⇒ <code>[Vector2](#Vector2)</code>
         * [.dot(vecA, vecB)](#Vector2.dot) ⇒ <code>number</code>
         * [.angle(vecA, vecB)](#Vector2.angle) ⇒ <code>number</code>
+        * [.threePointangle(vecA, vecB, vecC)](#Vector2.threePointangle) ⇒ <code>number</code>
         * [.scalarProjection(vecA, vecB)](#Vector2.scalarProjection) ⇒ <code>number</code>
 
 <a name="new_Vector2_new"></a>
@@ -2462,6 +2508,47 @@ Rotate a vector around a given center to the same angle as another vector (so th
 | vec | <code>[Vector2](#Vector2)</code> |  | The vector to rotate this vector to. |
 | center | <code>[Vector2](#Vector2)</code> |  | The rotational center. |
 | [offsetAngle] | <code>number</code> | <code>0.0</code> | An additional amount of radians to rotate the vector. |
+
+<a name="Vector2+rotateAwayFrom"></a>
+
+### vector2.rotateAwayFrom(vec, center, angle)
+Rotates the vector away from a specified vector around a center.
+
+**Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>[Vector2](#Vector2)</code> | The vector this one is rotated away from. |
+| center | <code>[Vector2](#Vector2)</code> | The rotational center. |
+| angle | <code>number</code> | The angle by which to rotate. |
+
+<a name="Vector2+getRotateAwayFromAngle"></a>
+
+### vector2.getRotateAwayFromAngle(vec, center, angle) ⇒ <code>number</code>
+Returns the angle in radians used to rotate this vector away from a given vector.
+
+**Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>number</code> - The angle in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>[Vector2](#Vector2)</code> | The vector this one is rotated away from. |
+| center | <code>[Vector2](#Vector2)</code> | The rotational center. |
+| angle | <code>number</code> | The angle by which to rotate. |
+
+<a name="Vector2+getRotateTowardsAngle"></a>
+
+### vector2.getRotateTowardsAngle(vec, center, angle) ⇒ <code>number</code>
+Returns the angle in radians used to rotate this vector towards a given vector.
+
+**Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>number</code> - The angle in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>[Vector2](#Vector2)</code> | The vector this one is rotated towards to. |
+| center | <code>[Vector2](#Vector2)</code> | The rotational center. |
+| angle | <code>number</code> | The angle by which to rotate. |
 
 <a name="Vector2+getRotateToAngle"></a>
 
@@ -2653,6 +2740,20 @@ Returns the angle between two vectors.
 | vecA | <code>[Vector2](#Vector2)</code> | A vector. |
 | vecB | <code>[Vector2](#Vector2)</code> | A vector. |
 
+<a name="Vector2.threePointangle"></a>
+
+### Vector2.threePointangle(vecA, vecB, vecC) ⇒ <code>number</code>
+Returns the angle between two vectors based on a third vector in between.
+
+**Kind**: static method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>number</code> - The angle in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>[Vector2](#Vector2)</code> | A vector. |
+| vecB | <code>[Vector2](#Vector2)</code> | A vector. |
+| vecC | <code>[Vector2](#Vector2)</code> | A vector. |
+
 <a name="Vector2.scalarProjection"></a>
 
 ### Vector2.scalarProjection(vecA, vecB) ⇒ <code>number</code>
@@ -2681,6 +2782,7 @@ A class representing a vertex
     * [.getAngle([referenceVector], [returnAsDegrees])](#Vertex+getAngle) ⇒ <code>number</code>
     * [.getTextDirection(vertices)](#Vertex+getTextDirection) ⇒ <code>string</code>
     * [.getNeighbours([vertexId])](#Vertex+getNeighbours) ⇒ <code>array</code>
+    * [.getNeighbourCount()](#Vertex+getNeighbourCount) ⇒ <code>number</code>
     * [.getCommonNeighbours(vertex)](#Vertex+getCommonNeighbours) ⇒ <code>array</code>
     * [.isNeighbour(vertexId)](#Vertex+isNeighbour) ⇒ <code>boolean</code>
     * [.getSpanningTreeNeighbours([vertexId])](#Vertex+getSpanningTreeNeighbours) ⇒ <code>array</code>
@@ -2761,6 +2863,13 @@ Returns an array of ids of neighbouring vertices.
 | --- | --- | --- | --- |
 | [vertexId] | <code>number</code> | <code></code> | If a value is supplied, the vertex with this id is excluded from the returned indices. |
 
+<a name="Vertex+getNeighbourCount"></a>
+
+### vertex.getNeighbourCount() ⇒ <code>number</code>
+Returns the number of neighbours of this vertex.
+
+**Kind**: instance method of <code>[Vertex](#Vertex)</code>  
+**Returns**: <code>number</code> - The number of neighbours.  
 <a name="Vertex+getCommonNeighbours"></a>
 
 ### vertex.getCommonNeighbours(vertex) ⇒ <code>array</code>

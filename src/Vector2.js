@@ -249,6 +249,58 @@ class Vector2 {
     }
 
     /**
+     * Returns the angle in radians used to rotate this vector away from a given vector.
+     * 
+     * @param {Vector2} vec The vector this one is rotated away from.
+     * @param {Vector2} center The rotational center.
+     * @param {number} angle The angle by which to rotate.
+     * @returns {number} The angle in radians.
+     */
+    getRotateAwayFromAngle(vec, center, angle) {
+        let tmp = this.clone();
+
+        tmp.rotateAround(angle, center);
+        
+        let distSqA = tmp.distanceSq(vec);
+        
+        tmp.rotateAround(-2.0 * angle, center);
+
+        let distSqB = tmp.distanceSq(vec);
+
+        if (distSqB < distSqA) {
+            return angle;
+        } else {
+            return -angle;
+        }
+    }
+
+    /**
+     * Returns the angle in radians used to rotate this vector towards a given vector.
+     * 
+     * @param {Vector2} vec The vector this one is rotated towards to.
+     * @param {Vector2} center The rotational center.
+     * @param {number} angle The angle by which to rotate.
+     * @returns {number} The angle in radians.
+     */
+    getRotateTowardsAngle(vec, center, angle) {
+        let tmp = this.clone();
+
+        tmp.rotateAround(angle, center);
+        
+        let distSqA = tmp.distanceSq(vec);
+        
+        tmp.rotateAround(-2.0 * angle, center);
+
+        let distSqB = tmp.distanceSq(vec);
+
+        if (distSqB > distSqA) {
+            return angle;
+        } else {
+            return -angle;
+        }
+    }
+
+    /**
      * Gets the angles between this vector and another vector around a common center of rotation.
      *
      * @param {Vector2} vec Another vector.
@@ -461,6 +513,24 @@ class Vector2 {
         let dot = Vector2.dot(vecA, vecB);
 
         return Math.acos(dot / (vecA.length() * vecB.length()));
+    }
+
+    /**
+     * Returns the angle between two vectors based on a third vector in between.
+     *
+     * @static
+     * @param {Vector2} vecA A vector.
+     * @param {Vector2} vecB A vector.
+     * @param {Vector2} vecC A vector.
+     * @returns {number} The angle in radians.
+     */
+    static threePointangle(vecA, vecB, vecC) {
+        let ab = Vector2.subtract(vecB - vecA);
+        let bc = Vector2.subtract(vecC, vecB);
+        let abLength = vecA.distance(vecB);
+        let bcLenght = vecB.distance(vecC);
+
+        return Math.acos(Vector2.dot(ab, bc) / (abLenght * bcLenght));
     }
     
     /**

@@ -28,7 +28,7 @@
                 console.log(i);
                 try {
                     let t = performance.now();
-                    let data = smiles.parse(drugbank[i]);
+                    let data = smiles.parse(SmilesDrawer.clean(drugbank[i]));
                     
                     smilesDrawer.draw(data, 'example-canvas', 'light', false);
                     

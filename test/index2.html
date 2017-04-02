@@ -25,6 +25,7 @@
                     canvas.setAttribute('id', 'canvas' + i);
                     canvas.setAttribute('width', '200');
                     canvas.setAttribute('height', '200');
+                    canvas.setAttribute('alt', drugbank[i]);
                     document.body.appendChild(canvas);
                     
                     let data = smiles.parse(drugbank[i]);
