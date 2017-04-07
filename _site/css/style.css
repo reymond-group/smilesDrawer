@@ -1,10 +1,10 @@
-/* Custom Stylesheet */
-/**
- * Use this file to override Materialize files so you can update
- * the core Materialize files in the future
- *
- * Made By MaterializeCSS.com
- */
+#canvas-container {
+  text-align: center;
+}
+
+#speed-info i, #speed-info span {
+  line-height: 20px;
+}
 
 .icon-block {
   padding: 0 15px;

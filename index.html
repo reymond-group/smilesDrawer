@@ -13,8 +13,8 @@
 </head>
 
 <body>
-  <nav class="teal darken-2" role="navigation">
-    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">SMILESdrawer</a>
+  <nav class="deep-purple" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Smiles Drawer</a>
       <ul class="right hide-on-med-and-down">
         <li><a href="#">Navbar Link</a></li>
       </ul>
@@ -28,58 +28,65 @@
   <div class="section no-pad-bot" id="index-banner">
     <div class="container">
       <br><br>
-      <h1 class="header center orange-text">Starter Template</h1>
+      <h1 class="header center green-text">Smiles Drawer</h1>
       <div class="row center">
-        <h5 class="header col s12 light">A modern responsive front-end framework based on Material Design</h5>
+        <h5 class="header col s12 light">A small, highly performant JavaScript component for parsing and drawing SMILES strings.</h5>
       </div>
       <div class="row center">
-        <a href="http://materializecss.com/getting-started.html" id="download-button" class="btn-large waves-effect waves-light orange">Get Started</a>
+        <a href="http://materializecss.com/getting-started.html" id="download-button" class="btn-large waves-effect waves-light green">Get Started</a>
       </div>
-      <br><br>
-
     </div>
   </div>
 
 
   <div class="container">
     <div class="section">
-
-      <!--   Icon Section   -->
       <div class="row">
-        <div class="col s12 m4">
-          <div class="icon-block">
-            <h2 class="center light-blue-text"><i class="material-icons">flash_on</i></h2>
-            <h5 class="center">Speeds up development</h5>
-
-            <p class="light">We did most of the heavy lifting for you to provide a default stylings that incorporate our custom components.
-              Additionally, we refined animations and transitions to provide a smoother experience for developers.</p>
-          </div>
+        <div id="canvas-container">
+          <canvas id="output-canvas" width="250" height="250"></canvas>
+          <div id="speed-info"><i class="material-icons">av_timer</i>&nbsp<span id="speed-info-value"></span>&nbsp ms</div>
         </div>
-
-        <div class="col s12 m4">
-          <div class="icon-block">
-            <h2 class="center light-blue-text"><i class="material-icons">group</i></h2>
-            <h5 class="center">User Experience Focused</h5>
-
-            <p class="light">By utilizing elements and principles of Material Design, we were able to create a framework that incorporates
-              components and animations that provide more feedback to users. Additionally, a single underlying responsive
-              system across all platforms allow for a more unified user experience.</p>
-          </div>
+        <div>
+          <label>SMILES</label>
+          <input id="input" type="text" value="FC(F)(F)C1=CC(NC2=C(C=CC=N2)C(=O)OC2OC(=O)C3=CC=CC=C23)=CC=C1" />
         </div>
-
-        <div class="col s12 m4">
-          <div class="icon-block">
-            <h2 class="center light-blue-text"><i class="material-icons">settings</i></h2>
-            <h5 class="center">Easy to work with</h5>
-
-            <p class="light">We have provided detailed documentation as well as specific code examples to help new users get started. We are
-              also always open to feedback and can answer any questions a user may have about Materialize.</p>
-          </div>
+        <p class="range-field">
+          <label for="canvasSize">Canvas Size</label>
+          <input type="range" id="canvasSize" name="canvasSize" value="250" min="50" max="1000" step="1" />
+        </p>
+        <p class="range-field">
+          <label for="bondLength">Bond Length</label>
+          <input type="range" id="bondLength" name="bondLength" value="16" min="1" max="99" step="1" />
+        </p>
+        <p class="range-field">
+          <label for="shortBondLength">Short Bond Length</label>
+          <input type="range" id="shortBondLength" name="shortBondLength" value="9" min="1" max="22" step="1" />
+        </p>
+        <p class="range-field">
+          <label for="bondSpacing">Bond Spacing</label>
+          <input type="range" id="bondSpacing" name="bondSpacing" value="4" min="1" max="99" step="1" />
+        </p>
+        <div class="switch">
+          <label>Theme</label><br />
+          <label>
+            Light
+            <input id="theme" name="theme" type="checkbox">
+            <span class="lever"></span>
+            Dark
+          </label>
+        </div>
+        <br />
+        <div class="switch">
+          <label>Debug</label><br />
+          <label>
+            Off
+            <input id="debug" name="debug" type="checkbox">
+            <span class="lever"></span>
+            On
+          </label>
         </div>
       </div>
-
     </div>
-    <br><br>
 
     <div class="section">
 
@@ -128,7 +135,95 @@
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="js/materialize.min.js"></script>
   <script src="js/init.js"></script>
+  <script src="js/smiles-drawer.min.js"></script>
 
+  <script>
+    var input = document.getElementById('input');
+    var debugCheckbox = document.getElementById('debug');
+    var themeCheckbox = document.getElementById('theme');
+    var canvasSizeInput = document.getElementById('canvasSize');
+    var bondLengthInput = document.getElementById('bondLength');
+    var shortBondLengthInput = document.getElementById('shortBondLength');
+    var bondSpacingInput = document.getElementById('bondSpacing');
+    var theme = 'light'
+
+    var options = {
+      debug: false,
+      bondLength: 16,
+      shortBondLength: 9,
+      bondSpacing: 4
+    }
+
+    var smilesDrawer = new SmilesDrawer(options);
+    var input = document.getElementById('input');
+
+    function draw() {
+      let t = performance.now();
+
+      var data = smiles.parse(input.value);
+      smilesDrawer.draw(data, 'output-canvas', theme, false);
+
+      let td = performance.now() - t;
+
+      document.getElementById('speed-info-value').innerHTML = Math.round(td * 100) / 100;
+    }
+
+    function updateOptions() {
+      smilesDrawer = new SmilesDrawer(options);
+      draw();
+    }
+
+    document.addEventListener('DOMContentLoaded', function (event) {
+      input.addEventListener('input', function () {
+        draw();
+      });
+
+      // Initial draw
+      draw();
+
+      canvasSizeInput.addEventListener('input', function () {
+        let canvasSize = parseInt(canvasSizeInput.value);
+        let canvas = document.getElementById('output-canvas');
+        canvas.setAttribute('width', canvasSize);
+        canvas.setAttribute('height', canvasSize)
+
+        updateOptions();
+      });
+
+      bondLengthInput.addEventListener('input', function () {
+        options.bondLength = parseInt(bondLengthInput.value);
+        shortBondLengthInput.max = options.bondLength;
+        updateOptions();
+      });
+
+      shortBondLengthInput.addEventListener('input', function () {
+        options.shortBondLength = parseInt(shortBondLengthInput.value);
+        updateOptions();
+      });
+
+      bondSpacingInput.addEventListener('input', function () {
+        options.bondSpacing = parseInt(bondSpacingInput.value);
+        updateOptions();
+      });
+
+      themeCheckbox.addEventListener('click', function () {
+        theme = themeCheckbox.checked ? 'dark' : 'light';
+
+        if (theme === 'light') {
+          document.getElementById('canvas-container').style.backgroundColor = '#fff';
+        } else {
+          document.getElementById('canvas-container').style.backgroundColor = '#222';
+        }
+
+        updateOptions();
+      });
+
+      debugCheckbox.addEventListener('click', function () {
+        options.debug = debugCheckbox.checked ? true : false;
+        updateOptions();
+      });
+    });
+  </script>
 </body>
 
 </html>
