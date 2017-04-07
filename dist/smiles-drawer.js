@@ -4522,6 +4522,8 @@ var SmilesDrawer = function () {
             this.originalRings = [];
             this.originalRingConnections = [];
 
+            this.bridgedRing = false;
+
             this.initGraph(data);
             this.initRings();
 
@@ -4759,13 +4761,7 @@ var SmilesDrawer = function () {
     }, {
         key: 'hasBridgedRing',
         value: function hasBridgedRing() {
-            for (var i = 0; i < this.rings.length; i++) {
-                if (this.rings[i].isBridged) {
-                    return true;
-                }
-            }
-
-            return false;
+            return this.bridgedRing;
         }
 
         /**
@@ -5004,6 +5000,7 @@ var SmilesDrawer = function () {
                 var _ring2 = this.getRing(id);
                 var involvedRings = this.getBridgedRingRings(_ring2.id);
 
+                this.bridgedRing = true;
                 this.createBridgedRing(involvedRings, _ring2.sourceId);
 
                 // Remove the rings
@@ -6193,7 +6190,7 @@ var SmilesDrawer = function () {
                 // If the ring size is larger than 2, then put all the non-positioned
                 // vertices at the center of the ring instead of 0,0
                 if (_vertex4.position.x === 0 && _vertex4.position.y === 0) {
-                    positions[_i32] = new Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
+                    // positions[i] = new Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
                 }
 
                 if (_vertex4.positioned && ring.rings.length === 2) {

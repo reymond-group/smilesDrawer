@@ -126,6 +126,8 @@ class SmilesDrawer {
 
         this.originalRings = [];
         this.originalRingConnections = [];
+
+        this.bridgedRing = false;
         
         this.initGraph(data);
         this.initRings();
@@ -340,13 +342,7 @@ class SmilesDrawer {
      * @returns {boolean} A boolean indicating whether or not the current molecule contains a bridged ring.
      */
     hasBridgedRing() {
-        for (let i = 0; i < this.rings.length; i++) {
-            if (this.rings[i].isBridged) {
-                return true;
-            }
-        }
-
-        return false;
+        return this.bridgedRing;
     }
 
     /**
@@ -569,6 +565,7 @@ class SmilesDrawer {
             let ring = this.getRing(id);
             let involvedRings = this.getBridgedRingRings(ring.id);
 
+            this.bridgedRing = true;
             this.createBridgedRing(involvedRings, ring.sourceId);
 
             // Remove the rings
@@ -1677,7 +1674,7 @@ class SmilesDrawer {
             // If the ring size is larger than 2, then put all the non-positioned
             // vertices at the center of the ring instead of 0,0
             if (vertex.position.x === 0 && vertex.position.y === 0) {
-                positions[i] = new Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
+                // positions[i] = new Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
             }
             
             if (vertex.positioned && ring.rings.length === 2) {
@@ -1689,7 +1686,7 @@ class SmilesDrawer {
         let c = 0.01;
         let maxMove = l / 2.0;
         let maxDist = l * 2.0;
-
+        
         for (let n = 0; n < 500; n++) {
             
             for (let i = 0; i < totalLength; i++) {

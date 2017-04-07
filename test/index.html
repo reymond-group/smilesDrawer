@@ -12,6 +12,7 @@
 
         <script src="../dist/smiles-drawer.min.js"></script>
         <script src="drugbank.js"></script>
+        <script src="schembl.js"></script>
         <script>
             let options = {};
             
@@ -21,7 +22,7 @@
             let nSuccesses = 0;
             let totalSpeed = 0;
             let totalOverlap = 0;
-            let str = 'time,overlap,rings,hac,bridged\n';
+            let str = 'parsetime,rendertime,overlap,rings,hac,bridged\n';
             
             let failed = '';
             for (let i = 0; i < drugbank.length; i++) {
@@ -29,14 +30,19 @@
                 try {
                     let t = performance.now();
                     let data = smiles.parse(SmilesDrawer.clean(drugbank[i]));
-                    
-                    smilesDrawer.draw(data, 'example-canvas', 'light', false);
-                    
                     let td = performance.now() - t;
-                    totalSpeed += td;
+                    
+                    let t2 = performance.now();
+                    smilesDrawer.draw(data, 'example-canvas', 'light', false);
+                    let td2 = performance.now() - t2;
+
+                    totalSpeed += td + td2;
                     totalOverlap += smilesDrawer.getTotalOverlapScore();
                     nSuccesses++;
-                    str += td + ',' + smilesDrawer.getTotalOverlapScore() + ',' + 
+
+                    str += td + ',' + 
+                           td2 + ',' + 
+                           smilesDrawer.getTotalOverlapScore() + ',' +
                            smilesDrawer.getRingCount() + ',' + 
                            smilesDrawer.getHeavyAtomCount() + ',' +
                            smilesDrawer.hasBridgedRing() + '\n';
