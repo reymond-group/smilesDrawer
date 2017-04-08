@@ -166,7 +166,7 @@ class SmilesDrawer {
 
                     let subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
                     
-                    if (subTreeOverlap.value > this.opts.bondLength) {
+                    if (subTreeOverlap.value > 1.0) {
                         let vertexA = this.vertices[a];
                         let vertexB = this.vertices[b];
                         let neighbours = vertexB.getNeighbours(a);
@@ -1353,7 +1353,7 @@ class SmilesDrawer {
                 let dist = Vector2.subtract(a.position, b.position).length();
                 
                 if (dist < this.opts.bondLength) {
-                    let weighted = this.opts.bondLength - dist;
+                    let weighted = (this.opts.bondLength - dist) / this.opts.bondLength;
                     total += weighted;
                     overlapScores[i] += weighted;
                     overlapScores[j] += weighted;

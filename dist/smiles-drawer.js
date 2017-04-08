@@ -4561,7 +4561,7 @@ var SmilesDrawer = function () {
 
                         var subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
 
-                        if (subTreeOverlap.value > this.opts.bondLength) {
+                        if (subTreeOverlap.value > 1.0) {
                             var vertexA = this.vertices[a];
                             var vertexB = this.vertices[b];
                             var neighbours = vertexB.getNeighbours(a);
@@ -5859,7 +5859,7 @@ var SmilesDrawer = function () {
                     var dist = Vector2.subtract(a.position, b.position).length();
 
                     if (dist < this.opts.bondLength) {
-                        var weighted = this.opts.bondLength - dist;
+                        var weighted = (this.opts.bondLength - dist) / this.opts.bondLength;
                         total += weighted;
                         overlapScores[_i22] += weighted;
                         overlapScores[j] += weighted;
