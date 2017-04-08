@@ -2,8 +2,17 @@
   text-align: center;
 }
 
-#speed-info i, #speed-info span {
-  line-height: 20px;
+#drawing-info {
+  text-align: center;
+}
+
+#speed-info, #overlap-info {
+  position: relative;
+  display: inline-block;
+  padding: 5px;
+  margin: 2px;
+  border: 1px solid #eee;
+  border-radius: 5px;
 }
 
 .icon-block {

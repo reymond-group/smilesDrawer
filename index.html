@@ -10,30 +10,24 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
   <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gist-embed/2.4/gist-embed.min.js"></script>
 </head>
 
 <body>
-  <nav class="deep-purple" role="navigation">
-    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Smiles Drawer</a>
-      <ul class="right hide-on-med-and-down">
-        <li><a href="#">Navbar Link</a></li>
-      </ul>
-
-      <ul id="nav-mobile" class="side-nav">
-        <li><a href="#">Navbar Link</a></li>
-      </ul>
-      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-    </div>
-  </nav>
   <div class="section no-pad-bot" id="index-banner">
     <div class="container">
-      <br><br>
+      <br>
       <h1 class="header center green-text">Smiles Drawer</h1>
       <div class="row center">
         <h5 class="header col s12 light">A small, highly performant JavaScript component for parsing and drawing SMILES strings.</h5>
       </div>
       <div class="row center">
-        <a href="http://materializecss.com/getting-started.html" id="download-button" class="btn-large waves-effect waves-light green">Get Started</a>
+        <a href="#canvas-container" id="download-button" class="btn-large waves-effect waves-light green">Demo</a>
+        <a href="https://github.com/reymond-group/smilesDrawer#getting-started" id="download-button" class="btn-large waves-effect waves-light green">Get Started</a>
+        <a href="https://github.com/reymond-group/smilesDrawer/blob/master/doc/all.md" id="download-button" class="btn-large waves-effect waves-light green">Doc</a>
+        <a href="https://github.com/reymond-group/smilesDrawer" id="download-button" class="btn-large waves-effect waves-light green">Src</a>
       </div>
     </div>
   </div>
@@ -44,8 +38,14 @@
       <div class="row">
         <div id="canvas-container">
           <canvas id="output-canvas" width="250" height="250"></canvas>
-          <div id="speed-info"><i class="material-icons">av_timer</i>&nbsp<span id="speed-info-value"></span>&nbsp ms</div>
         </div>
+        <div id="drawing-info">
+          <p id="speed-info">
+            <span class="grey-text">Drawing time (parsing + rendering): </span><span class="green-text" id="speed-info-value"></span><span class="green-text"> ms</span>
+          </p>
+          <p id="overlap-info">
+            <span class="grey-text">Overlap score (&times; bond length): </span><span class="green-text" id="overlap-info-value"></span>
+          </p>
         <div>
           <label>SMILES</label>
           <input id="input" type="text" value="FC(F)(F)C1=CC(NC2=C(C=CC=N2)C(=O)OC2OC(=O)C3=CC=CC=C23)=CC=C1" />
@@ -87,143 +87,21 @@
         </div>
       </div>
     </div>
-
-    <div class="section">
-
-    </div>
   </div>
 
-  <footer class="page-footer orange">
-    <div class="container">
-      <div class="row">
-        <div class="col l6 s12">
-          <h5 class="white-text">Company Bio</h5>
-          <p class="grey-text text-lighten-4">We are a team of college students working on this project like it's our full time job. Any amount would help support
-            and continue development on this project and is greatly appreciated.</p>
-
-
-        </div>
-        <div class="col l3 s12">
-          <h5 class="white-text">Settings</h5>
-          <ul>
-            <li><a class="white-text" href="#!">Link 1</a></li>
-            <li><a class="white-text" href="#!">Link 2</a></li>
-            <li><a class="white-text" href="#!">Link 3</a></li>
-            <li><a class="white-text" href="#!">Link 4</a></li>
-          </ul>
-        </div>
-        <div class="col l3 s12">
-          <h5 class="white-text">Connect</h5>
-          <ul>
-            <li><a class="white-text" href="#!">Link 1</a></li>
-            <li><a class="white-text" href="#!">Link 2</a></li>
-            <li><a class="white-text" href="#!">Link 3</a></li>
-            <li><a class="white-text" href="#!">Link 4</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
+  <footer class="page-footer green">
     <div class="footer-copyright">
       <div class="container">
-        Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+        Made by <a class="green-text text-lighten-3" href="http://gdb.unibe.ch">gdb.unibe.ch</a>
       </div>
     </div>
   </footer>
 
 
   <!--  Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="js/materialize.min.js"></script>
-  <script src="js/init.js"></script>
   <script src="js/smiles-drawer.min.js"></script>
-
-  <script>
-    var input = document.getElementById('input');
-    var debugCheckbox = document.getElementById('debug');
-    var themeCheckbox = document.getElementById('theme');
-    var canvasSizeInput = document.getElementById('canvasSize');
-    var bondLengthInput = document.getElementById('bondLength');
-    var shortBondLengthInput = document.getElementById('shortBondLength');
-    var bondSpacingInput = document.getElementById('bondSpacing');
-    var theme = 'light'
-
-    var options = {
-      debug: false,
-      bondLength: 16,
-      shortBondLength: 9,
-      bondSpacing: 4
-    }
-
-    var smilesDrawer = new SmilesDrawer(options);
-    var input = document.getElementById('input');
-
-    function draw() {
-      let t = performance.now();
-
-      var data = smiles.parse(input.value);
-      smilesDrawer.draw(data, 'output-canvas', theme, false);
-
-      let td = performance.now() - t;
-
-      document.getElementById('speed-info-value').innerHTML = Math.round(td * 100) / 100;
-    }
-
-    function updateOptions() {
-      smilesDrawer = new SmilesDrawer(options);
-      draw();
-    }
-
-    document.addEventListener('DOMContentLoaded', function (event) {
-      input.addEventListener('input', function () {
-        draw();
-      });
-
-      // Initial draw
-      draw();
-
-      canvasSizeInput.addEventListener('input', function () {
-        let canvasSize = parseInt(canvasSizeInput.value);
-        let canvas = document.getElementById('output-canvas');
-        canvas.setAttribute('width', canvasSize);
-        canvas.setAttribute('height', canvasSize)
-
-        updateOptions();
-      });
-
-      bondLengthInput.addEventListener('input', function () {
-        options.bondLength = parseInt(bondLengthInput.value);
-        shortBondLengthInput.max = options.bondLength;
-        updateOptions();
-      });
-
-      shortBondLengthInput.addEventListener('input', function () {
-        options.shortBondLength = parseInt(shortBondLengthInput.value);
-        updateOptions();
-      });
-
-      bondSpacingInput.addEventListener('input', function () {
-        options.bondSpacing = parseInt(bondSpacingInput.value);
-        updateOptions();
-      });
-
-      themeCheckbox.addEventListener('click', function () {
-        theme = themeCheckbox.checked ? 'dark' : 'light';
-
-        if (theme === 'light') {
-          document.getElementById('canvas-container').style.backgroundColor = '#fff';
-        } else {
-          document.getElementById('canvas-container').style.backgroundColor = '#222';
-        }
-
-        updateOptions();
-      });
-
-      debugCheckbox.addEventListener('click', function () {
-        options.debug = debugCheckbox.checked ? true : false;
-        updateOptions();
-      });
-    });
-  </script>
+  <script src="js/init.js"></script>
 </body>
 
 </html>
