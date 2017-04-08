@@ -21,7 +21,7 @@
       <br>
       <h1 class="header center green-text">Smiles Drawer</h1>
       <div class="row center">
-        <h5 class="header col s12 light">A small, highly performant JavaScript component for parsing and drawing SMILES strings.</h5>
+        <h5 class="header col s12 light">A small, highly performant JavaScript component for parsing and drawing SMILES strings. Released under the <a class="green-text" href="https://github.com/reymond-group/smilesDrawer/blob/master/LICENSE.md">MIT license</a></h5>
       </div>
       <div class="row center">
         <a href="#canvas-container" id="download-button" class="btn-large waves-effect waves-light green">Demo</a>
@@ -41,11 +41,13 @@
         </div>
         <div id="drawing-info">
           <p id="speed-info">
-            <span class="grey-text">Drawing time (parsing + rendering): </span><span class="green-text" id="speed-info-value"></span><span class="green-text"> ms</span>
+            <span class="grey-text">Drawing time (parsing + rendering): </span><span class="green-text" id="speed-info-value"></span>
+            <span class="green-text"> ms</span>
           </p>
           <p id="overlap-info">
             <span class="grey-text">Overlap score (&times; bond length): </span><span class="green-text" id="overlap-info-value"></span>
           </p>
+        </div>
         <div>
           <label>SMILES</label>
           <input id="input" type="text" value="FC(F)(F)C1=CC(NC2=C(C=CC=N2)C(=O)OC2OC(=O)C3=CC=CC=C23)=CC=C1" />
@@ -87,12 +89,17 @@
         </div>
       </div>
     </div>
+    <div class="section">
+      <div class="row">
+        <p><b>Want to see more?</b> Take a look at <a href="drugbank.html" class="green-text">2'222 random compounds from drugbank.</p></p>
+      </div>
+    </div>
   </div>
 
   <footer class="page-footer green">
     <div class="footer-copyright">
       <div class="container">
-        Made by <a class="green-text text-lighten-3" href="http://gdb.unibe.ch">gdb.unibe.ch</a>
+        <p class="grey-text text-lighten-5">Made by <a class="green-text text-lighten-5" href="http://gdb.unibe.ch">gdb.unibe.ch</a></p>
       </div>
     </div>
   </footer>
