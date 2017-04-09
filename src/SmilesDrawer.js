@@ -145,7 +145,7 @@ class SmilesDrawer {
             let overlapScore = this.getOverlapScore();
 
             this.totalOverlapScore = this.getOverlapScore().total;
-
+            
             for (let i = 0; i < this.edges.length; i++) {
                 let edge = this.edges[i];
                 
@@ -372,6 +372,7 @@ class SmilesDrawer {
     initGraph(node, order = 0, parentVertexId = null, isBranch = false) {
         // Create a new vertex object
         let atom = new Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
+        
         atom.branchBond = node.branchBond;
         atom.ringbonds = node.ringbonds;
         atom.bracket = node.atom.element ? node.atom : null;
@@ -408,7 +409,9 @@ class SmilesDrawer {
         
         if (atom.bracket && this.opts.isomeric) {
             for (let i = 0; i < atom.bracket.hcount; i++) {
-                this.initGraph({ atom: { element: 'H', bond: '-' }, ringbonds: [] }, i + 1, vertex.id);
+                if (this.opts.isomeric) {
+                    this.initGraph({ atom: { element: 'H', bond: '-' }, ringbonds: [] }, i + 1, vertex.id);
+                }
             }
         }
 
@@ -587,6 +590,7 @@ class SmilesDrawer {
 
         let recurse = function (r) {
             let ring = that.getRing(r);
+            
             involvedRings.push(r);
 
             for (let i = 0; i < ring.neighbours.length; i++) {
@@ -824,7 +828,7 @@ class SmilesDrawer {
 
         // Initialize arrays for the algorithm
         for (let i = 0; i < this.vertices.length; i++) {
-            dist[i] = i == sourceId ? 0 : Number.MAX_VALUE;
+            dist[i] = i === sourceId ? 0 : Number.MAX_VALUE;
             prev[i] = null;
             visited[i] = false;
             neighbours[i] = this.vertices[i].getNeighbours();
@@ -835,7 +839,7 @@ class SmilesDrawer {
             let u = this.getMinDist(dist, visited);
 
             // if u is the target, we're done
-            if (u == targetId) {
+            if (u == targetId) { 
                 return prev;
             }
 
@@ -1513,12 +1517,12 @@ class SmilesDrawer {
      */
     forceLayout(vertices, center, startVertexId, ring) {
         // Constants
-        let l = this.opts.bondLength;
+        const l = this.opts.bondLength;
 
         // On bridged bonds, add the remaining neighbours to the vertices
         // to be positioned using the force layout
         let tmp = [];
-
+        /*
         for (let u = 0; u < vertices.length; u++) {
             let vertex = this.vertices[vertices[u]];
             
@@ -1536,6 +1540,7 @@ class SmilesDrawer {
                 }
             }
         }
+        */
 
         vertices = ArrayHelper.merge(vertices, tmp);
         
@@ -1617,6 +1622,10 @@ class SmilesDrawer {
             // Connecting ring centers, let them have a distance of apothem + apothem
             for (let j = 0; j < ring.rings.length; j++) {
                 let r2 = ring.rings[j];
+
+                if (r2.id === r.id) {
+                    continue;
+                }
                 
                 // If they do not share a vertex, they are not connected
                 let intersection = ArrayHelper.intersection(r.members, r2.members).length;
@@ -1630,7 +1639,6 @@ class SmilesDrawer {
                 let dist = MathHelper.apothemFromSideLength(l, ringSize) + MathHelper.apothemFromSideLength(l, ringSize2);
                 
                 adjMatrix[ringIndex][ringIndex2] = dist;
-                adjMatrix[ringIndex2][ringIndex] = dist;
             }
         }
 
@@ -1688,7 +1696,6 @@ class SmilesDrawer {
         let maxDist = l * 2.0;
         
         for (let n = 0; n < 500; n++) {
-            
             for (let i = 0; i < totalLength; i++) {
                 forces[i].set(0, 0);
             }
@@ -1705,7 +1712,7 @@ class SmilesDrawer {
             // Repulsive forces
             for (let u = 0; u < totalLength - 1; u++) {
                 for (let v = u + 1; v < totalLength; v++) {
-                    if (n < 250 && !(isRingCenter[u] && isRingCenter[v])) {
+                    if (n <= 250 && !(isRingCenter[u] && isRingCenter[v])) {
                         continue;
                     }
 
@@ -1736,11 +1743,15 @@ class SmilesDrawer {
 
                     let d = Math.sqrt(dSq);
 
-                    if (d > adjMatrix[u][v]) {
+                    if (d > adjMatrix[u][v] && n > 200) {
                         continue;
                     }
 
                     let force = k * k / d;
+
+                    if (n <= 200) {
+                        force *= ringSize[u] * ringSize[v];
+                    }
 
                     if (n > 250 && (isRingCenter[u] || isRingCenter[v])) {
                         force *= ringSize[u] * ringSize[v];
@@ -1768,7 +1779,7 @@ class SmilesDrawer {
                         continue;
                     }
 
-                    if (n < 250 && !(isRingCenter[u] && isRingCenter[v])) {
+                    if (n <= 250 && !(isRingCenter[u] && isRingCenter[v])) {
                         continue;
                     }
 
@@ -1872,7 +1883,7 @@ class SmilesDrawer {
 
                     positions[vertices.length + i] = center;
                 }
-            }            
+            }          
         }
 
         for (let i = 0; i < totalLength; i++) {
@@ -1886,31 +1897,26 @@ class SmilesDrawer {
                 ring.rings[index].center = positions[i];
             }
         }        
-
+        
         for (let u = 0; u < vertices.length; u++) {
             let vertex = this.vertices[vertices[u]];
             let parentVertex = this.vertices[vertex.parentVertexId];
             let neighbours = vertex.getNeighbours();
             
-            let angle = vertex.getAngle(null, true) - 60;
             for (let i = 0; i < neighbours.length; i++) {
                 let currentVertex = this.vertices[neighbours[i]];
 
-                if (vertex.value.isBridge || (parentVertex !== undefined && parentVertex.value.isBridge)) {
-                    currentVertex.angle = MathHelper.toRad(120);
-                    currentVertex.globalAngle = MathHelper.toRad(angle);
-                    this.createNextBond(currentVertex, vertex, currentVertex.globalAngle);
-                } else if (currentVertex.value.rings.length === 0) {
-                    // If there is a spiro, this will be handeled in create ring
-                    // This here positiones the vertices going away from the outer ring
-                    if (ring.rings.length > 2) {
-                        center = this.getSubringCenter(ring, vertex);
-                    }
-
-                    this.createNextBond(currentVertex, vertex, center);
+                if (currentVertex.positioned) {
+                    continue;
                 }
 
-                angle += 120;
+                // If there is a spiro, this will be handeled in create ring
+                // This here positiones the vertices going away from the outer ring
+                if (ring.rings.length > 2) {
+                    center = this.getSubringCenter(ring, vertex);
+                }
+                
+                this.createNextBond(currentVertex, vertex, center);
             }
         }
     }
@@ -1923,16 +1929,26 @@ class SmilesDrawer {
      * @returns {Vector2} The center of the subring that contains the provided vertex.
      */
     getSubringCenter(ring, vertex) {
+        // If there are multiple subrings associated with this ring, always
+        // take the smaller one
+        let size = Number.MAX_VALUE;
+        let center = ring.center;
+
         for (let i = 0; i < ring.rings.length; i++) {
             let subring = ring.rings[i];
             for (let j = 0; j < subring.members.length; j++) {
                 if (subring.members[j] === vertex.id) {
-                    return subring.center;
+                    if (size > subring.members.length) {
+                        center = subring.center;
+                        size = subring.members.length;
+                    }
                 }
             }
         }
 
-        return ring.center;
+
+
+        return center;
     }
 
     /**
@@ -1949,6 +1965,7 @@ class SmilesDrawer {
             let vertexB = this.vertices[edge.targetId];
             let elementA = vertexA.value.element;
             let elementB = vertexB.value.element;
+
             let a = vertexA.position;
             let b = vertexB.position;
             let normals = this.getEdgeNormals(edge);
@@ -2115,6 +2132,7 @@ class SmilesDrawer {
         for (let i = 0; i < this.vertices.length; i++) {
             let vertex = this.vertices[i];
             let atom = vertex.value;
+
             let charge = 0;
             let bondCount = this.getBondCount(vertex);
             let element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
@@ -2162,7 +2180,7 @@ class SmilesDrawer {
                 for (let j = 0; j < this.rings[i].members.length; j++) {
                     startVertex = this.vertices[this.rings[i].members[j]];
                     
-                    if (startVertex.value.rings.length === 1) {
+                    if (startVertex.value.originalRings.length === 1) {
                         break;
                     }
                 }
@@ -2284,7 +2302,7 @@ class SmilesDrawer {
         }
 
         center = center ? center : new Vector2(0, 0);
-
+        
         let orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
         let startingAngle = startVector ? Vector2.subtract(startVector.position, center).angle() : 0;
 
@@ -2637,19 +2655,19 @@ class SmilesDrawer {
      */
     resolveSecondaryOverlaps(scores) {
         for (let i = 0; i < scores.length; i++) {
-            if (scores[i].score > this.opts.bondLength / 4) {
+            if (scores[i].score > this.opts.bondLength / (4.0 * this.opts.bondLength)) {
                 let vertex = this.vertices[scores[i].id];
 
                 if (vertex.isTerminal()) {
                     let closest = this.getClosestVertex(vertex);
-
+                    
                     if (closest) {
                         // If one of the vertices is the first one, the previous vertex is not the central vertex but the dummy
                         // so take the next rather than the previous, which is vertex 1
-                        let closestPreviousPosition = closest.id === 0 ? this.vertices[1].position : closest.previousPosition;
+                        let closestPosition = closest.id === 0 ? this.vertices[1].position : closest.position;
                         let vertexPreviousPosition = vertex.id === 0 ? this.vertices[1].position : vertex.previousPosition;
 
-                        vertex.position.rotateAwayFrom(closestPreviousPosition, vertexPreviousPosition, MathHelper.toRad(30));
+                        vertex.position.rotateAwayFrom(closestPosition, vertexPreviousPosition, MathHelper.toRad(15));
                     }
                 }
 
@@ -2728,7 +2746,7 @@ class SmilesDrawer {
             vertex.angle = MathHelper.toRad(-120);
             vertex.globalAngle = vertex.angle;
             vertex.positioned = true;
-        } else if (previousVertex.value.rings.length === 0 && !vertex.value.isBridge) {
+        } else if (previousVertex.value.rings.length === 0 && !vertex.value.isBridge && !previousVertex.value.isBridge) {
             // Here, ringOrAngle is always an angle
 
             // If the previous vertex was not part of a ring, draw a bond based
@@ -2739,6 +2757,7 @@ class SmilesDrawer {
 
             vertex.globalAngle = ringOrAngle;
             vertex.position = v;
+
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (previousVertex.value.isBridgeNode && vertex.value.isBridge) {
@@ -2763,7 +2782,7 @@ class SmilesDrawer {
             vertex.position = v;
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
-        } else if (previousVertex.value.rings.length == 1) {
+        } else if (previousVertex.value.rings.length == 1 || previousVertex.value.isBridge) {
             // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
             // Use the same approach es with rings that are connected at one vertex
             // and draw the atom in the opposite direction of the center.

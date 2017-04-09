@@ -48,7 +48,7 @@ class RingConnection {
 
         for (let i = 0; i < this.vertices.length; i++) {
             let vertexId = this.vertices[i];
-            
+
             if(vertices[vertexId].value.rings.length > 2) {
                 return true;
             }
