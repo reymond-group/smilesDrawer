@@ -1896,7 +1896,6 @@ class SmilesDrawer {
                 }
 
                 center = this.getSubringCenter(ring, vertex);
-                console.log('create next bond', currentVertex);
                 this.createNextBond(currentVertex, vertex, center);
             }
         }
@@ -2715,8 +2714,6 @@ class SmilesDrawer {
         if (vertex.positioned) {
             return;
         }
-
-        console.log('positioning', vertex, previousVertex, ringOrAngle);
 
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of
