@@ -6410,7 +6410,6 @@ var SmilesDrawer = function () {
                     }
 
                     center = this.getSubringCenter(ring, _vertex4);
-                    console.log('create next bond', currentVertex);
                     this.createNextBond(currentVertex, _vertex4, center);
                 }
             }
@@ -7221,10 +7220,17 @@ var SmilesDrawer = function () {
                         if (closest) {
                             // If one of the vertices is the first one, the previous vertex is not the central vertex but the dummy
                             // so take the next rather than the previous, which is vertex 1
-                            var closestPosition = closest.id === 0 ? this.vertices[1].position : closest.position;
+                            var closestPosition = null;
+
+                            if (closest.isTerminal()) {
+                                closestPosition = closest.id === 0 ? this.vertices[1].position : closest.previousPosition;
+                            } else {
+                                closestPosition = closest.id === 0 ? this.vertices[1].position : closest.position;
+                            }
+
                             var vertexPreviousPosition = vertex.id === 0 ? this.vertices[1].position : vertex.previousPosition;
 
-                            vertex.position.rotateAwayFrom(closestPosition, vertexPreviousPosition, MathHelper.toRad(15));
+                            vertex.position.rotateAwayFrom(closestPosition, vertexPreviousPosition, MathHelper.toRad(20));
                         }
                     }
 
@@ -7286,8 +7292,6 @@ var SmilesDrawer = function () {
             if (vertex.positioned) {
                 return;
             }
-
-            console.log('positioning', vertex, previousVertex, ringOrAngle);
 
             // If the current node is the member of one ring, then point straight away
             // from the center of the ring. However, if the current node is a member of
