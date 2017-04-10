@@ -12,23 +12,23 @@
     </head>
     <body>
         <script src="../dist/smiles-drawer.min.js"></script>
-        <script src="gdb17.js"></script>
+        <script src="drugbank.js"></script>
         <script>
             let options = {};
             
             // Initialize the drawer
             let smilesDrawer = new SmilesDrawer(options);
             
-            for (let i = 0; i < gdb17.length; i++) {
+            for (let i = 0; i < drugbank.length; i++) {
                 try {
                     let canvas = document.createElement('canvas');
                     canvas.setAttribute('id', 'canvas' + i);
                     canvas.setAttribute('width', '200');
                     canvas.setAttribute('height', '200');
-                    canvas.setAttribute('alt', gdb17[i]);
+                    canvas.setAttribute('alt', drugbank[i]);
                     document.body.appendChild(canvas);
                     
-                    let data = smiles.parse(gdb17[i]);
+                    let data = smiles.parse(drugbank[i]);
                     
                     smilesDrawer.draw(data, 'canvas' + i, 'light', false);
 

@@ -1519,31 +1519,16 @@ class SmilesDrawer {
         // Constants
         const l = this.opts.bondLength;
 
-        // On bridged bonds, add the remaining neighbours to the vertices
-        // to be positioned using the force layout
-        let tmp = [];
-        /*
-        for (let u = 0; u < vertices.length; u++) {
-            let vertex = this.vertices[vertices[u]];
-            
-            if(!vertex.value.isBridge) {
-                continue;
-            }
-            
-            let neighbours = vertex.getNeighbours();
-            
-            for (let i = 0; i < neighbours.length; i++) {
-                let neighbourId = neighbours[i];
-                
-                if (!ArrayHelper.contains(vertices, { value: neighbourId })) {
-                    tmp.push(neighbourId);
-                }
+        let startVertex = this.vertices[startVertexId];
+        let startVertexNeighbours = startVertex.getNeighbours();
+
+        // Add neighbours that are already positioned to the vertices to prevent overlap
+        for (let i = 0; i < startVertexNeighbours.length; i++) {
+            if (this.vertices[startVertexNeighbours[i]].positioned) {
+                vertices.push(startVertexNeighbours[i]);
             }
         }
-        */
 
-        vertices = ArrayHelper.merge(vertices, tmp);
-        
         // Create adjencency matrix
         let totalLength = vertices.length + ring.rings.length;
         let vToId = new Array(vertices.length);
@@ -1896,7 +1881,7 @@ class SmilesDrawer {
                 let index = i - vertices.length;
                 ring.rings[index].center = positions[i];
             }
-        }        
+        }
         
         for (let u = 0; u < vertices.length; u++) {
             let vertex = this.vertices[vertices[u]];
@@ -1905,20 +1890,19 @@ class SmilesDrawer {
             
             for (let i = 0; i < neighbours.length; i++) {
                 let currentVertex = this.vertices[neighbours[i]];
-
+                
                 if (currentVertex.positioned) {
                     continue;
                 }
 
-                // If there is a spiro, this will be handeled in create ring
-                // This here positiones the vertices going away from the outer ring
-                if (ring.rings.length > 2) {
-                    center = this.getSubringCenter(ring, vertex);
-                }
-                
+                center = this.getSubringCenter(ring, vertex);
+                console.log('create next bond', currentVertex);
                 this.createNextBond(currentVertex, vertex, center);
             }
         }
+
+        // This has to be called in order to position rings connected to this bridged ring
+        this.createRing(ring, null, null, null, true);
     }
 
     /**
@@ -2292,19 +2276,20 @@ class SmilesDrawer {
      * Creates a new ring, that is, positiones all the vertices inside a ring.
      *
      * @param {Ring} ring The ring to position.
-     * @param {Vector2} center The center of the ring to be created.
-     * @param {Vector|null} [startVector=null] The first vector to be positioned inside the ring.
+     * @param {Vector2|null} [center=null] The center of the ring to be created.
+     * @param {Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
      * @param {Vertex|null} [previousVertex=null] The last vertex that was positioned.
+     * @param {boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
      */
-    createRing(ring, center, startVector = null, previousVertex = null) {
-        if (ring.positioned) {
+    createRing(ring, center = null, startVertex = null, previousVertex = null, forcePositioned = false) {
+        if (ring.positioned && !forcePositioned) {
             return;
         }
 
         center = center ? center : new Vector2(0, 0);
         
         let orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
-        let startingAngle = startVector ? Vector2.subtract(startVector.position, center).angle() : 0;
+        let startingAngle = startVertex ? Vector2.subtract(startVertex.position, center).angle() : 0;
 
         let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
         let angle = MathHelper.centralAngle(ring.getSize());
@@ -2314,35 +2299,37 @@ class SmilesDrawer {
         let a = startingAngle;
         let that = this;
 
-        ring.eachMember(this.vertices, function (v) {
-            let vertex = that.vertices[v];
+        if (!forcePositioned) {
+            ring.eachMember(this.vertices, function (v) {
+                let vertex = that.vertices[v];
 
-            if (!vertex.positioned) {
-                vertex.position.x = center.x + Math.cos(a) * radius;
-                vertex.position.y = center.y + Math.sin(a) * radius;
+                if (!vertex.positioned) {
+                    vertex.position.x = center.x + Math.cos(a) * radius;
+                    vertex.position.y = center.y + Math.sin(a) * radius;
+                }
+
+                a += angle;
+                
+                if(!ring.isBridged || ring.rings.length < 3) {
+                    vertex.positioned = true;
+                }
+            }, (startVertex) ? startVertex.id : null, (previousVertex) ? previousVertex.id : null);
+
+            // If the ring is bridged, then draw the vertices inside the ring
+            // using a force based approach
+            if (ring.isBridged) {
+                let allVertices = ArrayHelper.merge(ring.members, ring.insiders);
+
+                this.forceLayout(allVertices, center, startVertex.id, ring);
             }
 
-            a += angle;
-            
-            if(!ring.isBridged || ring.rings.length < 3) {
-                vertex.positioned = true;
-            }
-        }, (startVector) ? startVector.id : null, (previousVertex) ? previousVertex.id : null);
+            // Anchor the ring to one of it's members, so that the ring center will always
+            // be tied to a single vertex when doing repositionings
+            this.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
 
-        // If the ring is bridged, then draw the vertices inside the ring
-        // using a force based approach
-        if (ring.isBridged) {
-            let allVertices = ArrayHelper.merge(ring.members, ring.insiders);
-
-            this.forceLayout(allVertices, center, startVector.id, ring);
+            ring.positioned = true;
+            ring.center = center;
         }
-
-        // Anchor the ring to one of it's members, so that the ring center will always
-        // be tied to a single vertex when doing repositionings
-        this.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
-
-        ring.positioned = true;
-        ring.center = center;
 
         // Draw neighbours in decreasing order of connectivity
         for (let i = 0; i < orderedNeighbours.length; i++) {
@@ -2729,6 +2716,8 @@ class SmilesDrawer {
             return;
         }
 
+        console.log('positioning', vertex, previousVertex, ringOrAngle);
+
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of
         // two rings, point away from the middle of the centers of the two rings
@@ -2782,9 +2771,9 @@ class SmilesDrawer {
             vertex.position = v;
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
-        } else if (previousVertex.value.rings.length == 1 || previousVertex.value.isBridge) {
+        } else if (previousVertex.value.rings.length === 1 || previousVertex.value.isBridge) {
             // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
-            // Use the same approach es with rings that are connected at one vertex
+            // Use the same approach as with rings that are connected at one vertex
             // and draw the atom in the opposite direction of the center.
             let pos = Vector2.subtract(ringOrAngle, previousVertex.position);
 
@@ -2828,12 +2817,15 @@ class SmilesDrawer {
         if (vertex.value.rings.length > 0) {
             let nextRing = this.getRing(vertex.value.rings[0]);
             let nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
+
             nextCenter.invert();
             nextCenter.normalize();
 
             let r = MathHelper.polyCircumradius(this.opts.bondLength, nextRing.getSize());
+
             nextCenter.multiply(r);
             nextCenter.add(vertex.position);
+
             this.createRing(nextRing, nextCenter, vertex);
         } else {
             // Draw the non-ring vertices connected to this one        
