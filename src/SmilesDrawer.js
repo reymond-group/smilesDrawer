@@ -22,12 +22,12 @@ class SmilesDrawer {
         };
 
         this.defaultOptions = {
-            shortBondLength: 9, // 25,
-            bondLength: 16, // 30,
+            shortBondLength: 9,
+            bondLength: 16,
             bondSpacing: 4,
+            atomVisualization: 'default',
             debug: false,
             allowFlips: false,
-            drawingIterations: 20,
             isomeric: false,
             themes: {
                 dark: {
@@ -42,6 +42,7 @@ class SmilesDrawer {
                     S: '#f1c40f',
                     B: '#e67e22',
                     SI: '#e67e22',
+                    H: '#252525',
                     BACKGROUND: '#141414'
                 },
                 light: {
@@ -56,6 +57,7 @@ class SmilesDrawer {
                     S: '#f1c40f',
                     B: '#e67e22',
                     SI: '#e67e22',
+                    H: '#d5d5d5',
                     BACKGROUND: '#fff'
                 }
             }
@@ -227,6 +229,9 @@ class SmilesDrawer {
             this.drawVertices(this.opts.debug);
 
             this.canvasWrapper.reset();
+
+            console.log(this.vertices);
+            console.log(this.edges);
         }
     }
 
@@ -447,10 +452,10 @@ class SmilesDrawer {
         for (let i = 0; i < vertexA.value.ringbonds.length; i++) {
             for (let j = 0; j < vertexB.value.ringbonds.length; j++) {
                 // if(i != j) continue;
-                if (vertexA.value.ringbonds[i].id == vertexB.value.ringbonds[j].id) {
+                if (vertexA.value.ringbonds[i].id === vertexB.value.ringbonds[j].id) {
                     // If the bonds are equal, it doesn't matter which bond is returned.
                     // if they are not equal, return the one that is not the default ("-")
-                    if (vertexA.value.ringbonds[i].bondType == '-') {
+                    if (vertexA.value.ringbonds[i].bondType === '-') {
                         return vertexB.value.ringbonds[j].bond;
                     } else {
                         return vertexA.value.ringbonds[i].bond;
@@ -995,9 +1000,7 @@ class SmilesDrawer {
 
             if (ring.isBenzeneLike(this.vertices)) {
                 return ring;
-            }
-            
-            if (size > maxSize) {
+            } else if (size > maxSize) {
                 maxSize = size;
                 largestCommonRing = ring;
             }
@@ -1675,12 +1678,12 @@ class SmilesDrawer {
             }
         }
         
-        let k = l / 1.25;
-        let c = 0.01;
+        let k = l / 1.4;
+        let c = 0.005;
         let maxMove = l / 2.0;
         let maxDist = l * 2.0;
         
-        for (let n = 0; n < 500; n++) {
+        for (let n = 0; n < 600; n++) {
             for (let i = 0; i < totalLength; i++) {
                 forces[i].set(0, 0);
             }
@@ -2130,8 +2133,13 @@ class SmilesDrawer {
             }
 
             if (!isCarbon || atom.explicit || isTerminal) {
-                this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
-                        element, hydrogens, dir, isTerminal, charge)
+                if (this.opts.atomVisualization === 'default') {
+                    this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
+                            element, hydrogens, dir, isTerminal, charge)
+                } else if (this.opts.atomVisualization === 'balls') {
+                    this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y,
+                            element)
+                }
             }
 
             if (debug) {

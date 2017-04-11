@@ -405,8 +405,8 @@ class CanvasWrapper {
      */
     drawDebugText(x, y, text) {
         let ctx = this.ctx;
+
         ctx.save();
-        
         ctx.font = '5px Droid Sans, sans-serif';
         ctx.textAlign = 'start';
         ctx.textBaseline = 'top';
@@ -416,10 +416,29 @@ class CanvasWrapper {
     }
 
     /**
+     * Draw a ball to the canvas.
+     *
+     * @param {number} x The x position of the text.
+     * @param {number} y The y position of the text.
+     * @param {string} elementName The name of the element (single-letter).
+     * @param {number} hydrogens The number of hydrogen atoms.
+     */
+    drawBall(x, y, elementName) {
+        let ctx = this.ctx;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x + this.offsetX, y + this.offsetY, this.bondLength / 4.5, 0, 2 * Math.PI, false);
+        ctx.fillStyle = this.getColor(elementName);
+        ctx.fill();
+    }
+
+    /**
      * Draw a text to the canvas.
      *
      * @param {number} x The x position of the text.
      * @param {number} y The y position of the text.
+     * @param {string} elementName The name of the element (single-letter).
      * @param {number} hydrogens The number of hydrogen atoms.
      * @param {string} direction The direction of the text in relation to the associated vertex.
      * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.

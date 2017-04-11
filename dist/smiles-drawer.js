@@ -1253,8 +1253,8 @@ var CanvasWrapper = function () {
         key: 'drawDebugText',
         value: function drawDebugText(x, y, text) {
             var ctx = this.ctx;
-            ctx.save();
 
+            ctx.save();
             ctx.font = '5px Droid Sans, sans-serif';
             ctx.textAlign = 'start';
             ctx.textBaseline = 'top';
@@ -1264,10 +1264,32 @@ var CanvasWrapper = function () {
         }
 
         /**
+         * Draw a ball to the canvas.
+         *
+         * @param {number} x The x position of the text.
+         * @param {number} y The y position of the text.
+         * @param {string} elementName The name of the element (single-letter).
+         * @param {number} hydrogens The number of hydrogen atoms.
+         */
+
+    }, {
+        key: 'drawBall',
+        value: function drawBall(x, y, elementName) {
+            var ctx = this.ctx;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x + this.offsetX, y + this.offsetY, this.bondLength / 4.5, 0, 2 * Math.PI, false);
+            ctx.fillStyle = this.getColor(elementName);
+            ctx.fill();
+        }
+
+        /**
          * Draw a text to the canvas.
          *
          * @param {number} x The x position of the text.
          * @param {number} y The y position of the text.
+         * @param {string} elementName The name of the element (single-letter).
          * @param {number} hydrogens The number of hydrogen atoms.
          * @param {string} direction The direction of the text in relation to the associated vertex.
          * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
@@ -2114,6 +2136,7 @@ var Ring = function () {
         this.sourceId = sourceId;
         this.targetId = targetId;
         this.members = new Array();
+        this.edges = new Array();
         this.insiders = new Array();
         this.neighbours = new Array();
         this.positioned = false;
@@ -2323,7 +2346,10 @@ var Ring = function () {
     }, {
         key: 'isBenzeneLike',
         value: function isBenzeneLike(vertices) {
-            return this.getDoubleBondCount(vertices) === 3 && this.members.length === 6;
+            var db = this.getDoubleBondCount(vertices);
+            var length = this.members.length;
+
+            return db === 3 && length === 6 || db === 2 && length === 5;
         }
 
         /**
@@ -2339,9 +2365,9 @@ var Ring = function () {
             var doubleBondCount = 0;
 
             for (var i = 0; i < this.members.length; i++) {
-                var bondType = vertices[this.members[i]].value.bondType;
+                var atom = vertices[this.members[i]].value;
 
-                if (bondType === '=') {
+                if (atom.bondType === '=' || atom.branchBond === '=') {
                     doubleBondCount++;
                 }
             }
@@ -4411,6 +4437,7 @@ var SmilesDrawer = function () {
             shortBondLength: 9, // 25,
             bondLength: 16, // 30,
             bondSpacing: 4,
+            atomVisualization: 'balls',
             debug: false,
             allowFlips: false,
             drawingIterations: 20,
@@ -4428,6 +4455,7 @@ var SmilesDrawer = function () {
                     S: '#f1c40f',
                     B: '#e67e22',
                     SI: '#e67e22',
+                    H: '#252525',
                     BACKGROUND: '#141414'
                 },
                 light: {
@@ -4442,6 +4470,7 @@ var SmilesDrawer = function () {
                     S: '#f1c40f',
                     B: '#e67e22',
                     SI: '#e67e22',
+                    H: '#d5d5d5',
                     BACKGROUND: '#fff'
                 }
             }
@@ -4622,6 +4651,9 @@ var SmilesDrawer = function () {
                 this.drawVertices(this.opts.debug);
 
                 this.canvasWrapper.reset();
+
+                console.log(this.vertices);
+                console.log(this.edges);
             }
         }
 
@@ -4879,10 +4911,10 @@ var SmilesDrawer = function () {
             for (var i = 0; i < vertexA.value.ringbonds.length; i++) {
                 for (var j = 0; j < vertexB.value.ringbonds.length; j++) {
                     // if(i != j) continue;
-                    if (vertexA.value.ringbonds[i].id == vertexB.value.ringbonds[j].id) {
+                    if (vertexA.value.ringbonds[i].id === vertexB.value.ringbonds[j].id) {
                         // If the bonds are equal, it doesn't matter which bond is returned.
                         // if they are not equal, return the one that is not the default ("-")
-                        if (vertexA.value.ringbonds[i].bondType == '-') {
+                        if (vertexA.value.ringbonds[i].bondType === '-') {
                             return vertexB.value.ringbonds[j].bond;
                         } else {
                             return vertexA.value.ringbonds[i].bond;
@@ -5459,9 +5491,7 @@ var SmilesDrawer = function () {
 
                 if (ring.isBenzeneLike(this.vertices)) {
                     return ring;
-                }
-
-                if (size > maxSize) {
+                } else if (size > maxSize) {
                     maxSize = size;
                     largestCommonRing = ring;
                 }
@@ -6191,12 +6221,12 @@ var SmilesDrawer = function () {
                 }
             }
 
-            var k = l / 1.25;
-            var c = 0.01;
+            var k = l / 1.4;
+            var c = 0.005;
             var maxMove = l / 2.0;
             var maxDist = l * 2.0;
 
-            for (var n = 0; n < 500; n++) {
+            for (var n = 0; n < 600; n++) {
                 for (var _i33 = 0; _i33 < totalLength; _i33++) {
                     forces[_i33].set(0, 0);
                 }
@@ -6654,7 +6684,11 @@ var SmilesDrawer = function () {
                 }
 
                 if (!isCarbon || atom.explicit || isTerminal) {
-                    this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge);
+                    if (this.opts.atomVisualization === 'default') {
+                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge);
+                    } else if (this.opts.atomVisualization === 'balls') {
+                        this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+                    }
                 }
 
                 if (debug) {

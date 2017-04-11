@@ -13,6 +13,7 @@ class Ring {
         this.sourceId = sourceId;
         this.targetId = targetId;
         this.members = new Array();
+        this.edges = new Array();
         this.insiders = new Array();
         this.neighbours = new Array();
         this.positioned = false;
@@ -191,7 +192,11 @@ class Ring {
      * @returns {boolean} A boolean indicating whether or not this ring is an implicitly defined benzene-like.
      */
     isBenzeneLike(vertices) {
-        return this.getDoubleBondCount(vertices) === 3 && this.members.length === 6;
+        let db = this.getDoubleBondCount(vertices);
+        let length = this.members.length;
+
+        return db === 3 && length === 6 ||
+               db === 2 && length === 5 ;
     }
 
     /**
@@ -204,9 +209,9 @@ class Ring {
         let doubleBondCount = 0;
 
         for (let i = 0; i < this.members.length; i++) {
-            let bondType = vertices[this.members[i]].value.bondType;
+            let atom = vertices[this.members[i]].value;
 
-            if (bondType === '=') {
+            if (atom.bondType === '=' || atom.branchBond === '=') {
                 doubleBondCount++;
             }
         }
