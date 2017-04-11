@@ -35,8 +35,8 @@ In order to have nice consistent font rendering you have to include the droid sa
             let smilesDrawer = new SmilesDrawer(options);
             
             input.addEventListener('input', function() {
-                // Parse the input
-                let data = smiles.parse(input.value);
+                // Clean the input (remove unrecognized characters, such as spaces and tabs) and parse it
+                let data = SmilesDrawer.parse(SmilesDrawer.clean(input.value));
 
                 // Draw to the canvas
                 smilesDrawer.draw(data, 'example-canvas', 'light', false);
@@ -56,9 +56,12 @@ The following options are available:
 
 | Option | Identifier | Data Type | Default Value |
 |---|---|---|---|
-| Bond length | bondLength | number | 25 |
-| Short bond length (e.g. double bonds in rings) | shortBondLength  | number | 20 |
+| Bond length | bondLength | number | 16 |
+| Short bond length (e.g. double bonds in rings) | shortBondLength  | number | 9 |
 | Bond spacing (e.g. space between double bonds | bondSpacing | number | 4 |
+| Atom Visualization | atomVisualization | string [ 'default', 'balls', 'none' ] | 'default' |
+| Allow Flips (flipping hydrogens etc. inside a ring) | allowFlips, boolean | false |
+| Isometric (EXPERIMENTAL) | isometric | boolean | false |
 | Debug (draw debug information to canvas | debug | boolean | false |
 | Color themes | themes | object | see below |
 
@@ -83,6 +86,7 @@ The default options are defined as follows:
             S: '#f1c40f',
             B: '#e67e22',
             SI: '#e67e22',
+            H: '#252525',
             BACKGROUND: '#141414'
         },
         light: {
@@ -97,6 +101,7 @@ The default options are defined as follows:
             S: '#f1c40f',
             B: '#e67e22',
             SI: '#e67e22',
+            H: '#d5d5d5',
             BACKGROUND: '#fff'
         }
     }

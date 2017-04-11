@@ -22,13 +22,13 @@ class SmilesDrawer {
         };
 
         this.defaultOptions = {
-            shortBondLength: 9,
             bondLength: 16,
+            shortBondLength: 9,
             bondSpacing: 4,
             atomVisualization: 'default',
-            debug: false,
             allowFlips: false,
             isomeric: false,
+            debug: false,
             themes: {
                 dark: {
                     C: '#fff',
