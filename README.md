@@ -60,7 +60,7 @@ The following options are available:
 | Short bond length (e.g. double bonds in rings) | shortBondLength  | number | 9 |
 | Bond spacing (e.g. space between double bonds) | bondSpacing | number | 4 |
 | Atom Visualization | atomVisualization | string ['default', 'balls', 'none'] | 'default' |
-| Allow Flips (flipping hydrogens etc. inside a ring) | allowFlips, boolean | false |
+| Allow Flips (flipping hydrogens etc. inside a ring) | allowFlips | boolean | false |
 | Isometric (EXPERIMENTAL) | isometric | boolean | false |
 | Debug (draw debug information to canvas) | debug | boolean | false |
 | Color themes | themes | object | see below |
