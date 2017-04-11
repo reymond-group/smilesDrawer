@@ -1,6 +1,0 @@
-{
-    "plugins": [ "plugins/parseHtml"],
-    "source": {
-        "includePattern": ".*"
-    }
-}

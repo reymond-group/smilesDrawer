@@ -1,7 +1,0 @@
-{
-  "name": "config-master",
-  "test-app": {
-    "one": "einen",
-    "four": "package"
-  }
-}
