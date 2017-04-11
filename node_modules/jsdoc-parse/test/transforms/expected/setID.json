@@ -1,0 +1,18 @@
+[
+    {
+    	"id": "the original longname",
+    	"longname": "the original longname"
+    },
+    {
+        "kind": "constructor",
+    	"longname": "constructor",
+    	"id": "constructor()"
+    },
+    {
+        "kind": "class",
+        "isExported": true,
+    	"longname": "module:something",
+    	"id": "module:something--Something",
+        "codeName": "Something"
+    }
+]

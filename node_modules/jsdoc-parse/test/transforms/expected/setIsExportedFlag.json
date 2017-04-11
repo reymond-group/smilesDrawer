@@ -1,0 +1,10 @@
+{
+    "description": "the exported contructor",
+    "kind": "class",
+    "classdesc": "the exported class",
+    "alias": "module:human",
+    "name": "module:human",
+    "longname": "module:human",
+	"isExported": true,
+    "memberof": "module:human"
+}

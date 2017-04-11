@@ -1,0 +1,327 @@
+[
+  {
+    "id": "module:handbrake-js~Handbrake",
+    "name": "Handbrake",
+    "scope": "inner",
+    "kind": "class",
+    "augments": [
+      "EventEmitter"
+    ],
+    "description": "A thin wrapper on the handbrakeCLI child_process handle. An instance of this class is returned by `hbjs.spawn()`.",
+    "memberof": "module:handbrake-js",
+    "fires": [
+      "event:start",
+      "module:handbrake-js~Handbrake#event:progress",
+      "module:handbrake-js~Handbrake#event:begin",
+      "module:handbrake-js~Handbrake#event:end",
+      "event:complete"
+    ],
+    "codeName": "Handbrake"
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#output",
+    "name": "output",
+    "scope": "instance",
+    "kind": "member",
+    "description": "A `String` containing all handbrakeCLI output",
+    "memberof": "module:handbrake-js~Handbrake",
+    "type": {
+      "names": [
+        "string"
+      ]
+    },
+    "codeName": "this.output"
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#options",
+    "name": "options",
+    "scope": "instance",
+    "kind": "member",
+    "description": "the options HandbrakeCLI was spawned with",
+    "memberof": "module:handbrake-js~Handbrake",
+    "type": {
+      "names": [
+        "object"
+      ]
+    },
+    "codeName": "this.options"
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#event:start",
+    "name": "start",
+    "scope": "instance",
+    "kind": "event",
+    "description": "Fired as HandbrakeCLI is launched. Nothing has happened yet.",
+    "memberof": "module:handbrake-js~Handbrake"
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#event:begin",
+    "name": "begin",
+    "scope": "instance",
+    "kind": "event",
+    "description": "Fired when encoding begins. If you're expecting an encode and this never fired, something went wrong.",
+    "memberof": "module:handbrake-js~Handbrake"
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#event:progress",
+    "name": "progress",
+    "scope": "instance",
+    "kind": "event",
+    "description": "Fired at regular intervals passing a `progress` object.",
+    "memberof": "module:handbrake-js~Handbrake",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "object"
+          ]
+        },
+        "description": "details of encode progress",
+        "name": "progress"
+      },
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "current task index",
+        "name": "progress.taskNumber"
+      },
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "total tasks in the queue",
+        "name": "progress.taskCount"
+      },
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "name": "progress.percentComplete"
+      },
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "Frames per second",
+        "name": "progress.fps"
+      },
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "Average frames per second",
+        "name": "progress.avgFps"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "Estimated time until completion",
+        "name": "progress.eta"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "Task description, either \"Encoding\" or \"Muxing\"",
+        "name": "progress.task"
+      }
+    ]
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#event:output",
+    "name": "output",
+    "scope": "instance",
+    "kind": "event",
+    "description": "An aggregate of `stdout` and `stderr` output from the underlying HandbrakeCLI process.",
+    "memberof": "module:handbrake-js~Handbrake",
+    "type": {
+      "names": [
+        "string"
+      ]
+    }
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#event:error",
+    "name": "error",
+    "scope": "instance",
+    "kind": "event",
+    "description": "All operational exceptions are delivered via this event. Passes an `Error` instance.",
+    "memberof": "module:handbrake-js~Handbrake",
+    "type": {
+      "names": [
+        "Error"
+      ]
+    },
+    "properties": [
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "One of `HandbrakeCLINotFound`, `HandbrakeCLIError`, `NoTitleFound`, `HandbrakeCLICrash` or `ValidationError`",
+        "name": "name"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "name": "message"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "name": "errno"
+      }
+    ]
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#event:end",
+    "name": "end",
+    "scope": "instance",
+    "kind": "event",
+    "description": "Fired on successful completion of an encoding task. Always follows a `begin` event, with some `progress` in between.",
+    "memberof": "module:handbrake-js~Handbrake",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "first param",
+        "name": "one"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "second param",
+        "name": "two"
+      }
+    ]
+  },
+  {
+    "id": "module:handbrake-js~Handbrake#event:complete",
+    "name": "complete",
+    "scope": "instance",
+    "kind": "event",
+    "description": "Fired when HandbrakeCLI exited cleanly. This does not necessarily mean your encode completed as planned..",
+    "memberof": "module:handbrake-js~Handbrake"
+  },
+  {
+    "id": "module:handbrake-js",
+    "name": "handbrake-js",
+    "kind": "module",
+    "description": "Handbrake for node.js.",
+    "examples": [
+      "```js\nvar hbjs = require(\"handbrake-js\");\n```"
+    ],
+    "typicalname": "hbjs"
+  },
+  {
+    "id": "module:handbrake-js.spawn",
+    "name": "spawn",
+    "scope": "static",
+    "kind": "function",
+    "description": "Spawns a HandbrakeCLI process with the supplied [options](https://trac.handbrake.fr/wiki/CLIGuide#options), returning an instance of `Handbrake` on which you can listen for events.",
+    "memberof": "module:handbrake-js",
+    "alias": "module:handbrake-js.spawn",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "Object",
+            "Array"
+          ]
+        },
+        "description": "[Options](https://trac.handbrake.fr/wiki/CLIGuide#options) to pass directly to HandbrakeCLI",
+        "name": "options"
+      }
+    ],
+    "examples": [
+      "```js\nvar hbjs = require(\"handbrake-js\");\n\nhbjs.spawn(options)\n    .on(\"error\", console.error)\n    .on(\"output\", console.log);\n```"
+    ],
+    "returns": [
+      {
+        "type": {
+          "names": [
+            "module:handbrake-js~Handbrake"
+          ]
+        }
+      }
+    ],
+    "codeName": "spawn"
+  },
+  {
+    "id": "module:handbrake-js.exec",
+    "name": "exec",
+    "scope": "static",
+    "kind": "function",
+    "description": "Runs HandbrakeCLI with the supplied [options](https://trac.handbrake.fr/wiki/CLIGuide#options) calling the supplied callback on completion. The exec method is best suited for short duration tasks where you can wait until completion for the output.",
+    "memberof": "module:handbrake-js",
+    "alias": "module:handbrake-js.exec",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "Object"
+          ]
+        },
+        "description": "[Options](https://trac.handbrake.fr/wiki/CLIGuide#options) to pass directly to HandbrakeCLI",
+        "name": "options"
+      },
+      {
+        "type": {
+          "names": [
+            "function"
+          ]
+        },
+        "optional": true,
+        "description": "If passed, `onComplete(err, stdout, stderr)` will be called on completion, `stdout` and `stderr` being strings containing the HandbrakeCLI output.",
+        "name": "onComplete"
+      }
+    ],
+    "examples": [
+      "```js\nvar hbjs = require(\"handbrake-js\");\n\nhbjs.exec({ preset-list: true }, function(err, stdout, stderr){\n    if (err) throw err;\n    console.log(stdout);\n});\n```"
+    ],
+    "codeName": "exec"
+  },
+  {
+    "id": "module:handbrake-js.cliOptions",
+    "name": "cliOptions",
+    "scope": "static",
+    "kind": "member",
+    "description": "[Command-line-args](https://github.com/75lb/command-line-args) option definitions, useful when building a CLI.",
+    "memberof": "module:handbrake-js",
+    "type": {
+      "names": [
+        "array"
+      ]
+    },
+    "codeName": "exports.cliOptions"
+  }
+]

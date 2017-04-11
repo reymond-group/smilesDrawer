@@ -2,6 +2,7 @@
   $(function(){
 
     $('.button-collapse').sideNav();
+    $('select').material_select();
 
     $(function() {
       $('a[href*="#"]:not([href="#"])').click(function() {
@@ -28,13 +29,15 @@ var input = document.getElementById('input');
   var bondLengthInput = document.getElementById('bondLength');
   var shortBondLengthInput = document.getElementById('shortBondLength');
   var bondSpacingInput = document.getElementById('bondSpacing');
+  var atomSelect = document.getElementById('atom');
   var theme = 'light'
 
   var options = {
     debug: false,
     bondLength: 16,
     shortBondLength: 9,
-    bondSpacing: 4
+    bondSpacing: 4,
+    atomVisualization: 'default'
   }
 
   var smilesDrawer = new SmilesDrawer(options);
@@ -88,6 +91,11 @@ var input = document.getElementById('input');
 
     bondSpacingInput.addEventListener('input', function () {
       options.bondSpacing = parseInt(bondSpacingInput.value);
+      updateOptions();
+    });
+
+    $("#atom").on('change', function() {
+      options.atomVisualization = $(this).val();
       updateOptions();
     });
 

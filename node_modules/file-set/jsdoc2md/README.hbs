@@ -1,0 +1,35 @@
+[![view on npm](http://img.shields.io/npm/v/file-set.svg)](https://www.npmjs.org/package/file-set)
+[![npm module downloads](http://img.shields.io/npm/dt/file-set.svg)](https://www.npmjs.org/package/file-set)
+[![Build Status](https://travis-ci.org/75lb/file-set.svg?branch=master)](https://travis-ci.org/75lb/file-set)
+[![Dependency Status](https://david-dm.org/75lb/file-set.svg)](https://david-dm.org/75lb/file-set)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](https://github.com/feross/standard)
+
+# file-set
+{{#module name="file-set"}}{{>body}}{{/module}}
+
+## Install
+```sh
+$ npm install file-set --save
+```
+
+## Usage
+```js
+> const FileSet = require('file-set');
+
+> new FileSet([ '*', 'not/existing/*' ])
+FileSet {
+  files: [ 'LICENSE', 'package.json', 'README.md' ],
+  dirs: [ 'jsdoc2md/', 'lib/', 'node_modules/', 'test/' ],
+  notExisting: [ 'not/existing/*' ] }
+```
+
+# API
+{{#module name='file-set'~}}
+{{>body~}}
+{{>member-index~}}
+{{>members~}}
+{{/module}}
+
+* * *
+
+&copy; 2014-16 Lloyd Brookes \<75pound@gmail.com\>. Documented by [jsdoc-to-markdown](https://github.com/jsdoc2md/jsdoc-to-markdown).

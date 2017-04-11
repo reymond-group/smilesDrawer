@@ -1,0 +1,222 @@
+[
+    {
+        "comment": "/**\n    the constructor description\n    @class\n    @classdesc a class with all of the things\n    @param {object} - an input\n    @param [options] {object} - optional shit\n    @author 75lb <75pound@gmail.com>\n    @deprecated\n    @since v0.10.28\n    @extends {Number}\n    @example\n    ```js\n    var yeah = new Everything(true)\n    ```\n    */",
+        "meta": {
+            "range": [
+                352,
+                597
+            ],
+            "filename": "0-src.html",
+            "lineno": 17,
+            "path": "/Users/lloyd/Documents/jsdoc2md/jsdoc-api/test/fixture/html",
+            "code": {
+                "id": "astnode100000001",
+                "name": "All",
+                "type": "FunctionDeclaration",
+                "paramnames": [
+                    "input",
+                    "second"
+                ]
+            },
+            "vars": {
+                "this.topping": "All#topping",
+                "this.size": "All#size"
+            }
+        },
+        "description": "the constructor description",
+        "kind": "class",
+        "classdesc": "a class with all of the things",
+        "params": [
+            {
+                "type": {
+                    "names": [
+                        "object"
+                    ]
+                },
+                "description": "an input",
+                "name": "input"
+            },
+            {
+                "type": {
+                    "names": [
+                        "object"
+                    ]
+                },
+                "optional": true,
+                "description": "optional shit",
+                "name": "options"
+            }
+        ],
+        "author": [
+            "75lb <75pound@gmail.com>"
+        ],
+        "deprecated": true,
+        "since": "v0.10.28",
+        "augments": [
+            "Number"
+        ],
+        "examples": [
+            "```js\n    var yeah = new Everything(true)\n    ```"
+        ],
+        "name": "All",
+        "longname": "All",
+        "scope": "global"
+    },
+    {
+        "comment": "/**\n      the ingredients on top\n      @default\n      @type {string}\n      @since v1.0.0\n      */",
+        "meta": {
+            "range": [
+                493,
+                522
+            ],
+            "filename": "0-src.html",
+            "lineno": 24,
+            "path": "/Users/lloyd/Documents/jsdoc2md/jsdoc-api/test/fixture/html",
+            "code": {
+                "id": "astnode100000007",
+                "name": "this.topping",
+                "type": "Literal",
+                "value": "mud, lettuce",
+                "paramnames": []
+            }
+        },
+        "description": "the ingredients on top",
+        "defaultvalue": "mud, lettuce",
+        "type": {
+            "names": [
+                "string"
+            ]
+        },
+        "since": "v1.0.0",
+        "name": "topping",
+        "longname": "All#topping",
+        "kind": "member",
+        "memberof": "All",
+        "scope": "instance"
+    },
+    {
+        "comment": "/**\n      the general size\n      */",
+        "meta": {
+            "range": [
+                571,
+                591
+            ],
+            "filename": "0-src.html",
+            "lineno": 28,
+            "path": "/Users/lloyd/Documents/jsdoc2md/jsdoc-api/test/fixture/html",
+            "code": {
+                "id": "astnode100000013",
+                "name": "this.size",
+                "type": "Literal",
+                "value": "medium",
+                "paramnames": []
+            }
+        },
+        "description": "the general size",
+        "name": "size",
+        "longname": "All#size",
+        "kind": "member",
+        "memberof": "All",
+        "scope": "instance"
+    },
+    {
+        "comment": "/**\n    This function has all tags set\n    @deprecated\n    @param {string} - The input string\n    @param {object} - a second input\n    @author Lloyd <75pound@gmail.com>\n    @since v0.10.28\n    @returns {object | string} this return has several types\n    @example\n    ```js\n    all.allTogether(true)\n    ```\n    */",
+        "meta": {
+            "range": [
+                920,
+                1044
+            ],
+            "filename": "0-src.html",
+            "lineno": 43,
+            "path": "/Users/lloyd/Documents/jsdoc2md/jsdoc-api/test/fixture/html",
+            "code": {
+                "id": "astnode100000019",
+                "name": "All.prototype.allThings",
+                "type": "FunctionExpression",
+                "paramnames": [
+                    "one",
+                    "two"
+                ]
+            },
+            "vars": {
+                "some": "All#allThings~some"
+            }
+        },
+        "description": "This function has all tags set",
+        "deprecated": true,
+        "params": [
+            {
+                "type": {
+                    "names": [
+                        "string"
+                    ]
+                },
+                "description": "The input string",
+                "name": "one"
+            },
+            {
+                "type": {
+                    "names": [
+                        "object"
+                    ]
+                },
+                "description": "a second input",
+                "name": "two"
+            }
+        ],
+        "author": [
+            "Lloyd <75pound@gmail.com>"
+        ],
+        "since": "v0.10.28",
+        "returns": [
+            {
+                "type": {
+                    "names": [
+                        "object",
+                        "string"
+                    ]
+                },
+                "description": "this return has several types"
+            }
+        ],
+        "examples": [
+            "```js\n    all.allTogether(true)\n    ```"
+        ],
+        "name": "allThings",
+        "longname": "All#allThings",
+        "kind": "function",
+        "memberof": "All",
+        "scope": "instance"
+    },
+    {
+        "comment": "/**\n      a rarseclart inner\n      */",
+        "meta": {
+            "range": [
+                1022,
+                1038
+            ],
+            "filename": "0-src.html",
+            "lineno": 47,
+            "path": "/Users/lloyd/Documents/jsdoc2md/jsdoc-api/test/fixture/html",
+            "code": {
+                "id": "astnode100000030",
+                "name": "some",
+                "type": "Literal",
+                "value": "bs code"
+            }
+        },
+        "description": "a rarseclart inner",
+        "name": "some",
+        "longname": "All#allThings~some",
+        "kind": "member",
+        "memberof": "All#allThings",
+        "scope": "inner"
+    },
+    {
+        "kind": "package",
+        "longname": "package:undefined",
+        "files": [
+            "/Users/lloyd/Documents/jsdoc2md/jsdoc-api/test/fixture/html/0-src.html"
+        ]
+    }
+]

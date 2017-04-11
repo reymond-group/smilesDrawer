@@ -1,0 +1,23 @@
+[
+    {
+      "id": "module:cjs/animals~Animal~Quadroped#legs",
+      "name": "legs",
+      "scope": "instance",
+      "kind": "member",
+      "description": "leg count",
+      "memberof": "module:cjs/animals~Animal~Quadroped",
+      "codeName": "this.legs"
+    },
+    {
+      "id": "module:cjs/animals~Animal#type",
+      "name": "type",
+      "scope": "instance",
+      "kind": "member",
+      "description": "animal type",
+      "memberof": "module:cjs/animals~Animal",
+      "type": {
+        "names": [ "Quadroped" ]
+      },
+      "codeName": "this.type"
+    }
+]

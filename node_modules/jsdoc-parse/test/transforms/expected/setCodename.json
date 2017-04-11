@@ -1,0 +1,25 @@
+{
+    "meta": {
+        "range": [
+            159,
+            654
+        ],
+        "filename": "human.js",
+        "lineno": 14,
+        "path": "/Users/lloyd.brookes/Documents/75lb/jsdoc-parse/test/fixture/cjs",
+        "code": {
+            "id": "astnode100000007",
+            "name": "Human",
+            "type": "FunctionDeclaration",
+            "paramnames": []
+        },
+        "vars": {
+            "Organ": null,
+            "this.liver": null
+        }
+    },
+    "kind": "class",
+    "name": "module:human",
+    "longname": "module:human",
+    "codeName": "Human"
+}

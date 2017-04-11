@@ -1,0 +1,764 @@
+[
+  {
+    "id": "module:cjs/class",
+    "name": "cjs/class",
+    "kind": "module",
+    "description": "exports a class",
+    "typicalname": "exp"
+  },
+  {
+    "id": "module:cjs/class^ExportedClass",
+    "name": "ExportedClass",
+    "kind": "class",
+    "isExported": true,
+    "description": "the exported class",
+    "alias": "module:cjs/class",
+    "codeName": "ExportedClass",
+    "memberof": "module:cjs/class"
+  },
+  {
+    "id": "module:cjs/class^ExportedClass()",
+    "name": "ExportedClass",
+    "kind": "constructor",
+    "description": "the exported contructor",
+    "memberof": "module:cjs/class^ExportedClass"
+  },
+  {
+    "id": "module:cjs/class^ExportedClass#prop",
+    "name": "prop",
+    "scope": "instance",
+    "kind": "member",
+    "description": "instance property",
+    "memberof": "module:cjs/class^ExportedClass",
+    "codeName": "this.prop"
+  },
+  {
+    "id": "module:cjs/class^ExportedClass.staticProp",
+    "name": "staticProp",
+    "scope": "static",
+    "kind": "member",
+    "description": "a static property for the exported class",
+    "memberof": "module:cjs/class^ExportedClass",
+    "codeName": "ExportedClass.staticProp"
+  },
+  {
+    "id": "module:cjs/class^ExportedClass~innerProp",
+    "name": "innerProp",
+    "scope": "inner",
+    "kind": "member",
+    "description": "inner module property",
+    "memberof": "module:cjs/class^ExportedClass",
+    "codeName": "innerProp"
+  },
+  {
+    "id": "module:cjs/falias-obj",
+    "name": "cjs/falias-obj",
+    "kind": "module",
+    "description": "exports a pointer to a function"
+  },
+  {
+    "id": "module:cjs/falias-obj^sum",
+    "name": "sum",
+    "kind": "function",
+    "isExported": true,
+    "description": "the function",
+    "alias": "module:cjs/falias-obj",
+    "codeName": "sum",
+    "memberof": "module:cjs/falias-obj"
+  },
+  {
+    "id": "module:cjs/falias-obj^sum.extra",
+    "name": "extra",
+    "scope": "static",
+    "kind": "function",
+    "description": "a static method on the exported function",
+    "memberof": "module:cjs/falias-obj^sum",
+    "codeName": "sum.extra"
+  },
+  {
+    "id": "module:cjs/function-alias",
+    "name": "cjs/function-alias",
+    "kind": "module",
+    "description": "exports a pointer to a function"
+  },
+  {
+    "id": "module:cjs/function-alias^sum",
+    "name": "sum",
+    "kind": "function",
+    "isExported": true,
+    "description": "the function",
+    "alias": "module:cjs/function-alias",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "the first number",
+        "name": "one"
+      },
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "the second number",
+        "name": "two"
+      }
+    ],
+    "returns": [
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "the calculation result"
+      }
+    ],
+    "codeName": "sum",
+    "memberof": "module:cjs/function-alias"
+  },
+  {
+    "id": "module:cjs/object-alias",
+    "name": "cjs/object-alias",
+    "kind": "module",
+    "description": "a module exporting an object"
+  },
+  {
+    "id": "module:cjs/object-alias^teams",
+    "name": "teams",
+    "kind": "member",
+    "isExported": true,
+    "description": "the teams",
+    "alias": "module:cjs/object-alias",
+    "codeName": "teams",
+    "memberof": "module:cjs/object-alias"
+  },
+  {
+    "id": "module:cjs/object",
+    "name": "cjs/object",
+    "kind": "module",
+    "description": "a module exporting `exports` directly",
+    "typicalname": "obj"
+  },
+  {
+    "id": "module:cjs/object.one",
+    "name": "one",
+    "scope": "static",
+    "kind": "member",
+    "description": "the first property",
+    "memberof": "module:cjs/object",
+    "type": {
+      "names": [
+        "number"
+      ]
+    },
+    "codeName": "exports.one"
+  },
+  {
+    "id": "module:cjs/object.two",
+    "name": "two",
+    "scope": "static",
+    "kind": "function",
+    "description": "the second property, a function",
+    "memberof": "module:cjs/object",
+    "examples": [
+      "this is the example"
+    ],
+    "codeName": "exports.two"
+  },
+  {
+    "id": "GlobalClass",
+    "name": "GlobalClass",
+    "scope": "global",
+    "kind": "class",
+    "augments": [
+      "String"
+    ],
+    "description": "a global class",
+    "codeName": "GlobalClass"
+  },
+  {
+    "id": "GlobalClass()",
+    "name": "GlobalClass",
+    "kind": "constructor",
+    "description": "the global class constructor",
+    "memberof": "GlobalClass",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "first param",
+        "name": "one"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "second param",
+        "name": "two"
+      }
+    ]
+  },
+  {
+    "id": "GlobalClass#propOne",
+    "name": "propOne",
+    "scope": "instance",
+    "kind": "member",
+    "description": "an instance property",
+    "memberof": "GlobalClass",
+    "codeName": "this.propOne"
+  },
+  {
+    "id": "GlobalClass.propTwo",
+    "name": "propTwo",
+    "scope": "static",
+    "kind": "member",
+    "description": "a static property",
+    "memberof": "GlobalClass",
+    "codeName": "GlobalClass.propTwo"
+  },
+  {
+    "id": "customTagged",
+    "name": "customTagged",
+    "scope": "global",
+    "kind": "member",
+    "description": "a global var with custom tags",
+    "codeName": "customTagged",
+    "customTags": [
+      {
+        "tag": "sitcom",
+        "value": "The Office"
+      },
+      {
+        "tag": "character",
+        "value": "Oggmeister"
+      }
+    ]
+  },
+  {
+    "customTags": [
+      {
+        "tag": "sitcom",
+        "value": "Only Fools"
+      },
+      {
+        "tag": "character",
+        "value": "Rodney Trotter"
+      }
+    ],
+    "id": "customClass",
+    "name": "customClass",
+    "scope": "global",
+    "kind": "class",
+    "description": "a class that has custom tags",
+    "codeName": "customClass"
+  },
+  {
+    "id": "customClass()",
+    "name": "customClass",
+    "kind": "constructor",
+    "description": "the constructor",
+    "memberof": "customClass"
+  },
+  {
+    "id": "customFunction",
+    "name": "customFunction",
+    "scope": "global",
+    "kind": "function",
+    "description": "a global function with custom tags",
+    "codeName": "customFunction",
+    "customTags": [
+      {
+        "tag": "sitcom",
+        "value": "Brass Eye"
+      },
+      {
+        "tag": "character",
+        "value": "Noel Edmonds"
+      }
+    ]
+  },
+  {
+    "id": "event:docletEvent",
+    "name": "docletEvent",
+    "scope": "global",
+    "kind": "event",
+    "description": "an event defined in a doclet"
+  },
+  {
+    "id": "exampleVar",
+    "name": "exampleVar",
+    "scope": "global",
+    "kind": "member",
+    "description": "an example var",
+    "examples": [
+      "var thisVar = funtion(){\n    return \"a value\";\n};"
+    ],
+    "type": {
+      "names": [
+        "string"
+      ]
+    },
+    "defaultvalue": "\"something\"",
+    "codeName": "exampleVar"
+  },
+  {
+    "id": "external:String",
+    "name": "String",
+    "scope": "global",
+    "kind": "external",
+    "description": "The built in string object.",
+    "see": [
+      "{@link https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String String}"
+    ]
+  },
+  {
+    "id": "external:String#rot13",
+    "name": "rot13",
+    "scope": "instance",
+    "kind": "function",
+    "description": "Adds a new method to the built-in string.",
+    "memberof": "external:String",
+    "examples": [
+      "var greeting = new String('hello world');\nconsole.log( greeting.rot13() ); // uryyb jbeyq"
+    ]
+  },
+  {
+    "id": "external:jQuery.fn",
+    "name": "jQuery.fn",
+    "scope": "global",
+    "kind": "external",
+    "description": "The jQuery plugin namespace.",
+    "see": [
+      "{@link http://docs.jquery.com/Plugins/Authoring The jQuery Plugin Guide}"
+    ]
+  },
+  {
+    "id": "external:jQuery.fn.starfairy",
+    "name": "starfairy",
+    "scope": "static",
+    "kind": "function",
+    "description": "A jQuery plugin to make stars fly around your home page.",
+    "memberof": "external:jQuery.fn"
+  },
+  {
+    "id": "external:XMLHttpRequest",
+    "name": "XMLHttpRequest",
+    "scope": "global",
+    "kind": "external",
+    "description": "Namespace provided by the browser.",
+    "see": [
+      "https://developer.mozilla.org/en/xmlhttprequest"
+    ]
+  },
+  {
+    "id": "EncryptedRequest",
+    "name": "EncryptedRequest",
+    "scope": "global",
+    "kind": "class",
+    "augments": [
+      "external:XMLHttpRequest"
+    ]
+  },
+  {
+    "id": "EncryptedRequest()",
+    "name": "EncryptedRequest",
+    "kind": "constructor",
+    "description": "Extends the built in XMLHttpRequest to send data encoded with a secret key.",
+    "memberof": "EncryptedRequest"
+  },
+  {
+    "id": "fileVar",
+    "name": "fileVar",
+    "scope": "global",
+    "kind": "member",
+    "description": "a variable in the file",
+    "codeName": "fileVar"
+  },
+  {
+    "id": "firesError",
+    "name": "firesError",
+    "scope": "global",
+    "kind": "function",
+    "fires": [
+      "event:error"
+    ],
+    "codeName": "firesError"
+  },
+  {
+    "id": "firesMany",
+    "name": "firesMany",
+    "scope": "global",
+    "kind": "function",
+    "fires": [
+      "event:error",
+      "event:begin",
+      "event:end"
+    ],
+    "codeName": "firesMany"
+  },
+  {
+    "id": "firesDefinedEvent",
+    "name": "firesDefinedEvent",
+    "scope": "global",
+    "kind": "function",
+    "fires": [
+      "event:docletEvent"
+    ],
+    "codeName": "firesDefinedEvent"
+  },
+  {
+    "id": "functionObj",
+    "name": "functionObj",
+    "scope": "global",
+    "kind": "function",
+    "description": "the function",
+    "codeName": "functionObj"
+  },
+  {
+    "id": "functionObj.extra",
+    "name": "extra",
+    "scope": "static",
+    "kind": "function",
+    "description": "a static method on the function",
+    "memberof": "functionObj",
+    "codeName": "functionObj.extra"
+  },
+  {
+    "id": "globalFunction",
+    "name": "globalFunction",
+    "scope": "global",
+    "kind": "function",
+    "description": "a global function",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "first param",
+        "name": "one"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "second param",
+        "name": "two"
+      }
+    ],
+    "codeName": "globalFunction"
+  },
+  {
+    "id": "LendsClass",
+    "name": "LendsClass",
+    "scope": "global",
+    "kind": "class",
+    "codeName": "LendsClass"
+  },
+  {
+    "id": "LendsClass.say",
+    "name": "say",
+    "scope": "static",
+    "kind": "function",
+    "description": "say something",
+    "memberof": "LendsClass",
+    "codeName": "say"
+  },
+  {
+    "id": "LendsClass2",
+    "name": "LendsClass2",
+    "scope": "global",
+    "kind": "class",
+    "alias": "LendsClass2",
+    "codeName": "initialize"
+  },
+  {
+    "id": "LendsClass2#say",
+    "name": "say",
+    "scope": "instance",
+    "kind": "function",
+    "description": "say something",
+    "memberof": "LendsClass2",
+    "codeName": "say"
+  },
+  {
+    "id": "EventfulClass",
+    "name": "EventfulClass",
+    "scope": "global",
+    "kind": "function",
+    "classdesc": "a class which mixes in Eventful behaviour",
+    "mixes": [
+      "Eventful"
+    ],
+    "codeName": "EventfulClass"
+  },
+  {
+    "id": "phantom",
+    "name": "phantom",
+    "scope": "global",
+    "kind": "mixin",
+    "description": "phantom mixin"
+  },
+  {
+    "id": "Eventful",
+    "name": "Eventful",
+    "scope": "global",
+    "kind": "mixin",
+    "description": "This provides methods used for event handling. It's not meant to\nbe used directly.",
+    "codeName": "Eventful"
+  },
+  {
+    "id": "Eventful.on",
+    "name": "on",
+    "scope": "static",
+    "kind": "function",
+    "description": "Register a handler function to be called whenever this event is fired.",
+    "memberof": "Eventful",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "Name of the event.",
+        "name": "eventName"
+      },
+      {
+        "type": {
+          "names": [
+            "function"
+          ]
+        },
+        "description": "The handler to call.",
+        "name": "handler"
+      }
+    ],
+    "codeName": "on"
+  },
+  {
+    "id": "Eventful.fire",
+    "name": "fire",
+    "scope": "static",
+    "kind": "function",
+    "description": "Fire an event, causing all handlers for that event name to run.",
+    "memberof": "Eventful",
+    "params": [
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "Name of the event.",
+        "name": "eventName"
+      },
+      {
+        "type": {
+          "names": [
+            "Object"
+          ]
+        },
+        "description": "The data provided to each handler.",
+        "name": "eventData"
+      }
+    ],
+    "codeName": "fire"
+  },
+  {
+    "id": "config",
+    "name": "config",
+    "scope": "global",
+    "kind": "namespace",
+    "properties": [
+      {
+        "type": {
+          "names": [
+            "object"
+          ]
+        },
+        "description": "The default values for parties.",
+        "name": "defaults"
+      },
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "The default number of players.",
+        "name": "defaults.players"
+      },
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "The default level for the party.",
+        "name": "defaults.level"
+      },
+      {
+        "type": {
+          "names": [
+            "object"
+          ]
+        },
+        "description": "The default treasure.",
+        "name": "defaults.treasure"
+      },
+      {
+        "type": {
+          "names": [
+            "number"
+          ]
+        },
+        "description": "How much gold the party starts with.",
+        "name": "defaults.treasure.gold"
+      }
+    ],
+    "codeName": "config"
+  },
+  {
+    "id": "globalFunction",
+    "name": "globalFunction",
+    "scope": "global",
+    "kind": "function",
+    "description": "a global function returning multiple stuff",
+    "returns": [
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        },
+        "description": "if something you get a string back"
+      },
+      {
+        "type": {
+          "names": [
+            "object",
+            "function"
+          ]
+        },
+        "description": "or an object, or function"
+      }
+    ],
+    "codeName": "globalFunction"
+  },
+  {
+    "id": "returnsSomething",
+    "name": "returnsSomething",
+    "scope": "global",
+    "kind": "function",
+    "description": "returns has no desc",
+    "returns": [
+      {
+        "type": {
+          "names": [
+            "string"
+          ]
+        }
+      }
+    ],
+    "codeName": "returnsSomething"
+  },
+  {
+    "id": "seeableVar",
+    "name": "seeableVar",
+    "scope": "global",
+    "kind": "member",
+    "description": "a global var with a @see",
+    "see": [
+      "something or other"
+    ],
+    "codeName": "seeableVar"
+  },
+  {
+    "id": "seefoo",
+    "name": "seefoo",
+    "scope": "global",
+    "kind": "function",
+    "description": "Both of these will link to the bar function.",
+    "see": [
+      "{@link seebar}",
+      "bar"
+    ],
+    "codeName": "seefoo"
+  },
+  {
+    "id": "seebar",
+    "name": "seebar",
+    "scope": "global",
+    "kind": "function",
+    "see": [
+      "{@link seefoo} for further information.",
+      "{@link http://github.com|GitHub}"
+    ],
+    "codeName": "seebar"
+  },
+  {
+    "id": "throwingFunction",
+    "name": "throwingFunction",
+    "scope": "global",
+    "kind": "function",
+    "exceptions": [
+      {
+        "description": "throw three"
+      }
+    ],
+    "codeName": "throwingFunction"
+  },
+  {
+    "id": "todoFunction",
+    "name": "todoFunction",
+    "scope": "global",
+    "kind": "function",
+    "codeName": "todoFunction",
+    "todoList": [
+      {
+        "done": false,
+        "task": "Write the documentation."
+      },
+      {
+        "done": false,
+        "task": "Implement this function."
+      },
+      {
+        "done": true,
+        "task": "this one is done"
+      },
+      {
+        "done": true,
+        "task": "finished"
+      }
+    ]
+  },
+  {
+    "id": "globalVar",
+    "name": "globalVar",
+    "scope": "global",
+    "kind": "member",
+    "description": "a global var",
+    "type": {
+      "names": [
+        "string"
+      ]
+    },
+    "defaultvalue": "\"something\"",
+    "codeName": "globalVar"
+  }
+]

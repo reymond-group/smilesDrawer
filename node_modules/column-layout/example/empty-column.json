@@ -1,0 +1,16 @@
+{
+  "options": {
+    "ignoreEmptyColumns": true,
+    "padding": {
+      "left": "-",
+      "right": "-"
+    }
+  },
+  "data": [
+    { "name": "Lloyd", "age": "" },
+    { "name": "Roger", "age": " " },
+    { "name": "Amir" },
+    { "name": "Frank" },
+    { "name": "Amy" }
+  ]
+}

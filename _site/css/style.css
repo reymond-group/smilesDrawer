@@ -1,3 +1,12 @@
+h1 {
+  position: relative;
+}
+
+img.logo {
+  width: 100px;
+  height: 100px;
+}
+
 #canvas-container {
   text-align: center;
 }

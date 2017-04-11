@@ -1,0 +1,26 @@
+[
+  {
+    "id": "module:cjs/human--Human()",
+    "memberof": "module:cjs/human--Human",
+    "name": "module:cjs/human--Human",
+    "type": {
+        "names": [
+          "module:cjs/human--Human~Organ~Cell"
+        ]
+    },
+    "returns": [
+      {
+        "type": {
+          "names": [
+            "module:cjs/human--Human~Organ"
+          ]
+        }
+      }
+    ]
+  },
+    {
+      "id": "module:MapView",
+      "name": "MapView",
+      "kind": "module"
+    }
+]
