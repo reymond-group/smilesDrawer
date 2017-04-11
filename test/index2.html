@@ -28,8 +28,7 @@
                     canvas.setAttribute('alt', drugbank[i]);
                     document.body.appendChild(canvas);
                     
-                    let data = smiles.parse(drugbank[i]);
-                    
+                    let data = SmilesDrawer.parse(drugbank[i]);
                     smilesDrawer.draw(data, 'canvas' + i, 'light', false);
 
                     // if (td > 1000) console.log(schembl[i]);

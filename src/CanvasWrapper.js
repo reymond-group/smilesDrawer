@@ -3,13 +3,18 @@ class CanvasWrapper {
     /**
      * The constructor for the class CanvasWrapper.
      *
-     * @param {string} targetId The canvas id.
+     * @param {string|HTMLElement} target The canvas id or the canvas HTMLElement.
      * @param {object} theme A theme from the smiles drawer options.
      * @param {number} bondLenght The bond length.
      * @param {number} bondSpacing The bond spacing.
      */
-    constructor(targetId, theme, bondLength, bondSpacing) {
-        this.canvas = document.getElementById(targetId);
+    constructor(target, theme, bondLength, bondSpacing) {
+        if (typeof target === 'string' || target instanceof String) {
+            this.canvas = document.getElementById(target);
+        } else {
+            this.canvas = target;
+        }
+        
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;
         this.bondLength = bondLength;

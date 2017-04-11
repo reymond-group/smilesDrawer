@@ -58,7 +58,7 @@
         function draw() {
             let t = performance.now();
     
-            var data = smiles.parse(input.value);
+            var data = SmilesDrawer.parse(input.value);
             smilesDrawer.draw(data, 'output-canvas', 'light', false);
 
             let td = performance.now() - t;

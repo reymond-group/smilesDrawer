@@ -448,7 +448,7 @@ A class wrapping a canvas element
 **Kind**: global class  
 
 * [CanvasWrapper](#CanvasWrapper)
-    * [new CanvasWrapper(targetId, theme, bondLenght, bondSpacing)](#new_CanvasWrapper_new)
+    * [new CanvasWrapper(target, theme, bondLenght, bondSpacing)](#new_CanvasWrapper_new)
     * [.setTheme(theme)](#CanvasWrapper+setTheme)
     * [.scale(vertices)](#CanvasWrapper+scale)
     * [.reset()](#CanvasWrapper+reset)
@@ -458,20 +458,21 @@ A class wrapping a canvas element
     * [.drawWedge(line, width)](#CanvasWrapper+drawWedge)
     * [.drawDashedWedge(line, width)](#CanvasWrapper+drawDashedWedge)
     * [.drawDebugText(x, y, text)](#CanvasWrapper+drawDebugText)
-    * [.drawText(x, y, hydrogens, direction, isTerminal, charge)](#CanvasWrapper+drawText)
+    * [.drawBall(x, y, elementName, hydrogens)](#CanvasWrapper+drawBall)
+    * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge)](#CanvasWrapper+drawText)
     * [.drawDebugPoint(x, y, [debugText], [color])](#CanvasWrapper+drawDebugPoint)
     * [.drawAromaticityRing(ring)](#CanvasWrapper+drawAromaticityRing)
     * [.clear()](#CanvasWrapper+clear)
 
 <a name="new_CanvasWrapper_new"></a>
 
-### new CanvasWrapper(targetId, theme, bondLenght, bondSpacing)
+### new CanvasWrapper(target, theme, bondLenght, bondSpacing)
 The constructor for the class CanvasWrapper.
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| targetId | <code>string</code> | The canvas id. |
+| target | <code>string</code> &#124; <code>HTMLElement</code> | The canvas id or the canvas HTMLElement. |
 | theme | <code>object</code> | A theme from the smiles drawer options. |
 | bondLenght | <code>number</code> | The bond length. |
 | bondSpacing | <code>number</code> | The bond spacing. |
@@ -581,9 +582,23 @@ Draws a debug text message at a given position
 | y | <code>number</code> | The y coordinate. |
 | text | <code>string</code> | The debug text. |
 
+<a name="CanvasWrapper+drawBall"></a>
+
+### canvasWrapper.drawBall(x, y, elementName, hydrogens)
+Draw a ball to the canvas.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| x | <code>number</code> | The x position of the text. |
+| y | <code>number</code> | The y position of the text. |
+| elementName | <code>string</code> | The name of the element (single-letter). |
+| hydrogens | <code>number</code> | The number of hydrogen atoms. |
+
 <a name="CanvasWrapper+drawText"></a>
 
-### canvasWrapper.drawText(x, y, hydrogens, direction, isTerminal, charge)
+### canvasWrapper.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge)
 Draw a text to the canvas.
 
 **Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
@@ -592,6 +607,7 @@ Draw a text to the canvas.
 | --- | --- | --- |
 | x | <code>number</code> | The x position of the text. |
 | y | <code>number</code> | The y position of the text. |
+| elementName | <code>string</code> | The name of the element (single-letter). |
 | hydrogens | <code>number</code> | The number of hydrogen atoms. |
 | direction | <code>string</code> | The direction of the text in relation to the associated vertex. |
 | isTerminal | <code>boolean</code> | A boolean indicating whether or not the vertex is terminal. |
@@ -1383,79 +1399,84 @@ The main class of the application representing the smiles drawer
 
 * [SmilesDrawer](#SmilesDrawer)
     * [new SmilesDrawer(options)](#new_SmilesDrawer_new)
-    * [.extend()](#SmilesDrawer+extend)
-    * [.draw(data, targetId, themeName, infoOnly)](#SmilesDrawer+draw)
-    * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
-    * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
-    * [.getFusedRings()](#SmilesDrawer+getFusedRings) ⇒ <code>array</code>
-    * [.getSpiros()](#SmilesDrawer+getSpiros) ⇒ <code>array</code>
-    * [.printRingInfo()](#SmilesDrawer+printRingInfo) ⇒ <code>string</code>
-    * [.getTotalOverlapScore()](#SmilesDrawer+getTotalOverlapScore) ⇒ <code>number</code>
-    * [.getRingCount()](#SmilesDrawer+getRingCount) ⇒ <code>number</code>
-    * [.hasBridgedRing()](#SmilesDrawer+hasBridgedRing) ⇒ <code>boolean</code>
-    * [.getHeavyAtomCount()](#SmilesDrawer+getHeavyAtomCount) ⇒ <code>number</code>
-    * [.initGraph(node, parentVertexId, isBranch)](#SmilesDrawer+initGraph)
-    * [.getRingbondType(vertexA, vertexB)](#SmilesDrawer+getRingbondType) ⇒ <code>string</code> &#124; <code>null</code>
-    * [.initRings()](#SmilesDrawer+initRings)
-    * [.getBridgedRingRings(ringId)](#SmilesDrawer+getBridgedRingRings) ⇒ <code>array</code>
-    * [.isPartOfBridgedRing(ringId)](#SmilesDrawer+isPartOfBridgedRing) ⇒ <code>boolean</code>
-    * [.createBridgedRing(ringIds, sourceVertexId)](#SmilesDrawer+createBridgedRing) ⇒ <code>[Ring](#Ring)</code>
-    * [.getRingVertices(sourceId, targetId)](#SmilesDrawer+getRingVertices) ⇒ <code>array</code>
-    * [.dijkstra(sourceId, targetId)](#SmilesDrawer+dijkstra) ⇒ <code>array</code>
-    * [.getMinDist(dist, visited)](#SmilesDrawer+getMinDist) ⇒ <code>number</code>
-    * [.areVerticesInSameRing(vertexA, vertexB)](#SmilesDrawer+areVerticesInSameRing) ⇒ <code>boolean</code>
-    * [.getCommonRings(vertexA, vertexB)](#SmilesDrawer+getCommonRings) ⇒ <code>array</code>
-    * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer+getSmallestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
-    * [.getLargestCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
-    * [.getLargestOrAromaticCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestOrAromaticCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
-    * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer+getVerticesAt) ⇒ <code>array</code>
-    * [.getClosestVertex(vertex)](#SmilesDrawer+getClosestVertex) ⇒ <code>[Vertex](#Vertex)</code>
-    * [.getClosestEndpointVertex(vertex)](#SmilesDrawer+getClosestEndpointVertex) ⇒ <code>[Vertex](#Vertex)</code>
-    * [.getBranch(vertexId, previousId)](#SmilesDrawer+getBranch) ⇒ <code>object</code>
-    * [.addVertex(vertex)](#SmilesDrawer+addVertex) ⇒ <code>number</code>
-    * [.addEdge(edge)](#SmilesDrawer+addEdge) ⇒ <code>number</code>
-    * [.addRing(ring)](#SmilesDrawer+addRing) ⇒ <code>number</code>
-    * [.removeRing(ringId)](#SmilesDrawer+removeRing)
-    * [.getRing(ringId)](#SmilesDrawer+getRing) ⇒ <code>[Ring](#Ring)</code>
-    * [.addRingConnection(ringConnection)](#SmilesDrawer+addRingConnection) ⇒ <code>number</code>
-    * [.removeRingConnection(ringConnectionId)](#SmilesDrawer+removeRingConnection)
-    * [.removeRingConnectionsBetween(vertexIdA, vertexIdB)](#SmilesDrawer+removeRingConnectionsBetween)
-    * [.getRingConnections(ringId, ringIds)](#SmilesDrawer+getRingConnections) ⇒ <code>array</code>
-    * [.isRingConnection(vertexIdA, vertexIdB)](#SmilesDrawer+isRingConnection) ⇒ <code>boolean</code>
-    * [.getOverlapScore()](#SmilesDrawer+getOverlapScore) ⇒ <code>object</code>
-    * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer+chooseSide) ⇒ <code>object</code>
-    * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer+areConnected) ⇒ <code>boolean</code>
-    * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer+getEdgeWeight) ⇒ <code>number</code> &#124; <code>null</code>
-    * [.getEdge(vertexIdA, vertexIdB)](#SmilesDrawer+getEdge) ⇒ <code>number</code> &#124; <code>null</code>
-    * [.forceLayout(vertices, center, startVertexId, ring)](#SmilesDrawer+forceLayout)
-    * [.getSubringCenter(ring, vertex)](#SmilesDrawer+getSubringCenter) ⇒ <code>[Vector2](#Vector2)</code>
-    * [.drawEdges(debug)](#SmilesDrawer+drawEdges)
-    * [.drawVertices(debug)](#SmilesDrawer+drawVertices)
-    * [.position()](#SmilesDrawer+position)
-    * [.clearPositions()](#SmilesDrawer+clearPositions)
-    * [.restorePositions()](#SmilesDrawer+restorePositions)
-    * [.backupRingInformation()](#SmilesDrawer+backupRingInformation)
-    * [.restoreRingInformation()](#SmilesDrawer+restoreRingInformation)
-    * [.createRing(ring, center, [startVector], [previousVertex])](#SmilesDrawer+createRing)
-    * [.rotateSubtree(vertexId, parentVertexId, angle, center)](#SmilesDrawer+rotateSubtree)
-    * [.getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores)](#SmilesDrawer+getSubtreeOverlapScore) ⇒ <code>number</code>
-    * [.getCurrentCenterOfMass()](#SmilesDrawer+getCurrentCenterOfMass) ⇒ <code>[Vector2](#Vector2)</code>
-    * [.getCurrentCenterOfMassInNeigbourhood(vec, [r])](#SmilesDrawer+getCurrentCenterOfMassInNeigbourhood) ⇒ <code>[Vector2](#Vector2)</code>
-    * [.resolvePrimaryOverlaps()](#SmilesDrawer+resolvePrimaryOverlaps)
-    * [.resolveSecondaryOverlaps(scores)](#SmilesDrawer+resolveSecondaryOverlaps)
-    * [.createNextBond(vertex, previousVertex, ringOrAngle, dir)](#SmilesDrawer+createNextBond)
-    * [.getCommonRingbondNeighbour(vertex)](#SmilesDrawer+getCommonRingbondNeighbour) ⇒ <code>number</code> &#124; <code>null</code>
-    * [.isPointInRing(vec)](#SmilesDrawer+isPointInRing) ⇒ <code>boolean</code>
-    * [.isEdgeInRing(edge)](#SmilesDrawer+isEdgeInRing) ⇒ <code>boolean</code>
-    * [.isEdgeRotatable(edge)](#SmilesDrawer+isEdgeRotatable) ⇒ <code>boolean</code>
-    * [.isRingAromatic(ring)](#SmilesDrawer+isRingAromatic) ⇒ <code>boolean</code>
-    * [.isEdgeInAromaticRing(edge)](#SmilesDrawer+isEdgeInAromaticRing) ⇒ <code>boolean</code>
-    * [.isVertexInAromaticRing(vertexId)](#SmilesDrawer+isVertexInAromaticRing) ⇒ <code>boolean</code>
-    * [.getEdgeNormals(edge)](#SmilesDrawer+getEdgeNormals) ⇒ <code>array</code>
-    * [.getTreeDepth(vertexId, parentVertexId)](#SmilesDrawer+getTreeDepth) ⇒ <code>number</code>
-    * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])](#SmilesDrawer+traverseTree)
-    * [.getBondCount(vertex)](#SmilesDrawer+getBondCount) ⇒ <code>number</code>
-    * [.getNonRingNeighbours(vertexId)](#SmilesDrawer+getNonRingNeighbours) ⇒ <code>array</code>
+    * _instance_
+        * [.extend()](#SmilesDrawer+extend)
+        * [.draw(data, target, themeName, infoOnly)](#SmilesDrawer+draw)
+        * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
+        * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
+        * [.getFusedRings()](#SmilesDrawer+getFusedRings) ⇒ <code>array</code>
+        * [.getSpiros()](#SmilesDrawer+getSpiros) ⇒ <code>array</code>
+        * [.printRingInfo()](#SmilesDrawer+printRingInfo) ⇒ <code>string</code>
+        * [.getTotalOverlapScore()](#SmilesDrawer+getTotalOverlapScore) ⇒ <code>number</code>
+        * [.getRingCount()](#SmilesDrawer+getRingCount) ⇒ <code>number</code>
+        * [.hasBridgedRing()](#SmilesDrawer+hasBridgedRing) ⇒ <code>boolean</code>
+        * [.getHeavyAtomCount()](#SmilesDrawer+getHeavyAtomCount) ⇒ <code>number</code>
+        * [.initGraph(node, parentVertexId, isBranch)](#SmilesDrawer+initGraph)
+        * [.getRingbondType(vertexA, vertexB)](#SmilesDrawer+getRingbondType) ⇒ <code>string</code> &#124; <code>null</code>
+        * [.initRings()](#SmilesDrawer+initRings)
+        * [.getBridgedRingRings(ringId)](#SmilesDrawer+getBridgedRingRings) ⇒ <code>array</code>
+        * [.isPartOfBridgedRing(ringId)](#SmilesDrawer+isPartOfBridgedRing) ⇒ <code>boolean</code>
+        * [.createBridgedRing(ringIds, sourceVertexId)](#SmilesDrawer+createBridgedRing) ⇒ <code>[Ring](#Ring)</code>
+        * [.getRingVertices(sourceId, targetId)](#SmilesDrawer+getRingVertices) ⇒ <code>array</code>
+        * [.dijkstra(sourceId, targetId)](#SmilesDrawer+dijkstra) ⇒ <code>array</code>
+        * [.getMinDist(dist, visited)](#SmilesDrawer+getMinDist) ⇒ <code>number</code>
+        * [.areVerticesInSameRing(vertexA, vertexB)](#SmilesDrawer+areVerticesInSameRing) ⇒ <code>boolean</code>
+        * [.getCommonRings(vertexA, vertexB)](#SmilesDrawer+getCommonRings) ⇒ <code>array</code>
+        * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer+getSmallestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+        * [.getLargestCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+        * [.getLargestOrAromaticCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestOrAromaticCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
+        * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer+getVerticesAt) ⇒ <code>array</code>
+        * [.getClosestVertex(vertex)](#SmilesDrawer+getClosestVertex) ⇒ <code>[Vertex](#Vertex)</code>
+        * [.getClosestEndpointVertex(vertex)](#SmilesDrawer+getClosestEndpointVertex) ⇒ <code>[Vertex](#Vertex)</code>
+        * [.getBranch(vertexId, previousId)](#SmilesDrawer+getBranch) ⇒ <code>object</code>
+        * [.addVertex(vertex)](#SmilesDrawer+addVertex) ⇒ <code>number</code>
+        * [.addEdge(edge)](#SmilesDrawer+addEdge) ⇒ <code>number</code>
+        * [.addRing(ring)](#SmilesDrawer+addRing) ⇒ <code>number</code>
+        * [.removeRing(ringId)](#SmilesDrawer+removeRing)
+        * [.getRing(ringId)](#SmilesDrawer+getRing) ⇒ <code>[Ring](#Ring)</code>
+        * [.addRingConnection(ringConnection)](#SmilesDrawer+addRingConnection) ⇒ <code>number</code>
+        * [.removeRingConnection(ringConnectionId)](#SmilesDrawer+removeRingConnection)
+        * [.removeRingConnectionsBetween(vertexIdA, vertexIdB)](#SmilesDrawer+removeRingConnectionsBetween)
+        * [.getRingConnections(ringId, ringIds)](#SmilesDrawer+getRingConnections) ⇒ <code>array</code>
+        * [.isRingConnection(vertexIdA, vertexIdB)](#SmilesDrawer+isRingConnection) ⇒ <code>boolean</code>
+        * [.getOverlapScore()](#SmilesDrawer+getOverlapScore) ⇒ <code>object</code>
+        * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer+chooseSide) ⇒ <code>object</code>
+        * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer+areConnected) ⇒ <code>boolean</code>
+        * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer+getEdgeWeight) ⇒ <code>number</code> &#124; <code>null</code>
+        * [.getEdge(vertexIdA, vertexIdB)](#SmilesDrawer+getEdge) ⇒ <code>number</code> &#124; <code>null</code>
+        * [.forceLayout(vertices, center, startVertexId, ring)](#SmilesDrawer+forceLayout)
+        * [.getSubringCenter(ring, vertex)](#SmilesDrawer+getSubringCenter) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.drawEdges(debug)](#SmilesDrawer+drawEdges)
+        * [.drawVertices(debug)](#SmilesDrawer+drawVertices)
+        * [.position()](#SmilesDrawer+position)
+        * [.clearPositions()](#SmilesDrawer+clearPositions)
+        * [.restorePositions()](#SmilesDrawer+restorePositions)
+        * [.backupRingInformation()](#SmilesDrawer+backupRingInformation)
+        * [.restoreRingInformation()](#SmilesDrawer+restoreRingInformation)
+        * [.createRing(ring, [center], [startVertex], [previousVertex], [previousVertex])](#SmilesDrawer+createRing)
+        * [.rotateSubtree(vertexId, parentVertexId, angle, center)](#SmilesDrawer+rotateSubtree)
+        * [.getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores)](#SmilesDrawer+getSubtreeOverlapScore) ⇒ <code>number</code>
+        * [.getCurrentCenterOfMass()](#SmilesDrawer+getCurrentCenterOfMass) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.getCurrentCenterOfMassInNeigbourhood(vec, [r])](#SmilesDrawer+getCurrentCenterOfMassInNeigbourhood) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.resolvePrimaryOverlaps()](#SmilesDrawer+resolvePrimaryOverlaps)
+        * [.resolveSecondaryOverlaps(scores)](#SmilesDrawer+resolveSecondaryOverlaps)
+        * [.createNextBond(vertex, previousVertex, ringOrAngle, dir)](#SmilesDrawer+createNextBond)
+        * [.getCommonRingbondNeighbour(vertex)](#SmilesDrawer+getCommonRingbondNeighbour) ⇒ <code>number</code> &#124; <code>null</code>
+        * [.isPointInRing(vec)](#SmilesDrawer+isPointInRing) ⇒ <code>boolean</code>
+        * [.isEdgeInRing(edge)](#SmilesDrawer+isEdgeInRing) ⇒ <code>boolean</code>
+        * [.isEdgeRotatable(edge)](#SmilesDrawer+isEdgeRotatable) ⇒ <code>boolean</code>
+        * [.isRingAromatic(ring)](#SmilesDrawer+isRingAromatic) ⇒ <code>boolean</code>
+        * [.isEdgeInAromaticRing(edge)](#SmilesDrawer+isEdgeInAromaticRing) ⇒ <code>boolean</code>
+        * [.isVertexInAromaticRing(vertexId)](#SmilesDrawer+isVertexInAromaticRing) ⇒ <code>boolean</code>
+        * [.getEdgeNormals(edge)](#SmilesDrawer+getEdgeNormals) ⇒ <code>array</code>
+        * [.getTreeDepth(vertexId, parentVertexId)](#SmilesDrawer+getTreeDepth) ⇒ <code>number</code>
+        * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])](#SmilesDrawer+traverseTree)
+        * [.getBondCount(vertex)](#SmilesDrawer+getBondCount) ⇒ <code>number</code>
+        * [.getNonRingNeighbours(vertexId)](#SmilesDrawer+getNonRingNeighbours) ⇒ <code>array</code>
+    * _static_
+        * [.clean(smiles)](#SmilesDrawer.clean) ⇒ <code>string</code>
+        * [.apply(options, [themeName])](#SmilesDrawer.apply)
+        * [.parse(smiles)](#SmilesDrawer.parse) ⇒ <code>object</code>
 
 <a name="new_SmilesDrawer_new"></a>
 
@@ -1475,7 +1496,7 @@ A helper method to extend the default options with user supplied ones.
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer+draw"></a>
 
-### smilesDrawer.draw(data, targetId, themeName, infoOnly)
+### smilesDrawer.draw(data, target, themeName, infoOnly)
 Draws the parsed smiles data to a canvas element.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
@@ -1483,7 +1504,7 @@ Draws the parsed smiles data to a canvas element.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | data | <code>object</code> |  | The tree returned by the smiles parser. |
-| targetId | <code>string</code> |  | The id of the HTML canvas element the structure is drawn to. |
+| target | <code>string</code> &#124; <code>HTMLElement</code> |  | The id of the HTML canvas element the structure is drawn to - or the element itself. |
 | themeName | <code>string</code> | <code>&quot;&#x27;dark&#x27;&quot;</code> | The name of the theme to use. Built-in themes are 'light' and 'dark'. |
 | infoOnly | <code>boolean</code> | <code>false</code> | Only output info on the molecule without drawing anything to the canvas. |
 
@@ -2047,7 +2068,7 @@ Restores the most recently backed up information associated with rings.
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer+createRing"></a>
 
-### smilesDrawer.createRing(ring, center, [startVector], [previousVertex])
+### smilesDrawer.createRing(ring, [center], [startVertex], [previousVertex], [previousVertex])
 Creates a new ring, that is, positiones all the vertices inside a ring.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
@@ -2055,9 +2076,10 @@ Creates a new ring, that is, positiones all the vertices inside a ring.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | ring | <code>[Ring](#Ring)</code> |  | The ring to position. |
-| center | <code>[Vector2](#Vector2)</code> |  | The center of the ring to be created. |
-| [startVector] | <code>Vector</code> &#124; <code>null</code> | <code></code> | The first vector to be positioned inside the ring. |
+| [center] | <code>[Vector2](#Vector2)</code> &#124; <code>null</code> | <code></code> | The center of the ring to be created. |
+| [startVertex] | <code>[Vertex](#Vertex)</code> &#124; <code>null</code> | <code></code> | The first vertex to be positioned inside the ring. |
 | [previousVertex] | <code>[Vertex](#Vertex)</code> &#124; <code>null</code> | <code></code> | The last vertex that was positioned. |
+| [previousVertex] | <code>boolean</code> | <code>false</code> | A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it. |
 
 <a name="SmilesDrawer+rotateSubtree"></a>
 
@@ -2285,6 +2307,42 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 | Param | Type | Description |
 | --- | --- | --- |
 | vertexId | <code>number</code> | A vertex id. |
+
+<a name="SmilesDrawer.clean"></a>
+
+### SmilesDrawer.clean(smiles) ⇒ <code>string</code>
+Cleans a SMILES string (removes non-valid characters)
+
+**Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>string</code> - The clean SMILES string.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| smiles | <code>string</code> | A SMILES string. |
+
+<a name="SmilesDrawer.apply"></a>
+
+### SmilesDrawer.apply(options, [themeName])
+Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
+
+**Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | <code>objects</code> |  | SmilesDrawer options. |
+| [themeName] | <code>string</code> | <code>&quot;&#x27;light&#x27;&quot;</code> | The theme to apply. |
+
+<a name="SmilesDrawer.parse"></a>
+
+### SmilesDrawer.parse(smiles) ⇒ <code>object</code>
+Parses the entered smiles string.
+
+**Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>object</code> - Returns the parse tree of the supplied SMILES.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| smiles | <code>string</code> | A SMILES string. |
 
 <a name="Vector2"></a>
 

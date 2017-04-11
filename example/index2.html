@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SMILES Parser Demo</title>
+    <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+    <script src="../dist/smiles-drawer.js"></script>
+
+    <style>
+        canvas {
+            margin: 10px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 2px 0 rgba(0,0,0,0.5);
+            transition: box-shadow 0.25s;
+        }
+
+        canvas:hover {
+            box-shadow: 0 0 15px 0 rgba(0,0,0,0.25);
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <canvas data-smiles="C[C@H](NCCC1=CC=C(O)C=C1)[C@H](O)C1=CC=C(O)C=C1" width="200" height="200"></canvas>
+        <canvas data-smiles="CCN(C)C(=O)OC1=CC=CC(=C1)[C@H](C)N(C)C" width="200" height="200"></canvas>
+        <canvas data-smiles="CN(C)CCC1=CNC2=C1C=C(CN1C=NC=N1)C=C2" width="200" height="200"></canvas>
+        <canvas data-smiles="FC(F)OC1=C(OCC2CC2)C=C(C=C1)C(=O)NC1=C(Cl)C=NC=C1Cl" width="200" height="200"></canvas>
+        <canvas data-smiles="CCCN1CCCC[C@H]1C(=O)NC1=C(C)C=CC=C1C" width="200" height="200"></canvas>
+        <canvas data-smiles="CCN1C=C(C(O)=O)C(=O)C2=C1C=C(C=C2)C1=CC=NC=C1" width="200" height="200"></canvas>
+    </center>
+    <script>
+        SmilesDrawer.apply();
+    </script>
+</body>
+
+</html>

@@ -110,13 +110,13 @@ class SmilesDrawer {
      * Draws the parsed smiles data to a canvas element.
      *
      * @param {object} data The tree returned by the smiles parser.
-     * @param {string} targetId The id of the HTML canvas element the structure is drawn to.
+     * @param {string|HTMLElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
      * @param {string} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
-    draw(data, targetId, themeName = 'dark', infoOnly = false) {
+    draw(data, target, themeName = 'light', infoOnly = false) {
         this.data = data;
-        this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName], this.opts.bondLength, this.opts.bondSpacing); 
+        this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts.bondLength, this.opts.bondSpacing);
         
         this.ringIdCounter = 0;
         this.ringConnectionIdCounter = 0;
@@ -229,9 +229,6 @@ class SmilesDrawer {
             this.drawVertices(this.opts.debug);
 
             this.canvasWrapper.reset();
-
-            console.log(this.vertices);
-            console.log(this.edges);
         }
     }
 
@@ -3472,5 +3469,36 @@ class SmilesDrawer {
      */
     static clean(smiles) {
         return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g,'');
+    }
+
+    /**
+     * Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
+     *
+     * @static
+     * @param {objects} options SmilesDrawer options.
+     * @param {string} [themeName='light'] The theme to apply.
+     */
+    static apply(options, themeName='light') {
+        let smilesDrawer = new SmilesDrawer(options);
+        let elements = document.querySelectorAll('canvas[data-smiles]');
+
+        for (let i = 0; i < elements.length; i++) {
+            let element = elements[i];
+            let data = SmilesDrawer.parse(SmilesDrawer.clean(element.getAttribute('data-smiles')));
+
+            smilesDrawer.draw(data, element, themeName, false);
+        }
+
+    }
+
+    /**
+     * Parses the entered smiles string.
+     * 
+     * @static
+     * @param {string} smiles A SMILES string.
+     * @returns {object} Returns the parse tree of the supplied SMILES.
+     */
+    static parse(smiles) {
+        return SMILESPARSER.parse(smiles);
     }
 }

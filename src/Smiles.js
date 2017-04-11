@@ -1,4 +1,4 @@
-var smiles = (function () {
+var SMILESPARSER = (function () {
   "use strict";
 
   /*

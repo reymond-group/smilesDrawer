@@ -823,15 +823,20 @@ var CanvasWrapper = function () {
     /**
      * The constructor for the class CanvasWrapper.
      *
-     * @param {string} targetId The canvas id.
+     * @param {string|HTMLElement} target The canvas id or the canvas HTMLElement.
      * @param {object} theme A theme from the smiles drawer options.
      * @param {number} bondLenght The bond length.
      * @param {number} bondSpacing The bond spacing.
      */
-    function CanvasWrapper(targetId, theme, bondLength, bondSpacing) {
+    function CanvasWrapper(target, theme, bondLength, bondSpacing) {
         _classCallCheck(this, CanvasWrapper);
 
-        this.canvas = document.getElementById(targetId);
+        if (typeof target === 'string' || target instanceof String) {
+            this.canvas = document.getElementById(target);
+        } else {
+            this.canvas = target;
+        }
+
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;
         this.bondLength = bondLength;
@@ -2646,7 +2651,7 @@ var RingConnection = function () {
     return RingConnection;
 }();
 
-var smiles = function () {
+var SMILESPARSER = function () {
     "use strict";
 
     /*
@@ -4434,13 +4439,12 @@ var SmilesDrawer = function () {
         };
 
         this.defaultOptions = {
-            shortBondLength: 9, // 25,
-            bondLength: 16, // 30,
+            shortBondLength: 9,
+            bondLength: 16,
             bondSpacing: 4,
-            atomVisualization: 'balls',
+            atomVisualization: 'default',
             debug: false,
             allowFlips: false,
-            drawingIterations: 20,
             isomeric: false,
             themes: {
                 dark: {
@@ -4529,16 +4533,16 @@ var SmilesDrawer = function () {
          * Draws the parsed smiles data to a canvas element.
          *
          * @param {object} data The tree returned by the smiles parser.
-         * @param {string} targetId The id of the HTML canvas element the structure is drawn to.
+         * @param {string|HTMLElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
          * @param {string} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
          * @param {boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
          */
-        value: function draw(data, targetId) {
-            var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'dark';
+        value: function draw(data, target) {
+            var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
             var infoOnly = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
             this.data = data;
-            this.canvasWrapper = new CanvasWrapper(targetId, this.opts.themes[themeName], this.opts.bondLength, this.opts.bondSpacing);
+            this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts.bondLength, this.opts.bondSpacing);
 
             this.ringIdCounter = 0;
             this.ringConnectionIdCounter = 0;
@@ -4651,9 +4655,6 @@ var SmilesDrawer = function () {
                 this.drawVertices(this.opts.debug);
 
                 this.canvasWrapper.reset();
-
-                console.log(this.vertices);
-                console.log(this.edges);
             }
         }
 
@@ -8098,6 +8099,44 @@ var SmilesDrawer = function () {
         key: 'clean',
         value: function clean(smiles) {
             return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
+        }
+
+        /**
+         * Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
+         *
+         * @static
+         * @param {objects} options SmilesDrawer options.
+         * @param {string} [themeName='light'] The theme to apply.
+         */
+
+    }, {
+        key: 'apply',
+        value: function apply(options) {
+            var themeName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'light';
+
+            var smilesDrawer = new SmilesDrawer(options);
+            var elements = document.querySelectorAll('canvas[data-smiles]');
+
+            for (var i = 0; i < elements.length; i++) {
+                var element = elements[i];
+                var data = SmilesDrawer.parse(SmilesDrawer.clean(element.getAttribute('data-smiles')));
+
+                smilesDrawer.draw(data, element, themeName, false);
+            }
+        }
+
+        /**
+         * Parses the entered smiles string.
+         * 
+         * @static
+         * @param {string} smiles A SMILES string.
+         * @returns {object} Returns the parse tree of the supplied SMILES.
+         */
+
+    }, {
+        key: 'parse',
+        value: function parse(smiles) {
+            return SMILESPARSER.parse(smiles);
         }
     }]);
 

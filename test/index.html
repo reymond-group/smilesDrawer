@@ -29,7 +29,7 @@
                 console.log(i);
                 try {
                     let t = performance.now();
-                    let data = smiles.parse(SmilesDrawer.clean(drugbank[i]));
+                    let data = SmilesDrawer.parse(SmilesDrawer.clean(drugbank[i]));
                     let td = performance.now() - t;
                     
                     let t2 = performance.now();
