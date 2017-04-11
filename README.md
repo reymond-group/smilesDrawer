@@ -58,20 +58,23 @@ The following options are available:
 |---|---|---|---|
 | Bond length | bondLength | number | 16 |
 | Short bond length (e.g. double bonds in rings) | shortBondLength  | number | 9 |
-| Bond spacing (e.g. space between double bonds | bondSpacing | number | 4 |
-| Atom Visualization | atomVisualization | string [ 'default', 'balls', 'none' ] | 'default' |
+| Bond spacing (e.g. space between double bonds) | bondSpacing | number | 4 |
+| Atom Visualization | atomVisualization | string ['default', 'balls', 'none'] | 'default' |
 | Allow Flips (flipping hydrogens etc. inside a ring) | allowFlips, boolean | false |
 | Isometric (EXPERIMENTAL) | isometric | boolean | false |
-| Debug (draw debug information to canvas | debug | boolean | false |
+| Debug (draw debug information to canvas) | debug | boolean | false |
 | Color themes | themes | object | see below |
 
 
 The default options are defined as follows:
 ```
 {
-    shortBondLength: 20,
-    bondLength: 25,
+    bondLength: 16,
+    shortBondLength: 9,
     bondSpacing: 4,
+    atomVisualization: 'default',
+    allowFlips: false,
+    isomeric: false,
     debug: false,
     themes: {
         dark: {
