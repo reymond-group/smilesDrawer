@@ -4435,7 +4435,17 @@ var SmilesDrawer = function () {
             'n': 3,
             'N': 3,
             'o': 2,
-            'O': 2
+            'O': 2,
+            'p': 3,
+            'P': 3,
+            's': 2,
+            'S': 2,
+            'b': 3,
+            'B': 3,
+            'F': 2,
+            'I': 1,
+            'Cl': 1,
+            'Br': 1
         };
 
         this.defaultOptions = {
@@ -4446,6 +4456,7 @@ var SmilesDrawer = function () {
             allowFlips: false,
             isomeric: false,
             debug: false,
+            terminalCarbons: false,
             themes: {
                 dark: {
                     C: '#fff',
@@ -4838,6 +4849,7 @@ var SmilesDrawer = function () {
             atom.branchBond = node.branchBond;
             atom.ringbonds = node.ringbonds;
             atom.bracket = node.atom.element ? node.atom : null;
+            console.log(atom.bracket);
             atom.setOrder(parentVertexId, order);
 
             var vertex = new Vertex(atom);
@@ -6676,7 +6688,7 @@ var SmilesDrawer = function () {
                 var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
                 var hydrogens = this.maxBonds[element] - bondCount;
                 var dir = vertex.getTextDirection(this.vertices);
-                var isTerminal = vertex.isTerminal();
+                var isTerminal = this.opts.terminalCarbons ? vertex.isTerminal() : false;
                 var isCarbon = atom.element.toLowerCase() === 'c';
 
                 if (atom.bracket) {
@@ -7994,7 +8006,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-             let done = new Array(vertexIds.length);
+              let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8011,10 +8023,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                     sortedVertexIds[index].atomicNumber += '.' + total;
+                      sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }

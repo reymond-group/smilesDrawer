@@ -18,7 +18,17 @@ class SmilesDrawer {
             'n': 3,
             'N': 3,
             'o': 2,
-            'O': 2
+            'O': 2,
+            'p': 3,
+            'P': 3,
+            's': 2,
+            'S': 2,
+            'b': 3,
+            'B': 3,
+            'F': 2,
+            'I': 1,
+            'Cl': 1,
+            'Br': 1
         };
 
         this.defaultOptions = {
@@ -29,6 +39,7 @@ class SmilesDrawer {
             allowFlips: false,
             isomeric: false,
             debug: false,
+            terminalCarbons: false,
             themes: {
                 dark: {
                     C: '#fff',
@@ -2117,25 +2128,27 @@ class SmilesDrawer {
             let atom = vertex.value;
 
             let charge = 0;
+            let isotope = 0;
             let bondCount = this.getBondCount(vertex);
             let element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
             let hydrogens = this.maxBonds[element] - bondCount;
             let dir = vertex.getTextDirection(this.vertices);
-            let isTerminal = vertex.isTerminal();
+            let isTerminal = this.opts.terminalCarbons ? vertex.isTerminal() : false;
             let isCarbon = atom.element.toLowerCase() === 'c';
 
-            if(atom.bracket) {
+            if (atom.bracket) {
                 hydrogens = atom.bracket.hcount;
                 charge = atom.bracket.charge;
+                isotope = atom.bracket.isotope;
             }
 
             if (!isCarbon || atom.explicit || isTerminal) {
                 if (this.opts.atomVisualization === 'default') {
                     this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
-                            element, hydrogens, dir, isTerminal, charge)
+                            element, hydrogens, dir, isTerminal, charge, isotope);
                 } else if (this.opts.atomVisualization === 'balls') {
                     this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y,
-                            element)
+                            element);
                 }
             }
 

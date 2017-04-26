@@ -448,8 +448,9 @@ class CanvasWrapper {
      * @param {string} direction The direction of the text in relation to the associated vertex.
      * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
      * @param {string} charge The charge of the atom.
+     * @param {number} isotope The isotope number.
      */
-    drawText(x, y, elementName, hydrogens, direction, isTerminal, charge) {
+    drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope) {
         // Return empty line element for debugging, remove this check later, values should not be NaN
         if (isNaN(x) || isNaN(y)) {
             return;
@@ -470,6 +471,7 @@ class CanvasWrapper {
         // Charge
         let chargeText = '+'
         let chargeWidth = 0;
+
         if (charge) {
             if (charge === 2) {
                 chargeText = '2+';
@@ -481,6 +483,15 @@ class CanvasWrapper {
 
             ctx.font = fontSmall;
             chargeWidth = ctx.measureText(chargeText).width;
+        }
+
+        let isotopeText = '0';
+        let isotopeWidth = 0;
+
+        if (isotope > 0) {
+            isotopeText = isotope;
+            ctx.font = fontSmall;
+            isotopeWidth = ctx.measureText(isotopeText).width;
         }
 
         ctx.font = fontLarge;
