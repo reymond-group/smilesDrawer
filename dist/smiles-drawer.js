@@ -1299,11 +1299,12 @@ var CanvasWrapper = function () {
          * @param {string} direction The direction of the text in relation to the associated vertex.
          * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
          * @param {string} charge The charge of the atom.
+         * @param {number} isotope The isotope number.
          */
 
     }, {
         key: 'drawText',
-        value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge) {
+        value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope) {
             // Return empty line element for debugging, remove this check later, values should not be NaN
             if (isNaN(x) || isNaN(y)) {
                 return;
@@ -1324,6 +1325,7 @@ var CanvasWrapper = function () {
             // Charge
             var chargeText = '+';
             var chargeWidth = 0;
+
             if (charge) {
                 if (charge === 2) {
                     chargeText = '2+';
@@ -1335,6 +1337,15 @@ var CanvasWrapper = function () {
 
                 ctx.font = fontSmall;
                 chargeWidth = ctx.measureText(chargeText).width;
+            }
+
+            var isotopeText = '0';
+            var isotopeWidth = 0;
+
+            if (isotope > 0) {
+                isotopeText = isotope;
+                ctx.font = fontSmall;
+                isotopeWidth = ctx.measureText(isotopeText).width;
             }
 
             ctx.font = fontLarge;
@@ -4849,7 +4860,6 @@ var SmilesDrawer = function () {
             atom.branchBond = node.branchBond;
             atom.ringbonds = node.ringbonds;
             atom.bracket = node.atom.element ? node.atom : null;
-            console.log(atom.bracket);
             atom.setOrder(parentVertexId, order);
 
             var vertex = new Vertex(atom);
@@ -6684,6 +6694,7 @@ var SmilesDrawer = function () {
                 var atom = vertex.value;
 
                 var charge = 0;
+                var isotope = 0;
                 var bondCount = this.getBondCount(vertex);
                 var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
                 var hydrogens = this.maxBonds[element] - bondCount;
@@ -6694,11 +6705,12 @@ var SmilesDrawer = function () {
                 if (atom.bracket) {
                     hydrogens = atom.bracket.hcount;
                     charge = atom.bracket.charge;
+                    isotope = atom.bracket.isotope;
                 }
 
                 if (!isCarbon || atom.explicit || isTerminal) {
                     if (this.opts.atomVisualization === 'default') {
-                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge);
+                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope);
                     } else if (this.opts.atomVisualization === 'balls') {
                         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
                     }
@@ -8006,7 +8018,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-              let done = new Array(vertexIds.length);
+             let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8023,10 +8035,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                      sortedVertexIds[index].atomicNumber += '.' + total;
+                     sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }

@@ -1299,11 +1299,12 @@ var CanvasWrapper = function () {
          * @param {string} direction The direction of the text in relation to the associated vertex.
          * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
          * @param {string} charge The charge of the atom.
+         * @param {number} isotope The isotope number.
          */
 
     }, {
         key: 'drawText',
-        value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge) {
+        value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope) {
             // Return empty line element for debugging, remove this check later, values should not be NaN
             if (isNaN(x) || isNaN(y)) {
                 return;
@@ -1324,6 +1325,7 @@ var CanvasWrapper = function () {
             // Charge
             var chargeText = '+';
             var chargeWidth = 0;
+
             if (charge) {
                 if (charge === 2) {
                     chargeText = '2+';
@@ -1335,6 +1337,15 @@ var CanvasWrapper = function () {
 
                 ctx.font = fontSmall;
                 chargeWidth = ctx.measureText(chargeText).width;
+            }
+
+            var isotopeText = '0';
+            var isotopeWidth = 0;
+
+            if (isotope > 0) {
+                isotopeText = isotope;
+                ctx.font = fontSmall;
+                isotopeWidth = ctx.measureText(isotopeText).width;
             }
 
             ctx.font = fontLarge;
@@ -4435,17 +4446,28 @@ var SmilesDrawer = function () {
             'n': 3,
             'N': 3,
             'o': 2,
-            'O': 2
+            'O': 2,
+            'p': 3,
+            'P': 3,
+            's': 2,
+            'S': 2,
+            'b': 3,
+            'B': 3,
+            'F': 2,
+            'I': 1,
+            'Cl': 1,
+            'Br': 1
         };
 
         this.defaultOptions = {
-            shortBondLength: 9,
             bondLength: 16,
+            shortBondLength: 9,
             bondSpacing: 4,
             atomVisualization: 'default',
-            debug: false,
             allowFlips: false,
             isomeric: false,
+            debug: false,
+            terminalCarbons: false,
             themes: {
                 dark: {
                     C: '#fff',
@@ -6672,21 +6694,23 @@ var SmilesDrawer = function () {
                 var atom = vertex.value;
 
                 var charge = 0;
+                var isotope = 0;
                 var bondCount = this.getBondCount(vertex);
                 var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
                 var hydrogens = this.maxBonds[element] - bondCount;
                 var dir = vertex.getTextDirection(this.vertices);
-                var isTerminal = vertex.isTerminal();
+                var isTerminal = this.opts.terminalCarbons ? vertex.isTerminal() : false;
                 var isCarbon = atom.element.toLowerCase() === 'c';
 
                 if (atom.bracket) {
                     hydrogens = atom.bracket.hcount;
                     charge = atom.bracket.charge;
+                    isotope = atom.bracket.isotope;
                 }
 
                 if (!isCarbon || atom.explicit || isTerminal) {
                     if (this.opts.atomVisualization === 'default') {
-                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge);
+                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope);
                     } else if (this.opts.atomVisualization === 'balls') {
                         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
                     }
