@@ -40,6 +40,8 @@ class SmilesDrawer {
             isomeric: false,
             debug: false,
             terminalCarbons: false,
+            fontSizeLarge: 6,
+            fontSizeSmall: 4,
             themes: {
                 dark: {
                     C: '#fff',
@@ -127,7 +129,7 @@ class SmilesDrawer {
      */
     draw(data, target, themeName = 'light', infoOnly = false) {
         this.data = data;
-        this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts.bondLength, this.opts.bondSpacing);
+        this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts);
         
         this.ringIdCounter = 0;
         this.ringConnectionIdCounter = 0;
@@ -3516,7 +3518,9 @@ class SmilesDrawer {
         try {
             return SMILESPARSER.parse(smiles);
         } catch (err) {
-            errorCallback(err);
+            if (errorCallback) {
+                errorCallback(err);
+            }
         }
     }
 }

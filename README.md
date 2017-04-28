@@ -60,6 +60,8 @@ The following options are available:
 | Short bond length (e.g. double bonds in rings) | shortBondLength  | number | 9 |
 | Bond spacing (e.g. space between double bonds) | bondSpacing | number | 4 |
 | Atom Visualization | atomVisualization | string ['default', 'balls', 'none'] | 'default' |
+| Large Font Size (in pt for elements) | fontSizeLarge | number | 6 |
+| Small Font Size (in pt for numbers) | fontSizeSmall | number | 4 |
 | Show Terminal Carbons (CH3) | terminalCarbons | boolean | false |
 | Allow Flips (flipping hydrogens etc. inside a ring) | allowFlips | boolean | false |
 | Isometric (EXPERIMENTAL) | isometric | boolean | false |
@@ -75,6 +77,8 @@ The default options are defined as follows:
     bondSpacing: 4,
     atomVisualization: 'default',
     terminalCarbons: false,
+    fontSizeLarge: 6,
+    fontSizeSmall: 4,
     allowFlips: false,
     isomeric: false,
     debug: false,

@@ -448,7 +448,8 @@ A class wrapping a canvas element
 **Kind**: global class  
 
 * [CanvasWrapper](#CanvasWrapper)
-    * [new CanvasWrapper(target, theme, bondLenght, bondSpacing)](#new_CanvasWrapper_new)
+    * [new CanvasWrapper(target, theme, options)](#new_CanvasWrapper_new)
+    * [.scaleHidpi()](#CanvasWrapper+scaleHidpi)
     * [.setTheme(theme)](#CanvasWrapper+setTheme)
     * [.scale(vertices)](#CanvasWrapper+scale)
     * [.reset()](#CanvasWrapper+reset)
@@ -466,7 +467,7 @@ A class wrapping a canvas element
 
 <a name="new_CanvasWrapper_new"></a>
 
-### new CanvasWrapper(target, theme, bondLenght, bondSpacing)
+### new CanvasWrapper(target, theme, options)
 The constructor for the class CanvasWrapper.
 
 
@@ -474,9 +475,14 @@ The constructor for the class CanvasWrapper.
 | --- | --- | --- |
 | target | <code>string</code> &#124; <code>HTMLElement</code> | The canvas id or the canvas HTMLElement. |
 | theme | <code>object</code> | A theme from the smiles drawer options. |
-| bondLenght | <code>number</code> | The bond length. |
-| bondSpacing | <code>number</code> | The bond spacing. |
+| options | <code>any</code> | The smiles drawer options object. |
 
+<a name="CanvasWrapper+scaleHidpi"></a>
+
+### canvasWrapper.scaleHidpi()
+Scale the canvas for hidpi displays.
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
 <a name="CanvasWrapper+setTheme"></a>
 
 ### canvasWrapper.setTheme(theme)
@@ -1477,7 +1483,7 @@ The main class of the application representing the smiles drawer
     * _static_
         * [.clean(smiles)](#SmilesDrawer.clean) ⇒ <code>string</code>
         * [.apply(options, [themeName])](#SmilesDrawer.apply)
-        * [.parse(smiles)](#SmilesDrawer.parse) ⇒ <code>object</code>
+        * [.parse(smiles, errorCallback)](#SmilesDrawer.parse) ⇒ <code>object</code>
 
 <a name="new_SmilesDrawer_new"></a>
 
@@ -2335,7 +2341,7 @@ Applies the smiles drawer draw function to each canvas element that has a smiles
 
 <a name="SmilesDrawer.parse"></a>
 
-### SmilesDrawer.parse(smiles) ⇒ <code>object</code>
+### SmilesDrawer.parse(smiles, errorCallback) ⇒ <code>object</code>
 Parses the entered smiles string.
 
 **Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
@@ -2344,6 +2350,7 @@ Parses the entered smiles string.
 | Param | Type | Description |
 | --- | --- | --- |
 | smiles | <code>string</code> | A SMILES string. |
+| errorCallback | <code>function</code> | A callback that is called with the error object on error. |
 
 <a name="Vector2"></a>
 

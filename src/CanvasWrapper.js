@@ -486,9 +486,9 @@ class CanvasWrapper {
         let offsetY = this.offsetY;
 
         ctx.save();
-
-        let fontSizeLarge = 6;
-        let fontSizeSmall = 4;
+        
+        let fontSizeLarge = this.opts.fontSizeLarge;
+        let fontSizeSmall = this.opts.fontSizeSmall;
 
         let fontLarge = fontSizeLarge + 'pt Droid Sans, sans-serif';
         let fontSmall = fontSizeSmall + 'pt Droid Sans, sans-serif';

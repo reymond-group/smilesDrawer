@@ -825,10 +825,9 @@ var CanvasWrapper = function () {
      *
      * @param {string|HTMLElement} target The canvas id or the canvas HTMLElement.
      * @param {object} theme A theme from the smiles drawer options.
-     * @param {number} bondLenght The bond length.
-     * @param {number} bondSpacing The bond spacing.
+     * @param {any} options The smiles drawer options object.
      */
-    function CanvasWrapper(target, theme, bondLength, bondSpacing) {
+    function CanvasWrapper(target, theme, options) {
         _classCallCheck(this, CanvasWrapper);
 
         if (typeof target === 'string' || target instanceof String) {
@@ -839,9 +838,7 @@ var CanvasWrapper = function () {
 
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;
-        this.bondLength = bondLength;
-        this.bondSpacing = bondSpacing;
-
+        this.opts = options;
         this.drawingWidth = 0.0;
         this.drawingHeight = 0.0;
         this.offsetX = 0.0;
@@ -1165,7 +1162,7 @@ var CanvasWrapper = function () {
             ctx.lineTo(v.x, v.y);
             ctx.lineTo(w.x, w.y);
 
-            var gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
+            var gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
             gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || this.getColor('C'));
             gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
 
@@ -1346,8 +1343,8 @@ var CanvasWrapper = function () {
 
             ctx.save();
 
-            var fontSizeLarge = 6;
-            var fontSizeSmall = 4;
+            var fontSizeLarge = this.opts.fontSizeLarge;
+            var fontSizeSmall = this.opts.fontSizeSmall;
 
             var fontLarge = fontSizeLarge + 'pt Droid Sans, sans-serif';
             var fontSmall = fontSizeSmall + 'pt Droid Sans, sans-serif';
@@ -1504,7 +1501,7 @@ var CanvasWrapper = function () {
             ctx.strokeStyle = this.getColor('C');
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, radius - this.bondLength / 3.0 - this.bondSpacing, 0, Math.PI * 2, true);
+            ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, radius - this.bondLength / 3.0 - this.opts.bondSpacing, 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.stroke();
             ctx.restore();
@@ -4503,6 +4500,8 @@ var SmilesDrawer = function () {
             isomeric: false,
             debug: false,
             terminalCarbons: false,
+            fontSizeLarge: 6,
+            fontSizeSmall: 4,
             themes: {
                 dark: {
                     C: '#fff',
@@ -4599,7 +4598,7 @@ var SmilesDrawer = function () {
             var infoOnly = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
             this.data = data;
-            this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts.bondLength, this.opts.bondSpacing);
+            this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts);
 
             this.ringIdCounter = 0;
             this.ringConnectionIdCounter = 0;
@@ -8053,7 +8052,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-             let done = new Array(vertexIds.length);
+              let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8070,10 +8069,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                     sortedVertexIds[index].atomicNumber += '.' + total;
+                      sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }
@@ -8199,7 +8198,9 @@ var SmilesDrawer = function () {
             try {
                 return SMILESPARSER.parse(smiles);
             } catch (err) {
-                errorCallback(err);
+                if (errorCallback) {
+                    errorCallback(err);
+                }
             }
         }
     }]);
