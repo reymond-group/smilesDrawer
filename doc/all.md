@@ -1483,7 +1483,7 @@ The main class of the application representing the smiles drawer
     * _static_
         * [.clean(smiles)](#SmilesDrawer.clean) ⇒ <code>string</code>
         * [.apply(options, [themeName])](#SmilesDrawer.apply)
-        * [.parse(smiles, errorCallback)](#SmilesDrawer.parse) ⇒ <code>object</code>
+        * [.parse(smiles, successCallback, errorCallback)](#SmilesDrawer.parse)
 
 <a name="new_SmilesDrawer_new"></a>
 
@@ -2341,15 +2341,15 @@ Applies the smiles drawer draw function to each canvas element that has a smiles
 
 <a name="SmilesDrawer.parse"></a>
 
-### SmilesDrawer.parse(smiles, errorCallback) ⇒ <code>object</code>
+### SmilesDrawer.parse(smiles, successCallback, errorCallback)
 Parses the entered smiles string.
 
 **Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>object</code> - Returns the parse tree of the supplied SMILES.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | smiles | <code>string</code> | A SMILES string. |
+| successCallback | <code>function</code> | A callback that is called on success with the parse tree. |
 | errorCallback | <code>function</code> | A callback that is called with the error object on error. |
 
 <a name="Vector2"></a>

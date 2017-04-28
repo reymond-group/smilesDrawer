@@ -3511,12 +3511,14 @@ class SmilesDrawer {
      * 
      * @static
      * @param {string} smiles A SMILES string.
+     * @param {Function} successCallback A callback that is called on success with the parse tree.
      * @param {Function} errorCallback A callback that is called with the error object on error.
-     * @returns {object} Returns the parse tree of the supplied SMILES.
      */
-    static parse(smiles, errorCallback) {
+    static parse(smiles, successCallback, errorCallback) {
         try {
-            return SMILESPARSER.parse(smiles);
+            if (successCallback) {
+                successCallback(SMILESPARSER.parse(smiles));
+            }
         } catch (err) {
             if (errorCallback) {
                 errorCallback(err);
