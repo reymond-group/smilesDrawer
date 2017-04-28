@@ -851,13 +851,37 @@ var CanvasWrapper = function () {
     }
 
     /**
-     * Sets a provided theme.
-     *
-     * @param {object} theme A theme from the smiles drawer options.
+     * Scale the canvas for hidpi displays.
      */
 
 
     _createClass(CanvasWrapper, [{
+        key: 'scaleHidpi',
+        value: function scaleHidpi() {
+            var ctx = this.ctx;
+            var devicePixelRatio = window.devicePixelRatio || 1;
+            var backingStoreRatio = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
+            var ratio = devicePixelRatio / backingStoreRatio;
+
+            if (devicePixelRatio !== backingStoreRatio) {
+                var w = canvas.width;
+                var h = canvas.height;
+
+                canvas.width = w * ratio;
+                canvas.height = h * ratio;
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+                ctx.scale(ratio, ratio);
+            }
+        }
+
+        /**
+         * Sets a provided theme.
+         *
+         * @param {object} theme A theme from the smiles drawer options.
+         */
+
+    }, {
         key: 'setTheme',
         value: function setTheme(theme) {
             this.colors = theme;
@@ -873,8 +897,14 @@ var CanvasWrapper = function () {
         key: 'scale',
         value: function scale(vertices) {
             // Figure out the final size of the image
-            var max = { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE };
-            var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE };
+            var max = {
+                x: -Number.MAX_VALUE,
+                y: -Number.MAX_VALUE
+            };
+            var min = {
+                x: Number.MAX_VALUE,
+                y: Number.MAX_VALUE
+            };
 
             for (var i = 0; i < vertices.length; i++) {
                 var p = vertices[i].position;
@@ -1299,11 +1329,12 @@ var CanvasWrapper = function () {
          * @param {string} direction The direction of the text in relation to the associated vertex.
          * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
          * @param {string} charge The charge of the atom.
+         * @param {number} isotope The isotope number.
          */
 
     }, {
         key: 'drawText',
-        value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge) {
+        value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope) {
             // Return empty line element for debugging, remove this check later, values should not be NaN
             if (isNaN(x) || isNaN(y)) {
                 return;
@@ -1315,15 +1346,19 @@ var CanvasWrapper = function () {
 
             ctx.save();
 
-            var fontLarge = '10px Droid Sans, sans-serif';
-            var fontSmall = '6px Droid Sans, sans-serif';
+            var fontSizeLarge = 6;
+            var fontSizeSmall = 4;
+
+            var fontLarge = fontSizeLarge + 'pt Droid Sans, sans-serif';
+            var fontSmall = fontSizeSmall + 'pt Droid Sans, sans-serif';
 
             ctx.textAlign = 'start';
-            ctx.textBaseline = 'top';
+            ctx.textBaseline = 'alphabetic';
 
             // Charge
             var chargeText = '+';
             var chargeWidth = 0;
+
             if (charge) {
                 if (charge === 2) {
                     chargeText = '2+';
@@ -1337,6 +1372,15 @@ var CanvasWrapper = function () {
                 chargeWidth = ctx.measureText(chargeText).width;
             }
 
+            var isotopeText = '0';
+            var isotopeWidth = 0;
+
+            if (isotope > 0) {
+                isotopeText = isotope;
+                ctx.font = fontSmall;
+                isotopeWidth = ctx.measureText(isotopeText).width;
+            }
+
             ctx.font = fontLarge;
             ctx.fillStyle = this.getColor(elementName);
 
@@ -1344,25 +1388,28 @@ var CanvasWrapper = function () {
             dim.totalWidth = dim.width + chargeWidth;
             dim.height = parseInt(fontLarge, 10);
 
-            var r = dim.totalWidth > dim.height ? dim.totalWidth : dim.height;
-            r /= 2.0;
+            var r = dim.width > fontSizeLarge ? dim.width : fontSizeLarge;
+            r /= 1.25;
 
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
-            ctx.arc(x + offsetX, y + offsetY + dim.height / 20.0, r + 1.0, 0, Math.PI * 2, true);
+            ctx.arc(x + offsetX, y + offsetY, r, 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.fill();
             ctx.globalCompositeOperation = 'source-over';
 
-            // Correct vertical text position
-            // y -= 2;
-
             ctx.fillStyle = this.getColor(elementName);
-            ctx.fillText(elementName, x - dim.totalWidth / 2.0 + offsetX, y - dim.height / 2.0 + offsetY);
+            ctx.textAlign = 'center';
+            ctx.fillText(elementName, x + offsetX, y + fontSizeLarge / 2.0 + offsetY);
 
             if (charge) {
                 ctx.font = fontSmall;
-                ctx.fillText(chargeText, x - dim.totalWidth / 2.0 + dim.width + offsetX, y - dim.height / 2.0 + offsetY);
+                ctx.fillText(chargeText, x + offsetX + dim.width / 2.0 + chargeWidth / 2.0, y - fontSizeSmall / 5.0 + offsetY);
+            }
+
+            if (isotope > 0) {
+                ctx.font = fontSmall;
+                ctx.fillText(isotopeText, x + offsetX - dim.width / 2.0 - isotopeWidth / 2.0, y - fontSizeSmall / 5.0 + offsetY);
             }
 
             ctx.font = fontLarge;
@@ -1371,11 +1418,11 @@ var CanvasWrapper = function () {
             hDim.height = parseInt(fontLarge, 10);
 
             if (hydrogens === 1) {
-                var hx = x - dim.totalWidth / 2.0 + offsetX;
-                var hy = y - dim.height / 2.0 + offsetY;
+                var hx = x + offsetX;
+                var hy = y + offsetY + fontSizeLarge / 2.0;
 
                 if (direction === 'left') {
-                    hx -= dim.totalWidth;
+                    hx -= dim.width;
                 } else if (direction === 'right') {
                     hx += dim.totalWidth;
                 } else if (direction === 'up' && isTerminal) {
@@ -1383,15 +1430,15 @@ var CanvasWrapper = function () {
                 } else if (direction === 'down' && isTerminal) {
                     hx += dim.totalWidth;
                 } else if (direction === 'up' && !isTerminal) {
-                    hy -= dim.height;
+                    hy -= fontSizeLarge + fontSizeLarge / 4.0;
                 } else if (direction === 'down' && !isTerminal) {
-                    hy += dim.height;
+                    hy += fontSizeLarge + fontSizeLarge / 4.0;
                 }
 
                 ctx.fillText('H', hx, hy);
             } else if (hydrogens > 1) {
-                var _hx = x - dim.totalWidth / 2.0 + offsetX;
-                var _hy = y - dim.height / 2.0 + offsetY;
+                var _hx = x + offsetX;
+                var _hy = y + offsetY + fontSizeLarge / 2.0;
 
                 ctx.font = fontSmall;
 
@@ -1408,16 +1455,16 @@ var CanvasWrapper = function () {
                 } else if (direction === 'down' && isTerminal) {
                     _hx += dim.totalWidth;
                 } else if (direction === 'up' && !isTerminal) {
-                    _hy -= dim.height;
+                    _hy -= fontSizeLarge + fontSizeLarge / 4.0;
                 } else if (direction === 'down' && !isTerminal) {
-                    _hy += dim.height;
+                    _hy += fontSizeLarge + fontSizeLarge / 4.0;
                 }
 
                 ctx.font = fontLarge;
                 ctx.fillText('H', _hx, _hy);
 
                 ctx.font = fontSmall;
-                ctx.fillText(hydrogens, _hx + hDim.width, _hy + hDim.height / 2.0);
+                ctx.fillText(hydrogens, _hx + hDim.width / 2.0 + cDim.width / 2.0, _hy + fontSizeSmall / 5.0);
             }
 
             ctx.restore();
@@ -1477,7 +1524,6 @@ var CanvasWrapper = function () {
 
     return CanvasWrapper;
 }();
-
 /** A class representing an edge */
 
 
@@ -4849,7 +4895,6 @@ var SmilesDrawer = function () {
             atom.branchBond = node.branchBond;
             atom.ringbonds = node.ringbonds;
             atom.bracket = node.atom.element ? node.atom : null;
-            console.log(atom.bracket);
             atom.setOrder(parentVertexId, order);
 
             var vertex = new Vertex(atom);
@@ -6684,6 +6729,7 @@ var SmilesDrawer = function () {
                 var atom = vertex.value;
 
                 var charge = 0;
+                var isotope = 0;
                 var bondCount = this.getBondCount(vertex);
                 var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
                 var hydrogens = this.maxBonds[element] - bondCount;
@@ -6694,11 +6740,12 @@ var SmilesDrawer = function () {
                 if (atom.bracket) {
                     hydrogens = atom.bracket.hcount;
                     charge = atom.bracket.charge;
+                    isotope = atom.bracket.isotope;
                 }
 
                 if (!isCarbon || atom.explicit || isTerminal) {
                     if (this.opts.atomVisualization === 'default') {
-                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge);
+                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope);
                     } else if (this.opts.atomVisualization === 'balls') {
                         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
                     }
@@ -8006,7 +8053,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-              let done = new Array(vertexIds.length);
+             let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8023,10 +8070,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                      sortedVertexIds[index].atomicNumber += '.' + total;
+                     sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }
@@ -8142,13 +8189,18 @@ var SmilesDrawer = function () {
          * 
          * @static
          * @param {string} smiles A SMILES string.
+         * @param {Function} errorCallback A callback that is called with the error object on error.
          * @returns {object} Returns the parse tree of the supplied SMILES.
          */
 
     }, {
         key: 'parse',
-        value: function parse(smiles) {
-            return SMILESPARSER.parse(smiles);
+        value: function parse(smiles, errorCallback) {
+            try {
+                return SMILESPARSER.parse(smiles);
+            } catch (err) {
+                errorCallback(err);
+            }
         }
     }]);
 

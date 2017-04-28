@@ -459,7 +459,7 @@ A class wrapping a canvas element
     * [.drawDashedWedge(line, width)](#CanvasWrapper+drawDashedWedge)
     * [.drawDebugText(x, y, text)](#CanvasWrapper+drawDebugText)
     * [.drawBall(x, y, elementName, hydrogens)](#CanvasWrapper+drawBall)
-    * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge)](#CanvasWrapper+drawText)
+    * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope)](#CanvasWrapper+drawText)
     * [.drawDebugPoint(x, y, [debugText], [color])](#CanvasWrapper+drawDebugPoint)
     * [.drawAromaticityRing(ring)](#CanvasWrapper+drawAromaticityRing)
     * [.clear()](#CanvasWrapper+clear)
@@ -598,7 +598,7 @@ Draw a ball to the canvas.
 
 <a name="CanvasWrapper+drawText"></a>
 
-### canvasWrapper.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge)
+### canvasWrapper.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope)
 Draw a text to the canvas.
 
 **Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
@@ -612,6 +612,7 @@ Draw a text to the canvas.
 | direction | <code>string</code> | The direction of the text in relation to the associated vertex. |
 | isTerminal | <code>boolean</code> | A boolean indicating whether or not the vertex is terminal. |
 | charge | <code>string</code> | The charge of the atom. |
+| isotope | <code>number</code> | The isotope number. |
 
 <a name="CanvasWrapper+drawDebugPoint"></a>
 
