@@ -46,7 +46,12 @@ var input = document.getElementById('input');
   function draw() {
     let t = performance.now();
 
-    var data = smiles.parse(input.value);
+    var data = SmilesDrawer.parse(input.value, function(err) {
+      console.log(err);
+    });
+
+    console.log(data);
+
     smilesDrawer.draw(data, 'output-canvas', theme, false);
 
     let td = performance.now() - t;

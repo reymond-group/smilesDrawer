@@ -46,13 +46,20 @@ var input = document.getElementById('input');
   function draw() {
     let t = performance.now();
 
-    var data = smiles.parse(input.value);
-    smilesDrawer.draw(data, 'output-canvas', theme, false);
+    var data = SmilesDrawer.parse(input.value, function(err) {
+      console.log(err);
+    });
 
-    let td = performance.now() - t;
+    if (data) {
+      smilesDrawer.draw(data, 'output-canvas', theme, false);
 
-    document.getElementById('speed-info-value').innerHTML = Math.round(td * 100) / 100;
-    document.getElementById('overlap-info-value').innerHTML = Math.round(smilesDrawer.getOverlapScore().total * 100) / 100;
+      let td = performance.now() - t;
+
+      document.getElementById('speed-info-value').innerHTML = Math.round(td * 100) / 100;
+      document.getElementById('overlap-info-value').innerHTML = Math.round(smilesDrawer.getOverlapScore().total * 100) / 100;
+    } else {
+      
+    }
   }
 
   function updateOptions() {
