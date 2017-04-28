@@ -5,10 +5,9 @@ class CanvasWrapper {
      *
      * @param {string|HTMLElement} target The canvas id or the canvas HTMLElement.
      * @param {object} theme A theme from the smiles drawer options.
-     * @param {number} bondLenght The bond length.
-     * @param {number} bondSpacing The bond spacing.
+     * @param {any} options The smiles drawer options object.
      */
-    constructor(target, theme, bondLength, bondSpacing) {
+    constructor(target, theme, options) {
         if (typeof target === 'string' || target instanceof String) {
             this.canvas = document.getElementById(target);
         } else {
@@ -17,8 +16,7 @@ class CanvasWrapper {
         
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;
-        this.bondLength = bondLength;
-        this.bondSpacing = bondSpacing;
+        this.opts = options
         
         this.drawingWidth = 0.0;
         this.drawingHeight = 0.0;
@@ -290,7 +288,7 @@ class CanvasWrapper {
         ctx.lineTo(v.x, v.y);
         ctx.lineTo(w.x, w.y);
 
-        let gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
+        let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
         gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || 
                 this.getColor('C'));
         gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || 
@@ -609,7 +607,7 @@ class CanvasWrapper {
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, 
-                radius - this.bondLength / 3.0 - this.bondSpacing, 0, Math.PI * 2, true); 
+                radius - this.bondLength / 3.0 - this.opts.bondSpacing, 0, Math.PI * 2, true); 
         ctx.closePath();
         ctx.stroke();
         ctx.restore();
