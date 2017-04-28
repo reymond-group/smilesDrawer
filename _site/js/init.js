@@ -25,10 +25,13 @@
 var input = document.getElementById('input');
   var debugCheckbox = document.getElementById('debug');
   var themeCheckbox = document.getElementById('theme');
+  var terminalCarbonsCheckbox = document.getElementById('terminalCarbons');
   var canvasSizeInput = document.getElementById('canvasSize');
   var bondLengthInput = document.getElementById('bondLength');
   var shortBondLengthInput = document.getElementById('shortBondLength');
   var bondSpacingInput = document.getElementById('bondSpacing');
+  var fontSizeLargeInput = document.getElementById('fontSizeLarge');
+  var fontSizeSmallInput = document.getElementById('fontSizeSmall');
   var atomSelect = document.getElementById('atom');
   var theme = 'light'
 
@@ -37,7 +40,10 @@ var input = document.getElementById('input');
     bondLength: 16,
     shortBondLength: 9,
     bondSpacing: 4,
-    atomVisualization: 'default'
+    fontSizeLarge: 6,
+    fontSizeSmall: 4,
+    atomVisualization: 'default',
+    terminalCarbons: false
   }
 
   var smilesDrawer = new SmilesDrawer(options);
@@ -50,14 +56,16 @@ var input = document.getElementById('input');
       console.log(err);
     });
 
-    console.log(data);
+    if (data) {
+      smilesDrawer.draw(data, 'output-canvas', theme, false);
 
-    smilesDrawer.draw(data, 'output-canvas', theme, false);
+      let td = performance.now() - t;
 
-    let td = performance.now() - t;
-
-    document.getElementById('speed-info-value').innerHTML = Math.round(td * 100) / 100;
-    document.getElementById('overlap-info-value').innerHTML = Math.round(smilesDrawer.getOverlapScore().total * 100) / 100;
+      document.getElementById('speed-info-value').innerHTML = Math.round(td * 100) / 100;
+      document.getElementById('overlap-info-value').innerHTML = Math.round(smilesDrawer.getOverlapScore().total * 100) / 100;
+    } else {
+      
+    }
   }
 
   function updateOptions() {
@@ -99,6 +107,16 @@ var input = document.getElementById('input');
       updateOptions();
     });
 
+    fontSizeLargeInput.addEventListener('input', function () {
+      options.fontSizeLarge = parseInt(fontSizeLargeInput.value);
+      updateOptions();
+    });
+
+    fontSizeSmallInput.addEventListener('input', function () {
+      options.fontSizeSmall = parseInt(fontSizeSmallInput.value);
+      updateOptions();
+    });
+
     $("#atom").on('change', function() {
       options.atomVisualization = $(this).val();
       updateOptions();
@@ -118,6 +136,11 @@ var input = document.getElementById('input');
 
     debugCheckbox.addEventListener('click', function () {
       options.debug = debugCheckbox.checked ? true : false;
+      updateOptions();
+    });
+
+    terminalCarbonsCheckbox.addEventListener('click', function () {
+      options.terminalCarbons = terminalCarbonsCheckbox.checked ? true : false;
       updateOptions();
     });
   });

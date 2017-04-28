@@ -37,66 +37,100 @@
   <div class="container">
     <div class="section">
       <div class="row">
-        <div id="canvas-container">
-          <canvas id="output-canvas" width="250" height="250"></canvas>
-        </div>
-        <div id="drawing-info">
-          <p id="speed-info">
-            <span class="grey-text">Drawing time (parsing + rendering): </span><span class="green-text" id="speed-info-value"></span>
-            <span class="green-text"> ms</span>
-          </p>
-          <p id="overlap-info">
-            <span class="grey-text">Overlap score (&times; bond length): </span><span class="green-text" id="overlap-info-value"></span>
-          </p>
+        <div class="col s12">
+          <div id="canvas-container">
+            <canvas id="output-canvas" width="250" height="250"></canvas>
+          </div>
+          <div id="drawing-info">
+            <p id="speed-info">
+              <span class="grey-text">Drawing time (parsing + rendering): </span><span class="green-text" id="speed-info-value"></span>
+              <span class="green-text"> ms</span>
+            </p>
+            <p id="overlap-info">
+              <span class="grey-text">Overlap score (&times; bond length): </span><span class="green-text" id="overlap-info-value"></span>
+            </p>
+          </div>
         </div>
       </div>
       <div class="row">
         <form class="col s12">
-          <div class="col s12">
-            <label for="input" class="active">SMILES</label>
-            <input id="input" type="text" value="FC(F)(F)C1=CC(NC2=C(C=CC=N2)C(=O)OC2OC(=O)C3=CC=CC=C23)=CC=C1" />
+          <div class="row">
+            <div class="col s12">
+              <label for="input" class="active">SMILES</label>
+              <input id="input" type="text" value="FC(F)(F)C1=CC(NC2=C(C=CC=N2)C(=O)OC2OC(=O)C3=CC=CC=C23)=CC=C1" />
+            </div>
           </div>
-          <p class="range-field col s6">
-            <label for="canvasSize">Canvas Size</label>
-            <input type="range" id="canvasSize" name="canvasSize" value="250" min="50" max="1000" step="1" />
-          </p>
-          <p class="range-field col s6">
-            <label for="bondLength">Bond Length</label>
-            <input type="range" id="bondLength" name="bondLength" value="16" min="1" max="99" step="1" />
-          </p>
-          <p class="range-field col s6">
-            <label for="shortBondLength">Short Bond Length</label>
-            <input type="range" id="shortBondLength" name="shortBondLength" value="9" min="1" max="22" step="1" />
-          </p>
-          <p class="range-field col s6">
-            <label for="bondSpacing">Bond Spacing</label>
-            <input type="range" id="bondSpacing" name="bondSpacing" value="4" min="1" max="99" step="1" />
-          </p>
-          <div class="input-field col s6">
-            <select id="atom">
-              <option value="default" selected>Default</option>
-              <option value="balls">Balls</option>
-              <option value="none">None</option>
-            </select>
-            <label>Atom Drawing Style</label>
+          <div class="row">
+            <div class="range-field col s6">
+              <label for="canvasSize">Canvas Size</label>
+              <input type="range" id="canvasSize" name="canvasSize" value="250" min="50" max="1000" step="1" />
+            </div>
+            <div class="range-field col s6">
+              <label for="bondLength">Bond Length</label>
+              <input type="range" id="bondLength" name="bondLength" value="16" min="1" max="99" step="1" />
+            </div>
           </div>
-          <div class="switch col s3">
-            <label>Theme</label><br />
-            <label>
-              Light
-              <input id="theme" name="theme" type="checkbox">
-              <span class="lever"></span>
-              Dark
-            </label>
+          <div class="row">
+            <div class="range-field col s6">
+              <label for="shortBondLength">Short Bond Length</label>
+              <input type="range" id="shortBondLength" name="shortBondLength" value="9" min="1" max="22" step="1" />
+            </div>
+            <div class="range-field col s6">
+              <label for="bondSpacing">Bond Spacing</label>
+              <input type="range" id="bondSpacing" name="bondSpacing" value="4" min="1" max="99" step="1" />
+            </div>
           </div>
-          <div class="switch col s3">
-            <label>Debug</label><br />
-            <label>
-              Off
-              <input id="debug" name="debug" type="checkbox">
-              <span class="lever"></span>
-              On
-            </label>
+          <div class="row">
+            <div class="input-field col s6">
+              <select id="atom">
+                <option value="default" selected>Default</option>
+                <option value="balls">Balls</option>
+                <option value="none">None</option>
+              </select>
+              <label>Atom Drawing Style</label>
+            </div>
+            <div class="switch col s3">
+              <label>Theme</label><br />
+              <label>
+                Light
+                <input id="theme" name="theme" type="checkbox">
+                <span class="lever"></span>
+                Dark
+              </label>
+            </div>
+            <div class="switch col s3">
+              <label>Show Terminal Carbons</label><br />
+              <label>
+                Off
+                <input id="terminalCarbons" name="terminalCarbons" type="checkbox">
+                <span class="lever"></span>
+                On
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="range-field col s6">
+              <label for="fontSizeLarge">Large Text Size</label>
+              <input type="range" id="fontSizeLarge" name="fontSizeLarge" value="6" min="0" max="20" step="1" />
+            </div>
+            <div class="switch col s3">
+              <label>Debug</label><br />
+              <label>
+                Off
+                <input id="debug" name="debug" type="checkbox">
+                <span class="lever"></span>
+                On
+              </label>
+            </div>
+            <div class="col s3"></div>
+            <div class="col s3"></div>
+          </div>
+          <div class="row">
+            <div class="range-field col s6">
+              <label for="fontSizeSmall">Small Text Size</label>
+              <input type="range" id="fontSizeSmall" name="fontSizeSmall" value="4" min="0" max="22" step="1" />
+            </div>
+            <div class="col s6"></div>
           </div>
         </form>
       </div>
