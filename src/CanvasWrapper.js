@@ -14,18 +14,41 @@ class CanvasWrapper {
         } else {
             this.canvas = target;
         }
-        
+
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;
         this.bondLength = bondLength;
         this.bondSpacing = bondSpacing;
-        
+
         this.drawingWidth = 0.0;
         this.drawingHeight = 0.0;
         this.offsetX = 0.0;
         this.offsetY = 0.0;
-    
+
         this.clear();
+    }
+
+    /**
+     * Scale the canvas for hidpi displays.
+     */
+    scaleHidpi() {
+        let ctx = this.ctx;
+        let devicePixelRatio = window.devicePixelRatio || 1;
+        let backingStoreRatio = ctx.webkitBackingStorePixelRatio ||  ctx.mozBackingStorePixelRatio || 
+                                ctx.msBackingStorePixelRatio ||  ctx.oBackingStorePixelRatio || 
+                                ctx.backingStorePixelRatio || 1;
+        let ratio = devicePixelRatio / backingStoreRatio;
+          
+        if (devicePixelRatio !== backingStoreRatio) {
+            let w = canvas.width;
+            let h = canvas.height;
+            
+            canvas.width = w * ratio;
+            canvas.height = h * ratio;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.scale(ratio, ratio);
+        }
     }
 
     /**
@@ -36,7 +59,7 @@ class CanvasWrapper {
     setTheme(theme) {
         this.colors = theme;
     }
-    
+
     /**
      * Scale the canvas based on vertex positions.
      *
@@ -44,15 +67,21 @@ class CanvasWrapper {
      */
     scale(vertices) {
         // Figure out the final size of the image
-        var max = { x: -Number.MAX_VALUE, y: -Number.MAX_VALUE };
-        var min = { x: Number.MAX_VALUE, y: Number.MAX_VALUE };
+        var max = {
+            x: -Number.MAX_VALUE,
+            y: -Number.MAX_VALUE
+        };
+        var min = {
+            x: Number.MAX_VALUE,
+            y: Number.MAX_VALUE
+        };
 
         for (var i = 0; i < vertices.length; i++) {
             var p = vertices[i].position;
-            if(max.x < p.x) max.x = p.x;
-            if(max.y < p.y) max.y = p.y;
-            if(min.x > p.x) min.x = p.x;
-            if(min.y > p.y) min.y = p.y;
+            if (max.x < p.x) max.x = p.x;
+            if (max.y < p.y) max.y = p.y;
+            if (min.x > p.x) min.x = p.x;
+            if (min.y > p.y) min.y = p.y;
         }
 
         // Add padding
@@ -78,8 +107,7 @@ class CanvasWrapper {
         // Center
         if (scaleX < scaleY) {
             this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
-        }
-        else {
+        } else {
             this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
         }
     }
@@ -130,11 +158,11 @@ class CanvasWrapper {
         ctx.save();
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2, true); 
+        ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2, true);
         ctx.closePath();
 
-        if(debug) {
-            if(fill) {
+        if (debug) {
+            if (fill) {
                 ctx.fillStyle = '#f00';
                 ctx.fill();
             } else {
@@ -144,7 +172,7 @@ class CanvasWrapper {
 
             this.drawDebugText(x, y, debugText);
         } else {
-            if(fill) {
+            if (fill) {
                 ctx.fillStyle = color;
                 ctx.fill();
             } else {
@@ -162,8 +190,8 @@ class CanvasWrapper {
      * @param {Line} line A line.
      */
     drawLine(line) {
-        if (isNaN(line.from.x) || isNaN(line.from.y) || 
-                isNaN(line.to.x) || isNaN(line.to.y)) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) ||
+            isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
 
@@ -214,17 +242,17 @@ class CanvasWrapper {
         ctx.lineWidth = 1.5;
 
         let gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
-        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || 
-                this.getColor('C'));
-        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || 
-                this.getColor('C'));
+        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
+            this.getColor('C'));
+        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
+            this.getColor('C'));
 
         ctx.strokeStyle = gradient;
-        
+
         ctx.stroke();
         ctx.restore();
     }
-    
+
     /**
      * Draw a wedge on the canvas.
      *
@@ -232,8 +260,8 @@ class CanvasWrapper {
      * @param {number} width The wedge width.
      */
     drawWedge(line, width = 3.0) {
-        if (isNaN(line.from.x) || isNaN(line.from.y) || 
-                isNaN(line.to.x) || isNaN(line.to.y)) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) ||
+            isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
 
@@ -252,7 +280,7 @@ class CanvasWrapper {
 
         r.x += offsetX;
         r.y += offsetY;
-        
+
         l = line.getLeftVector().clone();
         r = line.getRightVector().clone();
 
@@ -261,24 +289,24 @@ class CanvasWrapper {
 
         r.x += offsetX;
         r.y += offsetY;
-        
+
         ctx.save();
 
         let normals = Vector2.normals(l, r);
-        
+
         normals[0].normalize();
         normals[1].normalize();
 
         let isRightChiralCenter = line.getRightChiral();
-        
+
         let start = l;
         let end = r;
 
-        if(isRightChiralCenter) {
+        if (isRightChiralCenter) {
             start = r;
             end = l;
         }
-        
+
         let t = Vector2.add(start, Vector2.multiply(normals[0], 0.75));
         let u = Vector2.add(end, Vector2.multiply(normals[0], width));
         let v = Vector2.add(end, Vector2.multiply(normals[1], width));
@@ -291,11 +319,11 @@ class CanvasWrapper {
         ctx.lineTo(w.x, w.y);
 
         let gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
-        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || 
-                this.getColor('C'));
-        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || 
-                this.getColor('C'));
-    
+        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
+            this.getColor('C'));
+        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
+            this.getColor('C'));
+
         ctx.fillStyle = gradient;
 
         ctx.fill();
@@ -309,15 +337,15 @@ class CanvasWrapper {
      * @param {number} width The wedge width.
      */
     drawDashedWedge(line, width = 6.0) {
-        if (isNaN(line.from.x) || isNaN(line.from.y) || 
-                isNaN(line.to.x) || isNaN(line.to.y)) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) ||
+            isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
 
         let ctx = this.ctx;
         let offsetX = this.offsetX;
         let offsetY = this.offsetY;
-        
+
         let l = line.getLeftVector().clone();
         let r = line.getRightVector().clone();
 
@@ -326,16 +354,16 @@ class CanvasWrapper {
 
         r.x += offsetX;
         r.y += offsetY;
-        
+
         ctx.save();
 
         let normals = Vector2.normals(l, r);
-        
+
         normals[0].normalize();
         normals[1].normalize();
 
         let isRightChiralCenter = line.getRightChiral();
-        
+
         let start;
         let end;
         let sStart;
@@ -343,7 +371,7 @@ class CanvasWrapper {
 
         let shortLine = line.clone();
 
-        if(isRightChiralCenter) {
+        if (isRightChiralCenter) {
             start = r;
             end = l;
 
@@ -365,7 +393,7 @@ class CanvasWrapper {
         sStart.y += offsetY;
         sEnd.x += offsetX;
         sEnd.y += offsetY;
-        
+
         let t = Vector2.add(start, Vector2.multiply(normals[0], 0.75));
         let u = Vector2.add(end, Vector2.multiply(normals[0], width / 2.0));
         let v = Vector2.add(end, Vector2.multiply(normals[1], width / 2.0));
@@ -378,15 +406,15 @@ class CanvasWrapper {
         ctx.lineTo(w.x, w.y);
 
         let gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
-        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || 
-                this.getColor('C'));
-        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || 
-                this.getColor('C'));
-    
+        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
+            this.getColor('C'));
+        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
+            this.getColor('C'));
+
         ctx.fillStyle = gradient;
 
         ctx.fill();
-        
+
         // Now dash it
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
@@ -462,11 +490,14 @@ class CanvasWrapper {
 
         ctx.save();
 
-        let fontLarge = '10px Droid Sans, sans-serif';
-        let fontSmall = '6px Droid Sans, sans-serif';
+        let fontSizeLarge = 6;
+        let fontSizeSmall = 4;
+
+        let fontLarge = fontSizeLarge + 'pt Droid Sans, sans-serif';
+        let fontSmall = fontSizeSmall + 'pt Droid Sans, sans-serif';
 
         ctx.textAlign = 'start';
-        ctx.textBaseline = 'top';
+        ctx.textBaseline = 'alphabetic';
 
         // Charge
         let chargeText = '+'
@@ -501,28 +532,28 @@ class CanvasWrapper {
         dim.totalWidth = dim.width + chargeWidth;
         dim.height = parseInt(fontLarge, 10);
 
-        let r = (dim.totalWidth > dim.height) ? dim.totalWidth : dim.height;
-        r /= 2.0;
+        let r = (dim.width > fontSizeLarge) ? dim.width : fontSizeLarge;
+        r /= 1.25;
 
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY + dim.height / 20.0, 
-                r + 1.0, 0, Math.PI * 2, true); 
+        ctx.arc(x + offsetX, y + offsetY, r, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
 
-        // Correct vertical text position
-        // y -= 2;
-
         ctx.fillStyle = this.getColor(elementName);
-        ctx.fillText(elementName, x - dim.totalWidth / 2.0 + offsetX, 
-                y - dim.height / 2.0 + offsetY);
+        ctx.textAlign = 'center';
+        ctx.fillText(elementName, x + offsetX, y + fontSizeLarge / 2.0 + offsetY);
 
-        if(charge) {
+        if (charge) {
             ctx.font = fontSmall;
-            ctx.fillText(chargeText, x - dim.totalWidth / 2.0 + dim.width + offsetX, 
-                    y - dim.height / 2.0 + offsetY);
+            ctx.fillText(chargeText, x + offsetX + dim.width / 2.0 + chargeWidth / 2.0, y - fontSizeSmall / 5.0 + offsetY);
+        }
+
+        if (isotope > 0) {
+            ctx.font = fontSmall;
+            ctx.fillText(isotopeText, x + offsetX - dim.width / 2.0 - isotopeWidth / 2.0, y - fontSizeSmall / 5.0 + offsetY);
         }
 
         ctx.font = fontLarge;
@@ -531,11 +562,11 @@ class CanvasWrapper {
         hDim.height = parseInt(fontLarge, 10);
 
         if (hydrogens === 1) {
-            let hx = x - dim.totalWidth / 2.0 + offsetX;
-            let hy = y - dim.height / 2.0 + offsetY;
+            let hx = x + offsetX;
+            let hy = y + offsetY + fontSizeLarge / 2.0;
 
             if (direction === 'left') {
-                hx -= dim.totalWidth;
+                hx -= dim.width;
             } else if (direction === 'right') {
                 hx += dim.totalWidth;
             } else if (direction === 'up' && isTerminal) {
@@ -543,15 +574,15 @@ class CanvasWrapper {
             } else if (direction === 'down' && isTerminal) {
                 hx += dim.totalWidth;
             } else if (direction === 'up' && !isTerminal) {
-                hy -= dim.height;
+                hy -= fontSizeLarge + fontSizeLarge / 4.0;
             } else if (direction === 'down' && !isTerminal) {
-                hy += dim.height;
+                hy += fontSizeLarge + fontSizeLarge / 4.0;
             }
 
             ctx.fillText('H', hx, hy);
         } else if (hydrogens > 1) {
-            let hx = x - dim.totalWidth / 2.0 + offsetX;
-            let hy = y - dim.height / 2.0 + offsetY;
+            let hx = x + offsetX;
+            let hy = y + offsetY + fontSizeLarge / 2.0;
 
             ctx.font = fontSmall;
 
@@ -568,16 +599,16 @@ class CanvasWrapper {
             } else if (direction === 'down' && isTerminal) {
                 hx += dim.totalWidth;
             } else if (direction === 'up' && !isTerminal) {
-                hy -= dim.height;
+                hy -= fontSizeLarge + fontSizeLarge / 4.0;
             } else if (direction === 'down' && !isTerminal) {
-                hy += dim.height;
+                hy += fontSizeLarge + fontSizeLarge / 4.0;
             }
 
             ctx.font = fontLarge;
             ctx.fillText('H', hx, hy)
 
-                ctx.font = fontSmall;
-            ctx.fillText(hydrogens, hx + hDim.width, hy + hDim.height / 2.0);
+            ctx.font = fontSmall;
+            ctx.fillText(hydrogens, hx + hDim.width / 2.0 + cDim.width / 2.0, hy + fontSizeSmall / 5.0);
         }
 
         ctx.restore();
@@ -608,8 +639,8 @@ class CanvasWrapper {
         ctx.strokeStyle = this.getColor('C');
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, 
-                radius - this.bondLength / 3.0 - this.bondSpacing, 0, Math.PI * 2, true); 
+        ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY,
+            radius - this.bondLength / 3.0 - this.bondSpacing, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.stroke();
         ctx.restore();
