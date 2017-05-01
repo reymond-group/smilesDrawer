@@ -25,7 +25,7 @@ class SmilesDrawer {
             'S': 2,
             'b': 3,
             'B': 3,
-            'F': 2,
+            'F': 1,
             'I': 1,
             'Cl': 1,
             'Br': 1
