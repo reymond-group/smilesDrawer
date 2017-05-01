@@ -52,20 +52,25 @@ var input = document.getElementById('input');
   function draw() {
     let t = performance.now();
 
-    var data = SmilesDrawer.parse(input.value, function(err) {
-      console.log(err);
-    });
-
-    if (data) {
-      smilesDrawer.draw(data, 'output-canvas', theme, false);
+    var data = SmilesDrawer.parse(input.value, function(tree) {
+      smilesDrawer.draw(tree, 'output-canvas', theme, false);
 
       let td = performance.now() - t;
 
       document.getElementById('speed-info-value').innerHTML = Math.round(td * 100) / 100;
       document.getElementById('overlap-info-value').innerHTML = Math.round(smilesDrawer.getOverlapScore().total * 100) / 100;
-    } else {
-      
-    }
+      document.getElementById('error-info').classList.add('hidden');
+    }, function(err) {
+      let element = document.getElementById('error-info');
+      let str = input.value;
+      console.log(err);
+      let from = err.location.start.column - 1;
+      let to = err.location.end.column + 5;
+      str = [str.slice(0, from), '<span>', str.slice(from)].join('');
+      str = [str.slice(0, to), '<span>' + err.message + '</span></span>', str.slice(to)].join('');
+      element.innerHTML = str;
+      element.classList.remove('hidden');
+    });
   }
 
   function updateOptions() {
