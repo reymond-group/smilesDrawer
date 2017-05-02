@@ -266,7 +266,7 @@ A class representing an atom
 * [Atom](#Atom)
     * [new Atom(element, [bondType])](#new_Atom_new)
     * _instance_
-        * [.attachPseudoElement(element, [occurrences])](#Atom+attachPseudoElement)
+        * [.attachPseudoElement(element, [hydrogenCount])](#Atom+attachPseudoElement)
         * [.addAnchoredRing(ringId)](#Atom+addAnchoredRing)
         * [.getRingbondCount()](#Atom+getRingbondCount) ⇒ <code>number</code>
         * [.canRotate()](#Atom+canRotate) ⇒ <code>boolean</code>
@@ -298,7 +298,7 @@ The constructor of the class Atom.
 
 <a name="Atom+attachPseudoElement"></a>
 
-### atom.attachPseudoElement(element, [occurrences])
+### atom.attachPseudoElement(element, [hydrogenCount])
 Attaches a pseudo element (e.g. Ac) to the atom.
 
 **Kind**: instance method of <code>[Atom](#Atom)</code>  
@@ -306,7 +306,7 @@ Attaches a pseudo element (e.g. Ac) to the atom.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | element | <code>string</code> |  | The element identifier (e.g. Br, C, ...). |
-| [occurrences] | <code>number</code> | <code>1</code> | The number of times the element occurres. |
+| [hydrogenCount] | <code>number</code> | <code>0</code> | The number of hydrogens for the element. |
 
 <a name="Atom+addAnchoredRing"></a>
 
@@ -487,7 +487,7 @@ A class wrapping a canvas element
     * [.drawDashedWedge(line, width)](#CanvasWrapper+drawDashedWedge)
     * [.drawDebugText(x, y, text)](#CanvasWrapper+drawDebugText)
     * [.drawBall(x, y, elementName, hydrogens)](#CanvasWrapper+drawBall)
-    * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope)](#CanvasWrapper+drawText)
+    * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, [pseudoElements])](#CanvasWrapper+drawText)
     * [.drawDebugPoint(x, y, [debugText], [color])](#CanvasWrapper+drawDebugPoint)
     * [.drawAromaticityRing(ring)](#CanvasWrapper+drawAromaticityRing)
     * [.clear()](#CanvasWrapper+clear)
@@ -631,21 +631,22 @@ Draw a ball to the canvas.
 
 <a name="CanvasWrapper+drawText"></a>
 
-### canvasWrapper.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope)
+### canvasWrapper.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, [pseudoElements])
 Draw a text to the canvas.
 
 **Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| x | <code>number</code> | The x position of the text. |
-| y | <code>number</code> | The y position of the text. |
-| elementName | <code>string</code> | The name of the element (single-letter). |
-| hydrogens | <code>number</code> | The number of hydrogen atoms. |
-| direction | <code>string</code> | The direction of the text in relation to the associated vertex. |
-| isTerminal | <code>boolean</code> | A boolean indicating whether or not the vertex is terminal. |
-| charge | <code>string</code> | The charge of the atom. |
-| isotope | <code>number</code> | The isotope number. |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| x | <code>number</code> |  | The x position of the text. |
+| y | <code>number</code> |  | The y position of the text. |
+| elementName | <code>string</code> |  | The name of the element (single-letter). |
+| hydrogens | <code>number</code> |  | The number of hydrogen atoms. |
+| direction | <code>string</code> |  | The direction of the text in relation to the associated vertex. |
+| isTerminal | <code>boolean</code> |  | A boolean indicating whether or not the vertex is terminal. |
+| charge | <code>string</code> |  | The charge of the atom. |
+| isotope | <code>number</code> |  | The isotope number. |
+| [pseudoElements] | <code>object</code> | <code>{}</code> | An object containing pseudo elements or shortcut elements and their count. E.g. { 'F': 3 }, { 'O': 2, 'H': 1 }. |
 
 <a name="CanvasWrapper+drawDebugPoint"></a>
 
@@ -1507,7 +1508,7 @@ The main class of the application representing the smiles drawer
         * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])](#SmilesDrawer+traverseTree)
         * [.getBondCount(vertex)](#SmilesDrawer+getBondCount) ⇒ <code>number</code>
         * [.getNonRingNeighbours(vertexId)](#SmilesDrawer+getNonRingNeighbours) ⇒ <code>array</code>
-        * [.setPseudoElements()](#SmilesDrawer+setPseudoElements)
+        * [.initPseudoElements()](#SmilesDrawer+initPseudoElements)
     * _static_
         * [.clean(smiles)](#SmilesDrawer.clean) ⇒ <code>string</code>
         * [.apply(options, [themeName])](#SmilesDrawer.apply)
@@ -2343,9 +2344,9 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 | --- | --- | --- |
 | vertexId | <code>number</code> | A vertex id. |
 
-<a name="SmilesDrawer+setPseudoElements"></a>
+<a name="SmilesDrawer+initPseudoElements"></a>
 
-### smilesDrawer.setPseudoElements()
+### smilesDrawer.initPseudoElements()
 Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
 the involved atoms not to be displayed.
 
@@ -2885,6 +2886,7 @@ A class representing a vertex
     * [.getAngle([referenceVector], [returnAsDegrees])](#Vertex+getAngle) ⇒ <code>number</code>
     * [.getTextDirection(vertices)](#Vertex+getTextDirection) ⇒ <code>string</code>
     * [.getNeighbours([vertexId])](#Vertex+getNeighbours) ⇒ <code>array</code>
+    * [.getDrawnNeighbours(vertices)](#Vertex+getDrawnNeighbours) ⇒ <code>array</code>
     * [.getNeighbourCount()](#Vertex+getNeighbourCount) ⇒ <code>number</code>
     * [.getCommonNeighbours(vertex)](#Vertex+getCommonNeighbours) ⇒ <code>array</code>
     * [.isNeighbour(vertexId)](#Vertex+isNeighbour) ⇒ <code>boolean</code>
@@ -2928,7 +2930,7 @@ Set the vertex id of the parent.
 <a name="Vertex+isTerminal"></a>
 
 ### vertex.isTerminal() ⇒ <code>boolean</code>
-Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.
+Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false. Always returns true if associated value has property hasAttachedPseudoElements set to true.
 
 **Kind**: instance method of <code>[Vertex](#Vertex)</code>  
 **Returns**: <code>boolean</code> - A boolean indicating whether or not this vertex is terminal.  
@@ -2987,6 +2989,18 @@ Returns an array of ids of neighbouring vertices.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [vertexId] | <code>number</code> | <code></code> | If a value is supplied, the vertex with this id is excluded from the returned indices. |
+
+<a name="Vertex+getDrawnNeighbours"></a>
+
+### vertex.getDrawnNeighbours(vertices) ⇒ <code>array</code>
+Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
+
+**Kind**: instance method of <code>[Vertex](#Vertex)</code>  
+**Returns**: <code>array</code> - An array containing the ids of neighbouring vertices that will be drawn.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>array</code> | An array containing the vertices associated with the current molecule. |
 
 <a name="Vertex+getNeighbourCount"></a>
 

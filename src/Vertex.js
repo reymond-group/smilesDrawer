@@ -51,11 +51,15 @@ class Vertex {
     }
 
     /**
-     * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.
+     * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false. Always returns true if associated value has property hasAttachedPseudoElements set to true.
      *
      * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
      */
     isTerminal() {
+        if (this.value.hasAttachedPseudoElements) {
+            return true;
+        }
+
         return (this.parentVertexId === null && this.children.length < 2) || this.children.length === 0;
     }
 
@@ -121,7 +125,7 @@ class Vertex {
      * @returns {string} The suggested direction of the text.
      */
     getTextDirection(vertices) {
-        let neighbours = this.getNeighbours();
+        let neighbours = this.getDrawnNeighbours(vertices);
         let angles = [];
         
         for (let i = 0; i < neighbours.length; i++) {
@@ -162,6 +166,24 @@ class Vertex {
 
         for (let i = 0; i < this.neighbours.length; i++) {
             if (this.neighbours[i] !== vertexId) {
+                arr.push(this.neighbours[i]);
+            }
+        }
+
+        return arr;
+    }
+
+    /**
+     * Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
+     * 
+     * @param {array} vertices An array containing the vertices associated with the current molecule.
+     * @returns {array} An array containing the ids of neighbouring vertices that will be drawn.
+     */
+    getDrawnNeighbours(vertices) {
+        let arr = [];
+
+        for (let i = 0; i < this.neighbours.length; i++) {
+            if (vertices[this.neighbours[i]].value.isDrawn) {
                 arr.push(this.neighbours[i]);
             }
         }

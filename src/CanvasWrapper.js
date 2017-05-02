@@ -556,12 +556,14 @@ class CanvasWrapper {
 
         ctx.font = fontLarge;
 
-        let hDim = ctx.measureText('H');
-        hDim.height = parseInt(fontLarge, 10);
+        let hydrogenWidth = 0;
+        let hydrogenCountWidth = 0;
 
         if (hydrogens === 1) {
             let hx = x + offsetX;
             let hy = y + offsetY + fontSizeLarge / 2.0;
+
+            hydrogenWidth = ctx.measureText('H');
 
             if (direction === 'left') {
                 hx -= dim.width;
@@ -577,19 +579,21 @@ class CanvasWrapper {
                 hy += fontSizeLarge + fontSizeLarge / 4.0;
             }
 
+            dim.totalWidth += hydrogenWidth;
+
             ctx.fillText('H', hx, hy);
         } else if (hydrogens > 1) {
             let hx = x + offsetX;
             let hy = y + offsetY + fontSizeLarge / 2.0;
 
+            hydrogenWidth = ctx.measureText('H');
+
             ctx.font = fontSmall;
 
-            let cDim = ctx.measureText(hydrogens);
-
-            cDim.height = parseInt(fontSmall, 10);
+            hydrogenCountWidth = ctx.measureText(hydrogens);
 
             if (direction === 'left') {
-                hx -= hDim.width + cDim.width;
+                hx -= hydrogenWidth + hydrogenCountWidth;
             } else if (direction === 'right') {
                 hx += dim.totalWidth;
             } else if (direction === 'up' && isTerminal) {
@@ -606,44 +610,54 @@ class CanvasWrapper {
             ctx.fillText('H', hx, hy)
 
             ctx.font = fontSmall;
-            ctx.fillText(hydrogens, hx + hDim.width / 2.0 + cDim.width / 2.0, hy + fontSizeSmall / 5.0);
+            ctx.fillText(hydrogens, hx + hydrogenWidth / 2.0 + hydrogenCountWidth / 2.0, hy + fontSizeSmall / 5.0);
         }
+
+        let sumWidth = hydrogenWidth + hydrogenCountWidth + hydrogenWidth / 2.0 + hydrogenCountWidth / 2.0;
 
         for (let key in pseudoElements) {
             if (!pseudoElements.hasOwnProperty(key)) {
                 continue;
             }
+            
+            let element = pseudoElements[key].element;
+            let count = pseudoElements[key].count;
+            let hydrogenCount = pseudoElements[key].hydrogenCount;
 
-            let count = pseudoElements[key];
+            ctx.font = fontLarge;
 
+            let elementWidth = ctx.measureText(element);
+
+            ctx.font = fontSmall;
+
+            let countWidth = 0;
+            if (hydrogenCount > 0) {
+                countWidth = ctx.measureText(hydrogenCount);
+            }
+            
             let hx = x + offsetX;
             let hy = y + offsetY + fontSizeLarge / 2.0;
 
-            ctx.font = fontSmall;
-
-            let cDim = ctx.measureText(hydrogens);
-
-            cDim.height = parseInt(fontSmall, 10);
-
             if (direction === 'left') {
-                hx -= hDim.width + cDim.width;
+                hx -= dim.totalWidth + sumWidth;
             } else if (direction === 'right') {
-                hx += dim.totalWidth;
-            } else if (direction === 'up' && isTerminal) {
-                hx += dim.totalWidth;
-            } else if (direction === 'down' && isTerminal) {
-                hx += dim.totalWidth;
-            } else if (direction === 'up' && !isTerminal) {
-                hy -= fontSizeLarge + fontSizeLarge / 4.0;
-            } else if (direction === 'down' && !isTerminal) {
-                hy += fontSizeLarge + fontSizeLarge / 4.0;
+                hx += dim.totalWidth + sumWidth;
+            } else if (direction === 'up') {
+                hx += dim.totalWidth + sumWidth;
+            } else if (direction === 'down') {
+                hx += dim.totalWidth + sumWidth;
             }
 
             ctx.font = fontLarge;
-            ctx.fillText(key, hx, hy)
+            ctx.fillStyle = this.getColor(element);
+            ctx.fillText(element, hx, hy)
 
-            ctx.font = fontSmall;
-            ctx.fillText(count, hx + hDim.width / 2.0 + cDim.width / 2.0, hy + fontSizeSmall / 5.0);
+            if (hydrogenCount > 1) {
+                ctx.font = fontSmall;
+                ctx.fillText(hydrogenCount, hx + elementWidth / 2.0 + countWidth / 2.0, hy + fontSizeSmall / 5.0);
+            }
+
+            sumWidth += elementWidth + countWidth + elementWidth / 2.0 + countWidth / 2.0;
         }
 
         ctx.restore();

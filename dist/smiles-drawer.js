@@ -410,22 +410,28 @@ var Atom = function () {
         this.chiral = 0;
         this.order = {};
         this.attachedPseudoElements = {};
+        this.hasAttachedPseudoElements = false;
         this.isDrawn = true;
     }
 
     /**
      * Attaches a pseudo element (e.g. Ac) to the atom.
      * @param {string} element The element identifier (e.g. Br, C, ...).
+     * @param {number} [hydrogenCount=0] The number of hydrogens for the element.
      */
 
 
     _createClass(Atom, [{
         key: 'attachPseudoElement',
         value: function attachPseudoElement(element) {
-            if (this.attachedPseudoElements[element]) {
-                this.attachedPseudoElements[element]++;
+            var hydrogenCount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+            this.hasAttachedPseudoElements = true;
+
+            if (this.attachedPseudoElements[element + hydrogenCount]) {
+                this.attachedPseudoElements[element + hydrogenCount].count += 1;
             } else {
-                this.attachedPseudoElements[element] = 1;
+                this.attachedPseudoElements[element + hydrogenCount] = { element: element, count: 1, hydrogenCount: hydrogenCount };
             }
         }
 
@@ -1578,12 +1584,14 @@ var CanvasWrapper = function () {
 
             ctx.font = fontLarge;
 
-            var hDim = ctx.measureText('H');
-            hDim.height = parseInt(fontLarge, 10);
+            var hydrogenWidth = 0;
+            var hydrogenCountWidth = 0;
 
             if (hydrogens === 1) {
                 var hx = x + offsetX;
                 var hy = y + offsetY + fontSizeLarge / 2.0;
+
+                hydrogenWidth = ctx.measureText('H');
 
                 if (direction === 'left') {
                     hx -= dim.width;
@@ -1599,19 +1607,21 @@ var CanvasWrapper = function () {
                     hy += fontSizeLarge + fontSizeLarge / 4.0;
                 }
 
+                dim.totalWidth += hydrogenWidth;
+
                 ctx.fillText('H', hx, hy);
             } else if (hydrogens > 1) {
                 var _hx = x + offsetX;
                 var _hy = y + offsetY + fontSizeLarge / 2.0;
 
+                hydrogenWidth = ctx.measureText('H');
+
                 ctx.font = fontSmall;
 
-                var cDim = ctx.measureText(hydrogens);
-
-                cDim.height = parseInt(fontSmall, 10);
+                hydrogenCountWidth = ctx.measureText(hydrogens);
 
                 if (direction === 'left') {
-                    _hx -= hDim.width + cDim.width;
+                    _hx -= hydrogenWidth + hydrogenCountWidth;
                 } else if (direction === 'right') {
                     _hx += dim.totalWidth;
                 } else if (direction === 'up' && isTerminal) {
@@ -1628,44 +1638,56 @@ var CanvasWrapper = function () {
                 ctx.fillText('H', _hx, _hy);
 
                 ctx.font = fontSmall;
-                ctx.fillText(hydrogens, _hx + hDim.width / 2.0 + cDim.width / 2.0, _hy + fontSizeSmall / 5.0);
+                ctx.fillText(hydrogens, _hx + hydrogenWidth / 2.0 + hydrogenCountWidth / 2.0, _hy + fontSizeSmall / 5.0);
             }
+
+            var sumWidth = hydrogenWidth + hydrogenCountWidth + hydrogenWidth / 2.0 + hydrogenCountWidth / 2.0;
 
             for (var key in pseudoElements) {
                 if (!pseudoElements.hasOwnProperty(key)) {
                     continue;
                 }
 
-                var count = pseudoElements[key];
+                var element = pseudoElements[key].element;
+                var count = pseudoElements[key].count;
+                var hydrogenCount = pseudoElements[key].hydrogenCount;
+
+                ctx.font = fontLarge;
+
+                var elementWidth = ctx.measureText(element);
+
+                ctx.font = fontSmall;
+
+                var countWidth = 0;
+                if (hydrogenCount > 0) {
+                    countWidth = ctx.measureText(hydrogenCount);
+                }
 
                 var _hx2 = x + offsetX;
                 var _hy2 = y + offsetY + fontSizeLarge / 2.0;
 
-                ctx.font = fontSmall;
-
-                var _cDim = ctx.measureText(hydrogens);
-
-                _cDim.height = parseInt(fontSmall, 10);
-
                 if (direction === 'left') {
-                    _hx2 -= hDim.width + _cDim.width;
+                    _hx2 -= dim.totalWidth + sumWidth;
                 } else if (direction === 'right') {
-                    _hx2 += dim.totalWidth;
-                } else if (direction === 'up' && isTerminal) {
-                    _hx2 += dim.totalWidth;
-                } else if (direction === 'down' && isTerminal) {
-                    _hx2 += dim.totalWidth;
-                } else if (direction === 'up' && !isTerminal) {
-                    _hy2 -= fontSizeLarge + fontSizeLarge / 4.0;
-                } else if (direction === 'down' && !isTerminal) {
-                    _hy2 += fontSizeLarge + fontSizeLarge / 4.0;
+                    _hx2 += dim.totalWidth + sumWidth;
+                } else if (direction === 'up') {
+                    _hx2 += dim.totalWidth + sumWidth;
+                } else if (direction === 'down') {
+                    _hx2 += dim.totalWidth + sumWidth;
                 }
 
                 ctx.font = fontLarge;
-                ctx.fillText(key, _hx2, _hy2);
+                ctx.fillStyle = this.getColor(element);
+                ctx.fillText(element, _hx2, _hy2);
+
+                if (hydrogenCount < 2) {
+                    continue;
+                }
 
                 ctx.font = fontSmall;
-                ctx.fillText(count, _hx2 + hDim.width / 2.0 + _cDim.width / 2.0, _hy2 + fontSizeSmall / 5.0);
+                ctx.fillText(hydrogenCount, _hx2 + elementWidth / 2.0 + countWidth / 2.0, _hy2 + fontSizeSmall / 5.0);
+
+                sumWidth += elementWidth + countWidth + elementWidth / 2.0 + countWidth / 2.0;
             }
 
             ctx.restore();
@@ -4912,7 +4934,6 @@ var SmilesDrawer = function () {
 
                 // Initialize pseudo elements or shortcuts
                 this.initPseudoElements();
-                console.log(this.vertices);
 
                 // Do the actual drawing
                 this.drawEdges(this.opts.debug);
@@ -6763,6 +6784,10 @@ var SmilesDrawer = function () {
                 var elementA = vertexA.value.element;
                 var elementB = vertexB.value.element;
 
+                if ((!vertexA.value.isDrawn || !vertexB.value.isDrawn) && _this.opts.atomVisualization === 'default') {
+                    return 'continue';
+                }
+
                 var a = vertexA.position;
                 var b = vertexB.position;
                 var normals = _this.getEdgeNormals(edge);
@@ -6908,7 +6933,9 @@ var SmilesDrawer = function () {
             };
 
             for (var i = 0; i < this.edges.length; i++) {
-                _loop(i);
+                var _ret = _loop(i);
+
+                if (_ret === 'continue') continue;
             }
 
             // Draw ring for benzenes
@@ -6940,7 +6967,7 @@ var SmilesDrawer = function () {
                 var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
                 var hydrogens = this.maxBonds[element] - bondCount;
                 var dir = vertex.getTextDirection(this.vertices);
-                var isTerminal = this.opts.terminalCarbons ? vertex.isTerminal() : false;
+                var isTerminal = this.opts.terminalCarbons || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
                 var isCarbon = atom.element.toLowerCase() === 'c';
 
                 if (atom.bracket) {
@@ -6949,9 +6976,9 @@ var SmilesDrawer = function () {
                     isotope = atom.bracket.isotope;
                 }
 
-                if ((!isCarbon || atom.explicit || isTerminal) && atom.isDrawn) {
+                if ((!isCarbon || atom.explicit || isTerminal || atom.hasAttachedPseudoElements) && atom.isDrawn) {
                     if (this.opts.atomVisualization === 'default') {
-                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.attachPseudoElement);
+                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.attachedPseudoElements);
                     } else if (this.opts.atomVisualization === 'balls') {
                         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
                     }
@@ -8389,10 +8416,11 @@ var SmilesDrawer = function () {
                     }
 
                     _neighbour.value.isDrawn = false;
-                    vertex.value.attachPseudoElement(_neighbour.value.element);
-                }
 
-                console.log(vertex, ctn);
+                    var hydrogens = this.maxBonds[_neighbour.value.element] - _neighbour.getNeighbourCount();
+
+                    vertex.value.attachPseudoElement(_neighbour.value.element, hydrogens);
+                }
             }
         }
 
@@ -9192,7 +9220,7 @@ var Vertex = function () {
         }
 
         /**
-         * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.
+         * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false. Always returns true if associated value has property hasAttachedPseudoElements set to true.
          *
          * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
          */
@@ -9200,6 +9228,10 @@ var Vertex = function () {
     }, {
         key: 'isTerminal',
         value: function isTerminal() {
+            if (this.value.hasAttachedPseudoElements) {
+                return true;
+            }
+
             return this.parentVertexId === null && this.children.length < 2 || this.children.length === 0;
         }
 
@@ -9280,7 +9312,7 @@ var Vertex = function () {
     }, {
         key: 'getTextDirection',
         value: function getTextDirection(vertices) {
-            var neighbours = this.getNeighbours();
+            var neighbours = this.getDrawnNeighbours(vertices);
             var angles = [];
 
             for (var i = 0; i < neighbours.length; i++) {
@@ -9326,6 +9358,27 @@ var Vertex = function () {
 
             for (var i = 0; i < this.neighbours.length; i++) {
                 if (this.neighbours[i] !== vertexId) {
+                    arr.push(this.neighbours[i]);
+                }
+            }
+
+            return arr;
+        }
+
+        /**
+         * Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
+         * 
+         * @param {array} vertices An array containing the vertices associated with the current molecule.
+         * @returns {array} An array containing the ids of neighbouring vertices that will be drawn.
+         */
+
+    }, {
+        key: 'getDrawnNeighbours',
+        value: function getDrawnNeighbours(vertices) {
+            var arr = [];
+
+            for (var i = 0; i < this.neighbours.length; i++) {
+                if (vertices[this.neighbours[i]].value.isDrawn) {
                     arr.push(this.neighbours[i]);
                 }
             }

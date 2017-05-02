@@ -22,18 +22,22 @@ class Atom {
         this.chiral = 0;
         this.order = {};
         this.attachedPseudoElements = {};
+        this.hasAttachedPseudoElements = false;
         this.isDrawn = true;
     }
 
     /**
      * Attaches a pseudo element (e.g. Ac) to the atom.
      * @param {string} element The element identifier (e.g. Br, C, ...).
+     * @param {number} [hydrogenCount=0] The number of hydrogens for the element.
      */
-    attachPseudoElement(element) {
-        if (this.attachedPseudoElements[element]) {
-            this.attachedPseudoElements[element]++;
+    attachPseudoElement(element, hydrogenCount = 0) {
+        this.hasAttachedPseudoElements = true;
+
+        if (this.attachedPseudoElements[element + hydrogenCount]) {
+            this.attachedPseudoElements[element + hydrogenCount].count += 1;
         } else {
-            this.attachedPseudoElements[element] = 1;
+            this.attachedPseudoElements[element + hydrogenCount] = ({ element: element, count: 1, hydrogenCount: hydrogenCount });
         }
     }
 

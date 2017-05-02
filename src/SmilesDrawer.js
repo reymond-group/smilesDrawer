@@ -239,7 +239,6 @@ class SmilesDrawer {
 
             // Initialize pseudo elements or shortcuts
             this.initPseudoElements();
-            console.log(this.vertices);
 
             // Do the actual drawing
             this.drawEdges(this.opts.debug);
@@ -1965,6 +1964,10 @@ class SmilesDrawer {
             let elementA = vertexA.value.element;
             let elementB = vertexB.value.element;
 
+            if ((!vertexA.value.isDrawn || !vertexB.value.isDrawn) && this.opts.atomVisualization === 'default') {
+                continue;
+            }
+
             let a = vertexA.position;
             let b = vertexB.position;
             let normals = this.getEdgeNormals(edge);
@@ -2138,7 +2141,7 @@ class SmilesDrawer {
             let element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
             let hydrogens = this.maxBonds[element] - bondCount;
             let dir = vertex.getTextDirection(this.vertices);
-            let isTerminal = this.opts.terminalCarbons ? vertex.isTerminal() : false;
+            let isTerminal = this.opts.terminalCarbons || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
             let isCarbon = atom.element.toLowerCase() === 'c';
 
             if (atom.bracket) {
@@ -2147,10 +2150,10 @@ class SmilesDrawer {
                 isotope = atom.bracket.isotope;
             }
 
-            if ((!isCarbon || atom.explicit || isTerminal) && atom.isDrawn) {
+            if ((!isCarbon || atom.explicit || isTerminal || atom.hasAttachedPseudoElements) && atom.isDrawn) {
                 if (this.opts.atomVisualization === 'default') {
                     this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
-                            element, hydrogens, dir, isTerminal, charge, isotope, atom.attachPseudoElement);
+                            element, hydrogens, dir, isTerminal, charge, isotope, atom.attachedPseudoElements);
                 } else if (this.opts.atomVisualization === 'balls') {
                     this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y,
                             element);
@@ -3512,10 +3515,11 @@ class SmilesDrawer {
                 }
 
                 neighbour.value.isDrawn = false;
-                vertex.value.attachPseudoElement(neighbour.value.element);
-            }
+                
+                let hydrogens = this.maxBonds[neighbour.value.element] - neighbour.getNeighbourCount()
 
-            console.log(vertex, ctn);
+                vertex.value.attachPseudoElement(neighbour.value.element, hydrogens);
+            }
         }
     }
 
