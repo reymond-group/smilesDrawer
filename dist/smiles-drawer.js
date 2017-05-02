@@ -1555,6 +1555,7 @@ var CanvasWrapper = function () {
             ctx.fillStyle = this.getColor(elementName);
 
             var dim = ctx.measureText(elementName);
+
             dim.totalWidth = dim.width + chargeWidth;
             dim.height = parseInt(fontLarge, 10);
 
@@ -1568,18 +1569,23 @@ var CanvasWrapper = function () {
             ctx.fill();
             ctx.globalCompositeOperation = 'source-over';
 
+            var cursorPos = -dim.width / 2.0;
+            var cursorPosLeft = -dim.width / 2.0;
+
             ctx.fillStyle = this.getColor(elementName);
-            ctx.textAlign = 'center';
-            ctx.fillText(elementName, x + offsetX, y + fontSizeLarge / 2.0 + offsetY);
+            ctx.fillText(elementName, x + offsetX + cursorPos, y + fontSizeLarge / 2.0 + offsetY);
+            cursorPos += dim.width;
 
             if (charge) {
                 ctx.font = fontSmall;
-                ctx.fillText(chargeText, x + offsetX + dim.width / 2.0 + chargeWidth / 2.0, y - fontSizeSmall / 5.0 + offsetY);
+                ctx.fillText(chargeText, x + offsetX + cursorPos, y - fontSizeSmall / 5.0 + offsetY);
+                cursorPos += chargeWidth;
             }
 
             if (isotope > 0) {
                 ctx.font = fontSmall;
-                ctx.fillText(isotopeText, x + offsetX - dim.width / 2.0 - isotopeWidth / 2.0, y - fontSizeSmall / 5.0 + offsetY);
+                ctx.fillText(isotopeText, x + offsetX + cursorPosLeft - isotopeWidth, y - fontSizeSmall / 5.0 + offsetY);
+                cursorPosLeft -= isotopeWidth;
             }
 
             ctx.font = fontLarge;
@@ -1591,103 +1597,175 @@ var CanvasWrapper = function () {
                 var hx = x + offsetX;
                 var hy = y + offsetY + fontSizeLarge / 2.0;
 
-                hydrogenWidth = ctx.measureText('H');
+                hydrogenWidth = ctx.measureText('H').width;
+                cursorPosLeft -= hydrogenWidth;
 
                 if (direction === 'left') {
-                    hx -= dim.width;
+                    hx += cursorPosLeft;
                 } else if (direction === 'right') {
-                    hx += dim.totalWidth;
+                    hx += cursorPos;
                 } else if (direction === 'up' && isTerminal) {
-                    hx += dim.totalWidth;
+                    hx += cursorPos;
                 } else if (direction === 'down' && isTerminal) {
-                    hx += dim.totalWidth;
+                    hx += cursorPos;
                 } else if (direction === 'up' && !isTerminal) {
                     hy -= fontSizeLarge + fontSizeLarge / 4.0;
+                    hx -= hydrogenWidth / 2.0;
                 } else if (direction === 'down' && !isTerminal) {
                     hy += fontSizeLarge + fontSizeLarge / 4.0;
+                    hx -= hydrogenWidth / 2.0;
                 }
 
-                dim.totalWidth += hydrogenWidth;
-
                 ctx.fillText('H', hx, hy);
+
+                cursorPos += hydrogenWidth;
             } else if (hydrogens > 1) {
                 var _hx = x + offsetX;
                 var _hy = y + offsetY + fontSizeLarge / 2.0;
 
-                hydrogenWidth = ctx.measureText('H');
-
+                hydrogenWidth = ctx.measureText('H').width;
                 ctx.font = fontSmall;
-
-                hydrogenCountWidth = ctx.measureText(hydrogens);
+                hydrogenCountWidth = ctx.measureText(hydrogens).width;
+                cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
 
                 if (direction === 'left') {
-                    _hx -= hydrogenWidth + hydrogenCountWidth;
+                    _hx += cursorPosLeft;
                 } else if (direction === 'right') {
-                    _hx += dim.totalWidth;
+                    _hx += cursorPos;
                 } else if (direction === 'up' && isTerminal) {
-                    _hx += dim.totalWidth;
+                    _hx += cursorPos;
                 } else if (direction === 'down' && isTerminal) {
-                    _hx += dim.totalWidth;
+                    _hx += cursorPos;
                 } else if (direction === 'up' && !isTerminal) {
                     _hy -= fontSizeLarge + fontSizeLarge / 4.0;
+                    _hx -= hydrogenWidth / 2.0;
                 } else if (direction === 'down' && !isTerminal) {
                     _hy += fontSizeLarge + fontSizeLarge / 4.0;
+                    _hx -= hydrogenWidth / 2.0;
                 }
 
                 ctx.font = fontLarge;
                 ctx.fillText('H', _hx, _hy);
 
                 ctx.font = fontSmall;
-                ctx.fillText(hydrogens, _hx + hydrogenWidth / 2.0 + hydrogenCountWidth / 2.0, _hy + fontSizeSmall / 5.0);
-            }
+                ctx.fillText(hydrogens, _hx + hydrogenWidth / 2.0 + hydrogenCountWidth, _hy + fontSizeSmall / 5.0);
 
-            var sumWidth = hydrogenWidth + hydrogenCountWidth + hydrogenWidth / 2.0 + hydrogenCountWidth / 2.0;
+                cursorPos += hydrogenWidth + hydrogenWidth / 2.0 + hydrogenCountWidth;
+            }
 
             for (var key in pseudoElements) {
                 if (!pseudoElements.hasOwnProperty(key)) {
                     continue;
                 }
 
+                var openParenthesisWidth = 0;
+                var closeParenthesisWidth = 0;
+
                 var element = pseudoElements[key].element;
-                var count = pseudoElements[key].count;
+                var elementCount = pseudoElements[key].count;
                 var hydrogenCount = pseudoElements[key].hydrogenCount;
+
+                if (elementCount > 1) {
+                    openParenthesisWidth = ctx.measureText('(').width;
+                    closeParenthesisWidth = ctx.measureText(')').width;
+                }
 
                 ctx.font = fontLarge;
 
-                var elementWidth = ctx.measureText(element);
+                var elementWidth = ctx.measureText(element).width;
+                var elementCountWidth = 0;
+
+                hydrogenWidth = 0;
+
+                if (hydrogenCount > 0) {
+                    hydrogenWidth = ctx.measureText('H').width;
+                }
 
                 ctx.font = fontSmall;
 
-                var countWidth = 0;
-                if (hydrogenCount > 0) {
-                    countWidth = ctx.measureText(hydrogenCount);
+                if (elementCount > 1) {
+                    elementCountWidth = ctx.measureText(elementCount).width;
                 }
+
+                hydrogenCountWidth = 0;
+
+                if (hydrogenCount > 1) {
+                    hydrogenCountWidth = ctx.measureText(hydrogenCount).width;
+                }
+
+                ctx.font = fontLarge;
 
                 var _hx2 = x + offsetX;
                 var _hy2 = y + offsetY + fontSizeLarge / 2.0;
 
+                ctx.fillStyle = this.getColor(element);
+
+                if (elementCount > 0) {
+                    cursorPosLeft -= elementCountWidth;
+                }
+
+                if (elementCount > 0 && hydrogenCount > 0) {
+                    if (direction === 'left') {
+                        cursorPosLeft -= closeParenthesisWidth;
+                        ctx.fillText(')', _hx2 + cursorPosLeft, _hy2);
+                    } else {
+                        ctx.fillText('(', _hx2 + cursorPos, _hy2);
+                        cursorPos += openParenthesisWidth;
+                    }
+                }
+
                 if (direction === 'left') {
-                    _hx2 -= dim.totalWidth + sumWidth;
-                } else if (direction === 'right') {
-                    _hx2 += dim.totalWidth + sumWidth;
-                } else if (direction === 'up') {
-                    _hx2 += dim.totalWidth + sumWidth;
-                } else if (direction === 'down') {
-                    _hx2 += dim.totalWidth + sumWidth;
+                    cursorPosLeft -= elementWidth;
+                    ctx.fillText(element, _hx2 + cursorPosLeft, _hy2);
+                } else {
+                    ctx.fillText(element, _hx2 + cursorPos, _hy2);
+                    cursorPos += elementWidth;
+                }
+
+                if (hydrogenCount > 0) {
+                    if (direction === 'left') {
+                        cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
+                        ctx.fillText('H', _hx2 + cursorPosLeft, _hy2);
+
+                        if (hydrogenCount > 1) {
+                            ctx.font = fontSmall;
+                            ctx.fillText(hydrogenCount, _hx2 + cursorPosLeft + hydrogenWidth, _hy2 + fontSizeSmall / 5.0);
+                        }
+                    } else {
+                        ctx.fillText('H', _hx2 + cursorPos, _hy2);
+                        cursorPos += hydrogenWidth;
+
+                        if (hydrogenCount > 1) {
+                            ctx.font = fontSmall;
+                            ctx.fillText(hydrogenCount, _hx2 + cursorPos, _hy2 + fontSizeSmall / 5.0);
+                            cursorPos += hydrogenCountWidth;
+                        }
+                    }
                 }
 
                 ctx.font = fontLarge;
-                ctx.fillStyle = this.getColor(element);
-                ctx.fillText(element, _hx2, _hy2);
 
-                if (hydrogenCount < 2) {
-                    continue;
+                if (elementCount > 1 && hydrogenCount > 0) {
+                    if (direction === 'left') {
+                        cursorPosLeft -= openParenthesisWidth;
+                        ctx.fillText('(', _hx2 + cursorPosLeft, _hy2);
+                    } else {
+                        ctx.fillText(')', _hx2 + cursorPos, _hy2);
+                        cursorPos += closeParenthesisWidth;
+                    }
                 }
 
                 ctx.font = fontSmall;
-                ctx.fillText(hydrogenCount, _hx2 + elementWidth / 2.0 + countWidth / 2.0, _hy2 + fontSizeSmall / 5.0);
 
-                sumWidth += elementWidth + countWidth + elementWidth / 2.0 + countWidth / 2.0;
+                if (elementCount > 1) {
+                    if (direction === 'left') {
+                        cursorPosLeft -= elementCountWidth;
+                        ctx.fillText(elementCount, _hx2 + cursorPosLeft + elementCountWidth + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, _hy2 + fontSizeSmall / 5.0);
+                    } else {
+                        ctx.fillText(elementCount, _hx2 + cursorPos, _hy2 + fontSizeSmall / 5.0);
+                        cursorPos += elementCountWidth;
+                    }
+                }
             }
 
             ctx.restore();
@@ -6964,10 +7042,10 @@ var SmilesDrawer = function () {
                 var charge = 0;
                 var isotope = 0;
                 var bondCount = this.getBondCount(vertex);
-                var element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
+                var element = atom.element.length === 1 ? atom.element.toUpperCase() : atom.element;
                 var hydrogens = this.maxBonds[element] - bondCount;
                 var dir = vertex.getTextDirection(this.vertices);
-                var isTerminal = this.opts.terminalCarbons || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
+                var isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
                 var isCarbon = atom.element.toLowerCase() === 'c';
 
                 if (atom.bracket) {
@@ -8286,7 +8364,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-             let done = new Array(vertexIds.length);
+              let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8303,10 +8381,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                     sortedVertexIds[index].atomicNumber += '.' + total;
+                      sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }
@@ -8389,7 +8467,7 @@ var SmilesDrawer = function () {
         value: function initPseudoElements() {
             for (var i = 0; i < this.vertices.length; i++) {
                 var vertex = this.vertices[i];
-                if (vertex.getNeighbourCount() < 2) {
+                if (vertex.getNeighbourCount() < 3) {
                     continue;
                 }
 

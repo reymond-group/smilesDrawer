@@ -527,6 +527,7 @@ class CanvasWrapper {
         ctx.fillStyle = this.getColor(elementName);
 
         let dim = ctx.measureText(elementName);
+
         dim.totalWidth = dim.width + chargeWidth;
         dim.height = parseInt(fontLarge, 10);
 
@@ -540,18 +541,23 @@ class CanvasWrapper {
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
 
+        let cursorPos = -dim.width / 2.0;
+        let cursorPosLeft = -dim.width / 2.0;
+
         ctx.fillStyle = this.getColor(elementName);
-        ctx.textAlign = 'center';
-        ctx.fillText(elementName, x + offsetX, y + fontSizeLarge / 2.0 + offsetY);
+        ctx.fillText(elementName, x + offsetX + cursorPos, y + fontSizeLarge / 2.0 + offsetY);
+        cursorPos += dim.width;
 
         if (charge) {
             ctx.font = fontSmall;
-            ctx.fillText(chargeText, x + offsetX + dim.width / 2.0 + chargeWidth / 2.0, y - fontSizeSmall / 5.0 + offsetY);
+            ctx.fillText(chargeText, x + offsetX + cursorPos, y - fontSizeSmall / 5.0 + offsetY);
+            cursorPos += chargeWidth;
         }
 
         if (isotope > 0) {
             ctx.font = fontSmall;
-            ctx.fillText(isotopeText, x + offsetX - dim.width / 2.0 - isotopeWidth / 2.0, y - fontSizeSmall / 5.0 + offsetY);
+            ctx.fillText(isotopeText, x + offsetX + cursorPosLeft - isotopeWidth, y - fontSizeSmall / 5.0 + offsetY);
+            cursorPosLeft -= isotopeWidth;
         }
 
         ctx.font = fontLarge;
@@ -563,101 +569,175 @@ class CanvasWrapper {
             let hx = x + offsetX;
             let hy = y + offsetY + fontSizeLarge / 2.0;
 
-            hydrogenWidth = ctx.measureText('H');
+            hydrogenWidth = ctx.measureText('H').width;
+            cursorPosLeft -= hydrogenWidth;
 
             if (direction === 'left') {
-                hx -= dim.width;
+                hx += cursorPosLeft;
             } else if (direction === 'right') {
-                hx += dim.totalWidth;
+                hx += cursorPos;
             } else if (direction === 'up' && isTerminal) {
-                hx += dim.totalWidth;
+                hx += cursorPos;
             } else if (direction === 'down' && isTerminal) {
-                hx += dim.totalWidth;
+                hx += cursorPos;
             } else if (direction === 'up' && !isTerminal) {
                 hy -= fontSizeLarge + fontSizeLarge / 4.0;
+                hx -= hydrogenWidth / 2.0;
             } else if (direction === 'down' && !isTerminal) {
                 hy += fontSizeLarge + fontSizeLarge / 4.0;
+                hx -= hydrogenWidth / 2.0;
             }
 
-            dim.totalWidth += hydrogenWidth;
-
             ctx.fillText('H', hx, hy);
+
+            cursorPos += hydrogenWidth;
         } else if (hydrogens > 1) {
             let hx = x + offsetX;
             let hy = y + offsetY + fontSizeLarge / 2.0;
 
-            hydrogenWidth = ctx.measureText('H');
-
+            hydrogenWidth = ctx.measureText('H').width;
             ctx.font = fontSmall;
-
-            hydrogenCountWidth = ctx.measureText(hydrogens);
+            hydrogenCountWidth = ctx.measureText(hydrogens).width;
+            cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
 
             if (direction === 'left') {
-                hx -= hydrogenWidth + hydrogenCountWidth;
+                hx += cursorPosLeft;
             } else if (direction === 'right') {
-                hx += dim.totalWidth;
+                hx += cursorPos;
             } else if (direction === 'up' && isTerminal) {
-                hx += dim.totalWidth;
+                hx += cursorPos;
             } else if (direction === 'down' && isTerminal) {
-                hx += dim.totalWidth;
+                hx += cursorPos;
             } else if (direction === 'up' && !isTerminal) {
                 hy -= fontSizeLarge + fontSizeLarge / 4.0;
+                hx -= hydrogenWidth / 2.0;
             } else if (direction === 'down' && !isTerminal) {
                 hy += fontSizeLarge + fontSizeLarge / 4.0;
+                hx -= hydrogenWidth / 2.0;
             }
 
             ctx.font = fontLarge;
             ctx.fillText('H', hx, hy)
 
             ctx.font = fontSmall;
-            ctx.fillText(hydrogens, hx + hydrogenWidth / 2.0 + hydrogenCountWidth / 2.0, hy + fontSizeSmall / 5.0);
-        }
+            ctx.fillText(hydrogens, hx + hydrogenWidth / 2.0 + hydrogenCountWidth, hy + fontSizeSmall / 5.0);
 
-        let sumWidth = hydrogenWidth + hydrogenCountWidth + hydrogenWidth / 2.0 + hydrogenCountWidth / 2.0;
+            cursorPos += hydrogenWidth + hydrogenWidth / 2.0 + hydrogenCountWidth;
+        }
 
         for (let key in pseudoElements) {
             if (!pseudoElements.hasOwnProperty(key)) {
                 continue;
             }
+
+            let openParenthesisWidth = 0;
+            let closeParenthesisWidth = 0;
             
             let element = pseudoElements[key].element;
-            let count = pseudoElements[key].count;
+            let elementCount = pseudoElements[key].count;
             let hydrogenCount = pseudoElements[key].hydrogenCount;
+
+            if (elementCount > 1) {
+                openParenthesisWidth = ctx.measureText('(').width;
+                closeParenthesisWidth = ctx.measureText(')').width;
+            }
 
             ctx.font = fontLarge;
 
-            let elementWidth = ctx.measureText(element);
+            let elementWidth = ctx.measureText(element).width;
+            let elementCountWidth = 0;
+
+            hydrogenWidth = 0;
+
+            if (hydrogenCount > 0) {
+                hydrogenWidth = ctx.measureText('H').width;
+            }
 
             ctx.font = fontSmall;
 
-            let countWidth = 0;
-            if (hydrogenCount > 0) {
-                countWidth = ctx.measureText(hydrogenCount);
+            if (elementCount > 1) {
+                elementCountWidth = ctx.measureText(elementCount).width;
             }
-            
-            let hx = x + offsetX;
-            let hy = y + offsetY + fontSizeLarge / 2.0;
 
-            if (direction === 'left') {
-                hx -= dim.totalWidth + sumWidth;
-            } else if (direction === 'right') {
-                hx += dim.totalWidth + sumWidth;
-            } else if (direction === 'up') {
-                hx += dim.totalWidth + sumWidth;
-            } else if (direction === 'down') {
-                hx += dim.totalWidth + sumWidth;
+            hydrogenCountWidth = 0;
+
+            if (hydrogenCount > 1) {
+                hydrogenCountWidth = ctx.measureText(hydrogenCount).width;
             }
 
             ctx.font = fontLarge;
-            ctx.fillStyle = this.getColor(element);
-            ctx.fillText(element, hx, hy)
 
-            if (hydrogenCount > 1) {
-                ctx.font = fontSmall;
-                ctx.fillText(hydrogenCount, hx + elementWidth / 2.0 + countWidth / 2.0, hy + fontSizeSmall / 5.0);
+            let hx = x + offsetX;
+            let hy = y + offsetY + fontSizeLarge / 2.0;
+
+            ctx.fillStyle = this.getColor(element);
+
+            if (elementCount > 0) {
+                cursorPosLeft -= elementCountWidth;
             }
 
-            sumWidth += elementWidth + countWidth + elementWidth / 2.0 + countWidth / 2.0;
+            if (elementCount > 0 && hydrogenCount > 0) {
+                if (direction === 'left') {
+                    cursorPosLeft -= closeParenthesisWidth;
+                    ctx.fillText(')', hx + cursorPosLeft, hy);
+                } else {
+                    ctx.fillText('(', hx + cursorPos, hy);
+                    cursorPos += openParenthesisWidth;
+                }
+            }
+
+            if (direction === 'left') {
+                cursorPosLeft -= elementWidth;
+                ctx.fillText(element, hx + cursorPosLeft, hy)
+            } else {
+                ctx.fillText(element, hx + cursorPos, hy)
+                cursorPos += elementWidth;
+            }
+
+            if (hydrogenCount > 0) {
+                if (direction === 'left') {
+                    cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
+                    ctx.fillText('H', hx + cursorPosLeft, hy)
+                    
+                    if (hydrogenCount > 1) {
+                        ctx.font = fontSmall;
+                        ctx.fillText(hydrogenCount, hx + cursorPosLeft + hydrogenWidth, hy + fontSizeSmall / 5.0);
+                    }
+                } else {
+                    ctx.fillText('H', hx + cursorPos, hy)
+                    cursorPos += hydrogenWidth;
+
+                    if (hydrogenCount > 1) {
+                        ctx.font = fontSmall;
+                        ctx.fillText(hydrogenCount, hx + cursorPos, hy + fontSizeSmall / 5.0);
+                        cursorPos += hydrogenCountWidth;
+                    }
+                }
+            }
+
+            ctx.font = fontLarge;
+
+            if (elementCount > 1 && hydrogenCount > 0) {
+                if (direction === 'left') {
+                    cursorPosLeft -= openParenthesisWidth;
+                    ctx.fillText('(', hx + cursorPosLeft, hy);
+                } else {
+                    ctx.fillText(')', hx + cursorPos, hy);
+                    cursorPos += closeParenthesisWidth;
+                }
+            }
+            
+            ctx.font = fontSmall;
+
+            if (elementCount > 1) {
+                if (direction === 'left') {
+                    cursorPosLeft -= elementCountWidth;
+                    ctx.fillText(elementCount, hx + cursorPosLeft + elementCountWidth + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, hy + fontSizeSmall / 5.0);
+                } else {
+                    ctx.fillText(elementCount, hx + cursorPos, hy + fontSizeSmall / 5.0);
+                    cursorPos += elementCountWidth;
+                }
+            }
         }
 
         ctx.restore();

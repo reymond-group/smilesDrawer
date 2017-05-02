@@ -2138,10 +2138,10 @@ class SmilesDrawer {
             let charge = 0;
             let isotope = 0;
             let bondCount = this.getBondCount(vertex);
-            let element = atom.element.length == 1 ? atom.element.toUpperCase() : atom.element;
+            let element = atom.element.length === 1 ? atom.element.toUpperCase() : atom.element;
             let hydrogens = this.maxBonds[element] - bondCount;
             let dir = vertex.getTextDirection(this.vertices);
-            let isTerminal = this.opts.terminalCarbons || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
+            let isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
             let isCarbon = atom.element.toLowerCase() === 'c';
 
             if (atom.bracket) {
@@ -3488,7 +3488,7 @@ class SmilesDrawer {
     initPseudoElements() {
         for (let i = 0; i < this.vertices.length; i++) {
             let vertex = this.vertices[i];
-            if (vertex.getNeighbourCount() < 2) {
+            if (vertex.getNeighbourCount() < 3) {
                 continue;
             }
 
