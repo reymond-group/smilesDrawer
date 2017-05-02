@@ -60,6 +60,8 @@
     
             SmilesDrawer.parse(input.value, function(tree) {
                 smilesDrawer.draw(tree, 'output-canvas', 'light', false);
+            }, function(err) {
+                console.log(err);
             });
 
             let td = performance.now() - t;

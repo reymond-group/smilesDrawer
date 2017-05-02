@@ -25,6 +25,29 @@ class Vertex {
         this.flipCenter = null;
         this.flipNeighbour = null;
         this.flipRings = new Array();
+        this.neighbourCount = 0;
+        this.neighbours = [];
+    }
+
+    /**
+     * Add a child vertex id to this vertex.
+     * @param {number} vertexID The id of a vertex to be added as a child to this vertex.
+     */
+    addChild(vertexId) {
+        this.neighbourCount++;
+        this.children.push(vertexId);
+        this.neighbours.push(vertexId);
+    }
+
+    /**
+     * Set the vertex id of the parent.
+     * 
+     * @param {number} parentVertexId The parents vertex id.
+     */
+    setParentVertexId(parentVertexId) {
+        this.neighbourCount++;
+        this.parentVertexId = parentVertexId;
+        this.neighbours.push(parentVertexId);
     }
 
     /**
@@ -61,7 +84,7 @@ class Vertex {
     /**
      * Returns true if this vertex and the supplied vertex both have the same id, else returns false.
      *
-     * @param {Vertex} - The vertex to check.
+     * @param {Vertex} vertex The vertex to check.
      * @returns {boolean} A boolean indicating whether or not the two vertices have the same id.
      */
     equals(vertex) {
@@ -131,21 +154,19 @@ class Vertex {
      * @returns {array} An array containing the ids of neighbouring vertices.
      */
     getNeighbours(vertexId = null) {
-        let neighbours = [];
+        if(vertexId === null) {
+            return this.neighbours;
+        }
 
-        for (let i = 0; i < this.children.length; i++) {
-            if (vertexId === undefined || vertexId != this.children[i]) {
-                neighbours.push(this.children[i]);
+        let arr = [];
+
+        for (let i = 0; i < this.neighbours.length; i++) {
+            if (this.neighbours[i] !== vertexId) {
+                arr.push(this.neighbours[i]);
             }
         }
 
-        if (this.parentVertexId != null) {
-            if (vertexId === undefined || vertexId != this.parentVertexId) {
-                neighbours.push(this.parentVertexId);
-            }
-        }
-
-        return neighbours;
+        return arr;
     }
 
     /**
@@ -154,13 +175,7 @@ class Vertex {
      * @returns {number} The number of neighbours.
      */
     getNeighbourCount() {
-        let count = this.children.length;
-
-        if (this.parentVertexId !== null) {
-            count += 1;
-        }
-
-        return count;
+        return this.neighbourCount;
     }
 
     /**

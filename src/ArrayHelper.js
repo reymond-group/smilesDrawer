@@ -219,6 +219,24 @@ class ArrayHelper {
     }
 
     /**
+     * Remove a value from an array with unique values.
+     *
+     * @static
+     * @param {array} arr An array.
+     * @param {*} value A value to be removed.
+     * @returns {array} An array with the element with a given value removed.
+     */
+    static removeUnique(arr, value) {
+        let index = array.indexOf(value);
+
+        if (index > -1) {
+            arr.splice(index, 1);
+        }
+
+        return arr;
+    }
+
+    /**
      * Remove all elements contained in one array from another array.
      *
      * @static

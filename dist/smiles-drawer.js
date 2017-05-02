@@ -260,6 +260,27 @@ var ArrayHelper = function () {
         }
 
         /**
+         * Remove a value from an array with unique values.
+         *
+         * @static
+         * @param {array} arr An array.
+         * @param {*} value A value to be removed.
+         * @returns {array} An array with the element with a given value removed.
+         */
+
+    }, {
+        key: 'removeUnique',
+        value: function removeUnique(arr, value) {
+            var index = array.indexOf(value);
+
+            if (index > -1) {
+                arr.splice(index, 1);
+            }
+
+            return arr;
+        }
+
+        /**
          * Remove all elements contained in one array from another array.
          *
          * @static
@@ -388,16 +409,33 @@ var Atom = function () {
         this.bracket = null;
         this.chiral = 0;
         this.order = {};
+        this.attachedPseudoElements = {};
+        this.isDrawn = true;
     }
 
     /**
-     * Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
-     *
-     * @param {number} ringId A ring id.
+     * Attaches a pseudo element (e.g. Ac) to the atom.
+     * @param {string} element The element identifier (e.g. Br, C, ...).
      */
 
 
     _createClass(Atom, [{
+        key: 'attachPseudoElement',
+        value: function attachPseudoElement(element) {
+            if (this.attachedPseudoElements[element]) {
+                this.attachedPseudoElements[element]++;
+            } else {
+                this.attachedPseudoElements[element] = 1;
+            }
+        }
+
+        /**
+         * Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
+         *
+         * @param {number} ringId A ring id.
+         */
+
+    }, {
         key: 'addAnchoredRing',
         value: function addAnchoredRing(ringId) {
             if (!ArrayHelper.contains(this.anchoredRings, { value: ringId })) {
@@ -817,6 +855,132 @@ Atom.atomicNumbers = {
     'Uuo': 118
 };
 
+Atom.mass = {
+    'H': 1,
+    'He': 2,
+    'Li': 3,
+    'Be': 4,
+    'B': 5,
+    'b': 5,
+    'C': 6,
+    'c': 6,
+    'N': 7,
+    'n': 7,
+    'O': 8,
+    'o': 8,
+    'F': 9,
+    'Ne': 10,
+    'Na': 11,
+    'Mg': 12,
+    'Al': 13,
+    'Si': 14,
+    'P': 15,
+    'p': 15,
+    'S': 16,
+    's': 16,
+    'Cl': 17,
+    'Ar': 18,
+    'K': 19,
+    'Ca': 20,
+    'Sc': 21,
+    'Ti': 22,
+    'V': 23,
+    'Cr': 24,
+    'Mn': 25,
+    'Fe': 26,
+    'Co': 27,
+    'Ni': 28,
+    'Cu': 29,
+    'Zn': 30,
+    'Ga': 31,
+    'Ge': 32,
+    'As': 33,
+    'Se': 34,
+    'Br': 35,
+    'Kr': 36,
+    'Rb': 37,
+    'Sr': 38,
+    'Y': 39,
+    'Zr': 40,
+    'Nb': 41,
+    'Mo': 42,
+    'Tc': 43,
+    'Ru': 44,
+    'Rh': 45,
+    'Pd': 46,
+    'Ag': 47,
+    'Cd': 48,
+    'In': 49,
+    'Sn': 50,
+    'Sb': 51,
+    'Te': 52,
+    'I': 53,
+    'Xe': 54,
+    'Cs': 55,
+    'Ba': 56,
+    'La': 57,
+    'Ce': 58,
+    'Pr': 59,
+    'Nd': 60,
+    'Pm': 61,
+    'Sm': 62,
+    'Eu': 63,
+    'Gd': 64,
+    'Tb': 65,
+    'Dy': 66,
+    'Ho': 67,
+    'Er': 68,
+    'Tm': 69,
+    'Yb': 70,
+    'Lu': 71,
+    'Hf': 72,
+    'Ta': 73,
+    'W': 74,
+    'Re': 75,
+    'Os': 76,
+    'Ir': 77,
+    'Pt': 78,
+    'Au': 79,
+    'Hg': 80,
+    'Tl': 81,
+    'Pb': 82,
+    'Bi': 83,
+    'Po': 84,
+    'At': 85,
+    'Rn': 86,
+    'Fr': 87,
+    'Ra': 88,
+    'Ac': 89,
+    'Th': 90,
+    'Pa': 91,
+    'U': 92,
+    'Np': 93,
+    'Pu': 94,
+    'Am': 95,
+    'Cm': 96,
+    'Bk': 97,
+    'Cf': 98,
+    'Es': 99,
+    'Fm': 100,
+    'Md': 101,
+    'No': 102,
+    'Lr': 103,
+    'Rf': 104,
+    'Db': 105,
+    'Sg': 106,
+    'Bh': 107,
+    'Hs': 108,
+    'Mt': 109,
+    'Ds': 110,
+    'Rg': 111,
+    'Cn': 112,
+    'Uut': 113,
+    'Uuq': 114,
+    'Uup': 115,
+    'Uuh': 116,
+    'Uus': 117,
+    'Uuo': 118
+};
 /** A class wrapping a canvas element */
 
 var CanvasWrapper = function () {
@@ -1327,11 +1491,14 @@ var CanvasWrapper = function () {
          * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
          * @param {string} charge The charge of the atom.
          * @param {number} isotope The isotope number.
+         * @param {object} [pseudoElements={}] An object containing pseudo elements or shortcut elements and their count. E.g. { 'F': 3 }, { 'O': 2, 'H': 1 }.
          */
 
     }, {
         key: 'drawText',
         value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope) {
+            var pseudoElements = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : {};
+
             // Return empty line element for debugging, remove this check later, values should not be NaN
             if (isNaN(x) || isNaN(y)) {
                 return;
@@ -1462,6 +1629,43 @@ var CanvasWrapper = function () {
 
                 ctx.font = fontSmall;
                 ctx.fillText(hydrogens, _hx + hDim.width / 2.0 + cDim.width / 2.0, _hy + fontSizeSmall / 5.0);
+            }
+
+            for (var key in pseudoElements) {
+                if (!pseudoElements.hasOwnProperty(key)) {
+                    continue;
+                }
+
+                var count = pseudoElements[key];
+
+                var _hx2 = x + offsetX;
+                var _hy2 = y + offsetY + fontSizeLarge / 2.0;
+
+                ctx.font = fontSmall;
+
+                var _cDim = ctx.measureText(hydrogens);
+
+                _cDim.height = parseInt(fontSmall, 10);
+
+                if (direction === 'left') {
+                    _hx2 -= hDim.width + _cDim.width;
+                } else if (direction === 'right') {
+                    _hx2 += dim.totalWidth;
+                } else if (direction === 'up' && isTerminal) {
+                    _hx2 += dim.totalWidth;
+                } else if (direction === 'down' && isTerminal) {
+                    _hx2 += dim.totalWidth;
+                } else if (direction === 'up' && !isTerminal) {
+                    _hy2 -= fontSizeLarge + fontSizeLarge / 4.0;
+                } else if (direction === 'down' && !isTerminal) {
+                    _hy2 += fontSizeLarge + fontSizeLarge / 4.0;
+                }
+
+                ctx.font = fontLarge;
+                ctx.fillText(key, _hx2, _hy2);
+
+                ctx.font = fontSmall;
+                ctx.fillText(count, _hx2 + hDim.width / 2.0 + _cDim.width / 2.0, _hy2 + fontSizeSmall / 5.0);
             }
 
             ctx.restore();
@@ -4485,7 +4689,7 @@ var SmilesDrawer = function () {
             'S': 2,
             'b': 3,
             'B': 3,
-            'F': 2,
+            'F': 1,
             'I': 1,
             'Cl': 1,
             'Br': 1
@@ -4706,6 +4910,10 @@ var SmilesDrawer = function () {
                 // Set the canvas to the appropriate size
                 this.canvasWrapper.scale(this.vertices);
 
+                // Initialize pseudo elements or shortcuts
+                this.initPseudoElements();
+                console.log(this.vertices);
+
                 // Do the actual drawing
                 this.drawEdges(this.opts.debug);
                 this.drawVertices(this.opts.debug);
@@ -4899,13 +5107,12 @@ var SmilesDrawer = function () {
             var vertex = new Vertex(atom);
             var parentVertex = this.vertices[parentVertexId];
 
-            vertex.parentVertexId = parentVertexId;
-
             this.addVertex(vertex);
 
             // Add the id of this node to the parent as child
-            if (parentVertexId != null) {
-                this.vertices[parentVertexId].children.push(vertex.id);
+            if (parentVertexId !== null) {
+                vertex.setParentVertexId(parentVertexId);
+                this.vertices[parentVertexId].addChild(vertex.id);
 
                 // In addition create a spanningTreeChildren property, which later will
                 // not contain the children added through ringbonds
@@ -5015,8 +5222,8 @@ var SmilesDrawer = function () {
                         var sourceVertex = that.vertices[source];
                         var targetVertex = that.vertices[target];
 
-                        sourceVertex.children.push(target);
-                        targetVertex.children.push(source);
+                        sourceVertex.addChild(target);
+                        targetVertex.addChild(source);
 
                         sourceVertex.edges.push(edgeId);
                         targetVertex.edges.push(edgeId);
@@ -5635,7 +5842,7 @@ var SmilesDrawer = function () {
             for (var i = 0; i < this.vertices.length; i++) {
                 var v = this.vertices[i];
 
-                if (v.id === vertex.id || v.getNeighbours().length > 1) {
+                if (v.id === vertex.id || v.getNeighbourCount() > 1) {
                     continue;
                 }
 
@@ -6742,9 +6949,9 @@ var SmilesDrawer = function () {
                     isotope = atom.bracket.isotope;
                 }
 
-                if (!isCarbon || atom.explicit || isTerminal) {
+                if ((!isCarbon || atom.explicit || isTerminal) && atom.isDrawn) {
                     if (this.opts.atomVisualization === 'default') {
-                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope);
+                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.attachPseudoElement);
                     } else if (this.opts.atomVisualization === 'balls') {
                         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
                     }
@@ -7205,7 +7412,7 @@ var SmilesDrawer = function () {
                     done[vertex.id] = true;
 
                     // Look for rings where there are atoms with two bonds outside the ring (overlaps)
-                    if (vertex.getNeighbours().length > 2) {
+                    if (vertex.getNeighbourCount() > 2) {
                         var rings = [];
 
                         for (var k = 0; k < vertex.value.rings.length; k++) {
@@ -7230,10 +7437,10 @@ var SmilesDrawer = function () {
             for (var _i49 = 0; _i49 < overlaps.length; _i49++) {
                 var overlap = overlaps[_i49];
 
-                if (overlap.vertices.length == 1) {
+                if (overlap.vertices.length === 1) {
                     var _a3 = overlap.vertices[0];
 
-                    if (_a3.getNeighbours().length == 1) {
+                    if (_a3.getNeighbourCount() === 1) {
                         _a3.flippable = true;
                         _a3.flipCenter = overlap.common.id;
 
@@ -7261,7 +7468,7 @@ var SmilesDrawer = function () {
                         _angle *= _a3.position.clockwise(midpoint);
                         this.rotateSubtree(_a3.id, overlap.common.id, _angle, overlap.common.position);
                     }
-                } else if (overlap.vertices.length == 2) {
+                } else if (overlap.vertices.length === 2) {
                     var _angle2 = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
                     var _a4 = overlap.vertices[0];
                     var _b2 = overlap.vertices[1];
@@ -7272,7 +7479,7 @@ var SmilesDrawer = function () {
                     this.rotateSubtree(_a4.id, overlap.common.id, _angle2, overlap.common.position);
                     this.rotateSubtree(_b2.id, overlap.common.id, -_angle2, overlap.common.position);
 
-                    if (_a4.getNeighbours().length == 1) {
+                    if (_a4.getNeighbourCount() === 1) {
                         _a4.flippable = true;
                         _a4.flipCenter = overlap.common.id;
                         _a4.flipNeighbour = _b2.id;
@@ -7281,7 +7488,7 @@ var SmilesDrawer = function () {
                             _a4.flipRings.push(overlap.rings[_j15]);
                         }
                     }
-                    if (_b2.getNeighbours().length == 1) {
+                    if (_b2.getNeighbourCount() === 1) {
                         _b2.flippable = true;
                         _b2.flipCenter = overlap.common.id;
                         _b2.flipNeighbour = _a4.id;
@@ -8052,7 +8259,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-              let done = new Array(vertexIds.length);
+             let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8069,10 +8276,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                      sortedVertexIds[index].atomicNumber += '.' + total;
+                     sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }
@@ -8084,7 +8291,7 @@ var SmilesDrawer = function () {
             for (var i = 0; i < this.vertices.length; i++) {
                 var vertex = this.vertices[i];
 
-                if (vertex.value.bracket && vertex.value.element.toLowerCase() === 'c' && vertex.getNeighbours().length === 4 || vertex.value.bracket && vertex.value.bracket.hcount > 0 && vertex.getNeighbours().length === 3) {
+                if (vertex.value.bracket && vertex.value.element.toLowerCase() === 'c' && vertex.getNeighbourCount() === 4 || vertex.value.bracket && vertex.value.bracket.hcount > 0 && vertex.getNeighbourCount() === 3) {
 
                     var chirality = vertex.value.bracket.chirality;
 
@@ -8136,12 +8343,56 @@ var SmilesDrawer = function () {
                         var _edgeDown = this.getEdge(orderedNeighbours[3], vertex.id);
 
                         // If the bond already points up here, there is no need to point down
-                        // into the other direction
+                        // into the other directiononsole.log(vertex, ctn);onsole.log(vertex, ctn);
                         if (!(_edgeDown.chiral === 'up')) {
                             _edgeDown.chiral = 'down';
                         }
                     }
                 }
+            }
+        }
+
+        /**
+         * Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+         * the involved atoms not to be displayed.
+         */
+
+    }, {
+        key: 'initPseudoElements',
+        value: function initPseudoElements() {
+            for (var i = 0; i < this.vertices.length; i++) {
+                var vertex = this.vertices[i];
+                if (vertex.getNeighbourCount() < 2) {
+                    continue;
+                }
+
+                var neighbours = vertex.getNeighbours();
+                var ctn = 0;
+
+                for (var j = 0; j < neighbours.length; j++) {
+                    var neighbour = this.vertices[neighbours[j]];
+
+                    if (neighbour.getNeighbourCount() > 1) {
+                        ctn++;
+                    }
+                }
+
+                if (ctn > 1) {
+                    continue;
+                }
+
+                for (var _j17 = 0; _j17 < neighbours.length; _j17++) {
+                    var _neighbour = this.vertices[neighbours[_j17]];
+
+                    if (_neighbour.getNeighbourCount() > 1) {
+                        continue;
+                    }
+
+                    _neighbour.value.isDrawn = false;
+                    vertex.value.attachPseudoElement(_neighbour.value.element);
+                }
+
+                console.log(vertex, ctn);
             }
         }
 
@@ -8908,16 +9159,45 @@ var Vertex = function () {
         this.flipCenter = null;
         this.flipNeighbour = null;
         this.flipRings = new Array();
+        this.neighbourCount = 0;
+        this.neighbours = [];
     }
 
     /**
-     * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.
-     *
-     * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
+     * Add a child vertex id to this vertex.
+     * @param {number} vertexID The id of a vertex to be added as a child to this vertex.
      */
 
 
     _createClass(Vertex, [{
+        key: 'addChild',
+        value: function addChild(vertexId) {
+            this.neighbourCount++;
+            this.children.push(vertexId);
+            this.neighbours.push(vertexId);
+        }
+
+        /**
+         * Set the vertex id of the parent.
+         * 
+         * @param {number} parentVertexId The parents vertex id.
+         */
+
+    }, {
+        key: 'setParentVertexId',
+        value: function setParentVertexId(parentVertexId) {
+            this.neighbourCount++;
+            this.parentVertexId = parentVertexId;
+            this.neighbours.push(parentVertexId);
+        }
+
+        /**
+         * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false.
+         *
+         * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
+         */
+
+    }, {
         key: 'isTerminal',
         value: function isTerminal() {
             return this.parentVertexId === null && this.children.length < 2 || this.children.length === 0;
@@ -8951,7 +9231,7 @@ var Vertex = function () {
         /**
          * Returns true if this vertex and the supplied vertex both have the same id, else returns false.
          *
-         * @param {Vertex} - The vertex to check.
+         * @param {Vertex} vertex The vertex to check.
          * @returns {boolean} A boolean indicating whether or not the two vertices have the same id.
          */
 
@@ -9038,21 +9318,19 @@ var Vertex = function () {
         value: function getNeighbours() {
             var vertexId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-            var neighbours = [];
+            if (vertexId === null) {
+                return this.neighbours;
+            }
 
-            for (var i = 0; i < this.children.length; i++) {
-                if (vertexId === undefined || vertexId != this.children[i]) {
-                    neighbours.push(this.children[i]);
+            var arr = [];
+
+            for (var i = 0; i < this.neighbours.length; i++) {
+                if (this.neighbours[i] !== vertexId) {
+                    arr.push(this.neighbours[i]);
                 }
             }
 
-            if (this.parentVertexId != null) {
-                if (vertexId === undefined || vertexId != this.parentVertexId) {
-                    neighbours.push(this.parentVertexId);
-                }
-            }
-
-            return neighbours;
+            return arr;
         }
 
         /**
@@ -9064,13 +9342,7 @@ var Vertex = function () {
     }, {
         key: 'getNeighbourCount',
         value: function getNeighbourCount() {
-            var count = this.children.length;
-
-            if (this.parentVertexId !== null) {
-                count += 1;
-            }
-
-            return count;
+            return this.neighbourCount;
         }
 
         /**

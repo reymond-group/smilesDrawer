@@ -59,6 +59,7 @@ A static class containing helper functions for array-related tasks.
     * [.count(arr, value)](#ArrayHelper.count) ⇒ <code>number</code>
     * [.toggle(arr, value)](#ArrayHelper.toggle) ⇒ <code>array</code>
     * [.remove(arr, value)](#ArrayHelper.remove) ⇒ <code>array</code>
+    * [.removeUnique(arr, value)](#ArrayHelper.removeUnique) ⇒ <code>array</code>
     * [.removeAll(arrA, arrB)](#ArrayHelper.removeAll) ⇒ <code>array</code>
     * [.merge(arrA, arrB)](#ArrayHelper.merge) ⇒ <code>array</code>
     * [.containsAll(arrA, arrB)](#ArrayHelper.containsAll) ⇒ <code>boolean</code>
@@ -191,6 +192,19 @@ Remove a value from an array.
 | arr | <code>array</code> | An array. |
 | value | <code>\*</code> | A value to be removed. |
 
+<a name="ArrayHelper.removeUnique"></a>
+
+### ArrayHelper.removeUnique(arr, value) ⇒ <code>array</code>
+Remove a value from an array with unique values.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - An array with the element with a given value removed.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array. |
+| value | <code>\*</code> | A value to be removed. |
+
 <a name="ArrayHelper.removeAll"></a>
 
 ### ArrayHelper.removeAll(arrA, arrB) ⇒ <code>array</code>
@@ -252,6 +266,7 @@ A class representing an atom
 * [Atom](#Atom)
     * [new Atom(element, [bondType])](#new_Atom_new)
     * _instance_
+        * [.attachPseudoElement(element, [occurrences])](#Atom+attachPseudoElement)
         * [.addAnchoredRing(ringId)](#Atom+addAnchoredRing)
         * [.getRingbondCount()](#Atom+getRingbondCount) ⇒ <code>number</code>
         * [.canRotate()](#Atom+canRotate) ⇒ <code>boolean</code>
@@ -280,6 +295,18 @@ The constructor of the class Atom.
 | --- | --- | --- | --- |
 | element | <code>string</code> |  | The one-letter code of the element. |
 | [bondType] | <code>string</code> | <code>&quot;&#x27;-&#x27;&quot;</code> | The type of the bond associated with this atom. |
+
+<a name="Atom+attachPseudoElement"></a>
+
+### atom.attachPseudoElement(element, [occurrences])
+Attaches a pseudo element (e.g. Ac) to the atom.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| element | <code>string</code> |  | The element identifier (e.g. Br, C, ...). |
+| [occurrences] | <code>number</code> | <code>1</code> | The number of times the element occurres. |
 
 <a name="Atom+addAnchoredRing"></a>
 
@@ -1480,6 +1507,7 @@ The main class of the application representing the smiles drawer
         * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])](#SmilesDrawer+traverseTree)
         * [.getBondCount(vertex)](#SmilesDrawer+getBondCount) ⇒ <code>number</code>
         * [.getNonRingNeighbours(vertexId)](#SmilesDrawer+getNonRingNeighbours) ⇒ <code>array</code>
+        * [.setPseudoElements()](#SmilesDrawer+setPseudoElements)
     * _static_
         * [.clean(smiles)](#SmilesDrawer.clean) ⇒ <code>string</code>
         * [.apply(options, [themeName])](#SmilesDrawer.apply)
@@ -2315,6 +2343,13 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 | --- | --- | --- |
 | vertexId | <code>number</code> | A vertex id. |
 
+<a name="SmilesDrawer+setPseudoElements"></a>
+
+### smilesDrawer.setPseudoElements()
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer.clean"></a>
 
 ### SmilesDrawer.clean(smiles) ⇒ <code>string</code>
@@ -2842,6 +2877,8 @@ A class representing a vertex
 
 * [Vertex](#Vertex)
     * [new Vertex(value, [x], [y])](#new_Vertex_new)
+    * [.addChild(vertexID)](#Vertex+addChild)
+    * [.setParentVertexId(parentVertexId)](#Vertex+setParentVertexId)
     * [.isTerminal()](#Vertex+isTerminal) ⇒ <code>boolean</code>
     * [.clone()](#Vertex+clone) ⇒ <code>[Vertex](#Vertex)</code>
     * [.equals(vertex)](#Vertex+equals) ⇒ <code>boolean</code>
@@ -2865,6 +2902,28 @@ The constructor for the class Vertex.
 | value | <code>\*</code> |  | The value associated with this vertex. |
 | [x] | <code>number</code> | <code>0</code> | The initial x coordinate of the positional vector of this vertex. |
 | [y] | <code>number</code> | <code>0</code> | The initial y coordinate of the positional vector of this vertex. |
+
+<a name="Vertex+addChild"></a>
+
+### vertex.addChild(vertexID)
+Add a child vertex id to this vertex.
+
+**Kind**: instance method of <code>[Vertex](#Vertex)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexID | <code>number</code> | The id of a vertex to be added as a child to this vertex. |
+
+<a name="Vertex+setParentVertexId"></a>
+
+### vertex.setParentVertexId(parentVertexId)
+Set the vertex id of the parent.
+
+**Kind**: instance method of <code>[Vertex](#Vertex)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| parentVertexId | <code>number</code> | The parents vertex id. |
 
 <a name="Vertex+isTerminal"></a>
 

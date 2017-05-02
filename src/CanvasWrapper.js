@@ -474,8 +474,9 @@ class CanvasWrapper {
      * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
      * @param {string} charge The charge of the atom.
      * @param {number} isotope The isotope number.
+     * @param {object} [pseudoElements={}] An object containing pseudo elements or shortcut elements and their count. E.g. { 'F': 3 }, { 'O': 2, 'H': 1 }.
      */
-    drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope) {
+    drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, pseudoElements = {}) {
         // Return empty line element for debugging, remove this check later, values should not be NaN
         if (isNaN(x) || isNaN(y)) {
             return;
@@ -606,6 +607,43 @@ class CanvasWrapper {
 
             ctx.font = fontSmall;
             ctx.fillText(hydrogens, hx + hDim.width / 2.0 + cDim.width / 2.0, hy + fontSizeSmall / 5.0);
+        }
+
+        for (let key in pseudoElements) {
+            if (!pseudoElements.hasOwnProperty(key)) {
+                continue;
+            }
+
+            let count = pseudoElements[key];
+
+            let hx = x + offsetX;
+            let hy = y + offsetY + fontSizeLarge / 2.0;
+
+            ctx.font = fontSmall;
+
+            let cDim = ctx.measureText(hydrogens);
+
+            cDim.height = parseInt(fontSmall, 10);
+
+            if (direction === 'left') {
+                hx -= hDim.width + cDim.width;
+            } else if (direction === 'right') {
+                hx += dim.totalWidth;
+            } else if (direction === 'up' && isTerminal) {
+                hx += dim.totalWidth;
+            } else if (direction === 'down' && isTerminal) {
+                hx += dim.totalWidth;
+            } else if (direction === 'up' && !isTerminal) {
+                hy -= fontSizeLarge + fontSizeLarge / 4.0;
+            } else if (direction === 'down' && !isTerminal) {
+                hy += fontSizeLarge + fontSizeLarge / 4.0;
+            }
+
+            ctx.font = fontLarge;
+            ctx.fillText(key, hx, hy)
+
+            ctx.font = fontSmall;
+            ctx.fillText(count, hx + hDim.width / 2.0 + cDim.width / 2.0, hy + fontSizeSmall / 5.0);
         }
 
         ctx.restore();

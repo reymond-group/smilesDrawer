@@ -233,9 +233,13 @@ class SmilesDrawer {
             }
             
             this.resolveSecondaryOverlaps(overlapScore.scores);
-
+            
             // Set the canvas to the appropriate size
             this.canvasWrapper.scale(this.vertices);
+
+            // Initialize pseudo elements or shortcuts
+            this.initPseudoElements();
+            console.log(this.vertices);
 
             // Do the actual drawing
             this.drawEdges(this.opts.debug);
@@ -395,14 +399,13 @@ class SmilesDrawer {
 
         let vertex = new Vertex(atom);
         let parentVertex = this.vertices[parentVertexId];
-
-        vertex.parentVertexId = parentVertexId;
-
+        
         this.addVertex(vertex);
 
         // Add the id of this node to the parent as child
-        if (parentVertexId != null) {
-            this.vertices[parentVertexId].children.push(vertex.id);
+        if (parentVertexId !== null) {
+            vertex.setParentVertexId(parentVertexId);
+            this.vertices[parentVertexId].addChild(vertex.id);
 
             // In addition create a spanningTreeChildren property, which later will
             // not contain the children added through ringbonds
@@ -506,8 +509,8 @@ class SmilesDrawer {
                     let sourceVertex = that.vertices[source];
                     let targetVertex = that.vertices[target];
                     
-                    sourceVertex.children.push(target);
-                    targetVertex.children.push(source);
+                    sourceVertex.addChild(target);
+                    targetVertex.addChild(source);
 
                     sourceVertex.edges.push(edgeId);
                     targetVertex.edges.push(edgeId);
@@ -1088,7 +1091,7 @@ class SmilesDrawer {
         for (let i = 0; i < this.vertices.length; i++) {
             let v = this.vertices[i];
 
-            if (v.id === vertex.id || v.getNeighbours().length > 1) {
+            if (v.id === vertex.id || v.getNeighbourCount() > 1) {
                 continue;
             }
 
@@ -2144,10 +2147,10 @@ class SmilesDrawer {
                 isotope = atom.bracket.isotope;
             }
 
-            if (!isCarbon || atom.explicit || isTerminal) {
+            if ((!isCarbon || atom.explicit || isTerminal) && atom.isDrawn) {
                 if (this.opts.atomVisualization === 'default') {
                     this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
-                            element, hydrogens, dir, isTerminal, charge, isotope);
+                            element, hydrogens, dir, isTerminal, charge, isotope, atom.attachPseudoElement);
                 } else if (this.opts.atomVisualization === 'balls') {
                     this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y,
                             element);
@@ -2565,7 +2568,7 @@ class SmilesDrawer {
                 done[vertex.id] = true;
 
                 // Look for rings where there are atoms with two bonds outside the ring (overlaps)
-                if (vertex.getNeighbours().length > 2) {
+                if (vertex.getNeighbourCount() > 2) {
                     let rings = [];
                     
                     for (var k = 0; k < vertex.value.rings.length; k++) {
@@ -2590,10 +2593,10 @@ class SmilesDrawer {
         for (let i = 0; i < overlaps.length; i++) {
             let overlap = overlaps[i];
 
-            if (overlap.vertices.length == 1) {
+            if (overlap.vertices.length === 1) {
                 let a = overlap.vertices[0];
                 
-                if (a.getNeighbours().length == 1) {
+                if (a.getNeighbourCount() === 1) {
                     a.flippable = true;
                     a.flipCenter = overlap.common.id;
 
@@ -2621,7 +2624,7 @@ class SmilesDrawer {
                     angle *= a.position.clockwise(midpoint);
                     this.rotateSubtree(a.id, overlap.common.id, angle, overlap.common.position);
                 }
-            } else if (overlap.vertices.length == 2) {
+            } else if (overlap.vertices.length === 2) {
                 let angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
                 let a = overlap.vertices[0];
                 let b = overlap.vertices[1];
@@ -2632,7 +2635,7 @@ class SmilesDrawer {
                 this.rotateSubtree(a.id, overlap.common.id, angle, overlap.common.position);
                 this.rotateSubtree(b.id, overlap.common.id, -angle, overlap.common.position);
 
-                if (a.getNeighbours().length == 1) {
+                if (a.getNeighbourCount() === 1) {
                     a.flippable = true;
                     a.flipCenter = overlap.common.id;
                     a.flipNeighbour = b.id;
@@ -2641,7 +2644,7 @@ class SmilesDrawer {
                         a.flipRings.push(overlap.rings[j]);
                     }
                 }
-                if (b.getNeighbours().length == 1) {
+                if (b.getNeighbourCount() === 1) {
                     b.flippable = true;
                     b.flipCenter = overlap.common.id;
                     b.flipNeighbour = a.id;
@@ -3410,9 +3413,9 @@ class SmilesDrawer {
             
             if (vertex.value.bracket && 
                 vertex.value.element.toLowerCase() === 'c' &&
-                vertex.getNeighbours().length === 4 ||
+                vertex.getNeighbourCount() === 4 ||
                 vertex.value.bracket &&
-                vertex.value.bracket.hcount > 0 && vertex.getNeighbours().length === 3) {
+                vertex.value.bracket.hcount > 0 && vertex.getNeighbourCount() === 3) {
                 
                 let chirality = vertex.value.bracket.chirality;
                 
@@ -3466,12 +3469,53 @@ class SmilesDrawer {
                     let edgeDown = this.getEdge(orderedNeighbours[3], vertex.id);
                     
                     // If the bond already points up here, there is no need to point down
-                    // into the other direction
+                    // into the other directiononsole.log(vertex, ctn);onsole.log(vertex, ctn);
                     if (!(edgeDown.chiral === 'up')) {
                         edgeDown.chiral = 'down';
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+     * the involved atoms not to be displayed.
+     */
+    initPseudoElements() {
+        for (let i = 0; i < this.vertices.length; i++) {
+            let vertex = this.vertices[i];
+            if (vertex.getNeighbourCount() < 2) {
+                continue;
+            }
+
+            let neighbours = vertex.getNeighbours();
+            let ctn = 0;
+
+            for(let j = 0; j < neighbours.length; j++) {
+                let neighbour = this.vertices[neighbours[j]];
+
+                if (neighbour.getNeighbourCount() > 1) {
+                    ctn++;
+                }
+            }
+
+            if (ctn > 1) {
+                continue;
+            }
+
+            for(let j = 0; j < neighbours.length; j++) {
+                let neighbour = this.vertices[neighbours[j]];
+                
+                if (neighbour.getNeighbourCount() > 1) {
+                    continue;
+                }
+
+                neighbour.value.isDrawn = false;
+                vertex.value.attachPseudoElement(neighbour.value.element);
+            }
+
+            console.log(vertex, ctn);
         }
     }
 
