@@ -27,10 +27,12 @@
                     canvas.setAttribute('height', '200');
                     canvas.setAttribute('alt', drugbank[i]);
                     document.body.appendChild(canvas);
-                    
-                    let data = smiles.parse(drugbank[i]);
-                    
-                    smilesDrawer.draw(data, 'canvas' + i, 'light', false);
+
+                    SmilesDrawer.parse(drugbank[i], function(tree) {
+                        smilesDrawer.draw(tree, 'canvas' + i, 'light', false); 
+                    }, function(err) {
+                        console.log(err);
+                    });
 
                     // if (td > 1000) console.log(schembl[i]);
                 } catch (exception) {
