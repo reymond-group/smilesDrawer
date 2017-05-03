@@ -1911,6 +1911,11 @@ class SmilesDrawer {
                 }
 
                 center = this.getSubringCenter(ring, vertex);
+
+                if (currentVertex.value.rings.length === 0) {
+                    currentVertex.value.isConnectedToRing = true;
+                }
+
                 this.createNextBond(currentVertex, vertex, center);
             }
         }
@@ -2447,6 +2452,7 @@ class SmilesDrawer {
                 }
                 
                 let v = this.vertices[ringMemberNeighbours[j]];
+                v.value.isConnectedToRing = true;
 
                 this.createNextBond(v, ringMember, ring.center);
             }
@@ -3487,12 +3493,14 @@ class SmilesDrawer {
      */
     initPseudoElements() {
         for (let i = 0; i < this.vertices.length; i++) {
-            let vertex = this.vertices[i];
-            if (vertex.getNeighbourCount() < 3) {
+            const vertex = this.vertices[i];
+            const neighbours = vertex.getNeighbours();
+
+            if ((vertex.getNeighbourCount() < 3 || vertex.value.isInRing()) &&
+                !(vertex.value.isConnectedToRing && vertex.getNeighbourCount() === 2)) {
                 continue;
             }
 
-            let neighbours = vertex.getNeighbours();
             let ctn = 0;
 
             for(let j = 0; j < neighbours.length; j++) {

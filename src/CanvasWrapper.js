@@ -497,6 +497,22 @@ class CanvasWrapper {
         ctx.textAlign = 'start';
         ctx.textBaseline = 'alphabetic';
 
+        let pseudoElementHandled = false;
+
+        // Check if the element name can be replaced by a pseudo element
+        if (!charge && !isotope && Object.keys(pseudoElements).length > 0) {
+            if (elementName === 'C' && Object.keys(pseudoElements).length === 1 && 
+                pseudoElements.hasOwnProperty('C3') && pseudoElements['C3'].count === 1) {
+                elementName = 'Et';
+                hydrogens = 0;
+                pseudoElementHandled = true;
+            } else if (Object.keys(pseudoElements).length === 1 && 
+                pseudoElements.hasOwnProperty('C3') && pseudoElements['C3'].count === 1) {
+                pseudoElements['C3'].element = 'Me';
+                pseudoElements['C3'].hydrogenCount = 0;
+            }
+        }
+
         // Charge
         let chargeText = '+'
         let chargeWidth = 0;
@@ -623,6 +639,11 @@ class CanvasWrapper {
             ctx.fillText(hydrogens, hx + hydrogenWidth / 2.0 + hydrogenCountWidth, hy + fontSizeSmall / 5.0);
 
             cursorPos += hydrogenWidth + hydrogenWidth / 2.0 + hydrogenCountWidth;
+        }
+
+        if (pseudoElementHandled) {
+            ctx.restore();
+            return;
         }
 
         for (let key in pseudoElements) {

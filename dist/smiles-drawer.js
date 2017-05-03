@@ -412,6 +412,7 @@ var Atom = function () {
         this.attachedPseudoElements = {};
         this.hasAttachedPseudoElements = false;
         this.isDrawn = true;
+        this.isConnectedToRing = false;
     }
 
     /**
@@ -522,6 +523,18 @@ var Atom = function () {
             }
 
             return max;
+        }
+
+        /**
+         * Checks whether or not this atom is part of a ring.
+         * 
+         * @returns {boolean} A boolean indicating whether or not this atom is part of a ring.
+         */
+
+    }, {
+        key: 'isInRing',
+        value: function isInRing() {
+            return this.rings.length > 0;
         }
 
         /**
@@ -1545,6 +1558,20 @@ var CanvasWrapper = function () {
             ctx.textAlign = 'start';
             ctx.textBaseline = 'alphabetic';
 
+            var pseudoElementHandled = false;
+
+            // Check if the element name can be replaced by a pseudo element
+            if (!charge && !isotope && Object.keys(pseudoElements).length > 0) {
+                if (elementName === 'C' && Object.keys(pseudoElements).length === 1 && pseudoElements.hasOwnProperty('C3') && pseudoElements['C3'].count === 1) {
+                    elementName = 'Et';
+                    hydrogens = 0;
+                    pseudoElementHandled = true;
+                } else if (Object.keys(pseudoElements).length === 1 && pseudoElements.hasOwnProperty('C3') && pseudoElements['C3'].count === 1) {
+                    pseudoElements['C3'].element = 'Me';
+                    pseudoElements['C3'].hydrogenCount = 0;
+                }
+            }
+
             // Charge
             var chargeText = '+';
             var chargeWidth = 0;
@@ -1671,6 +1698,11 @@ var CanvasWrapper = function () {
                 ctx.fillText(hydrogens, _hx + hydrogenWidth / 2.0 + hydrogenCountWidth, _hy + fontSizeSmall / 5.0);
 
                 cursorPos += hydrogenWidth + hydrogenWidth / 2.0 + hydrogenCountWidth;
+            }
+
+            if (pseudoElementHandled) {
+                ctx.restore();
+                return;
             }
 
             for (var key in pseudoElements) {
@@ -6823,6 +6855,11 @@ var SmilesDrawer = function () {
                     }
 
                     center = this.getSubringCenter(ring, _vertex4);
+
+                    if (currentVertex.value.rings.length === 0) {
+                        currentVertex.value.isConnectedToRing = true;
+                    }
+
                     this.createNextBond(currentVertex, _vertex4, center);
                 }
             }
@@ -7396,6 +7433,7 @@ var SmilesDrawer = function () {
                     }
 
                     var v = this.vertices[ringMemberNeighbours[j]];
+                    v.value.isConnectedToRing = true;
 
                     this.createNextBond(v, ringMember, ring.center);
                 }
@@ -8384,7 +8422,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-             let done = new Array(vertexIds.length);
+              let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8401,10 +8439,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                     sortedVertexIds[index].atomicNumber += '.' + total;
+                      sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }
@@ -8487,11 +8525,12 @@ var SmilesDrawer = function () {
         value: function initPseudoElements() {
             for (var i = 0; i < this.vertices.length; i++) {
                 var vertex = this.vertices[i];
-                if (vertex.getNeighbourCount() < 3) {
+                var neighbours = vertex.getNeighbours();
+
+                if ((vertex.getNeighbourCount() < 3 || vertex.value.isInRing()) && !(vertex.value.isConnectedToRing && vertex.getNeighbourCount() === 2)) {
                     continue;
                 }
 
-                var neighbours = vertex.getNeighbours();
                 var ctn = 0;
 
                 for (var j = 0; j < neighbours.length; j++) {

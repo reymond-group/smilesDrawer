@@ -24,6 +24,7 @@ class Atom {
         this.attachedPseudoElements = {};
         this.hasAttachedPseudoElements = false;
         this.isDrawn = true;
+        this.isConnectedToRing = false;
     }
 
     /**
@@ -110,6 +111,15 @@ class Atom {
         }
  
         return max;
+    }
+
+    /**
+     * Checks whether or not this atom is part of a ring.
+     * 
+     * @returns {boolean} A boolean indicating whether or not this atom is part of a ring.
+     */
+    isInRing() {
+        return this.rings.length > 0;
     }
 
     /**
