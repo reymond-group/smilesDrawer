@@ -2153,7 +2153,7 @@ class SmilesDrawer {
             if ((!isCarbon || atom.explicit || isTerminal || atom.hasAttachedPseudoElements) && atom.isDrawn) {
                 if (this.opts.atomVisualization === 'default') {
                     this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
-                            element, hydrogens, dir, isTerminal, charge, isotope, atom.attachedPseudoElements);
+                            element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
                 } else if (this.opts.atomVisualization === 'balls') {
                     this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y,
                             element);
@@ -3516,7 +3516,11 @@ class SmilesDrawer {
 
                 neighbour.value.isDrawn = false;
                 
-                let hydrogens = this.maxBonds[neighbour.value.element] - neighbour.getNeighbourCount()
+                let hydrogens = this.maxBonds[neighbour.value.element] - this.getBondCount(neighbour);
+                
+                if (neighbour.value.bracket) {
+                    hydrogens = neighbour.value.bracket.hcount;
+                }
 
                 vertex.value.attachPseudoElement(neighbour.value.element, hydrogens);
             }

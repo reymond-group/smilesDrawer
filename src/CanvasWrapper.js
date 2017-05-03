@@ -637,12 +637,12 @@ class CanvasWrapper {
             let elementCount = pseudoElements[key].count;
             let hydrogenCount = pseudoElements[key].hydrogenCount;
 
-            if (elementCount > 1) {
+            ctx.font = fontLarge;
+
+            if (elementCount > 1 && hydrogenCount > 0) {
                 openParenthesisWidth = ctx.measureText('(').width;
                 closeParenthesisWidth = ctx.measureText(')').width;
             }
-
-            ctx.font = fontLarge;
 
             let elementWidth = ctx.measureText(element).width;
             let elementCountWidth = 0;
@@ -676,7 +676,7 @@ class CanvasWrapper {
                 cursorPosLeft -= elementCountWidth;
             }
 
-            if (elementCount > 0 && hydrogenCount > 0) {
+            if (elementCount > 1 && hydrogenCount > 0) {
                 if (direction === 'left') {
                     cursorPosLeft -= closeParenthesisWidth;
                     ctx.fillText(')', hx + cursorPosLeft, hy);
@@ -731,8 +731,8 @@ class CanvasWrapper {
 
             if (elementCount > 1) {
                 if (direction === 'left') {
-                    cursorPosLeft -= elementCountWidth;
-                    ctx.fillText(elementCount, hx + cursorPosLeft + elementCountWidth + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, hy + fontSizeSmall / 5.0);
+                    // cursorPosLeft -= elementCountWidth;
+                    ctx.fillText(elementCount, hx - elementCountWidth + cursorPosLeft + elementCountWidth + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, hy + fontSizeSmall / 5.0);
                 } else {
                     ctx.fillText(elementCount, hx + cursorPos, hy + fontSizeSmall / 5.0);
                     cursorPos += elementCountWidth;

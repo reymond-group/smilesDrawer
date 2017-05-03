@@ -42,6 +42,23 @@ class Atom {
     }
 
     /**
+     * Returns the attached pseudo elements sorted by hydrogen count (ascending).
+     *
+     * @returns {object} The sorted attached pseudo elements.
+     */
+    getAttachedPseudoElements() {
+        const ordered = {};
+
+        let that = this;
+
+        Object.keys(this.attachedPseudoElements).sort().forEach(function(key) {
+            ordered[key] = that.attachedPseudoElements[key];
+        });
+
+        return ordered;
+    }
+
+    /**
      * Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
      *
      * @param {number} ringId A ring id.

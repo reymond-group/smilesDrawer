@@ -267,6 +267,7 @@ A class representing an atom
     * [new Atom(element, [bondType])](#new_Atom_new)
     * _instance_
         * [.attachPseudoElement(element, [hydrogenCount])](#Atom+attachPseudoElement)
+        * [.getAttachedPseudoElements()](#Atom+getAttachedPseudoElements) ⇒ <code>object</code>
         * [.addAnchoredRing(ringId)](#Atom+addAnchoredRing)
         * [.getRingbondCount()](#Atom+getRingbondCount) ⇒ <code>number</code>
         * [.canRotate()](#Atom+canRotate) ⇒ <code>boolean</code>
@@ -308,6 +309,13 @@ Attaches a pseudo element (e.g. Ac) to the atom.
 | element | <code>string</code> |  | The element identifier (e.g. Br, C, ...). |
 | [hydrogenCount] | <code>number</code> | <code>0</code> | The number of hydrogens for the element. |
 
+<a name="Atom+getAttachedPseudoElements"></a>
+
+### atom.getAttachedPseudoElements() ⇒ <code>object</code>
+Returns the attached pseudo elements sorted by hydrogen count (ascending).
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>object</code> - The sorted attached pseudo elements.  
 <a name="Atom+addAnchoredRing"></a>
 
 ### atom.addAnchoredRing(ringId)

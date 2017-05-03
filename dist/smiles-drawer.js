@@ -436,6 +436,26 @@ var Atom = function () {
         }
 
         /**
+         * Returns the attached pseudo elements sorted by hydrogen count (ascending).
+         *
+         * @returns {object} The sorted attached pseudo elements.
+         */
+
+    }, {
+        key: 'getAttachedPseudoElements',
+        value: function getAttachedPseudoElements() {
+            var ordered = {};
+
+            var that = this;
+
+            Object.keys(this.attachedPseudoElements).sort().forEach(function (key) {
+                ordered[key] = that.attachedPseudoElements[key];
+            });
+
+            return ordered;
+        }
+
+        /**
          * Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
          *
          * @param {number} ringId A ring id.
@@ -1665,12 +1685,12 @@ var CanvasWrapper = function () {
                 var elementCount = pseudoElements[key].count;
                 var hydrogenCount = pseudoElements[key].hydrogenCount;
 
-                if (elementCount > 1) {
+                ctx.font = fontLarge;
+
+                if (elementCount > 1 && hydrogenCount > 0) {
                     openParenthesisWidth = ctx.measureText('(').width;
                     closeParenthesisWidth = ctx.measureText(')').width;
                 }
-
-                ctx.font = fontLarge;
 
                 var elementWidth = ctx.measureText(element).width;
                 var elementCountWidth = 0;
@@ -1704,7 +1724,7 @@ var CanvasWrapper = function () {
                     cursorPosLeft -= elementCountWidth;
                 }
 
-                if (elementCount > 0 && hydrogenCount > 0) {
+                if (elementCount > 1 && hydrogenCount > 0) {
                     if (direction === 'left') {
                         cursorPosLeft -= closeParenthesisWidth;
                         ctx.fillText(')', _hx2 + cursorPosLeft, _hy2);
@@ -1759,8 +1779,8 @@ var CanvasWrapper = function () {
 
                 if (elementCount > 1) {
                     if (direction === 'left') {
-                        cursorPosLeft -= elementCountWidth;
-                        ctx.fillText(elementCount, _hx2 + cursorPosLeft + elementCountWidth + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, _hy2 + fontSizeSmall / 5.0);
+                        // cursorPosLeft -= elementCountWidth;
+                        ctx.fillText(elementCount, _hx2 - elementCountWidth + cursorPosLeft + elementCountWidth + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, _hy2 + fontSizeSmall / 5.0);
                     } else {
                         ctx.fillText(elementCount, _hx2 + cursorPos, _hy2 + fontSizeSmall / 5.0);
                         cursorPos += elementCountWidth;
@@ -7056,7 +7076,7 @@ var SmilesDrawer = function () {
 
                 if ((!isCarbon || atom.explicit || isTerminal || atom.hasAttachedPseudoElements) && atom.isDrawn) {
                     if (this.opts.atomVisualization === 'default') {
-                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.attachedPseudoElements);
+                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
                     } else if (this.opts.atomVisualization === 'balls') {
                         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
                     }
@@ -8364,7 +8384,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-              let done = new Array(vertexIds.length);
+             let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8381,10 +8401,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                      sortedVertexIds[index].atomicNumber += '.' + total;
+                     sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }
@@ -8495,7 +8515,11 @@ var SmilesDrawer = function () {
 
                     _neighbour.value.isDrawn = false;
 
-                    var hydrogens = this.maxBonds[_neighbour.value.element] - _neighbour.getNeighbourCount();
+                    var hydrogens = this.maxBonds[_neighbour.value.element] - this.getBondCount(_neighbour);
+
+                    if (_neighbour.value.bracket) {
+                        hydrogens = _neighbour.value.bracket.hcount;
+                    }
 
                     vertex.value.attachPseudoElement(_neighbour.value.element, hydrogens);
                 }
