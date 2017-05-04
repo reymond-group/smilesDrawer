@@ -1057,7 +1057,7 @@ var CanvasWrapper = function () {
         this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio || this.ctx.mozBackingStorePixelRatio || this.ctx.msBackingStorePixelRatio || this.ctx.oBackingStorePixelRatio || this.ctx.backingStorePixelRatio || 1;
         this.ratio = this.devicePixelRatio / this.backingStoreRatio;
 
-        if (ratio !== 1) {
+        if (this.ratio !== 1) {
             this.canvas.width = this.opts.width * this.ratio;
             this.canvas.height = this.opts.height * this.ratio;
             this.canvas.style.width = this.opts.width + 'px';
