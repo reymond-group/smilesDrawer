@@ -1062,6 +1062,7 @@ var CanvasWrapper = function () {
             this.canvas.height = this.opts.height * this.ratio;
             this.canvas.style.width = this.opts.width + 'px';
             this.canvas.style.height = this.opts.height + 'px';
+            this.ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
         }
 
         this.clear();
