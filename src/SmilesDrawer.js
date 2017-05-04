@@ -32,6 +32,8 @@ class SmilesDrawer {
         };
 
         this.defaultOptions = {
+            width: 500,
+            height: 500,
             bondLength: 16,
             shortBondLength: 9,
             bondSpacing: 4,
@@ -246,8 +248,7 @@ class SmilesDrawer {
             // Do the actual drawing
             this.drawEdges(this.opts.debug);
             this.drawVertices(this.opts.debug);
-
-            this.canvasWrapper.scaleHidpi();
+            
             this.canvasWrapper.reset();
         }
     }

@@ -1057,38 +1057,24 @@ var CanvasWrapper = function () {
         this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio || this.ctx.mozBackingStorePixelRatio || this.ctx.msBackingStorePixelRatio || this.ctx.oBackingStorePixelRatio || this.ctx.backingStorePixelRatio || 1;
         this.ratio = this.devicePixelRatio / this.backingStoreRatio;
 
+        if (ratio !== 1) {
+            this.canvas.width = this.opts.width * this.ratio;
+            this.canvas.height = this.opts.height * this.ratio;
+            this.canvas.style.width = this.opts.width + 'px';
+            this.canvas.style.height = this.opts.height + 'px';
+        }
+
         this.clear();
     }
 
     /**
-     * Scale the canvas for hidpi displays.
+     * Sets a provided theme.
+     *
+     * @param {object} theme A theme from the smiles drawer options.
      */
 
 
     _createClass(CanvasWrapper, [{
-        key: 'scaleHidpi',
-        value: function scaleHidpi() {
-            var ctx = this.ctx;
-
-            if (this.devicePixelRatio !== this.backingStoreRatio) {
-                var w = canvas.width;
-                var h = canvas.height;
-
-                canvas.width = w * ratio;
-                canvas.height = h * ratio;
-                canvas.style.width = w + 'px';
-                canvas.style.height = h + 'px';
-                // ctx.scale(this.ratio, this.ratio);
-            }
-        }
-
-        /**
-         * Sets a provided theme.
-         *
-         * @param {object} theme A theme from the smiles drawer options.
-         */
-
-    }, {
         key: 'setTheme',
         value: function setTheme(theme) {
             this.colors = theme;
@@ -4862,6 +4848,8 @@ var SmilesDrawer = function () {
         };
 
         this.defaultOptions = {
+            width: 500,
+            height: 500,
             bondLength: 16,
             shortBondLength: 9,
             bondSpacing: 4,
@@ -5086,7 +5074,6 @@ var SmilesDrawer = function () {
                 this.drawEdges(this.opts.debug);
                 this.drawVertices(this.opts.debug);
 
-                this.canvasWrapper.scaleHidpi();
                 this.canvasWrapper.reset();
             }
         }

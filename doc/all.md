@@ -493,7 +493,6 @@ A class wrapping a canvas element
 
 * [CanvasWrapper](#CanvasWrapper)
     * [new CanvasWrapper(target, theme, options)](#new_CanvasWrapper_new)
-    * [.scaleHidpi()](#CanvasWrapper+scaleHidpi)
     * [.setTheme(theme)](#CanvasWrapper+setTheme)
     * [.scale(vertices)](#CanvasWrapper+scale)
     * [.reset()](#CanvasWrapper+reset)
@@ -521,12 +520,6 @@ The constructor for the class CanvasWrapper.
 | theme | <code>object</code> | A theme from the smiles drawer options. |
 | options | <code>any</code> | The smiles drawer options object. |
 
-<a name="CanvasWrapper+scaleHidpi"></a>
-
-### canvasWrapper.scaleHidpi()
-Scale the canvas for hidpi displays.
-
-**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
 <a name="CanvasWrapper+setTheme"></a>
 
 ### canvasWrapper.setTheme(theme)

@@ -28,25 +28,14 @@ class CanvasWrapper {
                                  this.ctx.backingStorePixelRatio || 1;
         this.ratio = this.devicePixelRatio / this.backingStoreRatio;
 
-        this.clear();
-    }
-
-    /**
-     * Scale the canvas for hidpi displays.
-     */
-    scaleHidpi() {
-        let ctx = this.ctx;
-          
-        if (this.devicePixelRatio !== this.backingStoreRatio) {
-            let w = this.canvas.width;
-            let h = this.canvas.height;
-            
-            this.canvas.width = w * ratio;
-            this.canvas.height = h * ratio;
-            this.canvas.style.width = w + 'px';
-            this.canvas.style.height = h + 'px';
-            // ctx.scale(this.ratio, this.ratio);
+        if (ratio !== 1) {      
+            this.canvas.width = this.opts.width * this.ratio;
+            this.canvas.height = this.opts.height * this.ratio;
+            this.canvas.style.width = this.opts.width + 'px';
+            this.canvas.style.height = this.opts.height + 'px';
         }
+
+        this.clear();
     }
 
     /**
