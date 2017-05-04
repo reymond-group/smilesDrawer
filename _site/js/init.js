@@ -45,7 +45,7 @@ var input = document.getElementById('input');
     fontSizeSmall: 4,
     atomVisualization: 'default',
     terminalCarbons: false,
-    compactDrawing: false
+    compactDrawing: true
   }
 
   var smilesDrawer = new SmilesDrawer(options);
