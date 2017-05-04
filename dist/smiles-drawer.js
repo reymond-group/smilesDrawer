@@ -6839,7 +6839,7 @@ var SmilesDrawer = function () {
             for (var _i37 = 0; _i37 < totalLength; _i37++) {
                 if (_i37 < vertices.length) {
                     if (!positioned[_i37]) {
-                        this.vertices[vToId[_i37]].position = positions[_i37];
+                        this.vertices[vToId[_i37]].setPositionFromVector(positions[_i37]);
                         this.vertices[vToId[_i37]].positioned = true;
                     }
                 } else if (_i37 < vertices.length + ring.rings.length) {
@@ -7184,7 +7184,7 @@ var SmilesDrawer = function () {
                 var vertex = this.vertices[i];
                 this.vertexPositionsBackup.push(vertex.position.clone());
                 vertex.positioned = false;
-                vertex.position = new Vector2();
+                vertex.setPositionFromVector(new Vector2());
             }
 
             for (var _i40 = 0; _i40 < this.rings.length; _i40++) {
@@ -7204,7 +7204,7 @@ var SmilesDrawer = function () {
         key: 'restorePositions',
         value: function restorePositions() {
             for (var i = 0; i < this.vertexPositionsBackup.length; i++) {
-                this.vertices[i].position = this.vertexPositionsBackup[i];
+                this.vertices[i].setPositionFromVector(this.vertexPositionsBackup[i]);
                 this.vertices[i].positioned = true;
             }
 
@@ -7319,8 +7319,7 @@ var SmilesDrawer = function () {
                     var vertex = that.vertices[v];
 
                     if (!vertex.positioned) {
-                        vertex.position.x = center.x + Math.cos(a) * radius;
-                        vertex.position.y = center.y + Math.sin(a) * radius;
+                        vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
                     }
 
                     a += angle;
@@ -7332,6 +7331,7 @@ var SmilesDrawer = function () {
 
                 // If the ring is bridged, then draw the vertices inside the ring
                 // using a force based approach
+                console.log(ring, ring.isBridged);
                 if (ring.isBridged) {
                     var allVertices = ArrayHelper.merge(ring.members, ring.insiders);
 
@@ -7775,7 +7775,7 @@ var SmilesDrawer = function () {
                 dummy.rotate(MathHelper.toRad(-120));
 
                 vertex.previousPosition = dummy;
-                vertex.position = new Vector2(this.opts.bondLength, 0);
+                vertex.setPosition(this.opts.bondLength, 0);
                 vertex.angle = MathHelper.toRad(-120);
                 vertex.globalAngle = vertex.angle;
                 vertex.positioned = true;
@@ -7789,7 +7789,7 @@ var SmilesDrawer = function () {
                 v.add(previousVertex.position);
 
                 vertex.globalAngle = ringOrAngle;
-                vertex.position = v;
+                vertex.setPositionFromVector(v);
 
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
@@ -7812,7 +7812,7 @@ var SmilesDrawer = function () {
                 _v3.add(previousVertex.position);
 
                 vertex.globalAngle = ringOrAngle;
-                vertex.position = _v3;
+                vertex.setPositionFromVector(_v3);
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
             } else if (previousVertex.value.rings.length === 1 || previousVertex.value.isBridge) {
@@ -8428,7 +8428,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-             let done = new Array(vertexIds.length);
+              let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8445,10 +8445,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                     sortedVertexIds[index].atomicNumber += '.' + total;
+                      sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }
@@ -8579,7 +8579,7 @@ var SmilesDrawer = function () {
                         hydrogens = _neighbour2.value.bracket.hcount;
                     }
 
-                    vertex.value.attachPseudoElement(_neighbour2.value.element, previous.value.element, hydrogens);
+                    vertex.value.attachPseudoElement(_neighbour2.value.element, previous ? previous.value.element : null, hydrogens);
                 }
             }
         }
@@ -9352,12 +9352,41 @@ var Vertex = function () {
     }
 
     /**
-     * Add a child vertex id to this vertex.
-     * @param {number} vertexID The id of a vertex to be added as a child to this vertex.
+     * Set the 2D coordinates of the vertex.
+     * 
+     * @param {number} x The x component of the coordinates.
+     * @param {number} y The y component of the coordinates.
+     * 
      */
 
 
     _createClass(Vertex, [{
+        key: 'setPosition',
+        value: function setPosition(x, y) {
+            this.position.x = x;
+            this.position.y = y;
+        }
+
+        /**
+         * Set the 2D coordinates of the vertex from a Vector2.
+         * 
+         * @param {Vector2} v A 2D vector.
+         * 
+         */
+
+    }, {
+        key: 'setPositionFromVector',
+        value: function setPositionFromVector(v) {
+            this.position.x = v.x;
+            this.position.y = v.y;
+        }
+
+        /**
+         * Add a child vertex id to this vertex.
+         * @param {number} vertexID The id of a vertex to be added as a child to this vertex.
+         */
+
+    }, {
         key: 'addChild',
         value: function addChild(vertexId) {
             this.neighbourCount++;

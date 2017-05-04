@@ -2357,8 +2357,7 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer+initPseudoElements"></a>
 
 ### smilesDrawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
-the involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer.clean"></a>
@@ -2888,6 +2887,8 @@ A class representing a vertex
 
 * [Vertex](#Vertex)
     * [new Vertex(value, [x], [y])](#new_Vertex_new)
+    * [.setPosition(x, y)](#Vertex+setPosition)
+    * [.setPositionFromVector(v)](#Vertex+setPositionFromVector)
     * [.addChild(vertexID)](#Vertex+addChild)
     * [.setParentVertexId(parentVertexId)](#Vertex+setParentVertexId)
     * [.isTerminal()](#Vertex+isTerminal) ⇒ <code>boolean</code>
@@ -2914,6 +2915,29 @@ The constructor for the class Vertex.
 | value | <code>\*</code> |  | The value associated with this vertex. |
 | [x] | <code>number</code> | <code>0</code> | The initial x coordinate of the positional vector of this vertex. |
 | [y] | <code>number</code> | <code>0</code> | The initial y coordinate of the positional vector of this vertex. |
+
+<a name="Vertex+setPosition"></a>
+
+### vertex.setPosition(x, y)
+Set the 2D coordinates of the vertex.
+
+**Kind**: instance method of <code>[Vertex](#Vertex)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| x | <code>number</code> | The x component of the coordinates. |
+| y | <code>number</code> | The y component of the coordinates. |
+
+<a name="Vertex+setPositionFromVector"></a>
+
+### vertex.setPositionFromVector(v)
+Set the 2D coordinates of the vertex from a Vector2.
+
+**Kind**: instance method of <code>[Vertex](#Vertex)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| v | <code>[Vector2](#Vector2)</code> | A 2D vector. |
 
 <a name="Vertex+addChild"></a>
 

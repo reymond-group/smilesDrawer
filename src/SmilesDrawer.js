@@ -1894,7 +1894,7 @@ class SmilesDrawer {
         for (let i = 0; i < totalLength; i++) {
             if (i < vertices.length) { 
                 if (!positioned[i]) {
-                    this.vertices[vToId[i]].position = positions[i];
+                    this.vertices[vToId[i]].setPositionFromVector(positions[i]);
                     this.vertices[vToId[i]].positioned = true;
                 }
             } else if (i < vertices.length + ring.rings.length) {
@@ -2224,7 +2224,7 @@ class SmilesDrawer {
             let vertex = this.vertices[i];
             this.vertexPositionsBackup.push(vertex.position.clone());
             vertex.positioned = false;
-            vertex.position = new Vector2();
+            vertex.setPositionFromVector(new Vector2());
         }
 
         for (let i = 0; i < this.rings.length; i++) {
@@ -2241,7 +2241,7 @@ class SmilesDrawer {
      */
     restorePositions() {        
         for (let i = 0; i < this.vertexPositionsBackup.length; i++) {
-            this.vertices[i].position = this.vertexPositionsBackup[i];
+            this.vertices[i].setPositionFromVector(this.vertexPositionsBackup[i]);
             this.vertices[i].positioned = true;
         }
 
@@ -2339,8 +2339,7 @@ class SmilesDrawer {
                 let vertex = that.vertices[v];
 
                 if (!vertex.positioned) {
-                    vertex.position.x = center.x + Math.cos(a) * radius;
-                    vertex.position.y = center.y + Math.sin(a) * radius;
+                    vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
                 }
 
                 a += angle;
@@ -2352,6 +2351,7 @@ class SmilesDrawer {
 
             // If the ring is bridged, then draw the vertices inside the ring
             // using a force based approach
+            console.log(ring, ring.isBridged);
             if (ring.isBridged) {
                 let allVertices = ArrayHelper.merge(ring.members, ring.insiders);
 
@@ -2772,7 +2772,7 @@ class SmilesDrawer {
             dummy.rotate(MathHelper.toRad(-120));
 
             vertex.previousPosition = dummy;
-            vertex.position = new Vector2(this.opts.bondLength, 0);
+            vertex.setPosition(this.opts.bondLength, 0);
             vertex.angle = MathHelper.toRad(-120);
             vertex.globalAngle = vertex.angle;
             vertex.positioned = true;
@@ -2786,7 +2786,7 @@ class SmilesDrawer {
             v.add(previousVertex.position);
 
             vertex.globalAngle = ringOrAngle;
-            vertex.position = v;
+            vertex.setPositionFromVector(v);
 
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
@@ -2809,7 +2809,7 @@ class SmilesDrawer {
             v.add(previousVertex.position);
 
             vertex.globalAngle = ringOrAngle;
-            vertex.position = v;
+            vertex.setPositionFromVector(v);
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (previousVertex.value.rings.length === 1 || previousVertex.value.isBridge) {
@@ -3549,7 +3549,7 @@ class SmilesDrawer {
                     hydrogens = neighbour.value.bracket.hcount;
                 }
 
-                vertex.value.attachPseudoElement(neighbour.value.element, previous.value.element, hydrogens);
+                vertex.value.attachPseudoElement(neighbour.value.element, previous ? previous.value.element : null, hydrogens);
             }
         }
     }

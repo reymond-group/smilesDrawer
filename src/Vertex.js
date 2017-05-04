@@ -30,6 +30,29 @@ class Vertex {
     }
 
     /**
+     * Set the 2D coordinates of the vertex.
+     * 
+     * @param {number} x The x component of the coordinates.
+     * @param {number} y The y component of the coordinates.
+     * 
+     */
+    setPosition(x, y) {
+        this.position.x = x;
+        this.position.y = y;
+    }
+
+    /**
+     * Set the 2D coordinates of the vertex from a Vector2.
+     * 
+     * @param {Vector2} v A 2D vector.
+     * 
+     */
+    setPositionFromVector(v) {
+        this.position.x = v.x;
+        this.position.y = v.y;
+    }
+
+    /**
      * Add a child vertex id to this vertex.
      * @param {number} vertexID The id of a vertex to be added as a child to this vertex.
      */
