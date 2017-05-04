@@ -40,6 +40,7 @@ class SmilesDrawer {
             isomeric: false,
             debug: false,
             terminalCarbons: false,
+            compactDrawing: true,
             fontSizeLarge: 6,
             fontSizeSmall: 4,
             themes: {
@@ -238,7 +239,9 @@ class SmilesDrawer {
             this.canvasWrapper.scale(this.vertices);
 
             // Initialize pseudo elements or shortcuts
-            this.initPseudoElements();
+            if (this.opts.compactDrawing) {
+                this.initPseudoElements();
+            }
 
             // Do the actual drawing
             this.drawEdges(this.opts.debug);
