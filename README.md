@@ -63,6 +63,7 @@ The following options are available:
 | Large Font Size (in pt for elements) | fontSizeLarge | number | 6 |
 | Small Font Size (in pt for numbers) | fontSizeSmall | number | 4 |
 | Show Terminal Carbons (CH3) | terminalCarbons | boolean | false |
+| Draw concatenated terminals and pseudo elements | drawCompact | boolean | true |
 | Allow Flips (flipping hydrogens etc. inside a ring) | allowFlips | boolean | false |
 | Isometric (EXPERIMENTAL) | isometric | boolean | false |
 | Debug (draw debug information to canvas) | debug | boolean | false |
@@ -77,6 +78,7 @@ The default options are defined as follows:
     bondSpacing: 4,
     atomVisualization: 'default',
     terminalCarbons: false,
+    compactDrawing: true,
     fontSizeLarge: 6,
     fontSizeSmall: 4,
     allowFlips: false,

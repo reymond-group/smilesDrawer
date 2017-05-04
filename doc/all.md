@@ -266,13 +266,14 @@ A class representing an atom
 * [Atom](#Atom)
     * [new Atom(element, [bondType])](#new_Atom_new)
     * _instance_
-        * [.attachPseudoElement(element, [hydrogenCount])](#Atom+attachPseudoElement)
+        * [.attachPseudoElement(element, previousElement, [hydrogenCount])](#Atom+attachPseudoElement)
         * [.getAttachedPseudoElements()](#Atom+getAttachedPseudoElements) ⇒ <code>object</code>
         * [.addAnchoredRing(ringId)](#Atom+addAnchoredRing)
         * [.getRingbondCount()](#Atom+getRingbondCount) ⇒ <code>number</code>
         * [.canRotate()](#Atom+canRotate) ⇒ <code>boolean</code>
         * [.hasRingbonds()](#Atom+hasRingbonds) ⇒ <code>boolean</code>
         * [.getMaxRingbond()](#Atom+getMaxRingbond) ⇒ <code>number</code>
+        * [.isInRing()](#Atom+isInRing) ⇒ <code>boolean</code>
         * [.hasRing(ringId)](#Atom+hasRing) ⇒ <code>boolean</code>
         * [.backupRings()](#Atom+backupRings)
         * [.restoreRings()](#Atom+restoreRings)
@@ -299,7 +300,7 @@ The constructor of the class Atom.
 
 <a name="Atom+attachPseudoElement"></a>
 
-### atom.attachPseudoElement(element, [hydrogenCount])
+### atom.attachPseudoElement(element, previousElement, [hydrogenCount])
 Attaches a pseudo element (e.g. Ac) to the atom.
 
 **Kind**: instance method of <code>[Atom](#Atom)</code>  
@@ -307,6 +308,7 @@ Attaches a pseudo element (e.g. Ac) to the atom.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | element | <code>string</code> |  | The element identifier (e.g. Br, C, ...). |
+| previousElement | <code>string</code> |  | The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated). |
 | [hydrogenCount] | <code>number</code> | <code>0</code> | The number of hydrogens for the element. |
 
 <a name="Atom+getAttachedPseudoElements"></a>
@@ -355,6 +357,13 @@ Returns the id of the ringbond with the highest id.
 
 **Kind**: instance method of <code>[Atom](#Atom)</code>  
 **Returns**: <code>number</code> - The highest ringbond id associated with this atom.  
+<a name="Atom+isInRing"></a>
+
+### atom.isInRing() ⇒ <code>boolean</code>
+Checks whether or not this atom is part of a ring.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not this atom is part of a ring.  
 <a name="Atom+hasRing"></a>
 
 ### atom.hasRing(ringId) ⇒ <code>boolean</code>
