@@ -6,6 +6,12 @@
         <title>Smiles Drawer Example</title>
         <meta name="description" content="A minimal smiles drawer example.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- CSS  -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+        <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+
         <style>
             canvas { margin: 5px; }
         </style>
@@ -14,17 +20,15 @@
         <script src="js/smiles-drawer.min.js"></script>
         <script src="js/drugbank.js"></script>
         <script>
-            let options = { width: 250, height: 250 };
+            let options = { width: 300, height: 300 };
             
             // Initialize the drawer
             let smilesDrawer = new SmilesDrawer(options);
             
-            for (let i = 0; i < 2222; i++) {
+            for (let i = 0; i < drugbank.length; i += 3) {
                 try {
                     let canvas = document.createElement('canvas');
                     canvas.setAttribute('id', 'canvas' + i);
-                    canvas.setAttribute('width', '200');
-                    canvas.setAttribute('height', '200');
                     canvas.setAttribute('alt', drugbank[i]);
                     document.body.appendChild(canvas);
 

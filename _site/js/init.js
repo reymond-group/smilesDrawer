@@ -37,8 +37,8 @@ var input = document.getElementById('input');
   var theme = 'light'
 
   var options = {
-    width: 250,
-    height: 250,
+    width: 350,
+    height: 350,
     debug: false,
     bondLength: 16,
     shortBondLength: 9,
