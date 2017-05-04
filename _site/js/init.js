@@ -37,6 +37,8 @@ var input = document.getElementById('input');
   var theme = 'light'
 
   var options = {
+    width: 250,
+    height: 250,
     debug: false,
     bondLength: 16,
     shortBondLength: 9,
@@ -91,9 +93,8 @@ var input = document.getElementById('input');
 
     canvasSizeInput.addEventListener('input', function () {
       let canvasSize = parseInt(canvasSizeInput.value);
-      let canvas = document.getElementById('output-canvas');
-      canvas.setAttribute('width', canvasSize);
-      canvas.setAttribute('height', canvasSize)
+      options.width = canvasSize;
+      options.height = canvasSize;
 
       updateOptions();
     });
