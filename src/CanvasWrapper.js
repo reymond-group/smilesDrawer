@@ -38,13 +38,13 @@ class CanvasWrapper {
         let ctx = this.ctx;
           
         if (this.devicePixelRatio !== this.backingStoreRatio) {
-            let w = canvas.width;
-            let h = canvas.height;
+            let w = this.canvas.width;
+            let h = this.canvas.height;
             
-            canvas.width = w * ratio;
-            canvas.height = h * ratio;
-            canvas.style.width = w + 'px';
-            canvas.style.height = h + 'px';
+            this.canvas.width = w * ratio;
+            this.canvas.height = h * ratio;
+            this.canvas.style.width = w + 'px';
+            this.canvas.style.height = h + 'px';
             // ctx.scale(this.ratio, this.ratio);
         }
     }
