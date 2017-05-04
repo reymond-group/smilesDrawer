@@ -26,6 +26,7 @@ var input = document.getElementById('input');
   var debugCheckbox = document.getElementById('debug');
   var themeCheckbox = document.getElementById('theme');
   var terminalCarbonsCheckbox = document.getElementById('terminalCarbons');
+  var compactDrawingCheckbox = document.getElementById('compactDrawing');
   var canvasSizeInput = document.getElementById('canvasSize');
   var bondLengthInput = document.getElementById('bondLength');
   var shortBondLengthInput = document.getElementById('shortBondLength');
@@ -43,7 +44,8 @@ var input = document.getElementById('input');
     fontSizeLarge: 6,
     fontSizeSmall: 4,
     atomVisualization: 'default',
-    terminalCarbons: false
+    terminalCarbons: false,
+    compactDrawing: false
   }
 
   var smilesDrawer = new SmilesDrawer(options);
@@ -146,6 +148,11 @@ var input = document.getElementById('input');
 
     terminalCarbonsCheckbox.addEventListener('click', function () {
       options.terminalCarbons = terminalCarbonsCheckbox.checked ? true : false;
+      updateOptions();
+    });
+
+    compactDrawingCheckbox.addEventListener('click', function () {
+      options.compactDrawing = compactDrawingCheckbox.checked ? true : false;
       updateOptions();
     });
   });
