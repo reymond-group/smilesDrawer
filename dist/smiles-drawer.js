@@ -1053,6 +1053,10 @@ var CanvasWrapper = function () {
         this.offsetX = 0.0;
         this.offsetY = 0.0;
 
+        this.devicePixelRatio = window.devicePixelRatio || 1;
+        this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio || this.ctx.mozBackingStorePixelRatio || this.ctx.msBackingStorePixelRatio || this.ctx.oBackingStorePixelRatio || this.ctx.backingStorePixelRatio || 1;
+        this.ratio = this.devicePixelRatio / this.backingStoreRatio;
+
         this.clear();
     }
 
@@ -1065,11 +1069,8 @@ var CanvasWrapper = function () {
         key: 'scaleHidpi',
         value: function scaleHidpi() {
             var ctx = this.ctx;
-            var devicePixelRatio = window.devicePixelRatio || 1;
-            var backingStoreRatio = ctx.webkitBackingStorePixelRatio || ctx.mozBackingStorePixelRatio || ctx.msBackingStorePixelRatio || ctx.oBackingStorePixelRatio || ctx.backingStorePixelRatio || 1;
-            var ratio = devicePixelRatio / backingStoreRatio;
 
-            if (devicePixelRatio !== backingStoreRatio) {
+            if (this.devicePixelRatio !== this.backingStoreRatio) {
                 var w = canvas.width;
                 var h = canvas.height;
 
@@ -1077,7 +1078,7 @@ var CanvasWrapper = function () {
                 canvas.height = h * ratio;
                 canvas.style.width = w + 'px';
                 canvas.style.height = h + 'px';
-                ctx.scale(ratio, ratio);
+                // ctx.scale(this.ratio, this.ratio);
             }
         }
 
@@ -5085,6 +5086,7 @@ var SmilesDrawer = function () {
                 this.drawEdges(this.opts.debug);
                 this.drawVertices(this.opts.debug);
 
+                this.canvasWrapper.scaleHidpi();
                 this.canvasWrapper.reset();
             }
         }
