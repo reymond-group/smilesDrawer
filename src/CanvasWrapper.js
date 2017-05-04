@@ -22,6 +22,18 @@ class CanvasWrapper {
         this.offsetX = 0.0;
         this.offsetY = 0.0;
 
+        this.updateSize(this.opts.width, this.opts.height);
+
+        this.clear();
+    }
+
+    /**
+     * Update the width and height of the canvas
+     * 
+     * @param {number} width 
+     * @param {number} height 
+     */
+    updateSize(width, height) {
         this.devicePixelRatio = window.devicePixelRatio || 1;
         this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio ||  this.ctx.mozBackingStorePixelRatio || 
                                  this.ctx.msBackingStorePixelRatio ||  this.ctx.oBackingStorePixelRatio || 
@@ -29,14 +41,17 @@ class CanvasWrapper {
         this.ratio = this.devicePixelRatio / this.backingStoreRatio;
 
         if (this.ratio !== 1) {      
-            this.canvas.width = this.opts.width * this.ratio;
-            this.canvas.height = this.opts.height * this.ratio;
-            this.canvas.style.width = this.opts.width + 'px';
-            this.canvas.style.height = this.opts.height + 'px';
-            this.ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
-        }
+            this.canvas.width = width * this.ratio;
+            this.canvas.height = height * this.ratio;
+            this.canvas.style.width = width + 'px';
+            this.canvas.style.height = height + 'px';
 
-        this.clear();
+            console.log(this.canvas);
+            this.ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
+        } else {
+            this.canvas.width = width * this.ratio;
+            this.canvas.height = height * this.ratio;
+        }
     }
 
     /**

@@ -493,6 +493,7 @@ A class wrapping a canvas element
 
 * [CanvasWrapper](#CanvasWrapper)
     * [new CanvasWrapper(target, theme, options)](#new_CanvasWrapper_new)
+    * [.updateSize(width, height)](#CanvasWrapper+updateSize)
     * [.setTheme(theme)](#CanvasWrapper+setTheme)
     * [.scale(vertices)](#CanvasWrapper+scale)
     * [.reset()](#CanvasWrapper+reset)
@@ -519,6 +520,18 @@ The constructor for the class CanvasWrapper.
 | target | <code>string</code> &#124; <code>HTMLElement</code> | The canvas id or the canvas HTMLElement. |
 | theme | <code>object</code> | A theme from the smiles drawer options. |
 | options | <code>any</code> | The smiles drawer options object. |
+
+<a name="CanvasWrapper+updateSize"></a>
+
+### canvasWrapper.updateSize(width, height)
+Update the width and height of the canvas
+
+**Kind**: instance method of <code>[CanvasWrapper](#CanvasWrapper)</code>  
+
+| Param | Type |
+| --- | --- |
+| width | <code>number</code> | 
+| height | <code>number</code> | 
 
 <a name="CanvasWrapper+setTheme"></a>
 

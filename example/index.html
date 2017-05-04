@@ -32,9 +32,9 @@
                min="1" max="99" step="1" />
     </div>
     <div>
-        <label for="k">K</label>
-        <input type="range" id="k" name="k" value="8"
-               min="1" max="99" step="1" />
+        <label for="k">Size</label>
+        <input type="range" id="size" name="size" value="500"
+               min="250" max="1000" step="1" />
     </div>
     <script>
         var input = document.getElementById('input');
@@ -42,7 +42,7 @@
         var bondLengthInput = document.getElementById('bondLength');
         var shortBondLengthInput = document.getElementById('shortBondLength');
         var bondSpacingInput = document.getElementById('bondSpacing');
-        var kInput = document.getElementById('k');
+        var sizeInput = document.getElementById('size');
 
         var options = { 
             debug: false,
@@ -101,8 +101,10 @@
                 updateOptions();
             });
 
-            kInput.addEventListener('input', function() {
-                options.k = parseInt(kInput.value);
+            sizeInput.addEventListener('input', function() {
+                options.width = parseInt(sizeInput.value);
+                options.height = parseInt(sizeInput.value);
+                console.log(options);
                 updateOptions();
             });
         });
