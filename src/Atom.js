@@ -30,15 +30,21 @@ class Atom {
     /**
      * Attaches a pseudo element (e.g. Ac) to the atom.
      * @param {string} element The element identifier (e.g. Br, C, ...).
+     * @param {string} previousElement The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated).
      * @param {number} [hydrogenCount=0] The number of hydrogens for the element.
      */
-    attachPseudoElement(element, hydrogenCount = 0) {
+    attachPseudoElement(element, previousElement, hydrogenCount = 0) {
         this.hasAttachedPseudoElements = true;
 
         if (this.attachedPseudoElements[element + hydrogenCount]) {
             this.attachedPseudoElements[element + hydrogenCount].count += 1;
         } else {
-            this.attachedPseudoElements[element + hydrogenCount] = ({ element: element, count: 1, hydrogenCount: hydrogenCount });
+            this.attachedPseudoElements[element + hydrogenCount] = { 
+                element: element, 
+                count: 1, 
+                hydrogenCount: hydrogenCount, 
+                previousElement: previousElement 
+            };
         }
     }
 

@@ -498,7 +498,7 @@ class CanvasWrapper {
         ctx.textBaseline = 'alphabetic';
 
         let pseudoElementHandled = false;
-
+        
         // Check if the element name can be replaced by a pseudo element
         if (!charge && !isotope && Object.keys(pseudoElements).length > 0) {
             if (elementName === 'C' && Object.keys(pseudoElements).length === 1 && 
@@ -510,6 +510,14 @@ class CanvasWrapper {
                 pseudoElements.hasOwnProperty('C3') && pseudoElements['C3'].count === 1) {
                 pseudoElements['C3'].element = 'Me';
                 pseudoElements['C3'].hydrogenCount = 0;
+            } else if (Object.keys(pseudoElements).length === 2 && (elementName === 'O' || elementName === 'N') &&
+                       pseudoElements.hasOwnProperty('C3') && pseudoElements.hasOwnProperty('O0')) {
+                pseudoElements = {};
+                pseudoElements['Ac'] = {
+                    element: 'Ac', 
+                    count: 1, 
+                    hydrogenCount: 0
+                };
             }
         }
 

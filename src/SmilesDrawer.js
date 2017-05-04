@@ -3496,7 +3496,10 @@ class SmilesDrawer {
             const vertex = this.vertices[i];
             const neighbours = vertex.getNeighbours();
 
-            if ((vertex.getNeighbourCount() < 3 || vertex.value.isInRing()) &&
+            // Ignore atoms that have less than 3 neighbours, except if
+            // the vertex is connected to a ring and has two neighbours
+
+            if (vertex.getNeighbourCount() < 3 &&
                 !(vertex.value.isConnectedToRing && vertex.getNeighbourCount() === 2)) {
                 continue;
             }
@@ -3515,6 +3518,17 @@ class SmilesDrawer {
                 continue;
             }
 
+            // Get the previous atom (the one which is not terminal)
+            let previous = null;
+
+            for(let j = 0; j < neighbours.length; j++) {
+                let neighbour = this.vertices[neighbours[j]];
+                if (neighbour.getNeighbourCount() > 1) {
+                    previous = neighbour;
+                }
+            }
+
+
             for(let j = 0; j < neighbours.length; j++) {
                 let neighbour = this.vertices[neighbours[j]];
                 
@@ -3530,7 +3544,7 @@ class SmilesDrawer {
                     hydrogens = neighbour.value.bracket.hcount;
                 }
 
-                vertex.value.attachPseudoElement(neighbour.value.element, hydrogens);
+                vertex.value.attachPseudoElement(neighbour.value.element, previous.value.element, hydrogens);
             }
         }
     }

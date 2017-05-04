@@ -418,21 +418,27 @@ var Atom = function () {
     /**
      * Attaches a pseudo element (e.g. Ac) to the atom.
      * @param {string} element The element identifier (e.g. Br, C, ...).
+     * @param {string} previousElement The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated).
      * @param {number} [hydrogenCount=0] The number of hydrogens for the element.
      */
 
 
     _createClass(Atom, [{
         key: 'attachPseudoElement',
-        value: function attachPseudoElement(element) {
-            var hydrogenCount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+        value: function attachPseudoElement(element, previousElement) {
+            var hydrogenCount = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
             this.hasAttachedPseudoElements = true;
 
             if (this.attachedPseudoElements[element + hydrogenCount]) {
                 this.attachedPseudoElements[element + hydrogenCount].count += 1;
             } else {
-                this.attachedPseudoElements[element + hydrogenCount] = { element: element, count: 1, hydrogenCount: hydrogenCount };
+                this.attachedPseudoElements[element + hydrogenCount] = {
+                    element: element,
+                    count: 1,
+                    hydrogenCount: hydrogenCount,
+                    previousElement: previousElement
+                };
             }
         }
 
@@ -1569,6 +1575,13 @@ var CanvasWrapper = function () {
                 } else if (Object.keys(pseudoElements).length === 1 && pseudoElements.hasOwnProperty('C3') && pseudoElements['C3'].count === 1) {
                     pseudoElements['C3'].element = 'Me';
                     pseudoElements['C3'].hydrogenCount = 0;
+                } else if (Object.keys(pseudoElements).length === 2 && (elementName === 'O' || elementName === 'N') && pseudoElements.hasOwnProperty('C3') && pseudoElements.hasOwnProperty('O0')) {
+                    pseudoElements = {};
+                    pseudoElements['Ac'] = {
+                        element: 'Ac',
+                        count: 1,
+                        hydrogenCount: 0
+                    };
                 }
             }
 
@@ -8422,7 +8435,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-              let done = new Array(vertexIds.length);
+             let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8439,10 +8452,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                      sortedVertexIds[index].atomicNumber += '.' + total;
+                     sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }
@@ -8527,7 +8540,10 @@ var SmilesDrawer = function () {
                 var vertex = this.vertices[i];
                 var neighbours = vertex.getNeighbours();
 
-                if ((vertex.getNeighbourCount() < 3 || vertex.value.isInRing()) && !(vertex.value.isConnectedToRing && vertex.getNeighbourCount() === 2)) {
+                // Ignore atoms that have less than 3 neighbours, except if
+                // the vertex is connected to a ring and has two neighbours
+
+                if (vertex.getNeighbourCount() < 3 && !(vertex.value.isConnectedToRing && vertex.getNeighbourCount() === 2)) {
                     continue;
                 }
 
@@ -8545,22 +8561,32 @@ var SmilesDrawer = function () {
                     continue;
                 }
 
+                // Get the previous atom (the one which is not terminal)
+                var previous = null;
+
                 for (var _j17 = 0; _j17 < neighbours.length; _j17++) {
                     var _neighbour = this.vertices[neighbours[_j17]];
-
                     if (_neighbour.getNeighbourCount() > 1) {
+                        previous = _neighbour;
+                    }
+                }
+
+                for (var _j18 = 0; _j18 < neighbours.length; _j18++) {
+                    var _neighbour2 = this.vertices[neighbours[_j18]];
+
+                    if (_neighbour2.getNeighbourCount() > 1) {
                         continue;
                     }
 
-                    _neighbour.value.isDrawn = false;
+                    _neighbour2.value.isDrawn = false;
 
-                    var hydrogens = this.maxBonds[_neighbour.value.element] - this.getBondCount(_neighbour);
+                    var hydrogens = this.maxBonds[_neighbour2.value.element] - this.getBondCount(_neighbour2);
 
-                    if (_neighbour.value.bracket) {
-                        hydrogens = _neighbour.value.bracket.hcount;
+                    if (_neighbour2.value.bracket) {
+                        hydrogens = _neighbour2.value.bracket.hcount;
                     }
 
-                    vertex.value.attachPseudoElement(_neighbour.value.element, hydrogens);
+                    vertex.value.attachPseudoElement(_neighbour2.value.element, previous.value.element, hydrogens);
                 }
             }
         }
