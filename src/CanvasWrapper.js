@@ -22,6 +22,12 @@ class CanvasWrapper {
         this.offsetX = 0.0;
         this.offsetY = 0.0;
 
+        this.devicePixelRatio = window.devicePixelRatio || 1;
+        this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio ||  this.ctx.mozBackingStorePixelRatio || 
+                                 this.ctx.msBackingStorePixelRatio ||  this.ctx.oBackingStorePixelRatio || 
+                                 this.ctx.backingStorePixelRatio || 1;
+        this.ratio = this.devicePixelRatio / this.backingStoreRatio;
+
         this.clear();
     }
 
@@ -30,13 +36,8 @@ class CanvasWrapper {
      */
     scaleHidpi() {
         let ctx = this.ctx;
-        let devicePixelRatio = window.devicePixelRatio || 1;
-        let backingStoreRatio = ctx.webkitBackingStorePixelRatio ||  ctx.mozBackingStorePixelRatio || 
-                                ctx.msBackingStorePixelRatio ||  ctx.oBackingStorePixelRatio || 
-                                ctx.backingStorePixelRatio || 1;
-        let ratio = devicePixelRatio / backingStoreRatio;
           
-        if (devicePixelRatio !== backingStoreRatio) {
+        if (this.devicePixelRatio !== this.backingStoreRatio) {
             let w = canvas.width;
             let h = canvas.height;
             
@@ -44,7 +45,7 @@ class CanvasWrapper {
             canvas.height = h * ratio;
             canvas.style.width = w + 'px';
             canvas.style.height = h + 'px';
-            ctx.scale(ratio, ratio);
+            // ctx.scale(this.ratio, this.ratio);
         }
     }
 

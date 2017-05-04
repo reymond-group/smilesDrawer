@@ -247,6 +247,7 @@ class SmilesDrawer {
             this.drawEdges(this.opts.debug);
             this.drawVertices(this.opts.debug);
 
+            this.canvasWrapper.scaleHidpi();
             this.canvasWrapper.reset();
         }
     }
