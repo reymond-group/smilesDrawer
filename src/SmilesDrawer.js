@@ -146,16 +146,11 @@ class SmilesDrawer {
         this.originalRingConnections = [];
 
         this.bridgedRing = false;
-
-        this.distanceMatrix = [];
-        this.adjacencyMatrix = [];
-        this.pathIncludedDistanceMatrix = [];
         
         this.initGraph(data);
         this.initRings();
 
         let t = performance.now();
-        this.initDistanceMatrix();
         this.initPathIncludedDistanceMatrix();
         console.log(performance.now() - t);
 
@@ -265,72 +260,184 @@ class SmilesDrawer {
     }
 
     /**
-     * Initialize the distance matrix (floyd marshall)
+     * Initialize the adjacency matrix of the molecular graph.
+     * 
+     * @returns {array} The adjancency matrix of the molecular graph.
      */
-    initDistanceMatrix() {
+    getAdjacencyMatrix() {
         let length = this.vertices.length;
-
-        this.distanceMatrix = Array(length);
-        this.adjacencyMatrix = Array(length);
+        let adjacencyMatrix = Array(length);
         
         for (let i = 0; i < length; i++) {
-            this.distanceMatrix[i] = new Array(length);
-            this.distanceMatrix[i].fill(Number.POSITIVE_INFINITY);
-
-            this.adjacencyMatrix[i] = new Array(length);
-            this.adjacencyMatrix[i].fill(0);
-        }
-
-        for (let i = 0; i < length; i++) {
-            this.distanceMatrix[i][i] = 0;
+            adjacencyMatrix[i] = new Array(length);
+            adjacencyMatrix[i].fill(0);
         }
 
         for (let i = 0; i < this.edges.length; i++) {
             let edge = this.edges[i];
 
-            this.distanceMatrix[edge.sourceId][edge.targetId] = 1;
-            this.distanceMatrix[edge.targetId][edge.sourceId] = 1;
+            adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
+            adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
+        }
 
-            this.adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
-            this.adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
+        return adjacencyMatrix;
+    }
+
+    /**
+     * Get the distance matrix (floyd marshall) of a adjacency matrix.
+     * 
+     * @param {array} adjacencyMatrix An adjacency matrix.
+     * @returns {array} The distance matrix of the graph defined by the adjacency matrix.
+     */
+    getDistanceMatrix(adjacencyMatrix) {
+        let length = adjacencyMatrix.length;
+        let distanceMatrix = new Array(length);
+
+        for (let i = 0; i < length; i++) {
+            distanceMatrix[i] = new Array(length);
+
+            for (let j = 0; j < length; j++) {
+                distanceMatrix[i][j] = (i === j || adjacencyMatrix[i][j] === 1) ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
+            }
+        }
+
+        for (let i = 0; i < length; i++) {
+            distanceMatrix[i][i] = 0;
         }
 
         for (let k = 0; k < length; k++) {
             for (let i = 0; i < length; i++) {
                 for (let j = 0; j < length; j++) {
-                    if (this.distanceMatrix[i][j] > this.distanceMatrix[i][k] + this.distanceMatrix[k][j]) {
-                        this.distanceMatrix[i][j] = this.distanceMatrix[i][k] + this.distanceMatrix[k][j];
+                    if (distanceMatrix[i][j] > distanceMatrix[i][k] + distanceMatrix[k][j]) {
+                        distanceMatrix[i][j] = distanceMatrix[i][k] + distanceMatrix[k][j];
                     }
                 }
             }
         }
+
+        return distanceMatrix;
+    }
+
+    /**
+     * Returns an edge list constructed form an adjacency matrix.
+     * 
+     * @param {array} adjacencyMatrix An adjacency matrix.
+     * @returns {array} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
+     */
+    getEdgeList(adjacencyMatrix) {
+        let length = adjacencyMatrix.length;
+        let edgeList = [];
+
+        for (let i = 0; i < length - 1; i++) {
+            for (let j = i + 1; j < length; j++) {
+                if (adjacencyMatrix[i][j] === 1) {
+                    edgeList.push([i,j]);
+                } 
+            }
+        }
+
+        return edgeList;
+    }
+
+    /**
+     * Returnes the two path-included distance matrices used to find the sssr.
+     * 
+     * @param {array} adjacencyMatrix An adjacency matrix.
+     * @returns {object} The path-included distance matrices. { p1, p2 }
+     */
+    getPathIncludedDistanceMatrices(adjacencyMatrix) {
+        let length = adjacencyMatrix.length;
+        let d = Array(length);
+        let dPrev = Array(length);
+        let p1 = Array(length);
+        let p2 = Array(length);
+
+        for (let i = 0; i < length; i++) {
+            d[i] = Array(length);
+            dPrev[i] = Array(length);
+            p1[i] = Array(length);
+            p2[i] = Array(length);
+            
+            for (let j = 0; j < length; j++) {
+                d[i][j] = (i === j || adjacencyMatrix[i][j] === 1) ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
+                dPrev[i][j] = d[i][j];
+
+
+                if (d[i][j] === 1) {
+                    p1[i][j] = [[[i, j]]];
+                } else {
+                    p1[i][j] = [];
+                }
+
+                p2[i][j] = [];
+            }
+        }
+
+        this.printMatrix(d);
+
+        for (let k = 0; k < length; k++) {
+            for (let i = 0; i < length; i++) {
+                for (let j = 0; j < length; j++) {
+                    const previousPathLength = d[i][j];
+                    const newPathLength = d[i][k] + d[k][j];
+
+                    if (previousPathLength > newPathLength) {
+                        if (previousPathLength === newPathLength + 1) {
+                            p2[i][j] = ArrayHelper.deepCopy(p1[i][j]);
+                        } else {
+                            p2[i][j] = [];
+                        }
+
+                        d[i][j] = newPathLength;
+                        p1[i][j] = [ p1[i][k][0].concat(p1[k][j][0]) ];
+                    } else if (previousPathLength === newPathLength) {
+                        if (p1[i][k].length && p1[k][j].length) {
+                            if (p1[i][j].length) {
+                                p1[i][j].push(p1[i][k][0].concat(p1[k][j][0]));
+                            } else {
+                                p1[i][j][0] = p1[i][k][0].concat(p1[k][j][0]);
+                            }
+                        }
+                    } else if (previousPathLength === newPathLength - 1) {
+                        if (p2[i][j].length) {
+                            p2[i][j].push(p1[i][k][0].concat(p1[k][j][0]));
+                        } else {
+                            p2[i][j][0] = p1[i][k][0].concat(p1[k][j][0]);
+                        }
+                    }
+                }
+            }
+        }
+
+        this.printMatrix(d);
+
+        return {
+            d: d,
+            p1: p1, 
+            p2: p2 
+        };
     }
 
     /**
      * Initializes the path-included distance matrix.
      */
     initPathIncludedDistanceMatrix() {
-        let length = this.vertices.length;
-        let v = new Array(length);
-
-        for (let i = 0; i < length; i++) {
-            v[i] = i;
-        }
+        let adjacencyMatrix = this.getAdjacencyMatrix();
 
         // Remove vertices that are not members of a ring
-        let removed = 0;
+        let removed;
 
         do {
             removed = 0;
 
-            for (let i = 0; i < length; i++) {
-                let nNeighbours = this.adjacencyMatrix[i].reduce((a, b) => a + b, 0);
+            for (let i = 0; i < adjacencyMatrix.length; i++) {
+                let nNeighbours = adjacencyMatrix[i].reduce((a, b) => a + b, 0);
                 
                 if (nNeighbours === 1) {
-                    this.adjacencyMatrix[i].fill(0);
+                    adjacencyMatrix[i].fill(0);
 
-                    for (let j = 0; j < length; j++) {
-                        this.adjacencyMatrix[j][i] = 0;
+                    for (let j = 0; j < adjacencyMatrix.length; j++) {
+                        adjacencyMatrix[j][i] = 0;
                     }
 
                     removed++;
@@ -338,46 +445,65 @@ class SmilesDrawer {
             }            
         } while (removed > 0);
 
-        // All remaining vertices are part of a ring
-        let ringVertices = [];
-        for (let i = 0; i < length; i++) {
-            if (this.adjacencyMatrix[i].indexOf(1) >= 0) {
-                ringVertices.push(i);
+        // Update the adjacency matrix (remove rows and columns filled with 0s)
+        
+        // Keep this as a map of new indices to old indices
+        let indices = [];
+        let indicesToRemove = [];
+        let updatedAdjacencyMatrix = [];
+
+        // Only the rows are filtered here, the columns still have their original values
+        for (let i = 0; i < adjacencyMatrix.length; i++) {
+            if (adjacencyMatrix[i].indexOf(1) >= 0) {
+                indices.push(i);
+                updatedAdjacencyMatrix.push(adjacencyMatrix[i]);
+            } else {
+                indicesToRemove.push(i);
             }
         }
 
-        let nVertices = ringVertices.length;
+        // Remove the unused values from the adjacency matrix
 
-        if (nVertices === 0) {
+        for (let i = 0; i < updatedAdjacencyMatrix.length; i++) {
+            for (let j = indicesToRemove.length - 1; j >= 0; j--) {
+                updatedAdjacencyMatrix[i].splice(indicesToRemove[j], 1);
+            }
+        }
+
+        adjacencyMatrix = updatedAdjacencyMatrix;
+
+        if (adjacencyMatrix.length === 0) {
             return;
         }
 
-        // Count number of edges in the remaining graph
-        let nEdges = 0;
+        // Get the edge list and the theoretical number of rings in SSSR
+        let edgeList = this.getEdgeList(adjacencyMatrix);
+        let nSssr = edgeList.length - adjacencyMatrix.length + 1;
 
-        for (let i = 0; i < length; i++) {
-            nEdges += this.adjacencyMatrix[i].reduce((a, b) => a + b, 0);
+        // Get the distance matrix
+        let distanceMatrix = this.getDistanceMatrix(adjacencyMatrix);
+
+        if (nSssr === 0) {
+            return;
         }
 
-        /*
+        let {d, p1, p2} = this.getPathIncludedDistanceMatrices(adjacencyMatrix);
+        console.log(p1);
+        console.log(p2);
+    }
+
+    printMatrix(matrix) {
         let str = '';
-        for (let i = 0; i < length; i++) {
-            for (let j = 0; j < length; j++) {
-                str += this.adjacencyMatrix[i][j] + ' ';
+
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix.length; j++) {
+                str += matrix[i][j] + ' ';
             }
+
             str += '\n';
         }
+
         console.log(str);
-
-        nEdges /= 2;
-
-        // Theoretical number of SSSR
-        let nSssr = nEdges - nVertices + 1;
-
-        console.log(nEdges + ' - ' + nVertices + ' + 1 = ' + nSssr);
-
-        console.log('ring vertices', ringVertices);
-        */
     }
 
     /**

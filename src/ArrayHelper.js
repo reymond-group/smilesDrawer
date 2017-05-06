@@ -320,4 +320,26 @@ class ArrayHelper {
         });
     }
 
+    /**
+     * Copies a an n-dimensional array.
+     * 
+     * @param {array} arr The array to be copied.
+     * @returns {array} The copy.
+     */
+    static deepCopy(arr) {
+        let newArr = [];
+
+        for (let i = 0; i < arr.length; i++) {
+            let item = arr[i];
+
+            if (item instanceof Array) {
+                newArr[i] = ArrayHelper.deepCopy(item);
+            } else {
+                newArr[i] = item;
+            }
+        }
+
+        return newArr;
+    }
+
 }

@@ -1,5 +1,6 @@
 ![Smiles Drawer](https://github.com/reymond-group/smilesDrawer/blob/master/logo.png?raw=true)
 # Smiles Drawer
+Current Version: 1.0.0 Beta (Ballroom Blitz)
 ### Building Smiles Drawer
 If you decide not to use the ready-to-go scripts in `dist`, you can (edit and) build the project by running:
 ```
