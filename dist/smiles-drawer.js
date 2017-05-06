@@ -1078,8 +1078,6 @@ var CanvasWrapper = function () {
                 this.canvas.height = height * this.ratio;
                 this.canvas.style.width = width + 'px';
                 this.canvas.style.height = height + 'px';
-
-                console.log(this.canvas);
                 this.ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
             } else {
                 this.canvas.width = width * this.ratio;
@@ -4991,8 +4989,19 @@ var SmilesDrawer = function () {
 
             this.bridgedRing = false;
 
+            this.distanceMatrix = [];
+            this.adjacencyMatrix = [];
+            this.pathIncludedDistanceMatrix = [];
+
             this.initGraph(data);
             this.initRings();
+
+            var t = performance.now();
+            this.initDistanceMatrix();
+            this.initPathIncludedDistanceMatrix();
+            console.log(performance.now() - t);
+
+            // console.log(this.distanceMatrix);
 
             if (this.opts.isomeric) {
                 this.annotateChirality();
@@ -5095,6 +5104,128 @@ var SmilesDrawer = function () {
 
                 this.canvasWrapper.reset();
             }
+        }
+
+        /**
+         * Initialize the distance matrix (floyd marshall)
+         */
+
+    }, {
+        key: 'initDistanceMatrix',
+        value: function initDistanceMatrix() {
+            var length = this.vertices.length;
+
+            this.distanceMatrix = Array(length);
+            this.adjacencyMatrix = Array(length);
+
+            for (var i = 0; i < length; i++) {
+                this.distanceMatrix[i] = new Array(length);
+                this.distanceMatrix[i].fill(Number.POSITIVE_INFINITY);
+
+                this.adjacencyMatrix[i] = new Array(length);
+                this.adjacencyMatrix[i].fill(0);
+            }
+
+            for (var _i4 = 0; _i4 < length; _i4++) {
+                this.distanceMatrix[_i4][_i4] = 0;
+            }
+
+            for (var _i5 = 0; _i5 < this.edges.length; _i5++) {
+                var edge = this.edges[_i5];
+
+                this.distanceMatrix[edge.sourceId][edge.targetId] = 1;
+                this.distanceMatrix[edge.targetId][edge.sourceId] = 1;
+
+                this.adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
+                this.adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
+            }
+
+            for (var k = 0; k < length; k++) {
+                for (var _i6 = 0; _i6 < length; _i6++) {
+                    for (var j = 0; j < length; j++) {
+                        if (this.distanceMatrix[_i6][j] > this.distanceMatrix[_i6][k] + this.distanceMatrix[k][j]) {
+                            this.distanceMatrix[_i6][j] = this.distanceMatrix[_i6][k] + this.distanceMatrix[k][j];
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Initializes the path-included distance matrix.
+         */
+
+    }, {
+        key: 'initPathIncludedDistanceMatrix',
+        value: function initPathIncludedDistanceMatrix() {
+            var length = this.vertices.length;
+            var v = new Array(length);
+
+            for (var i = 0; i < length; i++) {
+                v[i] = i;
+            }
+
+            // Remove vertices that are not members of a ring
+            var removed = 0;
+
+            do {
+                removed = 0;
+
+                for (var _i7 = 0; _i7 < length; _i7++) {
+                    var nNeighbours = this.adjacencyMatrix[_i7].reduce(function (a, b) {
+                        return a + b;
+                    }, 0);
+
+                    if (nNeighbours === 1) {
+                        this.adjacencyMatrix[_i7].fill(0);
+
+                        for (var j = 0; j < length; j++) {
+                            this.adjacencyMatrix[j][_i7] = 0;
+                        }
+
+                        removed++;
+                    }
+                }
+            } while (removed > 0);
+
+            // All remaining vertices are part of a ring
+            var ringVertices = [];
+            for (var _i8 = 0; _i8 < length; _i8++) {
+                if (this.adjacencyMatrix[_i8].indexOf(1) >= 0) {
+                    ringVertices.push(_i8);
+                }
+            }
+
+            var nVertices = ringVertices.length;
+
+            if (nVertices === 0) {
+                return;
+            }
+
+            // Count number of edges in the remaining graph
+            var nEdges = 0;
+
+            for (var _i9 = 0; _i9 < length; _i9++) {
+                nEdges += this.adjacencyMatrix[_i9].reduce(function (a, b) {
+                    return a + b;
+                }, 0);
+            }
+
+            /*
+            let str = '';
+            for (let i = 0; i < length; i++) {
+                for (let j = 0; j < length; j++) {
+                    str += this.adjacencyMatrix[i][j] + ' ';
+                }
+                str += '\n';
+            }
+            console.log(str);
+             nEdges /= 2;
+             // Theoretical number of SSSR
+            let nSssr = nEdges - nVertices + 1;
+             console.log(nEdges + ' - ' + nVertices + ' + 1 = ' + nSssr);
+             console.log('ring vertices', ringVertices);
+            */
         }
 
         /**
@@ -5321,8 +5452,8 @@ var SmilesDrawer = function () {
                 offset += atom.bracket.hcount;
             }
 
-            for (var _i4 = 0; _i4 < node.branchCount; _i4++) {
-                this.initGraph(node.branches[_i4], _i4 + offset, vertex.id, true);
+            for (var _i10 = 0; _i10 < node.branchCount; _i10++) {
+                this.initGraph(node.branches[_i10], _i10 + offset, vertex.id, true);
             }
 
             if (node.hasNext) {
@@ -5430,9 +5561,9 @@ var SmilesDrawer = function () {
             // Find connection between rings
             // Check for common vertices and create ring connections. This is a bit
             // ugly, but the ringcount is always fairly low (< 100)
-            for (var _i5 = 0; _i5 < this.rings.length - 1; _i5++) {
-                for (var _j = _i5 + 1; _j < this.rings.length; _j++) {
-                    var a = this.rings[_i5];
+            for (var _i11 = 0; _i11 < this.rings.length - 1; _i11++) {
+                for (var _j = _i11 + 1; _j < this.rings.length; _j++) {
+                    var a = this.rings[_i11];
                     var b = this.rings[_j];
 
                     var ringConnection = new RingConnection(a, b);
@@ -5446,8 +5577,8 @@ var SmilesDrawer = function () {
             }
 
             // Add neighbours to the rings
-            for (var _i6 = 0; _i6 < this.rings.length; _i6++) {
-                var _ring = this.rings[_i6];
+            for (var _i12 = 0; _i12 < this.rings.length; _i12++) {
+                var _ring = this.rings[_i12];
                 _ring.neighbours = RingConnection.getNeighbours(this.ringConnections, _ring.id);
             }
 
@@ -5459,8 +5590,8 @@ var SmilesDrawer = function () {
             // Replace rings contained by a larger bridged ring with a bridged ring
             while (this.rings.length > 0) {
                 var id = -1;
-                for (var _i7 = 0; _i7 < this.rings.length; _i7++) {
-                    var _ring3 = this.rings[_i7];
+                for (var _i13 = 0; _i13 < this.rings.length; _i13++) {
+                    var _ring3 = this.rings[_i13];
 
                     if (this.isPartOfBridgedRing(_ring3.id)) {
                         id = _ring3.id;
@@ -5478,8 +5609,8 @@ var SmilesDrawer = function () {
                 this.createBridgedRing(involvedRings, _ring2.sourceId);
 
                 // Remove the rings
-                for (var _i8 = 0; _i8 < involvedRings.length; _i8++) {
-                    this.removeRing(involvedRings[_i8]);
+                for (var _i14 = 0; _i14 < involvedRings.length; _i14++) {
+                    this.removeRing(involvedRings[_i14]);
                 }
             }
         }
@@ -5572,8 +5703,8 @@ var SmilesDrawer = function () {
             // which is not part of the bridged ring).
             var leftovers = new Array();
 
-            for (var _i9 = 0; _i9 < vertices.length; _i9++) {
-                var vertex = this.vertices[vertices[_i9]];
+            for (var _i15 = 0; _i15 < vertices.length; _i15++) {
+                var vertex = this.vertices[vertices[_i15]];
                 var intersection = ArrayHelper.intersection(ringIds, vertex.value.rings);
 
                 if (vertex.value.rings.length == 1 || intersection.length == 1) {
@@ -5589,8 +5720,8 @@ var SmilesDrawer = function () {
             var tmp = new Array();
             var insideRing = new Array();
 
-            for (var _i10 = 0; _i10 < leftovers.length; _i10++) {
-                var _vertex = this.vertices[leftovers[_i10]];
+            for (var _i16 = 0; _i16 < leftovers.length; _i16++) {
+                var _vertex = this.vertices[leftovers[_i16]];
                 var onRing = false;
 
                 /*
@@ -5632,8 +5763,8 @@ var SmilesDrawer = function () {
             var sourceNeighbours = source.getNeighbours();
             var target = null;
 
-            for (var _i11 = 0; _i11 < sourceNeighbours.length; _i11++) {
-                var n = sourceNeighbours[_i11];
+            for (var _i17 = 0; _i17 < sourceNeighbours.length; _i17++) {
+                var n = sourceNeighbours[_i17];
 
                 if (ringMembers.indexOf(n) !== -1) {
                     target = n;
@@ -5648,8 +5779,8 @@ var SmilesDrawer = function () {
             ring.neighbours = neighbours;
             ring.insiders = insideRing;
 
-            for (var _i12 = 0; _i12 < ringIds.length; _i12++) {
-                ring.rings.push(this.getRing(ringIds[_i12]).clone());
+            for (var _i18 = 0; _i18 < ringIds.length; _i18++) {
+                ring.rings.push(this.getRing(ringIds[_i18]).clone());
             }
 
             this.addRing(ring);
@@ -5658,8 +5789,8 @@ var SmilesDrawer = function () {
 
             // Atoms inside the ring are no longer part of a ring but are now
             // associated with the bridged ring
-            for (var _i13 = 0; _i13 < insideRing.length; _i13++) {
-                var _vertex2 = this.vertices[insideRing[_i13]];
+            for (var _i19 = 0; _i19 < insideRing.length; _i19++) {
+                var _vertex2 = this.vertices[insideRing[_i19]];
 
                 _vertex2.value.rings = new Array();
                 _vertex2.value.anchoredRings = new Array();
@@ -5667,29 +5798,29 @@ var SmilesDrawer = function () {
             }
 
             // Remove former rings from members of the bridged ring and add the bridged ring
-            for (var _i14 = 0; _i14 < ringMembers.length; _i14++) {
-                var _vertex3 = this.vertices[ringMembers[_i14]];
+            for (var _i20 = 0; _i20 < ringMembers.length; _i20++) {
+                var _vertex3 = this.vertices[ringMembers[_i20]];
 
                 _vertex3.value.rings = ArrayHelper.removeAll(_vertex3.value.rings, ringIds);
                 _vertex3.value.rings.push(ring.id);
             }
 
             // Remove all the ring connections no longer used
-            for (var _i15 = 0; _i15 < ringIds.length; _i15++) {
-                for (var _j4 = _i15 + 1; _j4 < ringIds.length; _j4++) {
-                    this.removeRingConnectionsBetween(ringIds[_i15], ringIds[_j4]);
+            for (var _i21 = 0; _i21 < ringIds.length; _i21++) {
+                for (var _j4 = _i21 + 1; _j4 < ringIds.length; _j4++) {
+                    this.removeRingConnectionsBetween(ringIds[_i21], ringIds[_j4]);
                 }
             }
 
             // Update the ring connections and add this ring to the neighbours neighbours
-            for (var _i16 = 0; _i16 < neighbours.length; _i16++) {
-                var connections = this.getRingConnections(neighbours[_i16], ringIds);
+            for (var _i22 = 0; _i22 < neighbours.length; _i22++) {
+                var connections = this.getRingConnections(neighbours[_i22], ringIds);
 
                 for (var _j5 = 0; _j5 < connections.length; _j5++) {
-                    this.getRingConnection(connections[_j5]).updateOther(ring.id, neighbours[_i16]);
+                    this.getRingConnection(connections[_j5]).updateOther(ring.id, neighbours[_i22]);
                 }
 
-                this.getRing(neighbours[_i16]).neighbours.push(ring.id);
+                this.getRing(neighbours[_i22]).neighbours.push(ring.id);
             }
 
             return ring;
@@ -5763,8 +5894,8 @@ var SmilesDrawer = function () {
 
                 visited[u] = true; // this "removes" the node from q
 
-                for (var _i17 = 0; _i17 < neighbours[u].length; _i17++) {
-                    var v = neighbours[u][_i17];
+                for (var _i23 = 0; _i23 < neighbours[u].length; _i23++) {
+                    var v = neighbours[u][_i23];
                     var tmp = dist[u] + this.getEdgeWeight(u, v);
 
                     // Do not move directly from the source to the target
@@ -6054,8 +6185,8 @@ var SmilesDrawer = function () {
                     rings.push(vertex.value.rings[i]);
                 }
 
-                for (var _i18 = 0; _i18 < vertex.children.length; _i18++) {
-                    var child = vertex.children[_i18];
+                for (var _i24 = 0; _i24 < vertex.children.length; _i24++) {
+                    var child = vertex.children[_i24];
 
                     if (child !== p && !ArrayHelper.contains(vertices, { value: child })) {
                         vertices.push(child);
@@ -6221,8 +6352,8 @@ var SmilesDrawer = function () {
                 }
             }
 
-            for (var _i19 = 0; _i19 < toRemove.length; _i19++) {
-                this.removeRingConnection(toRemove[_i19]);
+            for (var _i25 = 0; _i25 < toRemove.length; _i25++) {
+                this.removeRingConnection(toRemove[_i25]);
             }
         }
     }, {
@@ -6259,18 +6390,18 @@ var SmilesDrawer = function () {
                     }
                 }
             } else if (ringIds.constructor !== Array) {
-                for (var _i20 = 0; _i20 < this.ringConnections.length; _i20++) {
-                    var _ringConnection = this.ringConnections[_i20];
+                for (var _i26 = 0; _i26 < this.ringConnections.length; _i26++) {
+                    var _ringConnection = this.ringConnections[_i26];
 
                     if (_ringConnection.rings.first === ringId && _ringConnection.rings.second === ringIds || _ringConnection.rings.first === ringIds && _ringConnection.rings.second === ringId) {
                         ringConnections.push(_ringConnection.id);
                     }
                 }
             } else {
-                for (var _i21 = 0; _i21 < this.ringConnections.length; _i21++) {
+                for (var _i27 = 0; _i27 < this.ringConnections.length; _i27++) {
                     for (var j = 0; j < ringIds.length; j++) {
                         var id = ringIds[j];
-                        var _ringConnection2 = this.ringConnections[_i21];
+                        var _ringConnection2 = this.ringConnections[_i27];
 
                         if (_ringConnection2.rings.first === ringId && _ringConnection2.rings.second === id || _ringConnection2.rings.first === id && _ringConnection2.rings.second === ringId) {
                             ringConnections.push(_ringConnection2.id);
@@ -6324,9 +6455,9 @@ var SmilesDrawer = function () {
                 overlapScores[i] = 0;
             }
 
-            for (var _i22 = 0; _i22 < this.vertices.length; _i22++) {
-                for (var j = _i22 + 1; j < this.vertices.length; j++) {
-                    var a = this.vertices[_i22];
+            for (var _i28 = 0; _i28 < this.vertices.length; _i28++) {
+                for (var j = _i28 + 1; j < this.vertices.length; j++) {
+                    var a = this.vertices[_i28];
                     var b = this.vertices[j];
 
                     var dist = Vector2.subtract(a.position, b.position).length();
@@ -6334,7 +6465,7 @@ var SmilesDrawer = function () {
                     if (dist < this.opts.bondLength) {
                         var weighted = (this.opts.bondLength - dist) / this.opts.bondLength;
                         total += weighted;
-                        overlapScores[_i22] += weighted;
+                        overlapScores[_i28] += weighted;
                         overlapScores[j] += weighted;
                     }
                 }
@@ -6342,10 +6473,10 @@ var SmilesDrawer = function () {
 
             var sortable = [];
 
-            for (var _i23 = 0; _i23 < this.vertices.length; _i23++) {
+            for (var _i29 = 0; _i29 < this.vertices.length; _i29++) {
                 sortable.push({
-                    id: _i23,
-                    score: overlapScores[_i23]
+                    id: _i29,
+                    score: overlapScores[_i29]
                 });
             }
 
@@ -6406,8 +6537,8 @@ var SmilesDrawer = function () {
             // from the above side counts
             var totalSideCount = [0, 0];
 
-            for (var _i24 = 0; _i24 < this.vertices.length; _i24++) {
-                var _v = this.vertices[_i24].position;
+            for (var _i30 = 0; _i30 < this.vertices.length; _i30++) {
+                var _v = this.vertices[_i30].position;
 
                 if (_v.sameSideAs(vertexA.position, vertexB.position, sides[0])) {
                     totalSideCount[0]++;
@@ -6523,34 +6654,34 @@ var SmilesDrawer = function () {
             var adjMatrix = new Array(totalLength);
             var edges = new Array();
 
-            for (var _i25 = 0; _i25 < totalLength; _i25++) {
-                adjMatrix[_i25] = new Array(totalLength);
+            for (var _i31 = 0; _i31 < totalLength; _i31++) {
+                adjMatrix[_i31] = new Array(totalLength);
 
                 for (var j = 0; j < totalLength; j++) {
-                    adjMatrix[_i25][j] = 0;
+                    adjMatrix[_i31][j] = 0;
                 }
             }
 
-            for (var _i26 = 0; _i26 < vertices.length; _i26++) {
-                vToId[_i26] = this.vertices[vertices[_i26]].id;
-                idToV[vToId[_i26]] = _i26;
+            for (var _i32 = 0; _i32 < vertices.length; _i32++) {
+                vToId[_i32] = this.vertices[vertices[_i32]].id;
+                idToV[vToId[_i32]] = _i32;
             }
 
-            for (var _i27 = 0; _i27 < vertices.length - 1; _i27++) {
-                for (var _j6 = _i27; _j6 < vertices.length; _j6++) {
-                    var edge = this.getEdge(vToId[_i27], this.vertices[vertices[_j6]].id);
+            for (var _i33 = 0; _i33 < vertices.length - 1; _i33++) {
+                for (var _j6 = _i33; _j6 < vertices.length; _j6++) {
+                    var edge = this.getEdge(vToId[_i33], this.vertices[vertices[_j6]].id);
 
                     if (edge !== null) {
-                        adjMatrix[_i27][_j6] = l;
-                        adjMatrix[_j6][_i27] = l;
-                        edges.push([_i27, _j6]);
+                        adjMatrix[_i33][_j6] = l;
+                        adjMatrix[_j6][_i33] = l;
+                        edges.push([_i33, _j6]);
                     }
                 }
             }
 
-            for (var _i28 = 0; _i28 < ring.rings.length; _i28++) {
-                var r = ring.rings[_i28];
-                var index = vertices.length + _i28;
+            for (var _i34 = 0; _i34 < ring.rings.length; _i34++) {
+                var r = ring.rings[_i34];
+                var index = vertices.length + _i34;
 
                 for (var _j7 = 0; _j7 < r.members.length; _j7++) {
                     var id = idToV[r.members[_j7]];
@@ -6561,7 +6692,7 @@ var SmilesDrawer = function () {
                 }
             }
 
-            for (var _i29 = 0; _i29 < edges.length; _i29++) {
+            for (var _i35 = 0; _i35 < edges.length; _i35++) {
                 for (var _j8 = 0; _j8 < totalLength; _j8++) {
                     adjMatrix[_j8].push(0);
                 }
@@ -6569,14 +6700,14 @@ var SmilesDrawer = function () {
                 adjMatrix.push(new Array());
 
                 for (var _j9 = 0; _j9 < totalLength + edges.length; _j9++) {
-                    adjMatrix[totalLength + _i29].push(0);
+                    adjMatrix[totalLength + _i35].push(0);
                 }
             }
 
             // Connect ring centers with edges 
-            for (var _i30 = 0; _i30 < ring.rings.length; _i30++) {
-                var _r = ring.rings[_i30];
-                var ringIndex = vertices.length + _i30;
+            for (var _i36 = 0; _i36 < ring.rings.length; _i36++) {
+                var _r = ring.rings[_i36];
+                var ringIndex = vertices.length + _i36;
                 var _ringSize = _r.getSize();
 
                 for (var _j10 = 0; _j10 < edges.length; _j10++) {
@@ -6625,29 +6756,29 @@ var SmilesDrawer = function () {
             var ringSize = new Array(totalLength);
             var ringCount = new Array(totalLength);
 
-            for (var _i31 = 0; _i31 < totalLength; _i31++) {
-                isRingCenter[_i31] = _i31 >= vertices.length && _i31 < edgeOffset;
+            for (var _i37 = 0; _i37 < totalLength; _i37++) {
+                isRingCenter[_i37] = _i37 >= vertices.length && _i37 < edgeOffset;
 
-                ringCount[_i31] = _i31 < vertices.length ? this.vertices[vToId[_i31]].value.originalRings.length : 1;
+                ringCount[_i37] = _i37 < vertices.length ? this.vertices[vToId[_i37]].value.originalRings.length : 1;
 
-                if (isRingCenter[_i31]) {
-                    ringSize[_i31] = ring.rings[_i31 - vertices.length].members.length;
+                if (isRingCenter[_i37]) {
+                    ringSize[_i37] = ring.rings[_i37 - vertices.length].members.length;
                 } else {
-                    ringSize[_i31] = 1;
+                    ringSize[_i37] = 1;
                 }
             }
 
-            for (var _i32 = 0; _i32 < totalLength; _i32++) {
-                forces[_i32] = new Vector2();
-                positions[_i32] = new Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
-                positioned[_i32] = false;
+            for (var _i38 = 0; _i38 < totalLength; _i38++) {
+                forces[_i38] = new Vector2();
+                positions[_i38] = new Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
+                positioned[_i38] = false;
 
-                if (_i32 >= vertices.length) {
+                if (_i38 >= vertices.length) {
                     continue;
                 }
 
-                var vertex = this.vertices[vToId[_i32]];
-                positions[_i32] = vertex.position.clone();
+                var vertex = this.vertices[vToId[_i38]];
+                positions[_i38] = vertex.position.clone();
 
                 // If the ring size is larger than 2, then put all the non-positioned
                 // vertices at the center of the ring instead of 0,0
@@ -6656,7 +6787,7 @@ var SmilesDrawer = function () {
                 }
 
                 if (vertex.positioned && ring.rings.length === 2) {
-                    positioned[_i32] = true;
+                    positioned[_i38] = true;
                 }
             }
 
@@ -6666,15 +6797,15 @@ var SmilesDrawer = function () {
             var maxDist = l * 2.0;
 
             for (var n = 0; n < 600; n++) {
-                for (var _i33 = 0; _i33 < totalLength; _i33++) {
-                    forces[_i33].set(0, 0);
+                for (var _i39 = 0; _i39 < totalLength; _i39++) {
+                    forces[_i39].set(0, 0);
                 }
 
                 // Set the positions of the edge midpoints
-                for (var _i34 = 0; _i34 < edges.length; _i34++) {
-                    var _index = edgeOffset + _i34;
-                    var _a = positions[edges[_i34][0]];
-                    var b = positions[edges[_i34][1]];
+                for (var _i40 = 0; _i40 < edges.length; _i40++) {
+                    var _index = edgeOffset + _i40;
+                    var _a = positions[edges[_i40][0]];
+                    var b = positions[edges[_i40][1]];
 
                     positions[_index] = Vector2.midpoint(_a, b);
                 }
@@ -6800,12 +6931,12 @@ var SmilesDrawer = function () {
                 }
 
                 // Add the edge forces to the vertices
-                for (var _i35 = 0; _i35 < edges.length; _i35++) {
-                    var _index2 = edgeOffset + _i35;
+                for (var _i41 = 0; _i41 < edges.length; _i41++) {
+                    var _index2 = edgeOffset + _i41;
                     var _force2 = forces[_index2];
 
-                    var _a2 = edges[_i35][0];
-                    var _b = edges[_i35][1];
+                    var _a2 = edges[_i41][0];
+                    var _b = edges[_i41][1];
 
                     forces[_a2].x += _force2.x;
                     forces[_a2].y += _force2.y;
@@ -6836,8 +6967,8 @@ var SmilesDrawer = function () {
 
                 // Place the ring centers in the middle of the members
                 if (n > 200 && ring.rings.length > 2) {
-                    for (var _i36 = 0; _i36 < ring.rings.length; _i36++) {
-                        var _r2 = ring.rings[_i36];
+                    for (var _i42 = 0; _i42 < ring.rings.length; _i42++) {
+                        var _r2 = ring.rings[_i42];
                         var _center = new Vector2();
 
                         for (var _j12 = 0; _j12 < _r2.members.length; _j12++) {
@@ -6849,20 +6980,20 @@ var SmilesDrawer = function () {
                         _center.x /= _r2.members.length;
                         _center.y /= _r2.members.length;
 
-                        positions[vertices.length + _i36] = _center;
+                        positions[vertices.length + _i42] = _center;
                     }
                 }
             }
 
-            for (var _i37 = 0; _i37 < totalLength; _i37++) {
-                if (_i37 < vertices.length) {
-                    if (!positioned[_i37]) {
-                        this.vertices[vToId[_i37]].setPositionFromVector(positions[_i37]);
-                        this.vertices[vToId[_i37]].positioned = true;
+            for (var _i43 = 0; _i43 < totalLength; _i43++) {
+                if (_i43 < vertices.length) {
+                    if (!positioned[_i43]) {
+                        this.vertices[vToId[_i43]].setPositionFromVector(positions[_i43]);
+                        this.vertices[vToId[_i43]].positioned = true;
                     }
-                } else if (_i37 < vertices.length + ring.rings.length) {
-                    var _index3 = _i37 - vertices.length;
-                    ring.rings[_index3].center = positions[_i37];
+                } else if (_i43 < vertices.length + ring.rings.length) {
+                    var _index3 = _i43 - vertices.length;
+                    ring.rings[_index3].center = positions[_i43];
                 }
             }
 
@@ -6871,8 +7002,8 @@ var SmilesDrawer = function () {
                 var parentVertex = this.vertices[_vertex4.parentVertexId];
                 var neighbours = _vertex4.getNeighbours();
 
-                for (var _i38 = 0; _i38 < neighbours.length; _i38++) {
-                    var currentVertex = this.vertices[neighbours[_i38]];
+                for (var _i44 = 0; _i44 < neighbours.length; _i44++) {
+                    var currentVertex = this.vertices[neighbours[_i44]];
 
                     if (currentVertex.positioned) {
                         continue;
@@ -7151,9 +7282,9 @@ var SmilesDrawer = function () {
 
             // Draw the ring centers for debug purposes
             if (this.opts.debug) {
-                for (var _i39 = 0; _i39 < this.rings.length; _i39++) {
-                    var center = this.rings[_i39].center;
-                    this.canvasWrapper.drawDebugPoint(center.x, center.y, 'r: ' + this.rings[_i39].id);
+                for (var _i45 = 0; _i45 < this.rings.length; _i45++) {
+                    var center = this.rings[_i45].center;
+                    this.canvasWrapper.drawDebugPoint(center.x, center.y, 'r: ' + this.rings[_i45].id);
                 }
             }
         }
@@ -7205,8 +7336,8 @@ var SmilesDrawer = function () {
                 vertex.setPositionFromVector(new Vector2());
             }
 
-            for (var _i40 = 0; _i40 < this.rings.length; _i40++) {
-                var ring = this.rings[_i40];
+            for (var _i46 = 0; _i46 < this.rings.length; _i46++) {
+                var ring = this.rings[_i46];
                 this.ringPositionsBackup.push(ring.center.clone());
                 ring.positioned = false;
                 ring.center = new Vector2();
@@ -7226,9 +7357,9 @@ var SmilesDrawer = function () {
                 this.vertices[i].positioned = true;
             }
 
-            for (var _i41 = 0; _i41 < this.ringPositionsBackup.length; _i41++) {
-                this.rings[_i41].center = this.ringPositionsBackup[_i41];
-                this.rings[_i41].positioned = true;
+            for (var _i47 = 0; _i47 < this.ringPositionsBackup.length; _i47++) {
+                this.rings[_i47].center = this.ringPositionsBackup[_i47];
+                this.rings[_i47].positioned = true;
             }
         }
 
@@ -7247,12 +7378,12 @@ var SmilesDrawer = function () {
                 this.originalRings.push(this.rings[i]);
             }
 
-            for (var _i42 = 0; _i42 < this.ringConnections.length; _i42++) {
-                this.originalRingConnections.push(this.ringConnections[_i42]);
+            for (var _i48 = 0; _i48 < this.ringConnections.length; _i48++) {
+                this.originalRingConnections.push(this.ringConnections[_i48]);
             }
 
-            for (var _i43 = 0; _i43 < this.vertices.length; _i43++) {
-                this.vertices[_i43].value.backupRings();
+            for (var _i49 = 0; _i49 < this.vertices.length; _i49++) {
+                this.vertices[_i49].value.backupRings();
             }
         }
 
@@ -7279,16 +7410,16 @@ var SmilesDrawer = function () {
                 }
             }
 
-            for (var _i44 = 0; _i44 < this.originalRings.length; _i44++) {
-                this.rings.push(this.originalRings[_i44]);
+            for (var _i50 = 0; _i50 < this.originalRings.length; _i50++) {
+                this.rings.push(this.originalRings[_i50]);
             }
 
-            for (var _i45 = 0; _i45 < this.originalRingConnections.length; _i45++) {
-                this.ringConnections.push(this.originalRingConnections[_i45]);
+            for (var _i51 = 0; _i51 < this.originalRingConnections.length; _i51++) {
+                this.ringConnections.push(this.originalRingConnections[_i51]);
             }
 
-            for (var _i46 = 0; _i46 < this.vertices.length; _i46++) {
-                this.vertices[_i46].value.restoreRings();
+            for (var _i52 = 0; _i52 < this.vertices.length; _i52++) {
+                this.vertices[_i52].value.restoreRings();
             }
         }
 
@@ -7349,7 +7480,6 @@ var SmilesDrawer = function () {
 
                 // If the ring is bridged, then draw the vertices inside the ring
                 // using a force based approach
-                console.log(ring, ring.isBridged);
                 if (ring.isBridged) {
                     var allVertices = ArrayHelper.merge(ring.members, ring.insiders);
 
@@ -7446,8 +7576,8 @@ var SmilesDrawer = function () {
             }
 
             // Next, draw atoms that are not part of a ring that are directly attached to this ring
-            for (var _i47 = 0; _i47 < ring.members.length; _i47++) {
-                var ringMember = this.vertices[ring.members[_i47]];
+            for (var _i53 = 0; _i53 < ring.members.length; _i53++) {
+                var ringMember = this.vertices[ring.members[_i53]];
                 var ringMemberNeighbours = ringMember.getNeighbours();
 
                 // If there are multiple, the ovlerap will be resolved in the appropriate step
@@ -7615,14 +7745,14 @@ var SmilesDrawer = function () {
                 }
             }
 
-            for (var _i48 = 0; _i48 < sharedSideChains.length; _i48++) {
-                var chain = sharedSideChains[_i48];
+            for (var _i54 = 0; _i54 < sharedSideChains.length; _i54++) {
+                var chain = sharedSideChains[_i54];
                 var angle = -chain.vertex.position.getRotateToAngle(chain.other.position, chain.common.position);
                 this.rotateSubtree(chain.vertex.id, chain.common.id, angle + Math.PI, chain.common.position);
             }
 
-            for (var _i49 = 0; _i49 < overlaps.length; _i49++) {
-                var overlap = overlaps[_i49];
+            for (var _i55 = 0; _i55 < overlaps.length; _i55++) {
+                var overlap = overlaps[_i55];
 
                 if (overlap.vertices.length === 1) {
                     var _a3 = overlap.vertices[0];
@@ -8446,7 +8576,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-              let done = new Array(vertexIds.length);
+             let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8463,10 +8593,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                      sortedVertexIds[index].atomicNumber += '.' + total;
+                     sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }

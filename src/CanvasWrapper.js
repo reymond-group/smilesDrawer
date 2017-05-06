@@ -45,8 +45,6 @@ class CanvasWrapper {
             this.canvas.height = height * this.ratio;
             this.canvas.style.width = width + 'px';
             this.canvas.style.height = height + 'px';
-
-            console.log(this.canvas);
             this.ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
         } else {
             this.canvas.width = width * this.ratio;

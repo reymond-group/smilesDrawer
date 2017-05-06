@@ -1460,6 +1460,8 @@ The main class of the application representing the smiles drawer
     * _instance_
         * [.extend()](#SmilesDrawer+extend)
         * [.draw(data, target, themeName, infoOnly)](#SmilesDrawer+draw)
+        * [.initDistanceMatrix()](#SmilesDrawer+initDistanceMatrix)
+        * [.initPathIncludedDistanceMatrix()](#SmilesDrawer+initPathIncludedDistanceMatrix)
         * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
         * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
         * [.getFusedRings()](#SmilesDrawer+getFusedRings) ⇒ <code>array</code>
@@ -1567,6 +1569,18 @@ Draws the parsed smiles data to a canvas element.
 | themeName | <code>string</code> | <code>&quot;&#x27;dark&#x27;&quot;</code> | The name of the theme to use. Built-in themes are 'light' and 'dark'. |
 | infoOnly | <code>boolean</code> | <code>false</code> | Only output info on the molecule without drawing anything to the canvas. |
 
+<a name="SmilesDrawer+initDistanceMatrix"></a>
+
+### smilesDrawer.initDistanceMatrix()
+Initialize the distance matrix (floyd marshall)
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+<a name="SmilesDrawer+initPathIncludedDistanceMatrix"></a>
+
+### smilesDrawer.initPathIncludedDistanceMatrix()
+Initializes the path-included distance matrix.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer+edgeRingCount"></a>
 
 ### smilesDrawer.edgeRingCount(edgeId) ⇒ <code>number</code>
@@ -2370,7 +2384,8 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer+initPseudoElements"></a>
 
 ### smilesDrawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer.clean"></a>

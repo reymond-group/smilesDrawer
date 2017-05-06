@@ -146,9 +146,20 @@ class SmilesDrawer {
         this.originalRingConnections = [];
 
         this.bridgedRing = false;
+
+        this.distanceMatrix = [];
+        this.adjacencyMatrix = [];
+        this.pathIncludedDistanceMatrix = [];
         
         this.initGraph(data);
         this.initRings();
+
+        let t = performance.now();
+        this.initDistanceMatrix();
+        this.initPathIncludedDistanceMatrix();
+        console.log(performance.now() - t);
+
+        // console.log(this.distanceMatrix);
         
         if (this.opts.isomeric) {
             this.annotateChirality();
@@ -251,6 +262,122 @@ class SmilesDrawer {
             
             this.canvasWrapper.reset();
         }
+    }
+
+    /**
+     * Initialize the distance matrix (floyd marshall)
+     */
+    initDistanceMatrix() {
+        let length = this.vertices.length;
+
+        this.distanceMatrix = Array(length);
+        this.adjacencyMatrix = Array(length);
+        
+        for (let i = 0; i < length; i++) {
+            this.distanceMatrix[i] = new Array(length);
+            this.distanceMatrix[i].fill(Number.POSITIVE_INFINITY);
+
+            this.adjacencyMatrix[i] = new Array(length);
+            this.adjacencyMatrix[i].fill(0);
+        }
+
+        for (let i = 0; i < length; i++) {
+            this.distanceMatrix[i][i] = 0;
+        }
+
+        for (let i = 0; i < this.edges.length; i++) {
+            let edge = this.edges[i];
+
+            this.distanceMatrix[edge.sourceId][edge.targetId] = 1;
+            this.distanceMatrix[edge.targetId][edge.sourceId] = 1;
+
+            this.adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
+            this.adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
+        }
+
+        for (let k = 0; k < length; k++) {
+            for (let i = 0; i < length; i++) {
+                for (let j = 0; j < length; j++) {
+                    if (this.distanceMatrix[i][j] > this.distanceMatrix[i][k] + this.distanceMatrix[k][j]) {
+                        this.distanceMatrix[i][j] = this.distanceMatrix[i][k] + this.distanceMatrix[k][j];
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Initializes the path-included distance matrix.
+     */
+    initPathIncludedDistanceMatrix() {
+        let length = this.vertices.length;
+        let v = new Array(length);
+
+        for (let i = 0; i < length; i++) {
+            v[i] = i;
+        }
+
+        // Remove vertices that are not members of a ring
+        let removed = 0;
+
+        do {
+            removed = 0;
+
+            for (let i = 0; i < length; i++) {
+                let nNeighbours = this.adjacencyMatrix[i].reduce((a, b) => a + b, 0);
+                
+                if (nNeighbours === 1) {
+                    this.adjacencyMatrix[i].fill(0);
+
+                    for (let j = 0; j < length; j++) {
+                        this.adjacencyMatrix[j][i] = 0;
+                    }
+
+                    removed++;
+                }
+            }            
+        } while (removed > 0);
+
+        // All remaining vertices are part of a ring
+        let ringVertices = [];
+        for (let i = 0; i < length; i++) {
+            if (this.adjacencyMatrix[i].indexOf(1) >= 0) {
+                ringVertices.push(i);
+            }
+        }
+
+        let nVertices = ringVertices.length;
+
+        if (nVertices === 0) {
+            return;
+        }
+
+        // Count number of edges in the remaining graph
+        let nEdges = 0;
+
+        for (let i = 0; i < length; i++) {
+            nEdges += this.adjacencyMatrix[i].reduce((a, b) => a + b, 0);
+        }
+
+        /*
+        let str = '';
+        for (let i = 0; i < length; i++) {
+            for (let j = 0; j < length; j++) {
+                str += this.adjacencyMatrix[i][j] + ' ';
+            }
+            str += '\n';
+        }
+        console.log(str);
+
+        nEdges /= 2;
+
+        // Theoretical number of SSSR
+        let nSssr = nEdges - nVertices + 1;
+
+        console.log(nEdges + ' - ' + nVertices + ' + 1 = ' + nSssr);
+
+        console.log('ring vertices', ringVertices);
+        */
     }
 
     /**
@@ -2351,7 +2478,6 @@ class SmilesDrawer {
 
             // If the ring is bridged, then draw the vertices inside the ring
             // using a force based approach
-            console.log(ring, ring.isBridged);
             if (ring.isBridged) {
                 let allVertices = ArrayHelper.merge(ring.members, ring.insiders);
 
