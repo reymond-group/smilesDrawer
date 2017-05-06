@@ -1,9 +1,9 @@
 ![Smiles Drawer](https://github.com/reymond-group/smilesDrawer/blob/master/logo.png?raw=true)
 # Smiles Drawer
-Current Version: 1.0.0 Beta (Ballroom Blitz)
+Current Version: 1.0.0 Beta ([Ballroom Blitz](https://www.youtube.com/watch?v=ewFBuYHldeY))
 ### Building Smiles Drawer
 If you decide not to use the ready-to-go scripts in `dist`, you can (edit and) build the project by running:
-```
+```bash
 npm install
 gulp
 ```
@@ -11,7 +11,7 @@ gulp
 ### Getting Started
 To get a simple input box which lets the user enter a SMILES and then display it in a canvas, the following minimal example is sufficient.
 In order to have nice consistent font rendering you have to include the droid sans font from google fonts.
-```
+```html
 <!doctype html>
 <html>
     <head>
@@ -49,7 +49,7 @@ In order to have nice consistent font rendering you have to include the droid sa
 See the example folder for a more complete example.
 ### Options
 The options are supplied to the constructor as shown in the example above.
-```
+```javascript
 let options = { ... };
 let smilesDrawer = new SmilesDrawer(options);
 ```
@@ -72,7 +72,7 @@ The following options are available:
 
 
 The default options are defined as follows:
-```
+```javascript
 {
     bondLength: 16,
     shortBondLength: 9,
