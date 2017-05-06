@@ -373,8 +373,6 @@ class SmilesDrawer {
             }
         }
 
-        this.printMatrix(d);
-
         for (let k = 0; k < length; k++) {
             for (let i = 0; i < length; i++) {
                 for (let j = 0; j < length; j++) {
@@ -408,8 +406,6 @@ class SmilesDrawer {
                 }
             }
         }
-
-        this.printMatrix(d);
 
         return {
             d: d,

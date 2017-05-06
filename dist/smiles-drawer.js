@@ -5251,8 +5251,6 @@ var SmilesDrawer = function () {
                 }
             }
 
-            this.printMatrix(d);
-
             for (var k = 0; k < length; k++) {
                 for (var _i7 = 0; _i7 < length; _i7++) {
                     for (var _j2 = 0; _j2 < length; _j2++) {
@@ -5282,14 +5280,10 @@ var SmilesDrawer = function () {
                             } else {
                                 p2[_i7][_j2][0] = p1[_i7][k][0].concat(p1[k][_j2][0]);
                             }
-                        } else {
-                            // d[i][j] = dPrev[i][j];
                         }
                     }
                 }
             }
-
-            this.printMatrix(d);
 
             return {
                 d: d,
