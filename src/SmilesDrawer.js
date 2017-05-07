@@ -348,28 +348,24 @@ class SmilesDrawer {
     getPathIncludedDistanceMatrices(adjacencyMatrix) {
         let length = adjacencyMatrix.length;
         let d = Array(length);
-        let dPrev = Array(length);
-        let p1 = Array(length);
-        let p2 = Array(length);
+        let pe1 = Array(length);
+        let pe2 = Array(length);
 
         for (let i = 0; i < length; i++) {
             d[i] = Array(length);
-            dPrev[i] = Array(length);
-            p1[i] = Array(length);
-            p2[i] = Array(length);
+            pe1[i] = Array(length);
+            pe2[i] = Array(length);
             
             for (let j = 0; j < length; j++) {
                 d[i][j] = (i === j || adjacencyMatrix[i][j] === 1) ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
-                dPrev[i][j] = d[i][j];
-
 
                 if (d[i][j] === 1) {
-                    p1[i][j] = [[[i, j]]];
+                    pe1[i][j] = [[[i, j]]];
                 } else {
-                    p1[i][j] = [];
+                    pe1[i][j] = [];
                 }
 
-                p2[i][j] = [];
+                pe2[i][j] = [];
             }
         }
 
@@ -381,26 +377,26 @@ class SmilesDrawer {
 
                     if (previousPathLength > newPathLength) {
                         if (previousPathLength === newPathLength + 1) {
-                            p2[i][j] = ArrayHelper.deepCopy(p1[i][j]);
+                            pe2[i][j] = ArrayHelper.deepCopy(pe1[i][j]);
                         } else {
-                            p2[i][j] = [];
+                            pe2[i][j] = [];
                         }
 
                         d[i][j] = newPathLength;
-                        p1[i][j] = [ p1[i][k][0].concat(p1[k][j][0]) ];
+                        pe1[i][j] = [ pe1[i][k][0].concat(pe1[k][j][0]) ];
                     } else if (previousPathLength === newPathLength) {
-                        if (p1[i][k].length && p1[k][j].length) {
-                            if (p1[i][j].length) {
-                                p1[i][j].push(p1[i][k][0].concat(p1[k][j][0]));
+                        if (pe1[i][k].length && pe1[k][j].length) {
+                            if (pe1[i][j].length) {
+                                pe1[i][j].push(pe1[i][k][0].concat(pe1[k][j][0]));
                             } else {
-                                p1[i][j][0] = p1[i][k][0].concat(p1[k][j][0]);
+                                pe1[i][j][0] = pe1[i][k][0].concat(pe1[k][j][0]);
                             }
                         }
                     } else if (previousPathLength === newPathLength - 1) {
-                        if (p2[i][j].length) {
-                            p2[i][j].push(p1[i][k][0].concat(p1[k][j][0]));
+                        if (pe2[i][j].length) {
+                            pe2[i][j].push(pe1[i][k][0].concat(pe1[k][j][0]));
                         } else {
-                            p2[i][j][0] = p1[i][k][0].concat(p1[k][j][0]);
+                            pe2[i][j][0] = pe1[i][k][0].concat(pe1[k][j][0]);
                         }
                     }
                 }
@@ -409,9 +405,152 @@ class SmilesDrawer {
 
         return {
             d: d,
-            p1: p1, 
-            p2: p2 
+            pe1: pe1, 
+            pe2: pe2 
         };
+    }
+
+    /**
+     * Get the ring candidates from the path-included distance matrices.
+     * 
+     * @param {array} d The distance matrix.
+     * @param {array} pe1 A matrix containing the shortest paths.
+     * @param {array} pe2 A matrix containing the shortest paths + one vertex.
+     * @returns {array} The ring candidates.
+     */
+    getRingCandidates(d, pe1, pe2) {
+        let length = d.length;
+        let candidates = [];
+        let c = 0;
+
+        for (let i = 0; i < length; i++) {
+            for (let j = 0; j < length; j++) {
+                if (d[i][j] === 0 || (pe1[i][j].length === 1 && pe2[i][j] === 0)) {
+                    continue;
+                } else {
+                    // c is the number of vertices in the cycle.
+                    if (pe2[i][j].length !== 0) {
+                        c = 2 * (d[i][j] + 0.5);
+                    } else {
+                        c = 2 * d[i][j];
+                    }
+                    
+                    candidates.push([c, pe1[i][j], pe2[i][2]]);
+                }
+            }
+        }
+
+        // Candidates have to be sorted by c
+        candidates.sort(function(a, b) {
+            return a[0] - b[0];
+        });
+
+        return candidates;
+    }
+
+    /**
+     * Searches the candidates for the smallest set of smallest rings.
+     * 
+     * @param {array} c The candidates.
+     * @param {array} d The distance matrix.
+     * @param {array} pe1 A matrix containing the shortest paths.
+     * @param {array} pe2 A matrix containing the shortest paths + one vertex.
+     * @param {number} nsssr The theoretical number of rings in the graph.
+     * @returns {array} The smallest set of smallest rings.
+     */
+    getSSSR(c, d, pe1, pe2, nsssr) {
+        let cSssr = [];
+
+        for (let i = 0; i < c.length; i++) {
+            if (c[i][0] % 2 !== 0) {
+                for (let j = 0; j < c[i][2].length; j++) {
+                    let bonds = c[i][1][0].concat(c[i][2][j]);
+                    let atoms = this.bondsToAtoms(bonds);
+                    
+                    if (bonds.length === atoms.size && !this.pathSetsContain(cSssr, atoms)) {
+                        cSssr.push(atoms);
+                    }
+
+                    if (cSssr.length === nsssr) {
+                        return cSssr;
+                    }
+                }
+            } else {
+                for (let j = 0; j < c[i][1].length - 1; j++) {
+                    let bonds = c[i][1][j].concat(c[i][1][j + 1]);
+                    let atoms = this.bondsToAtoms(bonds);
+
+                    if (bonds.length === atoms.size && !this.pathSetsContain(cSssr, atoms)) {
+                        cSssr.push(atoms);
+                    }
+
+                    if (cSssr.length === nsssr) {
+                        return cSssr;
+                    }
+                }
+            }
+        }
+
+        return cSssr;
+    }
+
+    /**
+     * Return a set of vertex indices contained in an array of bonds.
+     * 
+     * @param {array} bonds An array of bonds.
+     * @returns {set} An array of vertices.
+     */
+    bondsToAtoms(bonds) {
+        let atoms = new Set();
+        
+        for (let i = 0; i < bonds.length; i++) {
+            atoms.add(bonds[i][0]);
+            atoms.add(bonds[i][1]);
+        }
+
+        return atoms;
+    }
+
+    /**
+     * Checks whether or not a given path already exists in an array of paths.
+     * 
+     * @param {array} pathSets An array of sets each representing a path.
+     * @param {set} pathSet A set representing a path.
+     * @returns {boolean} A boolean indicating whether or not a give path is contained within a set.
+     */
+    pathSetsContain(pathSets, pathSet) {
+        for (let i = 0; i < pathSets.length; i++) {
+            if (pathSets[i].size !== pathSet.size) {
+                continue;
+            }
+            
+            if (this.areSetsEqual(pathSets[i], pathSet)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether or not two sets are equal (contain the same elements).
+     * 
+     * @param {set} setA A set.
+     * @param {set} setB A set.
+     * @returns {boolean} A boolean indicating whether or not the two sets are equal.
+     */
+    areSetsEqual(setA, setB) {
+        if (setA.size !== setB.size) {
+            return false;
+        }
+        
+        for (let element of setA) {
+            if (!setB.has(element)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -483,9 +622,18 @@ class SmilesDrawer {
             return;
         }
 
-        let {d, p1, p2} = this.getPathIncludedDistanceMatrices(adjacencyMatrix);
-        console.log(p1);
-        console.log(p2);
+        let {d, pe1, pe2} = this.getPathIncludedDistanceMatrices(adjacencyMatrix);
+        
+        this.printMatrix(d);
+        console.log(pe1);
+        console.log(pe2);
+        
+        let c = this.getRingCandidates(d, pe1, pe2);
+        console.log(c);
+        let sssr = this.getSSSR(c, d, pe1, pe2, nSssr);
+        console.log(sssr);
+        
+        //console.log(candidates);
     }
 
     printMatrix(matrix) {

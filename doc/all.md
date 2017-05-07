@@ -64,6 +64,7 @@ A static class containing helper functions for array-related tasks.
     * [.merge(arrA, arrB)](#ArrayHelper.merge) ⇒ <code>array</code>
     * [.containsAll(arrA, arrB)](#ArrayHelper.containsAll) ⇒ <code>boolean</code>
     * [.sortByAtomicNumberDesc(arr)](#ArrayHelper.sortByAtomicNumberDesc) ⇒ <code>array</code>
+    * [.deepCopy(arr)](#ArrayHelper.deepCopy) ⇒ <code>array</code>
 
 <a name="ArrayHelper.clone"></a>
 
@@ -255,6 +256,18 @@ Sort an array of atomic number information. Where the number is indicated as x, 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>array</code> | An array of objects { atomicNumber: 6, vertexId: 2 }. |
+
+<a name="ArrayHelper.deepCopy"></a>
+
+### ArrayHelper.deepCopy(arr) ⇒ <code>array</code>
+Copies a an n-dimensional array.
+
+**Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
+**Returns**: <code>array</code> - The copy.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | The array to be copied. |
 
 <a name="Atom"></a>
 
@@ -1460,7 +1473,11 @@ The main class of the application representing the smiles drawer
     * _instance_
         * [.extend()](#SmilesDrawer+extend)
         * [.draw(data, target, themeName, infoOnly)](#SmilesDrawer+draw)
-        * [.getGraphMatrices()](#SmilesDrawer+getGraphMatrices) ⇒ <code>object</code>
+        * [.getAdjacencyMatrix()](#SmilesDrawer+getAdjacencyMatrix) ⇒ <code>array</code>
+        * [.getDistanceMatrix(adjacencyMatrix)](#SmilesDrawer+getDistanceMatrix) ⇒ <code>array</code>
+        * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer+getEdgeList) ⇒ <code>array</code>
+        * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer+getPathIncludedDistanceMatrices) ⇒ <code>object</code>
+        * [.getRingCandidates(d, pe1, pe2)](#SmilesDrawer+getRingCandidates) ⇒ <code>array</code>
         * [.initPathIncludedDistanceMatrix()](#SmilesDrawer+initPathIncludedDistanceMatrix)
         * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
         * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
@@ -1569,13 +1586,63 @@ Draws the parsed smiles data to a canvas element.
 | themeName | <code>string</code> | <code>&quot;&#x27;dark&#x27;&quot;</code> | The name of the theme to use. Built-in themes are 'light' and 'dark'. |
 | infoOnly | <code>boolean</code> | <code>false</code> | Only output info on the molecule without drawing anything to the canvas. |
 
-<a name="SmilesDrawer+getGraphMatrices"></a>
+<a name="SmilesDrawer+getAdjacencyMatrix"></a>
 
-### smilesDrawer.getGraphMatrices() ⇒ <code>object</code>
-Initialize the adjacency and the distance matrix (floyd marshall) of the molecular graph.
+### smilesDrawer.getAdjacencyMatrix() ⇒ <code>array</code>
+Initialize the adjacency matrix of the molecular graph.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>object</code> - An object containing the adjacency and distance matrix of the graph.  
+**Returns**: <code>array</code> - The adjancency matrix of the molecular graph.  
+<a name="SmilesDrawer+getDistanceMatrix"></a>
+
+### smilesDrawer.getDistanceMatrix(adjacencyMatrix) ⇒ <code>array</code>
+Get the distance matrix (floyd marshall) of a adjacency matrix.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - The distance matrix of the graph defined by the adjacency matrix.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
+
+<a name="SmilesDrawer+getEdgeList"></a>
+
+### smilesDrawer.getEdgeList(adjacencyMatrix) ⇒ <code>array</code>
+Returns an edge list constructed form an adjacency matrix.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
+
+<a name="SmilesDrawer+getPathIncludedDistanceMatrices"></a>
+
+### smilesDrawer.getPathIncludedDistanceMatrices(adjacencyMatrix) ⇒ <code>object</code>
+Returnes the two path-included distance matrices used to find the sssr.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>object</code> - The path-included distance matrices. { p1, p2 }  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
+
+<a name="SmilesDrawer+getRingCandidates"></a>
+
+### smilesDrawer.getRingCandidates(d, pe1, pe2) ⇒ <code>array</code>
+Get the ring candidates from the path-included distance matrices.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - The ring candidates.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| d | <code>array</code> | The distance matrix. |
+| pe1 | <code>array</code> | A matrix containing the shortest paths. |
+| pe2 | <code>array</code> | A matrix containing the shortest paths + one vertex. |
+
 <a name="SmilesDrawer+initPathIncludedDistanceMatrix"></a>
 
 ### smilesDrawer.initPathIncludedDistanceMatrix()
