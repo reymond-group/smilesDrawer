@@ -98,7 +98,7 @@ The default options are defined as follows:
             S: '#f1c40f',
             B: '#e67e22',
             SI: '#e67e22',
-            H: '#252525',
+            H: '#fff',
             BACKGROUND: '#141414'
         },
         light: {
@@ -113,7 +113,7 @@ The default options are defined as follows:
             S: '#f1c40f',
             B: '#e67e22',
             SI: '#e67e22',
-            H: '#d5d5d5',
+            H: '#222',
             BACKGROUND: '#fff'
         }
     }

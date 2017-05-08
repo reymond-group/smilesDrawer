@@ -4874,7 +4874,7 @@ var SmilesDrawer = function () {
                     S: '#f1c40f',
                     B: '#e67e22',
                     SI: '#e67e22',
-                    H: '#252525',
+                    H: '#fff',
                     BACKGROUND: '#141414'
                 },
                 light: {
@@ -4889,7 +4889,7 @@ var SmilesDrawer = function () {
                     S: '#f1c40f',
                     B: '#e67e22',
                     SI: '#e67e22',
-                    H: '#d5d5d5',
+                    H: '#222',
                     BACKGROUND: '#fff'
                 }
             }
@@ -4972,15 +4972,22 @@ var SmilesDrawer = function () {
 
             this.bridgedRing = false;
 
+            var t = performance.now();
             this.initGraph(data);
+            console.log('initGraph', performance.now() - t);
+
+            t = performance.now();
             this.initRings();
+            console.log('initRings', performance.now() - t);
 
             if (this.opts.isomeric) {
                 this.annotateChirality();
             }
 
             if (!infoOnly) {
+                t = performance.now();
                 this.position();
+                console.log('position', performance.now() - t);
 
                 // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
                 this.restoreRingInformation();
@@ -4989,6 +4996,7 @@ var SmilesDrawer = function () {
 
                 this.totalOverlapScore = this.getOverlapScore().total;
 
+                t = performance.now();
                 for (var i = 0; i < this.edges.length; i++) {
                     var edge = this.edges[i];
 
@@ -5059,8 +5067,11 @@ var SmilesDrawer = function () {
                         }
                     }
                 }
+                console.log('rotatableBonds', performance.now() - t);
 
+                t = performance.now();
                 this.resolveSecondaryOverlaps(overlapScore.scores);
+                console.log('resolveSecondaryOverlaps', performance.now() - t);
 
                 // Set the canvas to the appropriate size
                 this.canvasWrapper.scale(this.vertices);
@@ -5071,8 +5082,10 @@ var SmilesDrawer = function () {
                 }
 
                 // Do the actual drawing
+                t = performance.now();
                 this.drawEdges(this.opts.debug);
                 this.drawVertices(this.opts.debug);
+                console.log('drawing', performance.now() - t);
 
                 this.canvasWrapper.reset();
             }
@@ -7218,9 +7231,6 @@ var SmilesDrawer = function () {
                 }
             }
 
-            // The bridged ring is positioned
-            ring.positioned = true;
-
             // This has to be called in order to position rings connected to this bridged ring
             this.createRing(ring, null, null, null, true);
         }
@@ -7648,7 +7658,7 @@ var SmilesDrawer = function () {
             var previousVertex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
             var forcePositioned = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
-            if (ring.positioned) {
+            if (ring.positioned && !forcePositioned) {
                 return;
             }
 
@@ -8780,7 +8790,7 @@ var SmilesDrawer = function () {
             if (!Atom.hasDuplicateAtomicNumbers(sortedVertexIds)) {
                 return sortedVertexIds;
             }
-             let done = new Array(vertexIds.length);
+              let done = new Array(vertexIds.length);
             let duplicates = Atom.getDuplicateAtomicNumbers(sortedVertexIds);
             
             let maxDepth = 1;
@@ -8797,10 +8807,10 @@ var SmilesDrawer = function () {
                         console.log(vertex);
                         total += vertex.value.getAtomicNumber();
                     }, maxDepth, true);
-                     sortedVertexIds[index].atomicNumber += '.' + total;
+                      sortedVertexIds[index].atomicNumber += '.' + total;
                 }
             }
-             sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
+              sortedVertexIds = ArrayHelper.sortByAtomicNumberDesc(sortedVertexIds);
             console.log(sortedVertexIds);
             return sortedVertexIds;
         }

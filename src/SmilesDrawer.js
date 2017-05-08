@@ -58,7 +58,7 @@ class SmilesDrawer {
                     S: '#f1c40f',
                     B: '#e67e22',
                     SI: '#e67e22',
-                    H: '#252525',
+                    H: '#fff',
                     BACKGROUND: '#141414'
                 },
                 light: {
@@ -73,7 +73,7 @@ class SmilesDrawer {
                     S: '#f1c40f',
                     B: '#e67e22',
                     SI: '#e67e22',
-                    H: '#d5d5d5',
+                    H: '#222',
                     BACKGROUND: '#fff'
                 }
             }
@@ -147,15 +147,22 @@ class SmilesDrawer {
 
         this.bridgedRing = false;
         
+        let t = performance.now();
         this.initGraph(data);
+        console.log('initGraph', performance.now() - t);
+
+        t = performance.now();
         this.initRings();
+        console.log('initRings', performance.now() - t);
         
         if (this.opts.isomeric) {
             this.annotateChirality();
         }
 
         if (!infoOnly) {
+            t = performance.now();
             this.position();
+            console.log('position', performance.now() - t);
 
             // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
             this.restoreRingInformation();
@@ -164,6 +171,7 @@ class SmilesDrawer {
 
             this.totalOverlapScore = this.getOverlapScore().total;
             
+            t = performance.now();
             for (let i = 0; i < this.edges.length; i++) {
                 let edge = this.edges[i];
                 
@@ -234,8 +242,11 @@ class SmilesDrawer {
                     }
                 }
             }
+            console.log('rotatableBonds', performance.now() - t);
             
+            t = performance.now();
             this.resolveSecondaryOverlaps(overlapScore.scores);
+            console.log('resolveSecondaryOverlaps', performance.now() - t);
             
             // Set the canvas to the appropriate size
             this.canvasWrapper.scale(this.vertices);
@@ -246,8 +257,10 @@ class SmilesDrawer {
             }
 
             // Do the actual drawing
+            t = performance.now();
             this.drawEdges(this.opts.debug);
             this.drawVertices(this.opts.debug);
+            console.log('drawing', performance.now() - t);
             
             this.canvasWrapper.reset();
         }
@@ -2444,8 +2457,7 @@ class SmilesDrawer {
                     this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
                             element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
                 } else if (this.opts.atomVisualization === 'balls') {
-                    this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y,
-                            element);
+                    this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
                 }
             }
 
@@ -3483,15 +3495,6 @@ class SmilesDrawer {
         if (edge.bondType !== '-') {
             return false;
         }
-
-        // C-N bonds are not rotatable because of their high rotational energy barrier
-        /* 
-        let combination = vertexA.value.element.toLowerCase() + vertexB.value.element.toLowerCase();
-        
-        if (combination === 'cn' || combination === 'nc') {
-            return false;
-        }
-        */
 
         // Do not rotate edges that have a further single bond to each side
         // If the bond is terminal, it doesn't make sense to rotate it
