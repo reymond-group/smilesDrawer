@@ -5854,7 +5854,7 @@ var SmilesDrawer = function () {
 
             // Get the rings in the graph (the SSSR)
             var rings = this.getRings();
-
+            console.log(rings);
             if (rings === null) {
                 return;
             }
@@ -7218,6 +7218,9 @@ var SmilesDrawer = function () {
                 }
             }
 
+            // The bridged ring is positioned
+            ring.positioned = true;
+
             // This has to be called in order to position rings connected to this bridged ring
             this.createRing(ring, null, null, null, true);
         }
@@ -7645,9 +7648,11 @@ var SmilesDrawer = function () {
             var previousVertex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
             var forcePositioned = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
-            if (ring.positioned && !forcePositioned) {
+            if (ring.positioned) {
                 return;
             }
+
+            console.log(ring);
 
             center = center ? center : new Vector2(0, 0);
 
