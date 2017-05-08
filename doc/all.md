@@ -1478,6 +1478,10 @@ The main class of the application representing the smiles drawer
         * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer+getEdgeList) ⇒ <code>array</code>
         * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer+getPathIncludedDistanceMatrices) ⇒ <code>object</code>
         * [.getRingCandidates(d, pe1, pe2)](#SmilesDrawer+getRingCandidates) ⇒ <code>array</code>
+        * [.getSSSR(c, d, pe1, pe2, nsssr)](#SmilesDrawer+getSSSR) ⇒ <code>array</code>
+        * [.bondsToAtoms(bonds)](#SmilesDrawer+bondsToAtoms) ⇒ <code>set</code>
+        * [.pathSetsContain(pathSets, pathSet)](#SmilesDrawer+pathSetsContain) ⇒ <code>boolean</code>
+        * [.areSetsEqual(setA, setB)](#SmilesDrawer+areSetsEqual) ⇒ <code>boolean</code>
         * [.initPathIncludedDistanceMatrix()](#SmilesDrawer+initPathIncludedDistanceMatrix)
         * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
         * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
@@ -1642,6 +1646,60 @@ Get the ring candidates from the path-included distance matrices.
 | d | <code>array</code> | The distance matrix. |
 | pe1 | <code>array</code> | A matrix containing the shortest paths. |
 | pe2 | <code>array</code> | A matrix containing the shortest paths + one vertex. |
+
+<a name="SmilesDrawer+getSSSR"></a>
+
+### smilesDrawer.getSSSR(c, d, pe1, pe2, nsssr) ⇒ <code>array</code>
+Searches the candidates for the smallest set of smallest rings.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - The smallest set of smallest rings.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| c | <code>array</code> | The candidates. |
+| d | <code>array</code> | The distance matrix. |
+| pe1 | <code>array</code> | A matrix containing the shortest paths. |
+| pe2 | <code>array</code> | A matrix containing the shortest paths + one vertex. |
+| nsssr | <code>number</code> | The theoretical number of rings in the graph. |
+
+<a name="SmilesDrawer+bondsToAtoms"></a>
+
+### smilesDrawer.bondsToAtoms(bonds) ⇒ <code>set</code>
+Return a set of vertex indices contained in an array of bonds.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>set</code> - An array of vertices.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| bonds | <code>array</code> | An array of bonds. |
+
+<a name="SmilesDrawer+pathSetsContain"></a>
+
+### smilesDrawer.pathSetsContain(pathSets, pathSet) ⇒ <code>boolean</code>
+Checks whether or not a given path already exists in an array of paths.
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not a give path is contained within a set.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| pathSets | <code>array</code> | An array of sets each representing a path. |
+| pathSet | <code>set</code> | A set representing a path. |
+
+<a name="SmilesDrawer+areSetsEqual"></a>
+
+### smilesDrawer.areSetsEqual(setA, setB) ⇒ <code>boolean</code>
+Checks whether or not two sets are equal (contain the same elements).
+
+**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not the two sets are equal.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| setA | <code>set</code> | A set. |
+| setB | <code>set</code> | A set. |
 
 <a name="SmilesDrawer+initPathIncludedDistanceMatrix"></a>
 
@@ -2452,7 +2510,8 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer+initPseudoElements"></a>
 
 ### smilesDrawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer.clean"></a>

@@ -150,10 +150,6 @@ class SmilesDrawer {
         this.initGraph(data);
         this.initRings();
 
-        let t = performance.now();
-        this.initPathIncludedDistanceMatrix();
-        console.log(performance.now() - t);
-
         // console.log(this.distanceMatrix);
         
         if (this.opts.isomeric) {
@@ -435,7 +431,7 @@ class SmilesDrawer {
                         c = 2 * d[i][j];
                     }
                     
-                    candidates.push([c, pe1[i][j], pe2[i][2]]);
+                    candidates.push([c, pe1[i][j], pe2[i][j]]);
                 }
             }
         }
@@ -554,9 +550,11 @@ class SmilesDrawer {
     }
 
     /**
-     * Initializes the path-included distance matrix.
+     * Returns an array containing all the rings in the molecule represented by arrays of vertices.
+     * 
+     * @returns {array} An array containing all the rings in the molecule represented by arrays of vertices.
      */
-    initPathIncludedDistanceMatrix() {
+    getRings() {
         let adjacencyMatrix = this.getAdjacencyMatrix();
 
         // Remove vertices that are not members of a ring
@@ -623,17 +621,21 @@ class SmilesDrawer {
         }
 
         let {d, pe1, pe2} = this.getPathIncludedDistanceMatrices(adjacencyMatrix);
-        
-        this.printMatrix(d);
-        console.log(pe1);
-        console.log(pe2);
-        
         let c = this.getRingCandidates(d, pe1, pe2);
-        console.log(c);
         let sssr = this.getSSSR(c, d, pe1, pe2, nSssr);
-        console.log(sssr);
-        
-        //console.log(candidates);
+        let rings = new Array(sssr.length);
+
+        for (let i = 0; i < sssr.length; i++) {
+            rings[i] = new Array(sssr[i].length);
+            
+            let index = 0;
+
+            for (let val of sssr[i]) {
+                rings[i][index++] = indices[val];
+            }
+        }
+
+        return rings;
     }
 
     printMatrix(matrix) {
