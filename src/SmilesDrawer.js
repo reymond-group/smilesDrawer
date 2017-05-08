@@ -149,8 +149,6 @@ class SmilesDrawer {
         
         this.initGraph(data);
         this.initRings();
-
-        // console.log(this.distanceMatrix);
         
         if (this.opts.isomeric) {
             this.annotateChirality();
@@ -606,7 +604,7 @@ class SmilesDrawer {
         adjacencyMatrix = updatedAdjacencyMatrix;
 
         if (adjacencyMatrix.length === 0) {
-            return;
+            return null;
         }
 
         // Get the edge list and the theoretical number of rings in SSSR
@@ -617,7 +615,7 @@ class SmilesDrawer {
         let distanceMatrix = this.getDistanceMatrix(adjacencyMatrix);
 
         if (nSssr === 0) {
-            return;
+            return null;
         }
 
         let {d, pe1, pe2} = this.getPathIncludedDistanceMatrices(adjacencyMatrix);
@@ -636,20 +634,6 @@ class SmilesDrawer {
         }
 
         return rings;
-    }
-
-    printMatrix(matrix) {
-        let str = '';
-
-        for (let i = 0; i < matrix.length; i++) {
-            for (let j = 0; j < matrix.length; j++) {
-                str += matrix[i][j] + ' ';
-            }
-
-            str += '\n';
-        }
-
-        console.log(str);
     }
 
     /**
@@ -888,57 +872,58 @@ class SmilesDrawer {
      *
      */
     initRings() {
-        let that = this;
         let openBonds = {};
         let ringId = 0;
 
+        // Close the open ring bonds (spanning tree -> graph)
         for (let i = this.vertices.length - 1; i >= 0; i--) {
             let vertex = this.vertices[i];
-            
+
             if (vertex.value.ringbonds.length === 0) {
                 continue;
             }
 
-            for (let r = 0; r < vertex.value.ringbonds.length; r++) {
-                let ringbondId = vertex.value.ringbonds[r].id;
-                
-                if (openBonds[ringbondId] === undefined) {
+            for (let j = 0; j < vertex.value.ringbonds.length; j++) {
+                let ringbondId = vertex.value.ringbonds[j].id;
+
+                // If the other ringbond id has not been discovered,
+                // add it to the open bonds map and continue.
+                // if the other ringbond id has already been discovered,
+                // create a bond between the two atoms.
+                if (openBonds[ringbondId] === undefined) { 
                     openBonds[ringbondId] = vertex.id;
                 } else {
-                    let target = openBonds[ringbondId];
-                    let source = vertex.id;
-                    let edgeId = that.addEdge(new Edge(source, target, 1));
+                    let sourceVertexId = vertex.id;
+                    let targetVertexId = openBonds[ringbondId];
+                    let edgeId = this.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
+                    let sourceVertex = this.vertices[sourceVertexId];
+                    let targetVertex = this.vertices[targetVertexId];
 
-                    let sourceVertex = that.vertices[source];
-                    let targetVertex = that.vertices[target];
-                    
-                    sourceVertex.addChild(target);
-                    targetVertex.addChild(source);
-
+                    sourceVertex.addChild(targetVertexId);
+                    targetVertex.addChild(sourceVertexId);
                     sourceVertex.edges.push(edgeId);
                     targetVertex.edges.push(edgeId);
 
-                    let ring = new Ring(ringbondId, source, target);
-                    that.addRing(ring);
-
-                    // Annotate the ring (add ring members to ring and rings to vertices)
-                    let path = that.getRingVertices(ring.sourceId, ring.targetId);
-
-                    for (let j = 0; j < path.length; j++) {
-                        ring.members.push(path[j]);
-                        that.vertices[path[j]].value.rings.push(ring.id);
-                    }
-
                     openBonds[ringbondId] = undefined;
-
-                    // Add the order to the new neighbour, this is used for chirality
-                    // visualization
-                    let targetOffset = targetVertex.value.bracket ? targetVertex.value.bracket.hcount : 0;
-                    let sourceOffset = sourceVertex.value.bracket ? sourceVertex.value.bracket.hcount : 0;
-
-                    targetVertex.value.setOrder(source, r + 1 + sourceOffset);
-                    sourceVertex.value.setOrder(target, r + 1 + targetOffset);
                 }
+            }
+        }
+
+        // Get the rings in the graph (the SSSR)
+        let rings = this.getRings();
+
+        if (rings === null) {
+            return;
+        }
+
+        for (let i = 0; i < rings.length; i++) {
+            let ringVertices = rings[i];
+
+            let ringId = this.addRing(new Ring(ringVertices));
+
+            // Add the ring to the atoms
+            for (let j = 0; j < ringVertices.length; j++) {
+                this.vertices[ringVertices[j]].value.rings.push(ringId);
             }
         }
 
@@ -990,7 +975,7 @@ class SmilesDrawer {
             let involvedRings = this.getBridgedRingRings(ring.id);
 
             this.bridgedRing = true;
-            this.createBridgedRing(involvedRings, ring.sourceId);
+            this.createBridgedRing(involvedRings, ring.members[0]);
 
             // Remove the rings
             for (let i = 0; i < involvedRings.length; i++) {
@@ -1150,10 +1135,9 @@ class SmilesDrawer {
         }
         
         // Create the ring
-        let ring = new Ring(-1, sourceVertexId, target);
+        let ring = new Ring(ringMembers);
         
         ring.isBridged = true;
-        ring.members = ringMembers;
         ring.neighbours = neighbours;
         ring.insiders = insideRing;
         
@@ -1202,110 +1186,6 @@ class SmilesDrawer {
         }
         
         return ring;
-    }
-
-    /**
-     * Returns an array of vertices that are members of the ring specified by the source and target vertex ids. It is assumed that those two vertices share the ringbond (the break introduced when creating the smiles MST).
-     *
-     * @param {number} sourceId A vertex id.
-     * @param {number} targetId A vertex id.
-     * @returns {array} An array of vertex ids.
-     */
-    getRingVertices(sourceId, targetId) {
-        let prev = this.dijkstra(sourceId, targetId);
-
-        // Backtrack from target to source
-        let tmp = [];
-        let path = [];
-        let u = targetId;
-
-        while (u != null) {
-            tmp.push(u);
-            u = prev[u];
-        }
-
-        // Reverse the backtrack path to get forward path
-        for (let i = tmp.length - 1; i >= 0; i--) {
-            path.push(tmp[i]);
-        }
-
-        return path;
-    }
-
-    /**
-     * Dijkstras algorithm for finding the shortest path between two vertices.
-     *
-     * @param {number} sourceId The id of the source vertex.
-     * @param {number} targetId The id of the target vertex.
-     * @returns {array} The path (vertex ids) from the source to the target vertex.
-     */
-    dijkstra(sourceId, targetId) {
-        // First initialize q which contains all the vertices
-        // including their neighbours, their id and a visited boolean
-        let prev = new Array(this.vertices.length);
-        let dist = new Array(this.vertices.length);
-        let visited = new Array(this.vertices.length);
-        let neighbours = new Array(this.vertices.length);
-
-        // Initialize arrays for the algorithm
-        for (let i = 0; i < this.vertices.length; i++) {
-            dist[i] = i === sourceId ? 0 : Number.MAX_VALUE;
-            prev[i] = null;
-            visited[i] = false;
-            neighbours[i] = this.vertices[i].getNeighbours();
-        }
-
-        // Dijkstras alogrithm
-        while (ArrayHelper.count(visited, false) > 0) {
-            let u = this.getMinDist(dist, visited);
-
-            // if u is the target, we're done
-            if (u == targetId) { 
-                return prev;
-            }
-
-            visited[u] = true; // this "removes" the node from q
-
-            for (let i = 0; i < neighbours[u].length; i++) {
-                let v = neighbours[u][i];
-                let tmp = dist[u] + this.getEdgeWeight(u, v);
-
-                // Do not move directly from the source to the target
-                // this should never happen, so just continue
-                if (u == sourceId && v == targetId || u == targetId && v == sourceId) {
-                    continue;
-                }
-
-                if (tmp < dist[v]) {
-                    dist[v] = tmp;
-                    prev[v] = u;
-                }
-            }
-        }
-    }
-
-    /**
-     * Gets the minimal distance from an array containing distances.
-     *
-     * @param {array} dist An array of distances.
-     * @param {array} visited An array indicated whether or not a vertex has been visited.
-     * @returns {number} The id with the minimal distance.
-     */
-    getMinDist(dist, visited) {
-        let min = Number.MAX_VALUE;
-        let v = null;
-
-        for (let i = 0; i < dist.length; i++) {
-            if (visited[i]) {
-                continue;
-            }
-            else if (dist[i] < min) {
-                v = i;
-                min = dist[v];
-            }
-        }
-
-        return v;
     }
 
     /**
@@ -2823,7 +2703,7 @@ class SmilesDrawer {
                 } else {
                     this.createRing(neighbour, nextCenter, vertexB, vertexA);
                 }
-            } else if (vertices.length == 1) {
+            } else if (vertices.length === 1) {
                 // This ring is a spiro
                 ring.isSpiro = true;
                 neighbour.isSpiro = true;

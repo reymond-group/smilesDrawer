@@ -3,22 +3,17 @@ class Ring {
     /**
      * The constructor for the class Ring.
      *
-     * @param {number} ringbond The id of the ring-bond shared by the source and target atom defined in the smiles string.
-     * @param {number} sourceId The source vertex id.
-     * @param {number} targetId The target vertex id.
+     * @param {array} members An array containing the vertex ids of the members of the ring to be created.
      */
-    constructor(ringbond, sourceId, targetId) {
+    constructor(members) {
         this.id = null;
-        this.ringbond = ringbond;
-        this.sourceId = sourceId;
-        this.targetId = targetId;
-        this.members = new Array();
-        this.edges = new Array();
-        this.insiders = new Array();
-        this.neighbours = new Array();
+        this.members = members.slice();
+        this.edges = [];
+        this.insiders = [];
+        this.neighbours = [];
         this.positioned = false;
         this.center = new Vector2();
-        this.rings = new Array();
+        this.rings = [];
         this.isBridged = false;
         this.template = null;
         this.isSpiro = false;
@@ -33,10 +28,9 @@ class Ring {
      * @returns {Ring} A clone of this ring.
      */
     clone() {
-        let clone = new Ring(this.ringbond, this.sourceId, this.target);
+        let clone = new Ring(this.members);
 
         clone.id = this.id;
-        clone.members = ArrayHelper.clone(this.members);
         clone.insiders = ArrayHelper.clone(this.insiders);
         clone.neighbours = ArrayHelper.clone(this.neighbours);
         clone.positioned = this.positioned;
@@ -254,33 +248,6 @@ class Ring {
         }
 
         return false;
-    }
-
-    /**
-     * Checks whether or not this ring has a source defined.
-     *
-     * @returns {boolean} A boolean indicating whether or not this ring has a source defined.
-     */
-    hasSource() {
-        return !(this.sourceId === undefined || this.sourceId === null);
-    }
-
-    /**
-     * Checks whether or not this ring has a target defined.
-     *
-     * @returns {boolean} A boolean indicating whether or not this ring has a target defined.
-     */
-    hasTarget() {
-        return !(this.targetId === undefined || this.targetId === null);
-    }
-
-    /**
-     * Checks whether or not this ring has a source and a target defined.
-     *
-     * @returns {boolean} A boolean indicating whether or not this ring has a source and a target defined.
-     */
-    hasSourceAndTarget() {
-        return this.hasSource() && this.hasTarget();
     }
 
     /**
