@@ -27,31 +27,36 @@
             let failed = '';
             for (let i = 0; i < drugbank.length; i++) {
                 console.log(i);
-                try {
-                    let t = performance.now();
-                    let data = SmilesDrawer.parse(SmilesDrawer.clean(drugbank[i]));
-                    let td = performance.now() - t;
-                    
-                    let t2 = performance.now();
-                    smilesDrawer.draw(data, 'example-canvas', 'light', false);
-                    let td2 = performance.now() - t2;
-
-                    totalSpeed += td + td2;
-                    totalOverlap += smilesDrawer.getTotalOverlapScore();
-                    nSuccesses++;
-
-                    str += td + ',' + 
-                           td2 + ',' + 
-                           smilesDrawer.getTotalOverlapScore() + ',' +
-                           smilesDrawer.getRingCount() + ',' + 
-                           smilesDrawer.getHeavyAtomCount() + ',' +
-                           smilesDrawer.hasBridgedRing() + '\n';
-                    
-                    // if (td > 1000) console.log(schembl[i]);
-                } catch (exception) {
+                
+                let td = null;
+                let t2 = null;
+                let td2 = null;
+                let t = performance.now();
+                
+                SmilesDrawer.parse(drugbank[i], function(tree) {
+                    td = performance.now() - t;
+                    t2 = performance.now();
+                    smilesDrawer.draw(tree, 'example-canvas', 'light', false);
+                    td2 = performance.now() - t2;
+                }, function(err) {
                     nErrors++;
                     failed += drugbank[i] + '\n';
+                });
+
+                if (td2 === null) {
+                    continue;
                 }
+
+                totalSpeed += td + td2;
+                totalOverlap += smilesDrawer.getTotalOverlapScore();
+                nSuccesses++;
+
+                str += td + ',' + 
+                       td2 + ',' + 
+                       smilesDrawer.getTotalOverlapScore() + ',' +
+                       smilesDrawer.getRingCount() + ',' + 
+                       smilesDrawer.getHeavyAtomCount() + ',' +
+                       smilesDrawer.hasBridgedRing() + '\n';
             }
 
             console.log(str);
