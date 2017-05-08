@@ -5867,7 +5867,7 @@ var SmilesDrawer = function () {
 
             // Get the rings in the graph (the SSSR)
             var rings = this.getRings();
-            console.log(rings);
+            // console.log(rings);
             if (rings === null) {
                 return;
             }
@@ -7662,7 +7662,7 @@ var SmilesDrawer = function () {
                 return;
             }
 
-            console.log(ring);
+            //console.log(ring);
 
             center = center ? center : new Vector2(0, 0);
 
@@ -8574,15 +8574,6 @@ var SmilesDrawer = function () {
             if (edge.bondType !== '-') {
                 return false;
             }
-
-            // C-N bonds are not rotatable because of their high rotational energy barrier
-            /* 
-            let combination = vertexA.value.element.toLowerCase() + vertexB.value.element.toLowerCase();
-            
-            if (combination === 'cn' || combination === 'nc') {
-                return false;
-            }
-            */
 
             // Do not rotate edges that have a further single bond to each side
             // If the bond is terminal, it doesn't make sense to rotate it

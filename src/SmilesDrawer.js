@@ -924,7 +924,7 @@ class SmilesDrawer {
 
         // Get the rings in the graph (the SSSR)
         let rings = this.getRings();
-        console.log(rings);
+        // console.log(rings);
         if (rings === null) {
             return;
         }
@@ -2612,7 +2612,7 @@ class SmilesDrawer {
             return;
         }
 
-        console.log(ring);
+        //console.log(ring);
 
         center = center ? center : new Vector2(0, 0);
         

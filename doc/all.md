@@ -1155,7 +1155,7 @@ A class representing a ring
 **Kind**: global class  
 
 * [Ring](#Ring)
-    * [new Ring(ringbond, sourceId, targetId)](#new_Ring_new)
+    * [new Ring(members)](#new_Ring_new)
     * _instance_
         * [.clone()](#Ring+clone) ⇒ <code>[Ring](#Ring)</code>
         * [.allowsFlip()](#Ring+allowsFlip) ⇒ <code>boolean</code>
@@ -1170,23 +1170,18 @@ A class representing a ring
         * [.getDoubleBondCount(vertices)](#Ring+getDoubleBondCount) ⇒ <code>number</code>
         * [.contains(vertexId)](#Ring+contains) ⇒ <code>boolean</code>
         * [.thisOrNeighboursContain(rings, vertexId)](#Ring+thisOrNeighboursContain) ⇒ <code>boolean</code>
-        * [.hasSource()](#Ring+hasSource) ⇒ <code>boolean</code>
-        * [.hasTarget()](#Ring+hasTarget) ⇒ <code>boolean</code>
-        * [.hasSourceAndTarget()](#Ring+hasSourceAndTarget) ⇒ <code>boolean</code>
     * _static_
         * [.getRing(rings, id)](#Ring.getRing) ⇒ <code>[Ring](#Ring)</code>
 
 <a name="new_Ring_new"></a>
 
-### new Ring(ringbond, sourceId, targetId)
+### new Ring(members)
 The constructor for the class Ring.
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ringbond | <code>number</code> | The id of the ring-bond shared by the source and target atom defined in the smiles string. |
-| sourceId | <code>number</code> | The source vertex id. |
-| targetId | <code>number</code> | The target vertex id. |
+| members | <code>array</code> | An array containing the vertex ids of the members of the ring to be created. |
 
 <a name="Ring+clone"></a>
 
@@ -1321,27 +1316,6 @@ Checks whether or not this ring or one of its neighbouring rings contains a memb
 | rings | <code>array</code> | An array of rings associated with this molecule. |
 | vertexId | <code>number</code> | A vertex id. |
 
-<a name="Ring+hasSource"></a>
-
-### ring.hasSource() ⇒ <code>boolean</code>
-Checks whether or not this ring has a source defined.
-
-**Kind**: instance method of <code>[Ring](#Ring)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not this ring has a source defined.  
-<a name="Ring+hasTarget"></a>
-
-### ring.hasTarget() ⇒ <code>boolean</code>
-Checks whether or not this ring has a target defined.
-
-**Kind**: instance method of <code>[Ring](#Ring)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not this ring has a target defined.  
-<a name="Ring+hasSourceAndTarget"></a>
-
-### ring.hasSourceAndTarget() ⇒ <code>boolean</code>
-Checks whether or not this ring has a source and a target defined.
-
-**Kind**: instance method of <code>[Ring](#Ring)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not this ring has a source and a target defined.  
 <a name="Ring.getRing"></a>
 
 ### Ring.getRing(rings, id) ⇒ <code>[Ring](#Ring)</code>
@@ -1482,7 +1456,7 @@ The main class of the application representing the smiles drawer
         * [.bondsToAtoms(bonds)](#SmilesDrawer+bondsToAtoms) ⇒ <code>set</code>
         * [.pathSetsContain(pathSets, pathSet)](#SmilesDrawer+pathSetsContain) ⇒ <code>boolean</code>
         * [.areSetsEqual(setA, setB)](#SmilesDrawer+areSetsEqual) ⇒ <code>boolean</code>
-        * [.initPathIncludedDistanceMatrix()](#SmilesDrawer+initPathIncludedDistanceMatrix)
+        * [.getRings()](#SmilesDrawer+getRings) ⇒ <code>array</code>
         * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
         * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
         * [.getFusedRings()](#SmilesDrawer+getFusedRings) ⇒ <code>array</code>
@@ -1498,9 +1472,6 @@ The main class of the application representing the smiles drawer
         * [.getBridgedRingRings(ringId)](#SmilesDrawer+getBridgedRingRings) ⇒ <code>array</code>
         * [.isPartOfBridgedRing(ringId)](#SmilesDrawer+isPartOfBridgedRing) ⇒ <code>boolean</code>
         * [.createBridgedRing(ringIds, sourceVertexId)](#SmilesDrawer+createBridgedRing) ⇒ <code>[Ring](#Ring)</code>
-        * [.getRingVertices(sourceId, targetId)](#SmilesDrawer+getRingVertices) ⇒ <code>array</code>
-        * [.dijkstra(sourceId, targetId)](#SmilesDrawer+dijkstra) ⇒ <code>array</code>
-        * [.getMinDist(dist, visited)](#SmilesDrawer+getMinDist) ⇒ <code>number</code>
         * [.areVerticesInSameRing(vertexA, vertexB)](#SmilesDrawer+areVerticesInSameRing) ⇒ <code>boolean</code>
         * [.getCommonRings(vertexA, vertexB)](#SmilesDrawer+getCommonRings) ⇒ <code>array</code>
         * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer+getSmallestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
@@ -1701,12 +1672,13 @@ Checks whether or not two sets are equal (contain the same elements).
 | setA | <code>set</code> | A set. |
 | setB | <code>set</code> | A set. |
 
-<a name="SmilesDrawer+initPathIncludedDistanceMatrix"></a>
+<a name="SmilesDrawer+getRings"></a>
 
-### smilesDrawer.initPathIncludedDistanceMatrix()
-Initializes the path-included distance matrix.
+### smilesDrawer.getRings() ⇒ <code>array</code>
+Returns an array containing all the rings in the molecule represented by arrays of vertices.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Returns**: <code>array</code> - An array containing all the rings in the molecule represented by arrays of vertices.  
 <a name="SmilesDrawer+edgeRingCount"></a>
 
 ### smilesDrawer.edgeRingCount(edgeId) ⇒ <code>number</code>
@@ -1843,45 +1815,6 @@ Creates a bridged ring.
 | --- | --- | --- |
 | ringIds | <code>array</code> | An array of ids of rings involved in the bridged ring. |
 | sourceVertexId | <code>number</code> | The vertex id to start the bridged ring discovery from. |
-
-<a name="SmilesDrawer+getRingVertices"></a>
-
-### smilesDrawer.getRingVertices(sourceId, targetId) ⇒ <code>array</code>
-Returns an array of vertices that are members of the ring specified by the source and target vertex ids. It is assumed that those two vertices share the ringbond (the break introduced when creating the smiles MST).
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>array</code> - An array of vertex ids.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sourceId | <code>number</code> | A vertex id. |
-| targetId | <code>number</code> | A vertex id. |
-
-<a name="SmilesDrawer+dijkstra"></a>
-
-### smilesDrawer.dijkstra(sourceId, targetId) ⇒ <code>array</code>
-Dijkstras algorithm for finding the shortest path between two vertices.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>array</code> - The path (vertex ids) from the source to the target vertex.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sourceId | <code>number</code> | The id of the source vertex. |
-| targetId | <code>number</code> | The id of the target vertex. |
-
-<a name="SmilesDrawer+getMinDist"></a>
-
-### smilesDrawer.getMinDist(dist, visited) ⇒ <code>number</code>
-Gets the minimal distance from an array containing distances.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>number</code> - The id with the minimal distance.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| dist | <code>array</code> | An array of distances. |
-| visited | <code>array</code> | An array indicated whether or not a vertex has been visited. |
 
 <a name="SmilesDrawer+areVerticesInSameRing"></a>
 
@@ -2510,8 +2443,7 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer+initPseudoElements"></a>
 
 ### smilesDrawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
-the involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer.clean"></a>
