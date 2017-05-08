@@ -33,6 +33,9 @@
 <dt><a href="#SmilesDrawer">SmilesDrawer</a></dt>
 <dd><p>The main class of the application representing the smiles drawer</p>
 </dd>
+<dt><a href="#SSSR">SSSR</a></dt>
+<dd><p>A class encapsulating the functionality to find the smallest set of smallest rings in a graph.</p>
+</dd>
 <dt><a href="#Vector2">Vector2</a></dt>
 <dd><p>A class representing a 2D vector.</p>
 </dd>
@@ -1448,15 +1451,6 @@ The main class of the application representing the smiles drawer
         * [.extend()](#SmilesDrawer+extend)
         * [.draw(data, target, themeName, infoOnly)](#SmilesDrawer+draw)
         * [.getAdjacencyMatrix()](#SmilesDrawer+getAdjacencyMatrix) ⇒ <code>array</code>
-        * [.getDistanceMatrix(adjacencyMatrix)](#SmilesDrawer+getDistanceMatrix) ⇒ <code>array</code>
-        * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer+getEdgeList) ⇒ <code>array</code>
-        * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer+getPathIncludedDistanceMatrices) ⇒ <code>object</code>
-        * [.getRingCandidates(d, pe1, pe2)](#SmilesDrawer+getRingCandidates) ⇒ <code>array</code>
-        * [.getSSSR(c, d, pe1, pe2, nsssr)](#SmilesDrawer+getSSSR) ⇒ <code>array</code>
-        * [.bondsToAtoms(bonds)](#SmilesDrawer+bondsToAtoms) ⇒ <code>set</code>
-        * [.pathSetsContain(pathSets, pathSet)](#SmilesDrawer+pathSetsContain) ⇒ <code>boolean</code>
-        * [.areSetsEqual(setA, setB)](#SmilesDrawer+areSetsEqual) ⇒ <code>boolean</code>
-        * [.getRings()](#SmilesDrawer+getRings) ⇒ <code>array</code>
         * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
         * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
         * [.getFusedRings()](#SmilesDrawer+getFusedRings) ⇒ <code>array</code>
@@ -1568,117 +1562,6 @@ Initialize the adjacency matrix of the molecular graph.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 **Returns**: <code>array</code> - The adjancency matrix of the molecular graph.  
-<a name="SmilesDrawer+getDistanceMatrix"></a>
-
-### smilesDrawer.getDistanceMatrix(adjacencyMatrix) ⇒ <code>array</code>
-Get the distance matrix (floyd marshall) of a adjacency matrix.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>array</code> - The distance matrix of the graph defined by the adjacency matrix.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer+getEdgeList"></a>
-
-### smilesDrawer.getEdgeList(adjacencyMatrix) ⇒ <code>array</code>
-Returns an edge list constructed form an adjacency matrix.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>array</code> - An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer+getPathIncludedDistanceMatrices"></a>
-
-### smilesDrawer.getPathIncludedDistanceMatrices(adjacencyMatrix) ⇒ <code>object</code>
-Returnes the two path-included distance matrices used to find the sssr.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>object</code> - The path-included distance matrices. { p1, p2 }  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer+getRingCandidates"></a>
-
-### smilesDrawer.getRingCandidates(d, pe1, pe2) ⇒ <code>array</code>
-Get the ring candidates from the path-included distance matrices.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>array</code> - The ring candidates.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| d | <code>array</code> | The distance matrix. |
-| pe1 | <code>array</code> | A matrix containing the shortest paths. |
-| pe2 | <code>array</code> | A matrix containing the shortest paths + one vertex. |
-
-<a name="SmilesDrawer+getSSSR"></a>
-
-### smilesDrawer.getSSSR(c, d, pe1, pe2, nsssr) ⇒ <code>array</code>
-Searches the candidates for the smallest set of smallest rings.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>array</code> - The smallest set of smallest rings.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| c | <code>array</code> | The candidates. |
-| d | <code>array</code> | The distance matrix. |
-| pe1 | <code>array</code> | A matrix containing the shortest paths. |
-| pe2 | <code>array</code> | A matrix containing the shortest paths + one vertex. |
-| nsssr | <code>number</code> | The theoretical number of rings in the graph. |
-
-<a name="SmilesDrawer+bondsToAtoms"></a>
-
-### smilesDrawer.bondsToAtoms(bonds) ⇒ <code>set</code>
-Return a set of vertex indices contained in an array of bonds.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>set</code> - An array of vertices.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| bonds | <code>array</code> | An array of bonds. |
-
-<a name="SmilesDrawer+pathSetsContain"></a>
-
-### smilesDrawer.pathSetsContain(pathSets, pathSet) ⇒ <code>boolean</code>
-Checks whether or not a given path already exists in an array of paths.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not a give path is contained within a set.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| pathSets | <code>array</code> | An array of sets each representing a path. |
-| pathSet | <code>set</code> | A set representing a path. |
-
-<a name="SmilesDrawer+areSetsEqual"></a>
-
-### smilesDrawer.areSetsEqual(setA, setB) ⇒ <code>boolean</code>
-Checks whether or not two sets are equal (contain the same elements).
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not the two sets are equal.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| setA | <code>set</code> | A set. |
-| setB | <code>set</code> | A set. |
-
-<a name="SmilesDrawer+getRings"></a>
-
-### smilesDrawer.getRings() ⇒ <code>array</code>
-Returns an array containing all the rings in the molecule represented by arrays of vertices.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>array</code> - An array containing all the rings in the molecule represented by arrays of vertices.  
 <a name="SmilesDrawer+edgeRingCount"></a>
 
 ### smilesDrawer.edgeRingCount(edgeId) ⇒ <code>number</code>
@@ -2482,6 +2365,127 @@ Parses the entered smiles string.
 | smiles | <code>string</code> | A SMILES string. |
 | successCallback | <code>function</code> | A callback that is called on success with the parse tree. |
 | errorCallback | <code>function</code> | A callback that is called with the error object on error. |
+
+<a name="SSSR"></a>
+
+## SSSR
+A class encapsulating the functionality to find the smallest set of smallest rings in a graph.
+
+**Kind**: global class  
+
+* [SSSR](#SSSR)
+    * [.getRings(adjacencyMatrix)](#SSSR.getRings) ⇒ <code>array</code>
+    * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SSSR.getPathIncludedDistanceMatrices) ⇒ <code>object</code>
+    * [.getRingCandidates(d, pe1, pe2)](#SSSR.getRingCandidates) ⇒ <code>array</code>
+    * [.getSSSR(c, d, pe1, pe2, nsssr)](#SSSR.getSSSR) ⇒ <code>array</code>
+    * [.getEdgeCount(adjacencyMatrix)](#SSSR.getEdgeCount) ⇒ <code>number</code>
+    * [.bondsToAtoms(bonds)](#SSSR.bondsToAtoms) ⇒ <code>set</code>
+    * [.pathSetsContain(pathSets, pathSet)](#SSSR.pathSetsContain) ⇒ <code>boolean</code>
+    * [.areSetsEqual(setA, setB)](#SSSR.areSetsEqual) ⇒ <code>boolean</code>
+
+<a name="SSSR.getRings"></a>
+
+### SSSR.getRings(adjacencyMatrix) ⇒ <code>array</code>
+Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>array</code> - An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>array</code> | A 2-dimensional array representing a graph. |
+
+<a name="SSSR.getPathIncludedDistanceMatrices"></a>
+
+### SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix) ⇒ <code>object</code>
+Returnes the two path-included distance matrices used to find the sssr.
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>object</code> - The path-included distance matrices. { p1, p2 }  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
+
+<a name="SSSR.getRingCandidates"></a>
+
+### SSSR.getRingCandidates(d, pe1, pe2) ⇒ <code>array</code>
+Get the ring candidates from the path-included distance matrices.
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>array</code> - The ring candidates.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| d | <code>array</code> | The distance matrix. |
+| pe1 | <code>array</code> | A matrix containing the shortest paths. |
+| pe2 | <code>array</code> | A matrix containing the shortest paths + one vertex. |
+
+<a name="SSSR.getSSSR"></a>
+
+### SSSR.getSSSR(c, d, pe1, pe2, nsssr) ⇒ <code>array</code>
+Searches the candidates for the smallest set of smallest rings.
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>array</code> - The smallest set of smallest rings.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| c | <code>array</code> | The candidates. |
+| d | <code>array</code> | The distance matrix. |
+| pe1 | <code>array</code> | A matrix containing the shortest paths. |
+| pe2 | <code>array</code> | A matrix containing the shortest paths + one vertex. |
+| nsssr | <code>number</code> | The theoretical number of rings in the graph. |
+
+<a name="SSSR.getEdgeCount"></a>
+
+### SSSR.getEdgeCount(adjacencyMatrix) ⇒ <code>number</code>
+Returns the number of edges in a graph defined by an adjacency matrix.
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>number</code> - The number of edges in the graph defined by the adjacency matrix.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
+
+<a name="SSSR.bondsToAtoms"></a>
+
+### SSSR.bondsToAtoms(bonds) ⇒ <code>set</code>
+Return a set of vertex indices contained in an array of bonds.
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>set</code> - An array of vertices.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| bonds | <code>array</code> | An array of bonds. |
+
+<a name="SSSR.pathSetsContain"></a>
+
+### SSSR.pathSetsContain(pathSets, pathSet) ⇒ <code>boolean</code>
+Checks whether or not a given path already exists in an array of paths.
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not a give path is contained within a set.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| pathSets | <code>array</code> | An array of sets each representing a path. |
+| pathSet | <code>set</code> | A set representing a path. |
+
+<a name="SSSR.areSetsEqual"></a>
+
+### SSSR.areSetsEqual(setA, setB) ⇒ <code>boolean</code>
+Checks whether or not two sets are equal (contain the same elements).
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not the two sets are equal.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| setA | <code>set</code> | A set. |
+| setB | <code>set</code> | A set. |
 
 <a name="Vector2"></a>
 
