@@ -724,7 +724,7 @@ class SmilesDrawer {
             let vertex = this.vertices[vertices[i]];
             let intersection = ArrayHelper.intersection(ringIds, vertex.value.rings);
             
-            if (vertex.value.rings.length == 1 || intersection.length == 1) {
+            if (vertex.value.rings.length === 1 || intersection.length === 1) {
                 bridgedRing.push(vertex.id);
             } else {
                 leftovers.push(vertex.id);
@@ -741,18 +741,8 @@ class SmilesDrawer {
             let vertex = this.vertices[leftovers[i]];
             let onRing = false;
 
-            /*
-            if (ArrayHelper.intersection(vertex.getNeighbours(), bridgedRing).length > 1) {
-                vertex.value.isBridgeNode = true;
-                tmp.push(vertex.id);
-            } else {
-                vertex.value.isBridge = true;
-                insideRing.push(vertex.id);
-            }
-            */
-
-            for(let j = 0; j < vertex.edges.length; j++) {
-                if(this.edgeRingCount(vertex.edges[j]) == 1) {
+            for (let j = 0; j < vertex.edges.length; j++) {
+                if(this.edgeRingCount(vertex.edges[j]) === 1) {
                     onRing = true;
                 }
             }
@@ -795,7 +785,7 @@ class SmilesDrawer {
         ring.neighbours = neighbours;
         ring.insiders = insideRing;
         
-        for(let i = 0; i < ringIds.length; i++) {
+        for (var i = 0; i < ringIds.length; i++) {
             ring.rings.push(this.getRing(ringIds[i]).clone());
         }
 
@@ -915,6 +905,7 @@ class SmilesDrawer {
      * @param {Vertex} vertexB A vertex.
      * @returns {Ring|null} If a largest common ring exists, that ring, else null.
      */
+    /*
     getLargestCommonRing(vertexA, vertexB) {
         let commonRings = this.getCommonRings(vertexA, vertexB);
         let maxSize = 0;
@@ -931,6 +922,7 @@ class SmilesDrawer {
 
         return largestCommonRing;
     }
+    */
 
     /**
      * Returns the aromatic or largest ring shared by the two vertices.
@@ -1050,6 +1042,7 @@ class SmilesDrawer {
      * @param {number} previousId The vertex id in the opposite of which the search will be started.
      * @returns {object} An object containing two arrays, one with the vertices in the subgraph and one with the rings in the subgraph.
      */
+    /*
     getBranch(vertexId, previousId) {
         let vertices = [];
         let rings = [];
@@ -1088,6 +1081,7 @@ class SmilesDrawer {
             rings: ArrayHelper.unique(rings)
         };
     }
+    */
 
     /**
      * Add a vertex to this representation of a molcule.
@@ -1409,7 +1403,7 @@ class SmilesDrawer {
      * @returns {boolean} A boolean indicating whether or not two vertices are connected.
      */
     areConnected(vertexIdA, vertexIdB) {
-        for(let i = 0; i < this.edges.length; i++) {
+        for (var i = 0; i < this.edges.length; i++) {
             let edge = this.edges[i];
             
             if(edge.sourceId === vertexIdA && edge.targetId === vertexIdB || 
@@ -3398,7 +3392,7 @@ class SmilesDrawer {
 
             let ctn = 0;
 
-            for(let j = 0; j < neighbours.length; j++) {
+            for (var j = 0; j < neighbours.length; j++) {
                 let neighbour = this.vertices[neighbours[j]];
 
                 if (neighbour.getNeighbourCount() > 1) {
@@ -3413,15 +3407,16 @@ class SmilesDrawer {
             // Get the previous atom (the one which is not terminal)
             let previous = null;
 
-            for(let j = 0; j < neighbours.length; j++) {
+            for (var j = 0; j < neighbours.length; j++) {
                 let neighbour = this.vertices[neighbours[j]];
+
                 if (neighbour.getNeighbourCount() > 1) {
                     previous = neighbour;
                 }
             }
 
 
-            for(let j = 0; j < neighbours.length; j++) {
+            for (var j = 0; j < neighbours.length; j++) {
                 let neighbour = this.vertices[neighbours[j]];
                 
                 if (neighbour.getNeighbourCount() > 1) {
