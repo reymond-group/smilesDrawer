@@ -572,7 +572,6 @@ class SmilesDrawer {
 
         for (var i = 0; i < rings.length; i++) {
             let ringVertices = rings[i];
-
             let ringId = this.addRing(new Ring(ringVertices));
 
             // Add the ring to the atoms
@@ -588,12 +587,11 @@ class SmilesDrawer {
             for (var j = i + 1; j < this.rings.length; j++) {
                 let a = this.rings[i];
                 let b = this.rings[j];
-
                 let ringConnection = new RingConnection(a, b);
 
                 // If there are no vertices in the ring connection, then there
                 // is no ring connection
-                if (ringConnection.vertices.length > 0) {
+                if (ringConnection.vertices.size > 0) {
                     this.addRingConnection(ringConnection);
                 }
             }
@@ -677,7 +675,7 @@ class SmilesDrawer {
      */
     isPartOfBridgedRing(ringId) {
         for (var i = 0; i < this.ringConnections.length; i++) {
-            if (this.ringConnections[i].rings.contains(ringId) &&
+            if (this.ringConnections[i].containsRing(ringId) &&
                 this.ringConnections[i].isBridge(this.vertices)) {
                 
                 return true;
@@ -1134,7 +1132,7 @@ class SmilesDrawer {
 
         // Also remove ring connections involving this ring
         this.ringConnections = this.ringConnections.filter(function (item) {
-            return item.rings.first !== ringId && item.rings.second !== ringId;
+            return item.firstRingId !== ringId && item.secondRingId !== ringId;
         });
 
         // Remove the ring as neighbour of other rings
@@ -1195,8 +1193,8 @@ class SmilesDrawer {
         for (var i = 0; i < this.ringConnections.length; i++) {
             let ringConnection = this.ringConnections[i];
 
-            if (ringConnection.rings.first === vertexIdA && ringConnection.rings.second === vertexIdB ||
-                ringConnection.rings.first === vertexIdB && ringConnection.rings.second === vertexIdA) {
+            if (ringConnection.firstRingId === vertexIdA && ringConnection.secondRingId === vertexIdB ||
+                ringConnection.firstRingId === vertexIdB && ringConnection.secondRingId === vertexIdA) {
                 toRemove.push(ringConnection.id);
             }
         }
@@ -1229,7 +1227,7 @@ class SmilesDrawer {
             for (var i = 0; i < this.ringConnections.length; i++) {
                 let ringConnection = this.ringConnections[i];
                 
-                if (ringConnection.rings.first === ringId || ringConnection.rings.second === ringId) {
+                if (ringConnection.firstRingId === ringId || ringConnection.secondRingId === ringId) {
                     ringConnections.push(ringConnection.id);
                 }
             }
@@ -1237,8 +1235,8 @@ class SmilesDrawer {
             for (var i = 0; i < this.ringConnections.length; i++) {
                 let ringConnection = this.ringConnections[i];
                 
-                if (ringConnection.rings.first === ringId && ringConnection.rings.second === ringIds ||
-                    ringConnection.rings.first === ringIds && ringConnection.rings.second === ringId) {
+                if (ringConnection.firstRingId === ringId && ringConnection.secondRingId === ringIds ||
+                    ringConnection.firstRingId === ringIds && ringConnection.secondRingId === ringId) {
                     ringConnections.push(ringConnection.id);
                 }
             }
@@ -1248,8 +1246,8 @@ class SmilesDrawer {
                     let id = ringIds[j];
                     let ringConnection = this.ringConnections[i];
                     
-                    if (ringConnection.rings.first === ringId && ringConnection.rings.second === id ||
-                        ringConnection.rings.first === id && ringConnection.rings.second === ringId) {
+                    if (ringConnection.firstRingId === ringId && ringConnection.secondRingId === id ||
+                        ringConnection.firstRingId === id && ringConnection.secondRingId === ringId) {
                         ringConnections.push(ringConnection.id);
                     }
                 }
@@ -1270,12 +1268,11 @@ class SmilesDrawer {
         for (var i = 0; i < this.ringConnections.length; i++) {
             let ringConnection = this.ringConnections[i];
             
-            if (ringConnection.vertices.length !== 2) {
+            if (ringConnection.vertices.size !== 2) {
                 continue;
             }
 
-            if (ringConnection.vertices[0] === vertexIdA && ringConnection.vertices[1] === vertexIdB ||
-                ringConnection.vertices[0] === vertexIdB && ringConnection.vertices[1] === vertexIdA) {
+            if (ringConnection.vertices.has(vertexIdA) && ringConnection.vertices.has(vertexIdB)) {
                 return true;
             }
         }
@@ -1731,7 +1728,6 @@ class SmilesDrawer {
                     if (dSq < 0.01) {
                         dx = 0.1 * Math.random() + 0.1;
                         dy = 0.1 * Math.random() + 0.1;
-
                         dSq = dx * dx + dy * dy;
                     }
 
@@ -2250,8 +2246,9 @@ class SmilesDrawer {
         console.log(ring);
 
         center = center ? center : new Vector2(0, 0);
-        
+        console.log(this.ringConnections);
         let orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
+        console.log(orderedNeighbours);
         let startingAngle = startVertex ? Vector2.subtract(startVertex.position, center).angle() : 0;
 
         let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());

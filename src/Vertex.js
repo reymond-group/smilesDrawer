@@ -181,7 +181,7 @@ class Vertex {
      * @returns {array} An array containing the ids of neighbouring vertices.
      */
     getNeighbours(vertexId = null) {
-        if(vertexId === null) {
+        if (vertexId === null) {
             return this.neighbours;
         }
 

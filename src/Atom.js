@@ -9,15 +9,15 @@ class Atom {
     constructor(element, bondType = '-') {
         this.element = element;
         this.explicit = false;
-        this.ringbonds = new Array();
-        this.rings = new Array();
+        this.ringbonds = [];
+        this.rings = [];
         this.bondType = bondType;
         this.isTerminal = false;
         this.isBridge = false;
         this.isBridgeNode = false;
-        this.originalRings = new Array();
+        this.originalRings = [];
         this.bridgedRing = null;
-        this.anchoredRings = new Array();
+        this.anchoredRings = [];
         this.bracket = null;
         this.chiral = 0;
         this.order = {};
@@ -54,8 +54,7 @@ class Atom {
      * @returns {object} The sorted attached pseudo elements.
      */
     getAttachedPseudoElements() {
-        const ordered = {};
-
+        let ordered = {};
         let that = this;
 
         Object.keys(this.attachedPseudoElements).sort().forEach(function(key) {

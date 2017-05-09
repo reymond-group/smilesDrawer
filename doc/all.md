@@ -21,9 +21,6 @@
 <dt><a href="#MathHelper">MathHelper</a></dt>
 <dd><p>A static class containing helper functions for math-related tasks.</p>
 </dd>
-<dt><a href="#Pair">Pair</a></dt>
-<dd><p>A class representing a pair</p>
-</dd>
 <dt><a href="#Ring">Ring</a></dt>
 <dd><p>A class representing a ring</p>
 </dd>
@@ -1093,63 +1090,6 @@ Converts degrees to radians.
 | --- | --- | --- |
 | deg | <code>number</code> | An angle in degrees. |
 
-<a name="Pair"></a>
-
-## Pair
-A class representing a pair
-
-**Kind**: global class  
-
-* [Pair](#Pair)
-    * [new Pair(first, second)](#new_Pair_new)
-    * _instance_
-        * [.getHash()](#Pair+getHash) ⇒ <code>number</code>
-        * [.contains(item)](#Pair+contains) ⇒ <code>boolean</code>
-    * _static_
-        * [.createUniquePairs(array)](#Pair.createUniquePairs) ⇒ <code>array</code>
-
-<a name="new_Pair_new"></a>
-
-### new Pair(first, second)
-The constructor for the class Pair.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| first | <code>\*</code> | The first element of the pair. |
-| second | <code>\*</code> | The second element of the pair. |
-
-<a name="Pair+getHash"></a>
-
-### pair.getHash() ⇒ <code>number</code>
-Returns a unique hash for this pair. Uses the cantor pairing function.
-
-**Kind**: instance method of <code>[Pair](#Pair)</code>  
-**Returns**: <code>number</code> - The hash.  
-<a name="Pair+contains"></a>
-
-### pair.contains(item) ⇒ <code>boolean</code>
-Checks whether or not this pair contains an object. Uses '===' to compare.
-
-**Kind**: instance method of <code>[Pair](#Pair)</code>  
-**Returns**: <code>boolean</code> - A boolean representing whether or not this pair contains a given value.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| item | <code>\*</code> | An string or a number (current limitation). |
-
-<a name="Pair.createUniquePairs"></a>
-
-### Pair.createUniquePairs(array) ⇒ <code>array</code>
-Creates unique paris from an array. The array must contain unique values.
-
-**Kind**: static method of <code>[Pair](#Pair)</code>  
-**Returns**: <code>array</code> - An array containing unique pairs created from the provided array.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| array | <code>array</code> | An array containing unique values. |
-
 <a name="Ring"></a>
 
 ## Ring
@@ -1343,7 +1283,7 @@ A class representing a ring connection
     * [new RingConnection(firstRing, secondRing)](#new_RingConnection_new)
     * _instance_
         * [.addVertex(vertexId)](#RingConnection+addVertex)
-        * [.isBridge(vertices)](#RingConnection+isBridge) ⇒ <code>boolean</code>
+        * [.isBridge()](#RingConnection+isBridge) ⇒ <code>boolean</code>
         * [.updateOther(ringId, otherRingId)](#RingConnection+updateOther)
     * _static_
         * [.isBridge(ringConnections, vertices, firstRingId, secondRingId)](#RingConnection.isBridge) ⇒ <code>boolean</code>
@@ -1358,8 +1298,8 @@ The constructor for the class RingConnection.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| firstRing | <code>number</code> | A ring. |
-| secondRing | <code>number</code> | A ring. |
+| firstRing | <code>[Ring](#Ring)</code> | A ring. |
+| secondRing | <code>[Ring](#Ring)</code> | A ring. |
 
 <a name="RingConnection+addVertex"></a>
 
@@ -1374,7 +1314,7 @@ Adding a vertex to the ring connection.
 
 <a name="RingConnection+isBridge"></a>
 
-### ringConnection.isBridge(vertices) ⇒ <code>boolean</code>
+### ringConnection.isBridge() ⇒ <code>boolean</code>
 Checks whether or not this ring connection is a bridge in a bridged ring.
 
 **Kind**: instance method of <code>[RingConnection](#RingConnection)</code>  
@@ -1382,7 +1322,7 @@ Checks whether or not this ring connection is a bridge in a bridged ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>array</code> | The array of vertices associated with the current molecule. |
+| . | <code>array</code> | vertices The array of vertices associated with the current molecule. |
 
 <a name="RingConnection+updateOther"></a>
 
@@ -1469,12 +1409,10 @@ The main class of the application representing the smiles drawer
         * [.areVerticesInSameRing(vertexA, vertexB)](#SmilesDrawer+areVerticesInSameRing) ⇒ <code>boolean</code>
         * [.getCommonRings(vertexA, vertexB)](#SmilesDrawer+getCommonRings) ⇒ <code>array</code>
         * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer+getSmallestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
-        * [.getLargestCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
         * [.getLargestOrAromaticCommonRing(vertexA, vertexB)](#SmilesDrawer+getLargestOrAromaticCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
         * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer+getVerticesAt) ⇒ <code>array</code>
         * [.getClosestVertex(vertex)](#SmilesDrawer+getClosestVertex) ⇒ <code>[Vertex](#Vertex)</code>
         * [.getClosestEndpointVertex(vertex)](#SmilesDrawer+getClosestEndpointVertex) ⇒ <code>[Vertex](#Vertex)</code>
-        * [.getBranch(vertexId, previousId)](#SmilesDrawer+getBranch) ⇒ <code>object</code>
         * [.addVertex(vertex)](#SmilesDrawer+addVertex) ⇒ <code>number</code>
         * [.addEdge(edge)](#SmilesDrawer+addEdge) ⇒ <code>number</code>
         * [.addRing(ring)](#SmilesDrawer+addRing) ⇒ <code>number</code>
@@ -1738,19 +1676,6 @@ Returns the smallest ring shared by the two vertices.
 | vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
 | vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
 
-<a name="SmilesDrawer+getLargestCommonRing"></a>
-
-### smilesDrawer.getLargestCommonRing(vertexA, vertexB) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
-Returns the largest ring shared by the two vertices.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>[Ring](#Ring)</code> &#124; <code>null</code> - If a largest common ring exists, that ring, else null.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
-| vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
-
 <a name="SmilesDrawer+getLargestOrAromaticCommonRing"></a>
 
 ### smilesDrawer.getLargestOrAromaticCommonRing(vertexA, vertexB) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
@@ -1801,19 +1726,6 @@ Returns the closest vertex (connected as well as unconnected), which is an endpo
 | Param | Type | Description |
 | --- | --- | --- |
 | vertex | <code>[Vertex](#Vertex)</code> | The vertex of which to find the closest other vertex. |
-
-<a name="SmilesDrawer+getBranch"></a>
-
-### smilesDrawer.getBranch(vertexId, previousId) ⇒ <code>object</code>
-Returns the rings and vertices contained in a sub-graph.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>object</code> - An object containing two arrays, one with the vertices in the subgraph and one with the rings in the subgraph.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexId | <code>number</code> | The vertex id to start the sub-graph search from |
-| previousId | <code>number</code> | The vertex id in the opposite of which the search will be started. |
 
 <a name="SmilesDrawer+addVertex"></a>
 
@@ -2326,7 +2238,8 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer+initPseudoElements"></a>
 
 ### smilesDrawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer.clean"></a>

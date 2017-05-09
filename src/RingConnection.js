@@ -3,13 +3,14 @@ class RingConnection {
     /**
      * The constructor for the class RingConnection.
      *
-     * @param {number} firstRing A ring.
-     * @param {number} secondRing A ring.
+     * @param {Ring} firstRing A ring.
+     * @param {Ring} secondRing A ring.
      */
     constructor(firstRing, secondRing) {
         this.id = null;
-        this.rings = new Pair(firstRing.id, secondRing.id);
-        this.vertices = [];
+        this.firstRingId = firstRing.id;
+        this.secondRingId = secondRing.id;
+        this.vertices = new Set();
 
         for (var m = 0; m < firstRing.members.length; m++) {
             let c = firstRing.members[m];
@@ -30,25 +31,21 @@ class RingConnection {
      * @param {number} vertexId A vertex id.
      */
     addVertex(vertexId) {
-        if (!ArrayHelper.contains(this.vertices, { value: vertexId })) {
-            this.vertices.push(vertexId);
-        }
+        this.vertices.add(vertexId);
     }
 
     /**
      * Checks whether or not this ring connection is a bridge in a bridged ring.
      *
-     * @param {array} vertices The array of vertices associated with the current molecule.
+     * @param {array}. vertices The array of vertices associated with the current molecule.
      * @returns {boolean} A boolean indicating whether or not this ring connection is a bridge.
      */
     isBridge(vertices) {
-        if (this.vertices.length > 2) { 
+        if (this.vertices.size > 2) { 
             return true;
         }
 
-        for (let i = 0; i < this.vertices.length; i++) {
-            let vertexId = this.vertices[i];
-
+        for (let vertexId of this.vertices) {
             if(vertices[vertexId].value.rings.length > 2) {
                 return true;
             }
@@ -64,11 +61,15 @@ class RingConnection {
      * @param {number} otherRingId A ring id. The id that is NOT to be updated.
      */
     updateOther(ringId, otherRingId) {
-        if (this.rings.first === otherRingId) {
-            this.rings.second = ringId;
+        if (this.firstRingId === otherRingId) {
+            this.secondRing = ringId;
         } else {
-            this.rings.first = ringId;
+            this.firstRingId = ringId;
         }
+    }
+
+    containsRing(ringId) {
+        return this.firstRingId === ringId || this.secondRing === ringId;
     }
 
     /**
@@ -87,10 +88,8 @@ class RingConnection {
         for (let i = 0; i < ringConnections.length; i++) {
             ringConnection = ringConnections[i];
             
-            let rings = ringConnection.rings;
-            
-            if (rings.first === firstRingId && rings.second === secondRingId ||
-                rings.first === secondRingId && rings.second === firstRingId) {
+            if (this.firstRingId === firstRingId && this.secondRingId === secondRingId ||
+                this.firstRingId === secondRingId && this.secondRingId === firstRingId) {
                 return ringConnection.isBridge(vertices);
             }
         }
@@ -110,12 +109,12 @@ class RingConnection {
         let neighbours = [];
 
         for (let i = 0; i < ringConnections.length; i++) {
-            let pair = ringConnections[i].rings;
+            let ringConnection = ringConnections[i];
             
-            if (pair.first === ringId) {
-                neighbours.push(pair.second);
-            } else if (pair.second === ringId) {
-                neighbours.push(pair.first);
+            if (ringConnection.firstRingId === ringId) {
+                neighbours.push(ringConnection.secondRingId);
+            } else if (ringConnection.secondRingId === ringId) {
+                neighbours.push(ringConnection.firstRingId);
             }
         }
 
@@ -133,12 +132,12 @@ class RingConnection {
      */
     static getVertices(ringConnections, firstRingId, secondRingId) {
         for (let i = 0; i < ringConnections.length; i++) {
-            let rc = ringConnections[i];
+            let ringConnection = ringConnections[i];
             
-            if (rc.rings.first == firstRingId && rc.rings.second == secondRingId ||
-                rc.rings.first == secondRingId && rc.rings.second == firstRingId) {
+            if (ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId ||
+                ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId) {
                 
-                return rc.vertices;
+                return [...ringConnection.vertices];
             }
         }
     }

@@ -143,12 +143,12 @@ class Ring {
      */
     getOrderedNeighbours(ringConnections) {
         let orderedNeighbours = [];
-
+        console.log('neighbours', this.neighbours);
         for (let i = 0; i < this.neighbours.length; i++) {
             let vertices = RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
             
             orderedNeighbours.push({
-                n: vertices.length,
+                n: vertices.size,
                 neighbour: this.neighbours[i]
             });
         }
