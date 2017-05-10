@@ -502,30 +502,6 @@ class CanvasWrapper {
         ctx.textBaseline = 'alphabetic';
 
         let pseudoElementHandled = false;
-        
-        // Check if the element name can be replaced by a pseudo element
-        if (!charge && !isotope && Object.keys(pseudoElements).length > 0) {
-            if (elementName === 'C' && Object.keys(pseudoElements).length === 1 && 
-                pseudoElements.hasOwnProperty('3C') && pseudoElements['3C'].count === 1) {
-                elementName = 'Et';
-                hydrogens = 0;
-                pseudoElementHandled = true;
-            } else if (Object.keys(pseudoElements).length === 1 && 
-                pseudoElements.hasOwnProperty('3C') && pseudoElements['3C'].count === 1) {
-                pseudoElements['3C'].element = 'Me';
-                pseudoElements['3C'].hydrogenCount = 0;
-            } else if (Object.keys(pseudoElements).length === 2 && (elementName === 'O' || elementName === 'N') &&
-                       pseudoElements.hasOwnProperty('3C') && pseudoElements.hasOwnProperty('0O')) {
-                pseudoElements = {};
-                pseudoElements['Ac'] = {
-                    element: 'Ac', 
-                    count: 1, 
-                    hydrogenCount: 0
-                };
-            }
-        }
-
-        console.log(elementName, pseudoElements);
 
         // Charge
         let chargeText = '+'

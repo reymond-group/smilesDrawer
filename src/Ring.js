@@ -7,7 +7,7 @@ class Ring {
      */
     constructor(members) {
         this.id = null;
-        this.members = members.slice();
+        this.members = members;
         this.edges = [];
         this.insiders = [];
         this.neighbours = [];
@@ -143,7 +143,7 @@ class Ring {
      */
     getOrderedNeighbours(ringConnections) {
         let orderedNeighbours = [];
-        console.log('neighbours', this.neighbours);
+        
         for (let i = 0; i < this.neighbours.length; i++) {
             let vertices = RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
             

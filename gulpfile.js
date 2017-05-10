@@ -7,6 +7,7 @@ var uglify = require('gulp-uglify');
 var jsdoc = require('gulp-jsdoc3');
 var gulpJsdoc2md = require('gulp-jsdoc-to-markdown');
 var gutil = require('gulp-util');
+var babili = require("gulp-babili");
 
 gulp.task('default', [ 'build', 'doc', 'md' ]);
 

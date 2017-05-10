@@ -61,7 +61,6 @@ class SSSR {
 
         // Get the edge list and the theoretical number of rings in SSSR
         let nSssr = SSSR.getEdgeCount(adjacencyMatrix) - adjacencyMatrix.length + 1;
-        console.log('nsssr', nSssr);
 
         if (nSssr === 0) {
             return null;

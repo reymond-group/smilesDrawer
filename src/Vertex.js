@@ -27,6 +27,7 @@ class Vertex {
         this.flipRings = new Array();
         this.neighbourCount = 0;
         this.neighbours = [];
+        this.neighbouringElements = [];
     }
 
     /**
@@ -67,7 +68,7 @@ class Vertex {
      * 
      * @param {number} parentVertexId The parents vertex id.
      */
-    setParentVertexId(parentVertexId) {
+    setParentVertexId(parentVertexId, element) {
         this.neighbourCount++;
         this.parentVertexId = parentVertexId;
         this.neighbours.push(parentVertexId);

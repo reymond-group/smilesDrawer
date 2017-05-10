@@ -448,11 +448,13 @@ class SmilesDrawer {
         // Add the id of this node to the parent as child
         if (parentVertexId !== null) {
             vertex.setParentVertexId(parentVertexId);
-            this.vertices[parentVertexId].addChild(vertex.id);
+            vertex.value.addNeighbouringElement(parentVertex.value.element);
+            parentVertex.addChild(vertex.id);
+            parentVertex.value.addNeighbouringElement(atom.element);
 
             // In addition create a spanningTreeChildren property, which later will
             // not contain the children added through ringbonds
-            this.vertices[parentVertexId].spanningTreeChildren.push(vertex.id);
+            parentVertex.spanningTreeChildren.push(vertex.id);
 
             // Add edge between this node and its parent
             let edge = new Edge(parentVertexId, vertex.id, 1);
@@ -460,7 +462,7 @@ class SmilesDrawer {
             if (isBranch) {
                 edge.bondType = vertex.value.branchBond;
             } else {
-                edge.bondType = this.vertices[parentVertexId].value.bondType;
+                edge.bondType = parentVertex.value.bondType;
             }
 
             let edgeId = this.addEdge(edge);
@@ -552,12 +554,13 @@ class SmilesDrawer {
                     let sourceVertexId = vertex.id;
                     let targetVertexId = openBonds.get(ringbondId);
                     let edgeId = this.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
-                    let sourceVertex = this.vertices[sourceVertexId];
                     let targetVertex = this.vertices[targetVertexId];
 
-                    sourceVertex.addChild(targetVertexId);
+                    vertex.addChild(targetVertexId);
+                    vertex.value.addNeighbouringElement(targetVertex.value.element);
                     targetVertex.addChild(sourceVertexId);
-                    sourceVertex.edges.push(edgeId);
+                    targetVertex.value.addNeighbouringElement(vertex.value.element);
+                    vertex.edges.push(edgeId);
                     targetVertex.edges.push(edgeId);
 
                     openBonds.delete(ringbondId);
@@ -567,7 +570,7 @@ class SmilesDrawer {
 
         // Get the rings in the graph (the SSSR)
         let rings = SSSR.getRings(this.getAdjacencyMatrix());
-        console.log(rings);
+
         if (rings === null) {
             return;
         }
@@ -590,7 +593,7 @@ class SmilesDrawer {
                 let a = this.rings[i];
                 let b = this.rings[j];
                 let ringConnection = new RingConnection(a, b);
-
+                
                 // If there are no vertices in the ring connection, then there
                 // is no ring connection
                 if (ringConnection.vertices.size > 0) {
@@ -2024,13 +2027,12 @@ class SmilesDrawer {
                 let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
                 let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-                lineA.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                lineB.shorten(this.opts.bondLength - this.opts.shortBondLength);
-
                 this.canvasWrapper.drawLine(lineA);
                 this.canvasWrapper.drawLine(lineB);
 
                 this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
+            } else if (edge.bondType === '.') {
+                // TODO: Something... maybe... version 2?
             } else {
                 let isChiralCenterA = vertexA.value.bracket && vertexA.value.bracket.chirality;
                 let isChiralCenterB = vertexB.value.bracket && vertexB.value.bracket.chirality;
@@ -2069,7 +2071,6 @@ class SmilesDrawer {
         for (var i = 0; i < this.vertices.length; i++) {
             let vertex = this.vertices[i];
             let atom = vertex.value;
-
             let charge = 0;
             let isotope = 0;
             let bondCount = this.getBondCount(vertex);
@@ -2245,12 +2246,9 @@ class SmilesDrawer {
             return;
         }
 
-        console.log(ring);
-
         center = center ? center : new Vector2(0, 0);
-        console.log(this.ringConnections);
+
         let orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
-        console.log(orderedNeighbours);
         let startingAngle = startVertex ? Vector2.subtract(startVertex.position, center).angle() : 0;
 
         let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
@@ -2808,6 +2806,7 @@ class SmilesDrawer {
                 let nextVertex = this.vertices[neighbours[0]];
 
                 // Make a single chain always cis except when there's a tribble bond
+                // or if there are successive double bonds
                 if((vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) ||
                     vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
                     vertex.value.explicit = true;
@@ -2883,6 +2882,10 @@ class SmilesDrawer {
                 // Check for the longer subtree - always go with cis for the longer subtree
                 let subTreeDepthA = this.getTreeDepth(neighbours[0], vertex.id);
                 let subTreeDepthB = this.getTreeDepth(neighbours[1], vertex.id);
+
+                // Also get the subtree for the previous direction (this is important when
+                // the previous vertex is the shortest path)
+                let subTreeDepthC = this.getTreeDepth(previousVertex ? previousVertex.id : null, vertex.id);
                 
                 let cis = 0;
                 let trans = 1;
@@ -2892,30 +2895,46 @@ class SmilesDrawer {
                     trans = 0;
                 }
 
-                if (vertex.position.clockwise(vertex.previousPosition) === 1) {
-                    let cisVertex = this.vertices[neighbours[cis]];
-                    let transVertex = this.vertices[neighbours[trans]];
+                let cisVertex = this.vertices[neighbours[cis]];
+                let transVertex = this.vertices[neighbours[trans]];
 
-                    transVertex.angle = MathHelper.toRad(60);
-                    cisVertex.angle = -MathHelper.toRad(60);
+                // If the origin tree is the shortest, set both vertices to trans
+                if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
+                    if (vertex.position.clockwise(vertex.previousPosition) === 1) {
+                        transVertex.angle = MathHelper.toRad(60);
+                        cisVertex.angle = -MathHelper.toRad(60);
+                        transVertex.globalAngle = angle + transVertex.angle;
+                        cisVertex.globalAngle = angle + cisVertex.angle;
 
-                    transVertex.globalAngle = angle + transVertex.angle;
-                    cisVertex.globalAngle = angle + cisVertex.angle;
+                        this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
+                        this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
+                    } else {
+                        transVertex.angle = -MathHelper.toRad(60);
+                        cisVertex.angle = MathHelper.toRad(60);
+                        transVertex.globalAngle = angle + transVertex.angle;
+                        cisVertex.globalAngle = angle + cisVertex.angle;
 
-                    this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
-                    this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
+                        this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
+                        this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
+                    }
                 } else {
-                    let cisVertex = this.vertices[neighbours[cis]];
-                    let transVertex = this.vertices[neighbours[trans]];
+                    if (vertex.position.clockwise(vertex.previousPosition) === 1) {
+                        transVertex.angle = MathHelper.toRad(60);
+                        cisVertex.angle = -MathHelper.toRad(60);
+                        transVertex.globalAngle = angle + transVertex.angle;
+                        cisVertex.globalAngle = angle + cisVertex.angle;
 
-                    transVertex.angle = -MathHelper.toRad(60);
-                    cisVertex.angle = MathHelper.toRad(60);
+                        this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
+                        this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
+                    } else {
+                        transVertex.angle = -MathHelper.toRad(60);
+                        cisVertex.angle = MathHelper.toRad(60);
+                        transVertex.globalAngle = angle + transVertex.angle;
+                        cisVertex.globalAngle = angle + cisVertex.angle;
 
-                    transVertex.globalAngle = angle + transVertex.angle;
-                    cisVertex.globalAngle = angle + cisVertex.angle;
-
-                    this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
-                    this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
+                        this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
+                        this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
+                    }
                 }
             } else if (neighbours.length === 3) {
                 // The vertex with the longest sub-tree should always go straight
@@ -3213,6 +3232,10 @@ class SmilesDrawer {
      * @returns {number} The depth of the sub-tree.
      */
     getTreeDepth(vertexId, parentVertexId) {
+        if (vertexId === null || parentVertexId === null) {
+            return 0;
+        }
+
         let neighbours = this.vertices[vertexId].getSpanningTreeNeighbours(parentVertexId);
         let max = 0;
 
@@ -3379,6 +3402,7 @@ class SmilesDrawer {
     initPseudoElements() {
         for (var i = 0; i < this.vertices.length; i++) {
             const vertex = this.vertices[i];
+            const element = vertex.value.element.toUpperCase();
             const neighbourIds = vertex.getNeighbours();
             let neighbours = [neighbourIds.length];
 
@@ -3386,42 +3410,9 @@ class SmilesDrawer {
                 neighbours[j] = this.vertices[neighbourIds[j]];
             }
 
-            // Check for Ac
-            //    O
-            //    ||
-            // X--C--CH3
-            let acFound = false;
-
-            for (var j = 0; j < neighbours.length; j++) {
-                let neighbour = neighbours[j];
-
-                if (neighbour.getNeighbourCount() !== 2) {
-                    continue;
-                }
-
-                let neighboursNeighbourIds = neighbour.getNeighbours();
-                let neighboursNeighbourA = this.vertices[neighboursNeighbourIds[0]];
-                let neighboursNeighbourB = this.vertices[neighboursNeighbourIds[1]];
-
-                // TODO Also check for isotope and charge
-                if (neighboursNeighbourA.value.element === 'O' && neighboursNeighbourB.value.element === 'N' ||
-                    neighboursNeighbourA.value.element === 'N' && neighboursNeighbourB.value.element === 'O') {
-                    // Ac found
-                    acFound = true;
-                    neighbour.value.isDrawn = false;
-                    neighboursNeighbourA.value.isDrawn = false;
-                    neighboursNeighbourB.value.isDrawn = false;
-                }
-            }
-
-            if (acFound) {
-                continue;
-            }
-
             // Ignore atoms that have less than 3 neighbours, except if
             // the vertex is connected to a ring and has two neighbours
-            if (vertex.getNeighbourCount() < 3 &&
-                !(vertex.value.isConnectedToRing && vertex.getNeighbourCount() === 2)) {
+            if (vertex.getNeighbourCount() < 3 || vertex.value.rings.length > 0) {
                 continue;
             }
 
@@ -3432,13 +3423,15 @@ class SmilesDrawer {
 
             for (var j = 0; j < neighbours.length; j++) {
                 let neighbour = neighbours[j];
-                let element = neighbour.value.element.toLowerCase();
+                let neighbouringElement = neighbour.value.element.toUpperCase();
+                let neighbourCount = neighbour.getNeighbourCount();
 
-                if (element !== 'c' && element !== 'h') {
+                if (neighbouringElement !== 'C' && neighbouringElement !== 'H' &&
+                    neighbourCount === 1) {
                     heteroAtomCount++;
                 }
 
-                if (neighbour.getNeighbourCount() > 1) {
+                if (neighbourCount > 1) {
                     ctn++;
                 }
             }
@@ -3458,7 +3451,6 @@ class SmilesDrawer {
                 }
             }
 
-
             for (var j = 0; j < neighbours.length; j++) {
                 let neighbour = neighbours[j];
                 
@@ -3475,6 +3467,39 @@ class SmilesDrawer {
                 }
 
                 vertex.value.attachPseudoElement(neighbour.value.element, previous ? previous.value.element : null, hydrogens);
+            }
+        }
+
+        // The second pass
+        for (var i = 0; i < this.vertices.length; i++) {
+            const vertex = this.vertices[i];
+            const atom = vertex.value;
+            const element = atom.element.toUpperCase();
+
+            if (element === 'C' || element === 'H' || !atom.isDrawn) {
+                continue;
+            }
+
+            const neighbourIds = vertex.getNeighbours();
+            let neighbours = [neighbourIds.length];
+
+            for (var j = 0; j < neighbourIds.length; j++) {
+                neighbours[j] = this.vertices[neighbourIds[j]];
+            }
+
+            for (var j = 0; j < neighbours.length; j++) {
+                let neighbour = neighbours[j].value;
+
+                if (!neighbour.hasAttachedPseudoElements || neighbour.getAttachedPseudoElementsCount() !== 2) {
+                    continue;
+                }
+                
+                const pseudoElements = neighbour.getAttachedPseudoElements();
+
+                if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
+                    neighbour.isDrawn = false;
+                    vertex.value.attachPseudoElement('Ac', '', 0);
+                }
             }
         }
     }

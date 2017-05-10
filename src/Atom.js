@@ -25,6 +25,16 @@ class Atom {
         this.hasAttachedPseudoElements = false;
         this.isDrawn = true;
         this.isConnectedToRing = false;
+        this.neighbouringElements = [];
+    }
+
+    /**
+     * Adds a neighbouring element to this atom.
+     * 
+     * @param {string} element A string representing an element.
+     */
+    addNeighbouringElement(element) {
+        this.neighbouringElements.push(element);
     }
 
     /**
@@ -34,18 +44,20 @@ class Atom {
      * @param {number} [hydrogenCount=0] The number of hydrogens for the element.
      */
     attachPseudoElement(element, previousElement, hydrogenCount = 0) {
-        this.hasAttachedPseudoElements = true;
+        let key = hydrogenCount + element;
 
-        if (this.attachedPseudoElements[hydrogenCount + element]) {
-            this.attachedPseudoElements[hydrogenCount + element].count += 1;
+        if (this.attachedPseudoElements[key]) {
+            this.attachedPseudoElements[key].count += 1;
         } else {
-            this.attachedPseudoElements[hydrogenCount + element] = { 
+            this.attachedPseudoElements[key] = { 
                 element: element, 
                 count: 1, 
                 hydrogenCount: hydrogenCount, 
                 previousElement: previousElement 
             };
         }
+
+        this.hasAttachedPseudoElements = true;
     }
 
     /**
@@ -62,6 +74,15 @@ class Atom {
         });
 
         return ordered;
+    }
+
+    /**
+     * Returns the number of attached pseudo elements.
+     *
+     * @returns {number} The number of attached pseudo elements.
+     */
+    getAttachedPseudoElementsCount() {
+        return Object.keys(this.attachedPseudoElements).length;
     }
 
     /**
@@ -231,6 +252,29 @@ class Atom {
      */
     setOrder(center, order) {
         this.order[center] = order;
+    }
+
+    /**
+     * Check whether or not the neighbouring elements of this atom equal the supplied array.
+     * 
+     * @param {array} arr An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N']
+     * @returns {boolean} A boolean indicating whether or not the neighbours match the supplied array of elements.
+     */
+    neighbouringElementsEqual(arr) {
+        if (arr.length !== this.neighbouringElements.length) {
+            return false;
+        }
+
+        arr.sort();
+        this.neighbouringElements.sort();
+
+        for (var i = 0; i < this.neighbouringElements.length; i++) {
+            if(arr[i] !== this.neighbouringElements[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
