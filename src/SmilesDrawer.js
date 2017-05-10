@@ -163,8 +163,7 @@ class SmilesDrawer {
             let overlapScore = this.getOverlapScore();
 
             this.totalOverlapScore = this.getOverlapScore().total;
-            
-            t = performance.now();
+
             for (var i = 0; i < this.edges.length; i++) {
                 let edge = this.edges[i];
                 

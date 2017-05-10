@@ -4964,7 +4964,6 @@ var SmilesDrawer = function () {
 
                 this.totalOverlapScore = this.getOverlapScore().total;
 
-                t = performance.now();
                 for (var i = 0; i < this.edges.length; i++) {
                     var edge = this.edges[i];
 
@@ -5444,6 +5443,7 @@ var SmilesDrawer = function () {
 
             // Replace rings contained by a larger bridged ring with a bridged ring
             while (this.rings.length > 0) {
+                console.log('looooop');
                 var id = -1;
                 for (var i = 0; i < this.rings.length; i++) {
                     var _ring2 = this.rings[i];
