@@ -36,10 +36,10 @@ class Atom {
     attachPseudoElement(element, previousElement, hydrogenCount = 0) {
         this.hasAttachedPseudoElements = true;
 
-        if (this.attachedPseudoElements[element + hydrogenCount]) {
-            this.attachedPseudoElements[element + hydrogenCount].count += 1;
+        if (this.attachedPseudoElements[hydrogenCount + element]) {
+            this.attachedPseudoElements[hydrogenCount + element].count += 1;
         } else {
-            this.attachedPseudoElements[element + hydrogenCount] = { 
+            this.attachedPseudoElements[hydrogenCount + element] = { 
                 element: element, 
                 count: 1, 
                 hydrogenCount: hydrogenCount, 

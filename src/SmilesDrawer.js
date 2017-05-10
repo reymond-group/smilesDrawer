@@ -253,7 +253,9 @@ class SmilesDrawer {
 
             // Initialize pseudo elements or shortcuts
             if (this.opts.compactDrawing) {
+                t = performance.now();
                 this.initPseudoElements();
+                console.log('initPseudoElements', performance.now() - t);
             }
 
             // Do the actual drawing
@@ -3377,27 +3379,71 @@ class SmilesDrawer {
     initPseudoElements() {
         for (var i = 0; i < this.vertices.length; i++) {
             const vertex = this.vertices[i];
-            const neighbours = vertex.getNeighbours();
+            const neighbourIds = vertex.getNeighbours();
+            let neighbours = [neighbourIds.length];
+
+            for (var j = 0; j < neighbourIds.length; j++) {
+                neighbours[j] = this.vertices[neighbourIds[j]];
+            }
+
+            // Check for Ac
+            //    O
+            //    ||
+            // X--C--CH3
+            let acFound = false;
+
+            for (var j = 0; j < neighbours.length; j++) {
+                let neighbour = neighbours[j];
+
+                if (neighbour.getNeighbourCount() !== 2) {
+                    continue;
+                }
+
+                let neighboursNeighbourIds = neighbour.getNeighbours();
+                let neighboursNeighbourA = this.vertices[neighboursNeighbourIds[0]];
+                let neighboursNeighbourB = this.vertices[neighboursNeighbourIds[1]];
+
+                // TODO Also check for isotope and charge
+                if (neighboursNeighbourA.value.element === 'O' && neighboursNeighbourB.value.element === 'N' ||
+                    neighboursNeighbourA.value.element === 'N' && neighboursNeighbourB.value.element === 'O') {
+                    // Ac found
+                    acFound = true;
+                    neighbour.value.isDrawn = false;
+                    neighboursNeighbourA.value.isDrawn = false;
+                    neighboursNeighbourB.value.isDrawn = false;
+                }
+            }
+
+            if (acFound) {
+                continue;
+            }
 
             // Ignore atoms that have less than 3 neighbours, except if
             // the vertex is connected to a ring and has two neighbours
-
             if (vertex.getNeighbourCount() < 3 &&
                 !(vertex.value.isConnectedToRing && vertex.getNeighbourCount() === 2)) {
                 continue;
             }
 
+            // Continue if there are less than two heteroatoms
+            // or if a neighbour has more than 1 neighbour
+            let heteroAtomCount = 0;
             let ctn = 0;
 
             for (var j = 0; j < neighbours.length; j++) {
-                let neighbour = this.vertices[neighbours[j]];
+                let neighbour = neighbours[j];
+                let element = neighbour.value.element.toLowerCase();
+
+                if (element !== 'c' && element !== 'h') {
+                    heteroAtomCount++;
+                }
 
                 if (neighbour.getNeighbourCount() > 1) {
                     ctn++;
                 }
             }
 
-            if (ctn > 1) {
+            if (ctn > 1 || heteroAtomCount < 2) {
                 continue;
             }
 
@@ -3405,7 +3451,7 @@ class SmilesDrawer {
             let previous = null;
 
             for (var j = 0; j < neighbours.length; j++) {
-                let neighbour = this.vertices[neighbours[j]];
+                let neighbour = neighbours[j];
 
                 if (neighbour.getNeighbourCount() > 1) {
                     previous = neighbour;
@@ -3414,7 +3460,7 @@ class SmilesDrawer {
 
 
             for (var j = 0; j < neighbours.length; j++) {
-                let neighbour = this.vertices[neighbours[j]];
+                let neighbour = neighbours[j];
                 
                 if (neighbour.getNeighbourCount() > 1) {
                     continue;

@@ -457,10 +457,10 @@ var Atom = function () {
 
             this.hasAttachedPseudoElements = true;
 
-            if (this.attachedPseudoElements[element + hydrogenCount]) {
-                this.attachedPseudoElements[element + hydrogenCount].count += 1;
+            if (this.attachedPseudoElements[hydrogenCount + element]) {
+                this.attachedPseudoElements[hydrogenCount + element].count += 1;
             } else {
-                this.attachedPseudoElements[element + hydrogenCount] = {
+                this.attachedPseudoElements[hydrogenCount + element] = {
                     element: element,
                     count: 1,
                     hydrogenCount: hydrogenCount,
@@ -1598,14 +1598,14 @@ var CanvasWrapper = function () {
 
             // Check if the element name can be replaced by a pseudo element
             if (!charge && !isotope && Object.keys(pseudoElements).length > 0) {
-                if (elementName === 'C' && Object.keys(pseudoElements).length === 1 && pseudoElements.hasOwnProperty('C3') && pseudoElements['C3'].count === 1) {
+                if (elementName === 'C' && Object.keys(pseudoElements).length === 1 && pseudoElements.hasOwnProperty('3C') && pseudoElements['3C'].count === 1) {
                     elementName = 'Et';
                     hydrogens = 0;
                     pseudoElementHandled = true;
-                } else if (Object.keys(pseudoElements).length === 1 && pseudoElements.hasOwnProperty('C3') && pseudoElements['C3'].count === 1) {
-                    pseudoElements['C3'].element = 'Me';
-                    pseudoElements['C3'].hydrogenCount = 0;
-                } else if (Object.keys(pseudoElements).length === 2 && (elementName === 'O' || elementName === 'N') && pseudoElements.hasOwnProperty('C3') && pseudoElements.hasOwnProperty('O0')) {
+                } else if (Object.keys(pseudoElements).length === 1 && pseudoElements.hasOwnProperty('3C') && pseudoElements['3C'].count === 1) {
+                    pseudoElements['3C'].element = 'Me';
+                    pseudoElements['3C'].hydrogenCount = 0;
+                } else if (Object.keys(pseudoElements).length === 2 && (elementName === 'O' || elementName === 'N') && pseudoElements.hasOwnProperty('3C') && pseudoElements.hasOwnProperty('0O')) {
                     pseudoElements = {};
                     pseudoElements['Ac'] = {
                         element: 'Ac',
@@ -1614,6 +1614,8 @@ var CanvasWrapper = function () {
                     };
                 }
             }
+
+            console.log(elementName, pseudoElements);
 
             // Charge
             var chargeText = '+';
@@ -2991,6 +2993,410 @@ var RingConnection = function () {
     }]);
 
     return RingConnection;
+}();
+
+/** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
+
+
+var SSSR = function () {
+    function SSSR() {
+        _classCallCheck(this, SSSR);
+    }
+
+    _createClass(SSSR, null, [{
+        key: 'getRings',
+
+        /**
+         * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
+         * 
+         * @param {array} adjacencyMatrix A 2-dimensional array representing a graph.
+         * @returns {array} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
+         */
+        value: function getRings(adjacencyMatrix) {
+            // Remove vertices that are not members of a ring
+            var removed = void 0;
+
+            do {
+                removed = 0;
+
+                for (var i = 0; i < adjacencyMatrix.length; i++) {
+                    var nNeighbours = adjacencyMatrix[i].reduce(function (a, b) {
+                        return a + b;
+                    }, 0);
+
+                    if (nNeighbours === 1) {
+                        adjacencyMatrix[i].fill(0);
+
+                        for (var j = 0; j < adjacencyMatrix.length; j++) {
+                            adjacencyMatrix[j][i] = 0;
+                        }
+
+                        removed++;
+                    }
+                }
+            } while (removed > 0);
+
+            // Update the adjacency matrix (remove rows and columns filled with 0s)
+
+            // Keep this as a map of new indices to old indices
+            var indices = [];
+            var indicesToRemove = [];
+            var updatedAdjacencyMatrix = [];
+
+            // Only the rows are filtered here, the columns still have their original values
+            for (var _i4 = 0; _i4 < adjacencyMatrix.length; _i4++) {
+                if (adjacencyMatrix[_i4].indexOf(1) >= 0) {
+                    indices.push(_i4);
+                    updatedAdjacencyMatrix.push(adjacencyMatrix[_i4]);
+                } else {
+                    indicesToRemove.push(_i4);
+                }
+            }
+
+            // Remove the unused values from the adjacency matrix
+
+            for (var _i5 = 0; _i5 < updatedAdjacencyMatrix.length; _i5++) {
+                for (var _j = indicesToRemove.length - 1; _j >= 0; _j--) {
+                    updatedAdjacencyMatrix[_i5].splice(indicesToRemove[_j], 1);
+                }
+            }
+
+            adjacencyMatrix = updatedAdjacencyMatrix;
+
+            if (adjacencyMatrix.length === 0) {
+                return null;
+            }
+
+            // Get the edge list and the theoretical number of rings in SSSR
+            var nSssr = SSSR.getEdgeCount(adjacencyMatrix) - adjacencyMatrix.length + 1;
+            console.log('nsssr', nSssr);
+
+            if (nSssr === 0) {
+                return null;
+            }
+
+            var _SSSR$getPathIncluded = SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix),
+                d = _SSSR$getPathIncluded.d,
+                pe1 = _SSSR$getPathIncluded.pe1,
+                pe2 = _SSSR$getPathIncluded.pe2;
+
+            var c = SSSR.getRingCandidates(d, pe1, pe2);
+            var sssr = SSSR.getSSSR(c, d, pe1, pe2, nSssr);
+            var rings = new Array(sssr.length);
+
+            for (var _i6 = 0; _i6 < sssr.length; _i6++) {
+                rings[_i6] = new Array(sssr[_i6].length);
+
+                var index = 0;
+
+                var _iteratorNormalCompletion2 = true;
+                var _didIteratorError2 = false;
+                var _iteratorError2 = undefined;
+
+                try {
+                    for (var _iterator2 = sssr[_i6][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                        var val = _step2.value;
+
+                        rings[_i6][index++] = indices[val];
+                    }
+                } catch (err) {
+                    _didIteratorError2 = true;
+                    _iteratorError2 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                            _iterator2.return();
+                        }
+                    } finally {
+                        if (_didIteratorError2) {
+                            throw _iteratorError2;
+                        }
+                    }
+                }
+            }
+
+            return rings;
+        }
+
+        /**
+         * Returnes the two path-included distance matrices used to find the sssr.
+         * 
+         * @param {array} adjacencyMatrix An adjacency matrix.
+         * @returns {object} The path-included distance matrices. { p1, p2 }
+         */
+
+    }, {
+        key: 'getPathIncludedDistanceMatrices',
+        value: function getPathIncludedDistanceMatrices(adjacencyMatrix) {
+            var length = adjacencyMatrix.length;
+            var d = Array(length);
+            var pe1 = Array(length);
+            var pe2 = Array(length);
+
+            for (var i = 0; i < length; i++) {
+                d[i] = Array(length);
+                pe1[i] = Array(length);
+                pe2[i] = Array(length);
+
+                for (var j = 0; j < length; j++) {
+                    d[i][j] = i === j || adjacencyMatrix[i][j] === 1 ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
+
+                    if (d[i][j] === 1) {
+                        pe1[i][j] = [[[i, j]]];
+                    } else {
+                        pe1[i][j] = [];
+                    }
+
+                    pe2[i][j] = [];
+                }
+            }
+
+            for (var k = 0; k < length; k++) {
+                for (var _i7 = 0; _i7 < length; _i7++) {
+                    for (var _j2 = 0; _j2 < length; _j2++) {
+                        var previousPathLength = d[_i7][_j2];
+                        var newPathLength = d[_i7][k] + d[k][_j2];
+
+                        if (previousPathLength > newPathLength) {
+                            if (previousPathLength === newPathLength + 1) {
+                                pe2[_i7][_j2] = ArrayHelper.deepCopy(pe1[_i7][_j2]);
+                            } else {
+                                pe2[_i7][_j2] = [];
+                            }
+
+                            d[_i7][_j2] = newPathLength;
+                            pe1[_i7][_j2] = [pe1[_i7][k][0].concat(pe1[k][_j2][0])];
+                        } else if (previousPathLength === newPathLength) {
+                            if (pe1[_i7][k].length && pe1[k][_j2].length) {
+                                if (pe1[_i7][_j2].length) {
+                                    pe1[_i7][_j2].push(pe1[_i7][k][0].concat(pe1[k][_j2][0]));
+                                } else {
+                                    pe1[_i7][_j2][0] = pe1[_i7][k][0].concat(pe1[k][_j2][0]);
+                                }
+                            }
+                        } else if (previousPathLength === newPathLength - 1) {
+                            if (pe2[_i7][_j2].length) {
+                                pe2[_i7][_j2].push(pe1[_i7][k][0].concat(pe1[k][_j2][0]));
+                            } else {
+                                pe2[_i7][_j2][0] = pe1[_i7][k][0].concat(pe1[k][_j2][0]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return {
+                d: d,
+                pe1: pe1,
+                pe2: pe2
+            };
+        }
+
+        /**
+         * Get the ring candidates from the path-included distance matrices.
+         * 
+         * @param {array} d The distance matrix.
+         * @param {array} pe1 A matrix containing the shortest paths.
+         * @param {array} pe2 A matrix containing the shortest paths + one vertex.
+         * @returns {array} The ring candidates.
+         */
+
+    }, {
+        key: 'getRingCandidates',
+        value: function getRingCandidates(d, pe1, pe2) {
+            var length = d.length;
+            var candidates = [];
+            var c = 0;
+
+            for (var i = 0; i < length; i++) {
+                for (var j = 0; j < length; j++) {
+                    if (d[i][j] === 0 || pe1[i][j].length === 1 && pe2[i][j] === 0) {
+                        continue;
+                    } else {
+                        // c is the number of vertices in the cycle.
+                        if (pe2[i][j].length !== 0) {
+                            c = 2 * (d[i][j] + 0.5);
+                        } else {
+                            c = 2 * d[i][j];
+                        }
+
+                        candidates.push([c, pe1[i][j], pe2[i][j]]);
+                    }
+                }
+            }
+
+            // Candidates have to be sorted by c
+            candidates.sort(function (a, b) {
+                return a[0] - b[0];
+            });
+
+            return candidates;
+        }
+
+        /**
+         * Searches the candidates for the smallest set of smallest rings.
+         * 
+         * @param {array} c The candidates.
+         * @param {array} d The distance matrix.
+         * @param {array} pe1 A matrix containing the shortest paths.
+         * @param {array} pe2 A matrix containing the shortest paths + one vertex.
+         * @param {number} nsssr The theoretical number of rings in the graph.
+         * @returns {array} The smallest set of smallest rings.
+         */
+
+    }, {
+        key: 'getSSSR',
+        value: function getSSSR(c, d, pe1, pe2, nsssr) {
+            var cSssr = [];
+
+            for (var i = 0; i < c.length; i++) {
+                if (c[i][0] % 2 !== 0) {
+                    for (var j = 0; j < c[i][2].length; j++) {
+                        var bonds = c[i][1][0].concat(c[i][2][j]);
+                        var atoms = SSSR.bondsToAtoms(bonds);
+
+                        if (bonds.length === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
+                            cSssr.push(atoms);
+                        }
+
+                        if (cSssr.length === nsssr) {
+                            return cSssr;
+                        }
+                    }
+                } else {
+                    for (var _j3 = 0; _j3 < c[i][1].length - 1; _j3++) {
+                        var _bonds = c[i][1][_j3].concat(c[i][1][_j3 + 1]);
+                        var _atoms = SSSR.bondsToAtoms(_bonds);
+
+                        if (_bonds.length === _atoms.size && !SSSR.pathSetsContain(cSssr, _atoms)) {
+                            cSssr.push(_atoms);
+                        }
+
+                        if (cSssr.length === nsssr) {
+                            return cSssr;
+                        }
+                    }
+                }
+            }
+
+            return cSssr;
+        }
+
+        /**
+         * Returns the number of edges in a graph defined by an adjacency matrix.
+         * 
+         * @param {array} adjacencyMatrix An adjacency matrix.
+         * @returns {number} The number of edges in the graph defined by the adjacency matrix.
+         */
+
+    }, {
+        key: 'getEdgeCount',
+        value: function getEdgeCount(adjacencyMatrix) {
+            var edgeCount = 0;
+            var length = adjacencyMatrix.length;
+
+            for (var i = 0; i < length - 1; i++) {
+                for (var j = i + 1; j < length; j++) {
+                    if (adjacencyMatrix[i][j] === 1) {
+                        edgeCount++;
+                    }
+                }
+            }
+
+            return edgeCount;
+        }
+
+        /**
+         * Return a set of vertex indices contained in an array of bonds.
+         * 
+         * @param {array} bonds An array of bonds.
+         * @returns {set} An array of vertices.
+         */
+
+    }, {
+        key: 'bondsToAtoms',
+        value: function bondsToAtoms(bonds) {
+            var atoms = new Set();
+
+            for (var i = 0; i < bonds.length; i++) {
+                atoms.add(bonds[i][0]);
+                atoms.add(bonds[i][1]);
+            }
+
+            return atoms;
+        }
+
+        /**
+         * Checks whether or not a given path already exists in an array of paths.
+         * 
+         * @param {array} pathSets An array of sets each representing a path.
+         * @param {set} pathSet A set representing a path.
+         * @returns {boolean} A boolean indicating whether or not a give path is contained within a set.
+         */
+
+    }, {
+        key: 'pathSetsContain',
+        value: function pathSetsContain(pathSets, pathSet) {
+            for (var i = 0; i < pathSets.length; i++) {
+                if (pathSets[i].size !== pathSet.size) {
+                    continue;
+                }
+
+                if (SSSR.areSetsEqual(pathSets[i], pathSet)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Checks whether or not two sets are equal (contain the same elements).
+         * 
+         * @param {set} setA A set.
+         * @param {set} setB A set.
+         * @returns {boolean} A boolean indicating whether or not the two sets are equal.
+         */
+
+    }, {
+        key: 'areSetsEqual',
+        value: function areSetsEqual(setA, setB) {
+            if (setA.size !== setB.size) {
+                return false;
+            }
+
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+                for (var _iterator3 = setA[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var element = _step3.value;
+
+                    if (!setB.has(element)) {
+                        return false;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+
+            return true;
+        }
+    }]);
+
+    return SSSR;
 }();
 
 var SMILESPARSER = function () {
@@ -5021,7 +5427,9 @@ var SmilesDrawer = function () {
 
                 // Initialize pseudo elements or shortcuts
                 if (this.opts.compactDrawing) {
+                    t = performance.now();
                     this.initPseudoElements();
+                    console.log('initPseudoElements', performance.now() - t);
                 }
 
                 // Do the actual drawing
@@ -5556,8 +5964,8 @@ var SmilesDrawer = function () {
                 var _vertex = this.vertices[leftovers[i]];
                 var onRing = false;
 
-                for (var _j = 0; _j < _vertex.edges.length; _j++) {
-                    if (this.edgeRingCount(_vertex.edges[_j]) === 1) {
+                for (var _j4 = 0; _j4 < _vertex.edges.length; _j4++) {
+                    if (this.edgeRingCount(_vertex.edges[_j4]) === 1) {
                         onRing = true;
                     }
                 }
@@ -8339,26 +8747,69 @@ var SmilesDrawer = function () {
         value: function initPseudoElements() {
             for (var i = 0; i < this.vertices.length; i++) {
                 var vertex = this.vertices[i];
-                var neighbours = vertex.getNeighbours();
+                var neighbourIds = vertex.getNeighbours();
+                var neighbours = [neighbourIds.length];
+
+                for (var j = 0; j < neighbourIds.length; j++) {
+                    neighbours[j] = this.vertices[neighbourIds[j]];
+                }
+
+                // Check for Ac
+                //    O
+                //    ||
+                // X--C--CH3
+                var acFound = false;
+
+                for (var j = 0; j < neighbours.length; j++) {
+                    var neighbour = neighbours[j];
+
+                    if (neighbour.getNeighbourCount() !== 2) {
+                        continue;
+                    }
+
+                    var neighboursNeighbourIds = neighbour.getNeighbours();
+                    var neighboursNeighbourA = this.vertices[neighboursNeighbourIds[0]];
+                    var neighboursNeighbourB = this.vertices[neighboursNeighbourIds[1]];
+
+                    // TODO Also check for isotope and charge
+                    if (neighboursNeighbourA.value.element === 'O' && neighboursNeighbourB.value.element === 'N' || neighboursNeighbourA.value.element === 'N' && neighboursNeighbourB.value.element === 'O') {
+                        // Ac found
+                        acFound = true;
+                        neighbour.value.isDrawn = false;
+                        neighboursNeighbourA.value.isDrawn = false;
+                        neighboursNeighbourB.value.isDrawn = false;
+                    }
+                }
+
+                if (acFound) {
+                    continue;
+                }
 
                 // Ignore atoms that have less than 3 neighbours, except if
                 // the vertex is connected to a ring and has two neighbours
-
                 if (vertex.getNeighbourCount() < 3 && !(vertex.value.isConnectedToRing && vertex.getNeighbourCount() === 2)) {
                     continue;
                 }
 
+                // Continue if there are less than two heteroatoms
+                // or if a neighbour has more than 1 neighbour
+                var heteroAtomCount = 0;
                 var ctn = 0;
 
                 for (var j = 0; j < neighbours.length; j++) {
-                    var neighbour = this.vertices[neighbours[j]];
+                    var _neighbour = neighbours[j];
+                    var element = _neighbour.value.element.toLowerCase();
 
-                    if (neighbour.getNeighbourCount() > 1) {
+                    if (element !== 'c' && element !== 'h') {
+                        heteroAtomCount++;
+                    }
+
+                    if (_neighbour.getNeighbourCount() > 1) {
                         ctn++;
                     }
                 }
 
-                if (ctn > 1) {
+                if (ctn > 1 || heteroAtomCount < 2) {
                     continue;
                 }
 
@@ -8366,29 +8817,29 @@ var SmilesDrawer = function () {
                 var previous = null;
 
                 for (var j = 0; j < neighbours.length; j++) {
-                    var _neighbour = this.vertices[neighbours[j]];
+                    var _neighbour2 = neighbours[j];
 
-                    if (_neighbour.getNeighbourCount() > 1) {
-                        previous = _neighbour;
+                    if (_neighbour2.getNeighbourCount() > 1) {
+                        previous = _neighbour2;
                     }
                 }
 
                 for (var j = 0; j < neighbours.length; j++) {
-                    var _neighbour2 = this.vertices[neighbours[j]];
+                    var _neighbour3 = neighbours[j];
 
-                    if (_neighbour2.getNeighbourCount() > 1) {
+                    if (_neighbour3.getNeighbourCount() > 1) {
                         continue;
                     }
 
-                    _neighbour2.value.isDrawn = false;
+                    _neighbour3.value.isDrawn = false;
 
-                    var hydrogens = this.maxBonds[_neighbour2.value.element] - this.getBondCount(_neighbour2);
+                    var hydrogens = this.maxBonds[_neighbour3.value.element] - this.getBondCount(_neighbour3);
 
-                    if (_neighbour2.value.bracket) {
-                        hydrogens = _neighbour2.value.bracket.hcount;
+                    if (_neighbour3.value.bracket) {
+                        hydrogens = _neighbour3.value.bracket.hcount;
                     }
 
-                    vertex.value.attachPseudoElement(_neighbour2.value.element, previous ? previous.value.element : null, hydrogens);
+                    vertex.value.attachPseudoElement(_neighbour3.value.element, previous ? previous.value.element : null, hydrogens);
                 }
             }
         }
@@ -8458,409 +8909,6 @@ var SmilesDrawer = function () {
     return SmilesDrawer;
 }();
 
-/** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
-
-
-var SSSR = function () {
-    function SSSR() {
-        _classCallCheck(this, SSSR);
-    }
-
-    _createClass(SSSR, null, [{
-        key: 'getRings',
-
-        /**
-         * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
-         * 
-         * @param {array} adjacencyMatrix A 2-dimensional array representing a graph.
-         * @returns {array} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
-         */
-        value: function getRings(adjacencyMatrix) {
-            // Remove vertices that are not members of a ring
-            var removed = void 0;
-
-            do {
-                removed = 0;
-
-                for (var i = 0; i < adjacencyMatrix.length; i++) {
-                    var nNeighbours = adjacencyMatrix[i].reduce(function (a, b) {
-                        return a + b;
-                    }, 0);
-
-                    if (nNeighbours === 1) {
-                        adjacencyMatrix[i].fill(0);
-
-                        for (var j = 0; j < adjacencyMatrix.length; j++) {
-                            adjacencyMatrix[j][i] = 0;
-                        }
-
-                        removed++;
-                    }
-                }
-            } while (removed > 0);
-
-            // Update the adjacency matrix (remove rows and columns filled with 0s)
-
-            // Keep this as a map of new indices to old indices
-            var indices = [];
-            var indicesToRemove = [];
-            var updatedAdjacencyMatrix = [];
-
-            // Only the rows are filtered here, the columns still have their original values
-            for (var _i4 = 0; _i4 < adjacencyMatrix.length; _i4++) {
-                if (adjacencyMatrix[_i4].indexOf(1) >= 0) {
-                    indices.push(_i4);
-                    updatedAdjacencyMatrix.push(adjacencyMatrix[_i4]);
-                } else {
-                    indicesToRemove.push(_i4);
-                }
-            }
-
-            // Remove the unused values from the adjacency matrix
-
-            for (var _i5 = 0; _i5 < updatedAdjacencyMatrix.length; _i5++) {
-                for (var _j2 = indicesToRemove.length - 1; _j2 >= 0; _j2--) {
-                    updatedAdjacencyMatrix[_i5].splice(indicesToRemove[_j2], 1);
-                }
-            }
-
-            adjacencyMatrix = updatedAdjacencyMatrix;
-
-            if (adjacencyMatrix.length === 0) {
-                return null;
-            }
-
-            // Get the edge list and the theoretical number of rings in SSSR
-            var nSssr = SSSR.getEdgeCount(adjacencyMatrix) - adjacencyMatrix.length + 1;
-            console.log('nsssr', nSssr);
-
-            if (nSssr === 0) {
-                return null;
-            }
-
-            var _SSSR$getPathIncluded = SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix),
-                d = _SSSR$getPathIncluded.d,
-                pe1 = _SSSR$getPathIncluded.pe1,
-                pe2 = _SSSR$getPathIncluded.pe2;
-
-            var c = SSSR.getRingCandidates(d, pe1, pe2);
-            var sssr = SSSR.getSSSR(c, d, pe1, pe2, nSssr);
-            var rings = new Array(sssr.length);
-
-            for (var _i6 = 0; _i6 < sssr.length; _i6++) {
-                rings[_i6] = new Array(sssr[_i6].length);
-
-                var index = 0;
-
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
-
-                try {
-                    for (var _iterator2 = sssr[_i6][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var val = _step2.value;
-
-                        rings[_i6][index++] = indices[val];
-                    }
-                } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
-                        }
-                    } finally {
-                        if (_didIteratorError2) {
-                            throw _iteratorError2;
-                        }
-                    }
-                }
-            }
-
-            return rings;
-        }
-
-        /**
-         * Returnes the two path-included distance matrices used to find the sssr.
-         * 
-         * @param {array} adjacencyMatrix An adjacency matrix.
-         * @returns {object} The path-included distance matrices. { p1, p2 }
-         */
-
-    }, {
-        key: 'getPathIncludedDistanceMatrices',
-        value: function getPathIncludedDistanceMatrices(adjacencyMatrix) {
-            var length = adjacencyMatrix.length;
-            var d = Array(length);
-            var pe1 = Array(length);
-            var pe2 = Array(length);
-
-            for (var i = 0; i < length; i++) {
-                d[i] = Array(length);
-                pe1[i] = Array(length);
-                pe2[i] = Array(length);
-
-                for (var j = 0; j < length; j++) {
-                    d[i][j] = i === j || adjacencyMatrix[i][j] === 1 ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
-
-                    if (d[i][j] === 1) {
-                        pe1[i][j] = [[[i, j]]];
-                    } else {
-                        pe1[i][j] = [];
-                    }
-
-                    pe2[i][j] = [];
-                }
-            }
-
-            for (var k = 0; k < length; k++) {
-                for (var _i7 = 0; _i7 < length; _i7++) {
-                    for (var _j3 = 0; _j3 < length; _j3++) {
-                        var previousPathLength = d[_i7][_j3];
-                        var newPathLength = d[_i7][k] + d[k][_j3];
-
-                        if (previousPathLength > newPathLength) {
-                            if (previousPathLength === newPathLength + 1) {
-                                pe2[_i7][_j3] = ArrayHelper.deepCopy(pe1[_i7][_j3]);
-                            } else {
-                                pe2[_i7][_j3] = [];
-                            }
-
-                            d[_i7][_j3] = newPathLength;
-                            pe1[_i7][_j3] = [pe1[_i7][k][0].concat(pe1[k][_j3][0])];
-                        } else if (previousPathLength === newPathLength) {
-                            if (pe1[_i7][k].length && pe1[k][_j3].length) {
-                                if (pe1[_i7][_j3].length) {
-                                    pe1[_i7][_j3].push(pe1[_i7][k][0].concat(pe1[k][_j3][0]));
-                                } else {
-                                    pe1[_i7][_j3][0] = pe1[_i7][k][0].concat(pe1[k][_j3][0]);
-                                }
-                            }
-                        } else if (previousPathLength === newPathLength - 1) {
-                            if (pe2[_i7][_j3].length) {
-                                pe2[_i7][_j3].push(pe1[_i7][k][0].concat(pe1[k][_j3][0]));
-                            } else {
-                                pe2[_i7][_j3][0] = pe1[_i7][k][0].concat(pe1[k][_j3][0]);
-                            }
-                        }
-                    }
-                }
-            }
-
-            return {
-                d: d,
-                pe1: pe1,
-                pe2: pe2
-            };
-        }
-
-        /**
-         * Get the ring candidates from the path-included distance matrices.
-         * 
-         * @param {array} d The distance matrix.
-         * @param {array} pe1 A matrix containing the shortest paths.
-         * @param {array} pe2 A matrix containing the shortest paths + one vertex.
-         * @returns {array} The ring candidates.
-         */
-
-    }, {
-        key: 'getRingCandidates',
-        value: function getRingCandidates(d, pe1, pe2) {
-            var length = d.length;
-            var candidates = [];
-            var c = 0;
-
-            for (var i = 0; i < length; i++) {
-                for (var j = 0; j < length; j++) {
-                    if (d[i][j] === 0 || pe1[i][j].length === 1 && pe2[i][j] === 0) {
-                        continue;
-                    } else {
-                        // c is the number of vertices in the cycle.
-                        if (pe2[i][j].length !== 0) {
-                            c = 2 * (d[i][j] + 0.5);
-                        } else {
-                            c = 2 * d[i][j];
-                        }
-
-                        candidates.push([c, pe1[i][j], pe2[i][j]]);
-                    }
-                }
-            }
-
-            // Candidates have to be sorted by c
-            candidates.sort(function (a, b) {
-                return a[0] - b[0];
-            });
-
-            return candidates;
-        }
-
-        /**
-         * Searches the candidates for the smallest set of smallest rings.
-         * 
-         * @param {array} c The candidates.
-         * @param {array} d The distance matrix.
-         * @param {array} pe1 A matrix containing the shortest paths.
-         * @param {array} pe2 A matrix containing the shortest paths + one vertex.
-         * @param {number} nsssr The theoretical number of rings in the graph.
-         * @returns {array} The smallest set of smallest rings.
-         */
-
-    }, {
-        key: 'getSSSR',
-        value: function getSSSR(c, d, pe1, pe2, nsssr) {
-            var cSssr = [];
-
-            for (var i = 0; i < c.length; i++) {
-                if (c[i][0] % 2 !== 0) {
-                    for (var j = 0; j < c[i][2].length; j++) {
-                        var bonds = c[i][1][0].concat(c[i][2][j]);
-                        var atoms = SSSR.bondsToAtoms(bonds);
-
-                        if (bonds.length === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
-                            cSssr.push(atoms);
-                        }
-
-                        if (cSssr.length === nsssr) {
-                            return cSssr;
-                        }
-                    }
-                } else {
-                    for (var _j4 = 0; _j4 < c[i][1].length - 1; _j4++) {
-                        var _bonds = c[i][1][_j4].concat(c[i][1][_j4 + 1]);
-                        var _atoms = SSSR.bondsToAtoms(_bonds);
-
-                        if (_bonds.length === _atoms.size && !SSSR.pathSetsContain(cSssr, _atoms)) {
-                            cSssr.push(_atoms);
-                        }
-
-                        if (cSssr.length === nsssr) {
-                            return cSssr;
-                        }
-                    }
-                }
-            }
-
-            return cSssr;
-        }
-
-        /**
-         * Returns the number of edges in a graph defined by an adjacency matrix.
-         * 
-         * @param {array} adjacencyMatrix An adjacency matrix.
-         * @returns {number} The number of edges in the graph defined by the adjacency matrix.
-         */
-
-    }, {
-        key: 'getEdgeCount',
-        value: function getEdgeCount(adjacencyMatrix) {
-            var edgeCount = 0;
-            var length = adjacencyMatrix.length;
-
-            for (var i = 0; i < length - 1; i++) {
-                for (var j = i + 1; j < length; j++) {
-                    if (adjacencyMatrix[i][j] === 1) {
-                        edgeCount++;
-                    }
-                }
-            }
-
-            return edgeCount;
-        }
-
-        /**
-         * Return a set of vertex indices contained in an array of bonds.
-         * 
-         * @param {array} bonds An array of bonds.
-         * @returns {set} An array of vertices.
-         */
-
-    }, {
-        key: 'bondsToAtoms',
-        value: function bondsToAtoms(bonds) {
-            var atoms = new Set();
-
-            for (var i = 0; i < bonds.length; i++) {
-                atoms.add(bonds[i][0]);
-                atoms.add(bonds[i][1]);
-            }
-
-            return atoms;
-        }
-
-        /**
-         * Checks whether or not a given path already exists in an array of paths.
-         * 
-         * @param {array} pathSets An array of sets each representing a path.
-         * @param {set} pathSet A set representing a path.
-         * @returns {boolean} A boolean indicating whether or not a give path is contained within a set.
-         */
-
-    }, {
-        key: 'pathSetsContain',
-        value: function pathSetsContain(pathSets, pathSet) {
-            for (var i = 0; i < pathSets.length; i++) {
-                if (pathSets[i].size !== pathSet.size) {
-                    continue;
-                }
-
-                if (SSSR.areSetsEqual(pathSets[i], pathSet)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /**
-         * Checks whether or not two sets are equal (contain the same elements).
-         * 
-         * @param {set} setA A set.
-         * @param {set} setB A set.
-         * @returns {boolean} A boolean indicating whether or not the two sets are equal.
-         */
-
-    }, {
-        key: 'areSetsEqual',
-        value: function areSetsEqual(setA, setB) {
-            if (setA.size !== setB.size) {
-                return false;
-            }
-
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-
-            try {
-                for (var _iterator3 = setA[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var element = _step3.value;
-
-                    if (!setB.has(element)) {
-                        return false;
-                    }
-                }
-            } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                    }
-                } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
-                    }
-                }
-            }
-
-            return true;
-        }
-    }]);
-
-    return SSSR;
-}();
 /** A class representing a 2D vector. */
 
 
