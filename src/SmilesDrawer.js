@@ -275,14 +275,14 @@ class SmilesDrawer {
      */
     getAdjacencyMatrix() {
         let length = this.vertices.length;
-        let adjacencyMatrix = [length];
+        let adjacencyMatrix = Array(length);
         
-        for (var i = 0; i < length; i++) {
-            adjacencyMatrix[i] = [length];
+        for (let i = 0; i < length; i++) {
+            adjacencyMatrix[i] = new Array(length);
             adjacencyMatrix[i].fill(0);
         }
 
-        for (var i = 0; i < this.edges.length; i++) {
+        for (let i = 0; i < this.edges.length; i++) {
             let edge = this.edges[i];
 
             adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
@@ -2297,7 +2297,7 @@ class SmilesDrawer {
             if (neighbour.positioned) {
                 continue;
             }
-
+            
             let vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
             
             if (vertices.length == 2) {

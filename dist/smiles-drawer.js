@@ -2861,7 +2861,6 @@ var RingConnection = function () {
                 var d = secondRing.members[n];
 
                 if (c === d) {
-                    console.log(c);
                     this.addVertex(c);
                 }
             }
@@ -3014,12 +3013,9 @@ var RingConnection = function () {
     }, {
         key: 'getVertices',
         value: function getVertices(ringConnections, firstRingId, secondRingId) {
-            console.log(firstRingId, secondRingId, ringConnections);
             for (var i = 0; i < ringConnections.length; i++) {
                 var ringConnection = ringConnections[i];
-                console.log(ringConnection.firstRingId, ringConnection.secondRingId);
                 if (ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId || ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId) {
-
                     return [].concat(_toConsumableArray(ringConnection.vertices));
                 }
             }
@@ -5082,15 +5078,15 @@ var SmilesDrawer = function () {
         key: 'getAdjacencyMatrix',
         value: function getAdjacencyMatrix() {
             var length = this.vertices.length;
-            var adjacencyMatrix = [length];
+            var adjacencyMatrix = Array(length);
 
             for (var i = 0; i < length; i++) {
-                adjacencyMatrix[i] = [length];
+                adjacencyMatrix[i] = new Array(length);
                 adjacencyMatrix[i].fill(0);
             }
 
-            for (var i = 0; i < this.edges.length; i++) {
-                var edge = this.edges[i];
+            for (var _i4 = 0; _i4 < this.edges.length; _i4++) {
+                var edge = this.edges[_i4];
 
                 adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
                 adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
@@ -5439,7 +5435,6 @@ var SmilesDrawer = function () {
                 for (var j = i + 1; j < this.rings.length; j++) {
                     var a = this.rings[i];
                     var b = this.rings[j];
-                    console.log(a, b);
                     var ringConnection = new RingConnection(a, b);
 
                     // If there are no vertices in the ring connection, then there
@@ -5776,7 +5771,7 @@ var SmilesDrawer = function () {
             let commonRings = this.getCommonRings(vertexA, vertexB);
             let maxSize = 0;
             let largestCommonRing = null;
-             for (var i = 0; i < commonRings.length; i++) {
+              for (var i = 0; i < commonRings.length; i++) {
                 let size = this.getRing(commonRings[i]).getSize();
                 
                 if (size > maxSize) {
@@ -5784,7 +5779,7 @@ var SmilesDrawer = function () {
                     largestCommonRing = this.getRing(commonRings[i]);
                 }
             }
-             return largestCommonRing;
+              return largestCommonRing;
         }
         */
 
@@ -5930,7 +5925,7 @@ var SmilesDrawer = function () {
                 for (var i = 0; i < vertex.value.rings.length; i++) {
                     rings.push(vertex.value.rings[i]);
                 }
-                 for (var i = 0; i < vertex.children.length; i++) {
+                  for (var i = 0; i < vertex.children.length; i++) {
                     let child = vertex.children[i];
                     
                     if (child !== p && !ArrayHelper.contains(vertices, { value: child })) {
@@ -5938,7 +5933,7 @@ var SmilesDrawer = function () {
                         recurse(child, v);
                     }
                 }
-                 let parentVertexId = vertex.parentVertexId;
+                  let parentVertexId = vertex.parentVertexId;
                 
                 if (parentVertexId !== p && parentVertexId !== null && 
                     !ArrayHelper.contains(vertices, { value: parentVertexId })) {
@@ -5946,9 +5941,9 @@ var SmilesDrawer = function () {
                     recurse(parentVertexId, v);
                 }
             }
-             vertices.push(vertexId);
+              vertices.push(vertexId);
             recurse(vertexId, previousId);
-             return {
+              return {
                 vertices: vertices,
                 rings: ArrayHelper.unique(rings)
             };
@@ -8616,20 +8611,20 @@ var SSSR = function () {
             var updatedAdjacencyMatrix = [];
 
             // Only the rows are filtered here, the columns still have their original values
-            for (var _i4 = 0; _i4 < adjacencyMatrix.length; _i4++) {
-                if (adjacencyMatrix[_i4].indexOf(1) >= 0) {
-                    indices.push(_i4);
-                    updatedAdjacencyMatrix.push(adjacencyMatrix[_i4]);
+            for (var _i5 = 0; _i5 < adjacencyMatrix.length; _i5++) {
+                if (adjacencyMatrix[_i5].indexOf(1) >= 0) {
+                    indices.push(_i5);
+                    updatedAdjacencyMatrix.push(adjacencyMatrix[_i5]);
                 } else {
-                    indicesToRemove.push(_i4);
+                    indicesToRemove.push(_i5);
                 }
             }
 
             // Remove the unused values from the adjacency matrix
 
-            for (var _i5 = 0; _i5 < updatedAdjacencyMatrix.length; _i5++) {
+            for (var _i6 = 0; _i6 < updatedAdjacencyMatrix.length; _i6++) {
                 for (var _j2 = indicesToRemove.length - 1; _j2 >= 0; _j2--) {
-                    updatedAdjacencyMatrix[_i5].splice(indicesToRemove[_j2], 1);
+                    updatedAdjacencyMatrix[_i6].splice(indicesToRemove[_j2], 1);
                 }
             }
 
@@ -8640,7 +8635,7 @@ var SSSR = function () {
             }
 
             // Get the edge list and the theoretical number of rings in SSSR
-            var nSssr = SSSR.getEdgeCount(adjacencyMatrix) - adjacencyMatrix.length + 1;
+            var nSssr = SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + 1;
 
             if (nSssr === 0) {
                 return null;
@@ -8655,8 +8650,8 @@ var SSSR = function () {
             var sssr = SSSR.getSSSR(c, d, pe1, pe2, nSssr);
             var rings = new Array(sssr.length);
 
-            for (var _i6 = 0; _i6 < sssr.length; _i6++) {
-                rings[_i6] = new Array(sssr[_i6].length);
+            for (var _i7 = 0; _i7 < sssr.length; _i7++) {
+                rings[_i7] = new Array(sssr[_i7].length);
 
                 var index = 0;
 
@@ -8665,10 +8660,10 @@ var SSSR = function () {
                 var _iteratorError2 = undefined;
 
                 try {
-                    for (var _iterator2 = sssr[_i6][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    for (var _iterator2 = sssr[_i7][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                         var val = _step2.value;
 
-                        rings[_i6][index++] = indices[val];
+                        rings[_i7][index++] = indices[val];
                     }
                 } catch (err) {
                     _didIteratorError2 = true;
@@ -8723,33 +8718,33 @@ var SSSR = function () {
             }
 
             for (var k = 0; k < length; k++) {
-                for (var _i7 = 0; _i7 < length; _i7++) {
+                for (var _i8 = 0; _i8 < length; _i8++) {
                     for (var _j3 = 0; _j3 < length; _j3++) {
-                        var previousPathLength = d[_i7][_j3];
-                        var newPathLength = d[_i7][k] + d[k][_j3];
+                        var previousPathLength = d[_i8][_j3];
+                        var newPathLength = d[_i8][k] + d[k][_j3];
 
                         if (previousPathLength > newPathLength) {
                             if (previousPathLength === newPathLength + 1) {
-                                pe2[_i7][_j3] = ArrayHelper.deepCopy(pe1[_i7][_j3]);
+                                pe2[_i8][_j3] = ArrayHelper.deepCopy(pe1[_i8][_j3]);
                             } else {
-                                pe2[_i7][_j3] = [];
+                                pe2[_i8][_j3] = [];
                             }
 
-                            d[_i7][_j3] = newPathLength;
-                            pe1[_i7][_j3] = [pe1[_i7][k][0].concat(pe1[k][_j3][0])];
+                            d[_i8][_j3] = newPathLength;
+                            pe1[_i8][_j3] = [pe1[_i8][k][0].concat(pe1[k][_j3][0])];
                         } else if (previousPathLength === newPathLength) {
-                            if (pe1[_i7][k].length && pe1[k][_j3].length) {
-                                if (pe1[_i7][_j3].length) {
-                                    pe1[_i7][_j3].push(pe1[_i7][k][0].concat(pe1[k][_j3][0]));
+                            if (pe1[_i8][k].length && pe1[k][_j3].length) {
+                                if (pe1[_i8][_j3].length) {
+                                    pe1[_i8][_j3].push(pe1[_i8][k][0].concat(pe1[k][_j3][0]));
                                 } else {
-                                    pe1[_i7][_j3][0] = pe1[_i7][k][0].concat(pe1[k][_j3][0]);
+                                    pe1[_i8][_j3][0] = pe1[_i8][k][0].concat(pe1[k][_j3][0]);
                                 }
                             }
                         } else if (previousPathLength === newPathLength - 1) {
-                            if (pe2[_i7][_j3].length) {
-                                pe2[_i7][_j3].push(pe1[_i7][k][0].concat(pe1[k][_j3][0]));
+                            if (pe2[_i8][_j3].length) {
+                                pe2[_i8][_j3].push(pe1[_i8][k][0].concat(pe1[k][_j3][0]));
                             } else {
-                                pe2[_i7][_j3][0] = pe1[_i7][k][0].concat(pe1[k][_j3][0]);
+                                pe2[_i8][_j3][0] = pe1[_i8][k][0].concat(pe1[k][_j3][0]);
                             }
                         }
                     }
@@ -8875,6 +8870,30 @@ var SSSR = function () {
             }
 
             return edgeCount;
+        }
+
+        /**
+         * Returns an edge list constructed form an adjacency matrix.
+         * 
+         * @param {array} adjacencyMatrix An adjacency matrix.
+         * @returns {array} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
+         */
+
+    }, {
+        key: 'getEdgeList',
+        value: function getEdgeList(adjacencyMatrix) {
+            var length = adjacencyMatrix.length;
+            var edgeList = [];
+
+            for (var i = 0; i < length - 1; i++) {
+                for (var j = i + 1; j < length; j++) {
+                    if (adjacencyMatrix[i][j] === 1) {
+                        edgeList.push([i, j]);
+                    }
+                }
+            }
+
+            return edgeList;
         }
 
         /**

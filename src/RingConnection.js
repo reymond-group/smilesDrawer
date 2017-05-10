@@ -131,13 +131,10 @@ class RingConnection {
      * @returns {array} An array of vertex ids associated with the ring connection.
      */
     static getVertices(ringConnections, firstRingId, secondRingId) {
-        console.log(firstRingId, secondRingId, ringConnections);
         for (let i = 0; i < ringConnections.length; i++) {
             let ringConnection = ringConnections[i];
-            console.log(ringConnection.firstRingId, ringConnection.secondRingId);
             if (ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId ||
                 ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId) {
-                
                 return [...ringConnection.vertices];
             }
         }

@@ -60,7 +60,7 @@ class SSSR {
         }
 
         // Get the edge list and the theoretical number of rings in SSSR
-        let nSssr = SSSR.getEdgeCount(adjacencyMatrix) - adjacencyMatrix.length + 1;
+        let nSssr = SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + 1;
 
         if (nSssr === 0) {
             return null;
@@ -258,6 +258,27 @@ class SSSR {
         }
 
         return edgeCount;
+    }
+
+    /**
+     * Returns an edge list constructed form an adjacency matrix.
+     * 
+     * @param {array} adjacencyMatrix An adjacency matrix.
+     * @returns {array} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
+     */
+    static getEdgeList(adjacencyMatrix) {
+        let length = adjacencyMatrix.length;
+        let edgeList = [];
+
+        for (let i = 0; i < length - 1; i++) {
+            for (let j = i + 1; j < length; j++) {
+                if (adjacencyMatrix[i][j] === 1) {
+                    edgeList.push([i,j]);
+                } 
+            }
+        }
+
+        return edgeList;
     }
 
     /**

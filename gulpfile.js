@@ -21,7 +21,6 @@ gulp.task('build', function() {
         .pipe(gulp.dest('./dist/'));
 });
 
-
 gulp.task('doc', function (cb) {
     var config = require('./jsdocConfig.json');
     gulp.src(['README.md', './src/*.js'], {read: false})
