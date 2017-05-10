@@ -147,22 +147,15 @@ class SmilesDrawer {
 
         this.bridgedRing = false;
         
-        let t = performance.now();
         this.initGraph(data);
-        console.log('initGraph', performance.now() - t);
-
-        t = performance.now();
         this.initRings();
-        console.log('initRings', performance.now() - t);
         
         if (this.opts.isomeric) {
             this.annotateChirality();
         }
 
         if (!infoOnly) {
-            t = performance.now();
             this.position();
-            console.log('position', performance.now() - t);
 
             // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
             this.restoreRingInformation();
@@ -242,27 +235,20 @@ class SmilesDrawer {
                     }
                 }
             }
-            console.log('rotatableBonds', performance.now() - t);
-            
-            t = performance.now();
+
             this.resolveSecondaryOverlaps(overlapScore.scores);
-            console.log('resolveSecondaryOverlaps', performance.now() - t);
             
             // Set the canvas to the appropriate size
             this.canvasWrapper.scale(this.vertices);
 
             // Initialize pseudo elements or shortcuts
             if (this.opts.compactDrawing) {
-                t = performance.now();
                 this.initPseudoElements();
-                console.log('initPseudoElements', performance.now() - t);
             }
 
             // Do the actual drawing
-            t = performance.now();
             this.drawEdges(this.opts.debug);
             this.drawVertices(this.opts.debug);
-            console.log('drawing', performance.now() - t);
             
             this.canvasWrapper.reset();
         }

@@ -279,8 +279,10 @@ A class representing an atom
 * [Atom](#Atom)
     * [new Atom(element, [bondType])](#new_Atom_new)
     * _instance_
+        * [.addNeighbouringElement(element)](#Atom+addNeighbouringElement)
         * [.attachPseudoElement(element, previousElement, [hydrogenCount])](#Atom+attachPseudoElement)
         * [.getAttachedPseudoElements()](#Atom+getAttachedPseudoElements) ⇒ <code>object</code>
+        * [.getAttachedPseudoElementsCount()](#Atom+getAttachedPseudoElementsCount) ⇒ <code>number</code>
         * [.addAnchoredRing(ringId)](#Atom+addAnchoredRing)
         * [.getRingbondCount()](#Atom+getRingbondCount) ⇒ <code>number</code>
         * [.canRotate()](#Atom+canRotate) ⇒ <code>boolean</code>
@@ -294,6 +296,7 @@ A class representing an atom
         * [.maxCommonRingbond(atomA, atomB)](#Atom+maxCommonRingbond) ⇒ <code>number</code>
         * [.getOrder(center)](#Atom+getOrder) ⇒ <code>number</code>
         * [.setOrder(The, The)](#Atom+setOrder)
+        * [.neighbouringElementsEqual(arr)](#Atom+neighbouringElementsEqual) ⇒ <code>boolean</code>
         * [.getAtomicNumber()](#Atom+getAtomicNumber) ⇒ <code>number</code>
     * _static_
         * [.sortByAtomicNumber(root, neighbours, vertices, rings)](#Atom.sortByAtomicNumber) ⇒ <code>array</code>
@@ -310,6 +313,17 @@ The constructor of the class Atom.
 | --- | --- | --- | --- |
 | element | <code>string</code> |  | The one-letter code of the element. |
 | [bondType] | <code>string</code> | <code>&quot;&#x27;-&#x27;&quot;</code> | The type of the bond associated with this atom. |
+
+<a name="Atom+addNeighbouringElement"></a>
+
+### atom.addNeighbouringElement(element)
+Adds a neighbouring element to this atom.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| element | <code>string</code> | A string representing an element. |
 
 <a name="Atom+attachPseudoElement"></a>
 
@@ -331,6 +345,13 @@ Returns the attached pseudo elements sorted by hydrogen count (ascending).
 
 **Kind**: instance method of <code>[Atom](#Atom)</code>  
 **Returns**: <code>object</code> - The sorted attached pseudo elements.  
+<a name="Atom+getAttachedPseudoElementsCount"></a>
+
+### atom.getAttachedPseudoElementsCount() ⇒ <code>number</code>
+Returns the number of attached pseudo elements.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>number</code> - The number of attached pseudo elements.  
 <a name="Atom+addAnchoredRing"></a>
 
 ### atom.addAnchoredRing(ringId)
@@ -450,6 +471,18 @@ Sets the order of this atom given a center. This is required since two atoms can
 | --- | --- | --- |
 | The | <code>number</code> | id of the central atom in respect to which the order is defined. |
 | The | <code>number</code> | order of this atom. |
+
+<a name="Atom+neighbouringElementsEqual"></a>
+
+### atom.neighbouringElementsEqual(arr) ⇒ <code>boolean</code>
+Check whether or not the neighbouring elements of this atom equal the supplied array.
+
+**Kind**: instance method of <code>[Atom](#Atom)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not the neighbours match the supplied array of elements.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>array</code> | An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N'] |
 
 <a name="Atom+getAtomicNumber"></a>
 
@@ -2238,8 +2271,7 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer+initPseudoElements"></a>
 
 ### smilesDrawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
-the involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer.clean"></a>
@@ -2292,6 +2324,7 @@ A class encapsulating the functionality to find the smallest set of smallest rin
     * [.getRingCandidates(d, pe1, pe2)](#SSSR.getRingCandidates) ⇒ <code>array</code>
     * [.getSSSR(c, d, pe1, pe2, nsssr)](#SSSR.getSSSR) ⇒ <code>array</code>
     * [.getEdgeCount(adjacencyMatrix)](#SSSR.getEdgeCount) ⇒ <code>number</code>
+    * [.getEdgeList(adjacencyMatrix)](#SSSR.getEdgeList) ⇒ <code>array</code>
     * [.bondsToAtoms(bonds)](#SSSR.bondsToAtoms) ⇒ <code>set</code>
     * [.pathSetsContain(pathSets, pathSet)](#SSSR.pathSetsContain) ⇒ <code>boolean</code>
     * [.areSetsEqual(setA, setB)](#SSSR.areSetsEqual) ⇒ <code>boolean</code>
@@ -2357,6 +2390,18 @@ Returns the number of edges in a graph defined by an adjacency matrix.
 
 **Kind**: static method of <code>[SSSR](#SSSR)</code>  
 **Returns**: <code>number</code> - The number of edges in the graph defined by the adjacency matrix.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
+
+<a name="SSSR.getEdgeList"></a>
+
+### SSSR.getEdgeList(adjacencyMatrix) ⇒ <code>array</code>
+Returns an edge list constructed form an adjacency matrix.
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>array</code> - An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]  
 
 | Param | Type | Description |
 | --- | --- | --- |
