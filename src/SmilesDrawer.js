@@ -604,7 +604,7 @@ class SmilesDrawer {
             for (var i = 0; i < this.rings.length; i++) {
                 let ring = this.rings[i];
 
-                if (this.isPartOfBridgedRing(ring.id)) {
+                if (this.isPartOfBridgedRing(ring.id) && !ring.isBridged) {
                     id = ring.id;
                 }
             }
@@ -614,11 +614,12 @@ class SmilesDrawer {
             }
 
             let ring = this.getRing(id);
+            
             let involvedRings = this.getBridgedRingRings(ring.id);
 
             this.bridgedRing = true;
             this.createBridgedRing(involvedRings, ring.members[0]);
-
+            
             // Remove the rings
             for (var i = 0; i < involvedRings.length; i++) {
                 this.removeRing(involvedRings[i]);
@@ -643,7 +644,7 @@ class SmilesDrawer {
 
             for (var i = 0; i < ring.neighbours.length; i++) {
                 let n = ring.neighbours[i];
-                
+
                 if (involvedRings.indexOf(n) === -1 &&
                     n !== r &&
                     RingConnection.isBridge(that.ringConnections, that.vertices, r, n)) {
@@ -2104,6 +2105,7 @@ class SmilesDrawer {
         let startVertex = this.vertices[0];
 
         // If there is a bridged ring, alwas start with the bridged ring
+        /*
         for (var i = 0; i < this.rings.length; i++) {
             if (this.rings[i].isBridged) {
                 for (var j = 0; j < this.rings[i].members.length; j++) {
@@ -2115,6 +2117,7 @@ class SmilesDrawer {
                 }
             }
         }
+        */
 
         this.createNextBond(startVertex);
 
@@ -2227,6 +2230,8 @@ class SmilesDrawer {
      * @param {boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
      */
     createRing(ring, center = null, startVertex = null, previousVertex = null, forcePositioned = false) {
+        console.log('creating ring', ring);
+        
         if (ring.positioned && !forcePositioned) {
             return;
         }
@@ -2278,14 +2283,14 @@ class SmilesDrawer {
         // Draw neighbours in decreasing order of connectivity
         for (var i = 0; i < orderedNeighbours.length; i++) {
             let neighbour = this.getRing(orderedNeighbours[i].neighbour);
-            
+            console.log('drawing neighbour', neighbour.id);
             if (neighbour.positioned) {
                 continue;
             }
             
             let vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
             
-            if (vertices.length == 2) {
+            if (vertices.length === 2) {
                 // This ring is a fused ring
                 ring.isFused = true;
                 neighbour.isFused = true;
@@ -2360,12 +2365,13 @@ class SmilesDrawer {
             let ringMemberNeighbours = ringMember.getNeighbours();
 
             // If there are multiple, the ovlerap will be resolved in the appropriate step
-            for (var j = 0; j < ringMemberNeighbours.length; j++) {
-                if (ring.thisOrNeighboursContain(this.rings, ringMemberNeighbours[j])) {
+            for (var j = 0; j < ringMemberNeighbours.length; j++) {                
+                let v = this.vertices[ringMemberNeighbours[j]];
+                
+                if (v.positioned) {
                     continue;
                 }
-                
-                let v = this.vertices[ringMemberNeighbours[j]];
+
                 v.value.isConnectedToRing = true;
 
                 this.createNextBond(v, ringMember, ring.center);
@@ -2667,6 +2673,8 @@ class SmilesDrawer {
         if (vertex.positioned) {
             return;
         }
+
+        console.log('positioning vertex', vertex, previousVertex, ringOrAngle, dir);
 
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of

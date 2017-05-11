@@ -87,9 +87,9 @@ class RingConnection {
         
         for (let i = 0; i < ringConnections.length; i++) {
             ringConnection = ringConnections[i];
-            
-            if (this.firstRingId === firstRingId && this.secondRingId === secondRingId ||
-                this.firstRingId === secondRingId && this.secondRingId === firstRingId) {
+
+            if (ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId ||
+                ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId) {
                 return ringConnection.isBridge(vertices);
             }
         }

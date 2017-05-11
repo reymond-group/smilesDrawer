@@ -2965,7 +2965,7 @@ var RingConnection = function () {
             for (var i = 0; i < ringConnections.length; i++) {
                 ringConnection = ringConnections[i];
 
-                if (this.firstRingId === firstRingId && this.secondRingId === secondRingId || this.firstRingId === secondRingId && this.secondRingId === firstRingId) {
+                if (ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId || ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId) {
                     return ringConnection.isBridge(vertices);
                 }
             }
@@ -5443,12 +5443,11 @@ var SmilesDrawer = function () {
 
             // Replace rings contained by a larger bridged ring with a bridged ring
             while (this.rings.length > 0) {
-                console.log('looooop');
                 var id = -1;
                 for (var i = 0; i < this.rings.length; i++) {
                     var _ring2 = this.rings[i];
 
-                    if (this.isPartOfBridgedRing(_ring2.id)) {
+                    if (this.isPartOfBridgedRing(_ring2.id) && !_ring2.isBridged) {
                         id = _ring2.id;
                     }
                 }
@@ -5458,6 +5457,7 @@ var SmilesDrawer = function () {
                 }
 
                 var _ring = this.getRing(id);
+
                 var involvedRings = this.getBridgedRingRings(_ring.id);
 
                 this.bridgedRing = true;
@@ -5757,7 +5757,7 @@ var SmilesDrawer = function () {
             let commonRings = this.getCommonRings(vertexA, vertexB);
             let maxSize = 0;
             let largestCommonRing = null;
-              for (var i = 0; i < commonRings.length; i++) {
+             for (var i = 0; i < commonRings.length; i++) {
                 let size = this.getRing(commonRings[i]).getSize();
                 
                 if (size > maxSize) {
@@ -5765,7 +5765,7 @@ var SmilesDrawer = function () {
                     largestCommonRing = this.getRing(commonRings[i]);
                 }
             }
-              return largestCommonRing;
+             return largestCommonRing;
         }
         */
 
@@ -5911,7 +5911,7 @@ var SmilesDrawer = function () {
                 for (var i = 0; i < vertex.value.rings.length; i++) {
                     rings.push(vertex.value.rings[i]);
                 }
-                  for (var i = 0; i < vertex.children.length; i++) {
+                 for (var i = 0; i < vertex.children.length; i++) {
                     let child = vertex.children[i];
                     
                     if (child !== p && !ArrayHelper.contains(vertices, { value: child })) {
@@ -5919,7 +5919,7 @@ var SmilesDrawer = function () {
                         recurse(child, v);
                     }
                 }
-                  let parentVertexId = vertex.parentVertexId;
+                 let parentVertexId = vertex.parentVertexId;
                 
                 if (parentVertexId !== p && parentVertexId !== null && 
                     !ArrayHelper.contains(vertices, { value: parentVertexId })) {
@@ -5927,9 +5927,9 @@ var SmilesDrawer = function () {
                     recurse(parentVertexId, v);
                 }
             }
-              vertices.push(vertexId);
+             vertices.push(vertexId);
             recurse(vertexId, previousId);
-              return {
+             return {
                 vertices: vertices,
                 rings: ArrayHelper.unique(rings)
             };
@@ -7022,17 +7022,19 @@ var SmilesDrawer = function () {
             var startVertex = this.vertices[0];
 
             // If there is a bridged ring, alwas start with the bridged ring
+            /*
             for (var i = 0; i < this.rings.length; i++) {
                 if (this.rings[i].isBridged) {
                     for (var j = 0; j < this.rings[i].members.length; j++) {
                         startVertex = this.vertices[this.rings[i].members[j]];
-
+                        
                         if (startVertex.value.originalRings.length === 1) {
                             break;
                         }
                     }
                 }
             }
+            */
 
             this.createNextBond(startVertex);
 
@@ -7168,6 +7170,8 @@ var SmilesDrawer = function () {
             var previousVertex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
             var forcePositioned = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
+            console.log('creating ring', ring);
+
             if (ring.positioned && !forcePositioned) {
                 return;
             }
@@ -7219,14 +7223,14 @@ var SmilesDrawer = function () {
             // Draw neighbours in decreasing order of connectivity
             for (var i = 0; i < orderedNeighbours.length; i++) {
                 var neighbour = this.getRing(orderedNeighbours[i].neighbour);
-
+                console.log('drawing neighbour', neighbour.id);
                 if (neighbour.positioned) {
                     continue;
                 }
 
                 var vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
 
-                if (vertices.length == 2) {
+                if (vertices.length === 2) {
                     (function () {
                         // This ring is a fused ring
                         ring.isFused = true;
@@ -7304,11 +7308,12 @@ var SmilesDrawer = function () {
 
                 // If there are multiple, the ovlerap will be resolved in the appropriate step
                 for (var j = 0; j < ringMemberNeighbours.length; j++) {
-                    if (ring.thisOrNeighboursContain(this.rings, ringMemberNeighbours[j])) {
+                    var v = this.vertices[ringMemberNeighbours[j]];
+
+                    if (v.positioned) {
                         continue;
                     }
 
-                    var v = this.vertices[ringMemberNeighbours[j]];
                     v.value.isConnectedToRing = true;
 
                     this.createNextBond(v, ringMember, ring.center);
@@ -7631,6 +7636,8 @@ var SmilesDrawer = function () {
             if (vertex.positioned) {
                 return;
             }
+
+            console.log('positioning vertex', vertex, previousVertex, ringOrAngle, dir);
 
             // If the current node is the member of one ring, then point straight away
             // from the center of the ring. However, if the current node is a member of
