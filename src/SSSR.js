@@ -71,6 +71,8 @@ class SSSR {
         let sssr = SSSR.getSSSR(c, d, pe1, pe2, nSssr);
         let rings = new Array(sssr.length);
 
+        console.log(nSssr, sssr);
+
         for (let i = 0; i < sssr.length; i++) {
             rings[i] = new Array(sssr[i].length);
             
@@ -82,6 +84,26 @@ class SSSR {
         }
 
         return rings;
+    }
+
+    /**
+     * Creates a printable string from a matrix (2D array).
+     * 
+     * @param {array} matrix A 2D array.
+     * @returns {string} A string representing the matrix.
+     */
+    static matrixToString(matrix) {
+        let str = '';
+
+        for (var i = 0; i < matrix.length; i++) {
+            for (var j = 0; j < matrix[i].length; j++) {
+                str += matrix[i][j] + ' ';
+            }
+
+            str += '\n';
+        }
+
+        return str;
     }
 
     /**

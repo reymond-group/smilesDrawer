@@ -540,7 +540,7 @@ class SmilesDrawer {
                     let targetVertexId = openBonds.get(ringbondId);
                     let edgeId = this.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
                     let targetVertex = this.vertices[targetVertexId];
-
+                    
                     vertex.addChild(targetVertexId);
                     vertex.value.addNeighbouringElement(targetVertex.value.element);
                     targetVertex.addChild(sourceVertexId);
@@ -555,7 +555,7 @@ class SmilesDrawer {
 
         // Get the rings in the graph (the SSSR)
         let rings = SSSR.getRings(this.getAdjacencyMatrix());
-
+        console.log(rings);
         if (rings === null) {
             return;
         }
@@ -625,6 +625,8 @@ class SmilesDrawer {
                 this.removeRing(involvedRings[i]);
             }
         }
+
+        console.log(this.rings);
     }
 
     /**
@@ -2230,8 +2232,6 @@ class SmilesDrawer {
      * @param {boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
      */
     createRing(ring, center = null, startVertex = null, previousVertex = null, forcePositioned = false) {
-        console.log('creating ring', ring);
-        
         if (ring.positioned && !forcePositioned) {
             return;
         }
@@ -2283,7 +2283,7 @@ class SmilesDrawer {
         // Draw neighbours in decreasing order of connectivity
         for (var i = 0; i < orderedNeighbours.length; i++) {
             let neighbour = this.getRing(orderedNeighbours[i].neighbour);
-            console.log('drawing neighbour', neighbour.id);
+            
             if (neighbour.positioned) {
                 continue;
             }
@@ -2673,8 +2673,6 @@ class SmilesDrawer {
         if (vertex.positioned) {
             return;
         }
-
-        console.log('positioning vertex', vertex, previousVertex, ringOrAngle, dir);
 
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of

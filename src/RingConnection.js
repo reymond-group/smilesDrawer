@@ -41,7 +41,8 @@ class RingConnection {
      * @returns {boolean} A boolean indicating whether or not this ring connection is a bridge.
      */
     isBridge(vertices) {
-        if (this.vertices.size > 2) { 
+        if (this.vertices.size > 2) {
+            console.log(this.firstRingId, this.secondRingId, this.vertices);
             return true;
         }
 

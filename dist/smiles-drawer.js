@@ -2891,6 +2891,7 @@ var RingConnection = function () {
         key: 'isBridge',
         value: function isBridge(vertices) {
             if (this.vertices.size > 2) {
+                console.log(this.firstRingId, this.secondRingId, this.vertices);
                 return true;
             }
 
@@ -5398,7 +5399,7 @@ var SmilesDrawer = function () {
 
             // Get the rings in the graph (the SSSR)
             var rings = SSSR.getRings(this.getAdjacencyMatrix());
-
+            console.log(rings);
             if (rings === null) {
                 return;
             }
@@ -5468,6 +5469,8 @@ var SmilesDrawer = function () {
                     this.removeRing(involvedRings[i]);
                 }
             }
+
+            console.log(this.rings);
         }
 
         /**
@@ -7170,8 +7173,6 @@ var SmilesDrawer = function () {
             var previousVertex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
             var forcePositioned = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
-            console.log('creating ring', ring);
-
             if (ring.positioned && !forcePositioned) {
                 return;
             }
@@ -7223,7 +7224,7 @@ var SmilesDrawer = function () {
             // Draw neighbours in decreasing order of connectivity
             for (var i = 0; i < orderedNeighbours.length; i++) {
                 var neighbour = this.getRing(orderedNeighbours[i].neighbour);
-                console.log('drawing neighbour', neighbour.id);
+
                 if (neighbour.positioned) {
                     continue;
                 }
@@ -7636,8 +7637,6 @@ var SmilesDrawer = function () {
             if (vertex.positioned) {
                 return;
             }
-
-            console.log('positioning vertex', vertex, previousVertex, ringOrAngle, dir);
 
             // If the current node is the member of one ring, then point straight away
             // from the center of the ring. However, if the current node is a member of
@@ -8643,6 +8642,8 @@ var SSSR = function () {
             var sssr = SSSR.getSSSR(c, d, pe1, pe2, nSssr);
             var rings = new Array(sssr.length);
 
+            console.log(nSssr, sssr);
+
             for (var _i7 = 0; _i7 < sssr.length; _i7++) {
                 rings[_i7] = new Array(sssr[_i7].length);
 
@@ -8675,6 +8676,29 @@ var SSSR = function () {
             }
 
             return rings;
+        }
+
+        /**
+         * Creates a printable string from a matrix (2D array).
+         * 
+         * @param {array} matrix A 2D array.
+         * @returns {string} A string representing the matrix.
+         */
+
+    }, {
+        key: 'matrixToString',
+        value: function matrixToString(matrix) {
+            var str = '';
+
+            for (var i = 0; i < matrix.length; i++) {
+                for (var j = 0; j < matrix[i].length; j++) {
+                    str += matrix[i][j] + ' ';
+                }
+
+                str += '\n';
+            }
+
+            return str;
         }
 
         /**
