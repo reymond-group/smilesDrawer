@@ -139,9 +139,11 @@ class Line {
      */
     setRightVector(x, y) {
         if (this.from.x < this.to.x) {
-            this.to.set(x, y);
+            this.to.x = x;
+            this.to.y = y;
         } else {
-            this.from.set(x, y);
+            this.from.x = x;
+            this.from.y = y;
         }
 
         return this;
@@ -156,9 +158,11 @@ class Line {
      */
     setLeftVector(x, y) {
         if (this.from.x < this.to.x) {
-            this.from.set(x, y);
+            this.from.x = x;
+            this.from.y = y;
         } else {
-            this.to.set(x, y);
+            this.to.x = x;
+            this.to.y = y;
         }
 
         return this;
@@ -186,8 +190,11 @@ class Line {
     rotate(theta) {
         let l = this.getLeftVector();
         let r = this.getRightVector();
-        let x = Math.cos(theta) * (r.x - l.x) - Math.sin(theta) * (r.y - l.y) + l.x;
-        let y = Math.sin(theta) * (r.x - l.x) - Math.cos(theta) * (r.y - l.y) + l.y;
+        let sinTheta = Math.sin(theta);
+        let cosTheta = Math.cos(theta);
+
+        let x = cosTheta * (r.x - l.x) - sinTheta * (r.y - l.y) + l.x;
+        let y = sinTheta * (r.x - l.x) - cosTheta * (r.y - l.y) + l.y;
         
         this.setRightVector(x, y);
 
@@ -204,7 +211,7 @@ class Line {
         let f = Vector2.subtract(this.to, this.from);
         
         f.normalize();
-        f.multiply(by);
+        f.multiplyScalar(by);
         
         this.from.add(f);
 
@@ -221,7 +228,7 @@ class Line {
         let f = Vector2.subtract(this.from, this.to);
         
         f.normalize();
-        f.multiply(by);
+        f.multiplyScalar(by);
         
         this.to.add(f);
 
@@ -270,7 +277,7 @@ class Line {
         let f = Vector2.subtract(this.from, this.to);
         
         f.normalize();
-        f.multiply(by / 2.0);
+        f.multiplyScalar(by / 2.0);
         
         this.to.add(f);
         this.from.subtract(f);

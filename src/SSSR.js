@@ -71,8 +71,6 @@ class SSSR {
         let sssr = SSSR.getSSSR(c, d, pe1, pe2, nSssr);
         let rings = new Array(sssr.length);
 
-        console.log(nSssr, sssr);
-
         for (let i = 0; i < sssr.length; i++) {
             rings[i] = new Array(sssr[i].length);
             
@@ -117,6 +115,9 @@ class SSSR {
         let d = Array(length);
         let pe1 = Array(length);
         let pe2 = Array(length);
+        var l = 0;
+        var m = 0;
+        var n = 0;
 
         for (let i = 0; i < length; i++) {
             d[i] = Array(length);
@@ -144,26 +145,79 @@ class SSSR {
 
                     if (previousPathLength > newPathLength) {
                         if (previousPathLength === newPathLength + 1) {
-                            pe2[i][j] = ArrayHelper.deepCopy(pe1[i][j]);
+                            pe2[i][j] = [pe1[i][j].length];
+                            for (l = 0; l < pe1[i][j].length; l++) {
+                                pe2[i][j][l] = [pe1[i][j][l].length];
+                                for (m = 0; m < pe1[i][j][l].length; m++) {
+                                    pe2[i][j][l][m] = [pe1[i][j][l][m].length];
+                                    for (n = 0; n < pe1[i][j][l][m].length; n++) {
+                                        pe2[i][j][l][m][n] = [pe1[i][j][l][m][0], pe1[i][j][l][m][1]];
+                                    }
+                                }
+                            }
                         } else {
                             pe2[i][j] = [];
                         }
 
                         d[i][j] = newPathLength;
-                        pe1[i][j] = [ pe1[i][k][0].concat(pe1[k][j][0]) ];
+                        
+                        pe1[i][j] = [[]];
+
+                        for (l = 0; l < pe1[i][k][0].length; l++) {
+                            pe1[i][j][0].push(pe1[i][k][0][l]);
+                        }
+                        for (l = 0; l < pe1[k][j][0].length; l++) {
+                            pe1[i][j][0].push(pe1[k][j][0][l]);
+                        }
                     } else if (previousPathLength === newPathLength) {
                         if (pe1[i][k].length && pe1[k][j].length) {
                             if (pe1[i][j].length) {
-                                pe1[i][j].push(pe1[i][k][0].concat(pe1[k][j][0]));
+                                let tmp = [];
+
+                                for (l = 0; l < pe1[i][k][0].length; l++) {
+                                    tmp.push(pe1[i][k][0][l]);
+                                }
+                                for (l = 0; l < pe1[k][j][0].length; l++) {
+                                    tmp.push(pe1[k][j][0][l]);
+                                }
+
+                                pe1[i][j].push(tmp);
                             } else {
-                                pe1[i][j][0] = pe1[i][k][0].concat(pe1[k][j][0]);
+                                let tmp = [];
+
+                                for (l = 0; l < pe1[i][k][0].length; l++) {
+                                    tmp.push(pe1[i][k][0][l]);
+                                }
+                                for (l = 0; l < pe1[k][j][0].length; l++) {
+                                    tmp.push(pe1[k][j][0][l]);
+                                }
+
+                                pe1[i][j][0] = tmp
                             }
                         }
                     } else if (previousPathLength === newPathLength - 1) {
                         if (pe2[i][j].length) {
-                            pe2[i][j].push(pe1[i][k][0].concat(pe1[k][j][0]));
+                            let tmp = [];
+
+                            for (var l = 0; l < pe1[i][k][0].length; l++) {
+                                tmp.push(pe1[i][k][0][l]);
+                            }
+                            for (var l = 0; l < pe1[k][j][0].length; l++) {
+                                tmp.push(pe1[k][j][0][l]);
+                            }
+
+                            pe2[i][j].push(tmp);
                         } else {
-                            pe2[i][j][0] = pe1[i][k][0].concat(pe1[k][j][0]);
+                            let tmp = [];
+
+                            for (var l = 0; l < pe1[i][k][0].length; l++) {
+                                tmp.push(pe1[i][k][0][l]);
+                            }
+                            for (var l = 0; l < pe1[k][j][0].length; l++) {
+                                tmp.push(pe1[k][j][0][l]);
+                            }
+
+                            pe2[i][j][0] = tmp;
                         }
                     }
                 }

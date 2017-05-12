@@ -20,20 +20,6 @@ class Vector2 {
     }
 
     /**
-     * Sets the values of the x and y coordinates of this vector.
-     *
-     * @param {number} [x=0] The value of the x coordinate.
-     * @param {number} [y=0] The value of the y coordinate.
-     * @returns {Vector2} Returns itself.
-     */
-    set(x = 0, y = 0) {
-        this.x = x;
-        this.y = y;
-
-        return this;
-    }
-
-    /**
      * Clones this vector and returns the clone.
      *
      * @returns {Vector2} The clone of this vector.
@@ -91,12 +77,25 @@ class Vector2 {
     }
     
     /**
+     * Multiply the x and y coordinate values of this vector by the values of another vector.
+     *
+     * @param {Vector2} v A vector.
+     * @returns {Vector2} Returns itself.
+     */
+    multiply(v) {
+        this.x *= v.x;
+        this.y *= v.y;
+
+        return this;
+    }
+
+    /**
      * Multiply the x and y coordinate values of this vector by a scalar.
      *
      * @param {number} scalar The scalar.
      * @returns {Vector2} Returns itself.
      */
-    multiply(scalar) {
+    multiplyScalar(scalar) {
         this.x *= scalar;
         this.y *= scalar;
 
@@ -172,9 +171,11 @@ class Vector2 {
      */
     rotate(angle) {
         let tmp = new Vector2();
-        
-        tmp.x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
-        tmp.y = this.x * Math.sin(angle) + this.y * Math.cos(angle);
+        let cosAngle = Math.cos(angle);
+        let sinAngle = Math.sin(angle);
+
+        tmp.x = this.x * cosAngle - this.y * sinAngle;
+        tmp.y = this.x * sinAngle + this.y * cosAngle;
         
         this.x = tmp.x;
         this.y = tmp.y;
@@ -217,6 +218,7 @@ class Vector2 {
         // Problem if this is first position
         this.x += 0.001;
         this.y -= 0.001;
+
         let a = Vector2.subtract(this, center);
         let b = Vector2.subtract(vec, center);
         let angle = Vector2.angle(b, a);
@@ -420,24 +422,20 @@ class Vector2 {
      * Multiplies two vectors (value by value) and returns the result.
      *
      * @static
-     * @param {Vector2} vecA A factor.
-     * @param {Vector2} vecB A factor.
+     * @param {Vector2} vecA A vector.
+     * @param {Vector2} vecB A vector.
      * @returns {Vector2} Returns the product of two vectors.
      */
     static multiply(vecA, vecB) {
-        if (vecB.x && vecB.y) {
-            return new Vector2(vecA.x * vecB.x, vecA.y * vecB.y);
-        }
-
-        return new Vector2(vecA.x * vecB, vecA.y * vecB);
+        return new Vector2(vecA.x * vecB.x, vecA.y * vecB.y);
     }
 
     /**
      * Multiplies two vectors (value by value) and returns the result.
      *
      * @static
-     * @param {Vector2} vec A factor.
-     * @param {number} scalar A scalar factor.
+     * @param {Vector2} vec A vector.
+     * @param {number} scalar A scalar.
      * @returns {Vector2} Returns the product of two vectors.
      */
     static multiplyScalar(vec, scalar) {
@@ -470,6 +468,23 @@ class Vector2 {
         return [
             new Vector2(-delta.y, delta.x),
             new Vector2(delta.y, -delta.x)
+        ];
+    }
+
+    /**
+     * Returns the unit (normalized normal) vectors of a line spanned by two vectors.
+     *
+     * @static
+     * @param {Vector2} vecA A vector spanning the line.
+     * @param {Vector2} vecB A vector spanning the line.
+     * @returns {array} An array containing the two unit vectors.
+     */
+    static units(vecA, vecB) {
+        let delta = Vector2.subtract(vecB, vecA);
+
+        return [
+            (new Vector2(-delta.y, delta.x)).normalize(),
+            (new Vector2(delta.y, -delta.x)).normalize()
         ];
     }
 

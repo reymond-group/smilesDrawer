@@ -7,7 +7,7 @@ class Atom {
      * @param {string} [bondType='-'] The type of the bond associated with this atom.
      */
     constructor(element, bondType = '-') {
-        this.element = element;
+        this.element = element.length === 1 ? element.toUpperCase() : element;
         this.explicit = false;
         this.ringbonds = [];
         this.rings = [];
@@ -26,6 +26,7 @@ class Atom {
         this.isDrawn = true;
         this.isConnectedToRing = false;
         this.neighbouringElements = [];
+        this.isPartOfAromaticRing = element !== this.element;
     }
 
     /**

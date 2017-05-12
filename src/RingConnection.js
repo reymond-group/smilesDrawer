@@ -42,7 +42,6 @@ class RingConnection {
      */
     isBridge(vertices) {
         if (this.vertices.size > 2) {
-            console.log(this.firstRingId, this.secondRingId, this.vertices);
             return true;
         }
 

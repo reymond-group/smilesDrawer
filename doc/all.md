@@ -1141,7 +1141,6 @@ A class representing a ring
         * [.getAngle()](#Ring+getAngle) ⇒ <code>number</code>
         * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#Ring+eachMember)
         * [.getOrderedNeighbours(ringConnections)](#Ring+getOrderedNeighbours) ⇒ <code>array</code>
-        * [.isAromatic(vertices)](#Ring+isAromatic) ⇒ <code>boolean</code>
         * [.isBenzeneLike(vertices)](#Ring+isBenzeneLike) ⇒ <code>boolean</code>
         * [.getDoubleBondCount(vertices)](#Ring+getDoubleBondCount) ⇒ <code>number</code>
         * [.contains(vertexId)](#Ring+contains) ⇒ <code>boolean</code>
@@ -1230,18 +1229,6 @@ Returns an array containing the neighbouring rings of this ring ordered by ring 
 | Param | Type | Description |
 | --- | --- | --- |
 | ringConnections | <code>array</code> | An array of ring connections associated with the current molecule. |
-
-<a name="Ring+isAromatic"></a>
-
-### ring.isAromatic(vertices) ⇒ <code>boolean</code>
-Check whether this ring is explicitly aromatic (e.g. c1ccccc1).
-
-**Kind**: instance method of <code>[Ring](#Ring)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not this ring is explicitly aromatic (using lowercase letters in smiles).  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertices | <code>array</code> | An array of vertices associated with the current molecule. |
 
 <a name="Ring+isBenzeneLike"></a>
 
@@ -1484,7 +1471,6 @@ The main class of the application representing the smiles drawer
         * [.isEdgeRotatable(edge)](#SmilesDrawer+isEdgeRotatable) ⇒ <code>boolean</code>
         * [.isRingAromatic(ring)](#SmilesDrawer+isRingAromatic) ⇒ <code>boolean</code>
         * [.isEdgeInAromaticRing(edge)](#SmilesDrawer+isEdgeInAromaticRing) ⇒ <code>boolean</code>
-        * [.isVertexInAromaticRing(vertexId)](#SmilesDrawer+isVertexInAromaticRing) ⇒ <code>boolean</code>
         * [.getEdgeNormals(edge)](#SmilesDrawer+getEdgeNormals) ⇒ <code>array</code>
         * [.getTreeDepth(vertexId, parentVertexId)](#SmilesDrawer+getTreeDepth) ⇒ <code>number</code>
         * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])](#SmilesDrawer+traverseTree)
@@ -2171,10 +2157,10 @@ Check whether or not an edge is rotatable.
 <a name="SmilesDrawer+isRingAromatic"></a>
 
 ### smilesDrawer.isRingAromatic(ring) ⇒ <code>boolean</code>
-Check whether or not a ring is an explicity defined aromatic ring (lower case smiles).
+Check whether or not a ring is an implicitly defined aromatic ring (lower case smiles).
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not a ring is explicitly defined as aromatic.  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not a ring is implicitly defined as aromatic.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2191,18 +2177,6 @@ Checks whether or not an edge is part of an explicit aromatic ring (lower case s
 | Param | Type | Description |
 | --- | --- | --- |
 | edge | <code>[Edge](#Edge)</code> | An edge. |
-
-<a name="SmilesDrawer+isVertexInAromaticRing"></a>
-
-### smilesDrawer.isVertexInAromaticRing(vertexId) ⇒ <code>boolean</code>
-Checks whether or not a vertex is part of an explicit aromatic ring (lower case smiles).
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not the vertex is part of an explicit aromatic ring.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexId | <code>number</code> | A vertex id. |
 
 <a name="SmilesDrawer+getEdgeNormals"></a>
 
@@ -2271,7 +2245,8 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer+initPseudoElements"></a>
 
 ### smilesDrawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 <a name="SmilesDrawer.clean"></a>
@@ -2320,6 +2295,7 @@ A class encapsulating the functionality to find the smallest set of smallest rin
 
 * [SSSR](#SSSR)
     * [.getRings(adjacencyMatrix)](#SSSR.getRings) ⇒ <code>array</code>
+    * [.matrixToString(matrix)](#SSSR.matrixToString) ⇒ <code>string</code>
     * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SSSR.getPathIncludedDistanceMatrices) ⇒ <code>object</code>
     * [.getRingCandidates(d, pe1, pe2)](#SSSR.getRingCandidates) ⇒ <code>array</code>
     * [.getSSSR(c, d, pe1, pe2, nsssr)](#SSSR.getSSSR) ⇒ <code>array</code>
@@ -2340,6 +2316,18 @@ Returns an array containing arrays, each representing a ring from the smallest s
 | Param | Type | Description |
 | --- | --- | --- |
 | adjacencyMatrix | <code>array</code> | A 2-dimensional array representing a graph. |
+
+<a name="SSSR.matrixToString"></a>
+
+### SSSR.matrixToString(matrix) ⇒ <code>string</code>
+Creates a printable string from a matrix (2D array).
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>string</code> - A string representing the matrix.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| matrix | <code>array</code> | A 2D array. |
 
 <a name="SSSR.getPathIncludedDistanceMatrices"></a>
 

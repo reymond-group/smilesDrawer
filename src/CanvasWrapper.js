@@ -22,6 +22,9 @@ class CanvasWrapper {
         this.offsetX = 0.0;
         this.offsetY = 0.0;
 
+        this.fontLarge = this.opts.fontSizeLarge + 'pt Droid Sans, sans-serif';
+        this.fontSmall = this.opts.fontSizeSmall + 'pt Droid Sans, sans-serif';
+
         this.updateSize(this.opts.width, this.opts.height);
 
         this.clear();
@@ -68,32 +71,29 @@ class CanvasWrapper {
      */
     scale(vertices) {
         // Figure out the final size of the image
-        var max = {
-            x: -Number.MAX_VALUE,
-            y: -Number.MAX_VALUE
-        };
-        var min = {
-            x: Number.MAX_VALUE,
-            y: Number.MAX_VALUE
-        };
+        let maxX = -Number.MAX_VALUE;
+        let maxY = -Number.MAX_VALUE;
+        let minX = Number.MAX_VALUE;
+        let minY = Number.MAX_VALUE;
 
         for (var i = 0; i < vertices.length; i++) {
-            var p = vertices[i].position;
-            if (max.x < p.x) max.x = p.x;
-            if (max.y < p.y) max.y = p.y;
-            if (min.x > p.x) min.x = p.x;
-            if (min.y > p.y) min.y = p.y;
+            let p = vertices[i].position;
+
+            if (maxX < p.x) maxX = p.x;
+            if (maxY < p.y) maxY = p.y;
+            if (minX > p.x) minX = p.x;
+            if (minY > p.y) minY = p.y;
         }
 
         // Add padding
         var padding = 20.0;
-        max.x += padding;
-        max.y += padding;
-        min.x -= padding;
-        min.y -= padding;
+        maxX += padding;
+        maxY += padding;
+        minX -= padding;
+        minY -= padding;
 
-        this.drawingWidth = max.x - min.x;
-        this.drawingHeight = max.y - min.y;
+        this.drawingWidth = maxX - minX;
+        this.drawingHeight = maxY - minY;
 
         var scaleX = this.canvas.offsetWidth / this.drawingWidth;
         var scaleY = this.canvas.offsetHeight / this.drawingHeight;
@@ -102,8 +102,8 @@ class CanvasWrapper {
 
         this.ctx.scale(scale, scale);
 
-        this.offsetX = -min.x;
-        this.offsetY = -min.y;
+        this.offsetX = -minX;
+        this.offsetY = -minY;
 
         // Center
         if (scaleX < scaleY) {
@@ -148,10 +148,6 @@ class CanvasWrapper {
      * @param {string} [debugText=''] A debug message.
      */
     drawCircle(x, y, radius, color, fill = true, debug = false, debugText = '') {
-        if (isNaN(x) || isNaN(y)) {
-            return;
-        }
-
         let ctx = this.ctx;
         let offsetX = this.offsetX;
         let offsetY = this.offsetY;
@@ -159,7 +155,7 @@ class CanvasWrapper {
         ctx.save();
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2, true);
+        ctx.arc(x + offsetX, y + offsetY, radius, 0, MathHelper.twoPI, true);
         ctx.closePath();
 
         if (debug) {
@@ -308,10 +304,10 @@ class CanvasWrapper {
             end = l;
         }
 
-        let t = Vector2.add(start, Vector2.multiply(normals[0], 0.75));
-        let u = Vector2.add(end, Vector2.multiply(normals[0], width));
-        let v = Vector2.add(end, Vector2.multiply(normals[1], width));
-        let w = Vector2.add(start, Vector2.multiply(normals[1], 0.75));
+        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], 0.75));
+        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], width));
+        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], width));
+        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], 0.75));
 
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
@@ -395,10 +391,10 @@ class CanvasWrapper {
         sEnd.x += offsetX;
         sEnd.y += offsetY;
 
-        let t = Vector2.add(start, Vector2.multiply(normals[0], 0.75));
-        let u = Vector2.add(end, Vector2.multiply(normals[0], width / 2.0));
-        let v = Vector2.add(end, Vector2.multiply(normals[1], width / 2.0));
-        let w = Vector2.add(start, Vector2.multiply(normals[1], 0.75));
+        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], 0.75));
+        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], width / 2.0));
+        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], width / 2.0));
+        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], 0.75));
 
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
@@ -462,7 +458,7 @@ class CanvasWrapper {
 
         ctx.save();
         ctx.beginPath();
-        ctx.arc(x + this.offsetX, y + this.offsetY, this.bondLength / 4.5, 0, 2 * Math.PI, false);
+        ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, MathHelper.twoPI, false);
         ctx.fillStyle = this.getColor(elementName);
         ctx.fill();
     }
@@ -481,11 +477,6 @@ class CanvasWrapper {
      * @param {object} [pseudoElements={}] An object containing pseudo elements or shortcut elements and their count. E.g. { 'F': 3 }, { 'O': 2, 'H': 1 }.
      */
     drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, pseudoElements = {}) {
-        // Return empty line element for debugging, remove this check later, values should not be NaN
-        if (isNaN(x) || isNaN(y)) {
-            return;
-        }
-
         let ctx = this.ctx;
         let offsetX = this.offsetX;
         let offsetY = this.offsetY;
@@ -494,9 +485,6 @@ class CanvasWrapper {
         
         let fontSizeLarge = this.opts.fontSizeLarge;
         let fontSizeSmall = this.opts.fontSizeSmall;
-
-        let fontLarge = fontSizeLarge + 'pt Droid Sans, sans-serif';
-        let fontSmall = fontSizeSmall + 'pt Droid Sans, sans-serif';
 
         ctx.textAlign = 'start';
         ctx.textBaseline = 'alphabetic';
@@ -516,7 +504,7 @@ class CanvasWrapper {
                 chargeText = '2-';
             }
 
-            ctx.font = fontSmall;
+            ctx.font = this.fontSmall;
             chargeWidth = ctx.measureText(chargeText).width;
         }
 
@@ -525,24 +513,24 @@ class CanvasWrapper {
 
         if (isotope > 0) {
             isotopeText = isotope;
-            ctx.font = fontSmall;
+            ctx.font = this.fontSmall;
             isotopeWidth = ctx.measureText(isotopeText).width;
         }
 
-        ctx.font = fontLarge;
+        ctx.font = this.fontLarge;
         ctx.fillStyle = this.getColor(elementName);
 
         let dim = ctx.measureText(elementName);
 
         dim.totalWidth = dim.width + chargeWidth;
-        dim.height = parseInt(fontLarge, 10);
+        dim.height = parseInt(this.fontLarge, 10);
 
-        let r = (dim.width > fontSizeLarge) ? dim.width : fontSizeLarge;
+        let r = (dim.width > fontSizeLarge) ? dim.width : this.opts.fontSizeLarge;
         r /= 1.25;
 
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY, r, 0, Math.PI * 2, true);
+        ctx.arc(x + offsetX, y + offsetY, r, 0, MathHelper.twoPI * 2, true);
         ctx.closePath();
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
@@ -551,22 +539,22 @@ class CanvasWrapper {
         let cursorPosLeft = -dim.width / 2.0;
 
         ctx.fillStyle = this.getColor(elementName);
-        ctx.fillText(elementName, x + offsetX + cursorPos, y + fontSizeLarge / 2.0 + offsetY);
+        ctx.fillText(elementName, x + offsetX + cursorPos, y + this.opts.fontSizeLarge / 2.0 + offsetY);
         cursorPos += dim.width;
 
         if (charge) {
-            ctx.font = fontSmall;
-            ctx.fillText(chargeText, x + offsetX + cursorPos, y - fontSizeSmall / 5.0 + offsetY);
+            ctx.font = this.fontSmall;
+            ctx.fillText(chargeText, x + offsetX + cursorPos, y - this.opts.fontSizeSmall / 5.0 + offsetY);
             cursorPos += chargeWidth;
         }
 
         if (isotope > 0) {
-            ctx.font = fontSmall;
-            ctx.fillText(isotopeText, x + offsetX + cursorPosLeft - isotopeWidth, y - fontSizeSmall / 5.0 + offsetY);
+            ctx.font = this.fontSmall;
+            ctx.fillText(isotopeText, x + offsetX + cursorPosLeft - isotopeWidth, y - this.opts.fontSizeSmall / 5.0 + offsetY);
             cursorPosLeft -= isotopeWidth;
         }
 
-        ctx.font = fontLarge;
+        ctx.font = this.fontLarge;
 
         let hydrogenWidth = 0;
         let hydrogenCountWidth = 0;
@@ -587,10 +575,10 @@ class CanvasWrapper {
             } else if (direction === 'down' && isTerminal) {
                 hx += cursorPos;
             } else if (direction === 'up' && !isTerminal) {
-                hy -= fontSizeLarge + fontSizeLarge / 4.0;
+                hy -= this.opts.fontSizeLarge + this.opts.fontSizeLarge / 4.0;
                 hx -= hydrogenWidth / 2.0;
             } else if (direction === 'down' && !isTerminal) {
-                hy += fontSizeLarge + fontSizeLarge / 4.0;
+                hy += this.opts.fontSizeLarge + this.opts.fontSizeLarge / 4.0;
                 hx -= hydrogenWidth / 2.0;
             }
 
@@ -602,7 +590,7 @@ class CanvasWrapper {
             let hy = y + offsetY + fontSizeLarge / 2.0;
 
             hydrogenWidth = ctx.measureText('H').width;
-            ctx.font = fontSmall;
+            ctx.font = this.fontSmall;
             hydrogenCountWidth = ctx.measureText(hydrogens).width;
             cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
 
@@ -615,18 +603,18 @@ class CanvasWrapper {
             } else if (direction === 'down' && isTerminal) {
                 hx += cursorPos;
             } else if (direction === 'up' && !isTerminal) {
-                hy -= fontSizeLarge + fontSizeLarge / 4.0;
+                hy -= this.opts.fontSizeLarge + this.opts.fontSizeLarge / 4.0;
                 hx -= hydrogenWidth / 2.0;
             } else if (direction === 'down' && !isTerminal) {
-                hy += fontSizeLarge + fontSizeLarge / 4.0;
+                hy += this.opts.fontSizeLarge + this.opts.fontSizeLarge / 4.0;
                 hx -= hydrogenWidth / 2.0;
             }
 
-            ctx.font = fontLarge;
+            ctx.font = this.fontLarge;
             ctx.fillText('H', hx, hy)
 
-            ctx.font = fontSmall;
-            ctx.fillText(hydrogens, hx + hydrogenWidth / 2.0 + hydrogenCountWidth, hy + fontSizeSmall / 5.0);
+            ctx.font = this.fontSmall;
+            ctx.fillText(hydrogens, hx + hydrogenWidth / 2.0 + hydrogenCountWidth, hy + this.opts.fontSizeSmall / 5.0);
 
             cursorPos += hydrogenWidth + hydrogenWidth / 2.0 + hydrogenCountWidth;
         }
@@ -648,7 +636,7 @@ class CanvasWrapper {
             let elementCount = pseudoElements[key].count;
             let hydrogenCount = pseudoElements[key].hydrogenCount;
 
-            ctx.font = fontLarge;
+            ctx.font = this.fontLarge;
 
             if (elementCount > 1 && hydrogenCount > 0) {
                 openParenthesisWidth = ctx.measureText('(').width;
@@ -664,7 +652,7 @@ class CanvasWrapper {
                 hydrogenWidth = ctx.measureText('H').width;
             }
 
-            ctx.font = fontSmall;
+            ctx.font = this.fontSmall;
 
             if (elementCount > 1) {
                 elementCountWidth = ctx.measureText(elementCount).width;
@@ -676,7 +664,7 @@ class CanvasWrapper {
                 hydrogenCountWidth = ctx.measureText(hydrogenCount).width;
             }
 
-            ctx.font = fontLarge;
+            ctx.font = this.fontLarge;
 
             let hx = x + offsetX;
             let hy = y + offsetY + fontSizeLarge / 2.0;
@@ -711,22 +699,22 @@ class CanvasWrapper {
                     ctx.fillText('H', hx + cursorPosLeft, hy)
                     
                     if (hydrogenCount > 1) {
-                        ctx.font = fontSmall;
-                        ctx.fillText(hydrogenCount, hx + cursorPosLeft + hydrogenWidth, hy + fontSizeSmall / 5.0);
+                        ctx.font = this.fontSmall;
+                        ctx.fillText(hydrogenCount, hx + cursorPosLeft + hydrogenWidth, hy + this.opts.fontSizeSmall / 5.0);
                     }
                 } else {
                     ctx.fillText('H', hx + cursorPos, hy)
                     cursorPos += hydrogenWidth;
 
                     if (hydrogenCount > 1) {
-                        ctx.font = fontSmall;
-                        ctx.fillText(hydrogenCount, hx + cursorPos, hy + fontSizeSmall / 5.0);
+                        ctx.font = this.fontSmall;
+                        ctx.fillText(hydrogenCount, hx + cursorPos, hy + this.opts.fontSizeSmall / 5.0);
                         cursorPos += hydrogenCountWidth;
                     }
                 }
             }
 
-            ctx.font = fontLarge;
+            ctx.font = this.fontLarge;
 
             if (elementCount > 1 && hydrogenCount > 0) {
                 if (direction === 'left') {
@@ -738,14 +726,16 @@ class CanvasWrapper {
                 }
             }
             
-            ctx.font = fontSmall;
+            ctx.font = this.fontSmall;
 
             if (elementCount > 1) {
                 if (direction === 'left') {
                     // cursorPosLeft -= elementCountWidth;
-                    ctx.fillText(elementCount, hx - elementCountWidth + cursorPosLeft + elementCountWidth + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, hy + fontSizeSmall / 5.0);
+                    ctx.fillText(elementCount, hx - cursorPosLeft + elementCountWidth + 
+                                 openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + 
+                                 hydrogenCountWidth + elementWidth, hy + this.opts.fontSizeSmall / 5.0);
                 } else {
-                    ctx.fillText(elementCount, hx + cursorPos, hy + fontSizeSmall / 5.0);
+                    ctx.fillText(elementCount, hx + cursorPos, hy + this.opts.fontSizeSmall / 5.0);
                     cursorPos += elementCountWidth;
                 }
             }
@@ -773,14 +763,14 @@ class CanvasWrapper {
      */
     drawAromaticityRing(ring) {
         let ctx = this.ctx;
-        let radius = MathHelper.polyCircumradius(this.bondLength, ring.getSize());
+        let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
 
         ctx.save();
         ctx.strokeStyle = this.getColor('C');
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, 
-                radius - this.bondLength / 3.0 - this.opts.bondSpacing, 0, Math.PI * 2, true); 
+                radius - this.opts.bondLength / 3.0 - this.opts.bondSpacing, 0, Math.PI * 2, true); 
         ctx.closePath();
         ctx.stroke();
         ctx.restore();

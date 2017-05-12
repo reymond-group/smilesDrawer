@@ -24,7 +24,7 @@ class MathHelper {
         let sin = 0.0;
         let cos = 0.0;
         
-        for (let i = 0; i < arr.length; i++) {
+        for (var i = 0; i < arr.length; i++) {
             sin += Math.sin(arr[i]);
             cos += Math.cos(arr[i]);
         }
@@ -92,7 +92,7 @@ class MathHelper {
      * @returns {number} The angle in degrees.
      */
     static toDeg(rad) {
-        return rad * 180 / Math.PI;
+        return rad * MathHelper.degFactor;
     }
 
     /**
@@ -103,6 +103,10 @@ class MathHelper {
      * @returns {number} The angle in radians.
      */
     static toRad(deg) {
-        return deg * Math.PI / 180;
+        return deg * MathHelper.radFactor;
     }
 }
+
+MathHelper.radFactor = Math.PI / 180;
+MathHelper.degFactor = 180 / Math.PI;
+MathHelper.twoPI = 2 * Math.PI;
