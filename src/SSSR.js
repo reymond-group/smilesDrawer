@@ -51,7 +51,9 @@ class SSSR {
                 updatedAdjacencyMatrix[i].splice(indicesToRemove[j], 1);
             }
         }
-        console.log(SSSR.matrixToString(adjacencyMatrix));
+
+        //console.log(SSSR.matrixToString(adjacencyMatrix));
+        
         adjacencyMatrix = updatedAdjacencyMatrix;
 
         if (adjacencyMatrix.length === 0) {

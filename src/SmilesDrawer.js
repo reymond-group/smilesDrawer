@@ -796,7 +796,6 @@ class SmilesDrawer {
             let vertex = this.vertices[ringMembers[i]];
             
             vertex.value.rings = ArrayHelper.removeAll(vertex.value.rings, ringIds);
-            console.log('Adding ring ' + ring.id + ' to ' + vertex.id);
             vertex.value.rings.push(ring.id);
         }
 
@@ -2670,8 +2669,6 @@ class SmilesDrawer {
             return;
         }
 
-        console.log('Positioning vertex ' + vertex.id);
-
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of
         // two rings, point away from the middle of the centers of the two rings
@@ -2724,14 +2721,11 @@ class SmilesDrawer {
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (previousVertex.value.rings.length === 1 || previousVertex.value.isBridge) {
-            console.log(vertex.id, vertex.value);
-            console.log(previousVertex.id, previousVertex.value);
-            console.log(this.rings);
             // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
             // Use the same approach as with rings that are connected at one vertex
             // and draw the atom in the opposite direction of the center.
             let pos = Vector2.subtract(ringOrAngle, previousVertex.position);
-            console.log(pos, ringOrAngle);
+            
             pos.invert();
             pos.normalize();
             // Unlike with the ring, do not multiply with radius but with bond length
