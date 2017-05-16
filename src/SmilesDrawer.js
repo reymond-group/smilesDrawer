@@ -796,6 +796,7 @@ class SmilesDrawer {
             let vertex = this.vertices[ringMembers[i]];
             
             vertex.value.rings = ArrayHelper.removeAll(vertex.value.rings, ringIds);
+            console.log('Adding ring ' + ring.id + ' to ' + vertex.id);
             vertex.value.rings.push(ring.id);
         }
 
@@ -1622,7 +1623,7 @@ class SmilesDrawer {
                 let a = positions[edges[i][0]];
                 let b = positions[edges[i][1]];
 
-                positions[index] = Vector2.midpoint(a, b)
+                positions[index] = Vector2.midpoint(a, b);
             }
 
             // Repulsive forces
@@ -1776,8 +1777,8 @@ class SmilesDrawer {
                 if (dx > maxMove) dx = maxMove;
                 if (dx < -maxMove) dx = -maxMove;
                 if (dy > maxMove) dy = maxMove;
-                if (dy < -maxMove) dy = - maxMove; 
-
+                if (dy < -maxMove) dy = - maxMove;
+                
                 positions[u].x += dx;
                 positions[u].y += dy;
             }
@@ -1830,7 +1831,7 @@ class SmilesDrawer {
                 if (currentVertex.value.rings.length === 0) {
                     currentVertex.value.isConnectedToRing = true;
                 }
-
+                
                 this.createNextBond(currentVertex, vertex, center);
             }
         }
@@ -1864,8 +1865,6 @@ class SmilesDrawer {
                 }
             }
         }
-
-
 
         return center;
     }
@@ -2099,7 +2098,7 @@ class SmilesDrawer {
         let startVertex = this.vertices[0];
 
         // If there is a bridged ring, alwas start with the bridged ring
-        /*
+        
         for (var i = 0; i < this.rings.length; i++) {
             if (this.rings[i].isBridged) {
                 for (var j = 0; j < this.rings[i].members.length; j++) {
@@ -2111,7 +2110,7 @@ class SmilesDrawer {
                 }
             }
         }
-        */
+        
 
         this.createNextBond(startVertex);
 
@@ -2262,7 +2261,7 @@ class SmilesDrawer {
             // using a force based approach
             if (ring.isBridged) {
                 let allVertices = ArrayHelper.merge(ring.members, ring.insiders);
-
+                
                 this.forceLayout(allVertices, center, startVertex.id, ring);
             }
 
@@ -2327,7 +2326,7 @@ class SmilesDrawer {
                 // Get the vertex (A or B) which is in clock-wise direction of the other
                 let posA = Vector2.subtract(vertexA.position, nextCenter);
                 let posB = Vector2.subtract(vertexB.position, nextCenter);
-
+                
                 if (posA.clockwise(posB) === -1) {
                     this.createRing(neighbour, nextCenter, vertexA, vertexB);
                 } else {
@@ -2351,6 +2350,7 @@ class SmilesDrawer {
                 
                 nextCenter.multiplyScalar(r);
                 nextCenter.add(vertexA.position);
+
                 this.createRing(neighbour, nextCenter, vertexA);
             }
         }
@@ -2670,6 +2670,8 @@ class SmilesDrawer {
             return;
         }
 
+        console.log('Positioning vertex ' + vertex.id);
+
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of
         // two rings, point away from the middle of the centers of the two rings
@@ -2698,7 +2700,6 @@ class SmilesDrawer {
 
             vertex.globalAngle = ringOrAngle;
             vertex.setPositionFromVector(v);
-
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (previousVertex.value.isBridgeNode && vertex.value.isBridge) {
@@ -2710,7 +2711,6 @@ class SmilesDrawer {
             pos.multiplyScalar(this.opts.bondLength);
             vertex.position.add(previousVertex.position);
             vertex.position.add(pos);
-
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (vertex.value.isBridge) {
@@ -2724,11 +2724,14 @@ class SmilesDrawer {
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         } else if (previousVertex.value.rings.length === 1 || previousVertex.value.isBridge) {
+            console.log(vertex.id, vertex.value);
+            console.log(previousVertex.id, previousVertex.value);
+            console.log(this.rings);
             // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
             // Use the same approach as with rings that are connected at one vertex
             // and draw the atom in the opposite direction of the center.
             let pos = Vector2.subtract(ringOrAngle, previousVertex.position);
-
+            console.log(pos, ringOrAngle);
             pos.invert();
             pos.normalize();
             // Unlike with the ring, do not multiply with radius but with bond length
@@ -2769,7 +2772,7 @@ class SmilesDrawer {
         if (vertex.value.rings.length > 0) {
             let nextRing = this.getRing(vertex.value.rings[0]);
             let nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
-
+            
             nextCenter.invert();
             nextCenter.normalize();
 
@@ -2777,7 +2780,6 @@ class SmilesDrawer {
 
             nextCenter.multiplyScalar(r);
             nextCenter.add(vertex.position);
-
             this.createRing(nextRing, nextCenter, vertex);
         } else {
             // Draw the non-ring vertices connected to this one        

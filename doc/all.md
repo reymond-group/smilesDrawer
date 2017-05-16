@@ -2443,13 +2443,13 @@ A class representing a 2D vector.
 * [Vector2](#Vector2)
     * [new Vector2(x, y)](#new_Vector2_new)
     * _instance_
-        * [.set([x], [y])](#Vector2+set) ⇒ <code>[Vector2](#Vector2)</code>
         * [.clone()](#Vector2+clone) ⇒ <code>[Vector2](#Vector2)</code>
         * [.toString()](#Vector2+toString) ⇒ <code>string</code>
         * [.add(vec)](#Vector2+add) ⇒ <code>[Vector2](#Vector2)</code>
         * [.subtract(vec)](#Vector2+subtract) ⇒ <code>[Vector2](#Vector2)</code>
         * [.divide(scalar)](#Vector2+divide) ⇒ <code>[Vector2](#Vector2)</code>
-        * [.multiply(scalar)](#Vector2+multiply) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.multiply(v)](#Vector2+multiply) ⇒ <code>[Vector2](#Vector2)</code>
+        * [.multiplyScalar(scalar)](#Vector2+multiplyScalar) ⇒ <code>[Vector2](#Vector2)</code>
         * [.invert()](#Vector2+invert) ⇒ <code>[Vector2](#Vector2)</code>
         * [.angle()](#Vector2+angle) ⇒ <code>number</code>
         * [.distance(vec)](#Vector2+distance) ⇒ <code>number</code>
@@ -2475,6 +2475,7 @@ A class representing a 2D vector.
         * [.multiplyScalar(vec, scalar)](#Vector2.multiplyScalar) ⇒ <code>[Vector2](#Vector2)</code>
         * [.midpoint(vecA, vecB)](#Vector2.midpoint) ⇒ <code>[Vector2](#Vector2)</code>
         * [.normals(vecA, vecB)](#Vector2.normals) ⇒ <code>array</code>
+        * [.units(vecA, vecB)](#Vector2.units) ⇒ <code>array</code>
         * [.divide(vecA, vecB)](#Vector2.divide) ⇒ <code>[Vector2](#Vector2)</code>
         * [.dot(vecA, vecB)](#Vector2.dot) ⇒ <code>number</code>
         * [.angle(vecA, vecB)](#Vector2.angle) ⇒ <code>number</code>
@@ -2491,19 +2492,6 @@ The constructor of the class Vector2.
 | --- | --- | --- |
 | x | <code>number</code> | The initial x coordinate value. |
 | y | <code>number</code> | The initial y coordinate value. |
-
-<a name="Vector2+set"></a>
-
-### vector2.set([x], [y]) ⇒ <code>[Vector2](#Vector2)</code>
-Sets the values of the x and y coordinates of this vector.
-
-**Kind**: instance method of <code>[Vector2](#Vector2)</code>  
-**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [x] | <code>number</code> | <code>0</code> | The value of the x coordinate. |
-| [y] | <code>number</code> | <code>0</code> | The value of the y coordinate. |
 
 <a name="Vector2+clone"></a>
 
@@ -2557,7 +2545,19 @@ Divide the x and y coordinate values of this vector by a scalar.
 
 <a name="Vector2+multiply"></a>
 
-### vector2.multiply(scalar) ⇒ <code>[Vector2](#Vector2)</code>
+### vector2.multiply(v) ⇒ <code>[Vector2](#Vector2)</code>
+Multiply the x and y coordinate values of this vector by the values of another vector.
+
+**Kind**: instance method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>[Vector2](#Vector2)</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| v | <code>[Vector2](#Vector2)</code> | A vector. |
+
+<a name="Vector2+multiplyScalar"></a>
+
+### vector2.multiplyScalar(scalar) ⇒ <code>[Vector2](#Vector2)</code>
 Multiply the x and y coordinate values of this vector by a scalar.
 
 **Kind**: instance method of <code>[Vector2](#Vector2)</code>  
@@ -2806,8 +2806,8 @@ Multiplies two vectors (value by value) and returns the result.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vecA | <code>[Vector2](#Vector2)</code> | A factor. |
-| vecB | <code>[Vector2](#Vector2)</code> | A factor. |
+| vecA | <code>[Vector2](#Vector2)</code> | A vector. |
+| vecB | <code>[Vector2](#Vector2)</code> | A vector. |
 
 <a name="Vector2.multiplyScalar"></a>
 
@@ -2819,8 +2819,8 @@ Multiplies two vectors (value by value) and returns the result.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vec | <code>[Vector2](#Vector2)</code> | A factor. |
-| scalar | <code>number</code> | A scalar factor. |
+| vec | <code>[Vector2](#Vector2)</code> | A vector. |
+| scalar | <code>number</code> | A scalar. |
 
 <a name="Vector2.midpoint"></a>
 
@@ -2842,6 +2842,19 @@ Returns the normals of a line spanned by two vectors.
 
 **Kind**: static method of <code>[Vector2](#Vector2)</code>  
 **Returns**: <code>array</code> - An array containing the two normals, each represented by a vector.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>[Vector2](#Vector2)</code> | A vector spanning the line. |
+| vecB | <code>[Vector2](#Vector2)</code> | A vector spanning the line. |
+
+<a name="Vector2.units"></a>
+
+### Vector2.units(vecA, vecB) ⇒ <code>array</code>
+Returns the unit (normalized normal) vectors of a line spanned by two vectors.
+
+**Kind**: static method of <code>[Vector2](#Vector2)</code>  
+**Returns**: <code>array</code> - An array containing the two unit vectors.  
 
 | Param | Type | Description |
 | --- | --- | --- |

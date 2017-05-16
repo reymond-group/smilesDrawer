@@ -5622,6 +5622,7 @@ var SmilesDrawer = function () {
                 var _vertex3 = this.vertices[ringMembers[i]];
 
                 _vertex3.value.rings = ArrayHelper.removeAll(_vertex3.value.rings, ringIds);
+                console.log('Adding ring ' + ring.id + ' to ' + _vertex3.id);
                 _vertex3.value.rings.push(ring.id);
             }
 
@@ -6987,19 +6988,18 @@ var SmilesDrawer = function () {
             var startVertex = this.vertices[0];
 
             // If there is a bridged ring, alwas start with the bridged ring
-            /*
+
             for (var i = 0; i < this.rings.length; i++) {
                 if (this.rings[i].isBridged) {
                     for (var j = 0; j < this.rings[i].members.length; j++) {
                         startVertex = this.vertices[this.rings[i].members[j]];
-                        
+
                         if (startVertex.value.originalRings.length === 1) {
                             break;
                         }
                     }
                 }
             }
-            */
 
             this.createNextBond(startVertex);
 
@@ -7264,6 +7264,7 @@ var SmilesDrawer = function () {
 
                     nextCenter.multiplyScalar(r);
                     nextCenter.add(vertexA.position);
+
                     this.createRing(neighbour, nextCenter, vertexA);
                 }
             }
@@ -7604,6 +7605,8 @@ var SmilesDrawer = function () {
                 return;
             }
 
+            console.log('Positioning vertex ' + vertex.id);
+
             // If the current node is the member of one ring, then point straight away
             // from the center of the ring. However, if the current node is a member of
             // two rings, point away from the middle of the centers of the two rings
@@ -7632,7 +7635,6 @@ var SmilesDrawer = function () {
 
                 vertex.globalAngle = ringOrAngle;
                 vertex.setPositionFromVector(v);
-
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
             } else if (previousVertex.value.isBridgeNode && vertex.value.isBridge) {
@@ -7644,7 +7646,6 @@ var SmilesDrawer = function () {
                 pos.multiplyScalar(this.opts.bondLength);
                 vertex.position.add(previousVertex.position);
                 vertex.position.add(pos);
-
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
             } else if (vertex.value.isBridge) {
@@ -7658,11 +7659,14 @@ var SmilesDrawer = function () {
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
             } else if (previousVertex.value.rings.length === 1 || previousVertex.value.isBridge) {
+                console.log(vertex.id, vertex.value);
+                console.log(previousVertex.id, previousVertex.value);
+                console.log(this.rings);
                 // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
                 // Use the same approach as with rings that are connected at one vertex
                 // and draw the atom in the opposite direction of the center.
                 var _pos = Vector2.subtract(ringOrAngle, previousVertex.position);
-
+                console.log(_pos, ringOrAngle);
                 _pos.invert();
                 _pos.normalize();
                 // Unlike with the ring, do not multiply with radius but with bond length
@@ -7711,7 +7715,6 @@ var SmilesDrawer = function () {
 
                 nextCenter.multiplyScalar(r);
                 nextCenter.add(vertex.position);
-
                 this.createRing(nextRing, nextCenter, vertex);
             } else {
                 // Draw the non-ring vertices connected to this one        
@@ -8501,13 +8504,12 @@ var SSSR = function () {
             }
 
             // Remove the unused values from the adjacency matrix
-
             for (var _i6 = 0; _i6 < updatedAdjacencyMatrix.length; _i6++) {
                 for (var _j2 = indicesToRemove.length - 1; _j2 >= 0; _j2--) {
                     updatedAdjacencyMatrix[_i6].splice(indicesToRemove[_j2], 1);
                 }
             }
-
+            console.log(SSSR.matrixToString(adjacencyMatrix));
             adjacencyMatrix = updatedAdjacencyMatrix;
 
             if (adjacencyMatrix.length === 0) {

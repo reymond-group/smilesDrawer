@@ -46,13 +46,12 @@ class SSSR {
         }
 
         // Remove the unused values from the adjacency matrix
-
         for (let i = 0; i < updatedAdjacencyMatrix.length; i++) {
             for (let j = indicesToRemove.length - 1; j >= 0; j--) {
                 updatedAdjacencyMatrix[i].splice(indicesToRemove[j], 1);
             }
         }
-
+        console.log(SSSR.matrixToString(adjacencyMatrix));
         adjacencyMatrix = updatedAdjacencyMatrix;
 
         if (adjacencyMatrix.length === 0) {
