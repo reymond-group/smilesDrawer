@@ -15,6 +15,8 @@
 <dt><a href="#Edge">Edge</a></dt>
 <dd><p>A class representing an edge</p>
 </dd>
+<dt><a href="#Graph">Graph</a></dt>
+<dd></dd>
 <dt><a href="#Line">Line</a></dt>
 <dd><p>A class representing a line</p>
 </dd>
@@ -788,6 +790,127 @@ An object mapping the bond type to the number of bonds.
 
 **Kind**: static property of <code>[Edge](#Edge)</code>  
 **Returns**: <code>object</code> - The object containing the map.  
+<a name="Graph"></a>
+
+## Graph
+**Kind**: global class  
+
+* [Graph](#Graph)
+    * [new Graph()](#new_Graph_new)
+    * [.clear()](#Graph+clear)
+    * [.addVertex(vertex)](#Graph+addVertex) ⇒ <code>number</code>
+    * [.addEdge(edge)](#Graph+addEdge) ⇒ <code>number</code>
+    * [.getEdge(vertexIdA, vertexIdB)](#Graph+getEdge) ⇒ <code>number</code> &#124; <code>null</code>
+    * [.hasEdge(vertexIdA, vertexIdB)](#Graph+hasEdge) ⇒ <code>number</code> &#124; <code>null</code>
+    * [.getAdjacencyMatrix()](#Graph+getAdjacencyMatrix) ⇒ <code>array</code>
+    * [.getSubgraphAdjacencyMatrix(vertexIds)](#Graph+getSubgraphAdjacencyMatrix) ⇒ <code>array</code>
+    * [.getSubgraphAdjacencyList(vertexIds)](#Graph+getSubgraphAdjacencyList) ⇒ <code>array</code>
+    * [.getLargestCycleInSubgraph(startVertexId, vertexIds)](#Graph+getLargestCycleInSubgraph)
+
+<a name="new_Graph_new"></a>
+
+### new Graph()
+The constructor of the class Graph.
+
+<a name="Graph+clear"></a>
+
+### graph.clear()
+Clears all the elements in this graph (edges and vertices).
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+<a name="Graph+addVertex"></a>
+
+### graph.addVertex(vertex) ⇒ <code>number</code>
+Add a vertex to the graph.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>number</code> - The vertex id of the new vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertex | <code>[Vertex](#Vertex)</code> | A new vertex. |
+
+<a name="Graph+addEdge"></a>
+
+### graph.addEdge(edge) ⇒ <code>number</code>
+Add an edge to the graph.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>number</code> - The edge id of the new edge.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| edge | <code>[Edge](#Edge)</code> | A new edge. |
+
+<a name="Graph+getEdge"></a>
+
+### graph.getEdge(vertexIdA, vertexIdB) ⇒ <code>number</code> &#124; <code>null</code>
+Returns the edge between two given vertices.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>number</code> &#124; <code>null</code> - The edge or, if no edge can be found, null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>number</code> | A vertex id. |
+| vertexIdB | <code>number</code> | A vertex id. |
+
+<a name="Graph+hasEdge"></a>
+
+### graph.hasEdge(vertexIdA, vertexIdB) ⇒ <code>number</code> &#124; <code>null</code>
+Returns the edge between two given vertices.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>number</code> &#124; <code>null</code> - The edge or, if no edge can be found, null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>number</code> | A vertex id. |
+| vertexIdB | <code>number</code> | A vertex id. |
+
+<a name="Graph+getAdjacencyMatrix"></a>
+
+### graph.getAdjacencyMatrix() ⇒ <code>array</code>
+Get the adjacency matrix of the graph.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>array</code> - The adjancency matrix of the molecular graph.  
+<a name="Graph+getSubgraphAdjacencyMatrix"></a>
+
+### graph.getSubgraphAdjacencyMatrix(vertexIds) ⇒ <code>array</code>
+Get the adjacency matrix of a subgraph.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>array</code> - The adjancency matrix of the subgraph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIds | <code>array</code> | An array containing the vertex ids contained within the subgraph. |
+
+<a name="Graph+getSubgraphAdjacencyList"></a>
+
+### graph.getSubgraphAdjacencyList(vertexIds) ⇒ <code>array</code>
+Get the adjacency list of a subgraph.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>array</code> - The adjancency list of the subgraph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIds | <code>array</code> | An array containing the vertex ids contained within the subgraph. |
+
+<a name="Graph+getLargestCycleInSubgraph"></a>
+
+### graph.getLargestCycleInSubgraph(startVertexId, vertexIds)
+Get the path of the
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| startVertexId | <code>array</code> | The start vertex of the cycle. |
+| vertexIds | <code>array</code> | An array containing the vertex ids contained within the subgraph. |
+
 <a name="Line"></a>
 
 ## Line
@@ -1410,7 +1533,6 @@ The main class of the application representing the smiles drawer
     * _instance_
         * [.extend()](#SmilesDrawer+extend)
         * [.draw(data, target, themeName, infoOnly)](#SmilesDrawer+draw)
-        * [.getAdjacencyMatrix()](#SmilesDrawer+getAdjacencyMatrix) ⇒ <code>array</code>
         * [.edgeRingCount(edgeId)](#SmilesDrawer+edgeRingCount) ⇒ <code>number</code>
         * [.getBridgedRings()](#SmilesDrawer+getBridgedRings) ⇒ <code>array</code>
         * [.getFusedRings()](#SmilesDrawer+getFusedRings) ⇒ <code>array</code>
@@ -1433,8 +1555,6 @@ The main class of the application representing the smiles drawer
         * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer+getVerticesAt) ⇒ <code>array</code>
         * [.getClosestVertex(vertex)](#SmilesDrawer+getClosestVertex) ⇒ <code>[Vertex](#Vertex)</code>
         * [.getClosestEndpointVertex(vertex)](#SmilesDrawer+getClosestEndpointVertex) ⇒ <code>[Vertex](#Vertex)</code>
-        * [.addVertex(vertex)](#SmilesDrawer+addVertex) ⇒ <code>number</code>
-        * [.addEdge(edge)](#SmilesDrawer+addEdge) ⇒ <code>number</code>
         * [.addRing(ring)](#SmilesDrawer+addRing) ⇒ <code>number</code>
         * [.removeRing(ringId)](#SmilesDrawer+removeRing)
         * [.getRing(ringId)](#SmilesDrawer+getRing) ⇒ <code>[Ring](#Ring)</code>
@@ -1447,7 +1567,6 @@ The main class of the application representing the smiles drawer
         * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer+chooseSide) ⇒ <code>object</code>
         * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer+areConnected) ⇒ <code>boolean</code>
         * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer+getEdgeWeight) ⇒ <code>number</code> &#124; <code>null</code>
-        * [.getEdge(vertexIdA, vertexIdB)](#SmilesDrawer+getEdge) ⇒ <code>number</code> &#124; <code>null</code>
         * [.forceLayout(vertices, center, startVertexId, ring)](#SmilesDrawer+forceLayout)
         * [.getSubringCenter(ring, vertex)](#SmilesDrawer+getSubringCenter) ⇒ <code>[Vector2](#Vector2)</code>
         * [.drawEdges(debug)](#SmilesDrawer+drawEdges)
@@ -1512,13 +1631,6 @@ Draws the parsed smiles data to a canvas element.
 | themeName | <code>string</code> | <code>&quot;&#x27;dark&#x27;&quot;</code> | The name of the theme to use. Built-in themes are 'light' and 'dark'. |
 | infoOnly | <code>boolean</code> | <code>false</code> | Only output info on the molecule without drawing anything to the canvas. |
 
-<a name="SmilesDrawer+getAdjacencyMatrix"></a>
-
-### smilesDrawer.getAdjacencyMatrix() ⇒ <code>array</code>
-Initialize the adjacency matrix of the molecular graph.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>array</code> - The adjancency matrix of the molecular graph.  
 <a name="SmilesDrawer+edgeRingCount"></a>
 
 ### smilesDrawer.edgeRingCount(edgeId) ⇒ <code>number</code>
@@ -1576,10 +1688,10 @@ Returns the ring count of the current molecule.
 <a name="SmilesDrawer+hasBridgedRing"></a>
 
 ### smilesDrawer.hasBridgedRing() ⇒ <code>boolean</code>
-Checks whether or not the current molecule contains a bridged ring.
+Checks whether or not the current molecule  a bridged ring.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>boolean</code> - A boolean indicating whether or not the current molecule contains a bridged ring.  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not the current molecule  a bridged ring.  
 <a name="SmilesDrawer+getHeavyAtomCount"></a>
 
 ### smilesDrawer.getHeavyAtomCount() ⇒ <code>number</code>
@@ -1746,30 +1858,6 @@ Returns the closest vertex (connected as well as unconnected), which is an endpo
 | --- | --- | --- |
 | vertex | <code>[Vertex](#Vertex)</code> | The vertex of which to find the closest other vertex. |
 
-<a name="SmilesDrawer+addVertex"></a>
-
-### smilesDrawer.addVertex(vertex) ⇒ <code>number</code>
-Add a vertex to this representation of a molcule.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>number</code> - The vertex id of the new vertex.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertex | <code>[Vertex](#Vertex)</code> | A new vertex. |
-
-<a name="SmilesDrawer+addEdge"></a>
-
-### smilesDrawer.addEdge(edge) ⇒ <code>number</code>
-Add an edge to this representation of a molecule.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>number</code> - The edge id of the new edge.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| edge | <code>[Edge](#Edge)</code> | A new edge. |
-
 <a name="SmilesDrawer+addRing"></a>
 
 ### smilesDrawer.addRing(ring) ⇒ <code>number</code>
@@ -1920,19 +2008,6 @@ Returns the weight of the edge between two given vertices.
 | vertexIdA | <code>number</code> | A vertex id. |
 | vertexIdB | <code>number</code> | A vertex id. |
 
-<a name="SmilesDrawer+getEdge"></a>
-
-### smilesDrawer.getEdge(vertexIdA, vertexIdB) ⇒ <code>number</code> &#124; <code>null</code>
-Returns the edge between two given vertices.
-
-**Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>number</code> &#124; <code>null</code> - The edge or, if no edge can be found, null.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIdA | <code>number</code> | A vertex id. |
-| vertexIdB | <code>number</code> | A vertex id. |
-
 <a name="SmilesDrawer+forceLayout"></a>
 
 ### smilesDrawer.forceLayout(vertices, center, startVertexId, ring)
@@ -1953,7 +2028,7 @@ Applies a force-based layout to a set of provided vertices.
 Gets the center of a ring contained within a bridged ring and containing a given vertex.
 
 **Kind**: instance method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>[Vector2](#Vector2)</code> - The center of the subring that contains the provided vertex.  
+**Returns**: <code>[Vector2](#Vector2)</code> - The center of the subring that  the provided vertex.  
 
 | Param | Type | Description |
 | --- | --- | --- |

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Edge.js - Documentation</title>
+    <title>Graph.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Edge.js</h1>
+    <h1 class="page-title">Graph.js</h1>
     
 
     
@@ -37,53 +37,170 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** A class representing an edge */
-class Edge {
+            <pre class="prettyprint source linenums"><code>/* A class representing the molecular graph. */
+class Graph {
     /**
-     * The constructor for the class Edge.
-     *
-     * @param {number} sourceId A vertex id.
-     * @param {number} targetId A vertex id.
-     * @param {number} weight The weight of the edge.
+     * The constructor of the class Graph.
      */
-    constructor(sourceId, targetId, weight) {
-        this.id = null;
-        this.sourceId = sourceId;
-        this.targetId = targetId;
-        this.weight = weight;
-        this.bondType = '-';
-        this.isInAromaticRing = false;
-        this.center = false;
-        this.chiral = '';
+    constructor() {
+        this.vertices = [];
+        this.edges = [];
+        this.vertexIdsToEdgeId = {};
     }
 
     /**
-     * Returns the number of bonds associated with the bond type of this edge.
-     *
-     * @returns {number} The number of bonds associated with this edge.
+     * Clears all the elements in this graph (edges and vertices).
      */
-    getBondCount() {
-        return Edge.bonds[this.bondType];
+    clear() {
+        this.vertices = [];
+        this.edges = [];
+        this.vertexIdsToEdgeId = {};
     }
 
     /**
-     * An object mapping the bond type to the number of bonds.
+     * Add a vertex to the graph.
      *
-     * @returns {object} The object containing the map.
+     * @param {Vertex} vertex A new vertex.
+     * @returns {number} The vertex id of the new vertex.
      */
-    static get bonds() {
-        return {
-            '-': 1,
-            '/': 1,
-            '\\': 1,
-            '=': 2,
-            '#': 3,
-            '$': 4
+    addVertex(vertex) {
+        vertex.id = this.vertices.length;
+        this.vertices.push(vertex);
+        
+        return vertex.id;
+    }
+
+    /**
+     * Add an edge to the graph.
+     *
+     * @param {Edge} edge A new edge.
+     * @returns {number} The edge id of the new edge.
+     */
+    addEdge(edge) {
+        edge.id = this.edges.length;
+        this.edges.push(edge);
+        
+        this.vertexIdsToEdgeId[edge.sourceId + '_' + edge.targetId] = edge.id;
+        this.vertexIdsToEdgeId[edge.targetId + '_' + edge.sourceId] = edge.id;
+        
+        return edge.id;
+    }
+
+    /**
+     * Returns the edge between two given vertices.
+     *
+     * @param {number} vertexIdA A vertex id.
+     * @param {number} vertexIdB A vertex id.
+     * @returns {number|null} The edge or, if no edge can be found, null.
+     */
+    getEdge(vertexIdA, vertexIdB) {
+        let edgeId = this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB];
+
+        return edgeId === undefined ? null : this.edges[edgeId];
+    }
+
+    /**
+     * Returns the edge between two given vertices.
+     *
+     * @param {number} vertexIdA A vertex id.
+     * @param {number} vertexIdB A vertex id.
+     * @returns {number|null} The edge or, if no edge can be found, null.
+     */
+    hasEdge(vertexIdA, vertexIdB) {
+        return this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB] !== undefined
+    }
+
+    /**
+     * Get the adjacency matrix of the graph.
+     * 
+     * @returns {array} The adjancency matrix of the molecular graph.
+     */
+    getAdjacencyMatrix() {
+        let length = this.vertices.length;
+        let adjacencyMatrix = Array(length);
+        
+        for (var i = 0; i &lt; length; i++) {
+            adjacencyMatrix[i] = new Array(length);
+            adjacencyMatrix[i].fill(0);
         }
-    }
-}
 
-</code></pre>
+        for (var i = 0; i &lt; this.edges.length; i++) {
+            let edge = this.edges[i];
+
+            adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
+            adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
+        }
+
+        return adjacencyMatrix;
+    }
+
+    /**
+     * Get the adjacency matrix of a subgraph.
+     * 
+     * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
+     * @returns {array} The adjancency matrix of the subgraph.
+     */
+    getSubgraphAdjacencyMatrix(vertexIds) {
+        let length = vertexIds.length;
+        let adjacencyMatrix = Array(length);
+
+        for (var i = 0; i &lt; length; i++) {
+            adjacencyMatrix[i] = new Array(length);
+            adjacencyMatrix[i].fill(0);
+
+            for (var j = 0; j &lt; length; j++) {
+                if (i === j) {
+                    continue;
+                }
+
+                if (this.hasEdge(vertexIds[i], vertexIds[j])) {
+                    adjacencyMatrix[i][j] = 1;
+                }
+            }
+        }
+
+        return adjacencyMatrix;
+    }
+
+    /**
+     * Get the adjacency list of a subgraph.
+     * 
+     * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
+     * @returns {array} The adjancency list of the subgraph.
+     */
+    getSubgraphAdjacencyList(vertexIds) {
+        let length = vertexIds.length;
+        let adjacencyList = Array(length);
+
+        for (var i = 0; i &lt; length; i++) {
+            adjacencyList[i] = [];
+
+            for (var j = 0; j &lt; length; j++) {
+                if (i === j) {
+                    continue;
+                }
+
+                if (this.hasEdge(vertexIds[i], vertexIds[j])) {
+                    adjacencyList[i].push(j);
+                }
+            }
+        }
+
+        return adjacencyList;
+    }
+
+    /**
+     * Get the path of the 
+     * 
+     * @param {array} startVertexId The start vertex of the cycle.
+     * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
+     */
+    getLargestCycleInSubgraph(startVertexId, vertexIds) {
+        let path = [];
+        let adjacencyList = this.getSubgraphAdjacencyList(vertexIds);
+        return path;
+    }
+}</code></pre>
         </article>
     </section>
 

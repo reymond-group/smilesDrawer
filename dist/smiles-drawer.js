@@ -7271,8 +7271,6 @@ var SmilesDrawer = function () {
 
             var a = startingAngle;
             var that = this;
-
-            console.log(center, startingAngle, startVertex);
             var startVertexId = startVertex ? startVertex.id : null;
 
             if (ring.members.indexOf(startVertexId) === -1) {
@@ -7298,7 +7296,7 @@ var SmilesDrawer = function () {
                 // using a force based approach
                 if (ring.isBridged) {
                     var allVertices = ArrayHelper.merge(ring.members, ring.insiders);
-                    console.log(allVertices, center, startVertex.id, ring);
+
                     this.forceLayout(allVertices, center, startVertex.id, ring);
                 }
 
@@ -7729,8 +7727,6 @@ var SmilesDrawer = function () {
             if (vertex.positioned) {
                 return;
             }
-
-            console.log('drawing vertex', vertex.id);
 
             // If the current node is the member of one ring, then point straight away
             // from the center of the ring. However, if the current node is a member of
