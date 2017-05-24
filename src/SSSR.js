@@ -7,62 +7,13 @@ class SSSR {
      * @returns {array} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
      */
     static getRings(adjacencyMatrix) {
-        // Remove vertices that are not members of a ring
-        let removed;
-
-        do {
-            removed = 0;
-
-            for (let i = 0; i < adjacencyMatrix.length; i++) {
-                let nNeighbours = adjacencyMatrix[i].reduce((a, b) => a + b, 0);
-                
-                if (nNeighbours === 1) {
-                    adjacencyMatrix[i].fill(0);
-
-                    for (let j = 0; j < adjacencyMatrix.length; j++) {
-                        adjacencyMatrix[j][i] = 0;
-                    }
-
-                    removed++;
-                }
-            }            
-        } while (removed > 0);
-
-        // Update the adjacency matrix (remove rows and columns filled with 0s)
-        
-        // Keep this as a map of new indices to old indices
-        let indices = [];
-        let indicesToRemove = [];
-        let updatedAdjacencyMatrix = [];
-
-        // Only the rows are filtered here, the columns still have their original values
-        for (let i = 0; i < adjacencyMatrix.length; i++) {
-            if (adjacencyMatrix[i].indexOf(1) >= 0) {
-                indices.push(i);
-                updatedAdjacencyMatrix.push(adjacencyMatrix[i]);
-            } else {
-                indicesToRemove.push(i);
-            }
-        }
-
-        // Remove the unused values from the adjacency matrix
-        for (let i = 0; i < updatedAdjacencyMatrix.length; i++) {
-            for (let j = indicesToRemove.length - 1; j >= 0; j--) {
-                updatedAdjacencyMatrix[i].splice(indicesToRemove[j], 1);
-            }
-        }
-
-        //console.log(SSSR.matrixToString(adjacencyMatrix));
-        
-        adjacencyMatrix = updatedAdjacencyMatrix;
-
         if (adjacencyMatrix.length === 0) {
             return null;
         }
 
         // Get the edge list and the theoretical number of rings in SSSR
-        let nSssr = SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + 1;
-
+        let nSssr = SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + Graph.getConnectedComponentCount(adjacencyMatrix);
+        
         if (nSssr === 0) {
             return null;
         }
@@ -78,7 +29,7 @@ class SSSR {
             let index = 0;
 
             for (let val of sssr[i]) {
-                rings[i][index++] = indices[val];
+                rings[i][index++] = val;
             }
         }
 

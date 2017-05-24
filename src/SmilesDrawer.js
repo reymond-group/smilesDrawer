@@ -529,14 +529,14 @@ class SmilesDrawer {
         }
 
         // Get the rings in the graph (the SSSR)
-        let rings = SSSR.getRings(this.graph.getAdjacencyMatrix());
+        let rings = SSSR.getRings(this.graph.getComponentsAdjacencyMatrix());
 
         if (rings === null) {
             return;
         }
 
         for (var i = 0; i < rings.length; i++) {
-            let ringVertices = rings[i];
+            let ringVertices = [...rings[i]];
             let ringId = this.addRing(new Ring(ringVertices));
 
             // Add the ring to the atoms
@@ -572,6 +572,8 @@ class SmilesDrawer {
         // This is needed in order to identify aromatic rings and stuff like this in
         // rings that are member of the superring.
         this.backupRingInformation();
+
+        // return;
 
         // Replace rings contained by a larger bridged ring with a bridged ring
         while (this.rings.length > 0) {

@@ -2016,6 +2016,9 @@ var Graph = function () {
         this.vertices = [];
         this.edges = [];
         this.vertexIdsToEdgeId = {};
+
+        // Used for the bridge detection algorithm
+        this._time = 0;
     }
 
     /**
@@ -2097,6 +2100,42 @@ var Graph = function () {
         }
 
         /**
+         * Returns an array containing the vertex ids of this graph.
+         * 
+         * @returns {array} An array containing all vertex ids of this graph.
+         */
+
+    }, {
+        key: 'getVertexList',
+        value: function getVertexList() {
+            var arr = [this.vertices.length];
+
+            for (var i = 0; i < this.vertices.length; i++) {
+                arr[i] = this.vertices[i].id;
+            }
+
+            return arr;
+        }
+
+        /**
+         * Returns an array containing source, target arrays of this graphs edges.
+         * 
+         * @returns {array} An array containing source, target arrays of this graphs edges.
+         */
+
+    }, {
+        key: 'getEdgeList',
+        value: function getEdgeList() {
+            var arr = [this.edges.length];
+
+            for (var i = 0; i < this.edges.length; i++) {
+                arr[i] = [this.edges[i].sourceId, this.edges[i].targetId];
+            }
+
+            return arr;
+        }
+
+        /**
          * Get the adjacency matrix of the graph.
          * 
          * @returns {array} The adjancency matrix of the molecular graph.
@@ -2118,6 +2157,39 @@ var Graph = function () {
 
                 adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
                 adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
+            }
+
+            return adjacencyMatrix;
+        }
+
+        /**
+         * Get the adjacency matrix of the graph with all bridges removed (thus the components). Thus the remaining vertices are all part of ring systems.
+         * 
+         * @returns {array} The adjancency matrix of the molecular graph with all bridges removed.
+         */
+
+    }, {
+        key: 'getComponentsAdjacencyMatrix',
+        value: function getComponentsAdjacencyMatrix() {
+            var length = this.vertices.length;
+            var adjacencyMatrix = Array(length);
+            var bridges = this.getBridges();
+
+            for (var i = 0; i < length; i++) {
+                adjacencyMatrix[i] = new Array(length);
+                adjacencyMatrix[i].fill(0);
+            }
+
+            for (var i = 0; i < this.edges.length; i++) {
+                var edge = this.edges[i];
+
+                adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
+                adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
+            }
+
+            for (var i = 0; i < bridges.length; i++) {
+                adjacencyMatrix[bridges[i][0]][bridges[i][1]] = 0;
+                adjacencyMatrix[bridges[i][1]][bridges[i][0]] = 0;
             }
 
             return adjacencyMatrix;
@@ -2152,6 +2224,35 @@ var Graph = function () {
             }
 
             return adjacencyMatrix;
+        }
+
+        /**
+         * Get the adjacency list of the graph.
+         * 
+         * @returns {array} The adjancency list of the graph.
+         */
+
+    }, {
+        key: 'getAdjacencyList',
+        value: function getAdjacencyList() {
+            var length = this.vertices.length;
+            var adjacencyList = Array(length);
+
+            for (var i = 0; i < length; i++) {
+                adjacencyList[i] = [];
+
+                for (var j = 0; j < length; j++) {
+                    if (i === j) {
+                        continue;
+                    }
+
+                    if (this.hasEdge(this.vertices[i].id, this.vertices[j].id)) {
+                        adjacencyList[i].push(j);
+                    }
+                }
+            }
+
+            return adjacencyList;
         }
 
         /**
@@ -2198,9 +2299,276 @@ var Graph = function () {
             var adjacencyList = this.getSubgraphAdjacencyList(vertexIds);
             return path;
         }
+
+        /**
+         * Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
+         * 
+         * @returns {array} An array containing the edge ids of the bridges.
+         */
+
+    }, {
+        key: 'getBridges',
+        value: function getBridges() {
+            var length = this.vertices.length;
+            var visited = new Array(length);
+            var disc = new Array(length);
+            var low = new Array(length);
+            var parent = new Array(length);
+            var adj = this.getAdjacencyList();
+            var outBridges = [];
+
+            visited.fill(false);
+            parent.fill(null);
+            this._time = 0;
+
+            for (var i = 0; i < length; i++) {
+                if (!visited[i]) {
+                    this._bridgeDfs(i, visited, disc, low, parent, adj, outBridges);
+                }
+            }
+
+            return outBridges;
+        }
+
+        /**
+         * PRIVATE FUNCTION used by getBridges().
+         */
+
+    }, {
+        key: '_bridgeDfs',
+        value: function _bridgeDfs(u, visited, disc, low, parent, adj, outBridges) {
+            visited[u] = true;
+            disc[u] = low[u] = ++this._time;
+
+            for (var i = 0; i < adj[u].length; i++) {
+                var v = adj[u][i];
+
+                if (!visited[v]) {
+                    parent[v] = u;
+
+                    this._bridgeDfs(v, visited, disc, low, parent, adj, outBridges);
+
+                    low[u] = Math.min(low[u], low[v]);
+
+                    // If low > disc, we have a bridge
+                    if (low[v] > disc[u]) {
+                        outBridges.push([u, v]);
+                    }
+                } else if (v !== parent[u]) {
+                    low[u] = Math.min(low[u], disc[v]);
+                }
+            }
+        }
+
+        /**
+         * Returns the number of connected components for the grpah 
+         * 
+         * @param {array} adjacencyMatrix An adjacency matrix.
+         * @returns {Number} The number of connected components of the supplied graph.
+         */
+
+    }], [{
+        key: 'getConnectedComponentCount',
+        value: function getConnectedComponentCount(adjacencyMatrix) {
+            var length = adjacencyMatrix.length;
+            var visited = new Array(length);
+            var count = 0;
+
+            visited.fill(false);
+
+            for (var u = 0; u < length; u++) {
+                if (!visited[u]) {
+                    visited[u] = true;
+                    count++;
+                    Graph._ccCountDfs(u, visited, adjacencyMatrix);
+                }
+            }
+
+            return count;
+        }
+
+        /**
+         * PRIVATE FUNCTION used by getConnectedComponentCount().
+         */
+
+    }, {
+        key: '_ccCountDfs',
+        value: function _ccCountDfs(u, visited, adjacencyMatrix) {
+            for (var v = 0; v < adjacencyMatrix[u].length; v++) {
+                var c = adjacencyMatrix[u][v];
+
+                if (!c || visited[v] || u === v) {
+                    continue;
+                }
+
+                visited[v] = true;
+                Graph._ccCountDfs(v, visited, adjacencyMatrix);
+            }
+        }
     }]);
 
     return Graph;
+}();
+/** A class encapsulating the functionality to find the rings in the graph using Hansers algorithm. */
+
+
+var Hanser = function () {
+    function Hanser(vertices, edges) {
+        _classCallCheck(this, Hanser);
+
+        this.vertices = vertices;
+        this.edges = edges;
+        this.cycles = [];
+        this.paths = {};
+        this.pathIdCounter = 0;
+
+        this.getRings();
+        this.removeBridgedRings();
+    }
+
+    _createClass(Hanser, [{
+        key: 'getRings',
+        value: function getRings(vertices, edges) {
+            for (var i = this.edges.length - 1; i >= 0; i--) {
+                this.paths[this.pathIdCounter] = {
+                    id: this.pathIdCounter++,
+                    nodes: [this.edges[i][0], this.edges[i][1]],
+                    source: this.edges[i][0],
+                    target: this.edges[i][1],
+                    isConnected: false
+                };
+
+                this.pathIdCounter++;
+            }
+
+            for (var i = this.vertices.length - 1; i >= 0; i--) {
+                this.remove(i);
+            }
+        }
+    }, {
+        key: 'remove',
+        value: function remove(vertexId) {
+            var paths = this.getPaths(vertexId);
+
+            for (var i = 0; i < paths.length; i++) {
+                for (var j = i + 1; j < paths.length; j++) {
+                    var path = this.splice(paths[i], paths[j]);
+                    if (path) {
+                        if (path.isConnected) {
+                            path.nodes.pop();
+                            this.cycles.push(new Set(path.nodes));
+                            delete this.paths[path.id];
+                        } else {
+                            this.paths[path.id] = path;
+                        }
+                    }
+                }
+
+                delete this.paths[paths[i].id];
+            }
+        }
+    }, {
+        key: 'getPaths',
+        value: function getPaths(vertexId) {
+            var paths = [];
+
+            for (var i in this.paths) {
+                var value = this.paths[i];
+
+                if (value.source === vertexId || value.target === vertexId) {
+                    paths.push(value);
+                }
+            }
+
+            return paths;
+        }
+    }, {
+        key: 'splice',
+        value: function splice(next, previous) {
+            var intersection = null;
+            var nodes = next.nodes.concat();
+
+            if (next.source === previous.source || next.source === previous.target) {
+                intersection = next.source;
+            } else {
+                intersection = next.target;
+            }
+
+            if (intersection === next.source) {
+                nodes = nodes.reverse();
+            }
+
+            if (intersection === previous.source) {
+                for (var i = 1; i < previous.nodes.length; i++) {
+                    nodes.push(previous.nodes[i]);
+                }
+            } else {
+                for (var i = previous.nodes.length - 2; i >= 0; i--) {
+                    nodes.push(previous.nodes[i]);
+                }
+            }
+
+            // If the path contains duplicate vertex ids, skip.
+            if (!this.valid(nodes)) {
+                return;
+            }
+
+            return {
+                id: this.pathIdCounter++,
+                nodes: nodes,
+                source: nodes[0],
+                target: nodes[nodes.length - 1],
+                isConnected: nodes.length > 2 && nodes[0] === nodes[nodes.length - 1]
+            };
+        }
+    }, {
+        key: 'valid',
+        value: function valid(nodes) {
+            for (var i = 1; i < nodes.length; i++) {
+                for (var j = 1; j < nodes.length; j++) {
+                    if (i === j) {
+                        continue;
+                    }
+
+                    if (nodes[i] === nodes[j]) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+    }, {
+        key: 'removeBridgedRings',
+        value: function removeBridgedRings() {
+            if (this.cycles.length < 2) {
+                return;
+            }
+
+            var vertexRings = new Array(this.vertices.length);
+
+            for (var i = 0; i < this.vertices.length; i++) {
+                vertexRings[i] = new Set();
+
+                for (var j = 0; j < this.cycles.length; j++) {
+                    if (this.cycles[j].has(i)) {
+                        vertexRings[i].add(j);
+                    }
+                }
+            }
+
+            // Return if there are no bridged rings (no vertices with ringcount > 2)
+            for (var i = 0; i < vertexRings.length; i++) {
+                if (vertexRings[i].size > 2) {
+                    return;
+                }
+            }
+
+            console.log('vertexRings', vertexRings);
+        }
+    }]);
+
+    return Hanser;
 }();
 /** A class representing a line */
 
@@ -5545,14 +5913,14 @@ var SmilesDrawer = function () {
             }
 
             // Get the rings in the graph (the SSSR)
-            var rings = SSSR.getRings(this.graph.getAdjacencyMatrix());
+            var rings = SSSR.getRings(this.graph.getComponentsAdjacencyMatrix());
 
             if (rings === null) {
                 return;
             }
 
             for (var i = 0; i < rings.length; i++) {
-                var ringVertices = rings[i];
+                var ringVertices = [].concat(_toConsumableArray(rings[i]));
                 var _ringId = this.addRing(new Ring(ringVertices));
 
                 // Add the ring to the atoms
@@ -5588,6 +5956,8 @@ var SmilesDrawer = function () {
             // This is needed in order to identify aromatic rings and stuff like this in
             // rings that are member of the superring.
             this.backupRingInformation();
+
+            // return;
 
             // Replace rings contained by a larger bridged ring with a bridged ring
             while (this.rings.length > 0) {
@@ -8595,63 +8965,12 @@ var SSSR = function () {
          * @returns {array} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
          */
         value: function getRings(adjacencyMatrix) {
-            // Remove vertices that are not members of a ring
-            var removed = void 0;
-
-            do {
-                removed = 0;
-
-                for (var i = 0; i < adjacencyMatrix.length; i++) {
-                    var nNeighbours = adjacencyMatrix[i].reduce(function (a, b) {
-                        return a + b;
-                    }, 0);
-
-                    if (nNeighbours === 1) {
-                        adjacencyMatrix[i].fill(0);
-
-                        for (var j = 0; j < adjacencyMatrix.length; j++) {
-                            adjacencyMatrix[j][i] = 0;
-                        }
-
-                        removed++;
-                    }
-                }
-            } while (removed > 0);
-
-            // Update the adjacency matrix (remove rows and columns filled with 0s)
-
-            // Keep this as a map of new indices to old indices
-            var indices = [];
-            var indicesToRemove = [];
-            var updatedAdjacencyMatrix = [];
-
-            // Only the rows are filtered here, the columns still have their original values
-            for (var _i4 = 0; _i4 < adjacencyMatrix.length; _i4++) {
-                if (adjacencyMatrix[_i4].indexOf(1) >= 0) {
-                    indices.push(_i4);
-                    updatedAdjacencyMatrix.push(adjacencyMatrix[_i4]);
-                } else {
-                    indicesToRemove.push(_i4);
-                }
-            }
-
-            // Remove the unused values from the adjacency matrix
-            for (var _i5 = 0; _i5 < updatedAdjacencyMatrix.length; _i5++) {
-                for (var _j2 = indicesToRemove.length - 1; _j2 >= 0; _j2--) {
-                    updatedAdjacencyMatrix[_i5].splice(indicesToRemove[_j2], 1);
-                }
-            }
-
-            //console.log(SSSR.matrixToString(adjacencyMatrix));
-
-            adjacencyMatrix = updatedAdjacencyMatrix;
-
             if (adjacencyMatrix.length === 0) {
                 return null;
             }
 
             // Get the edge list and the theoretical number of rings in SSSR
-            var nSssr = SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + 1;
+            var nSssr = SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + Graph.getConnectedComponentCount(adjacencyMatrix);
 
             if (nSssr === 0) {
                 return null;
@@ -8666,8 +8985,8 @@ var SSSR = function () {
             var sssr = SSSR.getSSSR(c, d, pe1, pe2, nSssr);
             var rings = new Array(sssr.length);
 
-            for (var _i6 = 0; _i6 < sssr.length; _i6++) {
-                rings[_i6] = new Array(sssr[_i6].length);
+            for (var i = 0; i < sssr.length; i++) {
+                rings[i] = new Array(sssr[i].length);
 
                 var index = 0;
 
@@ -8676,10 +8995,10 @@ var SSSR = function () {
                 var _iteratorError2 = undefined;
 
                 try {
-                    for (var _iterator2 = sssr[_i6][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    for (var _iterator2 = sssr[i][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                         var val = _step2.value;
 
-                        rings[_i6][index++] = indices[val];
+                        rings[i][index++] = val;
                     }
                 } catch (err) {
                     _didIteratorError2 = true;
@@ -8760,86 +9079,86 @@ var SSSR = function () {
             }
 
             for (var k = 0; k < length; k++) {
-                for (var _i7 = 0; _i7 < length; _i7++) {
-                    for (var _j3 = 0; _j3 < length; _j3++) {
-                        var previousPathLength = d[_i7][_j3];
-                        var newPathLength = d[_i7][k] + d[k][_j3];
+                for (var _i4 = 0; _i4 < length; _i4++) {
+                    for (var _j2 = 0; _j2 < length; _j2++) {
+                        var previousPathLength = d[_i4][_j2];
+                        var newPathLength = d[_i4][k] + d[k][_j2];
 
                         if (previousPathLength > newPathLength) {
                             if (previousPathLength === newPathLength + 1) {
-                                pe2[_i7][_j3] = [pe1[_i7][_j3].length];
-                                for (l = 0; l < pe1[_i7][_j3].length; l++) {
-                                    pe2[_i7][_j3][l] = [pe1[_i7][_j3][l].length];
-                                    for (m = 0; m < pe1[_i7][_j3][l].length; m++) {
-                                        pe2[_i7][_j3][l][m] = [pe1[_i7][_j3][l][m].length];
-                                        for (n = 0; n < pe1[_i7][_j3][l][m].length; n++) {
-                                            pe2[_i7][_j3][l][m][n] = [pe1[_i7][_j3][l][m][0], pe1[_i7][_j3][l][m][1]];
+                                pe2[_i4][_j2] = [pe1[_i4][_j2].length];
+                                for (l = 0; l < pe1[_i4][_j2].length; l++) {
+                                    pe2[_i4][_j2][l] = [pe1[_i4][_j2][l].length];
+                                    for (m = 0; m < pe1[_i4][_j2][l].length; m++) {
+                                        pe2[_i4][_j2][l][m] = [pe1[_i4][_j2][l][m].length];
+                                        for (n = 0; n < pe1[_i4][_j2][l][m].length; n++) {
+                                            pe2[_i4][_j2][l][m][n] = [pe1[_i4][_j2][l][m][0], pe1[_i4][_j2][l][m][1]];
                                         }
                                     }
                                 }
                             } else {
-                                pe2[_i7][_j3] = [];
+                                pe2[_i4][_j2] = [];
                             }
 
-                            d[_i7][_j3] = newPathLength;
+                            d[_i4][_j2] = newPathLength;
 
-                            pe1[_i7][_j3] = [[]];
+                            pe1[_i4][_j2] = [[]];
 
-                            for (l = 0; l < pe1[_i7][k][0].length; l++) {
-                                pe1[_i7][_j3][0].push(pe1[_i7][k][0][l]);
+                            for (l = 0; l < pe1[_i4][k][0].length; l++) {
+                                pe1[_i4][_j2][0].push(pe1[_i4][k][0][l]);
                             }
-                            for (l = 0; l < pe1[k][_j3][0].length; l++) {
-                                pe1[_i7][_j3][0].push(pe1[k][_j3][0][l]);
+                            for (l = 0; l < pe1[k][_j2][0].length; l++) {
+                                pe1[_i4][_j2][0].push(pe1[k][_j2][0][l]);
                             }
                         } else if (previousPathLength === newPathLength) {
-                            if (pe1[_i7][k].length && pe1[k][_j3].length) {
-                                if (pe1[_i7][_j3].length) {
+                            if (pe1[_i4][k].length && pe1[k][_j2].length) {
+                                if (pe1[_i4][_j2].length) {
                                     var tmp = [];
 
-                                    for (l = 0; l < pe1[_i7][k][0].length; l++) {
-                                        tmp.push(pe1[_i7][k][0][l]);
+                                    for (l = 0; l < pe1[_i4][k][0].length; l++) {
+                                        tmp.push(pe1[_i4][k][0][l]);
                                     }
-                                    for (l = 0; l < pe1[k][_j3][0].length; l++) {
-                                        tmp.push(pe1[k][_j3][0][l]);
+                                    for (l = 0; l < pe1[k][_j2][0].length; l++) {
+                                        tmp.push(pe1[k][_j2][0][l]);
                                     }
 
-                                    pe1[_i7][_j3].push(tmp);
+                                    pe1[_i4][_j2].push(tmp);
                                 } else {
                                     var _tmp = [];
 
-                                    for (l = 0; l < pe1[_i7][k][0].length; l++) {
-                                        _tmp.push(pe1[_i7][k][0][l]);
+                                    for (l = 0; l < pe1[_i4][k][0].length; l++) {
+                                        _tmp.push(pe1[_i4][k][0][l]);
                                     }
-                                    for (l = 0; l < pe1[k][_j3][0].length; l++) {
-                                        _tmp.push(pe1[k][_j3][0][l]);
+                                    for (l = 0; l < pe1[k][_j2][0].length; l++) {
+                                        _tmp.push(pe1[k][_j2][0][l]);
                                     }
 
-                                    pe1[_i7][_j3][0] = _tmp;
+                                    pe1[_i4][_j2][0] = _tmp;
                                 }
                             }
                         } else if (previousPathLength === newPathLength - 1) {
-                            if (pe2[_i7][_j3].length) {
+                            if (pe2[_i4][_j2].length) {
                                 var _tmp2 = [];
 
-                                for (var l = 0; l < pe1[_i7][k][0].length; l++) {
-                                    _tmp2.push(pe1[_i7][k][0][l]);
+                                for (var l = 0; l < pe1[_i4][k][0].length; l++) {
+                                    _tmp2.push(pe1[_i4][k][0][l]);
                                 }
-                                for (var l = 0; l < pe1[k][_j3][0].length; l++) {
-                                    _tmp2.push(pe1[k][_j3][0][l]);
+                                for (var l = 0; l < pe1[k][_j2][0].length; l++) {
+                                    _tmp2.push(pe1[k][_j2][0][l]);
                                 }
 
-                                pe2[_i7][_j3].push(_tmp2);
+                                pe2[_i4][_j2].push(_tmp2);
                             } else {
                                 var _tmp3 = [];
 
-                                for (var l = 0; l < pe1[_i7][k][0].length; l++) {
-                                    _tmp3.push(pe1[_i7][k][0][l]);
+                                for (var l = 0; l < pe1[_i4][k][0].length; l++) {
+                                    _tmp3.push(pe1[_i4][k][0][l]);
                                 }
-                                for (var l = 0; l < pe1[k][_j3][0].length; l++) {
-                                    _tmp3.push(pe1[k][_j3][0][l]);
+                                for (var l = 0; l < pe1[k][_j2][0].length; l++) {
+                                    _tmp3.push(pe1[k][_j2][0][l]);
                                 }
 
-                                pe2[_i7][_j3][0] = _tmp3;
+                                pe2[_i4][_j2][0] = _tmp3;
                             }
                         }
                     }
@@ -8925,8 +9244,8 @@ var SSSR = function () {
                         }
                     }
                 } else {
-                    for (var _j4 = 0; _j4 < c[i][1].length - 1; _j4++) {
-                        var _bonds = c[i][1][_j4].concat(c[i][1][_j4 + 1]);
+                    for (var _j3 = 0; _j3 < c[i][1].length - 1; _j3++) {
+                        var _bonds = c[i][1][_j3].concat(c[i][1][_j3 + 1]);
                         var _atoms = SSSR.bondsToAtoms(_bonds);
 
                         if (_bonds.length === _atoms.size && !SSSR.pathSetsContain(cSssr, _atoms)) {
