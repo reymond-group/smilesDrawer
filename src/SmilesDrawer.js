@@ -530,7 +530,7 @@ class SmilesDrawer {
 
         // Get the rings in the graph (the SSSR)
         let rings = SSSR.getRings(this.graph.getComponentsAdjacencyMatrix());
-
+        
         if (rings === null) {
             return;
         }

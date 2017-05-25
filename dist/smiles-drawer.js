@@ -9200,7 +9200,9 @@ var SSSR = function () {
                             c = 2 * d[i][j];
                         }
 
-                        candidates.push([c, pe1[i][j], pe2[i][j]]);
+                        if (c !== Infinity) {
+                            candidates.push([c, pe1[i][j], pe2[i][j]]);
+                        }
                     }
                 }
             }
@@ -9342,6 +9344,10 @@ var SSSR = function () {
         key: 'pathSetsContain',
         value: function pathSetsContain(pathSets, pathSet) {
             for (var i = 0; i < pathSets.length; i++) {
+                if (SSSR.isSupersetOf(pathSet, pathSets[i])) {
+                    return true;
+                }
+
                 if (pathSets[i].size !== pathSet.size) {
                     continue;
                 }
@@ -9392,6 +9398,47 @@ var SSSR = function () {
                 } finally {
                     if (_didIteratorError3) {
                         throw _iteratorError3;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /**
+         * Checks whether or not a set (setA) is a superset of another set (setB).
+         * 
+         * @param {Set} setA A set.
+         * @param {Wet} setB A set.
+         * @returns {boolean} A boolean indicating whether or not setB is a superset of setA.
+         */
+
+    }, {
+        key: 'isSupersetOf',
+        value: function isSupersetOf(setA, setB) {
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+                for (var _iterator4 = setB[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var element = _step4.value;
+
+                    if (!setA.has(element)) {
+                        return false;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
                     }
                 }
             }

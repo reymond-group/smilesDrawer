@@ -208,7 +208,9 @@ class SSSR {
                         c = 2 * d[i][j];
                     }
                     
-                    candidates.push([c, pe1[i][j], pe2[i][j]]);
+                    if (c !== Infinity) {
+                        candidates.push([c, pe1[i][j], pe2[i][j]]);
+                    }
                 }
             }
         }
@@ -335,6 +337,10 @@ class SSSR {
      */
     static pathSetsContain(pathSets, pathSet) {
         for (let i = 0; i < pathSets.length; i++) {
+            if (SSSR.isSupersetOf(pathSet, pathSets[i])) {
+                return true;
+            }
+
             if (pathSets[i].size !== pathSet.size) {
                 continue;
             }
@@ -365,6 +371,23 @@ class SSSR {
             }
         }
 
+        return true;
+    }
+
+    /**
+     * Checks whether or not a set (setA) is a superset of another set (setB).
+     * 
+     * @param {Set} setA A set.
+     * @param {Wet} setB A set.
+     * @returns {boolean} A boolean indicating whether or not setB is a superset of setA.
+     */
+    static isSupersetOf(setA, setB) {
+        for (var element of setB) {
+            if (!setA.has(element)) {
+                return false;
+            }
+        }
+        
         return true;
     }
 }
