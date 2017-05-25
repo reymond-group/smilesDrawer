@@ -1877,8 +1877,7 @@ var CanvasWrapper = function () {
 
                 if (elementCount > 1) {
                     if (direction === 'left') {
-                        // cursorPosLeft -= elementCountWidth;
-                        ctx.fillText(elementCount, _hx2 - cursorPosLeft + elementCountWidth + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, _hy2 + this.opts.fontSizeSmall / 5.0);
+                        ctx.fillText(elementCount, _hx2 + cursorPosLeft + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, _hy2 + this.opts.fontSizeSmall / 5.0);
                     } else {
                         ctx.fillText(elementCount, _hx2 + cursorPos, _hy2 + this.opts.fontSizeSmall / 5.0);
                         cursorPos += elementCountWidth;

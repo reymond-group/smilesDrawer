@@ -730,8 +730,7 @@ class CanvasWrapper {
 
             if (elementCount > 1) {
                 if (direction === 'left') {
-                    // cursorPosLeft -= elementCountWidth;
-                    ctx.fillText(elementCount, hx - cursorPosLeft + elementCountWidth + 
+                    ctx.fillText(elementCount, hx + cursorPosLeft + 
                                  openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + 
                                  hydrogenCountWidth + elementWidth, hy + this.opts.fontSizeSmall / 5.0);
                 } else {
