@@ -17,6 +17,9 @@
 </dd>
 <dt><a href="#Graph">Graph</a></dt>
 <dd></dd>
+<dt><a href="#Hanser">Hanser</a></dt>
+<dd><p>A class encapsulating the functionality to find the rings in the graph using Hansers algorithm.</p>
+</dd>
 <dt><a href="#Line">Line</a></dt>
 <dd><p>A class representing a line</p>
 </dd>
@@ -797,15 +800,25 @@ An object mapping the bond type to the number of bonds.
 
 * [Graph](#Graph)
     * [new Graph()](#new_Graph_new)
-    * [.clear()](#Graph+clear)
-    * [.addVertex(vertex)](#Graph+addVertex) ⇒ <code>number</code>
-    * [.addEdge(edge)](#Graph+addEdge) ⇒ <code>number</code>
-    * [.getEdge(vertexIdA, vertexIdB)](#Graph+getEdge) ⇒ <code>number</code> &#124; <code>null</code>
-    * [.hasEdge(vertexIdA, vertexIdB)](#Graph+hasEdge) ⇒ <code>number</code> &#124; <code>null</code>
-    * [.getAdjacencyMatrix()](#Graph+getAdjacencyMatrix) ⇒ <code>array</code>
-    * [.getSubgraphAdjacencyMatrix(vertexIds)](#Graph+getSubgraphAdjacencyMatrix) ⇒ <code>array</code>
-    * [.getSubgraphAdjacencyList(vertexIds)](#Graph+getSubgraphAdjacencyList) ⇒ <code>array</code>
-    * [.getLargestCycleInSubgraph(startVertexId, vertexIds)](#Graph+getLargestCycleInSubgraph)
+    * _instance_
+        * [.clear()](#Graph+clear)
+        * [.addVertex(vertex)](#Graph+addVertex) ⇒ <code>number</code>
+        * [.addEdge(edge)](#Graph+addEdge) ⇒ <code>number</code>
+        * [.getEdge(vertexIdA, vertexIdB)](#Graph+getEdge) ⇒ <code>number</code> &#124; <code>null</code>
+        * [.hasEdge(vertexIdA, vertexIdB)](#Graph+hasEdge) ⇒ <code>number</code> &#124; <code>null</code>
+        * [.getVertexList()](#Graph+getVertexList) ⇒ <code>array</code>
+        * [.getEdgeList()](#Graph+getEdgeList) ⇒ <code>array</code>
+        * [.getAdjacencyMatrix()](#Graph+getAdjacencyMatrix) ⇒ <code>array</code>
+        * [.getComponentsAdjacencyMatrix()](#Graph+getComponentsAdjacencyMatrix) ⇒ <code>array</code>
+        * [.getSubgraphAdjacencyMatrix(vertexIds)](#Graph+getSubgraphAdjacencyMatrix) ⇒ <code>array</code>
+        * [.getAdjacencyList()](#Graph+getAdjacencyList) ⇒ <code>array</code>
+        * [.getSubgraphAdjacencyList(vertexIds)](#Graph+getSubgraphAdjacencyList) ⇒ <code>array</code>
+        * [.getLargestCycleInSubgraph(startVertexId, vertexIds)](#Graph+getLargestCycleInSubgraph)
+        * [.getBridges()](#Graph+getBridges) ⇒ <code>array</code>
+        * [._bridgeDfs()](#Graph+_bridgeDfs)
+    * _static_
+        * [.getConnectedComponentCount(adjacencyMatrix)](#Graph.getConnectedComponentCount) ⇒ <code>Number</code>
+        * [._ccCountDfs()](#Graph._ccCountDfs)
 
 <a name="new_Graph_new"></a>
 
@@ -868,6 +881,20 @@ Returns the edge between two given vertices.
 | vertexIdA | <code>number</code> | A vertex id. |
 | vertexIdB | <code>number</code> | A vertex id. |
 
+<a name="Graph+getVertexList"></a>
+
+### graph.getVertexList() ⇒ <code>array</code>
+Returns an array containing the vertex ids of this graph.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>array</code> - An array containing all vertex ids of this graph.  
+<a name="Graph+getEdgeList"></a>
+
+### graph.getEdgeList() ⇒ <code>array</code>
+Returns an array containing source, target arrays of this graphs edges.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>array</code> - An array containing source, target arrays of this graphs edges.  
 <a name="Graph+getAdjacencyMatrix"></a>
 
 ### graph.getAdjacencyMatrix() ⇒ <code>array</code>
@@ -875,6 +902,13 @@ Get the adjacency matrix of the graph.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
 **Returns**: <code>array</code> - The adjancency matrix of the molecular graph.  
+<a name="Graph+getComponentsAdjacencyMatrix"></a>
+
+### graph.getComponentsAdjacencyMatrix() ⇒ <code>array</code>
+Get the adjacency matrix of the graph with all bridges removed (thus the components). Thus the remaining vertices are all part of ring systems.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>array</code> - The adjancency matrix of the molecular graph with all bridges removed.  
 <a name="Graph+getSubgraphAdjacencyMatrix"></a>
 
 ### graph.getSubgraphAdjacencyMatrix(vertexIds) ⇒ <code>array</code>
@@ -887,6 +921,13 @@ Get the adjacency matrix of a subgraph.
 | --- | --- | --- |
 | vertexIds | <code>array</code> | An array containing the vertex ids contained within the subgraph. |
 
+<a name="Graph+getAdjacencyList"></a>
+
+### graph.getAdjacencyList() ⇒ <code>array</code>
+Get the adjacency list of the graph.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>array</code> - The adjancency list of the graph.  
 <a name="Graph+getSubgraphAdjacencyList"></a>
 
 ### graph.getSubgraphAdjacencyList(vertexIds) ⇒ <code>array</code>
@@ -911,6 +952,43 @@ Get the path of the
 | startVertexId | <code>array</code> | The start vertex of the cycle. |
 | vertexIds | <code>array</code> | An array containing the vertex ids contained within the subgraph. |
 
+<a name="Graph+getBridges"></a>
+
+### graph.getBridges() ⇒ <code>array</code>
+Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>array</code> - An array containing the edge ids of the bridges.  
+<a name="Graph+_bridgeDfs"></a>
+
+### graph._bridgeDfs()
+PRIVATE FUNCTION used by getBridges().
+
+**Kind**: instance method of <code>[Graph](#Graph)</code>  
+<a name="Graph.getConnectedComponentCount"></a>
+
+### Graph.getConnectedComponentCount(adjacencyMatrix) ⇒ <code>Number</code>
+Returns the number of connected components for the grpah
+
+**Kind**: static method of <code>[Graph](#Graph)</code>  
+**Returns**: <code>Number</code> - The number of connected components of the supplied graph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>array</code> | An adjacency matrix. |
+
+<a name="Graph._ccCountDfs"></a>
+
+### Graph._ccCountDfs()
+PRIVATE FUNCTION used by getConnectedComponentCount().
+
+**Kind**: static method of <code>[Graph](#Graph)</code>  
+<a name="Hanser"></a>
+
+## Hanser
+A class encapsulating the functionality to find the rings in the graph using Hansers algorithm.
+
+**Kind**: global class  
 <a name="Line"></a>
 
 ## Line
@@ -2379,6 +2457,7 @@ A class encapsulating the functionality to find the smallest set of smallest rin
     * [.bondsToAtoms(bonds)](#SSSR.bondsToAtoms) ⇒ <code>set</code>
     * [.pathSetsContain(pathSets, pathSet)](#SSSR.pathSetsContain) ⇒ <code>boolean</code>
     * [.areSetsEqual(setA, setB)](#SSSR.areSetsEqual) ⇒ <code>boolean</code>
+    * [.isSupersetOf(setA, setB)](#SSSR.isSupersetOf) ⇒ <code>boolean</code>
 
 <a name="SSSR.getRings"></a>
 
@@ -2507,6 +2586,19 @@ Checks whether or not two sets are equal (contain the same elements).
 | --- | --- | --- |
 | setA | <code>set</code> | A set. |
 | setB | <code>set</code> | A set. |
+
+<a name="SSSR.isSupersetOf"></a>
+
+### SSSR.isSupersetOf(setA, setB) ⇒ <code>boolean</code>
+Checks whether or not a set (setA) is a superset of another set (setB).
+
+**Kind**: static method of <code>[SSSR](#SSSR)</code>  
+**Returns**: <code>boolean</code> - A boolean indicating whether or not setB is a superset of setA.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| setA | <code>Set</code> | A set. |
+| setB | <code>Wet</code> | A set. |
 
 <a name="Vector2"></a>
 

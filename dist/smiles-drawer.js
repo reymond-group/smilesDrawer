@@ -6264,30 +6264,6 @@ var SmilesDrawer = function () {
         }
 
         /**
-         * Returns the largest ring shared by the two vertices.
-         *
-         * @param {Vertex} vertexA A vertex.
-         * @param {Vertex} vertexB A vertex.
-         * @returns {Ring|null} If a largest common ring exists, that ring, else null.
-         */
-        /*
-        getLargestCommonRing(vertexA, vertexB) {
-            let commonRings = this.getCommonRings(vertexA, vertexB);
-            let maxSize = 0;
-            let largestCommonRing = null;
-             for (var i = 0; i < commonRings.length; i++) {
-                let size = this.getRing(commonRings[i]).getSize();
-                
-                if (size > maxSize) {
-                    maxSize = size;
-                    largestCommonRing = this.getRing(commonRings[i]);
-                }
-            }
-             return largestCommonRing;
-        }
-        */
-
-        /**
          * Returns the aromatic or largest ring shared by the two vertices.
          *
          * @param {Vertex} vertexA A vertex.
@@ -7184,8 +7160,14 @@ var SmilesDrawer = function () {
                 }
             }
 
+            // Only for bridges, not for members, the members are handled in createRing.
             for (var u = 0; u < vertices.length; u++) {
                 var _vertex4 = this.graph.vertices[vertices[u]];
+
+                if (!_vertex4.value.isBridge) {
+                    continue;
+                }
+
                 var neighbours = _vertex4.getNeighbours();
 
                 for (var i = 0; i < neighbours.length; i++) {
@@ -7205,8 +7187,7 @@ var SmilesDrawer = function () {
                 }
             }
 
-            // This has to be called in order to position rings connected to this bridged ring
-            this.createRing(ring, null, null, null, true);
+            ring.positioned = true;
         }
 
         /**
@@ -7618,14 +7599,13 @@ var SmilesDrawer = function () {
         key: 'createRing',
         value: function createRing(ring) {
             var center = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-            var startVertex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
             var _this = this;
 
+            var startVertex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
             var previousVertex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-            var forcePositioned = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
-            if (ring.positioned && !forcePositioned) {
+            if (ring.positioned) {
                 return;
             }
 
@@ -7647,36 +7627,34 @@ var SmilesDrawer = function () {
                 startVertexId = ring.members[0];
             }
 
-            if (!forcePositioned) {
-                ring.eachMember(this.graph.vertices, function (v) {
-                    var vertex = that.graph.vertices[v];
+            ring.eachMember(this.graph.vertices, function (v) {
+                var vertex = that.graph.vertices[v];
 
-                    if (!vertex.positioned) {
-                        vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
-                    }
-
-                    a += angle;
-
-                    if (!ring.isBridged || ring.rings.length < 3) {
-                        vertex.positioned = true;
-                    }
-                }, startVertexId, previousVertex ? previousVertex.id : null);
-
-                // If the ring is bridged, then draw the vertices inside the ring
-                // using a force based approach
-                if (ring.isBridged) {
-                    var allVertices = ArrayHelper.merge(ring.members, ring.insiders);
-
-                    this.forceLayout(allVertices, center, startVertex.id, ring);
+                if (!vertex.positioned) {
+                    vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
                 }
 
-                // Anchor the ring to one of it's members, so that the ring center will always
-                // be tied to a single vertex when doing repositionings
-                this.graph.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
+                a += angle;
 
-                ring.positioned = true;
-                ring.center = center;
+                if (!ring.isBridged || ring.rings.length < 3) {
+                    vertex.positioned = true;
+                }
+            }, startVertexId, previousVertex ? previousVertex.id : null);
+
+            // If the ring is bridged, then draw the vertices inside the ring
+            // using a force based approach
+            if (ring.isBridged && !ring.positioned) {
+                var allVertices = ArrayHelper.merge(ring.members, ring.insiders);
+
+                this.forceLayout(allVertices, center, startVertex.id, ring);
             }
+
+            // Anchor the ring to one of it's members, so that the ring center will always
+            // be tied to a single vertex when doing repositionings
+            this.graph.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
+
+            ring.positioned = true;
+            ring.center = center;
 
             // Draw neighbours in decreasing order of connectivity
             for (var i = 0; i < orderedNeighbours.length; i++) {
@@ -7734,9 +7712,13 @@ var SmilesDrawer = function () {
                         var posB = Vector2.subtract(vertexB.position, nextCenter);
 
                         if (posA.clockwise(posB) === -1) {
-                            _this.createRing(neighbour, nextCenter, vertexA, vertexB);
+                            if (!neighbour.positioned) {
+                                _this.createRing(neighbour, nextCenter, vertexA, vertexB);
+                            }
                         } else {
-                            _this.createRing(neighbour, nextCenter, vertexB, vertexA);
+                            if (!neighbour.positioned) {
+                                _this.createRing(neighbour, nextCenter, vertexB, vertexA);
+                            }
                         }
                     })();
                 } else if (vertices.length === 1) {
@@ -7758,7 +7740,9 @@ var SmilesDrawer = function () {
                     nextCenter.multiplyScalar(r);
                     nextCenter.add(vertexA.position);
 
-                    this.createRing(neighbour, nextCenter, vertexA);
+                    if (!neighbour.positioned) {
+                        this.createRing(neighbour, nextCenter, vertexA);
+                    }
                 }
             }
 
@@ -7776,7 +7760,6 @@ var SmilesDrawer = function () {
                     }
 
                     v.value.isConnectedToRing = true;
-
                     this.createNextBond(v, ringMember, ring.center);
                 }
             }
@@ -8204,7 +8187,9 @@ var SmilesDrawer = function () {
                 nextCenter.multiplyScalar(r);
                 nextCenter.add(vertex.position);
 
-                this.createRing(nextRing, nextCenter, vertex);
+                if (!nextRing.positioned) {
+                    this.createRing(nextRing, nextCenter, vertex);
+                }
             } else if (vertex.value.bridgedRing !== null) {
                 var _nextRing = this.getRing(vertex.value.bridgedRing);
                 var _nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
@@ -8217,7 +8202,9 @@ var SmilesDrawer = function () {
                 _nextCenter.multiplyScalar(_r3);
                 _nextCenter.add(vertex.position);
 
-                this.createRing(_nextRing, _nextCenter, vertex);
+                if (!_nextRing.positioned) {
+                    this.createRing(_nextRing, _nextCenter, vertex);
+                }
             } else {
                 // Draw the non-ring vertices connected to this one        
                 var neighbours = vertex.getNeighbours();
