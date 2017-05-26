@@ -1,5 +1,5 @@
 /** A class representing a ring connection */
-class RingConnection {
+SmilesDrawer.RingConnection = class RingConnection {
     /**
      * The constructor for the class RingConnection.
      *

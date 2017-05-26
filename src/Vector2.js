@@ -1,5 +1,5 @@
 /** A class representing a 2D vector. */
-class Vector2 {
+SmilesDrawer.Vector2 = class Vector2 {
     /**
      * The constructor of the class Vector2.
      *
@@ -25,7 +25,7 @@ class Vector2 {
      * @returns {Vector2} The clone of this vector.
      */
     clone() {
-        return new Vector2(this.x, this.y);
+        return new SmilesDrawer.Vector2(this.x, this.y);
     }
 
     /**
@@ -170,7 +170,7 @@ class Vector2 {
      * @returns {Vector2} Returns itself.
      */
     rotate(angle) {
-        let tmp = new Vector2();
+        let tmp = new SmilesDrawer.Vector2();
         let cosAngle = Math.cos(angle);
         let sinAngle = Math.sin(angle);
 
@@ -219,9 +219,9 @@ class Vector2 {
         this.x += 0.001;
         this.y -= 0.001;
 
-        let a = Vector2.subtract(this, center);
-        let b = Vector2.subtract(vec, center);
-        let angle = Vector2.angle(b, a);
+        let a = SmilesDrawer.Vector2.subtract(this, center);
+        let b = SmilesDrawer.Vector2.subtract(vec, center);
+        let angle = SmilesDrawer.Vector2.angle(b, a);
 
         this.rotateAround(angle + offsetAngle, center);
 
@@ -310,9 +310,9 @@ class Vector2 {
      * @returns {number} The angle between this vector and another vector around a center of rotation in radians.
      */
     getRotateToAngle(vec, center) {
-        let a = Vector2.subtract(this, center);
-        let b = Vector2.subtract(vec, center);
-        let angle = Vector2.angle(b, a);
+        let a = SmilesDrawer.Vector2.subtract(this, center);
+        let b = SmilesDrawer.Vector2.subtract(vec, center);
+        let angle = SmilesDrawer.Vector2.angle(b, a);
         
         return Number.isNaN(angle) ? 0.0 : angle;
     }
@@ -365,7 +365,7 @@ class Vector2 {
      * @returns {Vector2} A normalized copy of this vector.
      */
     normalized() {
-        return Vector2.divide(this, this.length());
+        return SmilesDrawer.Vector2.divide(this, this.length());
     }
 
     /**
@@ -403,7 +403,7 @@ class Vector2 {
      * @returns {Vector2} Returns the sum of two vectors.
      */
     static add(vecA, vecB) {
-        return new Vector2(vecA.x + vecB.x, vecA.y + vecB.y);
+        return new SmilesDrawer.Vector2(vecA.x + vecB.x, vecA.y + vecB.y);
     }
 
     /**
@@ -415,7 +415,7 @@ class Vector2 {
      * @returns {Vector2} Returns the difference of two vectors.
      */
     static subtract(vecA, vecB) {
-        return new Vector2(vecA.x - vecB.x, vecA.y - vecB.y);
+        return new SmilesDrawer.Vector2(vecA.x - vecB.x, vecA.y - vecB.y);
     }
 
     /**
@@ -427,7 +427,7 @@ class Vector2 {
      * @returns {Vector2} Returns the product of two vectors.
      */
     static multiply(vecA, vecB) {
-        return new Vector2(vecA.x * vecB.x, vecA.y * vecB.y);
+        return new SmilesDrawer.Vector2(vecA.x * vecB.x, vecA.y * vecB.y);
     }
 
     /**
@@ -439,7 +439,7 @@ class Vector2 {
      * @returns {Vector2} Returns the product of two vectors.
      */
     static multiplyScalar(vec, scalar) {
-        return new Vector2(vec).multiply(scalar);
+        return new SmilesDrawer.Vector2(vec).multiply(scalar);
     }
 
     /**
@@ -451,7 +451,7 @@ class Vector2 {
      * @returns {Vector2} The midpoint of the line spanned by two vectors.
      */
     static midpoint(vecA, vecB) {
-        return new Vector2((vecA.x + vecB.x) / 2, (vecA.y + vecB.y) / 2);
+        return new SmilesDrawer.Vector2((vecA.x + vecB.x) / 2, (vecA.y + vecB.y) / 2);
     }
 
     /**
@@ -463,11 +463,11 @@ class Vector2 {
      * @returns {array} An array containing the two normals, each represented by a vector.
      */
     static normals(vecA, vecB) {
-        let delta = Vector2.subtract(vecB, vecA);
+        let delta = SmilesDrawer.Vector2.subtract(vecB, vecA);
 
         return [
-            new Vector2(-delta.y, delta.x),
-            new Vector2(delta.y, -delta.x)
+            new SmilesDrawer.Vector2(-delta.y, delta.x),
+            new SmilesDrawer.Vector2(delta.y, -delta.x)
         ];
     }
 
@@ -480,11 +480,11 @@ class Vector2 {
      * @returns {array} An array containing the two unit vectors.
      */
     static units(vecA, vecB) {
-        let delta = Vector2.subtract(vecB, vecA);
+        let delta = SmilesDrawer.Vector2.subtract(vecB, vecA);
 
         return [
-            (new Vector2(-delta.y, delta.x)).normalize(),
-            (new Vector2(delta.y, -delta.x)).normalize()
+            (new SmilesDrawer.Vector2(-delta.y, delta.x)).normalize(),
+            (new SmilesDrawer.Vector2(delta.y, -delta.x)).normalize()
         ];
     }
 
@@ -498,10 +498,10 @@ class Vector2 {
      */
     static divide(vecA, vecB) {
         if (vecB.x && vecB.y) {
-            return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
+            return new SmilesDrawer.Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
         }
 
-        return new Vector2(vecA.x / vecB, vecA.y / vecB);
+        return new SmilesDrawer.Vector2(vecA.x / vecB, vecA.y / vecB);
     }
 
     /**
@@ -525,7 +525,7 @@ class Vector2 {
      * @returns {number} The angle between two vectors in radians.
      */
     static angle(vecA, vecB) {
-        let dot = Vector2.dot(vecA, vecB);
+        let dot = SmilesDrawer.Vector2.dot(vecA, vecB);
 
         return Math.acos(dot / (vecA.length() * vecB.length()));
     }
@@ -540,12 +540,12 @@ class Vector2 {
      * @returns {number} The angle in radians.
      */
     static threePointangle(vecA, vecB, vecC) {
-        let ab = Vector2.subtract(vecB - vecA);
-        let bc = Vector2.subtract(vecC, vecB);
+        let ab = SmilesDrawer.Vector2.subtract(vecB - vecA);
+        let bc = SmilesDrawer.Vector2.subtract(vecC, vecB);
         let abLength = vecA.distance(vecB);
         let bcLenght = vecB.distance(vecC);
 
-        return Math.acos(Vector2.dot(ab, bc) / (abLenght * bcLenght));
+        return Math.acos(SmilesDrawer.Vector2.dot(ab, bc) / (abLenght * bcLenght));
     }
     
     /**
@@ -559,6 +559,6 @@ class Vector2 {
     static scalarProjection(vecA, vecB) {
         let unit = vecB.normalized();
         
-        return Vector2.dot(vecA, unit);
+        return SmilesDrawer.Vector2.dot(vecA, unit);
     }
 }

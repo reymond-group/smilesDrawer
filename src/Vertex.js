@@ -1,5 +1,5 @@
 /** A class representing a vertex */
-class Vertex {
+SmilesDrawer.Vertex = class Vertex {
     /**
      * The constructor for the class Vertex.
      *
@@ -10,8 +10,8 @@ class Vertex {
     constructor(value, x = 0, y = 0) {
         this.id = null;
         this.value = value;
-        this.position = new Vector2(x ? x : 0, y ? y : 0);
-        this.previousPosition = new Vector2(0, 0);
+        this.position = new SmilesDrawer.Vector2(x ? x : 0, y ? y : 0);
+        this.previousPosition = new SmilesDrawer.Vector2(0, 0);
         this.parentVertexId = null;
         this.children = [];
         this.spanningTreeChildren = [];
@@ -61,6 +61,8 @@ class Vertex {
         this.neighbourCount++;
         this.children.push(vertexId);
         this.neighbours.push(vertexId);
+
+        this.value.bondCount++;
     }
 
     /**
@@ -68,10 +70,12 @@ class Vertex {
      * 
      * @param {number} parentVertexId The parents vertex id.
      */
-    setParentVertexId(parentVertexId, element) {
+    setParentVertexId(parentVertexId) {
         this.neighbourCount++;
         this.parentVertexId = parentVertexId;
         this.neighbours.push(parentVertexId);
+
+        this.value.bondCount++;
     }
 
     /**
@@ -95,17 +99,17 @@ class Vertex {
     clone() {
         let clone = new Vertex(this.value, this.position.x, this.position.y);
         clone.id = this.id;
-        clone.previousPosition = new Vector2(this.previousPosition.x, this.previousPosition.y);
+        clone.previousPosition = new SmilesDrawer.Vector2(this.previousPosition.x, this.previousPosition.y);
         clone.parentVertexId = this.parentVertexId;
-        clone.children = ArrayHelper.clone(this.children);
-        clone.spanningTreeChildren = ArrayHelper.clone(this.spanningTreeChildren);
-        clone.edges = ArrayHelper.clone(this.edges);
+        clone.children = SmilesDrawer.ArrayHelper.clone(this.children);
+        clone.spanningTreeChildren = SmilesDrawer.ArrayHelper.clone(this.spanningTreeChildren);
+        clone.edges = SmilesDrawer.ArrayHelper.clone(this.edges);
         clone.positioned = this.positioned;
         clone.angle = this.angle;
         clone.backAngle = this.backAngle;
         clone.flippable = this.flippable;
         clone.flipCenter = this.flipCenter;
-        clone.flipRings = ArrayHelper.clone(this.flipRings);
+        clone.flipRings = SmilesDrawer.ArrayHelper.clone(this.flipRings);
         return clone;
     }
 
@@ -130,13 +134,13 @@ class Vertex {
         let u = null;
         
         if (!referenceVector) {
-            u = Vector2.subtract(this.position, this.previousPosition);
+            u = SmilesDrawer.Vector2.subtract(this.position, this.previousPosition);
         } else {
-            u = Vector2.subtract(this.position, referenceVector);
+            u = SmilesDrawer.Vector2.subtract(this.position, referenceVector);
         }
 
         if (returnAsDegrees) {
-            return MathHelper.toDeg(u.angle());
+            return SmilesDrawer.MathHelper.toDeg(u.angle());
         }
 
         return u.angle();
@@ -156,19 +160,19 @@ class Vertex {
             angles.push(this.getAngle(vertices[neighbours[i]].position));
         }
 
-        let textAngle = MathHelper.meanAngle(angles);
+        let textAngle = SmilesDrawer.MathHelper.meanAngle(angles);
 
         // Round to 0, 90, 180 or 270 degree
         let halfPi = Math.PI / 2.0;
         textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi, 3);
 
-        if (textAngle == 2) {
+        if (textAngle === 2) {
             return 'down';
-        } else if (textAngle == -2) {
+        } else if (textAngle === -2) {
             return 'up';
         } else if (textAngle === 0 || textAngle === -0) {
             return 'right'; // is checking for -0 necessary?
-        } else if (textAngle == 3 || textAngle == -3) {
+        } else if (textAngle === 3 || textAngle === -3) {
             return 'left';
         } else {
             return 'down'; // default to down
@@ -302,7 +306,7 @@ class Vertex {
         let neighbours = this.getNeighbours();
 
         for (let i = 0; i < neighbours.length; i++) {
-            if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, { value: ringId }) && 
+            if (SmilesDrawer.ArrayHelper.contains(vertices[neighbours[i]].value.rings, { value: ringId }) && 
                 neighbours[i] != previousVertexId) {
                 return neighbours[i];
             }

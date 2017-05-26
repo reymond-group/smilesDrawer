@@ -1,5 +1,5 @@
 /** A class representing an atom */
-class Atom {
+SmilesDrawer.Atom = class Atom {
     /**
      * The constructor of the class Atom.
      *
@@ -27,6 +27,7 @@ class Atom {
         this.isConnectedToRing = false;
         this.neighbouringElements = [];
         this.isPartOfAromaticRing = element !== this.element;
+        this.bondCount = 0;
     }
 
     /**
@@ -92,7 +93,7 @@ class Atom {
      * @param {number} ringId A ring id.
      */
     addAnchoredRing(ringId) {
-        if (!ArrayHelper.contains(this.anchoredRings, { value: ringId })) {
+        if (!SmilesDrawer.ArrayHelper.contains(this.anchoredRings, { value: ringId })) {
             this.anchoredRings.push(ringId);
         }
     }
@@ -309,7 +310,7 @@ class Atom {
             };
         }
 
-        return ArrayHelper.sortByAtomicNumberDesc(orderedVertices);
+        return SmilesDrawer.ArrayHelper.sortByAtomicNumberDesc(orderedVertices);
     }
 
     /**
@@ -366,7 +367,20 @@ class Atom {
     }
 }
 
-Atom.atomicNumbers = {
+SmilesDrawer.Atom.maxBonds = {
+    'C': 4,
+    'N': 3,
+    'O': 2,
+    'P': 3,
+    'S': 2,
+    'B': 3,
+    'F': 1,
+    'I': 1,
+    'Cl': 1,
+    'Br': 1
+};
+
+SmilesDrawer.Atom.atomicNumbers = {
     'H': 1,
     'He': 2,
     'Li': 3,
@@ -493,7 +507,7 @@ Atom.atomicNumbers = {
     'Uuo': 118
 }
 
-Atom.mass = {
+SmilesDrawer.Atom.mass = {
     'H': 1,
     'He': 2,
     'Li': 3,

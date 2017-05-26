@@ -1,4 +1,4 @@
-var SMILESPARSER = (function () {
+SmilesDrawer.Parser = (function () {
   "use strict";
 
   /*

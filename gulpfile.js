@@ -8,11 +8,12 @@ var jsdoc = require('gulp-jsdoc3');
 var gulpJsdoc2md = require('gulp-jsdoc-to-markdown');
 var gutil = require('gulp-util');
 var babili = require("gulp-babili");
+var webpack = require('webpack-stream');
 
 gulp.task('default', [ 'build', 'doc', 'md' ]);
 
 gulp.task('build', function() {
-    return gulp.src('./src/*.js')
+    return gulp.src(['./src/SmilesDrawer.js', './src/*.js'])
         .pipe(concat('smiles-drawer.js'))
         .pipe(babel({ presets: ['es2015'] }))
         .pipe(gulp.dest('./dist/'))

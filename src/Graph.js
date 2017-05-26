@@ -1,15 +1,106 @@
 /* A class representing the molecular graph. */
-class Graph {
+SmilesDrawer.Graph = class Graph {
     /**
      * The constructor of the class Graph.
+     * 
+     * @param {any} parseTree A SMILES parse tree.
+     * @param {boolean} [isomeric=false] A boolean specifying whether or not the SMILES is isomeric.
      */
-    constructor() {
+    constructor(parseTree, isomeric = false) {
         this.vertices = [];
         this.edges = [];
         this.vertexIdsToEdgeId = {};
+        this.elementCount = {};
+        this.isomeric = isomeric;
 
         // Used for the bridge detection algorithm
         this._time = 0;
+        this._init(parseTree);
+        this._initInfos();
+    }
+
+    /**
+     * PRIVATE FUNCTION. Initializing the graph from the parse tree.
+     *
+     * @param {object} node The current node in the parse tree.
+     * @param {number} parentVertexId=null The id of the previous vertex.
+     * @param {boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
+     */
+    _init(node, order = 0, parentVertexId = null, isBranch = false) {
+        // Create a new vertex object
+        let atom = new SmilesDrawer.Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
+        
+        atom.branchBond = node.branchBond;
+        atom.ringbonds = node.ringbonds;
+        atom.bracket = node.atom.element ? node.atom : null;
+        atom.setOrder(parentVertexId, order);
+
+        let vertex = new SmilesDrawer.Vertex(atom);
+        let parentVertex = this.vertices[parentVertexId];
+
+        this.addVertex(vertex);
+
+        // Add the id of this node to the parent as child
+        if (parentVertexId !== null) {
+            vertex.setParentVertexId(parentVertexId);
+            vertex.value.addNeighbouringElement(parentVertex.value.element);
+            parentVertex.addChild(vertex.id);
+            parentVertex.value.addNeighbouringElement(atom.element);
+
+            // In addition create a spanningTreeChildren property, which later will
+            // not contain the children added through ringbonds
+            parentVertex.spanningTreeChildren.push(vertex.id);
+
+            // Add edge between this node and its parent
+            let edge = new SmilesDrawer.Edge(parentVertexId, vertex.id, 1);
+            
+            if (isBranch) {
+                edge.bondType = vertex.value.branchBond;
+            } else {
+                edge.bondType = parentVertex.value.bondType;
+            }
+
+            let edgeId = this.addEdge(edge);
+            vertex.edges.push(edgeId);
+            parentVertex.edges.push(edgeId);
+        }
+        
+        if (atom.bracket && this.isomeric) {
+            for (var i = 0; i < atom.bracket.hcount; i++) {
+                if (this.isomeric) {
+                    this._init({ atom: { element: 'H', bond: '-' }, ringbonds: [] }, i + 1, vertex.id);
+                }
+            }
+        }
+
+        let offset = node.ringbondCount + 1;
+
+        if (atom.bracket) {
+            offset += atom.bracket.hcount;
+        }
+        
+        for (var i = 0; i < node.branchCount; i++) {
+            this._init(node.branches[i], i + offset, vertex.id, true);
+        }
+
+        if (node.hasNext) {
+            this._init(node.next, node.branchCount + offset, vertex.id);
+        }
+    }
+
+    /**
+     * PRIVATE FUNCTION. Initializes element counts etc.
+     */
+    _initInfos() {
+        for (var i = 0; i < this.vertices.length; i++) {
+            let atom = this.vertices[i].value;
+            
+            if (typeof this.elementCount[atom.element] !== 'undefined') {
+                this.elementCount[atom.element] += 1;
+            } else {
+                this.elementCount[atom.element] = 0;
+            }
+        }
     }
 
     /**

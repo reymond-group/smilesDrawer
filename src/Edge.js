@@ -1,5 +1,5 @@
 /** A class representing an edge */
-class Edge {
+SmilesDrawer.Edge = class Edge {
     /**
      * The constructor for the class Edge.
      *

@@ -1,5 +1,5 @@
 /** A class representing a ring */
-class Ring {
+SmilesDrawer.Ring = class Ring {
     /**
      * The constructor for the class Ring.
      *
@@ -12,7 +12,7 @@ class Ring {
         this.insiders = [];
         this.neighbours = [];
         this.positioned = false;
-        this.center = new Vector2();
+        this.center = new SmilesDrawer.Vector2();
         this.rings = [];
         this.isBridged = false;
         this.template = null;
@@ -31,11 +31,11 @@ class Ring {
         let clone = new Ring(this.members);
 
         clone.id = this.id;
-        clone.insiders = ArrayHelper.clone(this.insiders);
-        clone.neighbours = ArrayHelper.clone(this.neighbours);
+        clone.insiders = SmilesDrawer.ArrayHelper.clone(this.insiders);
+        clone.neighbours = SmilesDrawer.ArrayHelper.clone(this.neighbours);
         clone.positioned = this.positioned;
         clone.center = this.center.clone();
-        clone.rings = ArrayHelper.clone(this.rings);
+        clone.rings = SmilesDrawer.ArrayHelper.clone(this.rings);
         clone.isBridged = this.isBridged;
         clone.template = this.template;
         clone.isSpiro = this.isSpiro;
@@ -145,7 +145,7 @@ class Ring {
         let orderedNeighbours = [];
         
         for (let i = 0; i < this.neighbours.length; i++) {
-            let vertices = RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
+            let vertices = SmilesDrawer.RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
             
             orderedNeighbours.push({
                 n: vertices.size,

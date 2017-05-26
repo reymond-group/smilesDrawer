@@ -1,5 +1,5 @@
 /** A class encapsulating the functionality to find the rings in the graph using Hansers algorithm. */
-class Hanser {
+SmilesDrawer.Hanser = class Hanser {
     constructor(vertices, edges) {
         this.vertices = vertices;
         this.edges = edges;

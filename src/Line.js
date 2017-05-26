@@ -1,5 +1,5 @@
 /** A class representing a line */
-class Line {
+SmilesDrawer.Line = class Line {
     /**
      * The constructor for the class Line.
      *
@@ -10,7 +10,7 @@ class Line {
      * @param {boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
      * @param {boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
      */
-    constructor(from = new Vector2(0,0), to = new Vector(0, 0), elementFrom = null, elementTo = null, chiralFrom = false, chiralTo = false) {
+    constructor(from = new SmilesDrawer.Vector2(0,0), to = new SmilesDrawer.Vector(0, 0), elementFrom = null, elementTo = null, chiralFrom = false, chiralTo = false) {
         this.from = from;
         this.to = to;
         this.elementFrom = elementFrom;
@@ -25,7 +25,7 @@ class Line {
      * @returns {Line} A clone of this line.
      */
     clone() {
-        return new Line(this.from.clone(), this.to.clone(), this.elementFrom, this.elementTo);
+        return new SmilesDrawer.Line(this.from.clone(), this.to.clone(), this.elementFrom, this.elementTo);
     }
 
     /**
@@ -46,7 +46,7 @@ class Line {
      */
     getAngle() {
         // Get the angle between the line and the x-axis
-        let diff = Vector2.subtract(this.getRightVector(), this.getLeftVector());
+        let diff = SmilesDrawer.Vector2.subtract(this.getRightVector(), this.getLeftVector());
         return diff.angle();
     }
 
@@ -208,7 +208,7 @@ class Line {
      * @returns {Line} This line.
      */
     shortenFrom(by) {
-        let f = Vector2.subtract(this.to, this.from);
+        let f = SmilesDrawer.Vector2.subtract(this.to, this.from);
         
         f.normalize();
         f.multiplyScalar(by);
@@ -225,7 +225,7 @@ class Line {
      * @returns {Line} This line.
      */
     shortenTo(by) {
-        let f = Vector2.subtract(this.from, this.to);
+        let f = SmilesDrawer.Vector2.subtract(this.from, this.to);
         
         f.normalize();
         f.multiplyScalar(by);
@@ -274,7 +274,7 @@ class Line {
      * @returns {Line} This line.
      */
     shorten(by) {
-        let f = Vector2.subtract(this.from, this.to);
+        let f = SmilesDrawer.Vector2.subtract(this.from, this.to);
         
         f.normalize();
         f.multiplyScalar(by / 2.0);
@@ -291,11 +291,11 @@ class Line {
      * @returns {array} An array containing the two normals as vertices.
      */
     getNormals() {
-        let delta = Vector2.subtract(from, to);
+        let delta = SmilesDrawer.Vector2.subtract(from, to);
 
         return [
-            new Vector2(-delta.y, delta.x),
-            new Vector2(delta.y, -delta.x)
+            new SmilesDrawer.Vector2(-delta.y, delta.x),
+            new SmilesDrawer.Vector2(delta.y, -delta.x)
         ];
     }
 }

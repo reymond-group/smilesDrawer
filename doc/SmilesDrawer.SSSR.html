@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Line.js - Documentation</title>
+    <title>SSSR - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,320 +27,2050 @@
 
 <div id="main">
     
-    <h1 class="page-title">Line.js</h1>
+    <h1 class="page-title">SSSR</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/** A class representing a line */
-SmilesDrawer.Line = class Line {
-    /**
-     * The constructor for the class Line.
-     *
-     * @param {Vector2} [from=new Vector2(0, 0)] A vector marking the beginning of the line.
-     * @param {Vector2} [to=new Vector2(0, 0)] A vector marking the end of the line.
-     * @param {string} [elementFrom=null] A one-letter representation of the element associated with the vector marking the beginning of the line.
-     * @param {string} [elementTo=null] A one-letter representation of the element associated with the vector marking the end of the line.
-     * @param {boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
-     * @param {boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
-     */
-    constructor(from = new SmilesDrawer.Vector2(0,0), to = new SmilesDrawer.Vector(0, 0), elementFrom = null, elementTo = null, chiralFrom = false, chiralTo = false) {
-        this.from = from;
-        this.to = to;
-        this.elementFrom = elementFrom;
-        this.elementTo = elementTo;
-        this.chiralFrom = chiralFrom;
-        this.chiralTo = chiralTo;
-    }
-
-    /**
-     * Clones this line and returns the clone.
-     *
-     * @returns {Line} A clone of this line.
-     */
-    clone() {
-        return new SmilesDrawer.Line(this.from.clone(), this.to.clone(), this.elementFrom, this.elementTo);
-    }
-
-    /**
-     * Returns the length of this line.
-     *
-     * @returns {number} The length of this line.
-     */
-    getLength() {
-        return Math.sqrt(Math.pow(this.to.x - this.from.x, 2) + 
-                         Math.pow(this.to.y - this.from.y, 2));
-    }
-
-
-    /**
-     * Returns the angle of the line in relation to the coordinate system (the x-axis).
-     *
-     * @returns {number} The angle in radians.
-     */
-    getAngle() {
-        // Get the angle between the line and the x-axis
-        let diff = SmilesDrawer.Vector2.subtract(this.getRightVector(), this.getLeftVector());
-        return diff.angle();
-    }
-
-    /**
-     * Returns the right vector (the vector with the larger x value).
-     *
-     * @returns {Vector2} The right vector.
-     */
-    getRightVector() {
-        // Return the vector with the larger x value (the right one)
-        if (this.from.x &lt; this.to.x) {
-            return this.to;
-        } else {
-            return this.from;
-        }
-    }
+        <h2>
+        SSSR
+        </h2>
+        
+            <div class="class-description"><p>A class encapsulating the functionality to find the smallest set of smallest rings in a graph.</p></div>
+        
     
-    /**
-     * Returns the left vector (the vector with the smaller x value).
-     *
-     * @returns {Vector2} The left vector.
-     */
-    getLeftVector() {
-        // Return the vector with the smaller x value (the left one)
-        if (this.from.x &lt; this.to.x) {
-            return this.from;
-        } else {
-            return this.to;
-        }
-    }
+</header>
 
-    /**
-     * Returns the element associated with the right vector (the vector with the larger x value).
-     *
-     * @returns {string} The element associated with the right vector.
-     */
-    getRightElement() {
-        if (this.from.x &lt; this.to.x) {
-            return this.elementTo;
-        } else {
-            return this.elementFrom;
-        }
-    }
-
-    /**
-     * Returns the element associated with the left vector (the vector with the smaller x value).
-     *
-     * @returns {string} The element associated with the left vector.
-     */
-    getLeftElement() {
-        if (this.from.x &lt; this.to.x) {
-            return this.elementFrom;
-        } else {
-            return this.elementTo;
-        }
-    }
-
-    /**
-     * Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.
-     *
-     * @returns {boolean} Whether or not the atom associated with the right vector is a chiral center.
-     */
-    getRightChiral() {
-        if (this.from.x &lt; this.to.x) {
-            return this.chiralTo;
-        } else {
-            return this.chiralFrom;
-        }
-    }
-
-    /**
-     * Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.
-     *
-     * @returns {boolean} Whether or not the atom  associated with the left vector is a chiral center.
-     */
-    getLeftChiral() {
-        if (this.from.x &lt; this.to.x) {
-            return this.chiralFrom;
-        } else {
-            return this.chiralTo;
-        }
-    }
-
-    /**
-     * Set the value of the right vector.
-     *
-     * @param {number} x The x value.
-     * @param {number} y The y value.
-     * @returns {Line} This line.
-     */
-    setRightVector(x, y) {
-        if (this.from.x &lt; this.to.x) {
-            this.to.x = x;
-            this.to.y = y;
-        } else {
-            this.from.x = x;
-            this.from.y = y;
-        }
-
-        return this;
-    }
-
-    /**
-     * Set the value of the left vector.
-     *
-     * @param {number} x The x value.
-     * @param {number} y The y value.
-     * @returns {Line} This line.
-     */
-    setLeftVector(x, y) {
-        if (this.from.x &lt; this.to.x) {
-            this.from.x = x;
-            this.from.y = y;
-        } else {
-            this.to.x = x;
-            this.to.y = y;
-        }
-
-        return this;
-    }
-
-    /**
-     * Rotates this line to be aligned with the x-axis. The center of rotation is the left vector.
-     *
-     * @returns {Line} This line.
-     */
-    rotateToXAxis() {
-        let left = this.getLeftVector();
-        
-        this.setRightVector(left.x + this.getLength(), left.y);
-        
-        return this;
-    }
-
-    /**
-     * Rotate the line by a given value (in radians). The center of rotation is the left vector.
-     *
-     * @param {number} theta The angle (in radians) to rotate the line.
-     * @returns {Line} This line.
-     */
-    rotate(theta) {
-        let l = this.getLeftVector();
-        let r = this.getRightVector();
-        let sinTheta = Math.sin(theta);
-        let cosTheta = Math.cos(theta);
-
-        let x = cosTheta * (r.x - l.x) - sinTheta * (r.y - l.y) + l.x;
-        let y = sinTheta * (r.x - l.x) - cosTheta * (r.y - l.y) + l.y;
-        
-        this.setRightVector(x, y);
-
-        return this;
-    }
-
-    /**
-     * Shortens this line from the "from" direction by a given value (in pixels).
-     *
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} This line.
-     */
-    shortenFrom(by) {
-        let f = SmilesDrawer.Vector2.subtract(this.to, this.from);
-        
-        f.normalize();
-        f.multiplyScalar(by);
-        
-        this.from.add(f);
-
-        return this;
-    }
-
-    /**
-     * Shortens this line from the "to" direction by a given value (in pixels).
-     *
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} This line.
-     */
-    shortenTo(by) {
-        let f = SmilesDrawer.Vector2.subtract(this.from, this.to);
-        
-        f.normalize();
-        f.multiplyScalar(by);
-        
-        this.to.add(f);
-
-        return this;
-    }
-
-    /**
-     * Shorten the right side.
-     *
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} Returns itself.
-     */
-    shortenRight(by) {
-        if (this.from.x &lt; this.to.x) {
-            this.shortenTo(by);
-        } else {
-            this.shortenFrom(by);
-        }
-
-        return this;
-    }
+<article>
+    <div class="container-overview">
     
-    /**
-     * Shorten the left side.
-     * 
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} Returns itself.
-     */
-    shortenLeft(by) {
-        if (this.from.x &lt; this.to.x) {
-            this.shortenFrom(by);
-        } else {
-            this.shortenTo(by);
-        }
-
-        return this;
-    }
-
-    /**
-     * Shortens this line from both directions by a given value (in pixels).
-     *
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} This line.
-     */
-    shorten(by) {
-        let f = SmilesDrawer.Vector2.subtract(this.from, this.to);
         
-        f.normalize();
-        f.multiplyScalar(by / 2.0);
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="SSSR"><span class="type-signature"></span>new SSSR<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line2">line 2</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
         
-        this.to.add(f);
-        this.from.subtract(f);
+            
 
-        return this;
-    }
+    
 
-    /**
-     * Returns the normals of this line.
-     *
-     * @returns {array} An array containing the two normals as vertices.
-     */
-    getNormals() {
-        let delta = SmilesDrawer.Vector2.subtract(from, to);
+    <h4 class="name" id=".areSetsEqual"><span class="type-signature">(static) </span>areSetsEqual<span class="signature">(setA, setB)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
 
-        return [
-            new SmilesDrawer.Vector2(-delta.y, delta.x),
-            new SmilesDrawer.Vector2(delta.y, -delta.x)
-        ];
-    }
-}
-</code></pre>
-        </article>
-    </section>
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line363">line 363</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Checks whether or not two sets are equal (contain the same elements).</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>setA</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">set</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A set.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>setB</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">set</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A set.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A boolean indicating whether or not the two sets are equal.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".bondsToAtoms"><span class="type-signature">(static) </span>bondsToAtoms<span class="signature">(bonds)</span><span class="type-signature"> &rarr; {set}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line320">line 320</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Return a set of vertex indices contained in an array of bonds.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>bonds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An array of bonds.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>An array of vertices.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">set</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getEdgeCount"><span class="type-signature">(static) </span>getEdgeCount<span class="signature">(adjacencyMatrix)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line278">line 278</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns the number of edges in a graph defined by an adjacency matrix.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>adjacencyMatrix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An adjacency matrix.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The number of edges in the graph defined by the adjacency matrix.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getEdgeList"><span class="type-signature">(static) </span>getEdgeList<span class="signature">(adjacencyMatrix)</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line299">line 299</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns an edge list constructed form an adjacency matrix.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>adjacencyMatrix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An adjacency matrix.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getPathIncludedDistanceMatrices"><span class="type-signature">(static) </span>getPathIncludedDistanceMatrices<span class="signature">(adjacencyMatrix)</span><span class="type-signature"> &rarr; {object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line65">line 65</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returnes the two path-included distance matrices used to find the sssr.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>adjacencyMatrix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An adjacency matrix.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The path-included distance matrices. { p1, p2 }</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getRingCandidates"><span class="type-signature">(static) </span>getRingCandidates<span class="signature">(d, pe1, pe2)</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line194">line 194</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Get the ring candidates from the path-included distance matrices.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The distance matrix.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pe1</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A matrix containing the shortest paths.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pe2</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A matrix containing the shortest paths + one vertex.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The ring candidates.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getRings"><span class="type-signature">(static) </span>getRings<span class="signature">(adjacencyMatrix)</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line9">line 9</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>adjacencyMatrix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A 2-dimensional array representing a graph.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".getSSSR"><span class="type-signature">(static) </span>getSSSR<span class="signature">(c, d, pe1, pe2, nsssr)</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line236">line 236</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Searches the candidates for the smallest set of smallest rings.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>c</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The candidates.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>d</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The distance matrix.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pe1</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A matrix containing the shortest paths.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pe2</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A matrix containing the shortest paths + one vertex.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>nsssr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The theoretical number of rings in the graph.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The smallest set of smallest rings.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".isSupersetOf"><span class="type-signature">(static) </span>isSupersetOf<span class="signature">(setA, setB)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line384">line 384</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Checks whether or not a set (setA) is a superset of another set (setB).</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>setA</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Set</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A set.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>setB</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Wet</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A set.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A boolean indicating whether or not setB is a superset of setA.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".matrixToString"><span class="type-signature">(static) </span>matrixToString<span class="signature">(matrix)</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line45">line 45</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Creates a printable string from a matrix (2D array).</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>matrix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A 2D array.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A string representing the matrix.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".pathSetsContain"><span class="type-signature">(static) </span>pathSetsContain<span class="signature">(pathSets, pathSet)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line338">line 338</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <p>Checks whether or not a given path already exists in an array of paths.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pathSets</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An array of sets each representing a path.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pathSet</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">set</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A set representing a path.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A boolean indicating whether or not a give path is contained within a set.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

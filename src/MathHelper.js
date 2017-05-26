@@ -1,5 +1,5 @@
 /** A static class containing helper functions for math-related tasks. */
-class MathHelper {
+SmilesDrawer.MathHelper = class MathHelper {
     /**
      * Rounds a value to a given number of decimals.
      *
@@ -40,7 +40,7 @@ class MathHelper {
      * @returns {number} The inner angle of a given regular polygon.
      */
     static innerAngle(n) {
-        return MathHelper.toRad((n - 2) * 180 / n);
+        return SmilesDrawer.MathHelper.toRad((n - 2) * 180 / n);
     }
 
     /**
@@ -68,9 +68,9 @@ class MathHelper {
     }
 
     static apothemFromSideLength(s, n) {
-        let r = MathHelper.polyCircumradius(s, n);
+        let r = SmilesDrawer.MathHelper.polyCircumradius(s, n);
         
-        return MathHelper.apothem(r, n);
+        return SmilesDrawer.MathHelper.apothem(r, n);
     }
 
     /**
@@ -81,7 +81,7 @@ class MathHelper {
      * @returns {number} The central angle of the n-sided polygon in radians.
      */
     static centralAngle(n) {
-        return MathHelper.toRad(360 / n);
+        return SmilesDrawer.MathHelper.toRad(360 / n);
     }
 
     /**
@@ -92,7 +92,7 @@ class MathHelper {
      * @returns {number} The angle in degrees.
      */
     static toDeg(rad) {
-        return rad * MathHelper.degFactor;
+        return rad * SmilesDrawer.MathHelper.degFactor;
     }
 
     /**
@@ -103,10 +103,10 @@ class MathHelper {
      * @returns {number} The angle in radians.
      */
     static toRad(deg) {
-        return deg * MathHelper.radFactor;
+        return deg * SmilesDrawer.MathHelper.radFactor;
     }
 }
 
-MathHelper.radFactor = Math.PI / 180;
-MathHelper.degFactor = 180 / Math.PI;
-MathHelper.twoPI = 2 * Math.PI;
+SmilesDrawer.MathHelper.radFactor = Math.PI / 180;
+SmilesDrawer.MathHelper.degFactor = 180 / Math.PI;
+SmilesDrawer.MathHelper.twoPI = 2 * Math.PI;

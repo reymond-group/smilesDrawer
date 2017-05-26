@@ -1,5 +1,5 @@
 /** A static class containing helper functions for array-related tasks. */
-class ArrayHelper {
+SmilesDrawer.ArrayHelper = class ArrayHelper {
     /**
      * Clone an array or an object. If an object is passed, a shallow clone will be created.
      *
@@ -17,7 +17,7 @@ class ArrayHelper {
                 out[key] = value.clone();
             }
             else {
-                out[key] = (typeof value === 'object') ? ArrayHelper.clone(value) : value;
+                out[key] = (typeof value === 'object') ? SmilesDrawer.ArrayHelper.clone(value) : value;
             }
         }
         
@@ -333,7 +333,7 @@ class ArrayHelper {
             let item = arr[i];
 
             if (item instanceof Array) {
-                newArr[i] = ArrayHelper.deepCopy(item);
+                newArr[i] = SmilesDrawer.ArrayHelper.deepCopy(item);
             } else {
                 newArr[i] = item;
             }

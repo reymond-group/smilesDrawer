@@ -1,5 +1,5 @@
 /** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
-class SSSR {
+SmilesDrawer.SSSR = class SSSR {
     /**
      * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
      * 
@@ -12,15 +12,15 @@ class SSSR {
         }
 
         // Get the edge list and the theoretical number of rings in SSSR
-        let nSssr = SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + Graph.getConnectedComponentCount(adjacencyMatrix);
+        let nSssr = SmilesDrawer.SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + SmilesDrawer.Graph.getConnectedComponentCount(adjacencyMatrix);
         
         if (nSssr === 0) {
             return null;
         }
 
-        let {d, pe1, pe2} = SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix);
-        let c = SSSR.getRingCandidates(d, pe1, pe2);
-        let sssr = SSSR.getSSSR(c, d, pe1, pe2, nSssr);
+        let {d, pe1, pe2} = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix);
+        let c = SmilesDrawer.SSSR.getRingCandidates(d, pe1, pe2);
+        let sssr = SmilesDrawer.SSSR.getSSSR(c, d, pe1, pe2, nSssr);
         let rings = new Array(sssr.length);
 
         for (let i = 0; i < sssr.length; i++) {

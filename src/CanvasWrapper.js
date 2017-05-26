@@ -1,5 +1,5 @@
 /** A class wrapping a canvas element */
-class CanvasWrapper {
+SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * The constructor for the class CanvasWrapper.
      *
@@ -155,7 +155,7 @@ class CanvasWrapper {
         ctx.save();
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY, radius, 0, MathHelper.twoPI, true);
+        ctx.arc(x + offsetX, y + offsetY, radius, 0, SmilesDrawer.MathHelper.twoPI, true);
         ctx.closePath();
 
         if (debug) {
@@ -289,7 +289,7 @@ class CanvasWrapper {
 
         ctx.save();
 
-        let normals = Vector2.normals(l, r);
+        let normals = SmilesDrawer.Vector2.normals(l, r);
 
         normals[0].normalize();
         normals[1].normalize();
@@ -304,10 +304,10 @@ class CanvasWrapper {
             end = l;
         }
 
-        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], 0.75));
-        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], width));
-        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], width));
-        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], 0.75));
+        let t = SmilesDrawer.Vector2.add(start, SmilesDrawer.Vector2.multiplyScalar(normals[0], 0.75));
+        let u = SmilesDrawer.Vector2.add(end, SmilesDrawer.Vector2.multiplyScalar(normals[0], width));
+        let v = SmilesDrawer.Vector2.add(end, SmilesDrawer.Vector2.multiplyScalar(normals[1], width));
+        let w = SmilesDrawer.Vector2.add(start, SmilesDrawer.Vector2.multiplyScalar(normals[1], 0.75));
 
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
@@ -354,7 +354,7 @@ class CanvasWrapper {
 
         ctx.save();
 
-        let normals = Vector2.normals(l, r);
+        let normals = SmilesDrawer.Vector2.normals(l, r);
 
         normals[0].normalize();
         normals[1].normalize();
@@ -391,10 +391,10 @@ class CanvasWrapper {
         sEnd.x += offsetX;
         sEnd.y += offsetY;
 
-        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], 0.75));
-        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], width / 2.0));
-        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], width / 2.0));
-        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], 0.75));
+        let t = SmilesDrawer.Vector2.add(start, SmilesDrawer.Vector2.multiplyScalar(normals[0], 0.75));
+        let u = SmilesDrawer.Vector2.add(end, SmilesDrawer.Vector2.multiplyScalar(normals[0], width / 2.0));
+        let v = SmilesDrawer.Vector2.add(end, SmilesDrawer.Vector2.multiplyScalar(normals[1], width / 2.0));
+        let w = SmilesDrawer.Vector2.add(start, SmilesDrawer.Vector2.multiplyScalar(normals[1], 0.75));
 
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
@@ -458,7 +458,7 @@ class CanvasWrapper {
 
         ctx.save();
         ctx.beginPath();
-        ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, MathHelper.twoPI, false);
+        ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, SmilesDrawer.MathHelper.twoPI, false);
         ctx.fillStyle = this.getColor(elementName);
         ctx.fill();
     }
@@ -530,7 +530,7 @@ class CanvasWrapper {
 
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY, r, 0, MathHelper.twoPI * 2, true);
+        ctx.arc(x + offsetX, y + offsetY, r, 0, SmilesDrawer.MathHelper.twoPI * 2, true);
         ctx.closePath();
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
@@ -762,7 +762,7 @@ class CanvasWrapper {
      */
     drawAromaticityRing(ring) {
         let ctx = this.ctx;
-        let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
+        let radius = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
 
         ctx.save();
         ctx.strokeStyle = this.getColor('C');

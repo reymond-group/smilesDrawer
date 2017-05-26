@@ -52,7 +52,7 @@
             k: 8
         }
 
-        var smilesDrawer = new SmilesDrawer(options);
+        var smilesDrawer = new SmilesDrawer.Drawer(options);
         var input = document.getElementById('input');
 
         function draw() {
@@ -71,7 +71,7 @@
         }
 
         function updateOptions() {
-            smilesDrawer = new SmilesDrawer(options);
+            smilesDrawer = new SmilesDrawer.Drawer(options);
             draw();
         }
 

@@ -33,6 +33,7 @@
     "gulp-jsdoc3": "^1.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^2.0.1",
-    "gulp-util": "^3.0.8"
+    "gulp-util": "^3.0.8",
+    "webpack-stream": "^3.2.0"
   }
 }
