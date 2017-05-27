@@ -219,7 +219,7 @@ SmilesDrawer.Drawer = class Drawer {
             this.canvasWrapper.scale(this.graph.vertices);
 
             // Initialize pseudo elements or shortcuts
-            if (this.opts.compactDrawing) {
+            if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
                 this.initPseudoElements();
             }
 

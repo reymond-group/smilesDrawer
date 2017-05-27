@@ -1,3 +1,7 @@
+/**
+ * The SmilesDrawer namespace.
+ * @typicalname SmilesDrawer
+ */
 let SmilesDrawer = {
     Version: '1.0.0'
 };

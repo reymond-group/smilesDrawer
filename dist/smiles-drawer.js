@@ -8,6 +8,10 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/**
+ * The SmilesDrawer namespace.
+ * @typicalname SmilesDrawer
+ */
 var SmilesDrawer = {
     Version: '1.0.0'
 };
@@ -2240,7 +2244,7 @@ SmilesDrawer.Drawer = function () {
                 this.canvasWrapper.scale(this.graph.vertices);
 
                 // Initialize pseudo elements or shortcuts
-                if (this.opts.compactDrawing) {
+                if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
                     this.initPseudoElements();
                 }
 
