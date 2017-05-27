@@ -15,19 +15,23 @@ img.logo {
   text-align: center;
 }
 
+#download-info {
+  display: inline-block;
+}
+
 #speed-info, #overlap-info {
   position: relative;
   display: inline-block;
-  padding: 5px;
+  padding: 6px;
   margin: 2px;
   border: 1px solid #eee;
-  border-radius: 5px;
+  font-size: 1.0em;
 }
 
 #error-info {
   position: relative;
   display: inline-block;
-  padding: 5px;
+  padding: 6px;
   margin: 2px;
   color: #888;
   border: 1px solid #e74c3c;

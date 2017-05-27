@@ -32,8 +32,7 @@
       </div>
     </div>
   </div>
-
-
+  
   <div class="container">
     <div class="section">
       <div class="row">
@@ -63,23 +62,31 @@
             </div>
           </div>
           <div class="row">
-            <div class="range-field col s6">
+            <div class="col s6">
               <label for="canvasSize">Canvas Size</label>
-              <input type="range" id="canvasSize" name="canvasSize" value="250" min="50" max="1000" step="1" />
+              <p class="range-field">
+                <input type="range" id="canvasSize" name="canvasSize" value="250" min="50" max="1000" step="1" />
+              </p>
             </div>
-            <div class="range-field col s6">
+            <div class="col s6">
               <label for="bondLength">Bond Length</label>
-              <input type="range" id="bondLength" name="bondLength" value="16" min="1" max="99" step="1" />
+              <p class="range-field">
+                <input type="range" id="bondLength" name="bondLength" value="16" min="1" max="99" step="1" />
+              </p>
             </div>
           </div>
           <div class="row">
-            <div class="range-field col s6">
+            <div class="col s6">
               <label for="shortBondLength">Short Bond Length</label>
-              <input type="range" id="shortBondLength" name="shortBondLength" value="9" min="1" max="22" step="1" />
+              <p class="range-field">
+                <input type="range" id="shortBondLength" name="shortBondLength" value="9" min="1" max="22" step="1" />
+              </p>
             </div>
-            <div class="range-field col s6">
+            <div class="col s6">
               <label for="bondSpacing">Bond Spacing</label>
-              <input type="range" id="bondSpacing" name="bondSpacing" value="4" min="1" max="99" step="1" />
+              <p class="range-field">
+                <input type="range" id="bondSpacing" name="bondSpacing" value="4" min="1" max="99" step="1" />
+              </p>
             </div>
           </div>
           <div class="row">
@@ -87,6 +94,7 @@
               <select id="atom">
                 <option value="default" selected>Default</option>
                 <option value="balls">Balls</option>
+                <option value="allballs">All Balls</option>
                 <option value="none">None</option>
               </select>
               <label>Atom Drawing Style</label>
@@ -111,9 +119,11 @@
             </div>
           </div>
           <div class="row">
-            <div class="range-field col s6">
+            <div class="col s6">
               <label for="fontSizeLarge">Large Text Size</label>
-              <input type="range" id="fontSizeLarge" name="fontSizeLarge" value="6" min="0" max="20" step="1" />
+              <p class="range-field">
+                <input type="range" id="fontSizeLarge" name="fontSizeLarge" value="6" min="0" max="20" step="1" />
+              </p>
             </div>
             <div class="switch col s3">
               <label>Debug</label><br />
@@ -135,9 +145,11 @@
             </div>
           </div>
           <div class="row">
-            <div class="range-field col s6">
+            <div class="col s6">
               <label for="fontSizeSmall">Small Text Size</label>
-              <input type="range" id="fontSizeSmall" name="fontSizeSmall" value="4" min="0" max="22" step="1" />
+              <p class="range-field">
+                <input type="range" id="fontSizeSmall" name="fontSizeSmall" value="4" min="0" max="22" step="1" />
+              </p>
             </div>
             <div class="col s6"></div>
           </div>

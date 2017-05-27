@@ -50,7 +50,7 @@ var input = document.getElementById('input');
     compactDrawing: true
   }
 
-  var smilesDrawer = new SmilesDrawer(options);
+  var smilesDrawer = new SmilesDrawer.Drawer(options);
   var input = document.getElementById('input');
 
   function draw() {
@@ -78,7 +78,7 @@ var input = document.getElementById('input');
   }
 
   function updateOptions() {
-    smilesDrawer = new SmilesDrawer(options);
+    smilesDrawer = new SmilesDrawer.Drawer(options);
     draw();
   }
 
