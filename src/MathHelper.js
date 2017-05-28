@@ -1,12 +1,14 @@
-/** A static class containing helper functions for math-related tasks. */
+/** 
+ * A static class containing helper functions for math-related tasks. 
+ */
 SmilesDrawer.MathHelper = class MathHelper {
     /**
      * Rounds a value to a given number of decimals.
      *
      * @static
-     * @param {number} value A number.
-     * @param {number} decimals The number of decimals.
-     * @returns {number} A number rounded to a given number of decimals.
+     * @param {Number} value A number.
+     * @param {Number} decimals The number of decimals.
+     * @returns {Number} A number rounded to a given number of decimals.
      */
     static round(value, decimals) {
         decimals = decimals ? decimals : 1;
@@ -17,8 +19,8 @@ SmilesDrawer.MathHelper = class MathHelper {
      * Returns the means of the angles contained in an array. In radians.
      *
      * @static
-     * @param {array} arr An array containing angles (in radians).
-     * @returns {number} The mean angle in radians.
+     * @param {Number[]} arr An array containing angles (in radians).
+     * @returns {Number} The mean angle in radians.
      */
     static meanAngle(arr) {
         let sin = 0.0;
@@ -36,8 +38,8 @@ SmilesDrawer.MathHelper = class MathHelper {
      * Returns the inner angle of a n-sided regular polygon.
      *
      * @static
-     * @param {number} n Number of sides of a regular polygon.
-     * @returns {number} The inner angle of a given regular polygon.
+     * @param {Number} n Number of sides of a regular polygon.
+     * @returns {Number} The inner angle of a given regular polygon.
      */
     static innerAngle(n) {
         return SmilesDrawer.MathHelper.toRad((n - 2) * 180 / n);
@@ -47,9 +49,9 @@ SmilesDrawer.MathHelper = class MathHelper {
      * Returns the circumradius of a n-sided regular polygon with a given side-length.
      *
      * @static
-     * @param {number} s The side length of the regular polygon.
-     * @param {number} n The number of sides.
-     * @returns {number} The circumradius of the regular polygon.
+     * @param {Number} s The side length of the regular polygon.
+     * @param {Number} n The number of sides.
+     * @returns {Number} The circumradius of the regular polygon.
      */
     static polyCircumradius(s, n) {
         return s / (2 * Math.sin(Math.PI / n));
@@ -59,9 +61,9 @@ SmilesDrawer.MathHelper = class MathHelper {
      * Returns the apothem of a regular n-sided polygon based on its radius.
      *
      * @static
-     * @param {number} r The radius.
-     * @param {number} n The number of edges of the regular polygon.
-     * @returns {number} The apothem of a n-sided polygon based on its radius.
+     * @param {Number} r The radius.
+     * @param {Number} n The number of edges of the regular polygon.
+     * @returns {Number} The apothem of a n-sided polygon based on its radius.
      */
     static apothem(r, n) {
         return r * Math.cos(Math.PI / n);
@@ -77,8 +79,8 @@ SmilesDrawer.MathHelper = class MathHelper {
      * The central angle of a n-sided regular polygon. In radians.
      *
      * @static
-     * @param {number} n The number of sides of the regular polygon.
-     * @returns {number} The central angle of the n-sided polygon in radians.
+     * @param {Number} n The number of sides of the regular polygon.
+     * @returns {Number} The central angle of the n-sided polygon in radians.
      */
     static centralAngle(n) {
         return SmilesDrawer.MathHelper.toRad(360 / n);
@@ -88,8 +90,8 @@ SmilesDrawer.MathHelper = class MathHelper {
      * Convertes radians to degrees.
      *
      * @static
-     * @param {number} rad An angle in radians.
-     * @returns {number} The angle in degrees.
+     * @param {Number} rad An angle in radians.
+     * @returns {Number} The angle in degrees.
      */
     static toDeg(rad) {
         return rad * SmilesDrawer.MathHelper.degFactor;
@@ -99,14 +101,19 @@ SmilesDrawer.MathHelper = class MathHelper {
      * Converts degrees to radians.
      *
      * @static
-     * @param {number} deg An angle in degrees.
-     * @returns {number} The angle in radians.
+     * @param {Number} deg An angle in degrees.
+     * @returns {Number} The angle in radians.
      */
     static toRad(deg) {
         return deg * SmilesDrawer.MathHelper.radFactor;
     }
 }
 
+/** The factor to convert degrees to radians. */
 SmilesDrawer.MathHelper.radFactor = Math.PI / 180;
+
+/** The factor to convert radians to degrees. */
 SmilesDrawer.MathHelper.degFactor = 180 / Math.PI;
+
+/** Two times PI. */
 SmilesDrawer.MathHelper.twoPI = 2 * Math.PI;

@@ -3,8 +3,8 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
      * 
-     * @param {array} adjacencyMatrix A 2-dimensional array representing a graph.
-     * @returns {array} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
+     * @param {Array[]} adjacencyMatrix A 2-dimensional array representing a graph.
+     * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
      */
     static getRings(adjacencyMatrix) {
         if (adjacencyMatrix.length === 0) {
@@ -39,8 +39,8 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Creates a printable string from a matrix (2D array).
      * 
-     * @param {array} matrix A 2D array.
-     * @returns {string} A string representing the matrix.
+     * @param {Array[]} matrix A 2D array.
+     * @returns {String} A string representing the matrix.
      */
     static matrixToString(matrix) {
         let str = '';
@@ -59,8 +59,8 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Returnes the two path-included distance matrices used to find the sssr.
      * 
-     * @param {array} adjacencyMatrix An adjacency matrix.
-     * @returns {object} The path-included distance matrices. { p1, p2 }
+     * @param {Array[]} adjacencyMatrix An adjacency matrix.
+     * @returns {Object} The path-included distance matrices. { p1, p2 }
      */
     static getPathIncludedDistanceMatrices(adjacencyMatrix) {
         let length = adjacencyMatrix.length;
@@ -186,10 +186,10 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Get the ring candidates from the path-included distance matrices.
      * 
-     * @param {array} d The distance matrix.
-     * @param {array} pe1 A matrix containing the shortest paths.
-     * @param {array} pe2 A matrix containing the shortest paths + one vertex.
-     * @returns {array} The ring candidates.
+     * @param {Array[]} d The distance matrix.
+     * @param {Array[]} pe1 A matrix containing the shortest paths.
+     * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
+     * @returns {Array[]} The ring candidates.
      */
     static getRingCandidates(d, pe1, pe2) {
         let length = d.length;
@@ -226,12 +226,12 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Searches the candidates for the smallest set of smallest rings.
      * 
-     * @param {array} c The candidates.
-     * @param {array} d The distance matrix.
-     * @param {array} pe1 A matrix containing the shortest paths.
-     * @param {array} pe2 A matrix containing the shortest paths + one vertex.
-     * @param {number} nsssr The theoretical number of rings in the graph.
-     * @returns {array} The smallest set of smallest rings.
+     * @param {Array[]} c The candidates.
+     * @param {Array[]} d The distance matrix.
+     * @param {Array[]} pe1 A matrix containing the shortest paths.
+     * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
+     * @param {Number} nsssr The theoretical number of rings in the graph.
+     * @returns {Set[]} The smallest set of smallest rings.
      */
     static getSSSR(c, d, pe1, pe2, nsssr) {
         let cSssr = [];
@@ -272,8 +272,8 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Returns the number of edges in a graph defined by an adjacency matrix.
      * 
-     * @param {array} adjacencyMatrix An adjacency matrix.
-     * @returns {number} The number of edges in the graph defined by the adjacency matrix.
+     * @param {Array[]} adjacencyMatrix An adjacency matrix.
+     * @returns {Number} The number of edges in the graph defined by the adjacency matrix.
      */
     static getEdgeCount(adjacencyMatrix) {
         let edgeCount = 0;
@@ -293,8 +293,8 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Returns an edge list constructed form an adjacency matrix.
      * 
-     * @param {array} adjacencyMatrix An adjacency matrix.
-     * @returns {array} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
+     * @param {Array[]} adjacencyMatrix An adjacency matrix.
+     * @returns {Array[]} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
      */
     static getEdgeList(adjacencyMatrix) {
         let length = adjacencyMatrix.length;
@@ -314,8 +314,8 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Return a set of vertex indices contained in an array of bonds.
      * 
-     * @param {array} bonds An array of bonds.
-     * @returns {set} An array of vertices.
+     * @param {Array} bonds An array of bonds. A bond is defined as [ sourceVertexId, targetVertexId ].
+     * @returns {Set<Number>} An array of vertices.
      */
     static bondsToAtoms(bonds) {
         let atoms = new Set();
@@ -331,9 +331,9 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Checks whether or not a given path already exists in an array of paths.
      * 
-     * @param {array} pathSets An array of sets each representing a path.
-     * @param {set} pathSet A set representing a path.
-     * @returns {boolean} A boolean indicating whether or not a give path is contained within a set.
+     * @param {Set[]} pathSets An array of sets each representing a path.
+     * @param {Set<Number>} pathSet A set representing a path.
+     * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
      */
     static pathSetsContain(pathSets, pathSet) {
         for (let i = 0; i < pathSets.length; i++) {
@@ -356,9 +356,9 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Checks whether or not two sets are equal (contain the same elements).
      * 
-     * @param {set} setA A set.
-     * @param {set} setB A set.
-     * @returns {boolean} A boolean indicating whether or not the two sets are equal.
+     * @param {Set<Number>} setA A set.
+     * @param {Set<Number>} setB A set.
+     * @returns {Boolean} A boolean indicating whether or not the two sets are equal.
      */
     static areSetsEqual(setA, setB) {
         if (setA.size !== setB.size) {
@@ -377,9 +377,9 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Checks whether or not a set (setA) is a superset of another set (setB).
      * 
-     * @param {Set} setA A set.
-     * @param {Wet} setB A set.
-     * @returns {boolean} A boolean indicating whether or not setB is a superset of setA.
+     * @param {Set<Number>} setA A set.
+     * @param {Set<Number>} setB A set.
+     * @returns {Boolean} A boolean indicating whether or not setB is a superset of setA.
      */
     static isSupersetOf(setA, setB) {
         for (var element of setB) {

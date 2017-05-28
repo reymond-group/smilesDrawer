@@ -1,11 +1,24 @@
-/** A class wrapping a canvas element */
+/** 
+ * A class wrapping a canvas element.
+ * 
+ * @property {HTMLElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
+ * @property {CanvasRenderingContext2D} ctx The CanvasRenderingContext2D of the canvas associated with this CanvasWrapper instance.
+ * @property {Object} colors The colors object as defined in the SmilesDrawer options.
+ * @property {Object} opts The SmilesDrawer options.
+ * @property {Number} drawingWidth The width of the canvas.
+ * @property {Number} drawingHeight The height of the canvas.
+ * @property {Number} offsetX The horizontal offset required for centering the drawing.
+ * @property {Number} offsetY The vertical offset required for centering the drawing.
+ * @property {Number} fontLarge The large font size in pt.
+ * @property {Number} fontSmall The small font size in pt.
+ */
 SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * The constructor for the class CanvasWrapper.
      *
-     * @param {string|HTMLElement} target The canvas id or the canvas HTMLElement.
-     * @param {object} theme A theme from the smiles drawer options.
-     * @param {any} options The smiles drawer options object.
+     * @param {String|HTMLElement} target The canvas id or the canvas HTMLElement.
+     * @param {Object} theme A theme from the smiles drawer options.
+     * @param {Object} options The smiles drawer options object.
      */
     constructor(target, theme, options) {
         if (typeof target === 'string' || target instanceof String) {
@@ -16,7 +29,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
         this.ctx = this.canvas.getContext('2d');
         this.colors = theme;
-        this.opts = options
+        this.opts = options;
         this.drawingWidth = 0.0;
         this.drawingHeight = 0.0;
         this.offsetX = 0.0;
@@ -33,8 +46,8 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Update the width and height of the canvas
      * 
-     * @param {number} width 
-     * @param {number} height 
+     * @param {Number} width 
+     * @param {Number} height 
      */
     updateSize(width, height) {
         this.devicePixelRatio = window.devicePixelRatio || 1;
@@ -58,7 +71,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Sets a provided theme.
      *
-     * @param {object} theme A theme from the smiles drawer options.
+     * @param {Object} theme A theme from the smiles drawer options.
      */
     setTheme(theme) {
         this.colors = theme;
@@ -67,7 +80,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Scale the canvas based on vertex positions.
      *
-     * @param {array} vertices An array of vertices containing the vertices associated with the current molecule.
+     * @param {SmilesDrawer.Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
      */
     scale(vertices) {
         // Figure out the final size of the image
@@ -115,7 +128,6 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
     /**
      * Resets the transform of the canvas.
-     *
      */
     reset() {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -124,8 +136,8 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Returns the hex code of a color associated with a key from the current theme.
      *
-     * @param {string} key The color key in the theme (e.g. C, N, BACKGROUND, ...).
-     * @returns {string} A color hex value.
+     * @param {String} key The color key in the theme (e.g. C, N, BACKGROUND, ...).
+     * @returns {String} A color hex value.
      */
     getColor(key) {
         key = key.toUpperCase();
@@ -139,13 +151,13 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
     /**
      * Draws a circle to a canvas context.
-     * @param {number} x The x coordinate of the circles center.
-     * @param {number} y The y coordinate of the circles center.
-     * @param {number} radius The radius of the circle
-     * @param {string} color A hex encoded color.
-     * @param {boolean} [fill=true] Whether to fill or stroke the circle.
-     * @param {boolean} [debug=false] Draw in debug mode.
-     * @param {string} [debugText=''] A debug message.
+     * @param {Number} x The x coordinate of the circles center.
+     * @param {Number} y The y coordinate of the circles center.
+     * @param {Number} radius The radius of the circle
+     * @param {String} color A hex encoded color.
+     * @param {Boolean} [fill=true] Whether to fill or stroke the circle.
+     * @param {Boolean} [debug=false] Draw in debug mode.
+     * @param {String} [debugText=''] A debug message.
      */
     drawCircle(x, y, radius, color, fill = true, debug = false, debugText = '') {
         let ctx = this.ctx;
@@ -184,7 +196,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draw a line to a canvas.
      *
-     * @param {Line} line A line.
+     * @param {SmilesDrawer.Line} line A line.
      */
     drawLine(line) {
         if (isNaN(line.from.x) || isNaN(line.from.y) ||
@@ -253,8 +265,8 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draw a wedge on the canvas.
      *
-     * @param {Line} line A line.
-     * @param {number} width The wedge width.
+     * @param {SmilesDrawer.Line} line A line.
+     * @param {Number} width The wedge width.
      */
     drawWedge(line, width = 3.0) {
         if (isNaN(line.from.x) || isNaN(line.from.y) ||
@@ -330,8 +342,8 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draw a dashed wedge on the canvas.
      *
-     * @param {Line} line A line.
-     * @param {number} width The wedge width.
+     * @param {SmilesDrawer.Line} line A line.
+     * @param {Number} width The wedge width.
      */
     drawDashedWedge(line, width = 6.0) {
         if (isNaN(line.from.x) || isNaN(line.from.y) ||
@@ -429,9 +441,9 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draws a debug text message at a given position
      *
-     * @param {number} x The x coordinate.
-     * @param {number} y The y coordinate.
-     * @param {string} text The debug text.
+     * @param {Number} x The x coordinate.
+     * @param {Number} y The y coordinate.
+     * @param {String} text The debug text.
      */
     drawDebugText(x, y, text) {
         let ctx = this.ctx;
@@ -448,10 +460,10 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draw a ball to the canvas.
      *
-     * @param {number} x The x position of the text.
-     * @param {number} y The y position of the text.
-     * @param {string} elementName The name of the element (single-letter).
-     * @param {number} hydrogens The number of hydrogen atoms.
+     * @param {Number} x The x position of the text.
+     * @param {Number} y The y position of the text.
+     * @param {String} elementName The name of the element (single-letter).
+     * @param {Number} hydrogens The number of hydrogen atoms.
      */
     drawBall(x, y, elementName) {
         let ctx = this.ctx;
@@ -466,17 +478,20 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draw a text to the canvas.
      *
-     * @param {number} x The x position of the text.
-     * @param {number} y The y position of the text.
-     * @param {string} elementName The name of the element (single-letter).
-     * @param {number} hydrogens The number of hydrogen atoms.
-     * @param {string} direction The direction of the text in relation to the associated vertex.
-     * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
-     * @param {string} charge The charge of the atom.
-     * @param {number} isotope The isotope number.
-     * @param {object} [pseudoElements={}] An object containing pseudo elements or shortcut elements and their count. E.g. { 'F': 3 }, { 'O': 2, 'H': 1 }.
+     * @param {Number} x The x position of the text.
+     * @param {Number} y The y position of the text.
+     * @param {String} elementName The name of the element (single-letter).
+     * @param {Number} hydrogens The number of hydrogen atoms.
+     * @param {String} direction The direction of the text in relation to the associated vertex.
+     * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
+     * @param {String} charge The charge of the atom.
+     * @param {Number} isotope The isotope number.
+     * @param {Object[]} attachedPseudoElements A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
+     * @param {String} attachedPseudoElement[].element The element symbol.
+     * @param {Number} attachedPseudoElement[].count The number of occurences that match the key.
+     * @param {Number} attachedPseudoElement[].hyrogenCount The number of hydrogens attached to each atom matching the key.
      */
-    drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, pseudoElements = {}) {
+    drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
         let ctx = this.ctx;
         let offsetX = this.offsetX;
         let offsetY = this.offsetY;
@@ -624,17 +639,17 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
             return;
         }
 
-        for (let key in pseudoElements) {
-            if (!pseudoElements.hasOwnProperty(key)) {
+        for (let key in attachedPseudoElement) {
+            if (!attachedPseudoElement.hasOwnProperty(key)) {
                 continue;
             }
 
             let openParenthesisWidth = 0;
             let closeParenthesisWidth = 0;
             
-            let element = pseudoElements[key].element;
-            let elementCount = pseudoElements[key].count;
-            let hydrogenCount = pseudoElements[key].hydrogenCount;
+            let element = attachedPseudoElement[key].element;
+            let elementCount = attachedPseudoElement[key].count;
+            let hydrogenCount = attachedPseudoElement[key].hydrogenCount;
 
             ctx.font = this.fontLarge;
 
@@ -746,10 +761,10 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draws a dubug dot at a given coordinate and adds text.
      *
-     * @param {number} x The x coordinate.
-     * @param {number} y The y coordindate.
-     * @param {string} [debugText=''] A string.
-     * @param {string} [color='#f00'] A color in hex form.
+     * @param {Number} x The x coordinate.
+     * @param {Number} y The y coordindate.
+     * @param {String} [debugText=''] A string.
+     * @param {String} [color='#f00'] A color in hex form.
      */
     drawDebugPoint(x, y, debugText = '', color = '#f00') {
         this.drawCircle(x, y, 2, color, true, true, debugText);
@@ -758,7 +773,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draws a ring inside a provided ring, indicating aromaticity.
      *
-     * @param {Ring} ring A ring.
+     * @param {SmilesDrawer.Ring} ring A ring.
      */
     drawAromaticityRing(ring) {
         let ctx = this.ctx;

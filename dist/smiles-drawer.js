@@ -20,8 +20,8 @@ var SmilesDrawer = {
  * Cleans a SMILES string (removes non-valid characters)
  *
  * @static
- * @param {string} smiles A SMILES string.
- * @returns {string} The clean SMILES string.
+ * @param {String} smiles A SMILES string.
+ * @returns {String} The clean SMILES string.
  */
 SmilesDrawer.clean = function (smiles) {
     return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
@@ -31,8 +31,8 @@ SmilesDrawer.clean = function (smiles) {
  * Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
  *
  * @static
- * @param {objects} options SmilesDrawer options.
- * @param {string} [themeName='light'] The theme to apply.
+ * @param {Object} options SmilesDrawer options.
+ * @param {String} [themeName='light'] The theme to apply.
  */
 SmilesDrawer.apply = function (options) {
     var themeName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'light';
@@ -52,7 +52,7 @@ SmilesDrawer.apply = function (options) {
  * Parses the entered smiles string.
  * 
  * @static
- * @param {string} smiles A SMILES string.
+ * @param {String} smiles A SMILES string.
  * @param {Function} successCallback A callback that is called on success with the parse tree.
  * @param {Function} errorCallback A callback that is called with the error object on error.
  */
@@ -67,7 +67,9 @@ SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
         }
     }
 };
-/** A static class containing helper functions for array-related tasks. */
+/** 
+ * A static class containing helper functions for array-related tasks. 
+ */
 SmilesDrawer.ArrayHelper = function () {
     function ArrayHelper() {
         _classCallCheck(this, ArrayHelper);
@@ -80,8 +82,8 @@ SmilesDrawer.ArrayHelper = function () {
          * Clone an array or an object. If an object is passed, a shallow clone will be created.
          *
          * @static
-         * @param {array|object} arr The array or object to be cloned.
-         * @returns {array|object} A clone of the array or object.
+         * @param {*} arr The array or object to be cloned.
+         * @returns {*} A clone of the array or object.
          */
         value: function clone(arr) {
             var out = Array.isArray(arr) ? [] : {};
@@ -103,8 +105,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Returns a string representation of an array. If the array contains objects with an id property, the id property is printed for each of the elements.
          *
          * @static
-         * @param {array} arr An array.
-         * @returns {string} A string representation of the array.
+         * @param {Object[]} arr An array.
+         * @param {*} arr[].id If the array contains an object with the property 'id', the properties value is printed. Else, the array elements value is printend.
+         * @returns {String} A string representation of the array.
          */
 
     }, {
@@ -129,8 +132,8 @@ SmilesDrawer.ArrayHelper = function () {
          * Run a function for each element in the array. The element is supplied as an argument for the callback function
          *
          * @static
-         * @param {array} arr An array.
-         * @param {function} callback The callback function that is called for each element.
+         * @param {Array} arr An array.
+         * @param {Function} callback The callback function that is called for each element.
          */
 
     }, {
@@ -145,9 +148,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Return the array element from an array containing objects, where a property of the object is set to a given value.
          *
          * @static
-         * @param {array} arr An array.
-         * @param {string|number} property A property contained within an object in the array.
-         * @param {string|number} value The value of the property.
+         * @param {Array} arr An array.
+         * @param {String|Number} property A property contained within an object in the array.
+         * @param {String|Number} value The value of the property.
          * @returns {*} The array element matching the value.
          */
 
@@ -165,9 +168,12 @@ SmilesDrawer.ArrayHelper = function () {
          * Checks whether or not an array contains a given value. the options object passed as a second argument can contain three properties. value: The value to be searched for. property: The property that is to be searched for a given value. func: A function that is used as a callback to return either true or false in order to do a custom comparison.
          *
          * @static
-         * @param {array} arr An array.
-         * @param {object} options See method description.
-         * @returns {boolean} A boolean whether or not the array contains a value.
+         * @param {Array} arr An array.
+         * @param {Object} options See method description.
+         * @param {String} options.property The property on which to check.
+         * @param {*} options.value The value for which to check.
+         * @param {Function} [options.func=undefined] A custom property function.
+         * @returns {Boolean} A boolean whether or not the array contains a value.
          */
 
     }, {
@@ -200,9 +206,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Returns an array containing the intersection between two arrays. That is, values that are common to both arrays.
          *
          * @static
-         * @param {array} arrA An array.
-         * @param {array} arrB An array.
-         * @returns {array} The intersecting vlaues.
+         * @param {Array} arrA An array.
+         * @param {Array} arrB An array.
+         * @returns {Array} The intersecting vlaues.
          */
 
     }, {
@@ -225,8 +231,8 @@ SmilesDrawer.ArrayHelper = function () {
          * Returns an array of unique elements contained in an array.
          *
          * @static
-         * @param {array} arr An array.
-         * @returns {array} An array of unique elements contained within the array supplied as an argument.
+         * @param {Array} arr An array.
+         * @returns {Array} An array of unique elements contained within the array supplied as an argument.
          */
 
     }, {
@@ -243,9 +249,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Count the number of occurences of a value in an array.
          *
          * @static
-         * @param {array} arr An array.
+         * @param {Array} arr An array.
          * @param {*} value A value to be counted.
-         * @returns {number} The number of occurences of a value in the array.
+         * @returns {Number} The number of occurences of a value in the array.
          */
 
     }, {
@@ -266,9 +272,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Toggles the value of an array. If a value is not contained in an array, the array returned will contain all the values of the original array including the value. If a value is contained in an array, the array returned will contain all the values of the original array excluding the value.
          *
          * @static
-         * @param {array} arr An array.
+         * @param {Array} arr An array.
          * @param {*} value A value to be toggled.
-         * @returns {array} The toggled array.
+         * @returns {Array} The toggled array.
          */
 
     }, {
@@ -301,9 +307,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Remove a value from an array.
          *
          * @static
-         * @param {array} arr An array.
+         * @param {Array} arr An array.
          * @param {*} value A value to be removed.
-         * @returns {array} A new array with the element with a given value removed.
+         * @returns {Array} A new array with the element with a given value removed.
          */
 
     }, {
@@ -324,9 +330,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Remove a value from an array with unique values.
          *
          * @static
-         * @param {array} arr An array.
+         * @param {Array} arr An array.
          * @param {*} value A value to be removed.
-         * @returns {array} An array with the element with a given value removed.
+         * @returns {Array} An array with the element with a given value removed.
          */
 
     }, {
@@ -345,9 +351,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Remove all elements contained in one array from another array.
          *
          * @static
-         * @param {array} arrA The array to be filtered.
-         * @param {array} arrB The array containing elements that will be removed from the other array.
-         * @returns {array} The filtered array.
+         * @param {Array} arrA The array to be filtered.
+         * @param {Array} arrB The array containing elements that will be removed from the other array.
+         * @returns {Array} The filtered array.
          */
 
     }, {
@@ -362,9 +368,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Merges two arrays and returns the result. The second array will be appended to the second array.
          *
          * @static
-         * @param {array} arrA An array.
-         * @param {array} arrB An array.
-         * @returns {array} The merged array.
+         * @param {Array} arrA An array.
+         * @param {Array} arrB An array.
+         * @returns {Array} The merged array.
          */
 
     }, {
@@ -387,9 +393,9 @@ SmilesDrawer.ArrayHelper = function () {
          * Checks whether or not an array contains all the elements of another array, without regard to the order.
          *
          * @static
-         * @param {array} arrA An array.
-         * @param {array} arrB An array.
-         * @returns {boolean} A boolean indicating whether or not both array contain the same elements.
+         * @param {Array} arrA An array.
+         * @param {Array} arrB An array.
+         * @returns {Boolean} A boolean indicating whether or not both array contain the same elements.
          */
 
     }, {
@@ -410,8 +416,10 @@ SmilesDrawer.ArrayHelper = function () {
         /**
          * Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...
          *
-         * @param {array} arr An array of objects { atomicNumber: 6, vertexId: 2 }.
-         * @returns {array} The sorted array.
+         * @param {Object[]} arr An array of vertex ids with their associated atomic numbers.
+         * @param {Number} arr[].vertexId A vertex id.
+         * @param {Number} arr[].atomicNumber The atomic number associated with the vertex id.
+         * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
          */
 
     }, {
@@ -440,8 +448,8 @@ SmilesDrawer.ArrayHelper = function () {
         /**
          * Copies a an n-dimensional array.
          * 
-         * @param {array} arr The array to be copied.
-         * @returns {array} The copy.
+         * @param {Array} arr The array to be copied.
+         * @returns {Array} The copy.
          */
 
     }, {
@@ -466,13 +474,40 @@ SmilesDrawer.ArrayHelper = function () {
     return ArrayHelper;
 }();
 
-/** A class representing an atom */
+/** 
+ * A class representing an atom.
+ * 
+ * @property {String} element The element symbol of this atom. Single-letter symbols are always uppercase. Examples: H, C, F, Br, Si, ...
+ * @property {Boolean} drawExplicit A boolean indicating whether or not this atom is drawn explicitly (for example, a carbon atom). This overrides the default behaviour.
+ * @property {Object[]} ringbonds An array containing the ringbond ids and bond types as specified in the original SMILE.
+ * @property {Number} ringbonds[].id The ringbond id as defined in the SMILES.
+ * @property {String} ringbonds[].bondType The bond type of the ringbond as defined in the SMILES.
+ * @property {Number[]} rings The ids of rings which contain this atom.
+ * @property {String} bondType The bond type associated with this array. Examples: -, =, #, ...
+ * @property {Boolean} isBridge A boolean indicating whether or not this atom is part of a bridge in a bridged ring (contained by the largest ring).
+ * @property {Boolean} isBridgeNode A boolean indicating whether or not this atom is a bridge node (a member of the largest ring in a bridged ring which is connected to a bridge-atom).
+ * @property {Number[]} originalRings Used to back up rings when they are replaced by a bridged ring.
+ * @property {Number} bridgedRing The id of the bridged ring if the atom is part of a bridged ring.
+ * @property {Number[]} anchoredRings The ids of the rings that are anchored to this atom. The centers of anchored rings are translated when this atom is translated.
+ * @property {Object} bracket If this atom is defined as a bracket atom in the original SMILES, this object contains all the bracket information. Example: { hcount: {Number}, charge: ['--', '-', '+', '++'], isotope: {Number} }.
+ * @property {Number} chiral EXPERIMENTAL: Specifies chirality.
+ * @property {Object[]} attachedPseudoElements A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
+ * @property {String} attachedPseudoElement[].element The element symbol.
+ * @property {Number} attachedPseudoElement[].count The number of occurences that match the key.
+ * @property {Number} attachedPseudoElement[].hyrogenCount The number of hydrogens attached to each atom matching the key.
+ * @property {Boolean} hasAttachedPseudoElements A boolean indicating whether or not this attom will be drawn with an attached pseudo element or concatinated elements.
+ * @property {Boolean} isDrawn A boolean indicating whether or not this atom is drawn. In contrast to drawExplicit, the bond is drawn neither.
+ * @property {Boolean} isConnectedToRing A boolean indicating whether or not this atom is directly connected (but not a member of) a ring.
+ * @property {String[]} neighbouringElements An array containing the element symbols of neighbouring atoms.
+ * @property {Boolean} isPartOfAromaticRing A boolean indicating whether or not this atom is part of an explicitly defined aromatic ring. Example: c1ccccc1.
+ * @property {Number} bondCount The number of bonds in which this atom is participating.
+ */
 SmilesDrawer.Atom = function () {
     /**
      * The constructor of the class Atom.
      *
-     * @param {string} element The one-letter code of the element.
-     * @param {string} [bondType='-'] The type of the bond associated with this atom.
+     * @param {String} element The one-letter code of the element.
+     * @param {String} [bondType='-'] The type of the bond associated with this atom.
      */
     function Atom(element) {
         var bondType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '-';
@@ -480,11 +515,10 @@ SmilesDrawer.Atom = function () {
         _classCallCheck(this, Atom);
 
         this.element = element.length === 1 ? element.toUpperCase() : element;
-        this.explicit = false;
+        this.drawExplicit = false;
         this.ringbonds = [];
         this.rings = [];
         this.bondType = bondType;
-        this.isTerminal = false;
         this.isBridge = false;
         this.isBridgeNode = false;
         this.originalRings = [];
@@ -505,7 +539,7 @@ SmilesDrawer.Atom = function () {
     /**
      * Adds a neighbouring element to this atom.
      * 
-     * @param {string} element A string representing an element.
+     * @param {String} element A string representing an element.
      */
 
 
@@ -517,9 +551,9 @@ SmilesDrawer.Atom = function () {
 
         /**
          * Attaches a pseudo element (e.g. Ac) to the atom.
-         * @param {string} element The element identifier (e.g. Br, C, ...).
-         * @param {string} previousElement The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated).
-         * @param {number} [hydrogenCount=0] The number of hydrogens for the element.
+         * @param {String} element The element identifier (e.g. Br, C, ...).
+         * @param {String} previousElement The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated).
+         * @param {Number} [hydrogenCount=0] The number of hydrogens for the element.
          */
 
     }, {
@@ -546,7 +580,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Returns the attached pseudo elements sorted by hydrogen count (ascending).
          *
-         * @returns {object} The sorted attached pseudo elements.
+         * @returns {Object} The sorted attached pseudo elements.
          */
 
     }, {
@@ -565,7 +599,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Returns the number of attached pseudo elements.
          *
-         * @returns {number} The number of attached pseudo elements.
+         * @returns {Number} The number of attached pseudo elements.
          */
 
     }, {
@@ -577,7 +611,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
          *
-         * @param {number} ringId A ring id.
+         * @param {Number} ringId A ring id.
          */
 
     }, {
@@ -591,7 +625,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Returns the number of ringbonds (breaks in rings to generate the MST of the smiles) within this atom is connected to.
          *
-         * @returns {number} The number of ringbonds this atom is connected to.
+         * @returns {Number} The number of ringbonds this atom is connected to.
          */
 
     }, {
@@ -603,7 +637,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Check whether or not this atom is rotatable. The atom is deemed rotatable if it is neither a member of a ring nor participating in a bond other than a single bond. TODO: Check the chemistry.
          *
-         * @returns {boolean} A boolean indicating whether or not this atom is rotatable.
+         * @returns {Boolean} A boolean indicating whether or not this atom is rotatable.
          */
 
     }, {
@@ -615,7 +649,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Returns whether or not this atom participates in ringbonds (breaks in the ring in the MST).
          *
-         * @returns {boolean} A boolean indicating whether or not this atom is associated with a ringbond.
+         * @returns {Boolean} A boolean indicating whether or not this atom is associated with a ringbond.
          */
 
     }, {
@@ -627,7 +661,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Returns the id of the ringbond with the highest id.
          *
-         * @returns {number} The highest ringbond id associated with this atom.
+         * @returns {Number} The highest ringbond id associated with this atom.
          */
 
     }, {
@@ -646,7 +680,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Checks whether or not this atom is part of a ring.
          * 
-         * @returns {boolean} A boolean indicating whether or not this atom is part of a ring.
+         * @returns {Boolean} A boolean indicating whether or not this atom is part of a ring.
          */
 
     }, {
@@ -658,8 +692,8 @@ SmilesDrawer.Atom = function () {
         /**
          * Checks whether or not this atom is a member of a given ring.
          *
-         * @param {number} ringId A ring id.
-         * @returns {boolean} A boolean indicating whether or not this atom is a member of a given ring.
+         * @param {Number} ringId A ring id.
+         * @returns {Boolean} A boolean indicating whether or not this atom is a member of a given ring.
          */
 
     }, {
@@ -705,9 +739,9 @@ SmilesDrawer.Atom = function () {
         /**
          * Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.
          *
-         * @param {Atom} atomA An atom.
-         * @param {Atom} atomB An atom.
-         * @returns {boolean} A boolean indicating whether or not two atoms share a common ringbond.
+         * @param {SmilesDrawer.Atom} atomA An atom.
+         * @param {SmilesDrawer.Atom} atomB An atom.
+         * @returns {Boolean} A boolean indicating whether or not two atoms share a common ringbond.
          */
 
     }, {
@@ -727,9 +761,9 @@ SmilesDrawer.Atom = function () {
         /**
          * Get the highest numbered ringbond shared by two atoms. A ringbond is a break in a ring created when generating the spanning tree of a structure.
          *
-         * @param {Atom} atomA An atom.
-         * @param {Atom} atomB An atom.
-         * @returns {number} The number of the maximum ringbond shared by two atoms.
+         * @param {SmilesDrawer.Atom} atomA An atom.
+         * @param {SmilesDrawer.Atom} atomB An atom.
+         * @returns {Number} The number of the maximum ringbond shared by two atoms.
          */
 
     }, {
@@ -759,8 +793,8 @@ SmilesDrawer.Atom = function () {
         /**
          * Returns the order of this atom given a central atom.
          * 
-         * @param {number} center The id of the central atom in respect to which the order is defined.
-         * @returns {number} The order of this atom in respect to the center atom.
+         * @param {Number} center The id of the central atom in respect to which the order is defined.
+         * @returns {Number} The order of this atom in respect to the center atom.
          */
 
     }, {
@@ -772,8 +806,8 @@ SmilesDrawer.Atom = function () {
         /**
          * Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
          *
-         * @param {number} The id of the central atom in respect to which the order is defined.
-         * @param {number} The order of this atom.
+         * @param {Number} center The id of the central atom in respect to which the order is defined.
+         * @param {Number} order The order of this atom.
          */
 
     }, {
@@ -785,8 +819,8 @@ SmilesDrawer.Atom = function () {
         /**
          * Check whether or not the neighbouring elements of this atom equal the supplied array.
          * 
-         * @param {array} arr An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N']
-         * @returns {boolean} A boolean indicating whether or not the neighbours match the supplied array of elements.
+         * @param {String[]} arr An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N']
+         * @returns {Boolean} A boolean indicating whether or not the neighbours match the supplied array of elements.
          */
 
     }, {
@@ -811,7 +845,7 @@ SmilesDrawer.Atom = function () {
         /**
          * Get the atomic number of this atom.
          * 
-         * @returns {number} The atomic number of this atom.
+         * @returns {Number} The atomic number of this atom.
          */
 
     }, {
@@ -823,11 +857,11 @@ SmilesDrawer.Atom = function () {
         /**
          * Sorts an array of vertices by their respecitve atomic number.
          *
-         * @param {Vertex} root The central vertex
-         * @param {array} neighbours An array of vertex ids.
-         * @param {array} vertices An array containing the vertices associated with the current molecule.
-         * @param {array} rings An array containing the rings associated with the current molecule.
-         * @returns {array} The array sorted by atomic number.
+         * @param {SmilesDrawer.Vertex} root The central vertex
+         * @param {Number[]} neighbours An array of vertex ids.
+         * @param {SmilesDrawer.Vertex[]} vertices An array containing the vertices associated with the current molecule.
+         * @param {SmilesDrawer.Ring[]} rings An array containing the rings associated with the current molecule.
+         * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
          */
 
     }], [{
@@ -851,8 +885,10 @@ SmilesDrawer.Atom = function () {
         /**
          * Checks wheter or not two atoms have the same atomic number
          *
-         * @param {array} sortedAtomicNumbers An array of objects { atomicNumber: 6, vertexId: 2 }.
-         * @returns {boolean} A boolean indicating whether or not there are duplicate atomic numbers.
+         * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
+         * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
+         * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
+         * @returns {Boolean} A boolean indicating whether or not there are duplicate atomic numbers.
          */
 
     }, {
@@ -876,8 +912,10 @@ SmilesDrawer.Atom = function () {
         /**
          * Returns sets of duplicate atomic numbers.
          *
-         * @param {array} sortedAtomicNumbers An array of objects { atomicNumber: 6, vertexId: 2 }.
-         * @returns {array} An array of arrays containing the indices of duplicate atomic numbers.
+         * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
+         * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
+         * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
+         * @returns {Array[]} An array of arrays containing the indices of duplicate atomic numbers.
          */
 
     }, {
@@ -911,6 +949,9 @@ SmilesDrawer.Atom = function () {
     return Atom;
 }();
 
+/**
+ * A map mapping element symbols to their maximum bonds.
+ */
 SmilesDrawer.Atom.maxBonds = {
     'C': 4,
     'N': 3,
@@ -924,6 +965,9 @@ SmilesDrawer.Atom.maxBonds = {
     'Br': 1
 };
 
+/**
+ * A map mapping element symbols to the atomic number.
+ */
 SmilesDrawer.Atom.atomicNumbers = {
     'H': 1,
     'He': 2,
@@ -1177,14 +1221,27 @@ SmilesDrawer.Atom.mass = {
     'Uus': 117,
     'Uuo': 118
 };
-/** A class wrapping a canvas element */
+/** 
+ * A class wrapping a canvas element.
+ * 
+ * @property {HTMLElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
+ * @property {CanvasRenderingContext2D} ctx The CanvasRenderingContext2D of the canvas associated with this CanvasWrapper instance.
+ * @property {Object} colors The colors object as defined in the SmilesDrawer options.
+ * @property {Object} opts The SmilesDrawer options.
+ * @property {Number} drawingWidth The width of the canvas.
+ * @property {Number} drawingHeight The height of the canvas.
+ * @property {Number} offsetX The horizontal offset required for centering the drawing.
+ * @property {Number} offsetY The vertical offset required for centering the drawing.
+ * @property {Number} fontLarge The large font size in pt.
+ * @property {Number} fontSmall The small font size in pt.
+ */
 SmilesDrawer.CanvasWrapper = function () {
     /**
      * The constructor for the class CanvasWrapper.
      *
-     * @param {string|HTMLElement} target The canvas id or the canvas HTMLElement.
-     * @param {object} theme A theme from the smiles drawer options.
-     * @param {any} options The smiles drawer options object.
+     * @param {String|HTMLElement} target The canvas id or the canvas HTMLElement.
+     * @param {Object} theme A theme from the smiles drawer options.
+     * @param {Object} options The smiles drawer options object.
      */
     function CanvasWrapper(target, theme, options) {
         _classCallCheck(this, CanvasWrapper);
@@ -1214,8 +1271,8 @@ SmilesDrawer.CanvasWrapper = function () {
     /**
      * Update the width and height of the canvas
      * 
-     * @param {number} width 
-     * @param {number} height 
+     * @param {Number} width 
+     * @param {Number} height 
      */
 
 
@@ -1241,7 +1298,7 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Sets a provided theme.
          *
-         * @param {object} theme A theme from the smiles drawer options.
+         * @param {Object} theme A theme from the smiles drawer options.
          */
 
     }, {
@@ -1253,7 +1310,7 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Scale the canvas based on vertex positions.
          *
-         * @param {array} vertices An array of vertices containing the vertices associated with the current molecule.
+         * @param {SmilesDrawer.Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
          */
 
     }, {
@@ -1304,7 +1361,6 @@ SmilesDrawer.CanvasWrapper = function () {
 
         /**
          * Resets the transform of the canvas.
-         *
          */
 
     }, {
@@ -1316,8 +1372,8 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Returns the hex code of a color associated with a key from the current theme.
          *
-         * @param {string} key The color key in the theme (e.g. C, N, BACKGROUND, ...).
-         * @returns {string} A color hex value.
+         * @param {String} key The color key in the theme (e.g. C, N, BACKGROUND, ...).
+         * @returns {String} A color hex value.
          */
 
     }, {
@@ -1334,13 +1390,13 @@ SmilesDrawer.CanvasWrapper = function () {
 
         /**
          * Draws a circle to a canvas context.
-         * @param {number} x The x coordinate of the circles center.
-         * @param {number} y The y coordinate of the circles center.
-         * @param {number} radius The radius of the circle
-         * @param {string} color A hex encoded color.
-         * @param {boolean} [fill=true] Whether to fill or stroke the circle.
-         * @param {boolean} [debug=false] Draw in debug mode.
-         * @param {string} [debugText=''] A debug message.
+         * @param {Number} x The x coordinate of the circles center.
+         * @param {Number} y The y coordinate of the circles center.
+         * @param {Number} radius The radius of the circle
+         * @param {String} color A hex encoded color.
+         * @param {Boolean} [fill=true] Whether to fill or stroke the circle.
+         * @param {Boolean} [debug=false] Draw in debug mode.
+         * @param {String} [debugText=''] A debug message.
          */
 
     }, {
@@ -1386,7 +1442,7 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Draw a line to a canvas.
          *
-         * @param {Line} line A line.
+         * @param {SmilesDrawer.Line} line A line.
          */
 
     }, {
@@ -1455,8 +1511,8 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Draw a wedge on the canvas.
          *
-         * @param {Line} line A line.
-         * @param {number} width The wedge width.
+         * @param {SmilesDrawer.Line} line A line.
+         * @param {Number} width The wedge width.
          */
 
     }, {
@@ -1534,8 +1590,8 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Draw a dashed wedge on the canvas.
          *
-         * @param {Line} line A line.
-         * @param {number} width The wedge width.
+         * @param {SmilesDrawer.Line} line A line.
+         * @param {Number} width The wedge width.
          */
 
     }, {
@@ -1635,9 +1691,9 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Draws a debug text message at a given position
          *
-         * @param {number} x The x coordinate.
-         * @param {number} y The y coordinate.
-         * @param {string} text The debug text.
+         * @param {Number} x The x coordinate.
+         * @param {Number} y The y coordinate.
+         * @param {String} text The debug text.
          */
 
     }, {
@@ -1657,10 +1713,10 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Draw a ball to the canvas.
          *
-         * @param {number} x The x position of the text.
-         * @param {number} y The y position of the text.
-         * @param {string} elementName The name of the element (single-letter).
-         * @param {number} hydrogens The number of hydrogen atoms.
+         * @param {Number} x The x position of the text.
+         * @param {Number} y The y position of the text.
+         * @param {String} elementName The name of the element (single-letter).
+         * @param {Number} hydrogens The number of hydrogen atoms.
          */
 
     }, {
@@ -1678,21 +1734,24 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Draw a text to the canvas.
          *
-         * @param {number} x The x position of the text.
-         * @param {number} y The y position of the text.
-         * @param {string} elementName The name of the element (single-letter).
-         * @param {number} hydrogens The number of hydrogen atoms.
-         * @param {string} direction The direction of the text in relation to the associated vertex.
-         * @param {boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
-         * @param {string} charge The charge of the atom.
-         * @param {number} isotope The isotope number.
-         * @param {object} [pseudoElements={}] An object containing pseudo elements or shortcut elements and their count. E.g. { 'F': 3 }, { 'O': 2, 'H': 1 }.
+         * @param {Number} x The x position of the text.
+         * @param {Number} y The y position of the text.
+         * @param {String} elementName The name of the element (single-letter).
+         * @param {Number} hydrogens The number of hydrogen atoms.
+         * @param {String} direction The direction of the text in relation to the associated vertex.
+         * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
+         * @param {String} charge The charge of the atom.
+         * @param {Number} isotope The isotope number.
+         * @param {Object[]} attachedPseudoElements A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
+         * @param {String} attachedPseudoElement[].element The element symbol.
+         * @param {Number} attachedPseudoElement[].count The number of occurences that match the key.
+         * @param {Number} attachedPseudoElement[].hyrogenCount The number of hydrogens attached to each atom matching the key.
          */
 
     }, {
         key: 'drawText',
         value: function drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope) {
-            var pseudoElements = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : {};
+            var attachedPseudoElement = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : {};
 
             var ctx = this.ctx;
             var offsetX = this.offsetX;
@@ -1841,17 +1900,17 @@ SmilesDrawer.CanvasWrapper = function () {
                 return;
             }
 
-            for (var key in pseudoElements) {
-                if (!pseudoElements.hasOwnProperty(key)) {
+            for (var key in attachedPseudoElement) {
+                if (!attachedPseudoElement.hasOwnProperty(key)) {
                     continue;
                 }
 
                 var openParenthesisWidth = 0;
                 var closeParenthesisWidth = 0;
 
-                var element = pseudoElements[key].element;
-                var elementCount = pseudoElements[key].count;
-                var hydrogenCount = pseudoElements[key].hydrogenCount;
+                var element = attachedPseudoElement[key].element;
+                var elementCount = attachedPseudoElement[key].count;
+                var hydrogenCount = attachedPseudoElement[key].hydrogenCount;
 
                 ctx.font = this.fontLarge;
 
@@ -1961,10 +2020,10 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Draws a dubug dot at a given coordinate and adds text.
          *
-         * @param {number} x The x coordinate.
-         * @param {number} y The y coordindate.
-         * @param {string} [debugText=''] A string.
-         * @param {string} [color='#f00'] A color in hex form.
+         * @param {Number} x The x coordinate.
+         * @param {Number} y The y coordindate.
+         * @param {String} [debugText=''] A string.
+         * @param {String} [color='#f00'] A color in hex form.
          */
 
     }, {
@@ -1979,7 +2038,7 @@ SmilesDrawer.CanvasWrapper = function () {
         /**
          * Draws a ring inside a provided ring, indicating aromaticity.
          *
-         * @param {Ring} ring A ring.
+         * @param {SmilesDrawer.Ring} ring A ring.
          */
 
     }, {
@@ -2012,12 +2071,23 @@ SmilesDrawer.CanvasWrapper = function () {
 
     return CanvasWrapper;
 }();
-/** The main class of the application representing the smiles drawer */
+/** 
+ * The main class of the application representing the smiles drawer 
+ * 
+ * @property {SmilesDrawer.Graph} graph The graph associated with this SmilesDrawer.Drawer instance.
+ * @property {Number} ringIdCounter An internal counter to keep track of ring ids.
+ * @property {Number} ringConnectionIdCounter An internal counter to keep track of ring connection ids.
+ * @property {SmilesDrawer.CanvasWrapper} canvasWrapper The SmilesDrawer.CanvasWrapper associated with this SmilesDrawer.Drawer instance.
+ * @property {Number} totalOverlapScore The current internal total overlap score.
+ * @property {Object} defaultOptions The default options.
+ * @property {Object} opts The merged options.
+ * @property {Object} theme The current theme.
+ */
 SmilesDrawer.Drawer = function () {
     /**
      * The constructor for the class SmilesDrawer.
      *
-     * @param {object} options An object containing custom values for different options. It is merged with the default options.
+     * @param {Object} options An object containing custom values for different options. It is merged with the default options.
      */
     function Drawer(options) {
         _classCallCheck(this, Drawer);
@@ -2026,7 +2096,6 @@ SmilesDrawer.Drawer = function () {
         this.ringIdCounter = 0;
         this.ringConnectionIdCounter = 0;
         this.canvasWrapper = null;
-        this.direction = 1;
         this.totalOverlapScore = 0;
 
         this.defaultOptions = {
@@ -2085,7 +2154,6 @@ SmilesDrawer.Drawer = function () {
 
     /**
      * A helper method to extend the default options with user supplied ones.
-     *
      */
 
 
@@ -2129,10 +2197,10 @@ SmilesDrawer.Drawer = function () {
         /**
          * Draws the parsed smiles data to a canvas element.
          *
-         * @param {object} data The tree returned by the smiles parser.
-         * @param {string|HTMLElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
-         * @param {string} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
-         * @param {boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+         * @param {Object} data The tree returned by the smiles parser.
+         * @param {String|HTMLElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+         * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+         * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
          */
         value: function draw(data, target) {
             var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
@@ -2259,8 +2327,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the number of rings this edge is a part of.
          *
-         * @param {number} edgeId The id of an edge.
-         * @returns {number} The number of rings the provided edge is part of.
+         * @param {Number} edgeId The id of an edge.
+         * @returns {Number} The number of rings the provided edge is part of.
          */
 
     }, {
@@ -2276,7 +2344,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns an array containing the bridged rings associated with this  molecule.
          *
-         * @returns {array} An array containing all bridged rings associated with this molecule.
+         * @returns {SmilesDrawer.Ring[]} An array containing all bridged rings associated with this molecule.
          */
 
     }, {
@@ -2296,7 +2364,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns an array containing all fused rings associated with this molecule.
          *
-         * @returns {array} An array containing all fused rings associated with this molecule.
+         * @returns {SmilesDrawer.Ring[]} An array containing all fused rings associated with this molecule.
          */
 
     }, {
@@ -2316,7 +2384,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns an array containing all spiros associated with this molecule.
          *
-         * @returns {array} An array containing all spiros associated with this molecule.
+         * @returns {SmilesDrawer.Ring[]} An array containing all spiros associated with this molecule.
          */
 
     }, {
@@ -2336,7 +2404,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings); Insiders Count (the number of vertices contained within a bridged ring)
          *
-         * @returns {string} A string as described in the method description.
+         * @returns {String} A string as described in the method description.
          */
 
     }, {
@@ -2363,7 +2431,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the total overlap score of the current molecule.
          *
-         * @returns {number} The overlap score.
+         * @returns {Number} The overlap score.
          */
 
     }, {
@@ -2375,7 +2443,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the ring count of the current molecule.
          *
-         * @returns {number} The ring count.
+         * @returns {Number} The ring count.
          */
 
     }, {
@@ -2387,7 +2455,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Checks whether or not the current molecule  a bridged ring.
          *
-         * @returns {boolean} A boolean indicating whether or not the current molecule  a bridged ring.
+         * @returns {Boolean} A boolean indicating whether or not the current molecule  a bridged ring.
          */
 
     }, {
@@ -2399,7 +2467,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the number of heavy atoms (non-hydrogen) in the current molecule.
          *
-         * @returns {number} The heavy atom count.
+         * @returns {Number} The heavy atom count.
          */
 
     }, {
@@ -2419,9 +2487,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond represents the break in a ring introduced when creating the MST. If the two vertices supplied as arguments are not part of a common ringbond, the method returns null.
          *
-         * @param {Vertex} vertexA A vertex.
-         * @param {Vertex} vertexB A vertex.
-         * @returns {string|null} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
+         * @param {SmilesDrawer.Vertex} vertexA A vertex.
+         * @param {SmilesDrawer.Vertex} vertexB A vertex.
+         * @returns {String|null} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
          */
 
     }, {
@@ -2453,7 +2521,6 @@ SmilesDrawer.Drawer = function () {
 
         /**
          * Initializes rings and ringbonds for the current molecule.
-         *
          */
 
     }, {
@@ -2575,8 +2642,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns all rings connected by bridged bonds starting from the ring with the supplied ring id.
          *
-         * @param {number} ringId A ring id.
-         * @returns {array} An array containing all ring ids of rings part of a bridged ring system.
+         * @param {Number} ringId A ring id.
+         * @returns {Number[]} An array containing all ring ids of rings part of a bridged ring system.
          */
 
     }, {
@@ -2607,8 +2674,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Checks whether or not a ring is part of a bridged ring.
          *
-         * @param {number} ringId A ring id.
-         * @returns {boolean} A boolean indicating whether or not the supplied ring (by id) is part of a bridged ring system.
+         * @param {Number} ringId A ring id.
+         * @returns {Boolean} A boolean indicating whether or not the supplied ring (by id) is part of a bridged ring system.
          */
 
     }, {
@@ -2627,9 +2694,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Creates a bridged ring.
          *
-         * @param {array} ringIds An array of ids of rings involved in the bridged ring.
-         * @param {number} sourceVertexId The vertex id to start the bridged ring discovery from.
-         * @returns {Ring} The bridged ring.
+         * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
+         * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
+         * @returns {SmilesDrawer.Ring} The bridged ring.
          */
 
     }, {
@@ -2760,9 +2827,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Checks whether or not two vertices are in the same ring.
          *
-         * @param {Vertex} vertexA A vertex.
-         * @param {Vertex} vertexB A vertex.
-         * @returns {boolean} A boolean indicating whether or not the two vertices are in the same ring.
+         * @param {SmilesDrawer.Vertex} vertexA A vertex.
+         * @param {SmilesDrawer.Vertex} vertexB A vertex.
+         * @returns {Boolean} A boolean indicating whether or not the two vertices are in the same ring.
          */
 
     }, {
@@ -2784,9 +2851,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns an array of ring ids shared by both vertices.
          *
-         * @param {Vertex} vertexA A vertex.
-         * @param {Vertex} vertexB A vertex.
-         * @returns {array} An array of ids of rings shared by the two vertices.
+         * @param {SmilesDrawer.Vertex} vertexA A vertex.
+         * @param {SmilesDrawer.Vertex} vertexB A vertex.
+         * @returns {Number[]} An array of ids of rings shared by the two vertices.
          */
 
     }, {
@@ -2808,9 +2875,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the smallest ring shared by the two vertices.
          *
-         * @param {Vertex} vertexA A vertex.
-         * @param {Vertex} vertexB A vertex.
-         * @returns {Ring|null} If a smallest common ring exists, that ring, else null.
+         * @param {SmilesDrawer.Vertex} vertexA A vertex.
+         * @param {SmilesDrawer.Vertex} vertexB A vertex.
+         * @returns {SmilesDrawer.Ring|null} If a smallest common ring exists, that ring, else null.
          */
 
     }, {
@@ -2835,9 +2902,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the aromatic or largest ring shared by the two vertices.
          *
-         * @param {Vertex} vertexA A vertex.
-         * @param {Vertex} vertexB A vertex.
-         * @returns {Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
+         * @param {SmilesDrawer.Vertex} vertexA A vertex.
+         * @param {SmilesDrawer.Vertex} vertexB A vertex.
+         * @returns {SmilesDrawer.Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
          */
 
     }, {
@@ -2865,10 +2932,10 @@ SmilesDrawer.Drawer = function () {
         /**
         * Returns an array of vertices positioned at a specified location.
         *
-        * @param {Vector2} position The position to search for vertices.
-        * @param {number} radius The radius within to search.
-        * @param {number} excludeVertexId A vertex id to be excluded from the search results.
-        * @returns {array} An array containing vertex ids in a given location.
+        * @param {SmilesDrawer.Vector2} position The position to search for vertices.
+        * @param {Number} radius The radius within to search.
+        * @param {Number} excludeVertexId A vertex id to be excluded from the search results.
+        * @returns {Number[]} An array containing vertex ids in a given location.
         */
 
     }, {
@@ -2896,8 +2963,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the closest vertex (connected as well as unconnected).
          *
-         * @param {Vertex} vertex The vertex of which to find the closest other vertex.
-         * @returns {Vertex} The closest vertex.
+         * @param {SmilesDrawer.Vertex} vertex The vertex of which to find the closest other vertex.
+         * @returns {SmilesDrawer.Vertex} The closest vertex.
          */
 
     }, {
@@ -2927,8 +2994,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the closest vertex (connected as well as unconnected), which is an endpoint.
          *
-         * @param {Vertex} vertex The vertex of which to find the closest other vertex.
-         * @returns {Vertex} The closest endpoint vertex.
+         * @param {SmilesDrawer.Vertex} vertex The vertex of which to find the closest other vertex.
+         * @returns {SmilesDrawer.Vertex} The closest endpoint vertex.
          */
 
     }, {
@@ -2956,54 +3023,10 @@ SmilesDrawer.Drawer = function () {
         }
 
         /**
-         * Returns the rings and vertices contained in a sub-graph.
-         *
-         * @param {number} vertexId The vertex id to start the sub-graph search from
-         * @param {number} previousId The vertex id in the opposite of which the search will be started.
-         * @returns {object} An object containing two arrays, one with the vertices in the subgraph and one with the rings in the subgraph.
-         */
-        /*
-        getBranch(vertexId, previousId) {
-            let vertices = [];
-            let rings = [];
-            let that = this;
-            
-            let recurse = function (v, p) {
-                let vertex = that.graph.vertices[v];
-                
-                for (var i = 0; i < vertex.value.rings.length; i++) {
-                    rings.push(vertex.value.rings[i]);
-                }
-                 for (var i = 0; i < vertex.children.length; i++) {
-                    let child = vertex.children[i];
-                    
-                    if (child !== p && !ArrayHelper.(vertices, { value: child })) {
-                        vertices.push(child);
-                        recurse(child, v);
-                    }
-                }
-                 let parentVertexId = vertex.parentVertexId;
-                
-                if (parentVertexId !== p && parentVertexId !== null && 
-                    !ArrayHelper.(vertices, { value: parentVertexId })) {
-                    vertices.push(parentVertexId);
-                    recurse(parentVertexId, v);
-                }
-            }
-             vertices.push(vertexId);
-            recurse(vertexId, previousId);
-             return {
-                vertices: vertices,
-                rings: ArrayHelper.unique(rings)
-            };
-        }
-        */
-
-        /**
          * Add a ring to this representation of a molecule.
          *
-         * @param {Ring} ring A new ring.
-         * @returns {number} The ring id of the new ring.
+         * @param {SmilesDrawer.Ring} ring A new ring.
+         * @returns {Number} The ring id of the new ring.
          */
 
     }, {
@@ -3018,7 +3041,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Removes a ring from the array of rings associated with the current molecule.
          *
-         * @param {number} ringId A ring id.
+         * @param {Number} ringId A ring id.
          */
 
     }, {
@@ -3045,8 +3068,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.
          *
-         * @param {number} ringId A ring id.
-         * @returns {Ring} A ring associated with the current molecule.
+         * @param {Number} ringId A ring id.
+         * @returns {SmilesDrawer.Ring} A ring associated with the current molecule.
          */
 
     }, {
@@ -3062,8 +3085,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Add a ring connection to this representation of a molecule.
          *
-         * @param {RingConnection} ringConnection A new ringConnection.
-         * @returns {number} The ring connection id of the new ring connection.
+         * @param {SmilesDrawer.RingConnection} ringConnection A new ringConnection.
+         * @returns {Number} The ring connection id of the new ring connection.
          */
 
     }, {
@@ -3078,7 +3101,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Removes a ring connection from the array of rings connections associated with the current molecule.
          *
-         * @param {number} ringConnectionId A ring connection id.
+         * @param {Number} ringConnectionId A ring connection id.
          */
 
     }, {
@@ -3092,8 +3115,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Removes all ring connections between two vertices.
          *
-         * @param {number} vertexIdA A vertex id.
-         * @param {number} vertexIdB A vertex id.
+         * @param {Number} vertexIdA A vertex id.
+         * @param {Number} vertexIdB A vertex id.
          */
 
     }, {
@@ -3112,6 +3135,14 @@ SmilesDrawer.Drawer = function () {
                 this.removeRingConnection(toRemove[i]);
             }
         }
+
+        /**
+         * Get a ring connection with a given id.
+         * 
+         * @param {Number} id 
+         * @returns {SmilesDrawer.RingConnection} The ring connection with the specified id.
+         */
+
     }, {
         key: 'getRingConnection',
         value: function getRingConnection(id) {
@@ -3125,9 +3156,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Get the ring connections associated with a ring, the ring connections between two rings or the ring connections between one ring and multiple other rings.
          *
-         * @param {number} ringId A ring id.
-         * @param {number|array|null} ringIds=null A ring id, an array of ring ids or null.
-         * @returns {array} An array of ring connection ids.
+         * @param {Number} ringId A ring id.
+         * @param {Number|Number[]|null} [ringIds=null] A ring id, an array of ring ids or null.
+         * @returns {Number[]} An array of ring connection ids.
          */
 
     }, {
@@ -3172,9 +3203,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Check whether or not the two vertices specified span a bond which is a ring connection (fused rings).
          * 
-         * @param {number} vertexIdA A vertex id.
-         * @param {number} vertexIdB A vertex id.
-         * @returns {boolean} Returns a boolean indicating whether or not the two vertices specify a ringbond.
+         * @param {Number} vertexIdA A vertex id.
+         * @param {Number} vertexIdB A vertex id.
+         * @returns {Boolean} Returns a boolean indicating whether or not the two vertices specify a ringbond.
          */
 
     }, {
@@ -3198,7 +3229,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the overlap score of the current molecule based on its positioned vertices. The higher the score, the more overlaps occur in the structure drawing.
          *
-         * @returns {object} Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }
+         * @returns {Object} Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }
          */
 
     }, {
@@ -3250,10 +3281,10 @@ SmilesDrawer.Drawer = function () {
         /**
          * When drawing a double bond, choose the side to place the double bond. E.g. a double bond should always been drawn inside a ring.
          *
-         * @param {Vertex} vertexA A vertex.
-         * @param {Vertex} vertexB A vertex.
-         * @param {array} sides An array containing the two normals of the line spanned by the two provided vertices.
-         * @returns {object} Returns an object containing the following information: {
+         * @param {SmilesDrawer.Vertex} vertexA A vertex.
+         * @param {SmilesDrawer.Vertex} vertexB A vertex.
+         * @param {SmilesDrawer.Vector2[]} sides An array containing the two normals of the line spanned by the two provided vertices.
+         * @returns {Object} Returns an object containing the following information: {
                 totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
                 totalPosition: Same as position, but based on entire molecule,
                 sideCount: Counts the sides of each neighbour, is an array [ a, b ],
@@ -3316,9 +3347,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Checks whether or not two vertices are connected.
          *
-         * @param {number} vertexIdA A vertex id.
-         * @param {number} vertexIdA A vertex id.
-         * @returns {boolean} A boolean indicating whether or not two vertices are connected.
+         * @param {Number} vertexIdA A vertex id.
+         * @param {Number} vertexIdA A vertex id.
+         * @returns {Boolean} A boolean indicating whether or not two vertices are connected.
          */
 
     }, {
@@ -3337,9 +3368,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the weight of the edge between two given vertices.
          *
-         * @param {number} vertexIdA A vertex id.
-         * @param {number} vertexIdB A vertex id.
-         * @returns {number|null} The weight of the edge or, if no edge can be found, null.
+         * @param {Number} vertexIdA A vertex id.
+         * @param {Number} vertexIdB A vertex id.
+         * @returns {Number|null} The weight of the edge or, if no edge can be found, null.
          */
 
     }, {
@@ -3359,15 +3390,15 @@ SmilesDrawer.Drawer = function () {
         /**
          * Applies a force-based layout to a set of provided vertices.
          *
-         * @param {array} vertices An array containing vertices to be placed using the force based layout.
-         * @param {Vector2} center The center of the layout.
-         * @param {number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
-         * @param {Ring} ring The bridged ring associated with this force-based layout.
+         * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
+         * @param {SmilesDrawer.Vector2} center The center of the layout.
+         * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
+         * @param {SmilesDrawer.Ring} ring The bridged ring associated with this force-based layout.
          */
 
     }, {
         key: 'forceLayout',
-        value: function forceLayout(vertices, center, startVertexId, ring) {
+        value: function forceLayout(vertexIds, center, startVertexId, ring) {
             // Constants
             var l = this.opts.bondLength;
 
@@ -3377,13 +3408,13 @@ SmilesDrawer.Drawer = function () {
             // Add neighbours that are already positioned to the vertices to prevent overlap
             for (var i = 0; i < startVertexNeighbours.length; i++) {
                 if (this.graph.vertices[startVertexNeighbours[i]].positioned) {
-                    vertices.push(startVertexNeighbours[i]);
+                    vertexIds.push(startVertexNeighbours[i]);
                 }
             }
 
             // Create adjencency matrix
-            var totalLength = vertices.length + ring.rings.length;
-            var vToId = [vertices.length];
+            var totalLength = vertexIds.length + ring.rings.length;
+            var vToId = [vertexIds.length];
             var idToV = new Map();
             var adjMatrix = [totalLength];
             var edges = [];
@@ -3396,14 +3427,14 @@ SmilesDrawer.Drawer = function () {
                 }
             }
 
-            for (var i = 0; i < vertices.length; i++) {
-                vToId[i] = this.graph.vertices[vertices[i]].id;
+            for (var i = 0; i < vertexIds.length; i++) {
+                vToId[i] = this.graph.vertices[vertexIds[i]].id;
                 idToV.set(vToId[i], i);
             }
 
-            for (var i = 0; i < vertices.length - 1; i++) {
-                for (var j = i; j < vertices.length; j++) {
-                    var edge = this.graph.getEdge(vToId[i], this.graph.vertices[vertices[j]].id);
+            for (var i = 0; i < vertexIds.length - 1; i++) {
+                for (var j = i; j < vertexIds.length; j++) {
+                    var edge = this.graph.getEdge(vToId[i], this.graph.vertices[vertexIds[j]].id);
 
                     if (edge !== null) {
                         adjMatrix[i][j] = l;
@@ -3415,7 +3446,7 @@ SmilesDrawer.Drawer = function () {
 
             for (var i = 0; i < ring.rings.length; i++) {
                 var r = ring.rings[i];
-                var index = vertices.length + i;
+                var index = vertexIds.length + i;
 
                 for (var j = 0; j < r.members.length; j++) {
                     var id = idToV.get(r.members[j]);
@@ -3441,7 +3472,7 @@ SmilesDrawer.Drawer = function () {
             // Connect ring centers with edges 
             for (var i = 0; i < ring.rings.length; i++) {
                 var _r = ring.rings[i];
-                var ringIndex = vertices.length + i;
+                var ringIndex = vertexIds.length + i;
                 var _ringSize = _r.getSize();
 
                 for (var j = 0; j < edges.length; j++) {
@@ -3471,7 +3502,7 @@ SmilesDrawer.Drawer = function () {
                         continue;
                     }
 
-                    var ringIndex2 = vertices.length + j;
+                    var ringIndex2 = vertexIds.length + j;
                     var ringSize2 = r2.getSize();
                     var dist = SmilesDrawer.MathHelper.apothemFromSideLength(l, _ringSize) + SmilesDrawer.MathHelper.apothemFromSideLength(l, ringSize2);
 
@@ -3491,12 +3522,12 @@ SmilesDrawer.Drawer = function () {
             var ringCount = [totalLength];
 
             for (var i = 0; i < totalLength; i++) {
-                isRingCenter[i] = i >= vertices.length && i < edgeOffset;
+                isRingCenter[i] = i >= vertexIds.length && i < edgeOffset;
 
-                ringCount[i] = i < vertices.length ? this.graph.vertices[vToId[i]].value.originalRings.length : 1;
+                ringCount[i] = i < vertexIds.length ? this.graph.vertices[vToId[i]].value.originalRings.length : 1;
 
                 if (isRingCenter[i]) {
-                    ringSize[i] = ring.rings[i - vertices.length].members.length;
+                    ringSize[i] = ring.rings[i - vertexIds.length].members.length;
                 } else {
                     ringSize[i] = 1;
                 }
@@ -3507,7 +3538,7 @@ SmilesDrawer.Drawer = function () {
                 positions[i] = new SmilesDrawer.Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
                 positioned[i] = false;
 
-                if (i >= vertices.length) {
+                if (i >= vertexIds.length) {
                     continue;
                 }
 
@@ -3712,26 +3743,26 @@ SmilesDrawer.Drawer = function () {
                         _center.x /= _r2.members.length;
                         _center.y /= _r2.members.length;
 
-                        positions[vertices.length + i] = _center;
+                        positions[vertexIds.length + i] = _center;
                     }
                 }
             }
 
             for (var i = 0; i < totalLength; i++) {
-                if (i < vertices.length) {
+                if (i < vertexIds.length) {
                     if (!positioned[i]) {
                         this.graph.vertices[vToId[i]].setPositionFromVector(positions[i]);
                         this.graph.vertices[vToId[i]].positioned = true;
                     }
-                } else if (i < vertices.length + ring.rings.length) {
-                    var _index3 = i - vertices.length;
+                } else if (i < vertexIds.length + ring.rings.length) {
+                    var _index3 = i - vertexIds.length;
                     ring.rings[_index3].center = positions[i];
                 }
             }
 
             // Only for bridges, not for members, the members are handled in createRing.
-            for (var u = 0; u < vertices.length; u++) {
-                var _vertex4 = this.graph.vertices[vertices[u]];
+            for (var u = 0; u < vertexIds.length; u++) {
+                var _vertex4 = this.graph.vertices[vertexIds[u]];
 
                 if (!_vertex4.value.isBridge) {
                     continue;
@@ -3762,9 +3793,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Gets the center of a ring contained within a bridged ring and containing a given vertex.
          *
-         * @param {Ring} ring A bridged ring.
-         * @param {Vertex} vertex A vertex.
-         * @returns {Vector2} The center of the subring that  the provided vertex.
+         * @param {SmilesDrawer.Ring} ring A bridged ring.
+         * @param {SmilesDrawer.Vertex} vertex A vertex.
+         * @returns {SmilesDrawer.Vector2} The center of the subring that  the provided vertex.
          */
 
     }, {
@@ -3794,7 +3825,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Draw the actual edges as bonds to the canvas.
          *
-         * @param {boolean} debug A boolean indicating whether or not to draw debug helpers.
+         * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
          */
 
     }, {
@@ -3967,7 +3998,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Draws the vertices representing atoms to the canvas.
          *
-         * @param {boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
+         * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
          */
 
     }, {
@@ -3993,7 +4024,7 @@ SmilesDrawer.Drawer = function () {
 
                 if (this.opts.atomVisualization === 'allballs') {
                     this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
-                } else if (atom.isDrawn && (!isCarbon || atom.explicit || isTerminal || atom.hasAttachedPseudoElements)) {
+                } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) {
                     if (this.opts.atomVisualization === 'default') {
                         this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
                     } else if (this.opts.atomVisualization === 'balls') {
@@ -4018,7 +4049,6 @@ SmilesDrawer.Drawer = function () {
 
         /**
          * Position the vertices according to their bonds and properties.
-         *
          */
 
     }, {
@@ -4034,7 +4064,6 @@ SmilesDrawer.Drawer = function () {
 
         /**
          * Reset the positions of rings and vertices. The previous positions will be backed up.
-         *
          */
 
     }, {
@@ -4062,7 +4091,6 @@ SmilesDrawer.Drawer = function () {
 
         /**
          * Restore the positions backed up during the last clearPositions() call.
-         *
          */
 
     }, {
@@ -4081,7 +4109,6 @@ SmilesDrawer.Drawer = function () {
 
         /**
          * Stores the current information associated with rings.
-         * 
          */
 
     }, {
@@ -4105,7 +4132,6 @@ SmilesDrawer.Drawer = function () {
 
         /**
          * Restores the most recently backed up information associated with rings.
-         * 
          */
 
     }, {
@@ -4144,11 +4170,11 @@ SmilesDrawer.Drawer = function () {
         /**
          * Creates a new ring, that is, positiones all the vertices inside a ring.
          *
-         * @param {Ring} ring The ring to position.
-         * @param {Vector2|null} [center=null] The center of the ring to be created.
-         * @param {Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
-         * @param {Vertex|null} [previousVertex=null] The last vertex that was positioned.
-         * @param {boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
+         * @param {SmilesDrawer.Ring} ring The ring to position.
+         * @param {SmilesDrawer.Vector2|null} [center=null] The center of the ring to be created.
+         * @param {SmilesDrawer.Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
+         * @param {SmilesDrawer.Vertex|null} [previousVertex=null] The last vertex that was positioned.
+         * @param {Boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
          */
 
     }, {
@@ -4324,10 +4350,10 @@ SmilesDrawer.Drawer = function () {
         /**
          * Rotate an entire subtree by an angle around a center.
          *
-         * @param {number} vertexId A vertex id (the root of the sub-tree).
-         * @param {number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
-         * @param {number} angle An angle in randians.
-         * @param {Vector2} center The rotational center.
+         * @param {Number} vertexId A vertex id (the root of the sub-tree).
+         * @param {Number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
+         * @param {Number} angle An angle in randians.
+         * @param {SmilesDrawer.Vector2} center The rotational center.
          */
 
     }, {
@@ -4351,10 +4377,10 @@ SmilesDrawer.Drawer = function () {
         /**
          * Gets the overlap score of a subtree.
          *
-         * @param {number} vertexId A vertex id (the root of the sub-tree).
-         * @param {number} parentVertexId A vertex id in the previous direction of the subtree.
-         * @param {Array} vertexOverlapScores An array containing the vertex overlap scores indexed by vertex id.
-         * @returns {number} The overlap score of the subtree.
+         * @param {Number} vertexId A vertex id (the root of the sub-tree).
+         * @param {Number} parentVertexId A vertex id in the previous direction of the subtree.
+         * @param {Number[]} vertexOverlapScores An array containing the vertex overlap scores indexed by vertex id.
+         * @returns {Object} An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new SmilesDrawer.Vector2() }.
          */
 
     }, {
@@ -4381,7 +4407,7 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the current (positioned vertices so far) center of mass.
          * 
-         * @returns {Vector2} The current center of mass.
+         * @returns {SmilesDrawer.Vector2} The current center of mass.
          */
 
     }, {
@@ -4405,9 +4431,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
          *
-         * @param {Vector2} vec The point at which to look for neighbours.
-         * @param {number} [r=currentBondLength*2.0] The radius of vertices to include.
-         * @returns {Vector2} The current center of mass.
+         * @param {SmilesDrawer.Vector2} vec The point at which to look for neighbours.
+         * @param {Number} [r=currentBondLength*2.0] The radius of vertices to include.
+         * @returns {SmilesDrawer.Vector2} The current center of mass.
          */
 
     }, {
@@ -4433,7 +4459,6 @@ SmilesDrawer.Drawer = function () {
 
         /**
          * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
-         *
          */
 
     }, {
@@ -4548,7 +4573,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Resolve secondary overlaps. Those overlaps are due to the structure turning back on itself.
          *
-         * @param {array} scores An array of objects sorted descending by score. An object is in the form of { id: 0, score: 22 }.
+         * @param {Object[]} scores An array of objects sorted descending by score.
+         * @param {Number} scores[].id A vertex id.
+         * @param {Number} scores[].score The overlap score associated with the vertex id.
          */
 
     }, {
@@ -4624,10 +4651,10 @@ SmilesDrawer.Drawer = function () {
         /**
          * Positiones the next vertex thus creating a bond.
          *
-         * @param {Vertex} vertex A vertex.
-         * @param {Vertex} previousVertex The previous vertex which has been positioned.
-         * @param {ring|number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
-         * @param {number} dir Either 1 or -1 to break ties (if no angle can be elucidated.
+         * @param {SmilesDrawer.Vertex} vertex A vertex.
+         * @param {SmilesDrawer.Vertex} previousVertex The previous vertex which has been positioned.
+         * @param {SmilesDrawer.Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
+         * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated.
          */
 
     }, {
@@ -4777,7 +4804,7 @@ SmilesDrawer.Drawer = function () {
                     // Make a single chain always cis except when there's a tribble bond
                     // or if there are successive double bonds
                     if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#' || vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
-                        vertex.value.explicit = true;
+                        vertex.value.drawExplicit = true;
 
                         if (previousVertex) {
                             var straightEdge1 = this.graph.getEdge(vertex.id, previousVertex.id);
@@ -5041,8 +5068,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Gets the vetex sharing the edge that is the common bond of two rings.
          *
-         * @param {Vertex} vertex A vertex.
-         * @returns {number|null} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
+         * @param {SmilesDrawer.Vertex} vertex A vertex.
+         * @returns {Number|null} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
          */
 
     }, {
@@ -5064,8 +5091,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Check if a vector is inside any ring.
          *
-         * @param {Vector2} vec A vector.
-         * @returns {boolean} A boolean indicating whether or not the point (vector) is inside any of the rings associated with the current molecule.
+         * @param {SmilesDrawer.Vector2} vec A vector.
+         * @returns {Boolean} A boolean indicating whether or not the point (vector) is inside any of the rings associated with the current molecule.
          */
 
     }, {
@@ -5092,8 +5119,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Check whether or not an edge is part of a ring.
          *
-         * @param {Edge} edge An edge.
-         * @returns {boolean} A boolean indicating whether or not the edge is part of a ring.
+         * @param {SmilesDrawer.Edge} edge An edge.
+         * @returns {Boolean} A boolean indicating whether or not the edge is part of a ring.
          */
 
     }, {
@@ -5108,8 +5135,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Check whether or not an edge is rotatable.
          *
-         * @param {Edge} edge An edge.
-         * @returns {boolean} A boolean indicating whether or not the edge is rotatable.
+         * @param {SmilesDrawer.Edge} edge An edge.
+         * @returns {Boolean} A boolean indicating whether or not the edge is rotatable.
          */
 
     }, {
@@ -5140,8 +5167,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Check whether or not a ring is an implicitly defined aromatic ring (lower case smiles).
          *
-         * @param {Ring} ring A ring.
-         * @returns {boolean} A boolean indicating whether or not a ring is implicitly defined as aromatic.
+         * @param {SmilesDrawer.Ring} ring A ring.
+         * @returns {Boolean} A boolean indicating whether or not a ring is implicitly defined as aromatic.
          */
 
     }, {
@@ -5161,8 +5188,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Checks whether or not an edge is part of an explicit aromatic ring (lower case smiles).
          *
-         * @param {Edge} edge An edge.
-         * @returns {boolean} A boolean indicating whether or not the vertex is part of an explicit aromatic ring.
+         * @param {SmilesDrawer.Edge} edge An edge.
+         * @returns {Boolean} A boolean indicating whether or not the vertex is part of an explicit aromatic ring.
          */
 
     }, {
@@ -5177,8 +5204,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Get the normals of an edge.
          *
-         * @param {Edge} edge An edge.
-         * @returns {array} An array containing two vectors, representing the normals.
+         * @param {SmilesDrawer.Edge} edge An edge.
+         * @returns {SmilesDrawer.Vector2[]} An array containing two vectors, representing the normals.
          */
 
     }, {
@@ -5196,9 +5223,9 @@ SmilesDrawer.Drawer = function () {
         /**
          * Get the depth of a subtree in the direction opposite to the vertex specified as the parent vertex.
          *
-         * @param {number} vertexId A vertex id.
-         * @param {number} parentVertexId The id of a neighbouring vertex.
-         * @returns {number} The depth of the sub-tree.
+         * @param {Number} vertexId A vertex id.
+         * @param {Number} parentVertexId The id of a neighbouring vertex.
+         * @returns {Number} The depth of the sub-tree.
          */
 
     }, {
@@ -5226,11 +5253,11 @@ SmilesDrawer.Drawer = function () {
         /**
          * Traverse a sub-tree in the graph.
          *
-         * @param {number} vertexId A vertex id.
-         * @param {number} parentVertexId A neighbouring vertex.
-         * @param {function} callback The callback function that is called with each visited as an argument.
-         * @param {number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
-         * @param {boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
+         * @param {Number} vertexId A vertex id.
+         * @param {Number} parentVertexId A neighbouring vertex.
+         * @param {Function} callback The callback function that is called with each visited as an argument.
+         * @param {Number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
+         * @param {Boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
          */
 
     }, {
@@ -5268,8 +5295,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Gets the number of bonds of a vertex.
          *
-         * @param {Vertex} vertex A vertex.
-         * @returns {number} The number of bonds the vertex participates in.
+         * @param {SmilesDrawer.Vertex} vertex A vertex.
+         * @returns {Number} The number of bonds the vertex participates in.
          */
 
     }, {
@@ -5287,8 +5314,8 @@ SmilesDrawer.Drawer = function () {
         /**
          * Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
          *
-         * @param {number} vertexId A vertex id.
-         * @returns {array} An array of vertices.
+         * @param {Number} vertexId A vertex id.
+         * @returns {SmilesDrawer.Vertex[]} An array of vertices.
          */
 
     }, {
@@ -5427,16 +5454,29 @@ SmilesDrawer.Drawer = function () {
     return Drawer;
 }();
 
-/** A class representing an edge */
+/** 
+ * A class representing an edge. 
+ * 
+ * @property {Number} id The id of this edge.
+ * @property {Number} sourceId The id of the source vertex.
+ * @property {Number} targetId The id of the target vertex.
+ * @property {Number} weight The weight of this edge.
+ * @property {String} [bondType='-'] The bond type of this edge.
+ * @property {Boolean} [isInAromaticRing=false] Whether or not this edge is part of an aromatic ring.
+ * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
+ * @property {String} [chiral=''] Chirality information.
+ */
 SmilesDrawer.Edge = function () {
     /**
      * The constructor for the class Edge.
      *
-     * @param {number} sourceId A vertex id.
-     * @param {number} targetId A vertex id.
-     * @param {number} weight The weight of the edge.
+     * @param {Number} sourceId A vertex id.
+     * @param {Number} targetId A vertex id.
+     * @param {Number} [weight=1] The weight of the edge.
      */
-    function Edge(sourceId, targetId, weight) {
+    function Edge(sourceId, targetId) {
+        var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
         _classCallCheck(this, Edge);
 
         this.id = null;
@@ -5452,7 +5492,7 @@ SmilesDrawer.Edge = function () {
     /**
      * Returns the number of bonds associated with the bond type of this edge.
      *
-     * @returns {number} The number of bonds associated with this edge.
+     * @returns {Number} The number of bonds associated with this edge.
      */
 
 
@@ -5465,7 +5505,7 @@ SmilesDrawer.Edge = function () {
         /**
          * An object mapping the bond type to the number of bonds.
          *
-         * @returns {object} The object containing the map.
+         * @returns {Object} The object containing the map.
          */
 
     }], [{
@@ -5485,13 +5525,21 @@ SmilesDrawer.Edge = function () {
     return Edge;
 }();
 
-/* A class representing the molecular graph. */
+/** 
+ * A class representing the molecular graph. 
+ * 
+ * @property {SmilesDrawer.Vertex[]} vertices The vertices of the graph.
+ * @property {SmilesDrawer.Edge[]} edges The edges of this graph.
+ * @property {Object} vertexIdsToEdgeId A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId.
+ * @property {Object} elementCount A map associating element symbols with the number of occurences in this graph.
+ * @property {Boolean} isometric A boolean indicating whether or not the SMILES associated with this graph is isometric.
+ */
 SmilesDrawer.Graph = function () {
     /**
      * The constructor of the class Graph.
      * 
-     * @param {any} parseTree A SMILES parse tree.
-     * @param {boolean} [isomeric=false] A boolean specifying whether or not the SMILES is isomeric.
+     * @param {Object} parseTree A SMILES parse tree.
+     * @param {Boolean} [isomeric=false] A boolean specifying whether or not the SMILES is isomeric.
      */
     function Graph(parseTree) {
         var isomeric = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -5513,9 +5561,9 @@ SmilesDrawer.Graph = function () {
     /**
      * PRIVATE FUNCTION. Initializing the graph from the parse tree.
      *
-     * @param {object} node The current node in the parse tree.
-     * @param {number} parentVertexId=null The id of the previous vertex.
-     * @param {boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
+     * @param {Object} node The current node in the parse tree.
+     * @param {Number} parentVertexId=null The id of the previous vertex.
+     * @param {Boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
      */
 
 
@@ -5620,8 +5668,8 @@ SmilesDrawer.Graph = function () {
         /**
          * Add a vertex to the graph.
          *
-         * @param {Vertex} vertex A new vertex.
-         * @returns {number} The vertex id of the new vertex.
+         * @param {SmilesDrawer.Vertex} vertex A new vertex.
+         * @returns {Number} The vertex id of the new vertex.
          */
 
     }, {
@@ -5636,8 +5684,8 @@ SmilesDrawer.Graph = function () {
         /**
          * Add an edge to the graph.
          *
-         * @param {Edge} edge A new edge.
-         * @returns {number} The edge id of the new edge.
+         * @param {SmilesDrawer.Edge} edge A new edge.
+         * @returns {Number} The edge id of the new edge.
          */
 
     }, {
@@ -5655,9 +5703,9 @@ SmilesDrawer.Graph = function () {
         /**
          * Returns the edge between two given vertices.
          *
-         * @param {number} vertexIdA A vertex id.
-         * @param {number} vertexIdB A vertex id.
-         * @returns {number|null} The edge or, if no edge can be found, null.
+         * @param {Number} vertexIdA A vertex id.
+         * @param {Number} vertexIdB A vertex id.
+         * @returns {Number|null} The edge or, if no edge can be found, null.
          */
 
     }, {
@@ -5671,9 +5719,9 @@ SmilesDrawer.Graph = function () {
         /**
          * Returns the edge between two given vertices.
          *
-         * @param {number} vertexIdA A vertex id.
-         * @param {number} vertexIdB A vertex id.
-         * @returns {number|null} The edge or, if no edge can be found, null.
+         * @param {Number} vertexIdA A vertex id.
+         * @param {Number} vertexIdB A vertex id.
+         * @returns {Number|null} The edge or, if no edge can be found, null.
          */
 
     }, {
@@ -5685,7 +5733,7 @@ SmilesDrawer.Graph = function () {
         /**
          * Returns an array containing the vertex ids of this graph.
          * 
-         * @returns {array} An array containing all vertex ids of this graph.
+         * @returns {Number[]} An array containing all vertex ids of this graph.
          */
 
     }, {
@@ -5703,7 +5751,7 @@ SmilesDrawer.Graph = function () {
         /**
          * Returns an array containing source, target arrays of this graphs edges.
          * 
-         * @returns {array} An array containing source, target arrays of this graphs edges.
+         * @returns {Array[]} An array containing source, target arrays of this graphs edges. Example: [ [ 2, 5 ], [ 6, 9 ] ].
          */
 
     }, {
@@ -5721,7 +5769,7 @@ SmilesDrawer.Graph = function () {
         /**
          * Get the adjacency matrix of the graph.
          * 
-         * @returns {array} The adjancency matrix of the molecular graph.
+         * @returns {Array[]} The adjancency matrix of the molecular graph.
          */
 
     }, {
@@ -5748,7 +5796,7 @@ SmilesDrawer.Graph = function () {
         /**
          * Get the adjacency matrix of the graph with all bridges removed (thus the components). Thus the remaining vertices are all part of ring systems.
          * 
-         * @returns {array} The adjancency matrix of the molecular graph with all bridges removed.
+         * @returns {Array[]} The adjancency matrix of the molecular graph with all bridges removed.
          */
 
     }, {
@@ -5781,8 +5829,8 @@ SmilesDrawer.Graph = function () {
         /**
          * Get the adjacency matrix of a subgraph.
          * 
-         * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
-         * @returns {array} The adjancency matrix of the subgraph.
+         * @param {Number[]} vertexIds An array containing the vertex ids contained within the subgraph.
+         * @returns {Array[]} The adjancency matrix of the subgraph.
          */
 
     }, {
@@ -5812,7 +5860,7 @@ SmilesDrawer.Graph = function () {
         /**
          * Get the adjacency list of the graph.
          * 
-         * @returns {array} The adjancency list of the graph.
+         * @returns {Array[]} The adjancency list of the graph.
          */
 
     }, {
@@ -5841,8 +5889,8 @@ SmilesDrawer.Graph = function () {
         /**
          * Get the adjacency list of a subgraph.
          * 
-         * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
-         * @returns {array} The adjancency list of the subgraph.
+         * @param {Number[]} vertexIds An array containing the vertex ids contained within the subgraph.
+         * @returns {Array[]} The adjancency list of the subgraph.
          */
 
     }, {
@@ -5869,24 +5917,9 @@ SmilesDrawer.Graph = function () {
         }
 
         /**
-         * Get the path of the 
-         * 
-         * @param {array} startVertexId The start vertex of the cycle.
-         * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
-         */
-
-    }, {
-        key: 'getLargestCycleInSubgraph',
-        value: function getLargestCycleInSubgraph(startVertexId, vertexIds) {
-            var path = [];
-            var adjacencyList = this.getSubgraphAdjacencyList(vertexIds);
-            return path;
-        }
-
-        /**
          * Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
          * 
-         * @returns {array} An array containing the edge ids of the bridges.
+         * @returns {Number[]} An array containing the edge ids of the bridges.
          */
 
     }, {
@@ -5946,7 +5979,7 @@ SmilesDrawer.Graph = function () {
         /**
          * Returns the number of connected components for the grpah 
          * 
-         * @param {array} adjacencyMatrix An adjacency matrix.
+         * @param {Array[]} adjacencyMatrix An adjacency matrix.
          * @returns {Number} The number of connected components of the supplied graph.
          */
 
@@ -5992,166 +6025,16 @@ SmilesDrawer.Graph = function () {
 
     return Graph;
 }();
-/** A class encapsulating the functionality to find the rings in the graph using Hansers algorithm. */
-SmilesDrawer.Hanser = function () {
-    function Hanser(vertices, edges) {
-        _classCallCheck(this, Hanser);
-
-        this.vertices = vertices;
-        this.edges = edges;
-        this.cycles = [];
-        this.paths = {};
-        this.pathIdCounter = 0;
-
-        this.getRings();
-        this.removeBridgedRings();
-    }
-
-    _createClass(Hanser, [{
-        key: 'getRings',
-        value: function getRings(vertices, edges) {
-            for (var i = this.edges.length - 1; i >= 0; i--) {
-                this.paths[this.pathIdCounter] = {
-                    id: this.pathIdCounter++,
-                    nodes: [this.edges[i][0], this.edges[i][1]],
-                    source: this.edges[i][0],
-                    target: this.edges[i][1],
-                    isConnected: false
-                };
-
-                this.pathIdCounter++;
-            }
-
-            for (var i = this.vertices.length - 1; i >= 0; i--) {
-                this.remove(i);
-            }
-        }
-    }, {
-        key: 'remove',
-        value: function remove(vertexId) {
-            var paths = this.getPaths(vertexId);
-
-            for (var i = 0; i < paths.length; i++) {
-                for (var j = i + 1; j < paths.length; j++) {
-                    var path = this.splice(paths[i], paths[j]);
-                    if (path) {
-                        if (path.isConnected) {
-                            path.nodes.pop();
-                            this.cycles.push(new Set(path.nodes));
-                            delete this.paths[path.id];
-                        } else {
-                            this.paths[path.id] = path;
-                        }
-                    }
-                }
-
-                delete this.paths[paths[i].id];
-            }
-        }
-    }, {
-        key: 'getPaths',
-        value: function getPaths(vertexId) {
-            var paths = [];
-
-            for (var i in this.paths) {
-                var value = this.paths[i];
-
-                if (value.source === vertexId || value.target === vertexId) {
-                    paths.push(value);
-                }
-            }
-
-            return paths;
-        }
-    }, {
-        key: 'splice',
-        value: function splice(next, previous) {
-            var intersection = null;
-            var nodes = next.nodes.concat();
-
-            if (next.source === previous.source || next.source === previous.target) {
-                intersection = next.source;
-            } else {
-                intersection = next.target;
-            }
-
-            if (intersection === next.source) {
-                nodes = nodes.reverse();
-            }
-
-            if (intersection === previous.source) {
-                for (var i = 1; i < previous.nodes.length; i++) {
-                    nodes.push(previous.nodes[i]);
-                }
-            } else {
-                for (var i = previous.nodes.length - 2; i >= 0; i--) {
-                    nodes.push(previous.nodes[i]);
-                }
-            }
-
-            // If the path contains duplicate vertex ids, skip.
-            if (!this.valid(nodes)) {
-                return;
-            }
-
-            return {
-                id: this.pathIdCounter++,
-                nodes: nodes,
-                source: nodes[0],
-                target: nodes[nodes.length - 1],
-                isConnected: nodes.length > 2 && nodes[0] === nodes[nodes.length - 1]
-            };
-        }
-    }, {
-        key: 'valid',
-        value: function valid(nodes) {
-            for (var i = 1; i < nodes.length; i++) {
-                for (var j = 1; j < nodes.length; j++) {
-                    if (i === j) {
-                        continue;
-                    }
-
-                    if (nodes[i] === nodes[j]) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-    }, {
-        key: 'removeBridgedRings',
-        value: function removeBridgedRings() {
-            if (this.cycles.length < 2) {
-                return;
-            }
-
-            var vertexRings = new Array(this.vertices.length);
-
-            for (var i = 0; i < this.vertices.length; i++) {
-                vertexRings[i] = new Set();
-
-                for (var j = 0; j < this.cycles.length; j++) {
-                    if (this.cycles[j].has(i)) {
-                        vertexRings[i].add(j);
-                    }
-                }
-            }
-
-            // Return if there are no bridged rings (no vertices with ringcount > 2)
-            for (var i = 0; i < vertexRings.length; i++) {
-                if (vertexRings[i].size > 2) {
-                    return;
-                }
-            }
-
-            console.log('vertexRings', vertexRings);
-        }
-    }]);
-
-    return Hanser;
-}();
-/** A class representing a line */
+/** 
+ * A class representing a line.
+ * 
+ * @property {SmilesDrawer.Vector2} from The SmilesDrawer.Vector2 defining the start of the line.
+ * @property {SmilesDrawer.Vector2} to The SmilesDrawer.Vector2 defining the end of the line.
+ * @property {String} elementFrom The element symbol associated with the start of the line.
+ * @property {String} elementTo The element symbol associated with the end of the line.
+ * @property {Boolean} chiralFrom A boolean indicating whether or not the source atom is a chiral center.
+ * @property {Boolean} chiralTo A boolean indicating whether or tno the target atom is a chiral center.
+ */
 SmilesDrawer.Line = function () {
     /**
      * The constructor for the class Line.
@@ -6184,7 +6067,7 @@ SmilesDrawer.Line = function () {
     /**
      * Clones this line and returns the clone.
      *
-     * @returns {Line} A clone of this line.
+     * @returns {SmilesDrawer.Line} A clone of this line.
      */
 
 
@@ -6197,7 +6080,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns the length of this line.
          *
-         * @returns {number} The length of this line.
+         * @returns {Number} The length of this line.
          */
 
     }, {
@@ -6209,7 +6092,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns the angle of the line in relation to the coordinate system (the x-axis).
          *
-         * @returns {number} The angle in radians.
+         * @returns {Number} The angle in radians.
          */
 
     }, {
@@ -6223,7 +6106,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns the right vector (the vector with the larger x value).
          *
-         * @returns {Vector2} The right vector.
+         * @returns {SmilesDrawer.Vector2} The right vector.
          */
 
     }, {
@@ -6240,7 +6123,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns the left vector (the vector with the smaller x value).
          *
-         * @returns {Vector2} The left vector.
+         * @returns {SmilesDrawer.Vector2} The left vector.
          */
 
     }, {
@@ -6257,7 +6140,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns the element associated with the right vector (the vector with the larger x value).
          *
-         * @returns {string} The element associated with the right vector.
+         * @returns {String} The element associated with the right vector.
          */
 
     }, {
@@ -6273,7 +6156,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns the element associated with the left vector (the vector with the smaller x value).
          *
-         * @returns {string} The element associated with the left vector.
+         * @returns {String} The element associated with the left vector.
          */
 
     }, {
@@ -6289,7 +6172,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.
          *
-         * @returns {boolean} Whether or not the atom associated with the right vector is a chiral center.
+         * @returns {Boolean} Whether or not the atom associated with the right vector is a chiral center.
          */
 
     }, {
@@ -6305,7 +6188,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.
          *
-         * @returns {boolean} Whether or not the atom  associated with the left vector is a chiral center.
+         * @returns {Boolean} Whether or not the atom  associated with the left vector is a chiral center.
          */
 
     }, {
@@ -6321,9 +6204,9 @@ SmilesDrawer.Line = function () {
         /**
          * Set the value of the right vector.
          *
-         * @param {number} x The x value.
-         * @param {number} y The y value.
-         * @returns {Line} This line.
+         * @param {Number} x The x value.
+         * @param {Number} y The y value.
+         * @returns {SmilesDrawer.Line} This line.
          */
 
     }, {
@@ -6343,9 +6226,9 @@ SmilesDrawer.Line = function () {
         /**
          * Set the value of the left vector.
          *
-         * @param {number} x The x value.
-         * @param {number} y The y value.
-         * @returns {Line} This line.
+         * @param {Number} x The x value.
+         * @param {Number} y The y value.
+         * @returns {SmilesDrawer.Line} This line.
          */
 
     }, {
@@ -6365,7 +6248,7 @@ SmilesDrawer.Line = function () {
         /**
          * Rotates this line to be aligned with the x-axis. The center of rotation is the left vector.
          *
-         * @returns {Line} This line.
+         * @returns {SmilesDrawer.Line} This line.
          */
 
     }, {
@@ -6381,8 +6264,8 @@ SmilesDrawer.Line = function () {
         /**
          * Rotate the line by a given value (in radians). The center of rotation is the left vector.
          *
-         * @param {number} theta The angle (in radians) to rotate the line.
-         * @returns {Line} This line.
+         * @param {Number} theta The angle (in radians) to rotate the line.
+         * @returns {SmilesDrawer.Line} This line.
          */
 
     }, {
@@ -6404,8 +6287,8 @@ SmilesDrawer.Line = function () {
         /**
          * Shortens this line from the "from" direction by a given value (in pixels).
          *
-         * @param {number} by The length in pixels to shorten the vector by.
-         * @returns {Line} This line.
+         * @param {Number} by The length in pixels to shorten the vector by.
+         * @returns {SmilesDrawer.Line} This line.
          */
 
     }, {
@@ -6424,8 +6307,8 @@ SmilesDrawer.Line = function () {
         /**
          * Shortens this line from the "to" direction by a given value (in pixels).
          *
-         * @param {number} by The length in pixels to shorten the vector by.
-         * @returns {Line} This line.
+         * @param {Number} by The length in pixels to shorten the vector by.
+         * @returns {SmilesDrawer.Line} This line.
          */
 
     }, {
@@ -6444,8 +6327,8 @@ SmilesDrawer.Line = function () {
         /**
          * Shorten the right side.
          *
-         * @param {number} by The length in pixels to shorten the vector by.
-         * @returns {Line} Returns itself.
+         * @param {Number} by The length in pixels to shorten the vector by.
+         * @returns {SmilesDrawer.Line} Returns itself.
          */
 
     }, {
@@ -6463,8 +6346,8 @@ SmilesDrawer.Line = function () {
         /**
          * Shorten the left side.
          * 
-         * @param {number} by The length in pixels to shorten the vector by.
-         * @returns {Line} Returns itself.
+         * @param {Number} by The length in pixels to shorten the vector by.
+         * @returns {SmilesDrawer.Line} Returns itself.
          */
 
     }, {
@@ -6482,8 +6365,8 @@ SmilesDrawer.Line = function () {
         /**
          * Shortens this line from both directions by a given value (in pixels).
          *
-         * @param {number} by The length in pixels to shorten the vector by.
-         * @returns {Line} This line.
+         * @param {Number} by The length in pixels to shorten the vector by.
+         * @returns {SmilesDrawer.Line} This line.
          */
 
     }, {
@@ -6503,7 +6386,7 @@ SmilesDrawer.Line = function () {
         /**
          * Returns the normals of this line.
          *
-         * @returns {array} An array containing the two normals as vertices.
+         * @returns {SmilesDrawer.Vector2[]} An array containing the two normals as vertices.
          */
 
     }, {
@@ -6518,7 +6401,9 @@ SmilesDrawer.Line = function () {
     return Line;
 }();
 
-/** A static class containing helper functions for math-related tasks. */
+/** 
+ * A static class containing helper functions for math-related tasks. 
+ */
 SmilesDrawer.MathHelper = function () {
     function MathHelper() {
         _classCallCheck(this, MathHelper);
@@ -6531,9 +6416,9 @@ SmilesDrawer.MathHelper = function () {
          * Rounds a value to a given number of decimals.
          *
          * @static
-         * @param {number} value A number.
-         * @param {number} decimals The number of decimals.
-         * @returns {number} A number rounded to a given number of decimals.
+         * @param {Number} value A number.
+         * @param {Number} decimals The number of decimals.
+         * @returns {Number} A number rounded to a given number of decimals.
          */
         value: function round(value, decimals) {
             decimals = decimals ? decimals : 1;
@@ -6544,8 +6429,8 @@ SmilesDrawer.MathHelper = function () {
          * Returns the means of the angles contained in an array. In radians.
          *
          * @static
-         * @param {array} arr An array containing angles (in radians).
-         * @returns {number} The mean angle in radians.
+         * @param {Number[]} arr An array containing angles (in radians).
+         * @returns {Number} The mean angle in radians.
          */
 
     }, {
@@ -6566,8 +6451,8 @@ SmilesDrawer.MathHelper = function () {
          * Returns the inner angle of a n-sided regular polygon.
          *
          * @static
-         * @param {number} n Number of sides of a regular polygon.
-         * @returns {number} The inner angle of a given regular polygon.
+         * @param {Number} n Number of sides of a regular polygon.
+         * @returns {Number} The inner angle of a given regular polygon.
          */
 
     }, {
@@ -6580,9 +6465,9 @@ SmilesDrawer.MathHelper = function () {
          * Returns the circumradius of a n-sided regular polygon with a given side-length.
          *
          * @static
-         * @param {number} s The side length of the regular polygon.
-         * @param {number} n The number of sides.
-         * @returns {number} The circumradius of the regular polygon.
+         * @param {Number} s The side length of the regular polygon.
+         * @param {Number} n The number of sides.
+         * @returns {Number} The circumradius of the regular polygon.
          */
 
     }, {
@@ -6595,9 +6480,9 @@ SmilesDrawer.MathHelper = function () {
          * Returns the apothem of a regular n-sided polygon based on its radius.
          *
          * @static
-         * @param {number} r The radius.
-         * @param {number} n The number of edges of the regular polygon.
-         * @returns {number} The apothem of a n-sided polygon based on its radius.
+         * @param {Number} r The radius.
+         * @param {Number} n The number of edges of the regular polygon.
+         * @returns {Number} The apothem of a n-sided polygon based on its radius.
          */
 
     }, {
@@ -6617,8 +6502,8 @@ SmilesDrawer.MathHelper = function () {
          * The central angle of a n-sided regular polygon. In radians.
          *
          * @static
-         * @param {number} n The number of sides of the regular polygon.
-         * @returns {number} The central angle of the n-sided polygon in radians.
+         * @param {Number} n The number of sides of the regular polygon.
+         * @returns {Number} The central angle of the n-sided polygon in radians.
          */
 
     }, {
@@ -6631,8 +6516,8 @@ SmilesDrawer.MathHelper = function () {
          * Convertes radians to degrees.
          *
          * @static
-         * @param {number} rad An angle in radians.
-         * @returns {number} The angle in degrees.
+         * @param {Number} rad An angle in radians.
+         * @returns {Number} The angle in degrees.
          */
 
     }, {
@@ -6645,8 +6530,8 @@ SmilesDrawer.MathHelper = function () {
          * Converts degrees to radians.
          *
          * @static
-         * @param {number} deg An angle in degrees.
-         * @returns {number} The angle in radians.
+         * @param {Number} deg An angle in degrees.
+         * @returns {Number} The angle in radians.
          */
 
     }, {
@@ -6659,8 +6544,13 @@ SmilesDrawer.MathHelper = function () {
     return MathHelper;
 }();
 
+/** The factor to convert degrees to radians. */
 SmilesDrawer.MathHelper.radFactor = Math.PI / 180;
+
+/** The factor to convert radians to degrees. */
 SmilesDrawer.MathHelper.degFactor = 180 / Math.PI;
+
+/** Two times PI. */
 SmilesDrawer.MathHelper.twoPI = 2 * Math.PI;
 SmilesDrawer.Parser = function () {
     "use strict";
@@ -8423,12 +8313,28 @@ SmilesDrawer.Parser = function () {
         parse: peg$parse
     };
 }();
-/** A class representing a ring */
+/** 
+ * A class representing a ring.
+ * 
+ * @property {Number} id The id of this ring.
+ * @property {Number[]} members An array containing the vertex ids of the ring members.
+ * @property {Number[]} edges An array containing the edge ids of the edges between the ring members.
+ * @property {Number[]} insiders An array containing the vertex ids of the vertices contained within the ring if it is a bridged ring.
+ * @property {Number[]} neighbours An array containing the ids of neighbouring rings.
+ * @property {Boolean} positioned A boolean indicating whether or not this ring has been positioned.
+ * @property {SmilesDrawer.Vector2} center The center of this ring.
+ * @property {SmilesDrawer.Ring[]} rings The rings contained within this ring if this ring is bridged.
+ * @property {Boolean} isBridged A boolean whether or not this ring is bridged.
+ * @property {Boolean} isSpiro A boolean whether or not this ring is part of a spiro.
+ * @property {Boolean} isFused A boolean whether or not this ring is part of a fused ring.
+ * @property {Number} centralAngle The central angle of this ring.
+ * @property {Boolean} canFlip A boolean indicating whether or not this ring allows flipping of attached vertices to the inside of the ring.
+ */
 SmilesDrawer.Ring = function () {
     /**
      * The constructor for the class Ring.
      *
-     * @param {array} members An array containing the vertex ids of the members of the ring to be created.
+     * @param {Number[]} members An array containing the vertex ids of the members of the ring to be created.
      */
     function Ring(members) {
         _classCallCheck(this, Ring);
@@ -8442,7 +8348,6 @@ SmilesDrawer.Ring = function () {
         this.center = new SmilesDrawer.Vector2();
         this.rings = [];
         this.isBridged = false;
-        this.template = null;
         this.isSpiro = false;
         this.isFused = false;
         this.centralAngle = 0.0;
@@ -8452,7 +8357,7 @@ SmilesDrawer.Ring = function () {
     /**
      * Clones this ring and returns the clone.
      *
-     * @returns {Ring} A clone of this ring.
+     * @returns {SmilesDrawer.Ring} A clone of this ring.
      */
 
 
@@ -8468,7 +8373,6 @@ SmilesDrawer.Ring = function () {
             clone.center = this.center.clone();
             clone.rings = SmilesDrawer.ArrayHelper.clone(this.rings);
             clone.isBridged = this.isBridged;
-            clone.template = this.template;
             clone.isSpiro = this.isSpiro;
             clone.isFused = this.isFused;
             clone.centralAngle = this.centralAngle;
@@ -8480,7 +8384,7 @@ SmilesDrawer.Ring = function () {
         /**
          * Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.
          *
-         * @returns {boolean} Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.
+         * @returns {Boolean} Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.
          */
 
     }, {
@@ -8491,7 +8395,6 @@ SmilesDrawer.Ring = function () {
 
         /**
          * Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.
-         *
          */
 
     }, {
@@ -8505,7 +8408,7 @@ SmilesDrawer.Ring = function () {
         /**
          * Returns the size (number of members) of this ring.
          *
-         * @returns {number} The size (number of members) of this ring.
+         * @returns {Number} The size (number of members) of this ring.
          */
 
     }, {
@@ -8517,8 +8420,8 @@ SmilesDrawer.Ring = function () {
         /**
          * Gets the polygon representation (an array of the ring-members positional vectors) of this ring.
          *
-         * @param {array} vertices An array of vertices representing the current molecule.
-         * @returns {array} An array of the positional vectors of the ring members.
+         * @param {SmilesDrawer.Vertex[]} vertices An array of vertices representing the current molecule.
+         * @returns {SmilesDrawer.Vector2[]} An array of the positional vectors of the ring members.
          */
 
     }, {
@@ -8536,7 +8439,7 @@ SmilesDrawer.Ring = function () {
         /**
          * Returns the angle of this ring in relation to the coordinate system.
          *
-         * @returns {number} The angle in radians.
+         * @returns {Number} The angle in radians.
          */
 
     }, {
@@ -8548,10 +8451,10 @@ SmilesDrawer.Ring = function () {
         /**
          * Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.
          *
-         * @param {array} vertices The vertices associated with the current molecule.
-         * @param {function} callback A callback with the current vertex id as a parameter.
-         * @param {number} startVertexId The vertex id of the start vertex.
-         * @param {number} previousVertexId The vertex id of the previous vertex (the loop calling the callback function will run in the opposite direction of this vertex).
+         * @param {SmilesDrawer.Vertex[]} vertices The vertices associated with the current molecule.
+         * @param {Function} callback A callback with the current vertex id as a parameter.
+         * @param {Number} startVertexId The vertex id of the start vertex.
+         * @param {Number} previousVertexId The vertex id of the previous vertex (the loop calling the callback function will run in the opposite direction of this vertex).
          */
 
     }, {
@@ -8587,8 +8490,8 @@ SmilesDrawer.Ring = function () {
         /**
          * Returns an array containing the neighbouring rings of this ring ordered by ring size.
          *
-         * @param {array} ringConnections An array of ring connections associated with the current molecule.
-         * @returns {array} An array of neighbouring rings sorted by ring size.
+         * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections associated with the current molecule.
+         * @returns {Object[]} An array of neighbouring rings sorted by ring size. Example: { n: 5, neighbour: 1 }.
          */
 
     }, {
@@ -8616,8 +8519,8 @@ SmilesDrawer.Ring = function () {
         /**
          * Check whether this ring is an implicitly defined benzene-like (e.g. C1=CC=CC=C1) with 6 members and 3 double bonds.
          *
-         * @param {array} vertices An array of vertices associated with the current molecule.
-         * @returns {boolean} A boolean indicating whether or not this ring is an implicitly defined benzene-like.
+         * @param {SmilesDrawer.Vertex[]} vertices An array of vertices associated with the current molecule.
+         * @returns {Boolean} A boolean indicating whether or not this ring is an implicitly defined benzene-like.
          */
 
     }, {
@@ -8632,8 +8535,8 @@ SmilesDrawer.Ring = function () {
         /**
          * Get the number of double bonds inside this ring.
          *
-         * @param {array} vertices An array of vertices associated with the current molecule.
-         * @returns {number} The number of double bonds inside this ring.
+         * @param {SmilesDrawer.Vertex[]} vertices An array of vertices associated with the current molecule.
+         * @returns {Number} The number of double bonds inside this ring.
          */
 
     }, {
@@ -8655,8 +8558,8 @@ SmilesDrawer.Ring = function () {
         /**
          * Checks whether or not this ring contains a member with a given vertex id.
          *
-         * @param {number} vertexId A vertex id.
-         * @returns {boolean} A boolean indicating whether or not this ring contains a member with the given vertex id.
+         * @param {Number} vertexId A vertex id.
+         * @returns {Boolean} A boolean indicating whether or not this ring contains a member with the given vertex id.
          */
 
     }, {
@@ -8674,9 +8577,9 @@ SmilesDrawer.Ring = function () {
         /**
          * Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.
          *
-         * @param {array} rings An array of rings associated with this molecule.
-         * @param {number} vertexId A vertex id.
-         * @returns {boolean} A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.
+         * @param {SmilesDrawer.Ring[]} rings An array of rings associated with this molecule.
+         * @param {Number} vertexId A vertex id.
+         * @returns {Boolean} A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.
          */
 
     }, {
@@ -8698,9 +8601,9 @@ SmilesDrawer.Ring = function () {
         /**
          * Returns a ring based on a provided ring id.
          *
-         * @param {array} rings An array of rings associated with the current molecule.
-         * @param {number} id A ring id.
-         * @returns {Ring} A ring with a given id.
+         * @param {SmilesDrawer.Ring[]} rings An array of rings associated with the current molecule.
+         * @param {Number} id A ring id.
+         * @returns {SmilesDrawer.Ring} A ring with a given id.
          */
 
     }], [{
@@ -8717,13 +8620,20 @@ SmilesDrawer.Ring = function () {
     return Ring;
 }();
 
-/** A class representing a ring connection */
+/** 
+ * A class representing a ring connection.
+ * 
+ * @property {Number} id The id of this ring connection.
+ * @property {Number} firstRingId A ring id.
+ * @property {Number} secondRingId A ring id.
+ * @property {Set<Number>} vertices A set containing the vertex ids participating in the ring connection.
+ */
 SmilesDrawer.RingConnection = function () {
     /**
      * The constructor for the class RingConnection.
      *
-     * @param {Ring} firstRing A ring.
-     * @param {Ring} secondRing A ring.
+     * @param {SmilesDrawer.Ring} firstRing A ring.
+     * @param {SmilesDrawer.Ring} secondRing A ring.
      */
     function RingConnection(firstRing, secondRing) {
         _classCallCheck(this, RingConnection);
@@ -8749,7 +8659,7 @@ SmilesDrawer.RingConnection = function () {
     /**
      * Adding a vertex to the ring connection.
      *
-     * @param {number} vertexId A vertex id.
+     * @param {Number} vertexId A vertex id.
      */
 
 
@@ -8762,8 +8672,8 @@ SmilesDrawer.RingConnection = function () {
         /**
          * Checks whether or not this ring connection is a bridge in a bridged ring.
          *
-         * @param {array}. vertices The array of vertices associated with the current molecule.
-         * @returns {boolean} A boolean indicating whether or not this ring connection is a bridge.
+         * @param {SmilesDrawer.Vertex[]}. vertices The array of vertices associated with the current molecule.
+         * @returns {Boolean} A boolean indicating whether or not this ring connection is a bridge.
          */
 
     }, {
@@ -8806,8 +8716,8 @@ SmilesDrawer.RingConnection = function () {
         /**
          * Update the ring id of this ring connection that is not the ring id supplied as the second argument.
          *
-         * @param {number} ringId A ring id. The new ring id to be set.
-         * @param {number} otherRingId A ring id. The id that is NOT to be updated.
+         * @param {Number} ringId A ring id. The new ring id to be set.
+         * @param {Number} otherRingId A ring id. The id that is NOT to be updated.
          */
 
     }, {
@@ -8819,6 +8729,14 @@ SmilesDrawer.RingConnection = function () {
                 this.firstRingId = ringId;
             }
         }
+
+        /**
+         * Returns a boolean indicating whether or not a ring with a given id is participating in this ring connection.
+         * 
+         * @param {Number} ringId A ring id.
+         * @returns {Boolean} A boolean indicating whether or not a ring with a given id participates in this ring connection.
+         */
+
     }, {
         key: 'containsRing',
         value: function containsRing(ringId) {
@@ -8829,11 +8747,11 @@ SmilesDrawer.RingConnection = function () {
          * Checks whether or not two rings are connected by a bridged bond.
          *
          * @static
-         * @param {array} ringConnections An array of ring connections containing the ring connections associated with the current molecule.
-         * @param {array} vertices An array of vertices containing the vertices associated with the current molecule.
-         * @param {number} firstRingId A ring id.
-         * @param {number} secondRingId A ring id.
-         * @returns {boolean} A boolean indicating whether or not two rings ar connected by a bridged bond.
+         * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing the ring connections associated with the current molecule.
+         * @param {SmilesDrawer.Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+         * @param {Number} firstRingId A ring id.
+         * @param {Nmber} secondRingId A ring id.
+         * @returns {Boolean} A boolean indicating whether or not two rings ar connected by a bridged bond.
          */
 
     }], [{
@@ -8856,9 +8774,9 @@ SmilesDrawer.RingConnection = function () {
          * Retruns the neighbouring rings of a given ring.
          *
          * @static
-         * @param {array} ringConnections An array of ring connections containing ring connections associated with the current molecule.
-         * @param {number} ringId A ring id.
-         * @returns {array} An array of ring ids of neighbouring rings.
+         * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing ring connections associated with the current molecule.
+         * @param {Number} ringId A ring id.
+         * @returns {Number[]} An array of ring ids of neighbouring rings.
          */
 
     }, {
@@ -8883,10 +8801,10 @@ SmilesDrawer.RingConnection = function () {
          * Returns an array of vertex ids associated with a given ring connection.
          *
          * @static
-         * @param {array} ringConnections An array of ring connections containing ring connections associated with the current molecule.
-         * @param {number} firstRingId A ring id.
-         * @param {number} secondRingId A ring id.
-         * @returns {array} An array of vertex ids associated with the ring connection.
+         * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing ring connections associated with the current molecule.
+         * @param {Number} firstRingId A ring id.
+         * @param {Number} secondRingId A ring id.
+         * @returns {Number[]} An array of vertex ids associated with the ring connection.
          */
 
     }, {
@@ -8916,8 +8834,8 @@ SmilesDrawer.SSSR = function () {
         /**
          * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
          * 
-         * @param {array} adjacencyMatrix A 2-dimensional array representing a graph.
-         * @returns {array} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
+         * @param {Array[]} adjacencyMatrix A 2-dimensional array representing a graph.
+         * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
          */
         value: function getRings(adjacencyMatrix) {
             if (adjacencyMatrix.length === 0) {
@@ -8977,8 +8895,8 @@ SmilesDrawer.SSSR = function () {
         /**
          * Creates a printable string from a matrix (2D array).
          * 
-         * @param {array} matrix A 2D array.
-         * @returns {string} A string representing the matrix.
+         * @param {Array[]} matrix A 2D array.
+         * @returns {String} A string representing the matrix.
          */
 
     }, {
@@ -9000,8 +8918,8 @@ SmilesDrawer.SSSR = function () {
         /**
          * Returnes the two path-included distance matrices used to find the sssr.
          * 
-         * @param {array} adjacencyMatrix An adjacency matrix.
-         * @returns {object} The path-included distance matrices. { p1, p2 }
+         * @param {Array[]} adjacencyMatrix An adjacency matrix.
+         * @returns {Object} The path-included distance matrices. { p1, p2 }
          */
 
     }, {
@@ -9130,10 +9048,10 @@ SmilesDrawer.SSSR = function () {
         /**
          * Get the ring candidates from the path-included distance matrices.
          * 
-         * @param {array} d The distance matrix.
-         * @param {array} pe1 A matrix containing the shortest paths.
-         * @param {array} pe2 A matrix containing the shortest paths + one vertex.
-         * @returns {array} The ring candidates.
+         * @param {Array[]} d The distance matrix.
+         * @param {Array[]} pe1 A matrix containing the shortest paths.
+         * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
+         * @returns {Array[]} The ring candidates.
          */
 
     }, {
@@ -9173,12 +9091,12 @@ SmilesDrawer.SSSR = function () {
         /**
          * Searches the candidates for the smallest set of smallest rings.
          * 
-         * @param {array} c The candidates.
-         * @param {array} d The distance matrix.
-         * @param {array} pe1 A matrix containing the shortest paths.
-         * @param {array} pe2 A matrix containing the shortest paths + one vertex.
-         * @param {number} nsssr The theoretical number of rings in the graph.
-         * @returns {array} The smallest set of smallest rings.
+         * @param {Array[]} c The candidates.
+         * @param {Array[]} d The distance matrix.
+         * @param {Array[]} pe1 A matrix containing the shortest paths.
+         * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
+         * @param {Number} nsssr The theoretical number of rings in the graph.
+         * @returns {Set[]} The smallest set of smallest rings.
          */
 
     }, {
@@ -9222,8 +9140,8 @@ SmilesDrawer.SSSR = function () {
         /**
          * Returns the number of edges in a graph defined by an adjacency matrix.
          * 
-         * @param {array} adjacencyMatrix An adjacency matrix.
-         * @returns {number} The number of edges in the graph defined by the adjacency matrix.
+         * @param {Array[]} adjacencyMatrix An adjacency matrix.
+         * @returns {Number} The number of edges in the graph defined by the adjacency matrix.
          */
 
     }, {
@@ -9246,8 +9164,8 @@ SmilesDrawer.SSSR = function () {
         /**
          * Returns an edge list constructed form an adjacency matrix.
          * 
-         * @param {array} adjacencyMatrix An adjacency matrix.
-         * @returns {array} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
+         * @param {Array[]} adjacencyMatrix An adjacency matrix.
+         * @returns {Array[]} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
          */
 
     }, {
@@ -9270,8 +9188,8 @@ SmilesDrawer.SSSR = function () {
         /**
          * Return a set of vertex indices contained in an array of bonds.
          * 
-         * @param {array} bonds An array of bonds.
-         * @returns {set} An array of vertices.
+         * @param {Array} bonds An array of bonds. A bond is defined as [ sourceVertexId, targetVertexId ].
+         * @returns {Set<Number>} An array of vertices.
          */
 
     }, {
@@ -9290,9 +9208,9 @@ SmilesDrawer.SSSR = function () {
         /**
          * Checks whether or not a given path already exists in an array of paths.
          * 
-         * @param {array} pathSets An array of sets each representing a path.
-         * @param {set} pathSet A set representing a path.
-         * @returns {boolean} A boolean indicating whether or not a give path is contained within a set.
+         * @param {Set[]} pathSets An array of sets each representing a path.
+         * @param {Set<Number>} pathSet A set representing a path.
+         * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
          */
 
     }, {
@@ -9318,9 +9236,9 @@ SmilesDrawer.SSSR = function () {
         /**
          * Checks whether or not two sets are equal (contain the same elements).
          * 
-         * @param {set} setA A set.
-         * @param {set} setB A set.
-         * @returns {boolean} A boolean indicating whether or not the two sets are equal.
+         * @param {Set<Number>} setA A set.
+         * @param {Set<Number>} setB A set.
+         * @returns {Boolean} A boolean indicating whether or not the two sets are equal.
          */
 
     }, {
@@ -9363,9 +9281,9 @@ SmilesDrawer.SSSR = function () {
         /**
          * Checks whether or not a set (setA) is a superset of another set (setB).
          * 
-         * @param {Set} setA A set.
-         * @param {Wet} setB A set.
-         * @returns {boolean} A boolean indicating whether or not setB is a superset of setA.
+         * @param {Set<Number>} setA A set.
+         * @param {Set<Number>} setB A set.
+         * @returns {Boolean} A boolean indicating whether or not setB is a superset of setA.
          */
 
     }, {
@@ -9404,13 +9322,18 @@ SmilesDrawer.SSSR = function () {
 
     return SSSR;
 }();
-/** A class representing a 2D vector. */
+/** 
+ * A class representing a 2D vector.
+ * 
+ * @property {Number} x The x component of the vector.
+ * @property {Number} y The y component of the vector.
+ */
 SmilesDrawer.Vector2 = function () {
     /**
      * The constructor of the class Vector2.
      *
-     * @param {number} x The initial x coordinate value.
-     * @param {number} y The initial y coordinate value.
+     * @param {Number} x The initial x coordinate value.
+     * @param {Number} y The initial y coordinate value.
      */
     function Vector2(x, y) {
         _classCallCheck(this, Vector2);
@@ -9430,7 +9353,7 @@ SmilesDrawer.Vector2 = function () {
     /**
      * Clones this vector and returns the clone.
      *
-     * @returns {Vector2} The clone of this vector.
+     * @returns {SmilesDrawer.Vector2} The clone of this vector.
      */
 
 
@@ -9443,7 +9366,7 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Returns a string representation of this vector.
          *
-         * @returns {string} A string representation of this vector.
+         * @returns {String} A string representation of this vector.
          */
 
     }, {
@@ -9455,8 +9378,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
          *
-         * @param {Vector2} vec Another vector.
-         * @returns {Vector2} Returns itself.
+         * @param {SmilesDrawer.Vector2} vec Another vector.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9471,8 +9394,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
          *
-         * @param {Vector2} vec Another vector.
-         * @returns {Vector2} Returns itself.
+         * @param {SmilesDrawer.Vector2} vec Another vector.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9487,8 +9410,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Divide the x and y coordinate values of this vector by a scalar.
          *
-         * @param {number} scalar The scalar.
-         * @returns {Vector2} Returns itself.
+         * @param {Number} scalar The scalar.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9503,8 +9426,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Multiply the x and y coordinate values of this vector by the values of another vector.
          *
-         * @param {Vector2} v A vector.
-         * @returns {Vector2} Returns itself.
+         * @param {SmilesDrawer.Vector2} v A vector.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9519,8 +9442,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Multiply the x and y coordinate values of this vector by a scalar.
          *
-         * @param {number} scalar The scalar.
-         * @returns {Vector2} Returns itself.
+         * @param {Number} scalar The scalar.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9535,7 +9458,7 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Inverts this vector. Same as multiply(-1.0).
          *
-         * @returns {Vector2} Returns itself.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9550,7 +9473,7 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Returns the angle of this vector in relation to the coordinate system.
          *
-         * @returns {number} The angle in radians.
+         * @returns {Number} The angle in radians.
          */
 
     }, {
@@ -9562,8 +9485,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Returns the euclidean distance between this vector and another vector.
          *
-         * @param {Vector2} vec A vector.
-         * @returns {number} The euclidean distance between the two vectors.
+         * @param {SmilesDrawer.Vector2} vec A vector.
+         * @returns {Number} The euclidean distance between the two vectors.
          */
 
     }, {
@@ -9575,8 +9498,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).
          *
-         * @param {Vector2} vec Another vector.
-         * @returns {number} The squared euclidean distance of the two vectors.
+         * @param {SmilesDrawer.Vector2} vec Another vector.
+         * @returns {Number} The squared euclidean distance of the two vectors.
          */
 
     }, {
@@ -9588,8 +9511,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.
          *
-         * @param {Vector2} vec Another vector.
-         * @returns {number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.
+         * @param {SmilesDrawer.Vector2} vec Another vector.
+         * @returns {Number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.
          */
 
     }, {
@@ -9610,8 +9533,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Rotates this vector by a given number of radians around the origin of the coordinate system.
          *
-         * @param {number} angle The angle in radians to rotate the vector.
-         * @returns {Vector2} Returns itself.
+         * @param {Number} angle The angle in radians to rotate the vector.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9633,9 +9556,9 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Rotates this vector around another vector.
          *
-         * @param {number} angle The angle in radians to rotate the vector.
-         * @param {Vector2} vec The vector which is used as the rotational center.
-         * @returns {Vector2} Returns itself.
+         * @param {Number} angle The angle in radians to rotate the vector.
+         * @param {SmilesDrawer.Vector2} vec The vector which is used as the rotational center.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9659,10 +9582,10 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.
          *
-         * @param {Vector2} vec The vector to rotate this vector to.
-         * @param {Vector2} center The rotational center.
-         * @param {number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
-         * @returns {Vector2} Returns itself.
+         * @param {SmilesDrawer.Vector2} vec The vector to rotate this vector to.
+         * @param {SmilesDrawer.Vector2} center The rotational center.
+         * @param {Number} [offsetAngle=0.0] An additional amount of radians to rotate the vector.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9686,9 +9609,9 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Rotates the vector away from a specified vector around a center.
          * 
-         * @param {Vector2} vec The vector this one is rotated away from.
-         * @param {Vector2} center The rotational center.
-         * @param {number} angle The angle by which to rotate.
+         * @param {SmilesDrawer.Vector2} vec The vector this one is rotated away from.
+         * @param {SmilesDrawer.Vector2} center The rotational center.
+         * @param {Number} angle The angle by which to rotate.
          */
 
     }, {
@@ -9711,10 +9634,10 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Returns the angle in radians used to rotate this vector away from a given vector.
          * 
-         * @param {Vector2} vec The vector this one is rotated away from.
-         * @param {Vector2} center The rotational center.
-         * @param {number} angle The angle by which to rotate.
-         * @returns {number} The angle in radians.
+         * @param {SmilesDrawer.Vector2} vec The vector this one is rotated away from.
+         * @param {SmilesDrawer.Vector2} center The rotational center.
+         * @param {Number} angle The angle by which to rotate.
+         * @returns {Number} The angle in radians.
          */
 
     }, {
@@ -9740,10 +9663,10 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Returns the angle in radians used to rotate this vector towards a given vector.
          * 
-         * @param {Vector2} vec The vector this one is rotated towards to.
-         * @param {Vector2} center The rotational center.
-         * @param {number} angle The angle by which to rotate.
-         * @returns {number} The angle in radians.
+         * @param {SmilesDrawer.Vector2} vec The vector this one is rotated towards to.
+         * @param {SmilesDrawer.Vector2} center The rotational center.
+         * @param {Number} angle The angle by which to rotate.
+         * @returns {Number} The angle in radians.
          */
 
     }, {
@@ -9769,9 +9692,9 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Gets the angles between this vector and another vector around a common center of rotation.
          *
-         * @param {Vector2} vec Another vector.
-         * @param {Vector2} center The center of rotation.
-         * @returns {number} The angle between this vector and another vector around a center of rotation in radians.
+         * @param {SmilesDrawer.Vector2} vec Another vector.
+         * @param {SmilesDrawer.Vector2} center The center of rotation.
+         * @returns {Number} The angle between this vector and another vector around a center of rotation in radians.
          */
 
     }, {
@@ -9787,8 +9710,8 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Checks whether a vector lies within a polygon spanned by a set of vectors.
          *
-         * @param {array} polygon An array of vectors spanning the polygon.
-         * @returns {boolean} A boolean indicating whether or not this vector is within a polygon.
+         * @param {SmilesDrawer.Vector2[]} polygon An array of vectors spanning the polygon.
+         * @returns {Boolean} A boolean indicating whether or not this vector is within a polygon.
          */
 
     }, {
@@ -9809,7 +9732,7 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Returns the length of this vector.
          *
-         * @returns {number} The length of this vector.
+         * @returns {Number} The length of this vector.
          */
 
     }, {
@@ -9821,7 +9744,7 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Normalizes this vector.
          *
-         * @returns {Vector2} Returns itself.
+         * @returns {SmilesDrawer.Vector2} Returns itself.
          */
 
     }, {
@@ -9835,7 +9758,7 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Returns a normalized copy of this vector.
          *
-         * @returns {Vector2} A normalized copy of this vector.
+         * @returns {SmilesDrawer.Vector2} A normalized copy of this vector.
          */
 
     }, {
@@ -9847,9 +9770,9 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Calculates which side of a line spanned by two vectors this vector is.
          *
-         * @param {Vector2} vecA A vector.
-         * @param {Vector2} vecB A vector.
-         * @returns {number} A number indicating the side of this vector, given a line spanned by two other vectors.
+         * @param {SmilesDrawer.Vector2} vecA A vector.
+         * @param {SmilesDrawer.Vector2} vecB A vector.
+         * @returns {Number} A number indicating the side of this vector, given a line spanned by two other vectors.
          */
 
     }, {
@@ -9861,10 +9784,10 @@ SmilesDrawer.Vector2 = function () {
         /**
          * Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.
          *
-         * @param {Vector2} vecA A vector spanning the line.
-         * @param {Vector2} vecB A vector spanning the line.
-         * @param {Vector2} vecC A vector to check whether or not it is on the same side as this vector.
-         * @returns {boolean} Returns a boolean indicating whether or not this vector is on the same side as another vector.
+         * @param {SmilesDrawer.Vector2} vecA A vector spanning the line.
+         * @param {SmilesDrawer.Vector2} vecB A vector spanning the line.
+         * @param {SmilesDrawer.Vector2} vecC A vector to check whether or not it is on the same side as this vector.
+         * @returns {Boolean} Returns a boolean indicating whether or not this vector is on the same side as another vector.
          */
 
     }, {
@@ -9880,9 +9803,9 @@ SmilesDrawer.Vector2 = function () {
          * Adds two vectors and returns the result as a new vector.
          *
          * @static
-         * @param {Vector2} vecA A summand.
-         * @param {Vector2} vecB A summand.
-         * @returns {Vector2} Returns the sum of two vectors.
+         * @param {SmilesDrawer.Vector2} vecA A summand.
+         * @param {SmilesDrawer.Vector2} vecB A summand.
+         * @returns {SmilesDrawer.Vector2} Returns the sum of two vectors.
          */
 
     }], [{
@@ -9895,9 +9818,9 @@ SmilesDrawer.Vector2 = function () {
          * Subtracts one vector from another and returns the result as a new vector.
          *
          * @static
-         * @param {Vector2} vecA The minuend.
-         * @param {Vector2} vecB The subtrahend.
-         * @returns {Vector2} Returns the difference of two vectors.
+         * @param {SmilesDrawer.Vector2} vecA The minuend.
+         * @param {SmilesDrawer.Vector2} vecB The subtrahend.
+         * @returns {SmilesDrawer.Vector2} Returns the difference of two vectors.
          */
 
     }, {
@@ -9910,9 +9833,9 @@ SmilesDrawer.Vector2 = function () {
          * Multiplies two vectors (value by value) and returns the result.
          *
          * @static
-         * @param {Vector2} vecA A vector.
-         * @param {Vector2} vecB A vector.
-         * @returns {Vector2} Returns the product of two vectors.
+         * @param {SmilesDrawer.Vector2} vecA A vector.
+         * @param {SmilesDrawer.Vector2} vecB A vector.
+         * @returns {SmilesDrawer.Vector2} Returns the product of two vectors.
          */
 
     }, {
@@ -9925,9 +9848,9 @@ SmilesDrawer.Vector2 = function () {
          * Multiplies two vectors (value by value) and returns the result.
          *
          * @static
-         * @param {Vector2} vec A vector.
-         * @param {number} scalar A scalar.
-         * @returns {Vector2} Returns the product of two vectors.
+         * @param {SmilesDrawer.Vector2} vec A vector.
+         * @param {Number} scalar A scalar.
+         * @returns {SmilesDrawer.Vector2} Returns the product of two vectors.
          */
 
     }, {
@@ -9940,9 +9863,9 @@ SmilesDrawer.Vector2 = function () {
          * Returns the midpoint of a line spanned by two vectors.
          *
          * @static
-         * @param {Vector2} vecA A vector spanning the line.
-         * @param {Vector2} vecB A vector spanning the line.
-         * @returns {Vector2} The midpoint of the line spanned by two vectors.
+         * @param {SmilesDrawer.Vector2} vecA A vector spanning the line.
+         * @param {SmilesDrawer.Vector2} vecB A vector spanning the line.
+         * @returns {SmilesDrawer.Vector2} The midpoint of the line spanned by two vectors.
          */
 
     }, {
@@ -9955,9 +9878,9 @@ SmilesDrawer.Vector2 = function () {
          * Returns the normals of a line spanned by two vectors.
          *
          * @static
-         * @param {Vector2} vecA A vector spanning the line.
-         * @param {Vector2} vecB A vector spanning the line.
-         * @returns {array} An array containing the two normals, each represented by a vector.
+         * @param {SmilesDrawer.Vector2} vecA A vector spanning the line.
+         * @param {SmilesDrawer.Vector2} vecB A vector spanning the line.
+         * @returns {SmilesDrawer.Vector2[]} An array containing the two normals, each represented by a vector.
          */
 
     }, {
@@ -9972,9 +9895,9 @@ SmilesDrawer.Vector2 = function () {
          * Returns the unit (normalized normal) vectors of a line spanned by two vectors.
          *
          * @static
-         * @param {Vector2} vecA A vector spanning the line.
-         * @param {Vector2} vecB A vector spanning the line.
-         * @returns {array} An array containing the two unit vectors.
+         * @param {SmilesDrawer.Vector2} vecA A vector spanning the line.
+         * @param {SmilesDrawer.Vector2} vecB A vector spanning the line.
+         * @returns {SmilesDrawer.Vector2[]} An array containing the two unit vectors.
          */
 
     }, {
@@ -9989,9 +9912,9 @@ SmilesDrawer.Vector2 = function () {
          * Divides a vector by another vector and returns the result as new vector.
          *
          * @static
-         * @param {Vector2} vecA The dividend.
-         * @param {Vector2} vecB The divisor.
-         * @returns {Vector2} The fraction of the two vectors.
+         * @param {SmilesDrawer.Vector2} vecA The dividend.
+         * @param {SmilesDrawer.Vector2} vecB The divisor.
+         * @returns {SmilesDrawer.Vector2} The fraction of the two vectors.
          */
 
     }, {
@@ -10008,9 +9931,9 @@ SmilesDrawer.Vector2 = function () {
          * Returns the dot product of two vectors.
          *
          * @static
-         * @param {Vector2} vecA A vector.
-         * @param {Vector2} vecB A vector.
-         * @returns {number} The dot product of two vectors.
+         * @param {SmilesDrawer.Vector2} vecA A vector.
+         * @param {SmilesDrawer.Vector2} vecB A vector.
+         * @returns {Number} The dot product of two vectors.
          */
 
     }, {
@@ -10023,9 +9946,9 @@ SmilesDrawer.Vector2 = function () {
          * Returns the angle between two vectors.
          *
          * @static
-         * @param {Vector2} vecA A vector.
-         * @param {Vector2} vecB A vector.
-         * @returns {number} The angle between two vectors in radians.
+         * @param {SmilesDrawer.Vector2} vecA A vector.
+         * @param {SmilesDrawer.Vector2} vecB A vector.
+         * @returns {Number} The angle between two vectors in radians.
          */
 
     }, {
@@ -10040,10 +9963,10 @@ SmilesDrawer.Vector2 = function () {
          * Returns the angle between two vectors based on a third vector in between.
          *
          * @static
-         * @param {Vector2} vecA A vector.
-         * @param {Vector2} vecB A vector.
-         * @param {Vector2} vecC A vector.
-         * @returns {number} The angle in radians.
+         * @param {SmilesDrawer.Vector2} vecA A vector.
+         * @param {SmilesDrawer.Vector2} vecB A vector.
+         * @param {SmilesDrawer.Vector2} vecC A vector.
+         * @returns {Number} The angle in radians.
          */
 
     }, {
@@ -10061,9 +9984,9 @@ SmilesDrawer.Vector2 = function () {
          * Returns the scalar projection of a vector on another vector.
          *
          * @static
-         * @param {Vector2} vecA Thecreate jsdoc babel vector to be projected.
-         * @param {Vector2} vecB The vector to be projection upon.
-         * @returns {number} The scalar component.
+         * @param {SmilesDrawer.Vector2} vecA Thecreate jsdoc babel vector to be projected.
+         * @param {SmilesDrawer.Vector2} vecB The vector to be projection upon.
+         * @returns {Number} The scalar component.
          */
 
     }, {
@@ -10078,14 +10001,37 @@ SmilesDrawer.Vector2 = function () {
     return Vector2;
 }();
 
-/** A class representing a vertex */
+/** 
+ * A class representing a vertex.
+ * 
+ * @property {Number} id The id of this vertex.
+ * @property {Atom} value The atom associated with this vertex.
+ * @property {SmilesDrawer.Vector2} position The position of this vertex.
+ * @property {SmilesDrawer.Vector2} previousPosition The position of the previous vertex.
+ * @property {Number|null} parentVertexId The id of the previous vertex.
+ * @property {Number[]} children The ids of the children of this vertex.
+ * @property {Number[]} spanningTreeChildren The ids of the children of this vertex as defined in the spanning tree defined by the SMILES.
+ * @property {Number[]} edges The ids of edges associated with this vertex.
+ * @property {Boolean} positioned A boolean indicating whether or not this vertex has been positioned.
+ * @property {Number} angle The angle of this vertex.
+ * @property {Number} globalAngle The global angle of this vertex.
+ * @property {Number} dir The direction of this vertex.
+ * @property {Number} backAngle The back angle associated with this vertex.
+ * @property {Boolean} flippable A boolean indicating whether or not this vertex can be flipped into a ring.
+ * @property {Number|null} flipCenter The id of the vertex on which this one can be flipped.
+ * @property {Number|null} flipNeighbour The id of the vertex which caused this vertex to be flipped.
+ * @property {Number[]} flipRings An array of ring ids which specify candidates for this vertex to be flipped into.
+ * @property {Number} neighbourCount The number of neighbouring vertices.
+ * @property {Number[]} neighbours The vertex ids of neighbouring vertices.
+ * @property {String[]} neighbouringElements The element symbols associated with neighbouring vertices.         
+ */
 SmilesDrawer.Vertex = function () {
     /**
      * The constructor for the class Vertex.
      *
      * @param {*} value The value associated with this vertex.
-     * @param {number} [x=0] The initial x coordinate of the positional vector of this vertex.
-     * @param {number} [y=0] The initial y coordinate of the positional vector of this vertex.
+     * @param {Number} [x=0] The initial x coordinate of the positional vector of this vertex.
+     * @param {Number} [y=0] The initial y coordinate of the positional vector of this vertex.
      */
     function Vertex(value) {
         var x = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -10118,8 +10064,8 @@ SmilesDrawer.Vertex = function () {
     /**
      * Set the 2D coordinates of the vertex.
      * 
-     * @param {number} x The x component of the coordinates.
-     * @param {number} y The y component of the coordinates.
+     * @param {Number} x The x component of the coordinates.
+     * @param {Number} y The y component of the coordinates.
      * 
      */
 
@@ -10134,7 +10080,7 @@ SmilesDrawer.Vertex = function () {
         /**
          * Set the 2D coordinates of the vertex from a Vector2.
          * 
-         * @param {Vector2} v A 2D vector.
+         * @param {SmilesDrawer.Vector2} v A 2D vector.
          * 
          */
 
@@ -10147,7 +10093,7 @@ SmilesDrawer.Vertex = function () {
 
         /**
          * Add a child vertex id to this vertex.
-         * @param {number} vertexID The id of a vertex to be added as a child to this vertex.
+         * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
          */
 
     }, {
@@ -10163,7 +10109,7 @@ SmilesDrawer.Vertex = function () {
         /**
          * Set the vertex id of the parent.
          * 
-         * @param {number} parentVertexId The parents vertex id.
+         * @param {Number} parentVertexId The parents vertex id.
          */
 
     }, {
@@ -10179,7 +10125,7 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false. Always returns true if associated value has property hasAttachedPseudoElements set to true.
          *
-         * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
+         * @returns {Boolean} A boolean indicating whether or not this vertex is terminal.
          */
 
     }, {
@@ -10195,7 +10141,7 @@ SmilesDrawer.Vertex = function () {
         /**
          * Clones this vertex and returns the clone.
          *
-         * @returns {Vertex} A clone of this vertex.
+         * @returns {SmilesDrawer.Vertex} A clone of this vertex.
          */
 
     }, {
@@ -10220,8 +10166,8 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns true if this vertex and the supplied vertex both have the same id, else returns false.
          *
-         * @param {Vertex} vertex The vertex to check.
-         * @returns {boolean} A boolean indicating whether or not the two vertices have the same id.
+         * @param {SmilesDrawer.Vertex} vertex The vertex to check.
+         * @returns {Boolean} A boolean indicating whether or not the two vertices have the same id.
          */
 
     }, {
@@ -10233,9 +10179,9 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
          *
-         * @param {Vertex} [referenceVector=null] - The refernece vector.
-         * @param {boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
-         * @returns {number} The angle of this vertex.
+         * @param {SmilesDrawer.Vertex} [referenceVector=null] - The refernece vector.
+         * @param {Boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
+         * @returns {Number} The angle of this vertex.
          */
 
     }, {
@@ -10262,8 +10208,8 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns the suggested text direction when text is added at the position of this vertex.
          *
-         * @param {array} vertices The array of vertices for the current molecule.
-         * @returns {string} The suggested direction of the text.
+         * @param {SmilesDrawer.Vertex[]} vertices The array of vertices for the current molecule.
+         * @returns {String} The suggested direction of the text.
          */
 
     }, {
@@ -10298,8 +10244,8 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns an array of ids of neighbouring vertices.
          *
-         * @param {number} [vertexId=null] If a value is supplied, the vertex with this id is excluded from the returned indices.
-         * @returns {array} An array containing the ids of neighbouring vertices.
+         * @param {Number} [vertexId=null] If a value is supplied, the vertex with this id is excluded from the returned indices.
+         * @returns {Number[]} An array containing the ids of neighbouring vertices.
          */
 
     }, {
@@ -10325,8 +10271,8 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
          * 
-         * @param {array} vertices An array containing the vertices associated with the current molecule.
-         * @returns {array} An array containing the ids of neighbouring vertices that will be drawn.
+         * @param {SmilesDrawer.Vertex[]} vertices An array containing the vertices associated with the current molecule.
+         * @returns {Number[]} An array containing the ids of neighbouring vertices that will be drawn.
          */
 
     }, {
@@ -10346,7 +10292,7 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns the number of neighbours of this vertex.
          *
-         * @returns {number} The number of neighbours.
+         * @returns {Number} The number of neighbours.
          */
 
     }, {
@@ -10359,7 +10305,7 @@ SmilesDrawer.Vertex = function () {
          * Gets the common neighbours of this and another vertex.
          *
          * @param {Vertex} vertex The vertex to check for common neighbours.
-         * @returns {array} An array containing common neighbours.
+         * @returns {Number[]} An array containing the ids of common neighbours.
          */
 
     }, {
@@ -10385,8 +10331,8 @@ SmilesDrawer.Vertex = function () {
         /**
          * Checks whether or not a vertex is a neighbour of this vertex.
          *
-         * @param {number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
-         * @returns {boolean} A boolean indicating whether or not the two vertices are neighbours.
+         * @param {Number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
+         * @returns {Boolean} A boolean indicating whether or not the two vertices are neighbours.
          */
 
     }, {
@@ -10406,8 +10352,8 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
          *
-         * @param {number} [vertexId=null] If supplied, the vertex with this id is excluded from the array returned.
-         * @returns {array} An array containing the ids of the neighbouring vertices.
+         * @param {Number} [vertexId=null] If supplied, the vertex with this id is excluded from the array returned.
+         * @returns {Number[]} An array containing the ids of the neighbouring vertices.
          */
 
     }, {
@@ -10435,10 +10381,10 @@ SmilesDrawer.Vertex = function () {
         /**
          * Gets the next vertex in the ring in opposide direction to the supplied vertex id.
          *
-         * @param {array} vertices The array of vertices for the current molecule.
-         * @param {number} ringId The id of the ring containing this vertex.
-         * @param {number} previousVertexId The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.
-         * @returns {number} The id of the next vertex in the ring.
+         * @param {SmilesDrawer.Vertex[]} vertices The array of vertices for the current molecule.
+         * @param {Number} ringId The id of the ring containing this vertex.
+         * @param {Number} previousVertexId The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.
+         * @returns {Number} The id of the next vertex in the ring.
          */
 
     }, {

@@ -1,10 +1,17 @@
-/** A class representing a ring connection */
+/** 
+ * A class representing a ring connection.
+ * 
+ * @property {Number} id The id of this ring connection.
+ * @property {Number} firstRingId A ring id.
+ * @property {Number} secondRingId A ring id.
+ * @property {Set<Number>} vertices A set containing the vertex ids participating in the ring connection.
+ */
 SmilesDrawer.RingConnection = class RingConnection {
     /**
      * The constructor for the class RingConnection.
      *
-     * @param {Ring} firstRing A ring.
-     * @param {Ring} secondRing A ring.
+     * @param {SmilesDrawer.Ring} firstRing A ring.
+     * @param {SmilesDrawer.Ring} secondRing A ring.
      */
     constructor(firstRing, secondRing) {
         this.id = null;
@@ -28,7 +35,7 @@ SmilesDrawer.RingConnection = class RingConnection {
     /**
      * Adding a vertex to the ring connection.
      *
-     * @param {number} vertexId A vertex id.
+     * @param {Number} vertexId A vertex id.
      */
     addVertex(vertexId) {
         this.vertices.add(vertexId);
@@ -37,8 +44,8 @@ SmilesDrawer.RingConnection = class RingConnection {
     /**
      * Checks whether or not this ring connection is a bridge in a bridged ring.
      *
-     * @param {array}. vertices The array of vertices associated with the current molecule.
-     * @returns {boolean} A boolean indicating whether or not this ring connection is a bridge.
+     * @param {SmilesDrawer.Vertex[]}. vertices The array of vertices associated with the current molecule.
+     * @returns {Boolean} A boolean indicating whether or not this ring connection is a bridge.
      */
     isBridge(vertices) {
         if (this.vertices.size > 2) {
@@ -57,8 +64,8 @@ SmilesDrawer.RingConnection = class RingConnection {
     /**
      * Update the ring id of this ring connection that is not the ring id supplied as the second argument.
      *
-     * @param {number} ringId A ring id. The new ring id to be set.
-     * @param {number} otherRingId A ring id. The id that is NOT to be updated.
+     * @param {Number} ringId A ring id. The new ring id to be set.
+     * @param {Number} otherRingId A ring id. The id that is NOT to be updated.
      */
     updateOther(ringId, otherRingId) {
         if (this.firstRingId === otherRingId) {
@@ -68,6 +75,12 @@ SmilesDrawer.RingConnection = class RingConnection {
         }
     }
 
+    /**
+     * Returns a boolean indicating whether or not a ring with a given id is participating in this ring connection.
+     * 
+     * @param {Number} ringId A ring id.
+     * @returns {Boolean} A boolean indicating whether or not a ring with a given id participates in this ring connection.
+     */
     containsRing(ringId) {
         return this.firstRingId === ringId || this.secondRingId === ringId;
     }
@@ -76,11 +89,11 @@ SmilesDrawer.RingConnection = class RingConnection {
      * Checks whether or not two rings are connected by a bridged bond.
      *
      * @static
-     * @param {array} ringConnections An array of ring connections containing the ring connections associated with the current molecule.
-     * @param {array} vertices An array of vertices containing the vertices associated with the current molecule.
-     * @param {number} firstRingId A ring id.
-     * @param {number} secondRingId A ring id.
-     * @returns {boolean} A boolean indicating whether or not two rings ar connected by a bridged bond.
+     * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing the ring connections associated with the current molecule.
+     * @param {SmilesDrawer.Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+     * @param {Number} firstRingId A ring id.
+     * @param {Nmber} secondRingId A ring id.
+     * @returns {Boolean} A boolean indicating whether or not two rings ar connected by a bridged bond.
      */
     static isBridge(ringConnections, vertices, firstRingId, secondRingId) {
         let ringConnection = null;
@@ -101,9 +114,9 @@ SmilesDrawer.RingConnection = class RingConnection {
      * Retruns the neighbouring rings of a given ring.
      *
      * @static
-     * @param {array} ringConnections An array of ring connections containing ring connections associated with the current molecule.
-     * @param {number} ringId A ring id.
-     * @returns {array} An array of ring ids of neighbouring rings.
+     * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing ring connections associated with the current molecule.
+     * @param {Number} ringId A ring id.
+     * @returns {Number[]} An array of ring ids of neighbouring rings.
      */
     static getNeighbours(ringConnections, ringId) {
         let neighbours = [];
@@ -125,10 +138,10 @@ SmilesDrawer.RingConnection = class RingConnection {
      * Returns an array of vertex ids associated with a given ring connection.
      *
      * @static
-     * @param {array} ringConnections An array of ring connections containing ring connections associated with the current molecule.
-     * @param {number} firstRingId A ring id.
-     * @param {number} secondRingId A ring id.
-     * @returns {array} An array of vertex ids associated with the ring connection.
+     * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing ring connections associated with the current molecule.
+     * @param {Number} firstRingId A ring id.
+     * @param {Number} secondRingId A ring id.
+     * @returns {Number[]} An array of vertex ids associated with the ring connection.
      */
     static getVertices(ringConnections, firstRingId, secondRingId) {
         for (let i = 0; i < ringConnections.length; i++) {

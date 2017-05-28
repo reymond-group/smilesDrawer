@@ -1,10 +1,18 @@
-/* A class representing the molecular graph. */
+/** 
+ * A class representing the molecular graph. 
+ * 
+ * @property {SmilesDrawer.Vertex[]} vertices The vertices of the graph.
+ * @property {SmilesDrawer.Edge[]} edges The edges of this graph.
+ * @property {Object} vertexIdsToEdgeId A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId.
+ * @property {Object} elementCount A map associating element symbols with the number of occurences in this graph.
+ * @property {Boolean} isometric A boolean indicating whether or not the SMILES associated with this graph is isometric.
+ */
 SmilesDrawer.Graph = class Graph {
     /**
      * The constructor of the class Graph.
      * 
-     * @param {any} parseTree A SMILES parse tree.
-     * @param {boolean} [isomeric=false] A boolean specifying whether or not the SMILES is isomeric.
+     * @param {Object} parseTree A SMILES parse tree.
+     * @param {Boolean} [isomeric=false] A boolean specifying whether or not the SMILES is isomeric.
      */
     constructor(parseTree, isomeric = false) {
         this.vertices = [];
@@ -22,9 +30,9 @@ SmilesDrawer.Graph = class Graph {
     /**
      * PRIVATE FUNCTION. Initializing the graph from the parse tree.
      *
-     * @param {object} node The current node in the parse tree.
-     * @param {number} parentVertexId=null The id of the previous vertex.
-     * @param {boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
+     * @param {Object} node The current node in the parse tree.
+     * @param {Number} parentVertexId=null The id of the previous vertex.
+     * @param {Boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
      */
     _init(node, order = 0, parentVertexId = null, isBranch = false) {
         // Create a new vertex object
@@ -115,8 +123,8 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Add a vertex to the graph.
      *
-     * @param {Vertex} vertex A new vertex.
-     * @returns {number} The vertex id of the new vertex.
+     * @param {SmilesDrawer.Vertex} vertex A new vertex.
+     * @returns {Number} The vertex id of the new vertex.
      */
     addVertex(vertex) {
         vertex.id = this.vertices.length;
@@ -128,8 +136,8 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Add an edge to the graph.
      *
-     * @param {Edge} edge A new edge.
-     * @returns {number} The edge id of the new edge.
+     * @param {SmilesDrawer.Edge} edge A new edge.
+     * @returns {Number} The edge id of the new edge.
      */
     addEdge(edge) {
         edge.id = this.edges.length;
@@ -144,9 +152,9 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Returns the edge between two given vertices.
      *
-     * @param {number} vertexIdA A vertex id.
-     * @param {number} vertexIdB A vertex id.
-     * @returns {number|null} The edge or, if no edge can be found, null.
+     * @param {Number} vertexIdA A vertex id.
+     * @param {Number} vertexIdB A vertex id.
+     * @returns {Number|null} The edge or, if no edge can be found, null.
      */
     getEdge(vertexIdA, vertexIdB) {
         let edgeId = this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB];
@@ -157,9 +165,9 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Returns the edge between two given vertices.
      *
-     * @param {number} vertexIdA A vertex id.
-     * @param {number} vertexIdB A vertex id.
-     * @returns {number|null} The edge or, if no edge can be found, null.
+     * @param {Number} vertexIdA A vertex id.
+     * @param {Number} vertexIdB A vertex id.
+     * @returns {Number|null} The edge or, if no edge can be found, null.
      */
     hasEdge(vertexIdA, vertexIdB) {
         return this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB] !== undefined
@@ -168,7 +176,7 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Returns an array containing the vertex ids of this graph.
      * 
-     * @returns {array} An array containing all vertex ids of this graph.
+     * @returns {Number[]} An array containing all vertex ids of this graph.
      */
     getVertexList() {
         let arr = [this.vertices.length];
@@ -183,7 +191,7 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Returns an array containing source, target arrays of this graphs edges.
      * 
-     * @returns {array} An array containing source, target arrays of this graphs edges.
+     * @returns {Array[]} An array containing source, target arrays of this graphs edges. Example: [ [ 2, 5 ], [ 6, 9 ] ].
      */
     getEdgeList() {
         let arr = [this.edges.length];
@@ -198,7 +206,7 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Get the adjacency matrix of the graph.
      * 
-     * @returns {array} The adjancency matrix of the molecular graph.
+     * @returns {Array[]} The adjancency matrix of the molecular graph.
      */
     getAdjacencyMatrix() {
         let length = this.vertices.length;
@@ -222,7 +230,7 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Get the adjacency matrix of the graph with all bridges removed (thus the components). Thus the remaining vertices are all part of ring systems.
      * 
-     * @returns {array} The adjancency matrix of the molecular graph with all bridges removed.
+     * @returns {Array[]} The adjancency matrix of the molecular graph with all bridges removed.
      */
     getComponentsAdjacencyMatrix() {
         let length = this.vertices.length;
@@ -252,8 +260,8 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Get the adjacency matrix of a subgraph.
      * 
-     * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
-     * @returns {array} The adjancency matrix of the subgraph.
+     * @param {Number[]} vertexIds An array containing the vertex ids contained within the subgraph.
+     * @returns {Array[]} The adjancency matrix of the subgraph.
      */
     getSubgraphAdjacencyMatrix(vertexIds) {
         let length = vertexIds.length;
@@ -280,7 +288,7 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Get the adjacency list of the graph.
      * 
-     * @returns {array} The adjancency list of the graph.
+     * @returns {Array[]} The adjancency list of the graph.
      */
     getAdjacencyList() {
         let length = this.vertices.length;
@@ -306,8 +314,8 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Get the adjacency list of a subgraph.
      * 
-     * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
-     * @returns {array} The adjancency list of the subgraph.
+     * @param {Number[]} vertexIds An array containing the vertex ids contained within the subgraph.
+     * @returns {Array[]} The adjancency list of the subgraph.
      */
     getSubgraphAdjacencyList(vertexIds) {
         let length = vertexIds.length;
@@ -331,21 +339,9 @@ SmilesDrawer.Graph = class Graph {
     }
 
     /**
-     * Get the path of the 
-     * 
-     * @param {array} startVertexId The start vertex of the cycle.
-     * @param {array} vertexIds An array containing the vertex ids contained within the subgraph.
-     */
-    getLargestCycleInSubgraph(startVertexId, vertexIds) {
-        let path = [];
-        let adjacencyList = this.getSubgraphAdjacencyList(vertexIds);
-        return path;
-    }
-
-    /**
      * Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
      * 
-     * @returns {array} An array containing the edge ids of the bridges.
+     * @returns {Number[]} An array containing the edge ids of the bridges.
      */
     getBridges() {
         let length = this.vertices.length;
@@ -399,7 +395,7 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Returns the number of connected components for the grpah 
      * 
-     * @param {array} adjacencyMatrix An adjacency matrix.
+     * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @returns {Number} The number of connected components of the supplied graph.
      */
     static getConnectedComponentCount(adjacencyMatrix) {

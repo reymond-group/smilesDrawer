@@ -10,8 +10,8 @@ let SmilesDrawer = {
  * Cleans a SMILES string (removes non-valid characters)
  *
  * @static
- * @param {string} smiles A SMILES string.
- * @returns {string} The clean SMILES string.
+ * @param {String} smiles A SMILES string.
+ * @returns {String} The clean SMILES string.
  */
 SmilesDrawer.clean = function(smiles) {
     return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g,'');
@@ -21,8 +21,8 @@ SmilesDrawer.clean = function(smiles) {
  * Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
  *
  * @static
- * @param {objects} options SmilesDrawer options.
- * @param {string} [themeName='light'] The theme to apply.
+ * @param {Object} options SmilesDrawer options.
+ * @param {String} [themeName='light'] The theme to apply.
  */
 SmilesDrawer.apply = function(options, themeName='light') {
     let smilesDrawer = new SmilesDrawer.Drawer(options);
@@ -41,7 +41,7 @@ SmilesDrawer.apply = function(options, themeName='light') {
  * Parses the entered smiles string.
  * 
  * @static
- * @param {string} smiles A SMILES string.
+ * @param {String} smiles A SMILES string.
  * @param {Function} successCallback A callback that is called on success with the parse tree.
  * @param {Function} errorCallback A callback that is called with the error object on error.
  */

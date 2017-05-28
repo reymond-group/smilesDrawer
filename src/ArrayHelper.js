@@ -1,11 +1,13 @@
-/** A static class containing helper functions for array-related tasks. */
+/** 
+ * A static class containing helper functions for array-related tasks. 
+ */
 SmilesDrawer.ArrayHelper = class ArrayHelper {
     /**
      * Clone an array or an object. If an object is passed, a shallow clone will be created.
      *
      * @static
-     * @param {array|object} arr The array or object to be cloned.
-     * @returns {array|object} A clone of the array or object.
+     * @param {*} arr The array or object to be cloned.
+     * @returns {*} A clone of the array or object.
      */
     static clone(arr) {
         let out = Array.isArray(arr) ? [] : {};
@@ -28,8 +30,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Returns a string representation of an array. If the array contains objects with an id property, the id property is printed for each of the elements.
      *
      * @static
-     * @param {array} arr An array.
-     * @returns {string} A string representation of the array.
+     * @param {Object[]} arr An array.
+     * @param {*} arr[].id If the array contains an object with the property 'id', the properties value is printed. Else, the array elements value is printend.
+     * @returns {String} A string representation of the array.
      */
     static print(arr) {
         if (arr.length == 0) {
@@ -51,8 +54,8 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Run a function for each element in the array. The element is supplied as an argument for the callback function
      *
      * @static
-     * @param {array} arr An array.
-     * @param {function} callback The callback function that is called for each element.
+     * @param {Array} arr An array.
+     * @param {Function} callback The callback function that is called for each element.
      */
     static each(arr, callback) {
         for (let i = 0; i < arr.length; i++) {
@@ -64,9 +67,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Return the array element from an array containing objects, where a property of the object is set to a given value.
      *
      * @static
-     * @param {array} arr An array.
-     * @param {string|number} property A property contained within an object in the array.
-     * @param {string|number} value The value of the property.
+     * @param {Array} arr An array.
+     * @param {String|Number} property A property contained within an object in the array.
+     * @param {String|Number} value The value of the property.
      * @returns {*} The array element matching the value.
      */
     static get(arr, property, value) {
@@ -81,9 +84,12 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Checks whether or not an array contains a given value. the options object passed as a second argument can contain three properties. value: The value to be searched for. property: The property that is to be searched for a given value. func: A function that is used as a callback to return either true or false in order to do a custom comparison.
      *
      * @static
-     * @param {array} arr An array.
-     * @param {object} options See method description.
-     * @returns {boolean} A boolean whether or not the array contains a value.
+     * @param {Array} arr An array.
+     * @param {Object} options See method description.
+     * @param {String} options.property The property on which to check.
+     * @param {*} options.value The value for which to check.
+     * @param {Function} [options.func=undefined] A custom property function.
+     * @returns {Boolean} A boolean whether or not the array contains a value.
      */
     static contains(arr, options) {
         if (!options.property && !options.func) {
@@ -113,9 +119,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Returns an array containing the intersection between two arrays. That is, values that are common to both arrays.
      *
      * @static
-     * @param {array} arrA An array.
-     * @param {array} arrB An array.
-     * @returns {array} The intersecting vlaues.
+     * @param {Array} arrA An array.
+     * @param {Array} arrB An array.
+     * @returns {Array} The intersecting vlaues.
      */
     static intersection(arrA, arrB) {
         let intersection = new Array();
@@ -135,8 +141,8 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Returns an array of unique elements contained in an array.
      *
      * @static
-     * @param {array} arr An array.
-     * @returns {array} An array of unique elements contained within the array supplied as an argument.
+     * @param {Array} arr An array.
+     * @returns {Array} An array of unique elements contained within the array supplied as an argument.
      */
     static unique(arr) {
         let contains = {};
@@ -150,9 +156,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Count the number of occurences of a value in an array.
      *
      * @static
-     * @param {array} arr An array.
+     * @param {Array} arr An array.
      * @param {*} value A value to be counted.
-     * @returns {number} The number of occurences of a value in the array.
+     * @returns {Number} The number of occurences of a value in the array.
      */
     static count(arr, value) {
         let count = 0;
@@ -170,9 +176,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Toggles the value of an array. If a value is not contained in an array, the array returned will contain all the values of the original array including the value. If a value is contained in an array, the array returned will contain all the values of the original array excluding the value.
      *
      * @static
-     * @param {array} arr An array.
+     * @param {Array} arr An array.
      * @param {*} value A value to be toggled.
-     * @returns {array} The toggled array.
+     * @returns {Array} The toggled array.
      */
     static toggle(arr, value) {
         let newArr = [];
@@ -202,9 +208,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Remove a value from an array.
      *
      * @static
-     * @param {array} arr An array.
+     * @param {Array} arr An array.
      * @param {*} value A value to be removed.
-     * @returns {array} A new array with the element with a given value removed.
+     * @returns {Array} A new array with the element with a given value removed.
      */
     static remove(arr, value) {
         let tmp = [];
@@ -222,9 +228,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Remove a value from an array with unique values.
      *
      * @static
-     * @param {array} arr An array.
+     * @param {Array} arr An array.
      * @param {*} value A value to be removed.
-     * @returns {array} An array with the element with a given value removed.
+     * @returns {Array} An array with the element with a given value removed.
      */
     static removeUnique(arr, value) {
         let index = array.indexOf(value);
@@ -240,9 +246,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Remove all elements contained in one array from another array.
      *
      * @static
-     * @param {array} arrA The array to be filtered.
-     * @param {array} arrB The array containing elements that will be removed from the other array.
-     * @returns {array} The filtered array.
+     * @param {Array} arrA The array to be filtered.
+     * @param {Array} arrB The array containing elements that will be removed from the other array.
+     * @returns {Array} The filtered array.
      */
     static removeAll(arrA, arrB) {
         return arrA.filter(function (item) {
@@ -254,9 +260,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Merges two arrays and returns the result. The second array will be appended to the second array.
      *
      * @static
-     * @param {array} arrA An array.
-     * @param {array} arrB An array.
-     * @returns {array} The merged array.
+     * @param {Array} arrA An array.
+     * @param {Array} arrB An array.
+     * @returns {Array} The merged array.
      */
     static merge(arrA, arrB) {
         let arr = new Array(arrA.length + arrB.length);
@@ -276,9 +282,9 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * Checks whether or not an array contains all the elements of another array, without regard to the order.
      *
      * @static
-     * @param {array} arrA An array.
-     * @param {array} arrB An array.
-     * @returns {boolean} A boolean indicating whether or not both array contain the same elements.
+     * @param {Array} arrA An array.
+     * @param {Array} arrB An array.
+     * @returns {Boolean} A boolean indicating whether or not both array contain the same elements.
      */
     static containsAll(arrA, arrB) {
         let containing = 0;
@@ -296,8 +302,10 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
     /**
      * Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...
      *
-     * @param {array} arr An array of objects { atomicNumber: 6, vertexId: 2 }.
-     * @returns {array} The sorted array.
+     * @param {Object[]} arr An array of vertex ids with their associated atomic numbers.
+     * @param {Number} arr[].vertexId A vertex id.
+     * @param {Number} arr[].atomicNumber The atomic number associated with the vertex id.
+     * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
      */
     static sortByAtomicNumberDesc(arr) {
         let map = arr.map(function(e, i) {
@@ -323,8 +331,8 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
     /**
      * Copies a an n-dimensional array.
      * 
-     * @param {array} arr The array to be copied.
-     * @returns {array} The copy.
+     * @param {Array} arr The array to be copied.
+     * @returns {Array} The copy.
      */
     static deepCopy(arr) {
         let newArr = [];

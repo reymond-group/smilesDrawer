@@ -1,4 +1,13 @@
-/** A class representing a line */
+/** 
+ * A class representing a line.
+ * 
+ * @property {SmilesDrawer.Vector2} from The SmilesDrawer.Vector2 defining the start of the line.
+ * @property {SmilesDrawer.Vector2} to The SmilesDrawer.Vector2 defining the end of the line.
+ * @property {String} elementFrom The element symbol associated with the start of the line.
+ * @property {String} elementTo The element symbol associated with the end of the line.
+ * @property {Boolean} chiralFrom A boolean indicating whether or not the source atom is a chiral center.
+ * @property {Boolean} chiralTo A boolean indicating whether or tno the target atom is a chiral center.
+ */
 SmilesDrawer.Line = class Line {
     /**
      * The constructor for the class Line.
@@ -22,7 +31,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Clones this line and returns the clone.
      *
-     * @returns {Line} A clone of this line.
+     * @returns {SmilesDrawer.Line} A clone of this line.
      */
     clone() {
         return new SmilesDrawer.Line(this.from.clone(), this.to.clone(), this.elementFrom, this.elementTo);
@@ -31,7 +40,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns the length of this line.
      *
-     * @returns {number} The length of this line.
+     * @returns {Number} The length of this line.
      */
     getLength() {
         return Math.sqrt(Math.pow(this.to.x - this.from.x, 2) + 
@@ -42,7 +51,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns the angle of the line in relation to the coordinate system (the x-axis).
      *
-     * @returns {number} The angle in radians.
+     * @returns {Number} The angle in radians.
      */
     getAngle() {
         // Get the angle between the line and the x-axis
@@ -53,7 +62,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns the right vector (the vector with the larger x value).
      *
-     * @returns {Vector2} The right vector.
+     * @returns {SmilesDrawer.Vector2} The right vector.
      */
     getRightVector() {
         // Return the vector with the larger x value (the right one)
@@ -67,7 +76,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns the left vector (the vector with the smaller x value).
      *
-     * @returns {Vector2} The left vector.
+     * @returns {SmilesDrawer.Vector2} The left vector.
      */
     getLeftVector() {
         // Return the vector with the smaller x value (the left one)
@@ -81,7 +90,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns the element associated with the right vector (the vector with the larger x value).
      *
-     * @returns {string} The element associated with the right vector.
+     * @returns {String} The element associated with the right vector.
      */
     getRightElement() {
         if (this.from.x < this.to.x) {
@@ -94,7 +103,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns the element associated with the left vector (the vector with the smaller x value).
      *
-     * @returns {string} The element associated with the left vector.
+     * @returns {String} The element associated with the left vector.
      */
     getLeftElement() {
         if (this.from.x < this.to.x) {
@@ -107,7 +116,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.
      *
-     * @returns {boolean} Whether or not the atom associated with the right vector is a chiral center.
+     * @returns {Boolean} Whether or not the atom associated with the right vector is a chiral center.
      */
     getRightChiral() {
         if (this.from.x < this.to.x) {
@@ -120,7 +129,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.
      *
-     * @returns {boolean} Whether or not the atom  associated with the left vector is a chiral center.
+     * @returns {Boolean} Whether or not the atom  associated with the left vector is a chiral center.
      */
     getLeftChiral() {
         if (this.from.x < this.to.x) {
@@ -133,9 +142,9 @@ SmilesDrawer.Line = class Line {
     /**
      * Set the value of the right vector.
      *
-     * @param {number} x The x value.
-     * @param {number} y The y value.
-     * @returns {Line} This line.
+     * @param {Number} x The x value.
+     * @param {Number} y The y value.
+     * @returns {SmilesDrawer.Line} This line.
      */
     setRightVector(x, y) {
         if (this.from.x < this.to.x) {
@@ -152,9 +161,9 @@ SmilesDrawer.Line = class Line {
     /**
      * Set the value of the left vector.
      *
-     * @param {number} x The x value.
-     * @param {number} y The y value.
-     * @returns {Line} This line.
+     * @param {Number} x The x value.
+     * @param {Number} y The y value.
+     * @returns {SmilesDrawer.Line} This line.
      */
     setLeftVector(x, y) {
         if (this.from.x < this.to.x) {
@@ -171,7 +180,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Rotates this line to be aligned with the x-axis. The center of rotation is the left vector.
      *
-     * @returns {Line} This line.
+     * @returns {SmilesDrawer.Line} This line.
      */
     rotateToXAxis() {
         let left = this.getLeftVector();
@@ -184,8 +193,8 @@ SmilesDrawer.Line = class Line {
     /**
      * Rotate the line by a given value (in radians). The center of rotation is the left vector.
      *
-     * @param {number} theta The angle (in radians) to rotate the line.
-     * @returns {Line} This line.
+     * @param {Number} theta The angle (in radians) to rotate the line.
+     * @returns {SmilesDrawer.Line} This line.
      */
     rotate(theta) {
         let l = this.getLeftVector();
@@ -204,8 +213,8 @@ SmilesDrawer.Line = class Line {
     /**
      * Shortens this line from the "from" direction by a given value (in pixels).
      *
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} This line.
+     * @param {Number} by The length in pixels to shorten the vector by.
+     * @returns {SmilesDrawer.Line} This line.
      */
     shortenFrom(by) {
         let f = SmilesDrawer.Vector2.subtract(this.to, this.from);
@@ -221,8 +230,8 @@ SmilesDrawer.Line = class Line {
     /**
      * Shortens this line from the "to" direction by a given value (in pixels).
      *
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} This line.
+     * @param {Number} by The length in pixels to shorten the vector by.
+     * @returns {SmilesDrawer.Line} This line.
      */
     shortenTo(by) {
         let f = SmilesDrawer.Vector2.subtract(this.from, this.to);
@@ -238,8 +247,8 @@ SmilesDrawer.Line = class Line {
     /**
      * Shorten the right side.
      *
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} Returns itself.
+     * @param {Number} by The length in pixels to shorten the vector by.
+     * @returns {SmilesDrawer.Line} Returns itself.
      */
     shortenRight(by) {
         if (this.from.x < this.to.x) {
@@ -254,8 +263,8 @@ SmilesDrawer.Line = class Line {
     /**
      * Shorten the left side.
      * 
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} Returns itself.
+     * @param {Number} by The length in pixels to shorten the vector by.
+     * @returns {SmilesDrawer.Line} Returns itself.
      */
     shortenLeft(by) {
         if (this.from.x < this.to.x) {
@@ -270,8 +279,8 @@ SmilesDrawer.Line = class Line {
     /**
      * Shortens this line from both directions by a given value (in pixels).
      *
-     * @param {number} by The length in pixels to shorten the vector by.
-     * @returns {Line} This line.
+     * @param {Number} by The length in pixels to shorten the vector by.
+     * @returns {SmilesDrawer.Line} This line.
      */
     shorten(by) {
         let f = SmilesDrawer.Vector2.subtract(this.from, this.to);
@@ -288,7 +297,7 @@ SmilesDrawer.Line = class Line {
     /**
      * Returns the normals of this line.
      *
-     * @returns {array} An array containing the two normals as vertices.
+     * @returns {SmilesDrawer.Vector2[]} An array containing the two normals as vertices.
      */
     getNormals() {
         let delta = SmilesDrawer.Vector2.subtract(from, to);

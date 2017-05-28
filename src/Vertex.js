@@ -1,11 +1,34 @@
-/** A class representing a vertex */
+/** 
+ * A class representing a vertex.
+ * 
+ * @property {Number} id The id of this vertex.
+ * @property {Atom} value The atom associated with this vertex.
+ * @property {SmilesDrawer.Vector2} position The position of this vertex.
+ * @property {SmilesDrawer.Vector2} previousPosition The position of the previous vertex.
+ * @property {Number|null} parentVertexId The id of the previous vertex.
+ * @property {Number[]} children The ids of the children of this vertex.
+ * @property {Number[]} spanningTreeChildren The ids of the children of this vertex as defined in the spanning tree defined by the SMILES.
+ * @property {Number[]} edges The ids of edges associated with this vertex.
+ * @property {Boolean} positioned A boolean indicating whether or not this vertex has been positioned.
+ * @property {Number} angle The angle of this vertex.
+ * @property {Number} globalAngle The global angle of this vertex.
+ * @property {Number} dir The direction of this vertex.
+ * @property {Number} backAngle The back angle associated with this vertex.
+ * @property {Boolean} flippable A boolean indicating whether or not this vertex can be flipped into a ring.
+ * @property {Number|null} flipCenter The id of the vertex on which this one can be flipped.
+ * @property {Number|null} flipNeighbour The id of the vertex which caused this vertex to be flipped.
+ * @property {Number[]} flipRings An array of ring ids which specify candidates for this vertex to be flipped into.
+ * @property {Number} neighbourCount The number of neighbouring vertices.
+ * @property {Number[]} neighbours The vertex ids of neighbouring vertices.
+ * @property {String[]} neighbouringElements The element symbols associated with neighbouring vertices.         
+ */
 SmilesDrawer.Vertex = class Vertex {
     /**
      * The constructor for the class Vertex.
      *
      * @param {*} value The value associated with this vertex.
-     * @param {number} [x=0] The initial x coordinate of the positional vector of this vertex.
-     * @param {number} [y=0] The initial y coordinate of the positional vector of this vertex.
+     * @param {Number} [x=0] The initial x coordinate of the positional vector of this vertex.
+     * @param {Number} [y=0] The initial y coordinate of the positional vector of this vertex.
      */
     constructor(value, x = 0, y = 0) {
         this.id = null;
@@ -33,8 +56,8 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Set the 2D coordinates of the vertex.
      * 
-     * @param {number} x The x component of the coordinates.
-     * @param {number} y The y component of the coordinates.
+     * @param {Number} x The x component of the coordinates.
+     * @param {Number} y The y component of the coordinates.
      * 
      */
     setPosition(x, y) {
@@ -45,7 +68,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Set the 2D coordinates of the vertex from a Vector2.
      * 
-     * @param {Vector2} v A 2D vector.
+     * @param {SmilesDrawer.Vector2} v A 2D vector.
      * 
      */
     setPositionFromVector(v) {
@@ -55,7 +78,7 @@ SmilesDrawer.Vertex = class Vertex {
 
     /**
      * Add a child vertex id to this vertex.
-     * @param {number} vertexID The id of a vertex to be added as a child to this vertex.
+     * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
      */
     addChild(vertexId) {
         this.neighbourCount++;
@@ -68,7 +91,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Set the vertex id of the parent.
      * 
-     * @param {number} parentVertexId The parents vertex id.
+     * @param {Number} parentVertexId The parents vertex id.
      */
     setParentVertexId(parentVertexId) {
         this.neighbourCount++;
@@ -81,7 +104,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false. Always returns true if associated value has property hasAttachedPseudoElements set to true.
      *
-     * @returns {boolean} A boolean indicating whether or not this vertex is terminal.
+     * @returns {Boolean} A boolean indicating whether or not this vertex is terminal.
      */
     isTerminal() {
         if (this.value.hasAttachedPseudoElements) {
@@ -94,7 +117,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Clones this vertex and returns the clone.
      *
-     * @returns {Vertex} A clone of this vertex.
+     * @returns {SmilesDrawer.Vertex} A clone of this vertex.
      */
     clone() {
         let clone = new Vertex(this.value, this.position.x, this.position.y);
@@ -116,8 +139,8 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns true if this vertex and the supplied vertex both have the same id, else returns false.
      *
-     * @param {Vertex} vertex The vertex to check.
-     * @returns {boolean} A boolean indicating whether or not the two vertices have the same id.
+     * @param {SmilesDrawer.Vertex} vertex The vertex to check.
+     * @returns {Boolean} A boolean indicating whether or not the two vertices have the same id.
      */
     equals(vertex) {
         return this.id === vertex.id;
@@ -126,9 +149,9 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
      *
-     * @param {Vertex} [referenceVector=null] - The refernece vector.
-     * @param {boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
-     * @returns {number} The angle of this vertex.
+     * @param {SmilesDrawer.Vertex} [referenceVector=null] - The refernece vector.
+     * @param {Boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
+     * @returns {Number} The angle of this vertex.
      */
     getAngle(referenceVector = null, returnAsDegrees = false) {
         let u = null;
@@ -149,8 +172,8 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns the suggested text direction when text is added at the position of this vertex.
      *
-     * @param {array} vertices The array of vertices for the current molecule.
-     * @returns {string} The suggested direction of the text.
+     * @param {SmilesDrawer.Vertex[]} vertices The array of vertices for the current molecule.
+     * @returns {String} The suggested direction of the text.
      */
     getTextDirection(vertices) {
         let neighbours = this.getDrawnNeighbours(vertices);
@@ -182,8 +205,8 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns an array of ids of neighbouring vertices.
      *
-     * @param {number} [vertexId=null] If a value is supplied, the vertex with this id is excluded from the returned indices.
-     * @returns {array} An array containing the ids of neighbouring vertices.
+     * @param {Number} [vertexId=null] If a value is supplied, the vertex with this id is excluded from the returned indices.
+     * @returns {Number[]} An array containing the ids of neighbouring vertices.
      */
     getNeighbours(vertexId = null) {
         if (vertexId === null) {
@@ -204,8 +227,8 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
      * 
-     * @param {array} vertices An array containing the vertices associated with the current molecule.
-     * @returns {array} An array containing the ids of neighbouring vertices that will be drawn.
+     * @param {SmilesDrawer.Vertex[]} vertices An array containing the vertices associated with the current molecule.
+     * @returns {Number[]} An array containing the ids of neighbouring vertices that will be drawn.
      */
     getDrawnNeighbours(vertices) {
         let arr = [];
@@ -222,7 +245,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns the number of neighbours of this vertex.
      *
-     * @returns {number} The number of neighbours.
+     * @returns {Number} The number of neighbours.
      */
     getNeighbourCount() {
         return this.neighbourCount;
@@ -232,7 +255,7 @@ SmilesDrawer.Vertex = class Vertex {
      * Gets the common neighbours of this and another vertex.
      *
      * @param {Vertex} vertex The vertex to check for common neighbours.
-     * @returns {array} An array containing common neighbours.
+     * @returns {Number[]} An array containing the ids of common neighbours.
      */
     getCommonNeighbours(vertex) {
         // There can only be one common neighbour of a Vertex
@@ -255,8 +278,8 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Checks whether or not a vertex is a neighbour of this vertex.
      *
-     * @param {number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
-     * @returns {boolean} A boolean indicating whether or not the two vertices are neighbours.
+     * @param {Number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
+     * @returns {Boolean} A boolean indicating whether or not the two vertices are neighbours.
      */
     isNeighbour(vertexId) {
         if (this.parentVertexId === vertexId) {
@@ -273,8 +296,8 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
      *
-     * @param {number} [vertexId=null] If supplied, the vertex with this id is excluded from the array returned.
-     * @returns {array} An array containing the ids of the neighbouring vertices.
+     * @param {Number} [vertexId=null] If supplied, the vertex with this id is excluded from the array returned.
+     * @returns {Number[]} An array containing the ids of the neighbouring vertices.
      */
     getSpanningTreeNeighbours(vertexId = null) {
         let neighbours = [];
@@ -297,10 +320,10 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Gets the next vertex in the ring in opposide direction to the supplied vertex id.
      *
-     * @param {array} vertices The array of vertices for the current molecule.
-     * @param {number} ringId The id of the ring containing this vertex.
-     * @param {number} previousVertexId The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.
-     * @returns {number} The id of the next vertex in the ring.
+     * @param {SmilesDrawer.Vertex[]} vertices The array of vertices for the current molecule.
+     * @param {Number} ringId The id of the ring containing this vertex.
+     * @param {Number} previousVertexId The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.
+     * @returns {Number} The id of the next vertex in the ring.
      */
     getNextInRing(vertices, ringId, previousVertexId) {
         let neighbours = this.getNeighbours();

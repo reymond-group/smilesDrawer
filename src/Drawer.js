@@ -1,16 +1,26 @@
-/** The main class of the application representing the smiles drawer */
+/** 
+ * The main class of the application representing the smiles drawer 
+ * 
+ * @property {SmilesDrawer.Graph} graph The graph associated with this SmilesDrawer.Drawer instance.
+ * @property {Number} ringIdCounter An internal counter to keep track of ring ids.
+ * @property {Number} ringConnectionIdCounter An internal counter to keep track of ring connection ids.
+ * @property {SmilesDrawer.CanvasWrapper} canvasWrapper The SmilesDrawer.CanvasWrapper associated with this SmilesDrawer.Drawer instance.
+ * @property {Number} totalOverlapScore The current internal total overlap score.
+ * @property {Object} defaultOptions The default options.
+ * @property {Object} opts The merged options.
+ * @property {Object} theme The current theme.
+ */
 SmilesDrawer.Drawer = class Drawer {
     /**
      * The constructor for the class SmilesDrawer.
      *
-     * @param {object} options An object containing custom values for different options. It is merged with the default options.
+     * @param {Object} options An object containing custom values for different options. It is merged with the default options.
      */
     constructor(options) {
         this.graph = null;
         this.ringIdCounter = 0;
         this.ringConnectionIdCounter = 0;
         this.canvasWrapper = null;
-        this.direction = 1;
         this.totalOverlapScore = 0;
 
         this.defaultOptions = {
@@ -69,7 +79,6 @@ SmilesDrawer.Drawer = class Drawer {
 
     /**
      * A helper method to extend the default options with user supplied ones.
-     *
      */
     extend() {
         let that = this;
@@ -107,10 +116,10 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Draws the parsed smiles data to a canvas element.
      *
-     * @param {object} data The tree returned by the smiles parser.
-     * @param {string|HTMLElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
-     * @param {string} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
-     * @param {boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+     * @param {Object} data The tree returned by the smiles parser.
+     * @param {String|HTMLElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+     * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
     draw(data, target, themeName = 'light', infoOnly = false) {
         this.data = data;
@@ -234,8 +243,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the number of rings this edge is a part of.
      *
-     * @param {number} edgeId The id of an edge.
-     * @returns {number} The number of rings the provided edge is part of.
+     * @param {Number} edgeId The id of an edge.
+     * @returns {Number} The number of rings the provided edge is part of.
      */
     edgeRingCount(edgeId) {
         let edge = this.graph.edges[edgeId];
@@ -248,7 +257,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns an array containing the bridged rings associated with this  molecule.
      *
-     * @returns {array} An array containing all bridged rings associated with this molecule.
+     * @returns {SmilesDrawer.Ring[]} An array containing all bridged rings associated with this molecule.
      */
     getBridgedRings() {
         let bridgedRings = [];
@@ -265,7 +274,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns an array containing all fused rings associated with this molecule.
      *
-     * @returns {array} An array containing all fused rings associated with this molecule.
+     * @returns {SmilesDrawer.Ring[]} An array containing all fused rings associated with this molecule.
      */
     getFusedRings() {
         let fusedRings = [];
@@ -282,7 +291,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns an array containing all spiros associated with this molecule.
      *
-     * @returns {array} An array containing all spiros associated with this molecule.
+     * @returns {SmilesDrawer.Ring[]} An array containing all spiros associated with this molecule.
      */
     getSpiros() {
         let spiros = [];
@@ -299,7 +308,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings); Insiders Count (the number of vertices contained within a bridged ring)
      *
-     * @returns {string} A string as described in the method description.
+     * @returns {String} A string as described in the method description.
      */
     printRingInfo() {
         let result = '';
@@ -323,7 +332,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the total overlap score of the current molecule.
      *
-     * @returns {number} The overlap score.
+     * @returns {Number} The overlap score.
      */
     getTotalOverlapScore() {
         return this.totalOverlapScore;
@@ -332,7 +341,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the ring count of the current molecule.
      *
-     * @returns {number} The ring count.
+     * @returns {Number} The ring count.
      */
     getRingCount() {
         return this.rings.length;
@@ -341,7 +350,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Checks whether or not the current molecule  a bridged ring.
      *
-     * @returns {boolean} A boolean indicating whether or not the current molecule  a bridged ring.
+     * @returns {Boolean} A boolean indicating whether or not the current molecule  a bridged ring.
      */
     hasBridgedRing() {
         return this.bridgedRing;
@@ -350,7 +359,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the number of heavy atoms (non-hydrogen) in the current molecule.
      *
-     * @returns {number} The heavy atom count.
+     * @returns {Number} The heavy atom count.
      */
     getHeavyAtomCount() {
         let hac = 0;
@@ -367,9 +376,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond represents the break in a ring introduced when creating the MST. If the two vertices supplied as arguments are not part of a common ringbond, the method returns null.
      *
-     * @param {Vertex} vertexA A vertex.
-     * @param {Vertex} vertexB A vertex.
-     * @returns {string|null} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
+     * @param {SmilesDrawer.Vertex} vertexA A vertex.
+     * @param {SmilesDrawer.Vertex} vertexB A vertex.
+     * @returns {String|null} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
      */
     getRingbondType(vertexA, vertexB) {
         // Checks whether the two vertices are the ones connecting the ring
@@ -398,7 +407,6 @@ SmilesDrawer.Drawer = class Drawer {
 
     /**
      * Initializes rings and ringbonds for the current molecule.
-     *
      */
     initRings() {
         let openBonds = new Map();
@@ -517,8 +525,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns all rings connected by bridged bonds starting from the ring with the supplied ring id.
      *
-     * @param {number} ringId A ring id.
-     * @returns {array} An array containing all ring ids of rings part of a bridged ring system.
+     * @param {Number} ringId A ring id.
+     * @returns {Number[]} An array containing all ring ids of rings part of a bridged ring system.
      */
     getBridgedRingRings(ringId) {
         let involvedRings = [];
@@ -548,8 +556,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Checks whether or not a ring is part of a bridged ring.
      *
-     * @param {number} ringId A ring id.
-     * @returns {boolean} A boolean indicating whether or not the supplied ring (by id) is part of a bridged ring system.
+     * @param {Number} ringId A ring id.
+     * @returns {Boolean} A boolean indicating whether or not the supplied ring (by id) is part of a bridged ring system.
      */
     isPartOfBridgedRing(ringId) {
         for (var i = 0; i < this.ringConnections.length; i++) {
@@ -566,9 +574,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Creates a bridged ring.
      *
-     * @param {array} ringIds An array of ids of rings involved in the bridged ring.
-     * @param {number} sourceVertexId The vertex id to start the bridged ring discovery from.
-     * @returns {Ring} The bridged ring.
+     * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
+     * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
+     * @returns {SmilesDrawer.Ring} The bridged ring.
      */
     createBridgedRing(ringIds, sourceVertexId) {
         let bridgedRing = [];
@@ -696,9 +704,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Checks whether or not two vertices are in the same ring.
      *
-     * @param {Vertex} vertexA A vertex.
-     * @param {Vertex} vertexB A vertex.
-     * @returns {boolean} A boolean indicating whether or not the two vertices are in the same ring.
+     * @param {SmilesDrawer.Vertex} vertexA A vertex.
+     * @param {SmilesDrawer.Vertex} vertexB A vertex.
+     * @returns {Boolean} A boolean indicating whether or not the two vertices are in the same ring.
      */
     areVerticesInSameRing(vertexA, vertexB) {
         // This is a little bit lighter (without the array and push) than
@@ -717,9 +725,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns an array of ring ids shared by both vertices.
      *
-     * @param {Vertex} vertexA A vertex.
-     * @param {Vertex} vertexB A vertex.
-     * @returns {array} An array of ids of rings shared by the two vertices.
+     * @param {SmilesDrawer.Vertex} vertexA A vertex.
+     * @param {SmilesDrawer.Vertex} vertexB A vertex.
+     * @returns {Number[]} An array of ids of rings shared by the two vertices.
      */
     getCommonRings(vertexA, vertexB) {
         let commonRings = [];
@@ -738,9 +746,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the smallest ring shared by the two vertices.
      *
-     * @param {Vertex} vertexA A vertex.
-     * @param {Vertex} vertexB A vertex.
-     * @returns {Ring|null} If a smallest common ring exists, that ring, else null.
+     * @param {SmilesDrawer.Vertex} vertexA A vertex.
+     * @param {SmilesDrawer.Vertex} vertexB A vertex.
+     * @returns {SmilesDrawer.Ring|null} If a smallest common ring exists, that ring, else null.
      */
     getSmallestCommonRing(vertexA, vertexB) {
         let commonRings = this.getCommonRings(vertexA, vertexB);
@@ -762,9 +770,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the aromatic or largest ring shared by the two vertices.
      *
-     * @param {Vertex} vertexA A vertex.
-     * @param {Vertex} vertexB A vertex.
-     * @returns {Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
+     * @param {SmilesDrawer.Vertex} vertexA A vertex.
+     * @param {SmilesDrawer.Vertex} vertexB A vertex.
+     * @returns {SmilesDrawer.Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
      */
     getLargestOrAromaticCommonRing(vertexA, vertexB) {
         let commonRings = this.getCommonRings(vertexA, vertexB);
@@ -789,10 +797,10 @@ SmilesDrawer.Drawer = class Drawer {
      /**
      * Returns an array of vertices positioned at a specified location.
      *
-     * @param {Vector2} position The position to search for vertices.
-     * @param {number} radius The radius within to search.
-     * @param {number} excludeVertexId A vertex id to be excluded from the search results.
-     * @returns {array} An array containing vertex ids in a given location.
+     * @param {SmilesDrawer.Vector2} position The position to search for vertices.
+     * @param {Number} radius The radius within to search.
+     * @param {Number} excludeVertexId A vertex id to be excluded from the search results.
+     * @returns {Number[]} An array containing vertex ids in a given location.
      */
     getVerticesAt(position, radius, excludeVertexId) {
         let locals = [];
@@ -817,8 +825,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the closest vertex (connected as well as unconnected).
      *
-     * @param {Vertex} vertex The vertex of which to find the closest other vertex.
-     * @returns {Vertex} The closest vertex.
+     * @param {SmilesDrawer.Vertex} vertex The vertex of which to find the closest other vertex.
+     * @returns {SmilesDrawer.Vertex} The closest vertex.
      */
     getClosestVertex(vertex) {
         let minDist = 99999;
@@ -845,8 +853,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the closest vertex (connected as well as unconnected), which is an endpoint.
      *
-     * @param {Vertex} vertex The vertex of which to find the closest other vertex.
-     * @returns {Vertex} The closest endpoint vertex.
+     * @param {SmilesDrawer.Vertex} vertex The vertex of which to find the closest other vertex.
+     * @returns {SmilesDrawer.Vertex} The closest endpoint vertex.
      */
     getClosestEndpointVertex(vertex) {
         let minDist = 99999;
@@ -871,58 +879,10 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     /**
-     * Returns the rings and vertices contained in a sub-graph.
-     *
-     * @param {number} vertexId The vertex id to start the sub-graph search from
-     * @param {number} previousId The vertex id in the opposite of which the search will be started.
-     * @returns {object} An object containing two arrays, one with the vertices in the subgraph and one with the rings in the subgraph.
-     */
-    /*
-    getBranch(vertexId, previousId) {
-        let vertices = [];
-        let rings = [];
-        let that = this;
-        
-        let recurse = function (v, p) {
-            let vertex = that.graph.vertices[v];
-            
-            for (var i = 0; i < vertex.value.rings.length; i++) {
-                rings.push(vertex.value.rings[i]);
-            }
-
-            for (var i = 0; i < vertex.children.length; i++) {
-                let child = vertex.children[i];
-                
-                if (child !== p && !ArrayHelper.(vertices, { value: child })) {
-                    vertices.push(child);
-                    recurse(child, v);
-                }
-            }
-
-            let parentVertexId = vertex.parentVertexId;
-            
-            if (parentVertexId !== p && parentVertexId !== null && 
-                !ArrayHelper.(vertices, { value: parentVertexId })) {
-                vertices.push(parentVertexId);
-                recurse(parentVertexId, v);
-            }
-        }
-
-        vertices.push(vertexId);
-        recurse(vertexId, previousId);
-
-        return {
-            vertices: vertices,
-            rings: ArrayHelper.unique(rings)
-        };
-    }
-    */
-
-    /**
      * Add a ring to this representation of a molecule.
      *
-     * @param {Ring} ring A new ring.
-     * @returns {number} The ring id of the new ring.
+     * @param {SmilesDrawer.Ring} ring A new ring.
+     * @returns {Number} The ring id of the new ring.
      */
     addRing(ring) {
         ring.id = this.ringIdCounter++;
@@ -934,7 +894,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Removes a ring from the array of rings associated with the current molecule.
      *
-     * @param {number} ringId A ring id.
+     * @param {Number} ringId A ring id.
      */
     removeRing(ringId) {
         this.rings = this.rings.filter(function (item) {
@@ -958,8 +918,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.
      *
-     * @param {number} ringId A ring id.
-     * @returns {Ring} A ring associated with the current molecule.
+     * @param {Number} ringId A ring id.
+     * @returns {SmilesDrawer.Ring} A ring associated with the current molecule.
      */
     getRing(ringId) {
         for (var i = 0; i < this.rings.length; i++) {
@@ -972,8 +932,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Add a ring connection to this representation of a molecule.
      *
-     * @param {RingConnection} ringConnection A new ringConnection.
-     * @returns {number} The ring connection id of the new ring connection.
+     * @param {SmilesDrawer.RingConnection} ringConnection A new ringConnection.
+     * @returns {Number} The ring connection id of the new ring connection.
      */
     addRingConnection(ringConnection) {
         ringConnection.id = this.ringConnectionIdCounter++;
@@ -985,7 +945,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Removes a ring connection from the array of rings connections associated with the current molecule.
      *
-     * @param {number} ringConnectionId A ring connection id.
+     * @param {Number} ringConnectionId A ring connection id.
      */
     removeRingConnection(ringConnectionId) {
         this.ringConnections = this.ringConnections.filter(function (item) {
@@ -996,8 +956,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Removes all ring connections between two vertices.
      *
-     * @param {number} vertexIdA A vertex id.
-     * @param {number} vertexIdB A vertex id.
+     * @param {Number} vertexIdA A vertex id.
+     * @param {Number} vertexIdB A vertex id.
      */
     removeRingConnectionsBetween(vertexIdA, vertexIdB) {
         let toRemove = [];
@@ -1015,7 +975,12 @@ SmilesDrawer.Drawer = class Drawer {
         }
     }
 
-
+    /**
+     * Get a ring connection with a given id.
+     * 
+     * @param {Number} id 
+     * @returns {SmilesDrawer.RingConnection} The ring connection with the specified id.
+     */
     getRingConnection(id) {
         for (var i = 0; i < this.ringConnections.length; i++) {
             if (this.ringConnections[i].id == id) {
@@ -1027,9 +992,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Get the ring connections associated with a ring, the ring connections between two rings or the ring connections between one ring and multiple other rings.
      *
-     * @param {number} ringId A ring id.
-     * @param {number|array|null} ringIds=null A ring id, an array of ring ids or null.
-     * @returns {array} An array of ring connection ids.
+     * @param {Number} ringId A ring id.
+     * @param {Number|Number[]|null} [ringIds=null] A ring id, an array of ring ids or null.
+     * @returns {Number[]} An array of ring connection ids.
      */
     getRingConnections(ringId, ringIds = null) {
         let ringConnections = [];
@@ -1071,9 +1036,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Check whether or not the two vertices specified span a bond which is a ring connection (fused rings).
      * 
-     * @param {number} vertexIdA A vertex id.
-     * @param {number} vertexIdB A vertex id.
-     * @returns {boolean} Returns a boolean indicating whether or not the two vertices specify a ringbond.
+     * @param {Number} vertexIdA A vertex id.
+     * @param {Number} vertexIdB A vertex id.
+     * @returns {Boolean} Returns a boolean indicating whether or not the two vertices specify a ringbond.
      */
     isRingConnection(vertexIdA, vertexIdB) {
         for (var i = 0; i < this.ringConnections.length; i++) {
@@ -1094,7 +1059,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the overlap score of the current molecule based on its positioned vertices. The higher the score, the more overlaps occur in the structure drawing.
      *
-     * @returns {object} Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }
+     * @returns {Object} Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }
      */
     getOverlapScore() {
         let total = 0.0;
@@ -1143,10 +1108,10 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * When drawing a double bond, choose the side to place the double bond. E.g. a double bond should always been drawn inside a ring.
      *
-     * @param {Vertex} vertexA A vertex.
-     * @param {Vertex} vertexB A vertex.
-     * @param {array} sides An array containing the two normals of the line spanned by the two provided vertices.
-     * @returns {object} Returns an object containing the following information: {
+     * @param {SmilesDrawer.Vertex} vertexA A vertex.
+     * @param {SmilesDrawer.Vertex} vertexB A vertex.
+     * @param {SmilesDrawer.Vector2[]} sides An array containing the two normals of the line spanned by the two provided vertices.
+     * @returns {Object} Returns an object containing the following information: {
             totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
             totalPosition: Same as position, but based on entire molecule,
             sideCount: Counts the sides of each neighbour, is an array [ a, b ],
@@ -1206,9 +1171,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Checks whether or not two vertices are connected.
      *
-     * @param {number} vertexIdA A vertex id.
-     * @param {number} vertexIdA A vertex id.
-     * @returns {boolean} A boolean indicating whether or not two vertices are connected.
+     * @param {Number} vertexIdA A vertex id.
+     * @param {Number} vertexIdA A vertex id.
+     * @returns {Boolean} A boolean indicating whether or not two vertices are connected.
      */
     areConnected(vertexIdA, vertexIdB) {
         for (var i = 0; i < this.graph.edges.length; i++) {
@@ -1225,9 +1190,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the weight of the edge between two given vertices.
      *
-     * @param {number} vertexIdA A vertex id.
-     * @param {number} vertexIdB A vertex id.
-     * @returns {number|null} The weight of the edge or, if no edge can be found, null.
+     * @param {Number} vertexIdA A vertex id.
+     * @param {Number} vertexIdB A vertex id.
+     * @returns {Number|null} The weight of the edge or, if no edge can be found, null.
      */
     getEdgeWeight(vertexIdA, vertexIdB) {
         for (var i = 0; i < this.graph.edges.length; i++) {
@@ -1245,12 +1210,12 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Applies a force-based layout to a set of provided vertices.
      *
-     * @param {array} vertices An array containing vertices to be placed using the force based layout.
-     * @param {Vector2} center The center of the layout.
-     * @param {number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
-     * @param {Ring} ring The bridged ring associated with this force-based layout.
+     * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
+     * @param {SmilesDrawer.Vector2} center The center of the layout.
+     * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
+     * @param {SmilesDrawer.Ring} ring The bridged ring associated with this force-based layout.
      */
-    forceLayout(vertices, center, startVertexId, ring) {
+    forceLayout(vertexIds, center, startVertexId, ring) {
         // Constants
         const l = this.opts.bondLength;
 
@@ -1260,13 +1225,13 @@ SmilesDrawer.Drawer = class Drawer {
         // Add neighbours that are already positioned to the vertices to prevent overlap
         for (var i = 0; i < startVertexNeighbours.length; i++) {
             if (this.graph.vertices[startVertexNeighbours[i]].positioned) {
-                vertices.push(startVertexNeighbours[i]);
+                vertexIds.push(startVertexNeighbours[i]);
             }
         }
 
         // Create adjencency matrix
-        let totalLength = vertices.length + ring.rings.length;
-        const vToId = [vertices.length];
+        let totalLength = vertexIds.length + ring.rings.length;
+        const vToId = [vertexIds.length];
         const idToV = new Map();
         const adjMatrix = [totalLength];
         const edges = [];
@@ -1279,14 +1244,14 @@ SmilesDrawer.Drawer = class Drawer {
             }
         }
 
-        for (var i = 0; i < vertices.length; i++) {
-            vToId[i] = this.graph.vertices[vertices[i]].id; 
+        for (var i = 0; i < vertexIds.length; i++) {
+            vToId[i] = this.graph.vertices[vertexIds[i]].id; 
             idToV.set(vToId[i], i);
         }
 
-        for (var i = 0; i < vertices.length - 1; i++) { 
-            for (var j = i; j < vertices.length; j++) {
-                let edge = this.graph.getEdge(vToId[i], this.graph.vertices[vertices[j]].id);
+        for (var i = 0; i < vertexIds.length - 1; i++) { 
+            for (var j = i; j < vertexIds.length; j++) {
+                let edge = this.graph.getEdge(vToId[i], this.graph.vertices[vertexIds[j]].id);
                 
                 if (edge !== null)  {
                     adjMatrix[i][j] = l;
@@ -1298,7 +1263,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         for (var i = 0; i < ring.rings.length; i++) {
             let r = ring.rings[i];
-            let index = vertices.length + i;
+            let index = vertexIds.length + i;
 
             for (var j = 0; j < r.members.length; j++) {
                 let id = idToV.get(r.members[j]);
@@ -1324,7 +1289,7 @@ SmilesDrawer.Drawer = class Drawer {
         // Connect ring centers with edges 
         for (var i = 0; i < ring.rings.length; i++) {
             let r = ring.rings[i];
-            let ringIndex = vertices.length + i;
+            let ringIndex = vertexIds.length + i;
             let ringSize = r.getSize();
             
             for (var j = 0; j < edges.length; j++) {
@@ -1354,7 +1319,7 @@ SmilesDrawer.Drawer = class Drawer {
                     continue;
                 }
 
-                let ringIndex2 = vertices.length + j;
+                let ringIndex2 = vertexIds.length + j;
                 let ringSize2 = r2.getSize();
                 let dist = SmilesDrawer.MathHelper.apothemFromSideLength(l, ringSize) + SmilesDrawer.MathHelper.apothemFromSideLength(l, ringSize2);
                 
@@ -1376,12 +1341,12 @@ SmilesDrawer.Drawer = class Drawer {
         let ringCount = [totalLength];
 
         for (var i = 0; i < totalLength; i++) {
-            isRingCenter[i] = i >= vertices.length && i < edgeOffset;
+            isRingCenter[i] = i >= vertexIds.length && i < edgeOffset;
 
-            ringCount[i] = i < vertices.length ? this.graph.vertices[vToId[i]].value.originalRings.length : 1;
+            ringCount[i] = i < vertexIds.length ? this.graph.vertices[vToId[i]].value.originalRings.length : 1;
 
             if (isRingCenter[i]) {
-                ringSize[i] = ring.rings[i - vertices.length].members.length;
+                ringSize[i] = ring.rings[i - vertexIds.length].members.length;
             } else {
                 ringSize[i] = 1;
             }
@@ -1392,7 +1357,7 @@ SmilesDrawer.Drawer = class Drawer {
             positions[i] = new SmilesDrawer.Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
             positioned[i] = false;
 
-            if (i >= vertices.length) {
+            if (i >= vertexIds.length) {
                 continue;
             }
 
@@ -1598,26 +1563,26 @@ SmilesDrawer.Drawer = class Drawer {
                     center.x /= r.members.length;
                     center.y /= r.members.length;
 
-                    positions[vertices.length + i] = center;
+                    positions[vertexIds.length + i] = center;
                 }
             }          
         }
 
         for (var i = 0; i < totalLength; i++) {
-            if (i < vertices.length) { 
+            if (i < vertexIds.length) { 
                 if (!positioned[i]) {
                     this.graph.vertices[vToId[i]].setPositionFromVector(positions[i]);
                     this.graph.vertices[vToId[i]].positioned = true;
                 }
-            } else if (i < vertices.length + ring.rings.length) {
-                let index = i - vertices.length;
+            } else if (i < vertexIds.length + ring.rings.length) {
+                let index = i - vertexIds.length;
                 ring.rings[index].center = positions[i];
             }
         }
         
         // Only for bridges, not for members, the members are handled in createRing.
-        for (var u = 0; u < vertices.length; u++) {
-            let vertex = this.graph.vertices[vertices[u]];
+        for (var u = 0; u < vertexIds.length; u++) {
+            let vertex = this.graph.vertices[vertexIds[u]];
 
             if (!vertex.value.isBridge) {
                 continue;
@@ -1648,9 +1613,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Gets the center of a ring contained within a bridged ring and containing a given vertex.
      *
-     * @param {Ring} ring A bridged ring.
-     * @param {Vertex} vertex A vertex.
-     * @returns {Vector2} The center of the subring that  the provided vertex.
+     * @param {SmilesDrawer.Ring} ring A bridged ring.
+     * @param {SmilesDrawer.Vertex} vertex A vertex.
+     * @returns {SmilesDrawer.Vector2} The center of the subring that  the provided vertex.
      */
     getSubringCenter(ring, vertex) {
         // If there are multiple subrings associated with this ring, always
@@ -1677,7 +1642,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Draw the actual edges as bonds to the canvas.
      *
-     * @param {boolean} debug A boolean indicating whether or not to draw debug helpers.
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
      */
     drawEdges(debug) {
         let that = this;
@@ -1850,7 +1815,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Draws the vertices representing atoms to the canvas.
      *
-     * @param {boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
      */
     drawVertices(debug) {
         for (var i = 0; i < this.graph.vertices.length; i++) {
@@ -1873,7 +1838,7 @@ SmilesDrawer.Drawer = class Drawer {
 
             if (this.opts.atomVisualization === 'allballs') {
                 this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
-            } else if (atom.isDrawn && (!isCarbon || atom.explicit || isTerminal || atom.hasAttachedPseudoElements)) {
+            } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) {
                 if (this.opts.atomVisualization === 'default') {
                     this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
                             element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
@@ -1899,7 +1864,6 @@ SmilesDrawer.Drawer = class Drawer {
 
     /**
      * Position the vertices according to their bonds and properties.
-     *
      */
     position() {
         let startVertex = this.graph.vertices[0];
@@ -1912,7 +1876,6 @@ SmilesDrawer.Drawer = class Drawer {
 
     /**
      * Reset the positions of rings and vertices. The previous positions will be backed up.
-     *
      */
     clearPositions() {
         this.vertexPositionsBackup = [];
@@ -1937,7 +1900,6 @@ SmilesDrawer.Drawer = class Drawer {
 
     /**
      * Restore the positions backed up during the last clearPositions() call.
-     *
      */
     restorePositions() {        
         for (var i = 0; i < this.vertexPositionsBackup.length; i++) {
@@ -1953,7 +1915,6 @@ SmilesDrawer.Drawer = class Drawer {
 
     /**
      * Stores the current information associated with rings.
-     * 
      */
     backupRingInformation() {
         this.originalRings = [];
@@ -1974,7 +1935,6 @@ SmilesDrawer.Drawer = class Drawer {
 
     /**
      * Restores the most recently backed up information associated with rings.
-     * 
      */
     restoreRingInformation() {
         // Get the subring centers from the bridged rings
@@ -2010,11 +1970,11 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Creates a new ring, that is, positiones all the vertices inside a ring.
      *
-     * @param {Ring} ring The ring to position.
-     * @param {Vector2|null} [center=null] The center of the ring to be created.
-     * @param {Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
-     * @param {Vertex|null} [previousVertex=null] The last vertex that was positioned.
-     * @param {boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
+     * @param {SmilesDrawer.Ring} ring The ring to position.
+     * @param {SmilesDrawer.Vector2|null} [center=null] The center of the ring to be created.
+     * @param {SmilesDrawer.Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
+     * @param {SmilesDrawer.Vertex|null} [previousVertex=null] The last vertex that was positioned.
+     * @param {Boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
      */
     createRing(ring, center = null, startVertex = null, previousVertex = null) {
         if (ring.positioned) {
@@ -2178,10 +2138,10 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Rotate an entire subtree by an angle around a center.
      *
-     * @param {number} vertexId A vertex id (the root of the sub-tree).
-     * @param {number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
-     * @param {number} angle An angle in randians.
-     * @param {Vector2} center The rotational center.
+     * @param {Number} vertexId A vertex id (the root of the sub-tree).
+     * @param {Number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
+     * @param {Number} angle An angle in randians.
+     * @param {SmilesDrawer.Vector2} center The rotational center.
      */
     rotateSubtree(vertexId, parentVertexId, angle, center) {
         let that = this;
@@ -2202,10 +2162,10 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Gets the overlap score of a subtree.
      *
-     * @param {number} vertexId A vertex id (the root of the sub-tree).
-     * @param {number} parentVertexId A vertex id in the previous direction of the subtree.
-     * @param {Array} vertexOverlapScores An array containing the vertex overlap scores indexed by vertex id.
-     * @returns {number} The overlap score of the subtree.
+     * @param {Number} vertexId A vertex id (the root of the sub-tree).
+     * @param {Number} parentVertexId A vertex id in the previous direction of the subtree.
+     * @param {Number[]} vertexOverlapScores An array containing the vertex overlap scores indexed by vertex id.
+     * @returns {Object} An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new SmilesDrawer.Vector2() }.
      */
     getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores) {
         let that = this;
@@ -2229,7 +2189,7 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the current (positioned vertices so far) center of mass.
      * 
-     * @returns {Vector2} The current center of mass.
+     * @returns {SmilesDrawer.Vector2} The current center of mass.
      */
     getCurrentCenterOfMass() {
         let total = new SmilesDrawer.Vector2();
@@ -2250,9 +2210,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
      *
-     * @param {Vector2} vec The point at which to look for neighbours.
-     * @param {number} [r=currentBondLength*2.0] The radius of vertices to include.
-     * @returns {Vector2} The current center of mass.
+     * @param {SmilesDrawer.Vector2} vec The point at which to look for neighbours.
+     * @param {Number} [r=currentBondLength*2.0] The radius of vertices to include.
+     * @returns {SmilesDrawer.Vector2} The current center of mass.
      */
     getCurrentCenterOfMassInNeigbourhood(vec, r = this.opts.bondLength * 2.0) {
         let total = new SmilesDrawer.Vector2();
@@ -2273,7 +2233,6 @@ SmilesDrawer.Drawer = class Drawer {
 
     /**
      * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
-     *
      */
     resolvePrimaryOverlaps() {
         let overlaps = [];
@@ -2385,7 +2344,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Resolve secondary overlaps. Those overlaps are due to the structure turning back on itself.
      *
-     * @param {array} scores An array of objects sorted descending by score. An object is in the form of { id: 0, score: 22 }.
+     * @param {Object[]} scores An array of objects sorted descending by score.
+     * @param {Number} scores[].id A vertex id.
+     * @param {Number} scores[].score The overlap score associated with the vertex id.
      */
     resolveSecondaryOverlaps(scores) {
         for (var i = 0; i < scores.length; i++) {
@@ -2460,10 +2421,10 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Positiones the next vertex thus creating a bond.
      *
-     * @param {Vertex} vertex A vertex.
-     * @param {Vertex} previousVertex The previous vertex which has been positioned.
-     * @param {ring|number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
-     * @param {number} dir Either 1 or -1 to break ties (if no angle can be elucidated.
+     * @param {SmilesDrawer.Vertex} vertex A vertex.
+     * @param {SmilesDrawer.Vertex} previousVertex The previous vertex which has been positioned.
+     * @param {SmilesDrawer.Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
+     * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated.
      */
     createNextBond(vertex, previousVertex, ringOrAngle, dir) {
         if (vertex.positioned) {
@@ -2611,7 +2572,7 @@ SmilesDrawer.Drawer = class Drawer {
                 // or if there are successive double bonds
                 if((vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) ||
                     vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
-                    vertex.value.explicit = true;
+                    vertex.value.drawExplicit = true;
                     
                     if (previousVertex) {
                         let straightEdge1 = this.graph.getEdge(vertex.id, previousVertex.id);
@@ -2880,8 +2841,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Gets the vetex sharing the edge that is the common bond of two rings.
      *
-     * @param {Vertex} vertex A vertex.
-     * @returns {number|null} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
+     * @param {SmilesDrawer.Vertex} vertex A vertex.
+     * @returns {Number|null} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
      */
     getCommonRingbondNeighbour(vertex) {
         let neighbours = vertex.getNeighbours();
@@ -2900,8 +2861,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Check if a vector is inside any ring.
      *
-     * @param {Vector2} vec A vector.
-     * @returns {boolean} A boolean indicating whether or not the point (vector) is inside any of the rings associated with the current molecule.
+     * @param {SmilesDrawer.Vector2} vec A vector.
+     * @returns {Boolean} A boolean indicating whether or not the point (vector) is inside any of the rings associated with the current molecule.
      */
     isPointInRing(vec) {
         for (var i = 0; i < this.rings.length; i++) {
@@ -2925,8 +2886,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Check whether or not an edge is part of a ring.
      *
-     * @param {Edge} edge An edge.
-     * @returns {boolean} A boolean indicating whether or not the edge is part of a ring.
+     * @param {SmilesDrawer.Edge} edge An edge.
+     * @returns {Boolean} A boolean indicating whether or not the edge is part of a ring.
      */
     isEdgeInRing(edge) {
         let source = this.graph.vertices[edge.sourceId];
@@ -2938,8 +2899,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Check whether or not an edge is rotatable.
      *
-     * @param {Edge} edge An edge.
-     * @returns {boolean} A boolean indicating whether or not the edge is rotatable.
+     * @param {SmilesDrawer.Edge} edge An edge.
+     * @returns {Boolean} A boolean indicating whether or not the edge is rotatable.
      */
     isEdgeRotatable(edge) {
         let vertexA = this.graph.vertices[edge.sourceId];
@@ -2968,8 +2929,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Check whether or not a ring is an implicitly defined aromatic ring (lower case smiles).
      *
-     * @param {Ring} ring A ring.
-     * @returns {boolean} A boolean indicating whether or not a ring is implicitly defined as aromatic.
+     * @param {SmilesDrawer.Ring} ring A ring.
+     * @returns {Boolean} A boolean indicating whether or not a ring is implicitly defined as aromatic.
      */
     isRingAromatic(ring) {
         for (var i = 0; i < ring.members.length; i++) {
@@ -2986,8 +2947,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Checks whether or not an edge is part of an explicit aromatic ring (lower case smiles).
      *
-     * @param {Edge} edge An edge.
-     * @returns {boolean} A boolean indicating whether or not the vertex is part of an explicit aromatic ring.
+     * @param {SmilesDrawer.Edge} edge An edge.
+     * @returns {Boolean} A boolean indicating whether or not the vertex is part of an explicit aromatic ring.
      */
     isEdgeInAromaticRing(edge) {
         let source = this.graph.vertices[edge.sourceId].value;
@@ -2999,8 +2960,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Get the normals of an edge.
      *
-     * @param {Edge} edge An edge.
-     * @returns {array} An array containing two vectors, representing the normals.
+     * @param {SmilesDrawer.Edge} edge An edge.
+     * @returns {SmilesDrawer.Vector2[]} An array containing two vectors, representing the normals.
      */
     getEdgeNormals(edge) {
         let v1 = this.graph.vertices[edge.sourceId].position;
@@ -3015,9 +2976,9 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Get the depth of a subtree in the direction opposite to the vertex specified as the parent vertex.
      *
-     * @param {number} vertexId A vertex id.
-     * @param {number} parentVertexId The id of a neighbouring vertex.
-     * @returns {number} The depth of the sub-tree.
+     * @param {Number} vertexId A vertex id.
+     * @param {Number} parentVertexId The id of a neighbouring vertex.
+     * @returns {Number} The depth of the sub-tree.
      */
     getTreeDepth(vertexId, parentVertexId) {
         if (vertexId === null || parentVertexId === null) {
@@ -3042,11 +3003,11 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Traverse a sub-tree in the graph.
      *
-     * @param {number} vertexId A vertex id.
-     * @param {number} parentVertexId A neighbouring vertex.
-     * @param {function} callback The callback function that is called with each visited as an argument.
-     * @param {number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
-     * @param {boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
+     * @param {Number} vertexId A vertex id.
+     * @param {Number} parentVertexId A neighbouring vertex.
+     * @param {Function} callback The callback function that is called with each visited as an argument.
+     * @param {Number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
+     * @param {Boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
      */
     traverseTree(vertexId, parentVertexId, callback, maxDepth = null, ignoreFirst = false, depth = 1, visited = []) {
         if (maxDepth !== null && depth > maxDepth + 1) {
@@ -3076,8 +3037,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Gets the number of bonds of a vertex.
      *
-     * @param {Vertex} vertex A vertex.
-     * @returns {number} The number of bonds the vertex participates in.
+     * @param {SmilesDrawer.Vertex} vertex A vertex.
+     * @returns {Number} The number of bonds the vertex participates in.
      */
     getBondCount(vertex) {
         let count = 0;
@@ -3092,8 +3053,8 @@ SmilesDrawer.Drawer = class Drawer {
     /**
      * Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
      *
-     * @param {number} vertexId A vertex id.
-     * @returns {array} An array of vertices.
+     * @param {Number} vertexId A vertex id.
+     * @returns {SmilesDrawer.Vertex[]} An array of vertices.
      */
     getNonRingNeighbours(vertexId) {
         let nrneighbours = [];
