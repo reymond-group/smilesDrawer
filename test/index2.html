@@ -12,24 +12,25 @@
     </head>
     <body>
         <script src="../dist/smiles-drawer.min.js"></script>
-        <script src="drugbank.js"></script>
+        <script src="gdb17.js"></script>
         <script>
             let options = {};
             
             // Initialize the drawer
-            let smilesDrawer = new SmilesDrawer(options);
+            let smilesDrawer = new SmilesDrawer.Drawer(options);
             
-            for (let i = 0; i < drugbank.length; i++) {
+            for (let i = 0; i < 2000; i++) {
                 try {
                     let canvas = document.createElement('canvas');
                     canvas.setAttribute('id', 'canvas' + i);
                     canvas.setAttribute('width', '200');
                     canvas.setAttribute('height', '200');
-                    canvas.setAttribute('alt', drugbank[i]);
+                    canvas.setAttribute('alt', gdb17[i]);
                     document.body.appendChild(canvas);
                     
-                    let data = SmilesDrawer.parse(drugbank[i]);
-                    smilesDrawer.draw(data, 'canvas' + i, 'light', false);
+                    SmilesDrawer.parse(gdb17[i], function(tree) {
+                        smilesDrawer.draw(tree, 'canvas' + i, 'light', false);
+                    });
 
                     // if (td > 1000) console.log(schembl[i]);
                 } catch (exception) {
