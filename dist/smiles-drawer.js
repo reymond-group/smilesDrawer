@@ -3550,7 +3550,7 @@ SmilesDrawer.Drawer = function () {
                 }
             }
 
-            var k = l / 1.4;
+            var k = l / 2.0;
             var kSq = k * k;
             var c = 0.005;
             var maxMove = l / 2.0;

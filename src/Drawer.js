@@ -1369,7 +1369,7 @@ SmilesDrawer.Drawer = class Drawer {
             }
         }
         
-        let k = l / 1.4;
+        let k = l / 2.0;
         let kSq = k * k;
         let c = 0.005;
         let maxMove = l / 2.0;
