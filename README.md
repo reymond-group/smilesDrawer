@@ -37,10 +37,10 @@ In order to have nice consistent font rendering you have to include the droid sa
             
             input.addEventListener('input', function() {
                 // Clean the input (remove unrecognized characters, such as spaces and tabs) and parse it
-                let data = SmilesDrawer.parse(SmilesDrawer.clean(input.value));
-
-                // Draw to the canvas
-                smilesDrawer.draw(data, 'example-canvas', 'light', false);
+                SmilesDrawer.parse(input.value, function(tree) {
+                    // Draw to the canvas
+                    smilesDrawer.draw(tree, 'example-canvas', 'light', false);
+                });
             });
         </script>
     </body>
