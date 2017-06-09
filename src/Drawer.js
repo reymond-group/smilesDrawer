@@ -1867,7 +1867,6 @@ SmilesDrawer.Drawer = class Drawer {
      */
     position() {
         let startVertex = this.graph.vertices[0];
-
         this.createNextBond(startVertex);
 
         // Atoms bonded to the same ring atom
@@ -2129,8 +2128,15 @@ SmilesDrawer.Drawer = class Drawer {
                     continue;
                 }
 
+                let center = ring.center;
+
+                if (ring.isBridged) {
+                    center = this.getSubringCenter(ring, ringMember);
+                    console.log(v.id, center);
+                }
+
                 v.value.isConnectedToRing = true;
-                this.createNextBond(v, ringMember, ring.center);
+                this.createNextBond(v, ringMember, center);
             }
         }
     }

@@ -4055,7 +4055,6 @@ SmilesDrawer.Drawer = function () {
         key: 'position',
         value: function position() {
             var startVertex = this.graph.vertices[0];
-
             this.createNextBond(startVertex);
 
             // Atoms bonded to the same ring atom
@@ -4341,8 +4340,15 @@ SmilesDrawer.Drawer = function () {
                         continue;
                     }
 
+                    var _center2 = ring.center;
+
+                    if (ring.isBridged) {
+                        _center2 = this.getSubringCenter(ring, ringMember);
+                        console.log(v.id, _center2);
+                    }
+
                     v.value.isConnectedToRing = true;
-                    this.createNextBond(v, ringMember, ring.center);
+                    this.createNextBond(v, ringMember, _center2);
                 }
             }
         }
