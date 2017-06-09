@@ -1262,22 +1262,21 @@ SmilesDrawer.Atom.mass = {
     'Uuh': 116,
     'Uus': 117,
     'Uuo': 118
-};
-/** 
- * A class wrapping a canvas element.
- * 
- * @property {HTMLElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
- * @property {CanvasRenderingContext2D} ctx The CanvasRenderingContext2D of the canvas associated with this CanvasWrapper instance.
- * @property {Object} colors The colors object as defined in the SmilesDrawer options.
- * @property {Object} opts The SmilesDrawer options.
- * @property {Number} drawingWidth The width of the canvas.
- * @property {Number} drawingHeight The height of the canvas.
- * @property {Number} offsetX The horizontal offset required for centering the drawing.
- * @property {Number} offsetY The vertical offset required for centering the drawing.
- * @property {Number} fontLarge The large font size in pt.
- * @property {Number} fontSmall The small font size in pt.
- */
-SmilesDrawer.CanvasWrapper = function () {
+    /** 
+     * A class wrapping a canvas element.
+     * 
+     * @property {HTMLElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
+     * @property {CanvasRenderingContext2D} ctx The CanvasRenderingContext2D of the canvas associated with this CanvasWrapper instance.
+     * @property {Object} colors The colors object as defined in the SmilesDrawer options.
+     * @property {Object} opts The SmilesDrawer options.
+     * @property {Number} drawingWidth The width of the canvas.
+     * @property {Number} drawingHeight The height of the canvas.
+     * @property {Number} offsetX The horizontal offset required for centering the drawing.
+     * @property {Number} offsetY The vertical offset required for centering the drawing.
+     * @property {Number} fontLarge The large font size in pt.
+     * @property {Number} fontSmall The small font size in pt.
+     */
+};SmilesDrawer.CanvasWrapper = function () {
     /**
      * The constructor for the class CanvasWrapper.
      *
@@ -2748,26 +2747,15 @@ SmilesDrawer.Drawer = function () {
             var vertices = [];
             var neighbours = [];
 
-            // Also add rings that are connected to the bridged ring
             for (var i = 0; i < ringIds.length; i++) {
                 var _ring3 = this.getRing(ringIds[i]);
 
+                for (var j = 0; j < _ring3.members.length; j++) {
+                    vertices.push(_ring3.members[j]);
+                }
+
                 for (var j = 0; j < _ring3.neighbours.length; j++) {
-                    if (ringIds.indexOf(_ring3.neighbours[j]) === -1) {
-                        ringIds.push(_ring3.neighbours[j]);
-                    }
-                }
-            }
-
-            for (var i = 0; i < ringIds.length; i++) {
-                var _ring4 = this.getRing(ringIds[i]);
-
-                for (var j = 0; j < _ring4.members.length; j++) {
-                    vertices.push(_ring4.members[j]);
-                }
-
-                for (var j = 0; j < _ring4.neighbours.length; j++) {
-                    neighbours.push(_ring4.neighbours[j]);
+                    neighbours.push(_ring3.neighbours[j]);
                 }
             }
 
@@ -2816,11 +2804,11 @@ SmilesDrawer.Drawer = function () {
             }
 
             // Merge the two arrays containing members of the bridged ring
-            var ringMembers = SmilesDrawer.ArrayHelper.merge(bridgedRing, tmp);
+            var ringMembers = SmilesDrawer.ArrayHelper.merge(bridgedRing, tmp
 
             // The neighbours of the rings in the bridged ring that are not connected by a
             // bridge are now the neighbours of the bridged ring
-            neighbours = SmilesDrawer.ArrayHelper.unique(neighbours);
+            );neighbours = SmilesDrawer.ArrayHelper.unique(neighbours);
             neighbours = SmilesDrawer.ArrayHelper.removeAll(neighbours, ringIds);
 
             // Create the ring
@@ -4112,9 +4100,9 @@ SmilesDrawer.Drawer = function () {
         value: function position() {
             var startVertex = this.graph.vertices[0];
 
-            // Always start drawing at a ring if there is one
+            // Always start drawing at a bridged ring if there is one
             for (var i = 0; i < this.graph.vertices.length; i++) {
-                if (this.graph.vertices[i].value.rings.length > 0) {
+                if (this.graph.vertices[i].value.bridgedRing !== null) {
                     startVertex = this.graph.vertices[i];
                     break;
                 }
