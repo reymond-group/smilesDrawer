@@ -1301,8 +1301,8 @@ SmilesDrawer.Atom.mass = {
         this.offsetX = 0.0;
         this.offsetY = 0.0;
 
-        this.fontLarge = this.opts.fontSizeLarge + 'pt Droid Sans, sans-serif';
-        this.fontSmall = this.opts.fontSizeSmall + 'pt Droid Sans, sans-serif';
+        this.fontLarge = this.opts.fontSizeLarge + 'pt Arial, sans-serif';
+        this.fontSmall = this.opts.fontSizeSmall + 'pt Arial, sans-serif';
 
         this.updateSize(this.opts.width, this.opts.height);
 
@@ -1847,7 +1847,7 @@ SmilesDrawer.Atom.mass = {
 
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
-            ctx.arc(x + offsetX, y + offsetY, r, 0, SmilesDrawer.MathHelper.twoPI * 2, true);
+            ctx.arc(x + offsetX, y + offsetY, r, 0, SmilesDrawer.MathHelper.twoPI, true);
             ctx.closePath();
             ctx.fill();
             ctx.globalCompositeOperation = 'source-over';
