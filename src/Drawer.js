@@ -1759,7 +1759,6 @@ SmilesDrawer.Drawer = class Drawer {
                     continue;
                 }
 
-                console.log(vertex);
                 center = this.getSubringCenter(ring, vertex);
 
                 if (currentVertex.value.rings.length === 0) {
@@ -2602,8 +2601,6 @@ SmilesDrawer.Drawer = class Drawer {
         if (vertex.positioned) {
             return;
         }
-
-        console.log(vertex.id, ringOrAngle);
 
         // If the current node is the member of one ring, then point straight away
         // from the center of the ring. However, if the current node is a member of

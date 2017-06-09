@@ -533,7 +533,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         }
 
         ctx.font = this.fontLarge;
-        ctx.fillStyle = this.getColor(elementName);
+        ctx.fillStyle = this.getColor('BACKGROUND');
 
         let dim = ctx.measureText(elementName);
 
