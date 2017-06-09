@@ -407,7 +407,7 @@ SmilesDrawer.ArrayHelper = function () {
         }
 
         /**
-         * Merges two arrays and returns the result. The second array will be appended to the second array.
+         * Merges two arrays and returns the result. The first array will be appended to the second array.
          *
          * @static
          * @param {Array} arrA An array.
@@ -2748,15 +2748,26 @@ SmilesDrawer.Drawer = function () {
             var vertices = [];
             var neighbours = [];
 
+            // Also add rings that are connected to the bridged ring
             for (var i = 0; i < ringIds.length; i++) {
                 var _ring3 = this.getRing(ringIds[i]);
 
-                for (var j = 0; j < _ring3.members.length; j++) {
-                    vertices.push(_ring3.members[j]);
+                for (var j = 0; j < _ring3.neighbours.length; j++) {
+                    if (ringIds.indexOf(_ring3.neighbours[j]) === -1) {
+                        ringIds.push(_ring3.neighbours[j]);
+                    }
+                }
+            }
+
+            for (var i = 0; i < ringIds.length; i++) {
+                var _ring4 = this.getRing(ringIds[i]);
+
+                for (var j = 0; j < _ring4.members.length; j++) {
+                    vertices.push(_ring4.members[j]);
                 }
 
-                for (var j = 0; j < _ring3.neighbours.length; j++) {
-                    neighbours.push(_ring3.neighbours[j]);
+                for (var j = 0; j < _ring4.neighbours.length; j++) {
+                    neighbours.push(_ring4.neighbours[j]);
                 }
             }
 
@@ -3443,9 +3454,12 @@ SmilesDrawer.Drawer = function () {
         value: function forceLayout(vertexIds, center, startVertexId, ring) {
             // Constants
             var l = this.opts.bondLength;
-
             var startVertex = this.graph.vertices[startVertexId];
             var startVertexNeighbours = startVertex.getNeighbours();
+
+            if (startVertexId === 0) {
+                startVertex.positioned = false;
+            }
 
             // Add neighbours that are already positioned to the vertices to prevent overlap
             for (var i = 0; i < startVertexNeighbours.length; i++) {
@@ -4097,6 +4111,15 @@ SmilesDrawer.Drawer = function () {
         key: 'position',
         value: function position() {
             var startVertex = this.graph.vertices[0];
+
+            // Always start drawing at a ring if there is one
+            for (var i = 0; i < this.graph.vertices.length; i++) {
+                if (this.graph.vertices[i].value.rings.length > 0) {
+                    startVertex = this.graph.vertices[i];
+                    break;
+                }
+            }
+
             this.createNextBond(startVertex);
 
             // Atoms bonded to the same ring atom
@@ -4382,15 +4405,8 @@ SmilesDrawer.Drawer = function () {
                         continue;
                     }
 
-                    var _center2 = ring.center;
-
-                    if (ring.isBridged) {
-                        _center2 = this.getSubringCenter(ring, ringMember);
-                        console.log(v.id, _center2);
-                    }
-
                     v.value.isConnectedToRing = true;
-                    this.createNextBond(v, ringMember, _center2);
+                    this.createNextBond(v, ringMember, ring.center);
                 }
             }
         }
@@ -5501,7 +5517,6 @@ SmilesDrawer.Drawer = function () {
 
     return Drawer;
 }();
-
 /** 
  * A class representing an edge. 
  * 

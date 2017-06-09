@@ -486,7 +486,7 @@ Remove all elements contained in one array from another array.
 <a name="SmilesDrawer.ArrayHelper.merge"></a>
 
 #### ArrayHelper.merge(arrA, arrB) ⇒ <code>Array</code>
-Merges two arrays and returns the result. The second array will be appended to the second array.
+Merges two arrays and returns the result. The first array will be appended to the second array.
 
 **Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
 **Returns**: <code>Array</code> - The merged array.  

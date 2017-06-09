@@ -583,6 +583,19 @@ SmilesDrawer.Drawer = class Drawer {
         let vertices = [];
         let neighbours = [];
 
+        
+        // Also add rings that are connected to the bridged ring
+        for (var i = 0; i < ringIds.length; i++) {
+            let ring = this.getRing(ringIds[i]);
+
+            for (var j = 0; j < ring.neighbours.length; j++) {
+                if (ringIds.indexOf(ring.neighbours[j]) === -1) {
+                    ringIds.push(ring.neighbours[j]);
+                }
+            }
+        }
+        
+
         for (var i = 0; i < ringIds.length; i++) {
             let ring = this.getRing(ringIds[i]);
             
@@ -1218,9 +1231,12 @@ SmilesDrawer.Drawer = class Drawer {
     forceLayout(vertexIds, center, startVertexId, ring) {
         // Constants
         const l = this.opts.bondLength;
-
         const startVertex = this.graph.vertices[startVertexId];
         const startVertexNeighbours = startVertex.getNeighbours();
+
+        if (startVertexId === 0) {
+            startVertex.positioned = false;
+        }
 
         // Add neighbours that are already positioned to the vertices to prevent overlap
         for (var i = 0; i < startVertexNeighbours.length; i++) {
@@ -1867,6 +1883,15 @@ SmilesDrawer.Drawer = class Drawer {
      */
     position() {
         let startVertex = this.graph.vertices[0];
+
+        // Always start drawing at a ring if there is one
+        for (var i = 0; i < this.graph.vertices.length; i++) {
+            if (this.graph.vertices[i].value.rings.length > 0) {
+                startVertex = this.graph.vertices[i];
+                break;
+            }
+        }
+
         this.createNextBond(startVertex);
 
         // Atoms bonded to the same ring atom
@@ -2128,15 +2153,8 @@ SmilesDrawer.Drawer = class Drawer {
                     continue;
                 }
 
-                let center = ring.center;
-
-                if (ring.isBridged) {
-                    center = this.getSubringCenter(ring, ringMember);
-                    console.log(v.id, center);
-                }
-
                 v.value.isConnectedToRing = true;
-                this.createNextBond(v, ringMember, center);
+                this.createNextBond(v, ringMember, ring.center);
             }
         }
     }

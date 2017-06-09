@@ -257,7 +257,7 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
     }
 
     /**
-     * Merges two arrays and returns the result. The second array will be appended to the second array.
+     * Merges two arrays and returns the result. The first array will be appended to the second array.
      *
      * @static
      * @param {Array} arrA An array.
