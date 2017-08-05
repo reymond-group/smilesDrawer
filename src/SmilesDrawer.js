@@ -24,17 +24,21 @@ SmilesDrawer.clean = function(smiles) {
  * @param {Object} options SmilesDrawer options.
  * @param {String} [themeName='light'] The theme to apply.
  */
-SmilesDrawer.apply = function(options, themeName='light') {
+SmilesDrawer.apply = function(options, themeName='light', onError=null) {
     let smilesDrawer = new SmilesDrawer.Drawer(options);
     let elements = document.querySelectorAll('canvas[data-smiles]');
 
     for (var i = 0; i < elements.length; i++) {
         let element = elements[i];
-        let data = SmilesDrawer.parse(SmilesDrawer.clean(element.getAttribute('data-smiles')));
 
-        smilesDrawer.draw(data, element, themeName, false);
+        SmilesDrawer.parse(element.getAttribute('data-smiles'), function(tree) {
+            smilesDrawer.draw(tree, element, themeName, false);
+        }, function(err) {
+          if (onError) {
+            onError(err);
+          }
+        });
     }
-
 }
 
 /**

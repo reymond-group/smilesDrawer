@@ -36,15 +36,25 @@ SmilesDrawer.clean = function (smiles) {
  */
 SmilesDrawer.apply = function (options) {
     var themeName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'light';
+    var onError = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
     var smilesDrawer = new SmilesDrawer.Drawer(options);
     var elements = document.querySelectorAll('canvas[data-smiles]');
 
-    for (var i = 0; i < elements.length; i++) {
+    var _loop = function _loop() {
         var element = elements[i];
-        var data = SmilesDrawer.parse(SmilesDrawer.clean(element.getAttribute('data-smiles')));
 
-        smilesDrawer.draw(data, element, themeName, false);
+        SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
+            smilesDrawer.draw(tree, element, themeName, false);
+        }, function (err) {
+            if (onError) {
+                onError(err);
+            }
+        });
+    };
+
+    for (var i = 0; i < elements.length; i++) {
+        _loop();
     }
 };
 
@@ -1949,7 +1959,7 @@ SmilesDrawer.Atom.mass = {
                 var openParenthesisWidth = 0;
                 var closeParenthesisWidth = 0;
 
-                var element = attachedPseudoElement[key].element;
+                var _element = attachedPseudoElement[key].element;
                 var elementCount = attachedPseudoElement[key].count;
                 var hydrogenCount = attachedPseudoElement[key].hydrogenCount;
 
@@ -1960,7 +1970,7 @@ SmilesDrawer.Atom.mass = {
                     closeParenthesisWidth = ctx.measureText(')').width;
                 }
 
-                var elementWidth = ctx.measureText(element).width;
+                var elementWidth = ctx.measureText(_element).width;
                 var elementCountWidth = 0;
 
                 hydrogenWidth = 0;
@@ -1986,7 +1996,7 @@ SmilesDrawer.Atom.mass = {
                 var _hx2 = x + offsetX;
                 var _hy2 = y + offsetY + fontSizeLarge / 2.0;
 
-                ctx.fillStyle = this.getColor(element);
+                ctx.fillStyle = this.getColor(_element);
 
                 if (elementCount > 0) {
                     cursorPosLeft -= elementCountWidth;
@@ -2004,9 +2014,9 @@ SmilesDrawer.Atom.mass = {
 
                 if (direction === 'left') {
                     cursorPosLeft -= elementWidth;
-                    ctx.fillText(element, _hx2 + cursorPosLeft, _hy2);
+                    ctx.fillText(_element, _hx2 + cursorPosLeft, _hy2);
                 } else {
-                    ctx.fillText(element, _hx2 + cursorPos, _hy2);
+                    ctx.fillText(_element, _hx2 + cursorPos, _hy2);
                     cursorPos += elementWidth;
                 }
 
@@ -2804,11 +2814,11 @@ SmilesDrawer.Drawer = function () {
             }
 
             // Merge the two arrays containing members of the bridged ring
-            var ringMembers = SmilesDrawer.ArrayHelper.merge(bridgedRing, tmp
+            var ringMembers = SmilesDrawer.ArrayHelper.merge(bridgedRing, tmp);
 
             // The neighbours of the rings in the bridged ring that are not connected by a
             // bridge are now the neighbours of the bridged ring
-            );neighbours = SmilesDrawer.ArrayHelper.unique(neighbours);
+            neighbours = SmilesDrawer.ArrayHelper.unique(neighbours);
             neighbours = SmilesDrawer.ArrayHelper.removeAll(neighbours, ringIds);
 
             // Create the ring
@@ -4210,10 +4220,10 @@ SmilesDrawer.Drawer = function () {
                 var charge = 0;
                 var isotope = 0;
                 var bondCount = this.getBondCount(vertex);
-                var element = atom.element;
-                var hydrogens = SmilesDrawer.Atom.maxBonds[element] - bondCount;
+                var _element2 = atom.element;
+                var hydrogens = SmilesDrawer.Atom.maxBonds[_element2] - bondCount;
                 var dir = vertex.getTextDirection(this.graph.vertices);
-                var isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
+                var isTerminal = this.opts.terminalCarbons || _element2 !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
                 var isCarbon = atom.element === 'C';
 
                 if (atom.bracket) {
@@ -4223,12 +4233,12 @@ SmilesDrawer.Drawer = function () {
                 }
 
                 if (this.opts.atomVisualization === 'allballs') {
-                    this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+                    this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, _element2);
                 } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) {
                     if (this.opts.atomVisualization === 'default') {
-                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+                        this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, _element2, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
                     } else if (this.opts.atomVisualization === 'balls') {
-                        this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+                        this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, _element2);
                     }
                 }
 
@@ -5632,9 +5642,9 @@ SmilesDrawer.Drawer = function () {
             for (var i = 0; i < this.graph.vertices.length; i++) {
                 var _vertex6 = this.graph.vertices[i];
                 var atom = _vertex6.value;
-                var element = atom.element;
+                var _element3 = atom.element;
 
-                if (element === 'C' || element === 'H' || !atom.isDrawn) {
+                if (_element3 === 'C' || _element3 === 'H' || !atom.isDrawn) {
                     continue;
                 }
 
@@ -9465,9 +9475,9 @@ SmilesDrawer.SSSR = function () {
 
             try {
                 for (var _iterator3 = setA[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var element = _step3.value;
+                    var _element4 = _step3.value;
 
-                    if (!setB.has(element)) {
+                    if (!setB.has(_element4)) {
                         return false;
                     }
                 }
