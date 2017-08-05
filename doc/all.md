@@ -298,7 +298,7 @@ The SmilesDrawer namespace.
         * [.getSpanningTreeNeighbours([vertexId])](#SmilesDrawer.Vertex+getSpanningTreeNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.getNextInRing(vertices, ringId, previousVertexId)](#SmilesDrawer.Vertex+getNextInRing) ⇒ <code>Number</code>
     * [.clean(smiles)](#SmilesDrawer.clean) ⇒ <code>String</code>
-    * [.apply(options, [themeName])](#SmilesDrawer.apply)
+    * [.apply(options, [selector], [themeName], [onError])](#SmilesDrawer.apply)
     * [.parse(smiles, successCallback, errorCallback)](#SmilesDrawer.parse)
 
 <a name="SmilesDrawer.ArrayHelper"></a>
@@ -3758,7 +3758,7 @@ Cleans a SMILES string (removes non-valid characters)
 
 <a name="SmilesDrawer.apply"></a>
 
-### SmilesDrawer.apply(options, [themeName])
+### SmilesDrawer.apply(options, [selector], [themeName], [onError])
 Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
 
 **Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
@@ -3766,7 +3766,9 @@ Applies the smiles drawer draw function to each canvas element that has a smiles
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | options | <code>Object</code> |  | SmilesDrawer options. |
+| [selector] | <code>String</code> | <code>&#x27;canvas[data-smiles]&#x27;</code> | Selectors for the draw areas (canvas elements). |
 | [themeName] | <code>String</code> | <code>&#x27;light&#x27;</code> | The theme to apply. |
+| [onError] | <code>function</code> | <code>&#x27;null&#x27;</code> | A callback function providing an error object. |
 
 <a name="SmilesDrawer.parse"></a>
 

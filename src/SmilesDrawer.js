@@ -22,11 +22,13 @@ SmilesDrawer.clean = function(smiles) {
  *
  * @static
  * @param {Object} options SmilesDrawer options.
+ * @param {String} [selector='canvas[data-smiles]'] Selectors for the draw areas (canvas elements).
  * @param {String} [themeName='light'] The theme to apply.
+ * @param {Function} [onError='null'] A callback function providing an error object.
  */
-SmilesDrawer.apply = function(options, themeName='light', onError=null) {
+SmilesDrawer.apply = function(options, selector='canvas[data-smiles]', themeName='light', onError=null) {
     let smilesDrawer = new SmilesDrawer.Drawer(options);
-    let elements = document.querySelectorAll('canvas[data-smiles]');
+    let elements = document.querySelectorAll(selector);
 
     for (var i = 0; i < elements.length; i++) {
         let element = elements[i];
