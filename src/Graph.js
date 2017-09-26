@@ -549,6 +549,7 @@ SmilesDrawer.Graph = class Graph {
                 if (i === index) {
                     continue;
                 }
+                
                 let v = arrPosition[i];
                 let l = arrL[i];
                 let k = arrK[i];
