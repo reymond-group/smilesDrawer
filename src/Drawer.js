@@ -2188,8 +2188,9 @@ SmilesDrawer.Drawer = class Drawer {
         // using a force based approach
         if (ring.isBridged && !ring.positioned) {
             let allVertices = SmilesDrawer.ArrayHelper.merge(ring.members, ring.insiders);
-
-            this.forceLayout(allVertices, center, startVertex.id, ring);
+            
+            this.graph.kkLayout(allVertices, center, startVertex.id, ring, this.opts.bondLength);
+            // this.forceLayout(allVertices, center, startVertex.id, ring);
         }
 
         // Anchor the ring to one of it's members, so that the ring center will always

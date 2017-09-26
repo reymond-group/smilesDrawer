@@ -286,6 +286,79 @@ SmilesDrawer.Graph = class Graph {
     }
 
     /**
+     * Get the distance matrix of the graph.
+     * 
+     * @returns {Array[]} The distance matrix of the graph.
+     */
+    getDistanceMatrix() {
+        let length = this.vertices.length;
+        let adja = this.getAdjacencyMatrix();
+        let dist = Array(length);
+
+        for (var i = 0; i < length; i++) {
+            dist[i] = Array(length);
+            dist[i].fill(Infinity);
+        }
+
+        for (var i = 0; i < length; i++) {
+            for (var j = 0; j < length; j++) {
+                if (adja[i][j] === 1) {
+                    dist[i][j] = 1;
+                }
+            }
+        }
+
+        for (var k = 0; k < length; k++) {
+            for (var i = 0; i < length; i++) {
+                for (var j = 0; j < length; j++) {
+                    if (dist[i][j] > dist[i][k] + dist[k][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j]
+                    }
+                }
+            }
+        }
+
+        return dist;
+    }
+
+    /**
+     * Get the distance matrix of a subgraph.
+     * 
+     * @param {Number[]} vertexIds An array containing the vertex ids contained within the subgraph.
+     * @returns {Array[]} The distance matrix of the subgraph.
+     */
+    getSubgraphDistanceMatrix(vertexIds) {
+        let length = vertexIds.length;
+        let adja = this.getSubgraphAdjacencyMatrix(vertexIds);
+        let dist = Array(length);
+
+        for (var i = 0; i < length; i++) {
+            dist[i] = Array(length);
+            dist[i].fill(Infinity);
+        }
+
+        for (var i = 0; i < length; i++) {
+            for (var j = 0; j < length; j++) {
+                if (adja[i][j] === 1) {
+                    dist[i][j] = 1;
+                }
+            }
+        }
+
+        for (var k = 0; k < length; k++) {
+            for (var i = 0; i < length; i++) {
+                for (var j = 0; j < length; j++) {
+                    if (dist[i][j] > dist[i][k] + dist[k][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j]
+                    }
+                }
+            }
+        }
+
+        return dist;
+    }
+
+    /**
      * Get the adjacency list of the graph.
      * 
      * @returns {Array[]} The adjancency list of the graph.
@@ -363,6 +436,169 @@ SmilesDrawer.Graph = class Graph {
         }
 
         return outBridges;
+    }
+    
+    /**
+     * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
+     * 
+     * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
+     * @param {SmilesDrawer.Vector2} center The center of the layout.
+     * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
+     * @param {SmilesDrawer.Ring} ring The bridged ring associated with this force-based layout.
+     */
+    kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
+        let edgeStrength = 1.0;
+        let matDist = this.getSubgraphDistanceMatrix(vertexIds);
+        let length = vertexIds.length;
+
+        // Initialize the positions. Place all vertices on a ring around the center
+        let radius = SmilesDrawer.MathHelper.polyCircumradius(bondLength, length);
+        let angle = SmilesDrawer.MathHelper.centralAngle(length);
+        let a = 0.0;
+        let arrPosition = Array(length);
+        let arrPositioned = Array(length);
+        for (var i = 0; i < length; i++) {
+            let vertex = this.vertices[vertexIds[i]];
+            // vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
+            // vertex.positioned = true;
+
+            arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
+            arrPositioned[i] = vertex.positioned;
+            a += angle;
+        }
+
+        // Create the matrix containing the lengths
+        let matLength = Array(length);
+        for (var i = 0; i < length; i++) {
+            matLength[i] = new Array(length);
+            for (var j = 0; j < length; j++) {
+                matLength[i][j] = bondLength * matDist[i][j];
+            }
+        }
+
+        // Create the matrix containing the spring strenghts
+        let matStrength = Array(length);
+        for (var i = 0; i < length; i++) {
+            matStrength[i] = Array(length);
+            for (var j = 0; j < length; j++) {
+                matStrength[i][j] = edgeStrength * Math.pow(matDist[i][j], -2);
+            }
+        }
+
+        // Create the metrix containing the energies
+        let matEnergy = Array(length);
+        let arrEnergySum = Array(length);
+        for (var i = 0; i < length; i++) {
+            matEnergy[i] = Array(length);
+        }
+        for (var i = 0; i < length; i++) {
+            let u = arrPosition[i];
+            let dEx = 0.0;
+            let dEy = 0.0;
+            for (var j = i; j < length; j++) {
+                if (i === j) {
+                    continue;
+                }
+                let v = arrPosition[j];
+                let denom = 1.0 / Math.sqrt(Math.pow(u[0] - v[0], 2) + Math.pow(u[1] - v[1], 2));
+                matEnergy[i][j] = [
+                    matStrength[i][j] * ((u[0] - v[0]) - matLength[i][j] * (u[0] - v[0]) * denom),
+                    matStrength[i][j] * ((u[1] - v[1]) - matLength[i][j] * (u[1] - v[1]) * denom)
+                ]
+                matEnergy[j][i] = matEnergy[i][j];
+                dEx += matEnergy[i][j][0];
+                dEy += matEnergy[i][j][1];
+            }
+            arrEnergySum[i] = [dEx, dEy];
+        }
+
+        // console.log(matEnergy, arrEnergySum, matStrength, matLength);
+
+        // Utility functions, maybe inline them later
+        let energy = function(index) {
+            let dE = arrEnergySum[index];
+            return [ Math.sqrt(Math.pow(dE[0], 2) + Math.pow(dE[1], 2)), dE ];
+        }
+
+        let highestEnergy = function() {
+            let maxEnergy = 0.0;
+            let maxEnergyId = 0;
+            let maxDE = [ 0.0, 0.0 ];
+
+            for (var i = 0; i < length; i++) {
+                let [ delta, dE ] = energy(i);
+                if (delta > maxEnergy) {
+                    maxEnergy = delta;
+                    maxEnergyId = i;
+                    maxDE = dE;
+                }
+            }
+
+            return [ maxEnergyId, maxEnergy, maxDE ];
+        }
+
+        let update = function(index, dE) {
+            let dxx = 0.0;
+            let dyy = 0.0;
+            let dxy = 0.0;
+            let u = arrPosition[index];
+            let arrL = matLength[index];
+            let arrK = matStrength[index];
+
+            for (var i = 0; i < length; i++) {
+                if (i === index) {
+                    continue;
+                }
+                let v = arrPosition[i];
+                let l = arrL[i];
+                let k = arrK[i];
+                let denom = 1.0/ Math.pow(Math.pow(u[0] - v[0], 2), Math.pow(u[1] - v[1], 2), 1.5);
+                dxx += k * (1 - l * Math.pow(u[1] - v[1], 2) * denom);
+                dyy += k * (1 - l * Math.pow(u[0] - v[0], 2) * denom);
+                dxy += k * (l * (u[0] - v[0]) * (u[1] - v[1]) * denom);
+            }
+            let dy = (dE[0] / dxx + dE[1] / dxy);
+            dy /= (dxy / dxx - dyy / dxy); // had to split this onto two lines because the syntax highlighter went crazy.
+            let dx = -(dxy * dy + dE[0]) / dxx;
+            arrPosition[index][0] += dx;
+            arrPosition[index][1] += dy;
+        }
+
+        // Setting parameters
+        let threshold = 0.01;
+        let innerThreshold = 1.0;
+        let maxIteration = 1000;
+        let maxInnerIteration = 5;
+        let maxEnergy = 1e9;
+
+        // Setting up variables for the while loops
+        let maxEnergyId = 0;
+        let dE = [ 0.0, 0.0 ];
+        let delta = 0.0;
+        let iteration = 0;
+        let innerIteration = 0;
+
+        while (maxEnergy > threshold && maxIteration > iteration) {
+            iteration++;
+            [ maxEnergyId, maxEnergy, dE ] = highestEnergy();
+            delta = maxEnergy;
+            innerIteration = 0;
+            while (delta > innerThreshold && maxInnerIteration > innerIteration) {
+                innerIteration++;
+                update(maxEnergyId, dE);
+                [ delta, dE ] = energy(maxEnergyId);
+            }
+        }
+
+        for (var i = 0; i < length; i++) {
+            let index = vertexIds[i];
+            if (this.vertices[index].positioned) {
+                continue;
+            }
+            this.vertices[index].position.x = arrPosition[i][0];
+            this.vertices[index].position.y = arrPosition[i][1];
+            this.vertices[index].positioned = true;
+        }
     }
 
     /**

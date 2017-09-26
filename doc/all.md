@@ -158,9 +158,12 @@ The SmilesDrawer namespace.
             * [.getAdjacencyMatrix()](#SmilesDrawer.Graph+getAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.getComponentsAdjacencyMatrix()](#SmilesDrawer.Graph+getComponentsAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.getSubgraphAdjacencyMatrix(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
+            * [.getDistanceMatrix()](#SmilesDrawer.Graph+getDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
+            * [.getSubgraphDistanceMatrix(vertexIds)](#SmilesDrawer.Graph+getSubgraphDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.getAdjacencyList()](#SmilesDrawer.Graph+getAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.getSubgraphAdjacencyList(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.getBridges()](#SmilesDrawer.Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
+            * [.kkLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
             * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
         * _static_
             * [.getConnectedComponentCount(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponentCount) ⇒ <code>Number</code>
@@ -1887,8 +1890,7 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer.Drawer+initPseudoElements"></a>
 
 #### drawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
-the involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 <a name="SmilesDrawer.Edge"></a>
@@ -1976,9 +1978,12 @@ A class representing the molecular graph.
         * [.getAdjacencyMatrix()](#SmilesDrawer.Graph+getAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.getComponentsAdjacencyMatrix()](#SmilesDrawer.Graph+getComponentsAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.getSubgraphAdjacencyMatrix(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
+        * [.getDistanceMatrix()](#SmilesDrawer.Graph+getDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
+        * [.getSubgraphDistanceMatrix(vertexIds)](#SmilesDrawer.Graph+getSubgraphDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.getAdjacencyList()](#SmilesDrawer.Graph+getAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.getSubgraphAdjacencyList(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.getBridges()](#SmilesDrawer.Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
+        * [.kkLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
         * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
     * _static_
         * [.getConnectedComponentCount(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponentCount) ⇒ <code>Number</code>
@@ -2110,6 +2115,25 @@ Get the adjacency matrix of a subgraph.
 | --- | --- | --- |
 | vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
 
+<a name="SmilesDrawer.Graph+getDistanceMatrix"></a>
+
+#### graph.getDistanceMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
+Get the distance matrix of the graph.
+
+**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The distance matrix of the graph.  
+<a name="SmilesDrawer.Graph+getSubgraphDistanceMatrix"></a>
+
+#### graph.getSubgraphDistanceMatrix(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
+Get the distance matrix of a subgraph.
+
+**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The distance matrix of the subgraph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
+
 <a name="SmilesDrawer.Graph+getAdjacencyList"></a>
 
 #### graph.getAdjacencyList() ⇒ <code>Array.&lt;Array&gt;</code>
@@ -2136,6 +2160,20 @@ Returns an array containing the edge ids of bridges. A bridge splits the graph i
 
 **Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
 **Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the edge ids of the bridges.  
+<a name="SmilesDrawer.Graph+kkLayout"></a>
+
+#### graph.kkLayout(vertexIds, center, startVertexId, ring)
+Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
+
+**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing vertexIds to be placed using the force based layout. |
+| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The center of the layout. |
+| startVertexId | <code>Number</code> | A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex. |
+| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | The bridged ring associated with this force-based layout. |
+
 <a name="SmilesDrawer.Graph+_bridgeDfs"></a>
 
 #### graph._bridgeDfs()
