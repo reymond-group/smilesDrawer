@@ -6367,26 +6367,53 @@ SmilesDrawer.Graph = function () {
                     if (i === index) {
                         continue;
                     }
+
                     var _v3 = arrPosition[i];
                     var l = arrL[i];
                     var k = arrK[i];
-                    var _denom = 1.0 / Math.pow(Math.pow(u[0] - _v3[0], 2), Math.pow(u[1] - _v3[1], 2), 1.5);
+                    var _denom = 1.0 / Math.pow(Math.pow(u[0] - _v3[0], 2) + Math.pow(u[1] - _v3[1], 2), 1.5);
                     dxx += k * (1 - l * Math.pow(u[1] - _v3[1], 2) * _denom);
                     dyy += k * (1 - l * Math.pow(u[0] - _v3[0], 2) * _denom);
                     dxy += k * (l * (u[0] - _v3[0]) * (u[1] - _v3[1]) * _denom);
                 }
+
                 var dy = dE[0] / dxx + dE[1] / dxy;
                 dy /= dxy / dxx - dyy / dxy; // had to split this onto two lines because the syntax highlighter went crazy.
                 var dx = -(dxy * dy + dE[0]) / dxx;
+
                 arrPosition[index][0] += dx;
                 arrPosition[index][1] += dy;
+
+                // Update the energies
+                var arrE = matEnergy[index];
+                dE = [0.0, 0.0];
+
+                for (var i = 0; i < length; i++) {
+                    if (index === i) {
+                        continue;
+                    }
+                    var _v4 = arrPosition[i];
+                    // Store old energies
+                    var prevEx = arrE[i][0];
+                    var prevEy = arrE[i][1];
+                    var _denom2 = 1.0 / Math.sqrt(Math.pow(u[0] - _v4[0], 2) + Math.pow(u[1] - _v4[1], 2));
+                    var _dx6 = arrK[i] * (u[0] - _v4[0] - arrL[i] * (u[0] - _v4[0]) * _denom2);
+                    var _dy6 = arrK[i] * (u[1] - _v4[1] - arrL[i] * (u[1] - _v4[1]) * _denom2);
+
+                    arrE[i] = [_dx6, _dy6];
+                    dE[0] += _dx6;
+                    dE[1] += _dy6;
+                    arrEnergySum[i][0] += _dx6 - prevEx;
+                    arrEnergySum[i][1] += _dy6 - prevEy;
+                }
+                arrEnergySum[index] = [dE[0], dE[1]];
             };
 
             // Setting parameters
             var threshold = 0.01;
-            var innerThreshold = 1.0;
-            var maxIteration = 1000;
-            var maxInnerIteration = 5;
+            var innerThreshold = 0.1;
+            var maxIteration = 200;
+            var maxInnerIteration = 50;
             var maxEnergy = 1e9;
 
             // Setting up variables for the while loops
@@ -6422,11 +6449,10 @@ SmilesDrawer.Graph = function () {
                 }
             }
 
+            console.log('iterations: ' + iteration);
+
             for (var i = 0; i < length; i++) {
                 var index = vertexIds[i];
-                if (this.vertices[index].positioned) {
-                    continue;
-                }
                 this.vertices[index].position.x = arrPosition[i][0];
                 this.vertices[index].position.y = arrPosition[i][1];
                 this.vertices[index].positioned = true;
