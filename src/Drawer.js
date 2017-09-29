@@ -148,6 +148,9 @@ SmilesDrawer.Drawer = class Drawer {
 
             // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
             this.restoreRingInformation();
+
+            // Atoms bonded to the same ring atom
+            this.resolvePrimaryOverlaps();
             
             let overlapScore = this.getOverlapScore();
 
@@ -235,7 +238,8 @@ SmilesDrawer.Drawer = class Drawer {
             // Do the actual drawing
             this.drawEdges(this.opts.debug);
             this.drawVertices(this.opts.debug);
-            
+            console.log(this.rings);
+            console.log(this.graph.vertices);
             this.canvasWrapper.reset();
         }
     }
@@ -448,7 +452,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // Get the rings in the graph (the SSSR)
         let rings = SmilesDrawer.SSSR.getRings(this.graph.getComponentsAdjacencyMatrix());
-        
+
         if (rings === null) {
             return;
         }
@@ -486,13 +490,19 @@ SmilesDrawer.Drawer = class Drawer {
             ring.neighbours = SmilesDrawer.RingConnection.getNeighbours(this.ringConnections, ring.id);
         }
 
+        // Anchor the ring to one of it's members, so that the ring center will always
+        // be tied to a single vertex when doing repositionings
+        for (var i = 0; i < this.rings.length; i++) {
+            let ring = this.rings[i];
+            this.graph.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
+        }
+
         // Backup the ring information to restore after placing the bridged ring.
         // This is needed in order to identify aromatic rings and stuff like this in
         // rings that are member of the superring.
         this.backupRingInformation();
 
-        // return;
-
+        
         // Replace rings contained by a larger bridged ring with a bridged ring
         while (this.rings.length > 0) {
             let id = -1;
@@ -660,7 +670,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         this.addRing(ring);
 
-        this.graph.vertices[sourceVertexId].value.anchoredRings.push(ring.id);
+        // this.graph.vertices[sourceVertexId].value.anchoredRings.push(ring.id);
 
         // Atoms inside the ring are no longer part of a ring but are now
         // associated with the bridged ring
@@ -668,7 +678,7 @@ SmilesDrawer.Drawer = class Drawer {
             let vertex = this.graph.vertices[insideRing[i]];
             
             vertex.value.rings = [];
-            vertex.value.anchoredRings = [];
+            //vertex.value.anchoredRings = [];
             vertex.value.bridgedRing = ring.id;
         }
 
@@ -1208,568 +1218,19 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     /**
-     * Applies a force-based layout to a set of provided vertices.
+     * Returns the weight of the edge between two given vertices.
      *
-     * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
-     * @param {SmilesDrawer.Vector2} center The center of the layout.
-     * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
-     * @param {SmilesDrawer.Ring} ring The bridged ring associated with this force-based layout.
+     * @param {SmilesDrawer.Ring} ring A ring.
      */
-    forceLayout(vertexIds, center, startVertexId, ring) {
-        // Constants
-        const l = this.opts.bondLength;
-        const startVertex = this.graph.vertices[startVertexId];
-        
+    setRingCenter(ring) {
+        let ringSize = ring.getSize();
+        let total = new SmilesDrawer.Vector2();
 
-        if (startVertex.isBridge) {
-            // startVertex = this.graph.vertices[ring.members[0]]
+        for (var i = 0; i < ringSize; i++) {
+            total.add(this.graph.vertices[ring.members[i]].position);
         }
 
-        const startVertexNeighbours = startVertex.getNeighbours();
-
-        // Add neighbours that are already positioned to the vertices to prevent overlap
-        for (var i = 0; i < startVertexNeighbours.length; i++) {
-            if (this.graph.vertices[startVertexNeighbours[i]].positioned) {
-                vertexIds.push(startVertexNeighbours[i]);
-            }
-        }
-
-        if (startVertex.id === 0 && ring.rings.length > 2) {
-            startVertex.positioned = false;
-        }
-
-        // Create adjencency matrix
-        let totalLength = vertexIds.length + ring.rings.length;
-        const vToId = [vertexIds.length];
-        const idToV = new Map();
-        const adjMatrix = [totalLength];
-        const edges = [];
-        
-        for (var i = 0; i < totalLength; i++) {
-            adjMatrix[i] = [totalLength];
-
-            for (var j = 0; j < totalLength; j++) {
-                adjMatrix[i][j] = 0;
-            }
-        }
-
-        for (var i = 0; i < vertexIds.length; i++) {
-            vToId[i] = this.graph.vertices[vertexIds[i]].id; 
-            idToV.set(vToId[i], i);
-        }
-
-        for (var i = 0; i < vertexIds.length - 1; i++) { 
-            for (var j = i; j < vertexIds.length; j++) {
-                let edge = this.graph.getEdge(vToId[i], this.graph.vertices[vertexIds[j]].id);
-                
-                if (edge !== null)  {
-                    adjMatrix[i][j] = l;
-                    adjMatrix[j][i] = l;
-                    edges.push([i, j]);
-                }
-            }
-        }
-
-        for (var i = 0; i < ring.rings.length; i++) {
-            let r = ring.rings[i];
-            let index = vertexIds.length + i;
-
-            for (var j = 0; j < r.members.length; j++) {
-                let id = idToV.get(r.members[j]);
-                let radius = SmilesDrawer.MathHelper.polyCircumradius(l, r.getSize());
-                
-                adjMatrix[id][index] = radius;
-                adjMatrix[index][id] = radius;
-            }
-        }
-
-        for (var i = 0; i < edges.length; i++) {
-            for (var j = 0; j < totalLength; j++) {
-                adjMatrix[j].push(0);
-            }
-
-            adjMatrix.push([]);
-        
-            for (var j = 0; j < totalLength + edges.length; j++) {
-                adjMatrix[totalLength + i].push(0);
-            }
-        }
-
-        // Connect ring centers with edges 
-        for (var i = 0; i < ring.rings.length; i++) {
-            let r = ring.rings[i];
-            let ringIndex = vertexIds.length + i;
-            let ringSize = r.getSize();
-            
-            for (var j = 0; j < edges.length; j++) {
-                let a = edges[j][0];
-
-                // If the vertex and the ring are connected, so must the edge be
-                if (adjMatrix[ringIndex][a] !== 0) {
-                    let apothem = SmilesDrawer.MathHelper.apothem(adjMatrix[ringIndex][a], ringSize);
-                    
-                    adjMatrix[ringIndex][totalLength + j] = apothem;
-                    adjMatrix[totalLength + j][ringIndex] = apothem;
-                }
-            }
-
-            // Connecting ring centers, let them have a distance of apothem + apothem
-            for (var j = i; j < ring.rings.length; j++) {
-                let r2 = ring.rings[j];
-
-                if (r2.id === r.id) {
-                    continue;
-                }
-                
-                // If they do not share a vertex, they are not connected
-                let intersection = SmilesDrawer.ArrayHelper.intersection(r.members, r2.members).length;
-
-                if (intersection === 0) {
-                    continue;
-                }
-
-                let ringIndex2 = vertexIds.length + j;
-                let ringSize2 = r2.getSize();
-                let dist = SmilesDrawer.MathHelper.apothemFromSideLength(l, ringSize) + SmilesDrawer.MathHelper.apothemFromSideLength(l, ringSize2);
-                
-                adjMatrix[ringIndex][ringIndex2] = dist;
-                adjMatrix[ringIndex2][ringIndex] = dist;
-            }
-        }
-
-
-        
-        totalLength += edges.length;
-        
-        const edgeOffset = totalLength - edges.length;
-        let forces = [totalLength];
-        let positions = [totalLength];
-        let positioned = [totalLength];
-        let isRingCenter = [totalLength];
-        let ringSize = [totalLength];
-        let ringCount = [totalLength];
-
-        for (var i = 0; i < totalLength; i++) {
-            isRingCenter[i] = i >= vertexIds.length && i < edgeOffset;
-
-            ringCount[i] = i < vertexIds.length ? this.graph.vertices[vToId[i]].value.originalRings.length : 1;
-
-            if (isRingCenter[i]) {
-                ringSize[i] = ring.rings[i - vertexIds.length].members.length;
-            } else {
-                ringSize[i] = 1;
-            }
-        }
-        
-        for (var i = 0; i < totalLength; i++) {
-            forces[i] = new SmilesDrawer.Vector2();
-            positions[i] = new SmilesDrawer.Vector2(center.x + Math.random() * l, center.y + Math.random() * l);
-            positioned[i] = false;
-
-            if (i >= vertexIds.length) {
-                continue;
-            }
-
-            let vertex = this.graph.vertices[vToId[i]];
-
-            positions[i] = vertex.position.clone();
-            
-            if (vertex.positioned && ring.rings.length === 2) {
-                positioned[i] = true;
-            }
-        }
-        
-        let k = l / 2.0;
-        let kSq = k * k;
-        let c = 0.005;
-        let maxMove = l / 2.0;
-        let maxDist = l * 2.0;
-        let maxDistSq = maxDist * maxDist;
-        
-        if (ring.rings.length > 2) {
-            for (var n = 0; n < 600; n++) {
-                for (var i = 0; i < totalLength; i++) {
-                    forces[i].x = 0;
-                    forces[i].y = 0;
-                }
-
-                // Set the positions of the edge midpoints
-                for (var i = 0; i < edges.length; i++) {
-                    let index = edgeOffset + i;
-                    let a = positions[edges[i][0]];
-                    let b = positions[edges[i][1]];
-
-                    positions[index] = SmilesDrawer.Vector2.midpoint(a, b);
-                }
-
-                // Repulsive forces
-                for (var u = 0; u < totalLength - 1; u++) {
-                    for (var v = u + 1; v < totalLength; v++) {
-                        if (n <= 250 && !(isRingCenter[u] && isRingCenter[v])) {
-                            continue;
-                        }
-
-                        if (n > 250 && isRingCenter[u] && isRingCenter[v]) {
-                            continue;
-                        }
-
-                        let dx = positions[v].x - positions[u].x;
-                        let dy = positions[v].y - positions[u].y;
-
-                        if (dx === 0 || dy === 0) {
-                            continue;
-                        }
-
-                        let dSq = dx * dx + dy * dy;
-
-                        if (dSq < 0.01) {
-                            dx = 0.1 * Math.random() + 0.1;
-                            dy = 0.1 * Math.random() + 0.1;
-
-                            dSq = dx * dx + dy * dy;
-                        }
-
-                        let d = Math.sqrt(dSq);
-
-                        if (d > adjMatrix[u][v] && n > 200) {
-                            continue;
-                        }
-
-                        let force = kSq / d;
-
-                        if (n <= 200) {
-                            force *= ringSize[u] * ringSize[v];
-                        }
-
-                        if (n > 250 && (isRingCenter[u] || isRingCenter[v])) {
-                            force *= ringSize[u] * ringSize[v];
-                        }
-
-                        let forceFactor = force / d;
-                        let fx = forceFactor * dx;
-                        let fy = forceFactor * dy;
-
-                        if (!positioned[u]) {
-                            forces[u].x -= fx;
-                            forces[u].y -= fy;
-                        }
-
-                        if (!positioned[v]) {
-                            forces[v].x += fx;
-                            forces[v].y += fy;
-                        }
-                    }
-                }
-
-                // Attractive forces
-                for (var u = 0; u < totalLength - 1; u++) {
-                    for (var v = u + 1; v < totalLength; v++) {
-                        let bothRingCenters = isRingCenter[u] && isRingCenter[v];
-
-                        if (adjMatrix[u][v] < 1) {
-                            continue;
-                        }
-
-                        if (n <= 250 && !bothRingCenters) {
-                            continue;
-                        }
-
-                        if (n > 250 && bothRingCenters) {
-                            continue;
-                        }
-                        
-                        let dx = positions[v].x - positions[u].x;
-                        let dy = positions[v].y - positions[u].y;
-
-                        if (dx === 0 || dy === 0) {
-                            continue;
-                        }
-                        
-                        let dSq = dx * dx + dy * dy;
-                    
-                        if (dSq < 0.01) {
-                            dx = 0.1 * Math.random() + 0.1;
-                            dy = 0.1 * Math.random() + 0.1;
-                            dSq = dx * dx + dy * dy;
-                        }
-
-                        let d = Math.sqrt(dSq);
-
-                        if (d > maxDist) {
-                            d = maxDist;
-                            dSq = maxDistSq;
-                        }
-
-                        let force = (dSq - kSq) / k;
-                        let dOptimal = adjMatrix[u][v];
-                        
-                        force *= d / dOptimal;
-
-                        let forceFactor = force / d;
-                        let fx = forceFactor * dx;
-                        let fy = forceFactor * dy;
-
-                        if (!positioned[u]) {
-                            forces[u].x += fx;
-                            forces[u].y += fy;
-                        }
-
-                        if (!positioned[v]) {
-                            forces[v].x -= fx;
-                            forces[v].y -= fy;
-                        }
-                    }
-                }
-
-                // Add the edge forces to the vertices
-                for (var i = 0; i < edges.length; i++) {
-                    let index = edgeOffset + i;
-                    let force = forces[index];
-
-                    let a = edges[i][0];
-                    let b = edges[i][1];
-
-                    forces[a].x += force.x;
-                    forces[a].y += force.y;
-
-                    forces[b].x += force.x;
-                    forces[b].y += force.y;
-                }
-
-                // Move the vertex
-                for (var u = 0; u < totalLength; u++) {
-                    if (positioned[u]) {
-                        continue;
-                    }
-
-                    let dx = c * forces[u].x;
-                    let dy = c * forces[u].y;
-
-                    if (dx > maxMove) dx = maxMove;
-                    if (dx < -maxMove) dx = -maxMove;
-                    if (dy > maxMove) dy = maxMove;
-                    if (dy < -maxMove) dy = - maxMove;
-                    
-                    positions[u].x += dx;
-                    positions[u].y += dy;
-                }
-
-                // Place the ring centers in the middle of the members
-                if (n > 200) {
-                    for (var i = 0; i < ring.rings.length; i++) {
-                        let r = ring.rings[i];
-                        let center = new SmilesDrawer.Vector2();
-
-                        for (var j = 0; j < r.members.length; j++) {
-                            let pos = positions[idToV.get(r.members[j])];
-                            center.x += pos.x;
-                            center.y += pos.y;
-                        }
-
-                        center.x /= r.members.length;
-                        center.y /= r.members.length;
-
-                        positions[vertexIds.length + i] = center;
-                    }
-                }          
-            }
-        } else {
-            for (var i = 0; i < vertexIds.length; i++) {
-                if (!positioned[i]) {
-                    positions[i] = center.clone();
-                    positions[i].x += Math.random() - 0.5;
-                    positions[i].y += Math.random() - 0.5;
-                }
-            }
-
-            for (var n = 0; n < 200; n++) {
-                for (var i = 0; i < totalLength; i++) {
-                    forces[i].x = 0;
-                    forces[i].y = 0;
-                }
-
-                // Set the positions of the edge midpoints
-                for (var i = 0; i < edges.length; i++) {
-                    let index = edgeOffset + i;
-                    let a = positions[edges[i][0]];
-                    let b = positions[edges[i][1]];
-
-                    positions[index] = SmilesDrawer.Vector2.midpoint(a, b);
-                }
-
-                // Repulsive forces
-                for (var u = 0; u < vertexIds.length - 1; u++) {
-                    for (var v = u + 1; v < vertexIds.length; v++) {
-                        let dx = positions[v].x - positions[u].x;
-                        let dy = positions[v].y - positions[u].y;
-
-                        if (dx === 0 || dy === 0) {
-                            continue;
-                        }
-
-                        let dSq = dx * dx + dy * dy;
-
-                        if (dSq < 0.01) {
-                            dx = 0.1 * Math.random() + 0.1;
-                            dy = 0.1 * Math.random() + 0.1;
-
-                            dSq = dx * dx + dy * dy;
-                        }
-
-                        let d = Math.sqrt(dSq);
-
-                        if (d > adjMatrix[u][v]) {
-                            continue;
-                        }
-
-                        let force = kSq / d;
-                        let forceFactor = force / d;
-                        let fx = forceFactor * dx;
-                        let fy = forceFactor * dy;
-
-                        if (!positioned[u]) {
-                            forces[u].x -= fx;
-                            forces[u].y -= fy;
-                        }
-
-                        if (!positioned[v]) {
-                            forces[v].x += fx;
-                            forces[v].y += fy;
-                        }
-                    }
-                }
-
-                // Attractive forces
-                for (var u = 0; u < vertexIds.length - 1; u++) {
-                    for (var v = u + 1; v < vertexIds.length; v++) {
-                        if (adjMatrix[u][v] < 1) {
-                            continue;
-                        }
-                        
-                        let dx = positions[v].x - positions[u].x;
-                        let dy = positions[v].y - positions[u].y;
-
-                        if (dx === 0 || dy === 0) {
-                            continue;
-                        }
-                        
-                        let dSq = dx * dx + dy * dy;
-                    
-                        if (dSq < 0.01) {
-                            dx = 0.1 * Math.random() + 0.1;
-                            dy = 0.1 * Math.random() + 0.1;
-                            dSq = dx * dx + dy * dy;
-                        }
-
-                        let d = Math.sqrt(dSq);
-
-                        if (d > maxDist) {
-                            d = maxDist;
-                            dSq = maxDistSq;
-                        }
-
-                        let force = (dSq - kSq) / k;
-                        let dOptimal = adjMatrix[u][v];
-                        
-                        force *= d / dOptimal;
-
-                        let forceFactor = force / d;
-                        let fx = forceFactor * dx;
-                        let fy = forceFactor * dy;
-
-                        if (!positioned[u]) {
-                            forces[u].x += fx;
-                            forces[u].y += fy;
-                        }
-
-                        if (!positioned[v]) {
-                            forces[v].x -= fx;
-                            forces[v].y -= fy;
-                        }
-                    }
-                }
-
-                // Move the vertex
-                for (var u = 0; u < vertexIds.length; u++) {
-                    if (positioned[u]) {
-                        continue;
-                    }
-
-                    // Add a bit of force pushing away from the center
-                    let gx = positions[u].x - center.x;
-                    let gy = positions[u].y - center.y;
-                    let dSq = gx * gx + gy * gy;
-                    let forceg = 50.0 / dSq;
-                    let fgx = forceg * gx;
-                    let fgy = forceg * gy;
-                    let dx = c * (forces[u].x + fgx);
-                    let dy = c * (forces[u].y + fgy);
-
-                    if (dx > maxMove) dx = maxMove;
-                    if (dx < -maxMove) dx = -maxMove;
-                    if (dy > maxMove) dy = maxMove;
-                    if (dy < -maxMove) dy = - maxMove;
-                    
-                    positions[u].x += dx;
-                    positions[u].y += dy;
-                }
-            }
-        }
-
-        // Set centers for subrings (already done for subrings > 2)
-        if (ring.rings.length < 3) {
-            for (var i = 0; i < ring.rings.length; i++) {
-                let r = ring.rings[i];
-                let center = new SmilesDrawer.Vector2();
-
-                for (var j = 0; j < r.members.length; j++) {
-                    let pos = positions[idToV.get(r.members[j])];
-                    center.x += pos.x;
-                    center.y += pos.y;
-                }
-
-                center.x /= r.members.length;
-                center.y /= r.members.length;
-
-                positions[vertexIds.length + i] = center;
-            }
-        }
-
-        for (var i = 0; i < totalLength; i++) {
-            if (i < vertexIds.length) { 
-                if (!positioned[i]) {
-                    this.graph.vertices[vToId[i]].setPositionFromVector(positions[i]);
-                    this.graph.vertices[vToId[i]].positioned = true;
-                }
-            } else if (i < vertexIds.length + ring.rings.length) {
-                let index = i - vertexIds.length;
-                ring.rings[index].center = positions[i];
-            }
-        }
-        
-        // Only for bridges, not for members, the members are handled in createRing.
-        for (var u = 0; u < vertexIds.length; u++) {
-            let vertex = this.graph.vertices[vertexIds[u]];
-            let neighbours = vertex.getNeighbours();
-            
-            for (var i = 0; i < neighbours.length; i++) {
-                let currentVertex = this.graph.vertices[neighbours[i]];
-                
-                if (currentVertex.positioned) {
-                    continue;
-                }
-
-                center = this.getSubringCenter(ring, vertex);
-
-                if (currentVertex.value.rings.length === 0) {
-                    currentVertex.value.isConnectedToRing = true;
-                }
-                
-                this.createNextBond(currentVertex, vertex, center);
-            }
-        }
-
-        ring.positioned = true;
+        ring.center = total.divide(ringSize);
     }
 
     /**
@@ -1777,7 +1238,7 @@ SmilesDrawer.Drawer = class Drawer {
      *
      * @param {SmilesDrawer.Ring} ring A bridged ring.
      * @param {SmilesDrawer.Vertex} vertex A vertex.
-     * @returns {SmilesDrawer.Vector2} The center of the subring that  the provided vertex.
+     * @returns {SmilesDrawer.Vector2} The center of the subring that containing the vertex.
      */
     getSubringCenter(ring, vertex) {
         let rings = vertex.value.originalRings;
@@ -2036,9 +1497,6 @@ SmilesDrawer.Drawer = class Drawer {
         }
 
         this.createNextBond(startVertex);
-
-        // Atoms bonded to the same ring atom
-        this.resolvePrimaryOverlaps();
     }
 
     /**
@@ -2190,12 +1648,37 @@ SmilesDrawer.Drawer = class Drawer {
             let allVertices = SmilesDrawer.ArrayHelper.merge(ring.members, ring.insiders);
             
             this.graph.kkLayout(allVertices, center, startVertex.id, ring, this.opts.bondLength);
-            // this.forceLayout(allVertices, center, startVertex.id, ring);
-        }
 
-        // Anchor the ring to one of it's members, so that the ring center will always
-        // be tied to a single vertex when doing repositionings
-        this.graph.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
+            // Setting the centers for the subrings
+            for (var i = 0; i < ring.rings.length; i++) {
+                this.setRingCenter(ring.rings[i]);
+            }
+
+            // Handle bridges
+            // Only for bridges, not for members, the members are handled in createRing.
+            for (var u = 0; u < allVertices.length; u++) {
+                let vertex = this.graph.vertices[allVertices[u]];
+                let neighbours = vertex.getNeighbours();
+                
+                for (var i = 0; i < neighbours.length; i++) {
+                    let currentVertex = this.graph.vertices[neighbours[i]];
+                    
+                    if (currentVertex.positioned) {
+                        continue;
+                    }
+
+                    center = this.getSubringCenter(ring, vertex);
+
+                    if (currentVertex.value.rings.length === 0) {
+                        currentVertex.value.isConnectedToRing = true;
+                    }
+                    
+                    this.createNextBond(currentVertex, vertex, center);
+                }
+            }
+
+            ring.positioned = true;
+        }
 
         ring.positioned = true;
         ring.center = center;
@@ -2317,13 +1800,18 @@ SmilesDrawer.Drawer = class Drawer {
      */
     rotateSubtree(vertexId, parentVertexId, angle, center) {
         let that = this;
-        
+
+        // for (var i = 0; i < this.graph.vertices.length; i++) {
+        //     let atom = this.graph.vertices[i].value;
+        //     console.log(i, atom.anchoredRings);
+        // }
+
         this.traverseTree(vertexId, parentVertexId, function (vertex) {
             vertex.position.rotateAround(angle, center);
 
             for (var i = 0; i < vertex.value.anchoredRings.length; i++) {
                 let ring = that.rings[vertex.value.anchoredRings[i]];
-
+                
                 if (ring) {
                     ring.center.rotateAround(angle, center);
                 }
@@ -2720,9 +2208,10 @@ SmilesDrawer.Drawer = class Drawer {
             nextCenter.normalize();
 
             let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
-
+            console.log(r, this.opts.bondLength, nextRing.members.length, nextRing);
             nextCenter.multiplyScalar(r);
             nextCenter.add(vertex.position);
+
 
             if (!nextRing.positioned) {
                 this.createRing(nextRing, nextCenter, vertex);

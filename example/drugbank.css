@@ -1,0 +1,68 @@
+h1 {
+    position: relative;
+  }
+  
+  img.logo {
+    width: 100px;
+    height: 100px;
+  }
+  
+  #canvas-container {
+    text-align: center;
+  }
+  
+  #drawing-info {
+    text-align: center;
+  }
+  
+  #download-info {
+    display: inline-block;
+  }
+  
+  #speed-info, #overlap-info {
+    position: relative;
+    display: inline-block;
+    padding: 6px;
+    margin: 2px;
+    border: 1px solid #eee;
+    font-size: 1.0em;
+  }
+  
+  #error-info {
+    position: relative;
+    display: inline-block;
+    padding: 6px;
+    margin: 2px;
+    color: #888;
+    border: 1px solid #e74c3c;
+  }
+  
+  #error-info > span {
+    position: relative;
+    font-weight: bold;
+    color: #e74c3c;
+  }
+  
+  #error-info > span > span {
+    position: absolute;
+    top: 25px;
+    left: -150px;
+    width: 300px;
+    padding: 5px;
+    background-color: #e74c3c;
+    color: #fff;
+    font-size: 0.75em;
+    font-weight: normal;
+  }
+  
+  .icon-block {
+    padding: 0 15px;
+  }
+  
+  .icon-block .material-icons {
+      font-size: inherit;
+  }
+  
+  .hidden {
+    display: none !important;
+  }

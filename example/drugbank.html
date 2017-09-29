@@ -1,0 +1,49 @@
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Smiles Drawer Example</title>
+        <meta name="description" content="A minimal smiles drawer example.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- CSS  -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+        <link href="drugbank.css" type="text/css" rel="stylesheet" media="screen,projection" />
+
+        <style>
+            canvas { margin: 5px; }
+        </style>
+    </head>
+    <body>
+        <script src="../dist/smiles-drawer.min.js"></script>
+        <script src="drugbank.js"></script>
+        <script>
+            let options = { width: 300, height: 300 };
+            
+            // Initialize the drawer
+            let smilesDrawer = new SmilesDrawer.Drawer(options);
+            
+            for (let i = 0; i < drugbank.length; i += 3) {
+                try {
+                    let canvas = document.createElement('canvas');
+                    canvas.setAttribute('id', 'canvas' + i);
+                    canvas.setAttribute('alt', drugbank[i]);
+                    document.body.appendChild(canvas);
+
+                    SmilesDrawer.parse(drugbank[i], function(tree) {
+                        smilesDrawer.draw(tree, 'canvas' + i, 'light', false); 
+                    }, function(err) {
+                        console.log(err);
+                    });
+
+                    // if (td > 1000) console.log(schembl[i]);
+                } catch (exception) {
+
+                }
+            }
+        </script>
+    </body>
+</html>

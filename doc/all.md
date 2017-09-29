@@ -108,7 +108,7 @@ The SmilesDrawer namespace.
         * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer.Drawer+chooseSide) ⇒ <code>Object</code>
         * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer.Drawer+areConnected) ⇒ <code>Boolean</code>
         * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer.Drawer+getEdgeWeight) ⇒ <code>Number</code> &#124; <code>null</code>
-        * [.forceLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Drawer+forceLayout)
+        * [.setRingCenter(ring)](#SmilesDrawer.Drawer+setRingCenter)
         * [.getSubringCenter(ring, vertex)](#SmilesDrawer.Drawer+getSubringCenter) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
         * [.drawEdges(debug)](#SmilesDrawer.Drawer+drawEdges)
         * [.drawVertices(debug)](#SmilesDrawer.Drawer+drawVertices)
@@ -1140,7 +1140,7 @@ The main class of the application representing the smiles drawer
     * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer.Drawer+chooseSide) ⇒ <code>Object</code>
     * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer.Drawer+areConnected) ⇒ <code>Boolean</code>
     * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer.Drawer+getEdgeWeight) ⇒ <code>Number</code> &#124; <code>null</code>
-    * [.forceLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Drawer+forceLayout)
+    * [.setRingCenter(ring)](#SmilesDrawer.Drawer+setRingCenter)
     * [.getSubringCenter(ring, vertex)](#SmilesDrawer.Drawer+getSubringCenter) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
     * [.drawEdges(debug)](#SmilesDrawer.Drawer+drawEdges)
     * [.drawVertices(debug)](#SmilesDrawer.Drawer+drawVertices)
@@ -1576,19 +1576,16 @@ Returns the weight of the edge between two given vertices.
 | vertexIdA | <code>Number</code> | A vertex id. |
 | vertexIdB | <code>Number</code> | A vertex id. |
 
-<a name="SmilesDrawer.Drawer+forceLayout"></a>
+<a name="SmilesDrawer.Drawer+setRingCenter"></a>
 
-#### drawer.forceLayout(vertexIds, center, startVertexId, ring)
-Applies a force-based layout to a set of provided vertices.
+#### drawer.setRingCenter(ring)
+Returns the weight of the edge between two given vertices.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing vertexIds to be placed using the force based layout. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The center of the layout. |
-| startVertexId | <code>Number</code> | A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex. |
-| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | The bridged ring associated with this force-based layout. |
+| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | A ring. |
 
 <a name="SmilesDrawer.Drawer+getSubringCenter"></a>
 
@@ -1596,7 +1593,7 @@ Applies a force-based layout to a set of provided vertices.
 Gets the center of a ring contained within a bridged ring and containing a given vertex.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The center of the subring that  the provided vertex.  
+**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The center of the subring that containing the vertex.  
 
 | Param | Type | Description |
 | --- | --- | --- |

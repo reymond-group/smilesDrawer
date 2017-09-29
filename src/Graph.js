@@ -593,8 +593,8 @@ SmilesDrawer.Graph = class Graph {
 
         // Setting parameters
         let threshold = 0.01;
-        let innerThreshold = 0.1;
-        let maxIteration = 200;
+        let innerThreshold = 1.0;
+        let maxIteration = 500;
         let maxInnerIteration = 10;
         let maxEnergy = 1e9;
 
