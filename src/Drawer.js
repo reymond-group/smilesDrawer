@@ -124,7 +124,8 @@ SmilesDrawer.Drawer = class Drawer {
     draw(data, target, themeName = 'light', infoOnly = false) {
         this.data = data;
         this.canvasWrapper = new SmilesDrawer.CanvasWrapper(target, this.opts.themes[themeName], this.opts);
-        
+        this.infoOnly = infoOnly;
+
         this.ringIdCounter = 0;
         this.ringConnectionIdCounter = 0;
 
@@ -143,7 +144,7 @@ SmilesDrawer.Drawer = class Drawer {
             this.annotateChirality();
         }
 
-        if (!infoOnly) {
+        if (!this.infoOnly) {
             this.position();
 
             // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
@@ -226,7 +227,7 @@ SmilesDrawer.Drawer = class Drawer {
             }
 
             this.resolveSecondaryOverlaps(overlapScore.scores);
-            
+
             // Set the canvas to the appropriate size
             this.canvasWrapper.scale(this.graph.vertices);
 
@@ -1606,6 +1607,8 @@ SmilesDrawer.Drawer = class Drawer {
             return;
         }
 
+        console.log(ring);
+
         center = center ? center : new SmilesDrawer.Vector2(0, 0);
 
         let orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
@@ -1648,7 +1651,7 @@ SmilesDrawer.Drawer = class Drawer {
             let allVertices = SmilesDrawer.ArrayHelper.merge(ring.members, ring.insiders);
             
             this.graph.kkLayout(allVertices, center, startVertex.id, ring, this.opts.bondLength);
-
+            ring.positioned = true;
             // Setting the centers for the subrings
             for (var i = 0; i < ring.rings.length; i++) {
                 this.setRingCenter(ring.rings[i]);
@@ -1676,8 +1679,6 @@ SmilesDrawer.Drawer = class Drawer {
                     this.createNextBond(currentVertex, vertex, center);
                 }
             }
-
-            ring.positioned = true;
         }
 
         ring.positioned = true;
@@ -1912,7 +1913,8 @@ SmilesDrawer.Drawer = class Drawer {
                 done[vertex.id] = true;
 
                 // Look for rings where there are atoms with two bonds outside the ring (overlaps)
-                if (vertex.getNeighbourCount() > 2) {
+                let nonRingNeighbours = this.getNonRingNeighbours(vertex.id);
+                if (nonRingNeighbours.length > 1) {
                     let rings = [];
                     
                     for (var k = 0; k < vertex.value.rings.length; k++) {
@@ -1922,12 +1924,12 @@ SmilesDrawer.Drawer = class Drawer {
                     overlaps.push({
                         common: vertex,
                         rings: rings,
-                        vertices: this.getNonRingNeighbours(vertex.id)
+                        vertices: nonRingNeighbours
                     });
                 }
             }
         }
-
+        
         for (var i = 0; i < sharedSideChains.length; i++) {
             let chain = sharedSideChains[i];
             let angle = -chain.vertex.position.getRotateToAngle(chain.other.position, chain.common.position);
@@ -2156,29 +2158,16 @@ SmilesDrawer.Drawer = class Drawer {
             vertex.position.add(pos);
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
-        } else if (previousVertex.value.rings.length == 2) {
+        } else if (previousVertex.value.rings.length === 2) {
             // Here, ringOrAngle is always a ring
             let ringA = this.getRing(previousVertex.value.rings[0]);
             let ringB = this.getRing(previousVertex.value.rings[1]);
-
-            // Project the current vertex onto the vector between the two centers to
-            // get the direction
-            let a = SmilesDrawer.Vector2.subtract(ringB.center, ringA.center);
-            let b = SmilesDrawer.Vector2.subtract(previousVertex.position, ringA.center);
-            let s = SmilesDrawer.Vector2.scalarProjection(b, a);
             
-            a.normalize();
-            a.multiply(s);
-            a.add(ringA.center);
+            let midpoint = SmilesDrawer.Vector2.midpoint(ringA.center, ringB.center);
+            let direction = SmilesDrawer.Vector2.subtract(previousVertex.position, midpoint);
+            direction.normalize().multiplyScalar(this.opts.bondLength);
 
-            let pos = SmilesDrawer.Vector2.subtract(a, previousVertex.position);
-            pos.invert();
-            pos.normalize();
-            pos.multiplyScalar(this.opts.bondLength);
-            
-            vertex.position.add(previousVertex.position);
-            vertex.position.add(pos);
-
+            vertex.position.add(previousVertex.position).add(direction);
             vertex.previousPosition = previousVertex.position;
             vertex.positioned = true;
         }
@@ -2208,7 +2197,6 @@ SmilesDrawer.Drawer = class Drawer {
             nextCenter.normalize();
 
             let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
-            console.log(r, this.opts.bondLength, nextRing.members.length, nextRing);
             nextCenter.multiplyScalar(r);
             nextCenter.add(vertex.position);
 

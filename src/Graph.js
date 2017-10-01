@@ -447,7 +447,7 @@ SmilesDrawer.Graph = class Graph {
      * @param {SmilesDrawer.Ring} ring The bridged ring associated with this force-based layout.
      */
     kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
-        let edgeStrength = 1.0;
+        let edgeStrength = 10.0;
         let matDist = this.getSubgraphDistanceMatrix(vertexIds);
         let length = vertexIds.length;
 

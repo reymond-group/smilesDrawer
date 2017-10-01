@@ -2264,6 +2264,7 @@ SmilesDrawer.Drawer = function () {
 
             this.data = data;
             this.canvasWrapper = new SmilesDrawer.CanvasWrapper(target, this.opts.themes[themeName], this.opts);
+            this.infoOnly = infoOnly;
 
             this.ringIdCounter = 0;
             this.ringConnectionIdCounter = 0;
@@ -2283,7 +2284,7 @@ SmilesDrawer.Drawer = function () {
                 this.annotateChirality();
             }
 
-            if (!infoOnly) {
+            if (!this.infoOnly) {
                 this.position();
 
                 // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
@@ -3874,6 +3875,8 @@ SmilesDrawer.Drawer = function () {
                 return;
             }
 
+            console.log(ring);
+
             center = center ? center : new SmilesDrawer.Vector2(0, 0);
 
             var orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
@@ -3916,7 +3919,7 @@ SmilesDrawer.Drawer = function () {
                 var allVertices = SmilesDrawer.ArrayHelper.merge(ring.members, ring.insiders);
 
                 this.graph.kkLayout(allVertices, center, startVertex.id, ring, this.opts.bondLength);
-
+                ring.positioned = true;
                 // Setting the centers for the subrings
                 for (var i = 0; i < ring.rings.length; i++) {
                     this.setRingCenter(ring.rings[i]);
@@ -3944,8 +3947,6 @@ SmilesDrawer.Drawer = function () {
                         this.createNextBond(currentVertex, vertex, center);
                     }
                 }
-
-                ring.positioned = true;
             }
 
             ring.positioned = true;
@@ -4199,7 +4200,8 @@ SmilesDrawer.Drawer = function () {
                     done[vertex.id] = true;
 
                     // Look for rings where there are atoms with two bonds outside the ring (overlaps)
-                    if (vertex.getNeighbourCount() > 2) {
+                    var nonRingNeighbours = this.getNonRingNeighbours(vertex.id);
+                    if (nonRingNeighbours.length > 1) {
                         var rings = [];
 
                         for (var k = 0; k < vertex.value.rings.length; k++) {
@@ -4209,7 +4211,7 @@ SmilesDrawer.Drawer = function () {
                         overlaps.push({
                             common: vertex,
                             rings: rings,
-                            vertices: this.getNonRingNeighbours(vertex.id)
+                            vertices: nonRingNeighbours
                         });
                     }
                 }
@@ -4447,29 +4449,16 @@ SmilesDrawer.Drawer = function () {
                 vertex.position.add(_pos);
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
-            } else if (previousVertex.value.rings.length == 2) {
+            } else if (previousVertex.value.rings.length === 2) {
                 // Here, ringOrAngle is always a ring
                 var ringA = this.getRing(previousVertex.value.rings[0]);
                 var ringB = this.getRing(previousVertex.value.rings[1]);
 
-                // Project the current vertex onto the vector between the two centers to
-                // get the direction
-                var a = SmilesDrawer.Vector2.subtract(ringB.center, ringA.center);
-                var b = SmilesDrawer.Vector2.subtract(previousVertex.position, ringA.center);
-                var s = SmilesDrawer.Vector2.scalarProjection(b, a);
+                var midpoint = SmilesDrawer.Vector2.midpoint(ringA.center, ringB.center);
+                var direction = SmilesDrawer.Vector2.subtract(previousVertex.position, midpoint);
+                direction.normalize().multiplyScalar(this.opts.bondLength);
 
-                a.normalize();
-                a.multiply(s);
-                a.add(ringA.center);
-
-                var _pos2 = SmilesDrawer.Vector2.subtract(a, previousVertex.position);
-                _pos2.invert();
-                _pos2.normalize();
-                _pos2.multiplyScalar(this.opts.bondLength);
-
-                vertex.position.add(previousVertex.position);
-                vertex.position.add(_pos2);
-
+                vertex.position.add(previousVertex.position).add(direction);
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
             }
@@ -4499,7 +4488,6 @@ SmilesDrawer.Drawer = function () {
                 _nextCenter.normalize();
 
                 var _r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, _nextRing.members.length);
-                console.log(_r, this.opts.bondLength, _nextRing.members.length, _nextRing);
                 _nextCenter.multiplyScalar(_r);
                 _nextCenter.add(vertex.position);
 
@@ -4655,21 +4643,21 @@ SmilesDrawer.Drawer = function () {
                     var d2 = this.getTreeDepth(neighbours[1], vertex.id);
                     var d3 = this.getTreeDepth(neighbours[2], vertex.id);
 
-                    var _s = this.graph.vertices[neighbours[0]];
+                    var s = this.graph.vertices[neighbours[0]];
                     var l = this.graph.vertices[neighbours[1]];
                     var _r2 = this.graph.vertices[neighbours[2]];
 
                     if (d2 > d1 && d2 > d3) {
-                        _s = this.graph.vertices[neighbours[1]];
+                        s = this.graph.vertices[neighbours[1]];
                         l = this.graph.vertices[neighbours[0]];
                         _r2 = this.graph.vertices[neighbours[2]];
                     } else if (d3 > d1 && d3 > d2) {
-                        _s = this.graph.vertices[neighbours[2]];
+                        s = this.graph.vertices[neighbours[2]];
                         l = this.graph.vertices[neighbours[0]];
                         _r2 = this.graph.vertices[neighbours[1]];
                     }
 
-                    if (this.getTreeDepth(l.id, vertex.id) === 1 && this.getTreeDepth(_r2.id, vertex.id) === 1 && this.getTreeDepth(_s.id, vertex.id) > 1) {
+                    if (this.getTreeDepth(l.id, vertex.id) === 1 && this.getTreeDepth(_r2.id, vertex.id) === 1 && this.getTreeDepth(s.id, vertex.id) > 1) {
 
                         if (!dir) {
                             var _proposedAngleA2 = SmilesDrawer.MathHelper.toRad(60);
@@ -4686,21 +4674,21 @@ SmilesDrawer.Drawer = function () {
                             var _distanceA2 = _proposedVectorA2.distance(_centerOfMass2);
                             var _distanceB2 = _proposedVectorB2.distance(_centerOfMass2);
 
-                            _s.angle = _distanceA2 < _distanceB2 ? _proposedAngleB2 : _proposedAngleA2;
+                            s.angle = _distanceA2 < _distanceB2 ? _proposedAngleB2 : _proposedAngleA2;
 
-                            if (_s.angle > 0) {
+                            if (s.angle > 0) {
                                 dir = -1;
                             } else {
                                 dir = 1;
                             }
                         } else {
-                            _s.angle = SmilesDrawer.MathHelper.toRad(60) * dir;
+                            s.angle = SmilesDrawer.MathHelper.toRad(60) * dir;
                             dir = -dir;
                         }
 
-                        _s.globalAngle = angle + _s.angle;
+                        s.globalAngle = angle + s.angle;
 
-                        this.createNextBond(_s, vertex, _s.globalAngle, -dir);
+                        this.createNextBond(s, vertex, s.globalAngle, -dir);
 
                         // If it's chiral, the order changes - for anticlockwise, switch the draw order around
                         // to keep the drawing the same
@@ -4724,15 +4712,15 @@ SmilesDrawer.Drawer = function () {
                             this.createNextBond(_r2, vertex, _r2.globalAngle);
                         }
                     } else {
-                        _s.angle = 0.0;
+                        s.angle = 0.0;
                         l.angle = SmilesDrawer.MathHelper.toRad(90);
                         _r2.angle = -SmilesDrawer.MathHelper.toRad(90);
 
-                        _s.globalAngle = angle + _s.angle;
+                        s.globalAngle = angle + s.angle;
                         l.globalAngle = angle + l.angle;
                         _r2.globalAngle = angle + _r2.angle;
 
-                        this.createNextBond(_s, vertex, _s.globalAngle);
+                        this.createNextBond(s, vertex, s.globalAngle);
                         this.createNextBond(l, vertex, l.globalAngle);
                         this.createNextBond(_r2, vertex, _r2.globalAngle);
                     }
@@ -5754,7 +5742,7 @@ SmilesDrawer.Graph = function () {
     }, {
         key: 'kkLayout',
         value: function kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
-            var edgeStrength = 1.0;
+            var edgeStrength = 10.0;
             var matDist = this.getSubgraphDistanceMatrix(vertexIds);
             var length = vertexIds.length;
 
