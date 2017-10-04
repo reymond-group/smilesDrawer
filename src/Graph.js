@@ -655,7 +655,31 @@ SmilesDrawer.Graph = class Graph {
     }
 
     /**
-     * Returns the number of connected components for the grpah 
+     * Returns the connected components of the graph.
+     * 
+     * @param {Array[]} adjacencyMatrix An adjacency matrix.
+     * @returns {Set[]} Connected compnents as sets.
+     */
+    static getConnectedComponents(adjacencyMatrix) {
+        let length = adjacencyMatrix.length;
+        let visited = new Array(length);
+        let count = 0;
+
+        visited.fill(false);
+
+        for (var u = 0; u < length; u++) {
+            if (!visited[u]) {
+                visited[u] = true;
+                count++;
+                Graph._ccCountDfs(u, visited, adjacencyMatrix);
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Returns the number of connected components for the graph. 
      * 
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @returns {Number} The number of connected components of the supplied graph.

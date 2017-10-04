@@ -166,6 +166,7 @@ The SmilesDrawer namespace.
             * [.kkLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
             * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
         * _static_
+            * [.getConnectedComponents(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
             * [.getConnectedComponentCount(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponentCount) ⇒ <code>Number</code>
             * [._ccCountDfs()](#SmilesDrawer.Graph._ccCountDfs)
     * [.Line](#SmilesDrawer.Line)
@@ -234,10 +235,11 @@ The SmilesDrawer namespace.
         * [.matrixToString(matrix)](#SmilesDrawer.SSSR.matrixToString) ⇒ <code>String</code>
         * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer.SSSR.getPathIncludedDistanceMatrices) ⇒ <code>Object</code>
         * [.getRingCandidates(d, pe1, pe2)](#SmilesDrawer.SSSR.getRingCandidates) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getSSSR(c, d, pe1, pe2, nsssr)](#SmilesDrawer.SSSR.getSSSR) ⇒ <code>Array.&lt;Set&gt;</code>
+        * [.getSSSR(c, d, adjacencyMatrix, pe1, pe2, nsssr)](#SmilesDrawer.SSSR.getSSSR) ⇒ <code>Array.&lt;Set&gt;</code>
         * [.getEdgeCount(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeCount) ⇒ <code>Number</code>
         * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.bondsToAtoms(bonds)](#SmilesDrawer.SSSR.bondsToAtoms) ⇒ <code>Set.&lt;Number&gt;</code>
+        * [.getBondCount(atoms, adjacencyMatrix)](#SmilesDrawer.SSSR.getBondCount) ⇒ <code>Number</code>
         * [.pathSetsContain(pathSets, pathSet)](#SmilesDrawer.SSSR.pathSetsContain) ⇒ <code>Boolean</code>
         * [.areSetsEqual(setA, setB)](#SmilesDrawer.SSSR.areSetsEqual) ⇒ <code>Boolean</code>
         * [.isSupersetOf(setA, setB)](#SmilesDrawer.SSSR.isSupersetOf) ⇒ <code>Boolean</code>
@@ -1236,7 +1238,7 @@ Returns an array containing all spiros associated with this molecule.
 <a name="SmilesDrawer.Drawer+printRingInfo"></a>
 
 #### drawer.printRingInfo() ⇒ <code>String</code>
-Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings); Insiders Count (the number of vertices contained within a bridged ring)
+Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings)
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 **Returns**: <code>String</code> - A string as described in the method description.  
@@ -1983,6 +1985,7 @@ A class representing the molecular graph.
         * [.kkLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
         * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
     * _static_
+        * [.getConnectedComponents(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
         * [.getConnectedComponentCount(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponentCount) ⇒ <code>Number</code>
         * [._ccCountDfs()](#SmilesDrawer.Graph._ccCountDfs)
 
@@ -2177,10 +2180,22 @@ Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general 
 PRIVATE FUNCTION used by getBridges().
 
 **Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
+<a name="SmilesDrawer.Graph.getConnectedComponents"></a>
+
+#### Graph.getConnectedComponents(adjacencyMatrix) ⇒ <code>Array.&lt;Set&gt;</code>
+Returns the connected components of the graph.
+
+**Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
+**Returns**: <code>Array.&lt;Set&gt;</code> - Connected compnents as sets.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+
 <a name="SmilesDrawer.Graph.getConnectedComponentCount"></a>
 
 #### Graph.getConnectedComponentCount(adjacencyMatrix) ⇒ <code>Number</code>
-Returns the number of connected components for the grpah
+Returns the number of connected components for the graph.
 
 **Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
 **Returns**: <code>Number</code> - The number of connected components of the supplied graph.  
@@ -2889,10 +2904,11 @@ A class encapsulating the functionality to find the smallest set of smallest rin
     * [.matrixToString(matrix)](#SmilesDrawer.SSSR.matrixToString) ⇒ <code>String</code>
     * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer.SSSR.getPathIncludedDistanceMatrices) ⇒ <code>Object</code>
     * [.getRingCandidates(d, pe1, pe2)](#SmilesDrawer.SSSR.getRingCandidates) ⇒ <code>Array.&lt;Array&gt;</code>
-    * [.getSSSR(c, d, pe1, pe2, nsssr)](#SmilesDrawer.SSSR.getSSSR) ⇒ <code>Array.&lt;Set&gt;</code>
+    * [.getSSSR(c, d, adjacencyMatrix, pe1, pe2, nsssr)](#SmilesDrawer.SSSR.getSSSR) ⇒ <code>Array.&lt;Set&gt;</code>
     * [.getEdgeCount(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeCount) ⇒ <code>Number</code>
     * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
     * [.bondsToAtoms(bonds)](#SmilesDrawer.SSSR.bondsToAtoms) ⇒ <code>Set.&lt;Number&gt;</code>
+    * [.getBondCount(atoms, adjacencyMatrix)](#SmilesDrawer.SSSR.getBondCount) ⇒ <code>Number</code>
     * [.pathSetsContain(pathSets, pathSet)](#SmilesDrawer.SSSR.pathSetsContain) ⇒ <code>Boolean</code>
     * [.areSetsEqual(setA, setB)](#SmilesDrawer.SSSR.areSetsEqual) ⇒ <code>Boolean</code>
     * [.isSupersetOf(setA, setB)](#SmilesDrawer.SSSR.isSupersetOf) ⇒ <code>Boolean</code>
@@ -2949,7 +2965,7 @@ Get the ring candidates from the path-included distance matrices.
 
 <a name="SmilesDrawer.SSSR.getSSSR"></a>
 
-#### SSSR.getSSSR(c, d, pe1, pe2, nsssr) ⇒ <code>Array.&lt;Set&gt;</code>
+#### SSSR.getSSSR(c, d, adjacencyMatrix, pe1, pe2, nsssr) ⇒ <code>Array.&lt;Set&gt;</code>
 Searches the candidates for the smallest set of smallest rings.
 
 **Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
@@ -2959,6 +2975,7 @@ Searches the candidates for the smallest set of smallest rings.
 | --- | --- | --- |
 | c | <code>Array.&lt;Array&gt;</code> | The candidates. |
 | d | <code>Array.&lt;Array&gt;</code> | The distance matrix. |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
 | pe1 | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths. |
 | pe2 | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
 | nsssr | <code>Number</code> | The theoretical number of rings in the graph. |
@@ -2998,6 +3015,19 @@ Return a set of vertex indices contained in an array of bonds.
 | Param | Type | Description |
 | --- | --- | --- |
 | bonds | <code>Array</code> | An array of bonds. A bond is defined as [ sourceVertexId, targetVertexId ]. |
+
+<a name="SmilesDrawer.SSSR.getBondCount"></a>
+
+#### SSSR.getBondCount(atoms, adjacencyMatrix) ⇒ <code>Number</code>
+Returns the number of bonds within a set of atoms.
+
+**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
+**Returns**: <code>Number</code> - The number of bonds in a set of atoms.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| atoms | <code>Set.&lt;Number&gt;</code> | An array of atom ids. |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
 
 <a name="SmilesDrawer.SSSR.pathSetsContain"></a>
 

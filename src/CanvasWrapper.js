@@ -221,7 +221,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         r.y += offsetY;
 
         // Draw the "shadow"
-        /*
+        
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
@@ -233,7 +233,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         ctx.stroke();
         ctx.globalCompositeOperation = 'source-over';
         ctx.restore();
-        */
+        
         l = line.getLeftVector().clone();
         r = line.getRightVector().clone();
 

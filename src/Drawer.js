@@ -311,7 +311,7 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     /**
-     * Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings); Insiders Count (the number of vertices contained within a bridged ring)
+     * Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings)
      *
      * @returns {String} A string as described in the method description.
      */
@@ -327,7 +327,6 @@ SmilesDrawer.Drawer = class Drawer {
             result += ring.isFused ? 'true;' : 'false;'
             result += ring.isBridged ? 'true;' : 'false;'
             result += ring.rings.length + ';';
-            result += ring.insiders.length;
             result += '\n';
         }
 
@@ -453,7 +452,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // Get the rings in the graph (the SSSR)
         let rings = SmilesDrawer.SSSR.getRings(this.graph.getComponentsAdjacencyMatrix());
-
+        console.log(rings);
         if (rings === null) {
             return;
         }
@@ -652,6 +651,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // Merge the two arrays containing members of the bridged ring
         let ringMembers = SmilesDrawer.ArrayHelper.merge(bridgedRing, tmp)
+        ringMembers = SmilesDrawer.ArrayHelper.merge(ringMembers, insideRing);
 
         // The neighbours of the rings in the bridged ring that are not connected by a
         // bridge are now the neighbours of the bridged ring
@@ -663,7 +663,6 @@ SmilesDrawer.Drawer = class Drawer {
         
         ring.isBridged = true;
         ring.neighbours = neighbours;
-        ring.insiders = insideRing;
         
         for (var i = 0; i < ringIds.length; i++) {
             ring.rings.push(this.getRing(ringIds[i]).clone());
@@ -1629,54 +1628,30 @@ SmilesDrawer.Drawer = class Drawer {
             startVertexId = ring.members[0];
         }
 
-        ring.eachMember(this.graph.vertices, function (v) {
-            let vertex = that.graph.vertices[v];
-            
-            if (!vertex.positioned) {
-                vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
-            }
-
-            a += angle;
-            
-            if(!ring.isBridged || ring.rings.length < 3) {
-                vertex.positioned = true;
-            }
-        }, startVertexId, (previousVertex) ? previousVertex.id : null);
-
         // If the ring is bridged, then draw the vertices inside the ring
         // using a force based approach
-        if (ring.isBridged && !ring.positioned) {
-            let allVertices = SmilesDrawer.ArrayHelper.merge(ring.members, ring.insiders);
-            
-            this.graph.kkLayout(allVertices, center, startVertex.id, ring, this.opts.bondLength);
+        if (ring.isBridged) {
+            this.graph.kkLayout(ring.members, center, startVertex.id, ring, this.opts.bondLength);
             ring.positioned = true;
 
             // Setting the centers for the subrings
             for (var i = 0; i < ring.rings.length; i++) {
                 this.setRingCenter(ring.rings[i]);
             }
-
-            // Handle bridges
-            // for (var u = 0; u < allVertices.length; u++) {
-            //     let vertex = this.graph.vertices[allVertices[u]];
-            //     let neighbours = vertex.getNeighbours();
+        } else {
+            ring.eachMember(this.graph.vertices, function (v) {
+                let vertex = that.graph.vertices[v];
                 
-            //     for (var i = 0; i < neighbours.length; i++) {
-            //         let currentVertex = this.graph.vertices[neighbours[i]];
-                    
-            //         if (currentVertex.positioned) {
-            //             continue;
-            //         }
-
-            //         center = this.getSubringCenter(ring, vertex);
-
-            //         if (currentVertex.value.rings.length === 0) {
-            //             currentVertex.value.isConnectedToRing = true;
-            //         }
-                    
-            //         this.createNextBond(currentVertex, vertex, center);
-            //     }
-            // }
+                if (!vertex.positioned) {
+                    vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
+                }
+    
+                a += angle;
+                
+                if(!ring.isBridged || ring.rings.length < 3) {
+                    vertex.positioned = true;
+                }
+            }, startVertexId, (previousVertex) ? previousVertex.id : null);
         }
 
         ring.positioned = true;
@@ -2193,7 +2168,7 @@ SmilesDrawer.Drawer = class Drawer {
             
             nextCenter.invert();
             nextCenter.normalize();
-
+            console.log(nextRing.id, nextRing);
             let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
             nextCenter.multiplyScalar(r);
             nextCenter.add(vertex.position);

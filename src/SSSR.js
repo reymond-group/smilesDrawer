@@ -20,7 +20,7 @@ SmilesDrawer.SSSR = class SSSR {
 
         let {d, pe1, pe2} = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix);
         let c = SmilesDrawer.SSSR.getRingCandidates(d, pe1, pe2);
-        let sssr = SmilesDrawer.SSSR.getSSSR(c, d, pe1, pe2, nSssr);
+        let sssr = SmilesDrawer.SSSR.getSSSR(c, d, adjacencyMatrix, pe1, pe2, nSssr);
         let rings = new Array(sssr.length);
 
         for (let i = 0; i < sssr.length; i++) {
@@ -228,21 +228,22 @@ SmilesDrawer.SSSR = class SSSR {
      * 
      * @param {Array[]} c The candidates.
      * @param {Array[]} d The distance matrix.
+     * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @param {Array[]} pe1 A matrix containing the shortest paths.
      * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
      * @param {Number} nsssr The theoretical number of rings in the graph.
      * @returns {Set[]} The smallest set of smallest rings.
      */
-    static getSSSR(c, d, pe1, pe2, nsssr) {
+    static getSSSR(c, d, adjacencyMatrix, pe1, pe2, nsssr) {
         let cSssr = [];
-
+        
         for (let i = 0; i < c.length; i++) {
             if (c[i][0] % 2 !== 0) {
                 for (let j = 0; j < c[i][2].length; j++) {
                     let bonds = c[i][1][0].concat(c[i][2][j]);
                     let atoms = SSSR.bondsToAtoms(bonds);
                     
-                    if (bonds.length === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
+                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
                         cSssr.push(atoms);
                     }
 
@@ -254,8 +255,8 @@ SmilesDrawer.SSSR = class SSSR {
                 for (let j = 0; j < c[i][1].length - 1; j++) {
                     let bonds = c[i][1][j].concat(c[i][1][j + 1]);
                     let atoms = SSSR.bondsToAtoms(bonds);
-
-                    if (bonds.length === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
+                    
+                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
                         cSssr.push(atoms);
                     }
 
@@ -304,7 +305,7 @@ SmilesDrawer.SSSR = class SSSR {
             for (let j = i + 1; j < length; j++) {
                 if (adjacencyMatrix[i][j] === 1) {
                     edgeList.push([i,j]);
-                } 
+                }
             }
         }
 
@@ -319,13 +320,39 @@ SmilesDrawer.SSSR = class SSSR {
      */
     static bondsToAtoms(bonds) {
         let atoms = new Set();
-        
+        // Somehow some bonds were added twice resulting in [[u, v], [u, v]] instead of [u, v].
+        // TODO: Fix it, this is just a workaround for now
         for (let i = 0; i < bonds.length; i++) {
-            atoms.add(bonds[i][0]);
-            atoms.add(bonds[i][1]);
+            if (bonds[i][0].constructor === Array) {
+                atoms.add(bonds[i][0][0]);
+                atoms.add(bonds[i][0][1]);
+            } else {
+                atoms.add(bonds[i][0]);
+                atoms.add(bonds[i][1]);
+            }
+        }
+        return atoms;
+    }
+
+     /**
+     * Returns the number of bonds within a set of atoms.
+     * 
+     * @param {Set<Number>} atoms An array of atom ids.
+     * @param {Array[]} adjacencyMatrix An adjacency matrix.
+     * @returns {Number} The number of bonds in a set of atoms.
+     */
+    static getBondCount(atoms, adjacencyMatrix) {
+        let count = 0;
+        for (let u of atoms) {
+            for (let v of atoms) {
+                if (u === v) {
+                    continue;
+                }
+                count += adjacencyMatrix[u][v]
+            }
         }
 
-        return atoms;
+        return count / 2;
     }
 
     /**
