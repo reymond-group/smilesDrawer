@@ -1607,8 +1607,6 @@ SmilesDrawer.Drawer = class Drawer {
             return;
         }
 
-        console.log(ring);
-
         center = center ? center : new SmilesDrawer.Vector2(0, 0);
 
         let orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
@@ -1652,33 +1650,33 @@ SmilesDrawer.Drawer = class Drawer {
             
             this.graph.kkLayout(allVertices, center, startVertex.id, ring, this.opts.bondLength);
             ring.positioned = true;
+
             // Setting the centers for the subrings
             for (var i = 0; i < ring.rings.length; i++) {
                 this.setRingCenter(ring.rings[i]);
             }
 
             // Handle bridges
-            // Only for bridges, not for members, the members are handled in createRing.
-            for (var u = 0; u < allVertices.length; u++) {
-                let vertex = this.graph.vertices[allVertices[u]];
-                let neighbours = vertex.getNeighbours();
+            // for (var u = 0; u < allVertices.length; u++) {
+            //     let vertex = this.graph.vertices[allVertices[u]];
+            //     let neighbours = vertex.getNeighbours();
                 
-                for (var i = 0; i < neighbours.length; i++) {
-                    let currentVertex = this.graph.vertices[neighbours[i]];
+            //     for (var i = 0; i < neighbours.length; i++) {
+            //         let currentVertex = this.graph.vertices[neighbours[i]];
                     
-                    if (currentVertex.positioned) {
-                        continue;
-                    }
+            //         if (currentVertex.positioned) {
+            //             continue;
+            //         }
 
-                    center = this.getSubringCenter(ring, vertex);
+            //         center = this.getSubringCenter(ring, vertex);
 
-                    if (currentVertex.value.rings.length === 0) {
-                        currentVertex.value.isConnectedToRing = true;
-                    }
+            //         if (currentVertex.value.rings.length === 0) {
+            //             currentVertex.value.isConnectedToRing = true;
+            //         }
                     
-                    this.createNextBond(currentVertex, vertex, center);
-                }
-            }
+            //         this.createNextBond(currentVertex, vertex, center);
+            //     }
+            // }
         }
 
         ring.positioned = true;
