@@ -617,8 +617,6 @@ SmilesDrawer.Graph = class Graph {
             }
         }
 
-        console.log('iterations: ' + iteration);
-
         for (var i = 0; i < length; i++) {
             let index = vertexIds[i];
             this.vertices[index].position.x = arrPosition[i][0];

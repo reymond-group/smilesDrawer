@@ -239,8 +239,8 @@ SmilesDrawer.Drawer = class Drawer {
             // Do the actual drawing
             this.drawEdges(this.opts.debug);
             this.drawVertices(this.opts.debug);
-            console.log(this.rings);
-            console.log(this.graph.vertices);
+            // console.log(this.rings);
+            // console.log(this.graph.vertices);
             this.canvasWrapper.reset();
         }
     }

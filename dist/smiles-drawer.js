@@ -2379,8 +2379,8 @@ SmilesDrawer.Drawer = function () {
                 // Do the actual drawing
                 this.drawEdges(this.opts.debug);
                 this.drawVertices(this.opts.debug);
-                console.log(this.rings);
-                console.log(this.graph.vertices);
+                // console.log(this.rings);
+                // console.log(this.graph.vertices);
                 this.canvasWrapper.reset();
             }
         }
@@ -5899,8 +5899,6 @@ SmilesDrawer.Graph = function () {
                     dE = _energy4[1];
                 }
             }
-
-            console.log('iterations: ' + iteration);
 
             for (var i = 0; i < length; i++) {
                 var index = vertexIds[i];
