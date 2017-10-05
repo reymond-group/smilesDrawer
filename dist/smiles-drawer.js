@@ -2624,8 +2624,8 @@ SmilesDrawer.Drawer = function () {
             }
 
             // Get the rings in the graph (the SSSR)
-            var rings = SmilesDrawer.SSSR.getRings(this.graph.getComponentsAdjacencyMatrix());
-            console.log(rings);
+            var rings = SmilesDrawer.SSSR.getRings(this.graph);
+
             if (rings === null) {
                 return;
             }
@@ -4459,7 +4459,7 @@ SmilesDrawer.Drawer = function () {
 
                 _nextCenter.invert();
                 _nextCenter.normalize();
-                console.log(_nextRing.id, _nextRing);
+
                 var _r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, _nextRing.members.length);
                 _nextCenter.multiplyScalar(_r);
                 _nextCenter.add(vertex.position);
@@ -5944,7 +5944,7 @@ SmilesDrawer.Graph = function () {
          * Returns the connected components of the graph.
          * 
          * @param {Array[]} adjacencyMatrix An adjacency matrix.
-         * @returns {Set[]} Connected compnents as sets.
+         * @returns {Set[]} Connected components as sets.
          */
 
     }], [{
@@ -5952,19 +5952,25 @@ SmilesDrawer.Graph = function () {
         value: function getConnectedComponents(adjacencyMatrix) {
             var length = adjacencyMatrix.length;
             var visited = new Array(length);
+            var components = new Array();
             var count = 0;
 
             visited.fill(false);
 
             for (var u = 0; u < length; u++) {
                 if (!visited[u]) {
+                    var component = Array();
                     visited[u] = true;
+                    component.push(u);
                     count++;
-                    Graph._ccCountDfs(u, visited, adjacencyMatrix);
+                    Graph._ccGetDfs(u, visited, adjacencyMatrix, component);
+                    if (component.length > 1) {
+                        components.push(component);
+                    }
                 }
             }
 
-            return count;
+            return components;
         }
 
         /**
@@ -6010,6 +6016,26 @@ SmilesDrawer.Graph = function () {
 
                 visited[v] = true;
                 Graph._ccCountDfs(v, visited, adjacencyMatrix);
+            }
+        }
+
+        /**
+         * PRIVATE FUNCTION used by getConnectedComponents().
+         */
+
+    }, {
+        key: '_ccGetDfs',
+        value: function _ccGetDfs(u, visited, adjacencyMatrix, component) {
+            for (var v = 0; v < adjacencyMatrix[u].length; v++) {
+                var c = adjacencyMatrix[u][v];
+
+                if (!c || visited[v] || u === v) {
+                    continue;
+                }
+
+                visited[v] = true;
+                component.push(v);
+                Graph._ccGetDfs(v, visited, adjacencyMatrix, component);
             }
         }
     }]);
@@ -8825,58 +8851,65 @@ SmilesDrawer.SSSR = function () {
         /**
          * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
          * 
-         * @param {Array[]} adjacencyMatrix A 2-dimensional array representing a graph.
+         * @param {SmilesDrawer.Graph} graph A SmilesDrawer.Graph object.
          * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
          */
-        value: function getRings(adjacencyMatrix) {
+        value: function getRings(graph) {
+            var adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
             if (adjacencyMatrix.length === 0) {
                 return null;
             }
 
-            // Get the edge list and the theoretical number of rings in SSSR
-            var nSssr = SmilesDrawer.SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + SmilesDrawer.Graph.getConnectedComponentCount(adjacencyMatrix);
+            var connectedComponents = SmilesDrawer.Graph.getConnectedComponents(adjacencyMatrix);
+            var rings = new Array();
 
-            if (nSssr === 0) {
-                return null;
-            }
+            for (var i = 0; i < connectedComponents.length; i++) {
+                var connectedComponent = connectedComponents[i];
+                var ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix(connectedComponent);
 
-            var _SmilesDrawer$SSSR$ge = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix),
-                d = _SmilesDrawer$SSSR$ge.d,
-                pe1 = _SmilesDrawer$SSSR$ge.pe1,
-                pe2 = _SmilesDrawer$SSSR$ge.pe2;
+                // Get the edge list and the theoretical number of rings in SSSR
+                var nSssr = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length - ccAdjacencyMatrix.length + 1;
 
-            var c = SmilesDrawer.SSSR.getRingCandidates(d, pe1, pe2);
-            var sssr = SmilesDrawer.SSSR.getSSSR(c, d, adjacencyMatrix, pe1, pe2, nSssr);
-            var rings = new Array(sssr.length);
+                var _SmilesDrawer$SSSR$ge = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix),
+                    d = _SmilesDrawer$SSSR$ge.d,
+                    pe1 = _SmilesDrawer$SSSR$ge.pe1,
+                    pe2 = _SmilesDrawer$SSSR$ge.pe2;
 
-            for (var i = 0; i < sssr.length; i++) {
-                rings[i] = new Array(sssr[i].length);
+                var c = SmilesDrawer.SSSR.getRingCandidates(d, pe1, pe2);
+                var sssr = SmilesDrawer.SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe1, pe2, nSssr);
 
-                var index = 0;
+                for (var _i4 = 0; _i4 < sssr.length; _i4++) {
+                    var ring = new Array(sssr[_i4].length);
 
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
+                    var index = 0;
 
-                try {
-                    for (var _iterator2 = sssr[i][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                        var val = _step2.value;
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
 
-                        rings[i][index++] = val;
-                    }
-                } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
-                } finally {
                     try {
-                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                            _iterator2.return();
+                        for (var _iterator2 = sssr[_i4][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            var val = _step2.value;
+
+                            // Get the original id of the vertex back
+                            ring[index++] = connectedComponent[val];
                         }
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
                     } finally {
-                        if (_didIteratorError2) {
-                            throw _iteratorError2;
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
                         }
                     }
+
+                    rings.push(ring);
                 }
             }
 
@@ -8943,86 +8976,86 @@ SmilesDrawer.SSSR = function () {
             }
 
             for (var k = 0; k < length; k++) {
-                for (var _i4 = 0; _i4 < length; _i4++) {
+                for (var _i5 = 0; _i5 < length; _i5++) {
                     for (var _j2 = 0; _j2 < length; _j2++) {
-                        var previousPathLength = d[_i4][_j2];
-                        var newPathLength = d[_i4][k] + d[k][_j2];
+                        var previousPathLength = d[_i5][_j2];
+                        var newPathLength = d[_i5][k] + d[k][_j2];
 
                         if (previousPathLength > newPathLength) {
                             if (previousPathLength === newPathLength + 1) {
-                                pe2[_i4][_j2] = [pe1[_i4][_j2].length];
-                                for (l = 0; l < pe1[_i4][_j2].length; l++) {
-                                    pe2[_i4][_j2][l] = [pe1[_i4][_j2][l].length];
-                                    for (m = 0; m < pe1[_i4][_j2][l].length; m++) {
-                                        pe2[_i4][_j2][l][m] = [pe1[_i4][_j2][l][m].length];
-                                        for (n = 0; n < pe1[_i4][_j2][l][m].length; n++) {
-                                            pe2[_i4][_j2][l][m][n] = [pe1[_i4][_j2][l][m][0], pe1[_i4][_j2][l][m][1]];
+                                pe2[_i5][_j2] = [pe1[_i5][_j2].length];
+                                for (l = 0; l < pe1[_i5][_j2].length; l++) {
+                                    pe2[_i5][_j2][l] = [pe1[_i5][_j2][l].length];
+                                    for (m = 0; m < pe1[_i5][_j2][l].length; m++) {
+                                        pe2[_i5][_j2][l][m] = [pe1[_i5][_j2][l][m].length];
+                                        for (n = 0; n < pe1[_i5][_j2][l][m].length; n++) {
+                                            pe2[_i5][_j2][l][m][n] = [pe1[_i5][_j2][l][m][0], pe1[_i5][_j2][l][m][1]];
                                         }
                                     }
                                 }
                             } else {
-                                pe2[_i4][_j2] = [];
+                                pe2[_i5][_j2] = [];
                             }
 
-                            d[_i4][_j2] = newPathLength;
+                            d[_i5][_j2] = newPathLength;
 
-                            pe1[_i4][_j2] = [[]];
+                            pe1[_i5][_j2] = [[]];
 
-                            for (l = 0; l < pe1[_i4][k][0].length; l++) {
-                                pe1[_i4][_j2][0].push(pe1[_i4][k][0][l]);
+                            for (l = 0; l < pe1[_i5][k][0].length; l++) {
+                                pe1[_i5][_j2][0].push(pe1[_i5][k][0][l]);
                             }
                             for (l = 0; l < pe1[k][_j2][0].length; l++) {
-                                pe1[_i4][_j2][0].push(pe1[k][_j2][0][l]);
+                                pe1[_i5][_j2][0].push(pe1[k][_j2][0][l]);
                             }
                         } else if (previousPathLength === newPathLength) {
-                            if (pe1[_i4][k].length && pe1[k][_j2].length) {
-                                if (pe1[_i4][_j2].length) {
+                            if (pe1[_i5][k].length && pe1[k][_j2].length) {
+                                if (pe1[_i5][_j2].length) {
                                     var tmp = [];
 
-                                    for (l = 0; l < pe1[_i4][k][0].length; l++) {
-                                        tmp.push(pe1[_i4][k][0][l]);
+                                    for (l = 0; l < pe1[_i5][k][0].length; l++) {
+                                        tmp.push(pe1[_i5][k][0][l]);
                                     }
                                     for (l = 0; l < pe1[k][_j2][0].length; l++) {
                                         tmp.push(pe1[k][_j2][0][l]);
                                     }
 
-                                    pe1[_i4][_j2].push(tmp);
+                                    pe1[_i5][_j2].push(tmp);
                                 } else {
                                     var _tmp = [];
 
-                                    for (l = 0; l < pe1[_i4][k][0].length; l++) {
-                                        _tmp.push(pe1[_i4][k][0][l]);
+                                    for (l = 0; l < pe1[_i5][k][0].length; l++) {
+                                        _tmp.push(pe1[_i5][k][0][l]);
                                     }
                                     for (l = 0; l < pe1[k][_j2][0].length; l++) {
                                         _tmp.push(pe1[k][_j2][0][l]);
                                     }
 
-                                    pe1[_i4][_j2][0] = _tmp;
+                                    pe1[_i5][_j2][0] = _tmp;
                                 }
                             }
                         } else if (previousPathLength === newPathLength - 1) {
-                            if (pe2[_i4][_j2].length) {
+                            if (pe2[_i5][_j2].length) {
                                 var _tmp2 = [];
 
-                                for (var l = 0; l < pe1[_i4][k][0].length; l++) {
-                                    _tmp2.push(pe1[_i4][k][0][l]);
+                                for (var l = 0; l < pe1[_i5][k][0].length; l++) {
+                                    _tmp2.push(pe1[_i5][k][0][l]);
                                 }
                                 for (var l = 0; l < pe1[k][_j2][0].length; l++) {
                                     _tmp2.push(pe1[k][_j2][0][l]);
                                 }
 
-                                pe2[_i4][_j2].push(_tmp2);
+                                pe2[_i5][_j2].push(_tmp2);
                             } else {
                                 var _tmp3 = [];
 
-                                for (var l = 0; l < pe1[_i4][k][0].length; l++) {
-                                    _tmp3.push(pe1[_i4][k][0][l]);
+                                for (var l = 0; l < pe1[_i5][k][0].length; l++) {
+                                    _tmp3.push(pe1[_i5][k][0][l]);
                                 }
                                 for (var l = 0; l < pe1[k][_j2][0].length; l++) {
                                     _tmp3.push(pe1[k][_j2][0][l]);
                                 }
 
-                                pe2[_i4][_j2][0] = _tmp3;
+                                pe2[_i5][_j2][0] = _tmp3;
                             }
                         }
                     }

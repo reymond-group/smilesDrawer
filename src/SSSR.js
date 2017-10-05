@@ -3,36 +3,42 @@ SmilesDrawer.SSSR = class SSSR {
     /**
      * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
      * 
-     * @param {Array[]} adjacencyMatrix A 2-dimensional array representing a graph.
+     * @param {SmilesDrawer.Graph} graph A SmilesDrawer.Graph object.
      * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
      */
-    static getRings(adjacencyMatrix) {
+    static getRings(graph) {
+        let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
         if (adjacencyMatrix.length === 0) {
             return null;
         }
 
-        // Get the edge list and the theoretical number of rings in SSSR
-        let nSssr = SmilesDrawer.SSSR.getEdgeList(adjacencyMatrix).length - adjacencyMatrix.length + SmilesDrawer.Graph.getConnectedComponentCount(adjacencyMatrix);
-        
-        if (nSssr === 0) {
-            return null;
-        }
+        let connectedComponents = SmilesDrawer.Graph.getConnectedComponents(adjacencyMatrix);
+        let rings = new Array();
 
-        let {d, pe1, pe2} = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix);
-        let c = SmilesDrawer.SSSR.getRingCandidates(d, pe1, pe2);
-        let sssr = SmilesDrawer.SSSR.getSSSR(c, d, adjacencyMatrix, pe1, pe2, nSssr);
-        let rings = new Array(sssr.length);
+        for (var i = 0; i < connectedComponents.length; i++) {
+            let connectedComponent = connectedComponents[i];
+            let ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix(connectedComponent);
 
-        for (let i = 0; i < sssr.length; i++) {
-            rings[i] = new Array(sssr[i].length);
-            
-            let index = 0;
+            // Get the edge list and the theoretical number of rings in SSSR
+            let nSssr = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length - ccAdjacencyMatrix.length + 1;
+            let {d, pe1, pe2} = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
+            let c = SmilesDrawer.SSSR.getRingCandidates(d, pe1, pe2);
+            let sssr = SmilesDrawer.SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe1, pe2, nSssr);
 
-            for (let val of sssr[i]) {
-                rings[i][index++] = val;
+            for (let i = 0; i < sssr.length; i++) {
+                let ring = new Array(sssr[i].length);
+                
+                let index = 0;
+    
+                for (let val of sssr[i]) {
+                    // Get the original id of the vertex back
+                    ring[index++] = connectedComponent[val];
+                }
+
+                rings.push(ring);
             }
         }
-
+        
         return rings;
     }
 

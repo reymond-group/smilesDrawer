@@ -169,6 +169,7 @@ The SmilesDrawer namespace.
             * [.getConnectedComponents(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
             * [.getConnectedComponentCount(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponentCount) ⇒ <code>Number</code>
             * [._ccCountDfs()](#SmilesDrawer.Graph._ccCountDfs)
+            * [._ccGetDfs()](#SmilesDrawer.Graph._ccGetDfs)
     * [.Line](#SmilesDrawer.Line)
         * [new SmilesDrawer.Line([from], [to], [elementFrom], [elementTo], [chiralFrom], [chiralTo])](#new_SmilesDrawer.Line_new)
         * [.clone()](#SmilesDrawer.Line+clone) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
@@ -231,7 +232,7 @@ The SmilesDrawer namespace.
             * [.getNeighbours(ringConnections, ringId)](#SmilesDrawer.RingConnection.getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
             * [.getVertices(ringConnections, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.getVertices) ⇒ <code>Array.&lt;Number&gt;</code>
     * [.SSSR](#SmilesDrawer.SSSR)
-        * [.getRings(adjacencyMatrix)](#SmilesDrawer.SSSR.getRings) ⇒ <code>Array.&lt;Array&gt;</code>
+        * [.getRings(graph)](#SmilesDrawer.SSSR.getRings) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.matrixToString(matrix)](#SmilesDrawer.SSSR.matrixToString) ⇒ <code>String</code>
         * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer.SSSR.getPathIncludedDistanceMatrices) ⇒ <code>Object</code>
         * [.getRingCandidates(d, pe1, pe2)](#SmilesDrawer.SSSR.getRingCandidates) ⇒ <code>Array.&lt;Array&gt;</code>
@@ -1988,6 +1989,7 @@ A class representing the molecular graph.
         * [.getConnectedComponents(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
         * [.getConnectedComponentCount(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponentCount) ⇒ <code>Number</code>
         * [._ccCountDfs()](#SmilesDrawer.Graph._ccCountDfs)
+        * [._ccGetDfs()](#SmilesDrawer.Graph._ccGetDfs)
 
 <a name="new_SmilesDrawer.Graph_new"></a>
 
@@ -2186,7 +2188,7 @@ PRIVATE FUNCTION used by getBridges().
 Returns the connected components of the graph.
 
 **Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Set&gt;</code> - Connected compnents as sets.  
+**Returns**: <code>Array.&lt;Set&gt;</code> - Connected components as sets.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2208,6 +2210,12 @@ Returns the number of connected components for the graph.
 
 #### Graph._ccCountDfs()
 PRIVATE FUNCTION used by getConnectedComponentCount().
+
+**Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
+<a name="SmilesDrawer.Graph._ccGetDfs"></a>
+
+#### Graph._ccGetDfs()
+PRIVATE FUNCTION used by getConnectedComponents().
 
 **Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
 <a name="SmilesDrawer.Line"></a>
@@ -2900,7 +2908,7 @@ A class encapsulating the functionality to find the smallest set of smallest rin
 **Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
 
 * [.SSSR](#SmilesDrawer.SSSR)
-    * [.getRings(adjacencyMatrix)](#SmilesDrawer.SSSR.getRings) ⇒ <code>Array.&lt;Array&gt;</code>
+    * [.getRings(graph)](#SmilesDrawer.SSSR.getRings) ⇒ <code>Array.&lt;Array&gt;</code>
     * [.matrixToString(matrix)](#SmilesDrawer.SSSR.matrixToString) ⇒ <code>String</code>
     * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer.SSSR.getPathIncludedDistanceMatrices) ⇒ <code>Object</code>
     * [.getRingCandidates(d, pe1, pe2)](#SmilesDrawer.SSSR.getRingCandidates) ⇒ <code>Array.&lt;Array&gt;</code>
@@ -2915,7 +2923,7 @@ A class encapsulating the functionality to find the smallest set of smallest rin
 
 <a name="SmilesDrawer.SSSR.getRings"></a>
 
-#### SSSR.getRings(adjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
+#### SSSR.getRings(graph) ⇒ <code>Array.&lt;Array&gt;</code>
 Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
 
 **Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
@@ -2923,7 +2931,7 @@ Returns an array containing arrays, each representing a ring from the smallest s
 
 | Param | Type | Description |
 | --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | A 2-dimensional array representing a graph. |
+| graph | <code>[Graph](#SmilesDrawer.Graph)</code> | A SmilesDrawer.Graph object. |
 
 <a name="SmilesDrawer.SSSR.matrixToString"></a>
 

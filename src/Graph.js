@@ -37,7 +37,7 @@ SmilesDrawer.Graph = class Graph {
     _init(node, order = 0, parentVertexId = null, isBranch = false) {
         // Create a new vertex object
         let atom = new SmilesDrawer.Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
-        
+
         atom.branchBond = node.branchBond;
         atom.ringbonds = node.ringbonds;
         atom.bracket = node.atom.element ? node.atom : null;
@@ -61,7 +61,7 @@ SmilesDrawer.Graph = class Graph {
 
             // Add edge between this node and its parent
             let edge = new SmilesDrawer.Edge(parentVertexId, vertex.id, 1);
-            
+
             if (isBranch) {
                 edge.bondType = vertex.value.branchBond;
             } else {
@@ -72,7 +72,7 @@ SmilesDrawer.Graph = class Graph {
             vertex.edges.push(edgeId);
             parentVertex.edges.push(edgeId);
         }
-        
+
         if (atom.bracket && this.isomeric) {
             for (var i = 0; i < atom.bracket.hcount; i++) {
                 if (this.isomeric) {
@@ -86,7 +86,7 @@ SmilesDrawer.Graph = class Graph {
         if (atom.bracket) {
             offset += atom.bracket.hcount;
         }
-        
+
         for (var i = 0; i < node.branchCount; i++) {
             this._init(node.branches[i], i + offset, vertex.id, true);
         }
@@ -102,7 +102,7 @@ SmilesDrawer.Graph = class Graph {
     _initInfos() {
         for (var i = 0; i < this.vertices.length; i++) {
             let atom = this.vertices[i].value;
-            
+
             if (typeof this.elementCount[atom.element] !== 'undefined') {
                 this.elementCount[atom.element] += 1;
             } else {
@@ -129,7 +129,7 @@ SmilesDrawer.Graph = class Graph {
     addVertex(vertex) {
         vertex.id = this.vertices.length;
         this.vertices.push(vertex);
-        
+
         return vertex.id;
     }
 
@@ -142,10 +142,10 @@ SmilesDrawer.Graph = class Graph {
     addEdge(edge) {
         edge.id = this.edges.length;
         this.edges.push(edge);
-        
+
         this.vertexIdsToEdgeId[edge.sourceId + '_' + edge.targetId] = edge.id;
         this.vertexIdsToEdgeId[edge.targetId + '_' + edge.sourceId] = edge.id;
-        
+
         return edge.id;
     }
 
@@ -211,7 +211,7 @@ SmilesDrawer.Graph = class Graph {
     getAdjacencyMatrix() {
         let length = this.vertices.length;
         let adjacencyMatrix = Array(length);
-        
+
         for (var i = 0; i < length; i++) {
             adjacencyMatrix[i] = new Array(length);
             adjacencyMatrix[i].fill(0);
@@ -236,7 +236,7 @@ SmilesDrawer.Graph = class Graph {
         let length = this.vertices.length;
         let adjacencyMatrix = Array(length);
         let bridges = this.getBridges();
-        
+
         for (var i = 0; i < length; i++) {
             adjacencyMatrix[i] = new Array(length);
             adjacencyMatrix[i].fill(0);
@@ -244,7 +244,7 @@ SmilesDrawer.Graph = class Graph {
 
         for (var i = 0; i < this.edges.length; i++) {
             let edge = this.edges[i];
-            
+
             adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
             adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
         }
@@ -428,7 +428,7 @@ SmilesDrawer.Graph = class Graph {
         visited.fill(false);
         parent.fill(null);
         this._time = 0;
-        
+
         for (var i = 0; i < length; i++) {
             if (!visited[i]) {
                 this._bridgeDfs(i, visited, disc, low, parent, adj, outBridges);
@@ -437,7 +437,7 @@ SmilesDrawer.Graph = class Graph {
 
         return outBridges;
     }
-    
+
     /**
      * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
      * 
@@ -515,18 +515,18 @@ SmilesDrawer.Graph = class Graph {
         // console.log(matEnergy, arrEnergySum, matStrength, matLength);
 
         // Utility functions, maybe inline them later
-        let energy = function(index) {
+        let energy = function (index) {
             let dE = arrEnergySum[index];
-            return [ Math.sqrt(Math.pow(dE[0], 2) + Math.pow(dE[1], 2)), dE ];
+            return [Math.sqrt(Math.pow(dE[0], 2) + Math.pow(dE[1], 2)), dE];
         }
 
-        let highestEnergy = function() {
+        let highestEnergy = function () {
             let maxEnergy = 0.0;
             let maxEnergyId = 0;
-            let maxDE = [ 0.0, 0.0 ];
+            let maxDE = [0.0, 0.0];
 
             for (var i = 0; i < length; i++) {
-                let [ delta, dE ] = energy(i);
+                let [delta, dE] = energy(i);
                 if (delta > maxEnergy) {
                     maxEnergy = delta;
                     maxEnergyId = i;
@@ -534,10 +534,10 @@ SmilesDrawer.Graph = class Graph {
                 }
             }
 
-            return [ maxEnergyId, maxEnergy, maxDE ];
+            return [maxEnergyId, maxEnergy, maxDE];
         }
 
-        let update = function(index, dE) {
+        let update = function (index, dE) {
             let dxx = 0.0;
             let dyy = 0.0;
             let dxy = 0.0;
@@ -568,7 +568,7 @@ SmilesDrawer.Graph = class Graph {
 
             // Update the energies
             let arrE = matEnergy[index];
-            dE = [ 0.0, 0.0 ];
+            dE = [0.0, 0.0];
 
             for (var i = 0; i < length; i++) {
                 if (index === i) {
@@ -582,13 +582,13 @@ SmilesDrawer.Graph = class Graph {
                 let dx = arrK[i] * ((u[0] - v[0]) - arrL[i] * (u[0] - v[0]) * denom);
                 let dy = arrK[i] * ((u[1] - v[1]) - arrL[i] * (u[1] - v[1]) * denom);
 
-                arrE[i] = [ dx, dy ];
+                arrE[i] = [dx, dy];
                 dE[0] += dx;
                 dE[1] += dy;
                 arrEnergySum[i][0] += dx - prevEx;
                 arrEnergySum[i][1] += dy - prevEy;
             }
-            arrEnergySum[index] = [ dE[0], dE[1] ];
+            arrEnergySum[index] = [dE[0], dE[1]];
         }
 
         // Setting parameters
@@ -600,20 +600,20 @@ SmilesDrawer.Graph = class Graph {
 
         // Setting up variables for the while loops
         let maxEnergyId = 0;
-        let dE = [ 0.0, 0.0 ];
+        let dE = [0.0, 0.0];
         let delta = 0.0;
         let iteration = 0;
         let innerIteration = 0;
 
         while (maxEnergy > threshold && maxIteration > iteration) {
             iteration++;
-            [ maxEnergyId, maxEnergy, dE ] = highestEnergy();
+            [maxEnergyId, maxEnergy, dE] = highestEnergy();
             delta = maxEnergy;
             innerIteration = 0;
             while (delta > innerThreshold && maxInnerIteration > innerIteration) {
                 innerIteration++;
                 update(maxEnergyId, dE);
-                [ delta, dE ] = energy(maxEnergyId);
+                [delta, dE] = energy(maxEnergyId);
             }
         }
 
@@ -643,7 +643,7 @@ SmilesDrawer.Graph = class Graph {
                 this._bridgeDfs(v, visited, disc, low, parent, adj, outBridges);
 
                 low[u] = Math.min(low[u], low[v]);
-                
+
                 // If low > disc, we have a bridge
                 if (low[v] > disc[u]) {
                     outBridges.push([u, v]);
@@ -658,24 +658,30 @@ SmilesDrawer.Graph = class Graph {
      * Returns the connected components of the graph.
      * 
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Set[]} Connected compnents as sets.
+     * @returns {Set[]} Connected components as sets.
      */
     static getConnectedComponents(adjacencyMatrix) {
         let length = adjacencyMatrix.length;
         let visited = new Array(length);
+        let components = new Array();
         let count = 0;
 
         visited.fill(false);
 
         for (var u = 0; u < length; u++) {
             if (!visited[u]) {
+                let component = Array();
                 visited[u] = true;
+                component.push(u);
                 count++;
-                Graph._ccCountDfs(u, visited, adjacencyMatrix);
+                Graph._ccGetDfs(u, visited, adjacencyMatrix, component);
+                if(component.length > 1) {
+                    components.push(component);
+                }
             }
         }
 
-        return count;
+        return components;
     }
 
     /**
@@ -715,6 +721,23 @@ SmilesDrawer.Graph = class Graph {
 
             visited[v] = true;
             Graph._ccCountDfs(v, visited, adjacencyMatrix);
+        }
+    }
+
+    /**
+     * PRIVATE FUNCTION used by getConnectedComponents().
+     */
+    static _ccGetDfs(u, visited, adjacencyMatrix, component) {
+        for (var v = 0; v < adjacencyMatrix[u].length; v++) {
+            let c = adjacencyMatrix[u][v];
+
+            if (!c || visited[v] || u === v) {
+                continue;
+            }
+
+            visited[v] = true;
+            component.push(v);
+            Graph._ccGetDfs(v, visited, adjacencyMatrix, component);
         }
     }
 }

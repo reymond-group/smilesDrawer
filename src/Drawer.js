@@ -451,8 +451,8 @@ SmilesDrawer.Drawer = class Drawer {
         }
 
         // Get the rings in the graph (the SSSR)
-        let rings = SmilesDrawer.SSSR.getRings(this.graph.getComponentsAdjacencyMatrix());
-        console.log(rings);
+        let rings = SmilesDrawer.SSSR.getRings(this.graph);
+
         if (rings === null) {
             return;
         }
@@ -2168,7 +2168,7 @@ SmilesDrawer.Drawer = class Drawer {
             
             nextCenter.invert();
             nextCenter.normalize();
-            console.log(nextRing.id, nextRing);
+            
             let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
             nextCenter.multiplyScalar(r);
             nextCenter.add(vertex.position);
