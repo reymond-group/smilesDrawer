@@ -241,7 +241,7 @@ The SmilesDrawer namespace.
         * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.bondsToAtoms(bonds)](#SmilesDrawer.SSSR.bondsToAtoms) ⇒ <code>Set.&lt;Number&gt;</code>
         * [.getBondCount(atoms, adjacencyMatrix)](#SmilesDrawer.SSSR.getBondCount) ⇒ <code>Number</code>
-        * [.pathSetsContain(pathSets, pathSet)](#SmilesDrawer.SSSR.pathSetsContain) ⇒ <code>Boolean</code>
+        * [.pathSetsContain(pathSets, pathSet, bonds, allBonds)](#SmilesDrawer.SSSR.pathSetsContain) ⇒ <code>Boolean</code>
         * [.areSetsEqual(setA, setB)](#SmilesDrawer.SSSR.areSetsEqual) ⇒ <code>Boolean</code>
         * [.isSupersetOf(setA, setB)](#SmilesDrawer.SSSR.isSupersetOf) ⇒ <code>Boolean</code>
     * [.Vector2](#SmilesDrawer.Vector2)
@@ -2917,7 +2917,7 @@ A class encapsulating the functionality to find the smallest set of smallest rin
     * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
     * [.bondsToAtoms(bonds)](#SmilesDrawer.SSSR.bondsToAtoms) ⇒ <code>Set.&lt;Number&gt;</code>
     * [.getBondCount(atoms, adjacencyMatrix)](#SmilesDrawer.SSSR.getBondCount) ⇒ <code>Number</code>
-    * [.pathSetsContain(pathSets, pathSet)](#SmilesDrawer.SSSR.pathSetsContain) ⇒ <code>Boolean</code>
+    * [.pathSetsContain(pathSets, pathSet, bonds, allBonds)](#SmilesDrawer.SSSR.pathSetsContain) ⇒ <code>Boolean</code>
     * [.areSetsEqual(setA, setB)](#SmilesDrawer.SSSR.areSetsEqual) ⇒ <code>Boolean</code>
     * [.isSupersetOf(setA, setB)](#SmilesDrawer.SSSR.isSupersetOf) ⇒ <code>Boolean</code>
 
@@ -3039,7 +3039,7 @@ Returns the number of bonds within a set of atoms.
 
 <a name="SmilesDrawer.SSSR.pathSetsContain"></a>
 
-#### SSSR.pathSetsContain(pathSets, pathSet) ⇒ <code>Boolean</code>
+#### SSSR.pathSetsContain(pathSets, pathSet, bonds, allBonds) ⇒ <code>Boolean</code>
 Checks whether or not a given path already exists in an array of paths.
 
 **Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
@@ -3049,6 +3049,8 @@ Checks whether or not a given path already exists in an array of paths.
 | --- | --- | --- |
 | pathSets | <code>Array.&lt;Set&gt;</code> | An array of sets each representing a path. |
 | pathSet | <code>Set.&lt;Number&gt;</code> | A set representing a path. |
+| bonds | <code>Array.&lt;Array&gt;</code> | The bonds associated with the current path. |
+| allBonds | <code>Array.&lt;Array&gt;</code> | All bonds currently associated with rings in the SSSR set. |
 
 <a name="SmilesDrawer.SSSR.areSetsEqual"></a>
 

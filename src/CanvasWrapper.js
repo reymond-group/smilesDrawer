@@ -777,14 +777,14 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
      */
     drawAromaticityRing(ring) {
         let ctx = this.ctx;
-        let radius = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
+        let radius = SmilesDrawer.MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
 
         ctx.save();
         ctx.strokeStyle = this.getColor('C');
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, 
-                radius - this.opts.bondLength / 3.0 - this.opts.bondSpacing, 0, Math.PI * 2, true); 
+                radius - this.opts.bondSpacing, 0, Math.PI * 2, true); 
         ctx.closePath();
         ctx.stroke();
         ctx.restore();

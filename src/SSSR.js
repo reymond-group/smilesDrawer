@@ -242,15 +242,23 @@ SmilesDrawer.SSSR = class SSSR {
      */
     static getSSSR(c, d, adjacencyMatrix, pe1, pe2, nsssr) {
         let cSssr = [];
-        
+        let allBonds = [];
+
         for (let i = 0; i < c.length; i++) {
             if (c[i][0] % 2 !== 0) {
                 for (let j = 0; j < c[i][2].length; j++) {
                     let bonds = c[i][1][0].concat(c[i][2][j]);
+                    // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
+                    // TODO: This is a workaround, fix later.
+                    for (var k = 0; k < bonds.length; k++) {
+                        if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
+                    }
+
                     let atoms = SSSR.bondsToAtoms(bonds);
                     
-                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
+                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds)) {
                         cSssr.push(atoms);
+                        allBonds = allBonds.concat(bonds);
                     }
 
                     if (cSssr.length === nsssr) {
@@ -260,10 +268,17 @@ SmilesDrawer.SSSR = class SSSR {
             } else {
                 for (let j = 0; j < c[i][1].length - 1; j++) {
                     let bonds = c[i][1][j].concat(c[i][1][j + 1]);
+                    // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
+                    // TODO: This is a workaround, fix later.
+                    for (var k = 0; k < bonds.length; k++) {
+                        if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
+                    }
+
                     let atoms = SSSR.bondsToAtoms(bonds);
                     
-                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
+                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds)) {
                         cSssr.push(atoms);
+                        allBonds = allBonds.concat(bonds);
                     }
 
                     if (cSssr.length === nsssr) {
@@ -326,16 +341,10 @@ SmilesDrawer.SSSR = class SSSR {
      */
     static bondsToAtoms(bonds) {
         let atoms = new Set();
-        // Somehow some bonds were added twice resulting in [[u, v], [u, v]] instead of [u, v].
-        // TODO: Fix it, this is just a workaround for now
+
         for (let i = 0; i < bonds.length; i++) {
-            if (bonds[i][0].constructor === Array) {
-                atoms.add(bonds[i][0][0]);
-                atoms.add(bonds[i][0][1]);
-            } else {
-                atoms.add(bonds[i][0]);
-                atoms.add(bonds[i][1]);
-            }
+            atoms.add(bonds[i][0]);
+            atoms.add(bonds[i][1]);
         }
         return atoms;
     }
@@ -366,9 +375,11 @@ SmilesDrawer.SSSR = class SSSR {
      * 
      * @param {Set[]} pathSets An array of sets each representing a path.
      * @param {Set<Number>} pathSet A set representing a path.
+     * @param {Array[]} bonds The bonds associated with the current path.
+     * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
      * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
      */
-    static pathSetsContain(pathSets, pathSet) {
+    static pathSetsContain(pathSets, pathSet, bonds, allBonds) {
         for (let i = 0; i < pathSets.length; i++) {
             if (SSSR.isSupersetOf(pathSet, pathSets[i])) {
                 return true;
@@ -380,6 +391,22 @@ SmilesDrawer.SSSR = class SSSR {
             
             if (SSSR.areSetsEqual(pathSets[i], pathSet)) {
                 return true;
+            }
+        }
+
+        // Check if the edges from the candidate are already all contained within the paths of the set of paths.
+        // TODO: For some reason, this does not replace the isSupersetOf method above -> why?
+        let count = 0;
+        for (var i = 0; i < bonds.length; i++) {
+            for (var j = 0; j < allBonds.length; j++) {
+                if (bonds[i][0] === allBonds[j][0] && bonds[i][1] === allBonds[j][1] ||
+                    bonds[i][1] === allBonds[j][0] && bonds[i][0] === allBonds[j][1]) {
+                    count++;
+                }
+
+                if (count === bonds.length) {
+                    return true;
+                }
             }
         }
 

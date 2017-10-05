@@ -452,7 +452,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // Get the rings in the graph (the SSSR)
         let rings = SmilesDrawer.SSSR.getRings(this.graph);
-
+        
         if (rings === null) {
             return;
         }

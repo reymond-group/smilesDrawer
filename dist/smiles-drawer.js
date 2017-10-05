@@ -2101,13 +2101,13 @@ SmilesDrawer.Atom.mass = {
         key: 'drawAromaticityRing',
         value: function drawAromaticityRing(ring) {
             var ctx = this.ctx;
-            var radius = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
+            var radius = SmilesDrawer.MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
 
             ctx.save();
             ctx.strokeStyle = this.getColor('C');
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, radius - this.opts.bondLength / 3.0 - this.opts.bondSpacing, 0, Math.PI * 2, true);
+            ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, radius - this.opts.bondSpacing, 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.stroke();
             ctx.restore();
@@ -9126,15 +9126,23 @@ SmilesDrawer.SSSR = function () {
         key: 'getSSSR',
         value: function getSSSR(c, d, adjacencyMatrix, pe1, pe2, nsssr) {
             var cSssr = [];
+            var allBonds = [];
 
             for (var i = 0; i < c.length; i++) {
                 if (c[i][0] % 2 !== 0) {
                     for (var j = 0; j < c[i][2].length; j++) {
                         var bonds = c[i][1][0].concat(c[i][2][j]);
+                        // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
+                        // TODO: This is a workaround, fix later.
+                        for (var k = 0; k < bonds.length; k++) {
+                            if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
+                        }
+
                         var atoms = SSSR.bondsToAtoms(bonds);
 
-                        if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms)) {
+                        if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds)) {
                             cSssr.push(atoms);
+                            allBonds = allBonds.concat(bonds);
                         }
 
                         if (cSssr.length === nsssr) {
@@ -9144,10 +9152,17 @@ SmilesDrawer.SSSR = function () {
                 } else {
                     for (var _j3 = 0; _j3 < c[i][1].length - 1; _j3++) {
                         var _bonds = c[i][1][_j3].concat(c[i][1][_j3 + 1]);
+                        // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
+                        // TODO: This is a workaround, fix later.
+                        for (var k = 0; k < _bonds.length; k++) {
+                            if (_bonds[k][0].constructor === Array) _bonds[k] = _bonds[k][0];
+                        }
+
                         var _atoms = SSSR.bondsToAtoms(_bonds);
 
-                        if (SSSR.getBondCount(_atoms, adjacencyMatrix) === _atoms.size && !SSSR.pathSetsContain(cSssr, _atoms)) {
+                        if (SSSR.getBondCount(_atoms, adjacencyMatrix) === _atoms.size && !SSSR.pathSetsContain(cSssr, _atoms, _bonds, allBonds)) {
                             cSssr.push(_atoms);
+                            allBonds = allBonds.concat(_bonds);
                         }
 
                         if (cSssr.length === nsssr) {
@@ -9219,16 +9234,10 @@ SmilesDrawer.SSSR = function () {
         key: 'bondsToAtoms',
         value: function bondsToAtoms(bonds) {
             var atoms = new Set();
-            // Somehow some bonds were added twice resulting in [[u, v], [u, v]] instead of [u, v].
-            // TODO: Fix it, this is just a workaround for now
+
             for (var i = 0; i < bonds.length; i++) {
-                if (bonds[i][0].constructor === Array) {
-                    atoms.add(bonds[i][0][0]);
-                    atoms.add(bonds[i][0][1]);
-                } else {
-                    atoms.add(bonds[i][0]);
-                    atoms.add(bonds[i][1]);
-                }
+                atoms.add(bonds[i][0]);
+                atoms.add(bonds[i][1]);
             }
             return atoms;
         }
@@ -9303,23 +9312,40 @@ SmilesDrawer.SSSR = function () {
          * 
          * @param {Set[]} pathSets An array of sets each representing a path.
          * @param {Set<Number>} pathSet A set representing a path.
+         * @param {Array[]} bonds The bonds associated with the current path.
+         * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
          * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
          */
 
     }, {
         key: 'pathSetsContain',
-        value: function pathSetsContain(pathSets, pathSet) {
-            for (var i = 0; i < pathSets.length; i++) {
-                if (SSSR.isSupersetOf(pathSet, pathSets[i])) {
+        value: function pathSetsContain(pathSets, pathSet, bonds, allBonds) {
+            for (var _i6 = 0; _i6 < pathSets.length; _i6++) {
+                if (SSSR.isSupersetOf(pathSet, pathSets[_i6])) {
                     return true;
                 }
 
-                if (pathSets[i].size !== pathSet.size) {
+                if (pathSets[_i6].size !== pathSet.size) {
                     continue;
                 }
 
-                if (SSSR.areSetsEqual(pathSets[i], pathSet)) {
+                if (SSSR.areSetsEqual(pathSets[_i6], pathSet)) {
                     return true;
+                }
+            }
+
+            // Check if the edges from the candidate are already all contained within the paths of the set of paths.
+            // TODO: For some reason, this does not replace the isSupersetOf method above -> why?
+            var count = 0;
+            for (var i = 0; i < bonds.length; i++) {
+                for (var j = 0; j < allBonds.length; j++) {
+                    if (bonds[i][0] === allBonds[j][0] && bonds[i][1] === allBonds[j][1] || bonds[i][1] === allBonds[j][0] && bonds[i][0] === allBonds[j][1]) {
+                        count++;
+                    }
+
+                    if (count === bonds.length) {
+                        return true;
+                    }
                 }
             }
 
