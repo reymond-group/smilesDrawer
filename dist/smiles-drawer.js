@@ -5727,10 +5727,9 @@ SmilesDrawer.Graph = function () {
             var arrPositioned = Array(length);
             for (var i = 0; i < length; i++) {
                 var vertex = this.vertices[vertexIds[i]];
-                // vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
-                // vertex.positioned = true;
 
-                arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
+                // arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
+                arrPosition[i] = [Math.random() * bondLength, Math.random() * bondLength];
                 arrPositioned[i] = vertex.positioned;
                 a += angle;
             }
@@ -5776,8 +5775,6 @@ SmilesDrawer.Graph = function () {
                 }
                 arrEnergySum[i] = [dEx, dEy];
             }
-
-            // console.log(matEnergy, arrEnergySum, matStrength, matLength);
 
             // Utility functions, maybe inline them later
             var energy = function energy(index) {

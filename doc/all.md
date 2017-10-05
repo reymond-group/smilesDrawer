@@ -1890,7 +1890,8 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer.Drawer+initPseudoElements"></a>
 
 #### drawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 <a name="SmilesDrawer.Edge"></a>

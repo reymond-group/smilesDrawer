@@ -459,9 +459,6 @@ SmilesDrawer.Graph = class Graph {
         let arrPositioned = Array(length);
         for (var i = 0; i < length; i++) {
             let vertex = this.vertices[vertexIds[i]];
-            // vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
-            // vertex.positioned = true;
-
             arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
             arrPositioned[i] = vertex.positioned;
             a += angle;
@@ -511,8 +508,6 @@ SmilesDrawer.Graph = class Graph {
             }
             arrEnergySum[i] = [dEx, dEy];
         }
-
-        // console.log(matEnergy, arrEnergySum, matStrength, matLength);
 
         // Utility functions, maybe inline them later
         let energy = function (index) {
