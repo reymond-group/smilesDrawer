@@ -452,7 +452,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // Get the rings in the graph (the SSSR)
         let rings = SmilesDrawer.SSSR.getRings(this.graph);
-        
+
         if (rings === null) {
             return;
         }
@@ -1242,19 +1242,20 @@ SmilesDrawer.Drawer = class Drawer {
      */
     getSubringCenter(ring, vertex) {
         let rings = vertex.value.originalRings;
-        let center = new SmilesDrawer.Vector2();
-        let count = 0;
+        let center = ring.center;
+        let smallest = Number.MAX_VALUE;
 
+        // Always get the smallest ring.
         for (var i = 0; i < rings.length; i++) {
             for (var j = 0; j < ring.rings.length; j++) {
                 if (rings[i] === ring.rings[j].id) {
-                    center.add(ring.rings[j].center);
-                    count++;
+                    if (ring.rings[j].getSize() < smallest) {
+                        center = ring.rings[j].center;
+                        smallest = ring.rings[j].getSize();
+                    }
                 }
             }
         }
-
-        center.divide(count);
 
         return center;
     }
@@ -1486,14 +1487,24 @@ SmilesDrawer.Drawer = class Drawer {
      * Position the vertices according to their bonds and properties.
      */
     position() {
-        let startVertex = this.graph.vertices[0];
+        let startVertex = null;
 
         // Always start drawing at a bridged ring if there is one
+        // If not, start with a ring
+        // else, start with 0
         for (var i = 0; i < this.graph.vertices.length; i++) {
             if (this.graph.vertices[i].value.bridgedRing !== null) {
                 startVertex = this.graph.vertices[i];
                 break;
             }
+        }
+
+        if (this.rings.length > 0 && startVertex === null) {
+            startVertex = this.graph.vertices[this.rings[0].members[0]];
+        }
+
+        if(startVertex === null) {
+            startVertex = this.graph.vertices[0];
         }
 
         this.createNextBond(startVertex);
@@ -1699,11 +1710,12 @@ SmilesDrawer.Drawer = class Drawer {
                     v.add(midpoint)
                 });
 
-                // Check if the center of the next ring lies within another ring and
-                // select the normal accordingly
+                // Get the normal further away from the previous center
+
+                // Pick the normal which results in a larger distance to the previous center
+                // Also check whether it's inside another ring
                 let nextCenter = normals[0];
-                
-                if (this.isPointInRing(nextCenter)) {
+                if (SmilesDrawer.Vector2.subtract(center, normals[1]).length() > SmilesDrawer.Vector2.subtract(center, normals[0]).length()) {
                     nextCenter = normals[1];
                 }
 
@@ -1727,7 +1739,7 @@ SmilesDrawer.Drawer = class Drawer {
 
                 let vertexA = this.graph.vertices[vertices[0]];
                 
-                // Get the vector pointing from the shared vertex to the new center
+                // Get the vector pointing from the shared vertex to the new centpositioner
                 let nextCenter = SmilesDrawer.Vector2.subtract(center, vertexA.position);
                 
                 nextCenter.invert();
@@ -1759,7 +1771,7 @@ SmilesDrawer.Drawer = class Drawer {
                 }
 
                 v.value.isConnectedToRing = true;
-                this.createNextBond(v, ringMember, ring.center);
+                this.createNextBond(v, ringMember, this.getSubringCenter(ring, ringMember));
             }
         }
     }
@@ -2059,7 +2071,7 @@ SmilesDrawer.Drawer = class Drawer {
      * @param {SmilesDrawer.Vertex} vertex A vertex.
      * @param {SmilesDrawer.Vertex} previousVertex The previous vertex which has been positioned.
      * @param {SmilesDrawer.Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
-     * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated.
+     * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated).
      */
     createNextBond(vertex, previousVertex, ringOrAngle, dir) {
         if (vertex.positioned) {

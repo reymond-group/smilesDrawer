@@ -1749,7 +1749,7 @@ Positiones the next vertex thus creating a bond.
 | vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
 | previousVertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | The previous vertex which has been positioned. |
 | ringOrAngle | <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>Number</code> | Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied. |
-| dir | <code>Number</code> | Either 1 or -1 to break ties (if no angle can be elucidated. |
+| dir | <code>Number</code> | Either 1 or -1 to break ties (if no angle can be elucidated). |
 
 <a name="SmilesDrawer.Drawer+getCommonRingbondNeighbour"></a>
 
@@ -1890,8 +1890,7 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 <a name="SmilesDrawer.Drawer+initPseudoElements"></a>
 
 #### drawer.initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
-the involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 <a name="SmilesDrawer.Edge"></a>

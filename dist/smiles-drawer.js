@@ -3483,19 +3483,20 @@ SmilesDrawer.Drawer = function () {
         key: 'getSubringCenter',
         value: function getSubringCenter(ring, vertex) {
             var rings = vertex.value.originalRings;
-            var center = new SmilesDrawer.Vector2();
-            var count = 0;
+            var center = ring.center;
+            var smallest = Number.MAX_VALUE;
 
+            // Always get the smallest ring.
             for (var i = 0; i < rings.length; i++) {
                 for (var j = 0; j < ring.rings.length; j++) {
                     if (rings[i] === ring.rings[j].id) {
-                        center.add(ring.rings[j].center);
-                        count++;
+                        if (ring.rings[j].getSize() < smallest) {
+                            center = ring.rings[j].center;
+                            smallest = ring.rings[j].getSize();
+                        }
                     }
                 }
             }
-
-            center.divide(count);
 
             return center;
         }
@@ -3732,14 +3733,24 @@ SmilesDrawer.Drawer = function () {
     }, {
         key: 'position',
         value: function position() {
-            var startVertex = this.graph.vertices[0];
+            var startVertex = null;
 
             // Always start drawing at a bridged ring if there is one
+            // If not, start with a ring
+            // else, start with 0
             for (var i = 0; i < this.graph.vertices.length; i++) {
                 if (this.graph.vertices[i].value.bridgedRing !== null) {
                     startVertex = this.graph.vertices[i];
                     break;
                 }
+            }
+
+            if (this.rings.length > 0 && startVertex === null) {
+                startVertex = this.graph.vertices[this.rings[0].members[0]];
+            }
+
+            if (startVertex === null) {
+                startVertex = this.graph.vertices[0];
             }
 
             this.createNextBond(startVertex);
@@ -3968,11 +3979,12 @@ SmilesDrawer.Drawer = function () {
                             v.add(midpoint);
                         });
 
-                        // Check if the center of the next ring lies within another ring and
-                        // select the normal accordingly
-                        var nextCenter = normals[0];
+                        // Get the normal further away from the previous center
 
-                        if (_this.isPointInRing(nextCenter)) {
+                        // Pick the normal which results in a larger distance to the previous center
+                        // Also check whether it's inside another ring
+                        var nextCenter = normals[0];
+                        if (SmilesDrawer.Vector2.subtract(center, normals[1]).length() > SmilesDrawer.Vector2.subtract(center, normals[0]).length()) {
                             nextCenter = normals[1];
                         }
 
@@ -3997,7 +4009,7 @@ SmilesDrawer.Drawer = function () {
 
                     var vertexA = this.graph.vertices[vertices[0]];
 
-                    // Get the vector pointing from the shared vertex to the new center
+                    // Get the vector pointing from the shared vertex to the new centpositioner
                     var nextCenter = SmilesDrawer.Vector2.subtract(center, vertexA.position);
 
                     nextCenter.invert();
@@ -4029,7 +4041,7 @@ SmilesDrawer.Drawer = function () {
                     }
 
                     v.value.isConnectedToRing = true;
-                    this.createNextBond(v, ringMember, ring.center);
+                    this.createNextBond(v, ringMember, this.getSubringCenter(ring, ringMember));
                 }
             }
         }
@@ -4347,7 +4359,7 @@ SmilesDrawer.Drawer = function () {
          * @param {SmilesDrawer.Vertex} vertex A vertex.
          * @param {SmilesDrawer.Vertex} previousVertex The previous vertex which has been positioned.
          * @param {SmilesDrawer.Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
-         * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated.
+         * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated).
          */
 
     }, {
@@ -5720,16 +5732,14 @@ SmilesDrawer.Graph = function () {
             var length = vertexIds.length;
 
             // Initialize the positions. Place all vertices on a ring around the center
-            var radius = SmilesDrawer.MathHelper.polyCircumradius(bondLength, length);
+            var radius = SmilesDrawer.MathHelper.polyCircumradius(100, length);
             var angle = SmilesDrawer.MathHelper.centralAngle(length);
             var a = 0.0;
             var arrPosition = Array(length);
             var arrPositioned = Array(length);
             for (var i = 0; i < length; i++) {
                 var vertex = this.vertices[vertexIds[i]];
-
-                // arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
-                arrPosition[i] = [Math.random() * bondLength, Math.random() * bondLength];
+                arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
                 arrPositioned[i] = vertex.positioned;
                 a += angle;
             }
