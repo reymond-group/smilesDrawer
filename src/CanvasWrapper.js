@@ -209,7 +209,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         let offsetY = this.offsetY;
 
         // Add a shadow behind the line
-        let shortLine = line.clone().shorten(8.0);
+        let shortLine = line.clone().shorten(4.0);
 
         let l = shortLine.getLeftVector().clone();
         let r = shortLine.getRightVector().clone();
@@ -228,7 +228,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         ctx.moveTo(l.x, l.y);
         ctx.lineTo(r.x, r.y);
         ctx.lineCap = 'round';
-        ctx.lineWidth = 3.5;
+        ctx.lineWidth = 2.5;
         ctx.strokeStyle = this.getColor('BACKGROUND');
         ctx.stroke();
         ctx.globalCompositeOperation = 'source-over';

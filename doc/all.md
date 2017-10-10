@@ -111,6 +111,7 @@ The SmilesDrawer namespace.
         * [.setRingCenter(ring)](#SmilesDrawer.Drawer+setRingCenter)
         * [.getSubringCenter(ring, vertex)](#SmilesDrawer.Drawer+getSubringCenter) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
         * [.drawEdges(debug)](#SmilesDrawer.Drawer+drawEdges)
+        * [.drawEdge(edgeId, debug)](#SmilesDrawer.Drawer+drawEdge)
         * [.drawVertices(debug)](#SmilesDrawer.Drawer+drawVertices)
         * [.position()](#SmilesDrawer.Drawer+position)
         * [.clearPositions()](#SmilesDrawer.Drawer+clearPositions)
@@ -152,6 +153,7 @@ The SmilesDrawer namespace.
             * [.addVertex(vertex)](#SmilesDrawer.Graph+addVertex) ⇒ <code>Number</code>
             * [.addEdge(edge)](#SmilesDrawer.Graph+addEdge) ⇒ <code>Number</code>
             * [.getEdge(vertexIdA, vertexIdB)](#SmilesDrawer.Graph+getEdge) ⇒ <code>Number</code> &#124; <code>null</code>
+            * [.getEdges(vertexId)](#SmilesDrawer.Graph+getEdges) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.hasEdge(vertexIdA, vertexIdB)](#SmilesDrawer.Graph+hasEdge) ⇒ <code>Number</code> &#124; <code>null</code>
             * [.getVertexList()](#SmilesDrawer.Graph+getVertexList) ⇒ <code>Array.&lt;Number&gt;</code>
             * [.getEdgeList()](#SmilesDrawer.Graph+getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
@@ -163,6 +165,7 @@ The SmilesDrawer namespace.
             * [.getAdjacencyList()](#SmilesDrawer.Graph+getAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.getSubgraphAdjacencyList(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.getBridges()](#SmilesDrawer.Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
+            * [.traverseBF(startVertexId, callback)](#SmilesDrawer.Graph+traverseBF)
             * [.kkLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
             * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
         * _static_
@@ -1146,6 +1149,7 @@ The main class of the application representing the smiles drawer
     * [.setRingCenter(ring)](#SmilesDrawer.Drawer+setRingCenter)
     * [.getSubringCenter(ring, vertex)](#SmilesDrawer.Drawer+getSubringCenter) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
     * [.drawEdges(debug)](#SmilesDrawer.Drawer+drawEdges)
+    * [.drawEdge(edgeId, debug)](#SmilesDrawer.Drawer+drawEdge)
     * [.drawVertices(debug)](#SmilesDrawer.Drawer+drawVertices)
     * [.position()](#SmilesDrawer.Drawer+position)
     * [.clearPositions()](#SmilesDrawer.Drawer+clearPositions)
@@ -1614,6 +1618,18 @@ Draw the actual edges as bonds to the canvas.
 | --- | --- | --- |
 | debug | <code>Boolean</code> | A boolean indicating whether or not to draw debug helpers. |
 
+<a name="SmilesDrawer.Drawer+drawEdge"></a>
+
+#### drawer.drawEdge(edgeId, debug)
+Draw the an edge as a bonds to the canvas.
+
+**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| edgeId | <code>Number</code> | An edge id. |
+| debug | <code>Boolean</code> | A boolean indicating whether or not to draw debug helpers. |
+
 <a name="SmilesDrawer.Drawer+drawVertices"></a>
 
 #### drawer.drawVertices(debug)
@@ -1972,6 +1988,7 @@ A class representing the molecular graph.
         * [.addVertex(vertex)](#SmilesDrawer.Graph+addVertex) ⇒ <code>Number</code>
         * [.addEdge(edge)](#SmilesDrawer.Graph+addEdge) ⇒ <code>Number</code>
         * [.getEdge(vertexIdA, vertexIdB)](#SmilesDrawer.Graph+getEdge) ⇒ <code>Number</code> &#124; <code>null</code>
+        * [.getEdges(vertexId)](#SmilesDrawer.Graph+getEdges) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.hasEdge(vertexIdA, vertexIdB)](#SmilesDrawer.Graph+hasEdge) ⇒ <code>Number</code> &#124; <code>null</code>
         * [.getVertexList()](#SmilesDrawer.Graph+getVertexList) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.getEdgeList()](#SmilesDrawer.Graph+getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
@@ -1983,6 +2000,7 @@ A class representing the molecular graph.
         * [.getAdjacencyList()](#SmilesDrawer.Graph+getAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.getSubgraphAdjacencyList(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.getBridges()](#SmilesDrawer.Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
+        * [.traverseBF(startVertexId, callback)](#SmilesDrawer.Graph+traverseBF)
         * [.kkLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
         * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
     * _static_
@@ -2063,6 +2081,18 @@ Returns the edge between two given vertices.
 | --- | --- | --- |
 | vertexIdA | <code>Number</code> | A vertex id. |
 | vertexIdB | <code>Number</code> | A vertex id. |
+
+<a name="SmilesDrawer.Graph+getEdges"></a>
+
+#### graph.getEdges(vertexId) ⇒ <code>Array.&lt;Array&gt;</code>
+Returns the ids of edges connected to a vertex.
+
+**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
+**Returns**: <code>Array.&lt;Array&gt;</code> - An array containing the ids of edges connected to the vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>Number</code> | A vertex id. |
 
 <a name="SmilesDrawer.Graph+hasEdge"></a>
 
@@ -2162,6 +2192,18 @@ Returns an array containing the edge ids of bridges. A bridge splits the graph i
 
 **Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
 **Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the edge ids of the bridges.  
+<a name="SmilesDrawer.Graph+traverseBF"></a>
+
+#### graph.traverseBF(startVertexId, callback)
+Traverses the graph in breadth-first order.
+
+**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| startVertexId | <code>Number</code> | The id of the starting vertex. |
+| callback | <code>function</code> | The callback function to be called on every vertex. |
+
 <a name="SmilesDrawer.Graph+kkLayout"></a>
 
 #### graph.kkLayout(vertexIds, center, startVertexId, ring)

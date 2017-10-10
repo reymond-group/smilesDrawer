@@ -184,7 +184,6 @@ SmilesDrawer.Drawer = class Drawer {
                             let neighbour = this.graph.vertices[neighbours[0]];
                             let angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, SmilesDrawer.MathHelper.toRad(120));
                             
-                            // console.log('Rotate ' + neighbour.id + ' by ' + angle + ' away from ' + vertexA.id + ' around ' + vertexB.id);
                             this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
                             
                             // If the new overlap is bigger, undo change
@@ -239,8 +238,6 @@ SmilesDrawer.Drawer = class Drawer {
             // Do the actual drawing
             this.drawEdges(this.opts.debug);
             this.drawVertices(this.opts.debug);
-            // console.log(this.rings);
-            // console.log(this.graph.vertices);
             this.canvasWrapper.reset();
         }
     }
@@ -573,7 +570,6 @@ SmilesDrawer.Drawer = class Drawer {
         for (var i = 0; i < this.ringConnections.length; i++) {
             if (this.ringConnections[i].containsRing(ringId) &&
                 this.ringConnections[i].isBridge(this.graph.vertices)) {
-                
                 return true;
             }
         }
@@ -670,7 +666,9 @@ SmilesDrawer.Drawer = class Drawer {
 
         this.addRing(ring);
 
-        // this.graph.vertices[sourceVertexId].value.anchoredRings.push(ring.id);
+        for (var i = 0; i < ring.members.length; i++) {
+            this.graph.vertices[ring.members[i]].value.bridgedRing = ring.id;
+        }
 
         // Atoms inside the ring are no longer part of a ring but are now
         // associated with the bridged ring
@@ -678,8 +676,6 @@ SmilesDrawer.Drawer = class Drawer {
             let vertex = this.graph.vertices[insideRing[i]];
             
             vertex.value.rings = [];
-            //vertex.value.anchoredRings = [];
-            vertex.value.bridgedRing = ring.id;
         }
 
         // Remove former rings from members of the bridged ring and add the bridged ring
@@ -1267,161 +1263,19 @@ SmilesDrawer.Drawer = class Drawer {
      */
     drawEdges(debug) {
         let that = this;
-        
-        for (var i = 0; i < this.graph.edges.length; i++) {
-            let edge = this.graph.edges[i];
-            let vertexA = this.graph.vertices[edge.sourceId];
-            let vertexB = this.graph.vertices[edge.targetId];
-            let elementA = vertexA.value.element;
-            let elementB = vertexB.value.element;
+        let drawn = Array(this.graph.edges.length);
+        drawn.fill(false);
 
-            if ((!vertexA.value.isDrawn || !vertexB.value.isDrawn) && this.opts.atomVisualization === 'default') {
-                continue;
-            }
-
-            let a = vertexA.position;
-            let b = vertexB.position;
-            let normals = this.getEdgeNormals(edge);
-
-            // Create a point on each side of the line
-            let sides = SmilesDrawer.ArrayHelper.clone(normals);
-
-            sides[0].multiplyScalar(10).add(a);
-            sides[1].multiplyScalar(10).add(a);
-
-            if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=') {
-                // Always draw double bonds inside the ring
-                let inRing = this.areVerticesInSameRing(vertexA, vertexB);
-                let s = this.chooseSide(vertexA, vertexB, sides);
-                
-                if (inRing) {
-                    // Always draw double bonds inside a ring
-                    // if the bond is shared by two rings, it is drawn in the larger
-                    // problem: smaller ring is aromatic, bond is still drawn in larger -> fix this
-                    let lcr = this.getLargestOrAromaticCommonRing(vertexA, vertexB);
-                    let center = lcr.center;
-
-                    SmilesDrawer.ArrayHelper.each(normals, function (v) {
-                        v.multiplyScalar(that.opts.bondSpacing);
-                    });
-
-                    // Choose the normal that is on the same side as the center
-                    let line = null;
-                    
-                    if (center.sameSideAs(vertexA.position, vertexB.position, SmilesDrawer.Vector2.add(a, normals[0]))) {
-                        line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-                    } else {
-                        line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
-                    }
-
-                    line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-
-                    // The shortened edge
-                    this.canvasWrapper.drawLine(line);
-
-                    // The normal edge
-                    this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
-                } else if (edge.center) {
-                    SmilesDrawer.ArrayHelper.each(normals, function (v) {
-                        v.multiplyScalar(that.opts.bondSpacing / 2.0)
-                    });
-
-                    let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-                    let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
-
-                    lineA.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                    lineB.shorten(this.opts.bondLength - this.opts.shortBondLength);
-
-                    this.canvasWrapper.drawLine(lineA);
-                    this.canvasWrapper.drawLine(lineB);
-                } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
-                    // Both lines are the same length here
-                    // Add the spacing to the edges (which are of unit length)
-                    SmilesDrawer.ArrayHelper.each(normals, function (v) {
-                        v.multiplyScalar(that.opts.bondSpacing / 2)
-                    });
-
-                    let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-                    let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
-
-                    this.canvasWrapper.drawLine(lineA);
-                    this.canvasWrapper.drawLine(lineB);
-                } else if (s.sideCount[0] > s.sideCount[1]) {
-                    SmilesDrawer.ArrayHelper.each(normals, function (v) {
-                        v.multiplyScalar(that.opts.bondSpacing)
-                    });
-
-                    let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-                    
-                    line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                    this.canvasWrapper.drawLine(line);
-                    this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
-                } else if (s.sideCount[0] < s.sideCount[1]) {
-                    SmilesDrawer.ArrayHelper.each(normals, function (v) {
-                        v.multiplyScalar(that.opts.bondSpacing)
-                    });
-
-                    let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
-                    
-                    line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                    this.canvasWrapper.drawLine(line);
-                    this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
-                } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
-                    SmilesDrawer.ArrayHelper.each(normals, function (v) {
-                        v.multiplyScalar(that.opts.bondSpacing)
-                    });
-
-                    let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-                    
-                    line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                    this.canvasWrapper.drawLine(line);
-                    this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
-                } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
-                    SmilesDrawer.ArrayHelper.each(normals, function (v) {
-                        v.multiplyScalar(that.opts.bondSpacing)
-                    });
-
-                    let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
-                    
-                    line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                    this.canvasWrapper.drawLine(line);
-                    this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
-                } else {
-
-                }
-            } 
-            else if(edge.bondType === '#') {
-                SmilesDrawer.ArrayHelper.each(normals, function (v) {
-                    v.multiplyScalar(that.opts.bondSpacing / 1.5)
-                });
-
-                let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-                let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
-
-                this.canvasWrapper.drawLine(lineA);
-                this.canvasWrapper.drawLine(lineB);
-
-                this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
-            } else if (edge.bondType === '.') {
-                // TODO: Something... maybe... version 2?
-            } else {
-                let isChiralCenterA = vertexA.value.bracket && vertexA.value.bracket.chirality;
-                let isChiralCenterB = vertexB.value.bracket && vertexB.value.bracket.chirality;
-                
-                if (edge.chiral === 'up') {
-                    this.canvasWrapper.drawWedge(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
-                } else if (edge.chiral === 'down') {
-                    this.canvasWrapper.drawDashedWedge(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
-                } else {
-                    this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+        this.graph.traverseBF(0, function(vertex) {
+            let edges = that.graph.getEdges(vertex.id);
+            for (var i = 0; i < edges.length; i++) {
+                let edgeId = edges[i];
+                if (!drawn[edgeId]) {
+                    drawn[edgeId] = true;
+                    that.drawEdge(edgeId, debug);
                 }
             }
-
-            if (debug) {
-                let midpoint = SmilesDrawer.Vector2.midpoint(a, b);
-                this.canvasWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + i);
-            }
-        }
+        });
 
         // Draw ring for implicitly defined aromatic rings
         for (var i = 0; i < this.rings.length; i++) {
@@ -1430,6 +1284,169 @@ SmilesDrawer.Drawer = class Drawer {
             if (this.isRingAromatic(ring)) {
                 this.canvasWrapper.drawAromaticityRing(ring);
             }
+        }
+    }
+
+    /**
+     * Draw the an edge as a bonds to the canvas.
+     *
+     * @param {Number} edgeId An edge id.
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+     */
+    drawEdge(edgeId, debug) {
+        let that = this;
+
+        let edge = this.graph.edges[edgeId];
+        let vertexA = this.graph.vertices[edge.sourceId];
+        let vertexB = this.graph.vertices[edge.targetId];
+        let elementA = vertexA.value.element;
+        let elementB = vertexB.value.element;
+
+        if ((!vertexA.value.isDrawn || !vertexB.value.isDrawn) && this.opts.atomVisualization === 'default') {
+            return;
+        }
+
+        let a = vertexA.position;
+        let b = vertexB.position;
+        let normals = this.getEdgeNormals(edge);
+
+        // Create a point on each side of the line
+        let sides = SmilesDrawer.ArrayHelper.clone(normals);
+
+        sides[0].multiplyScalar(10).add(a);
+        sides[1].multiplyScalar(10).add(a);
+
+        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=') {
+            // Always draw double bonds inside the ring
+            let inRing = this.areVerticesInSameRing(vertexA, vertexB);
+            let s = this.chooseSide(vertexA, vertexB, sides);
+            
+            if (inRing) {
+                // Always draw double bonds inside a ring
+                // if the bond is shared by two rings, it is drawn in the larger
+                // problem: smaller ring is aromatic, bond is still drawn in larger -> fix this
+                let lcr = this.getLargestOrAromaticCommonRing(vertexA, vertexB);
+                let center = lcr.center;
+
+                SmilesDrawer.ArrayHelper.each(normals, function (v) {
+                    v.multiplyScalar(that.opts.bondSpacing);
+                });
+
+                // Choose the normal that is on the same side as the center
+                let line = null;
+                
+                if (center.sameSideAs(vertexA.position, vertexB.position, SmilesDrawer.Vector2.add(a, normals[0]))) {
+                    line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+                } else {
+                    line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+                }
+
+                line.shorten(this.opts.bondLength - this.opts.shortBondLength);
+
+                // The shortened edge
+                this.canvasWrapper.drawLine(line);
+
+                // The normal edge
+                this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+            } else if (edge.center) {
+                SmilesDrawer.ArrayHelper.each(normals, function (v) {
+                    v.multiplyScalar(that.opts.bondSpacing / 2.0)
+                });
+
+                let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+                let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+
+                lineA.shorten(this.opts.bondLength - this.opts.shortBondLength);
+                lineB.shorten(this.opts.bondLength - this.opts.shortBondLength);
+
+                this.canvasWrapper.drawLine(lineA);
+                this.canvasWrapper.drawLine(lineB);
+            } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
+                // Both lines are the same length here
+                // Add the spacing to the edges (which are of unit length)
+                SmilesDrawer.ArrayHelper.each(normals, function (v) {
+                    v.multiplyScalar(that.opts.bondSpacing / 2)
+                });
+
+                let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+                let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+
+                this.canvasWrapper.drawLine(lineA);
+                this.canvasWrapper.drawLine(lineB);
+            } else if (s.sideCount[0] > s.sideCount[1]) {
+                SmilesDrawer.ArrayHelper.each(normals, function (v) {
+                    v.multiplyScalar(that.opts.bondSpacing)
+                });
+
+                let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+                
+                line.shorten(this.opts.bondLength - this.opts.shortBondLength);
+                this.canvasWrapper.drawLine(line);
+                this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+            } else if (s.sideCount[0] < s.sideCount[1]) {
+                SmilesDrawer.ArrayHelper.each(normals, function (v) {
+                    v.multiplyScalar(that.opts.bondSpacing)
+                });
+
+                let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+                
+                line.shorten(this.opts.bondLength - this.opts.shortBondLength);
+                this.canvasWrapper.drawLine(line);
+                this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+            } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
+                SmilesDrawer.ArrayHelper.each(normals, function (v) {
+                    v.multiplyScalar(that.opts.bondSpacing)
+                });
+
+                let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+                
+                line.shorten(this.opts.bondLength - this.opts.shortBondLength);
+                this.canvasWrapper.drawLine(line);
+                this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+            } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
+                SmilesDrawer.ArrayHelper.each(normals, function (v) {
+                    v.multiplyScalar(that.opts.bondSpacing)
+                });
+
+                let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+                
+                line.shorten(this.opts.bondLength - this.opts.shortBondLength);
+                this.canvasWrapper.drawLine(line);
+                this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+            } else {
+
+            }
+        } 
+        else if(edge.bondType === '#') {
+            SmilesDrawer.ArrayHelper.each(normals, function (v) {
+                v.multiplyScalar(that.opts.bondSpacing / 1.5)
+            });
+
+            let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+            let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+
+            this.canvasWrapper.drawLine(lineA);
+            this.canvasWrapper.drawLine(lineB);
+
+            this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+        } else if (edge.bondType === '.') {
+            // TODO: Something... maybe... version 2?
+        } else {
+            let isChiralCenterA = vertexA.value.bracket && vertexA.value.bracket.chirality;
+            let isChiralCenterB = vertexB.value.bracket && vertexB.value.bracket.chirality;
+            
+            if (edge.chiral === 'up') {
+                this.canvasWrapper.drawWedge(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+            } else if (edge.chiral === 'down') {
+                this.canvasWrapper.drawDashedWedge(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+            } else {
+                this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+            }
+        }
+
+        if (debug) {
+            let midpoint = SmilesDrawer.Vector2.midpoint(a, b);
+            this.canvasWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
         }
     }
 
@@ -1496,6 +1513,12 @@ SmilesDrawer.Drawer = class Drawer {
             if (this.graph.vertices[i].value.bridgedRing !== null) {
                 startVertex = this.graph.vertices[i];
                 break;
+            }
+        }
+
+        for (var i = 0; i < this.rings.length; i++) {
+            if (this.rings[i].isBridged) {
+                startVertex = this.graph.vertices[this.rings[i].members[0]];
             }
         }
 
@@ -1645,6 +1668,10 @@ SmilesDrawer.Drawer = class Drawer {
             this.graph.kkLayout(ring.members, center, startVertex.id, ring, this.opts.bondLength);
             ring.positioned = true;
 
+            // Update the center of the bridged ring
+            this.setRingCenter(ring);
+            center = ring.center;
+
             // Setting the centers for the subrings
             for (var i = 0; i < ring.rings.length; i++) {
                 this.setRingCenter(ring.rings[i]);
@@ -1682,7 +1709,7 @@ SmilesDrawer.Drawer = class Drawer {
                 // This ring is a fused ring
                 ring.isFused = true;
                 neighbour.isFused = true;
-
+                
                 let vertexA = this.graph.vertices[vertices[0]];
                 let vertexB = this.graph.vertices[vertices[1]];
 
@@ -1709,9 +1736,7 @@ SmilesDrawer.Drawer = class Drawer {
                 SmilesDrawer.ArrayHelper.each(normals, function (v) {
                     v.add(midpoint)
                 });
-
-                // Get the normal further away from the previous center
-
+                
                 // Pick the normal which results in a larger distance to the previous center
                 // Also check whether it's inside another ring
                 let nextCenter = normals[0];
@@ -1786,11 +1811,6 @@ SmilesDrawer.Drawer = class Drawer {
      */
     rotateSubtree(vertexId, parentVertexId, angle, center) {
         let that = this;
-
-        // for (var i = 0; i < this.graph.vertices.length; i++) {
-        //     let atom = this.graph.vertices[i].value;
-        //     console.log(i, atom.anchoredRings);
-        // }
 
         this.traverseTree(vertexId, parentVertexId, function (vertex) {
             vertex.position.rotateAround(angle, center);
@@ -2087,6 +2107,8 @@ SmilesDrawer.Drawer = class Drawer {
             // Add a (dummy) previous position if there is no previous vertex defined
             // Since the first vertex is at (0, 0), create a vector at (bondLength, 0)
             // and rotate it by 90°
+
+            
             let dummy = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
             dummy.rotate(SmilesDrawer.MathHelper.toRad(-120));
 
@@ -2094,7 +2116,11 @@ SmilesDrawer.Drawer = class Drawer {
             vertex.setPosition(this.opts.bondLength, 0);
             vertex.angle = SmilesDrawer.MathHelper.toRad(-120);
             vertex.globalAngle = vertex.angle;
-            vertex.positioned = true;
+
+            // Do not position the vertex if it belongs to a bridged ring that is positioned using a layout algorithm.
+            if (vertex.value.bridgedRing === null) {
+                vertex.positioned = true;
+            }
         } else if (previousVertex.value.rings.length === 0 && !vertex.value.isBridge && !previousVertex.value.isBridge) {
             // Here, ringOrAngle is always an angle
 
@@ -2159,22 +2185,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // Go to next vertex
         // If two rings are connected by a bond ...
-        if (vertex.value.rings.length > 0) {
-            let nextRing = this.getRing(vertex.value.rings[0]);
-            let nextCenter = SmilesDrawer.Vector2.subtract(vertex.previousPosition, vertex.position);
-            
-            nextCenter.invert();
-            nextCenter.normalize();
-
-            let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, nextRing.getSize());
-
-            nextCenter.multiplyScalar(r);
-            nextCenter.add(vertex.position);
-
-            if (!nextRing.positioned) {
-                this.createRing(nextRing, nextCenter, vertex);
-            }
-        } else if (vertex.value.bridgedRing !== null) {
+        if (vertex.value.bridgedRing !== null) {
             let nextRing = this.getRing(vertex.value.bridgedRing);
             let nextCenter = SmilesDrawer.Vector2.subtract(vertex.previousPosition, vertex.position);
             
@@ -2185,6 +2196,21 @@ SmilesDrawer.Drawer = class Drawer {
             nextCenter.multiplyScalar(r);
             nextCenter.add(vertex.position);
 
+
+            if (!nextRing.positioned) {
+                this.createRing(nextRing, nextCenter, vertex);
+            }
+        } else if (vertex.value.rings.length > 0) {
+            let nextRing = this.getRing(vertex.value.rings[0]);
+            let nextCenter = SmilesDrawer.Vector2.subtract(vertex.previousPosition, vertex.position);
+            
+            nextCenter.invert();
+            nextCenter.normalize();
+
+            let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, nextRing.getSize());
+
+            nextCenter.multiplyScalar(r);
+            nextCenter.add(vertex.position);
 
             if (!nextRing.positioned) {
                 this.createRing(nextRing, nextCenter, vertex);

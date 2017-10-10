@@ -163,6 +163,24 @@ SmilesDrawer.Graph = class Graph {
     }
 
     /**
+     * Returns the ids of edges connected to a vertex.
+     *
+     * @param {Number} vertexId A vertex id.
+     * @returns {Array[]} An array containing the ids of edges connected to the vertex.
+     */
+    getEdges(vertexId) {
+        let edgeIds = Array();
+        let vertex = this.vertices[vertexId];
+
+        for (var i = 0; i < vertex.neighbours.length; i++) {
+            edgeIds.push(this.vertexIdsToEdgeId[vertexId + '_' + vertex.neighbours[i]]);
+        }
+
+        return edgeIds;
+    }
+    
+
+    /**
      * Returns the edge between two given vertices.
      *
      * @param {Number} vertexIdA A vertex id.
@@ -439,6 +457,37 @@ SmilesDrawer.Graph = class Graph {
     }
 
     /**
+     * Traverses the graph in breadth-first order.
+     * 
+     * @param {Number} startVertexId The id of the starting vertex.
+     * @param {Function} callback The callback function to be called on every vertex.
+     */
+    traverseBF(startVertexId, callback) {
+        let length = this.vertices.length;
+        let visited = new Array(length);
+
+        visited.fill(false);
+
+        var queue = [startVertexId];
+
+        while (queue.length > 0) {
+            // JavaScripts shift() is O(n) ... bad JavaScript, bad!
+            let u = queue.shift();
+            let vertex = this.vertices[u];
+
+            callback(vertex);
+
+            for (var i = 0; i < vertex.neighbours.length; i++) {
+                let v = vertex.neighbours[i]
+                if (!visited[v]) {
+                    visited[v] = true;
+                    queue.push(v);
+                }
+            }
+        }
+    }
+
+    /**
      * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
      * 
      * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
@@ -450,7 +499,7 @@ SmilesDrawer.Graph = class Graph {
         let edgeStrength = 10.0;
         let matDist = this.getSubgraphDistanceMatrix(vertexIds);
         let length = vertexIds.length;
-        
+
         // Initialize the positions. Place all vertices on a ring around the center
         let radius = SmilesDrawer.MathHelper.polyCircumradius(100, length);
         let angle = SmilesDrawer.MathHelper.centralAngle(length);
@@ -459,7 +508,11 @@ SmilesDrawer.Graph = class Graph {
         let arrPositioned = Array(length);
         for (var i = 0; i < length; i++) {
             let vertex = this.vertices[vertexIds[i]];
-            arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
+            if (!vertex.positioned) {
+                arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
+            } else {
+                arrPosition[i] = [vertex.position.x, vertex.position.y];
+            }
             arrPositioned[i] = vertex.positioned;
             a += angle;
         }
@@ -522,7 +575,8 @@ SmilesDrawer.Graph = class Graph {
 
             for (var i = 0; i < length; i++) {
                 let [delta, dE] = energy(i);
-                if (delta > maxEnergy) {
+
+                if (delta > maxEnergy && arrPositioned[i] === false) {
                     maxEnergy = delta;
                     maxEnergyId = i;
                     maxDE = dE;
@@ -668,7 +722,7 @@ SmilesDrawer.Graph = class Graph {
                 component.push(u);
                 count++;
                 Graph._ccGetDfs(u, visited, adjacencyMatrix, component);
-                if(component.length > 1) {
+                if (component.length > 1) {
                     components.push(component);
                 }
             }
