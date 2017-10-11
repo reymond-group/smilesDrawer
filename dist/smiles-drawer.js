@@ -1520,7 +1520,7 @@ SmilesDrawer.Atom.mass = {
             var offsetY = this.offsetY;
 
             // Add a shadow behind the line
-            var shortLine = line.clone().shorten(4.0);
+            var shortLine = line.clone().shorten(6.0);
 
             var l = shortLine.getLeftVector().clone();
             var r = shortLine.getRightVector().clone();
@@ -1788,7 +1788,6 @@ SmilesDrawer.Atom.mass = {
          * @param {Number} x The x position of the text.
          * @param {Number} y The y position of the text.
          * @param {String} elementName The name of the element (single-letter).
-         * @param {Number} hydrogens The number of hydrogen atoms.
          */
 
     }, {
@@ -1801,6 +1800,37 @@ SmilesDrawer.Atom.mass = {
             ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, SmilesDrawer.MathHelper.twoPI, false);
             ctx.fillStyle = this.getColor(elementName);
             ctx.fill();
+            ctx.restore();
+        }
+
+        /**
+         * Draw a point to the canvas.
+         *
+         * @param {Number} x The x position of the point.
+         * @param {Number} y The y position of the point.
+         * @param {String} elementName The name of the element (single-letter).
+         */
+
+    }, {
+        key: 'drawPoint',
+        value: function drawPoint(x, y, elementName) {
+            var ctx = this.ctx;
+            var offsetX = this.offsetX;
+            var offsetY = this.offsetY;
+
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x + offsetX, y + offsetY, 1.5, 0, SmilesDrawer.MathHelper.twoPI, true);
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+
+            ctx.beginPath();
+            ctx.arc(x + this.offsetX, y + this.offsetY, 0.75, 0, SmilesDrawer.MathHelper.twoPI, false);
+            ctx.fillStyle = this.getColor(elementName);
+            ctx.fill();
+            ctx.restore();
         }
 
         /**
@@ -3759,6 +3789,15 @@ SmilesDrawer.Drawer = function () {
                         this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, _element2, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
                     } else if (this.opts.atomVisualization === 'balls') {
                         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, _element2);
+                    }
+                } else if (vertex.getNeighbourCount() === 2) {
+                    // If there is a carbon which bonds are in a straight line, draw a dot
+                    var a = this.graph.vertices[vertex.neighbours[0]].position;
+                    var b = this.graph.vertices[vertex.neighbours[1]].position;
+                    var angle = SmilesDrawer.Vector2.threePointangle(vertex.position, a, b);
+
+                    if (Math.abs(Math.PI - angle) < 0.1) {
+                        this.canvasWrapper.drawPoint(vertex.position.x, vertex.position.y, _element2);
                     }
                 }
 
@@ -10204,12 +10243,12 @@ SmilesDrawer.Vector2 = function () {
     }, {
         key: 'threePointangle',
         value: function threePointangle(vecA, vecB, vecC) {
-            var ab = SmilesDrawer.Vector2.subtract(vecB - vecA);
+            var ab = SmilesDrawer.Vector2.subtract(vecB, vecA);
             var bc = SmilesDrawer.Vector2.subtract(vecC, vecB);
             var abLength = vecA.distance(vecB);
-            var bcLenght = vecB.distance(vecC);
+            var bcLength = vecB.distance(vecC);
 
-            return Math.acos(SmilesDrawer.Vector2.dot(ab, bc) / (abLenght * bcLenght));
+            return Math.acos(SmilesDrawer.Vector2.dot(ab, bc) / (abLength * bcLength));
         }
 
         /**

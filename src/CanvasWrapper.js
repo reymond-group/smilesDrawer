@@ -212,7 +212,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         let offsetY = this.offsetY;
 
         // Add a shadow behind the line
-        let shortLine = line.clone().shorten(4.0);
+        let shortLine = line.clone().shorten(6.0);
 
         let l = shortLine.getLeftVector().clone();
         let r = shortLine.getRightVector().clone();
@@ -475,7 +475,6 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
      * @param {Number} x The x position of the text.
      * @param {Number} y The y position of the text.
      * @param {String} elementName The name of the element (single-letter).
-     * @param {Number} hydrogens The number of hydrogen atoms.
      */
     drawBall(x, y, elementName) {
         let ctx = this.ctx;
@@ -485,6 +484,34 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, SmilesDrawer.MathHelper.twoPI, false);
         ctx.fillStyle = this.getColor(elementName);
         ctx.fill();
+        ctx.restore();
+    }
+
+    /**
+     * Draw a point to the canvas.
+     *
+     * @param {Number} x The x position of the point.
+     * @param {Number} y The y position of the point.
+     * @param {String} elementName The name of the element (single-letter).
+     */
+    drawPoint(x, y, elementName) {
+        let ctx = this.ctx;
+        let offsetX = this.offsetX;
+        let offsetY = this.offsetY;
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x + offsetX, y + offsetY, 1.5, 0, SmilesDrawer.MathHelper.twoPI, true);
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+
+        ctx.beginPath();
+        ctx.arc(x + this.offsetX, y + this.offsetY, 0.75, 0, SmilesDrawer.MathHelper.twoPI, false);
+        ctx.fillStyle = this.getColor(elementName);
+        ctx.fill();
+        ctx.restore();
     }
 
     /**

@@ -65,7 +65,8 @@ The SmilesDrawer namespace.
         * [.drawWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawWedge)
         * [.drawDashedWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawDashedWedge)
         * [.drawDebugText(x, y, text)](#SmilesDrawer.CanvasWrapper+drawDebugText)
-        * [.drawBall(x, y, elementName, hydrogens)](#SmilesDrawer.CanvasWrapper+drawBall)
+        * [.drawBall(x, y, elementName)](#SmilesDrawer.CanvasWrapper+drawBall)
+        * [.drawPoint(x, y, elementName)](#SmilesDrawer.CanvasWrapper+drawPoint)
         * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)](#SmilesDrawer.CanvasWrapper+drawText)
         * [.drawDebugPoint(x, y, [debugText], [color])](#SmilesDrawer.CanvasWrapper+drawDebugPoint)
         * [.drawAromaticityRing(ring)](#SmilesDrawer.CanvasWrapper+drawAromaticityRing)
@@ -885,7 +886,8 @@ A class wrapping a canvas element.
     * [.drawWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawWedge)
     * [.drawDashedWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawDashedWedge)
     * [.drawDebugText(x, y, text)](#SmilesDrawer.CanvasWrapper+drawDebugText)
-    * [.drawBall(x, y, elementName, hydrogens)](#SmilesDrawer.CanvasWrapper+drawBall)
+    * [.drawBall(x, y, elementName)](#SmilesDrawer.CanvasWrapper+drawBall)
+    * [.drawPoint(x, y, elementName)](#SmilesDrawer.CanvasWrapper+drawPoint)
     * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)](#SmilesDrawer.CanvasWrapper+drawText)
     * [.drawDebugPoint(x, y, [debugText], [color])](#SmilesDrawer.CanvasWrapper+drawDebugPoint)
     * [.drawAromaticityRing(ring)](#SmilesDrawer.CanvasWrapper+drawAromaticityRing)
@@ -1025,7 +1027,7 @@ Draws a debug text message at a given position
 
 <a name="SmilesDrawer.CanvasWrapper+drawBall"></a>
 
-#### canvasWrapper.drawBall(x, y, elementName, hydrogens)
+#### canvasWrapper.drawBall(x, y, elementName)
 Draw a ball to the canvas.
 
 **Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
@@ -1035,7 +1037,19 @@ Draw a ball to the canvas.
 | x | <code>Number</code> | The x position of the text. |
 | y | <code>Number</code> | The y position of the text. |
 | elementName | <code>String</code> | The name of the element (single-letter). |
-| hydrogens | <code>Number</code> | The number of hydrogen atoms. |
+
+<a name="SmilesDrawer.CanvasWrapper+drawPoint"></a>
+
+#### canvasWrapper.drawPoint(x, y, elementName)
+Draw a point to the canvas.
+
+**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| x | <code>Number</code> | The x position of the point. |
+| y | <code>Number</code> | The y position of the point. |
+| elementName | <code>String</code> | The name of the element (single-letter). |
 
 <a name="SmilesDrawer.CanvasWrapper+drawText"></a>
 

@@ -545,12 +545,12 @@ SmilesDrawer.Vector2 = class Vector2 {
      * @returns {Number} The angle in radians.
      */
     static threePointangle(vecA, vecB, vecC) {
-        let ab = SmilesDrawer.Vector2.subtract(vecB - vecA);
+        let ab = SmilesDrawer.Vector2.subtract(vecB, vecA);
         let bc = SmilesDrawer.Vector2.subtract(vecC, vecB);
         let abLength = vecA.distance(vecB);
-        let bcLenght = vecB.distance(vecC);
+        let bcLength = vecB.distance(vecC);
 
-        return Math.acos(SmilesDrawer.Vector2.dot(ab, bc) / (abLenght * bcLenght));
+        return Math.acos(SmilesDrawer.Vector2.dot(ab, bc) / (abLength * bcLength));
     }
     
     /**

@@ -1499,6 +1499,15 @@ SmilesDrawer.Drawer = class Drawer {
                 } else if (this.opts.atomVisualization === 'balls') {
                     this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
                 }
+            } else if (vertex.getNeighbourCount() === 2) {
+                // If there is a carbon which bonds are in a straight line, draw a dot
+                let a = this.graph.vertices[vertex.neighbours[0]].position;
+                let b = this.graph.vertices[vertex.neighbours[1]].position;
+                let angle = SmilesDrawer.Vector2.threePointangle(vertex.position, a, b);
+                
+                if (Math.abs(Math.PI - angle) < 0.1) {
+                    this.canvasWrapper.drawPoint(vertex.position.x, vertex.position.y, element);
+                }
             }
 
             if (debug) {
