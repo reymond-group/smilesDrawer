@@ -61,7 +61,7 @@ The SmilesDrawer namespace.
         * [.reset()](#SmilesDrawer.CanvasWrapper+reset)
         * [.getColor(key)](#SmilesDrawer.CanvasWrapper+getColor) ⇒ <code>String</code>
         * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#SmilesDrawer.CanvasWrapper+drawCircle)
-        * [.drawLine(line)](#SmilesDrawer.CanvasWrapper+drawLine)
+        * [.drawLine(line, [thickness], [dashed], [alpha])](#SmilesDrawer.CanvasWrapper+drawLine)
         * [.drawWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawWedge)
         * [.drawDashedWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawDashedWedge)
         * [.drawDebugText(x, y, text)](#SmilesDrawer.CanvasWrapper+drawDebugText)
@@ -131,7 +131,6 @@ The SmilesDrawer namespace.
         * [.isEdgeInRing(edge)](#SmilesDrawer.Drawer+isEdgeInRing) ⇒ <code>Boolean</code>
         * [.isEdgeRotatable(edge)](#SmilesDrawer.Drawer+isEdgeRotatable) ⇒ <code>Boolean</code>
         * [.isRingAromatic(ring)](#SmilesDrawer.Drawer+isRingAromatic) ⇒ <code>Boolean</code>
-        * [.isEdgeInAromaticRing(edge)](#SmilesDrawer.Drawer+isEdgeInAromaticRing) ⇒ <code>Boolean</code>
         * [.getEdgeNormals(edge)](#SmilesDrawer.Drawer+getEdgeNormals) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
         * [.getTreeDepth(vertexId, parentVertexId)](#SmilesDrawer.Drawer+getTreeDepth) ⇒ <code>Number</code>
         * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])](#SmilesDrawer.Drawer+traverseTree)
@@ -882,7 +881,7 @@ A class wrapping a canvas element.
     * [.reset()](#SmilesDrawer.CanvasWrapper+reset)
     * [.getColor(key)](#SmilesDrawer.CanvasWrapper+getColor) ⇒ <code>String</code>
     * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#SmilesDrawer.CanvasWrapper+drawCircle)
-    * [.drawLine(line)](#SmilesDrawer.CanvasWrapper+drawLine)
+    * [.drawLine(line, [thickness], [dashed], [alpha])](#SmilesDrawer.CanvasWrapper+drawLine)
     * [.drawWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawWedge)
     * [.drawDashedWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawDashedWedge)
     * [.drawDebugText(x, y, text)](#SmilesDrawer.CanvasWrapper+drawDebugText)
@@ -975,14 +974,17 @@ Draws a circle to a canvas context.
 
 <a name="SmilesDrawer.CanvasWrapper+drawLine"></a>
 
-#### canvasWrapper.drawLine(line)
+#### canvasWrapper.drawLine(line, [thickness], [dashed], [alpha])
 Draw a line to a canvas.
 
 **Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| line | <code>[Line](#SmilesDrawer.Line)</code> | A line. |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| line | <code>[Line](#SmilesDrawer.Line)</code> |  | A line. |
+| [thickness] | <code>Number</code> | <code>1.5</code> | The thickness of the line. |
+| [dashed] | <code>Boolean</code> | <code>false</code> | Whether or not the line is dashed. |
+| [alpha] | <code>Number</code> | <code>1.0</code> | The alpha value of the color. |
 
 <a name="SmilesDrawer.CanvasWrapper+drawWedge"></a>
 
@@ -1169,7 +1171,6 @@ The main class of the application representing the smiles drawer
     * [.isEdgeInRing(edge)](#SmilesDrawer.Drawer+isEdgeInRing) ⇒ <code>Boolean</code>
     * [.isEdgeRotatable(edge)](#SmilesDrawer.Drawer+isEdgeRotatable) ⇒ <code>Boolean</code>
     * [.isRingAromatic(ring)](#SmilesDrawer.Drawer+isRingAromatic) ⇒ <code>Boolean</code>
-    * [.isEdgeInAromaticRing(edge)](#SmilesDrawer.Drawer+isEdgeInAromaticRing) ⇒ <code>Boolean</code>
     * [.getEdgeNormals(edge)](#SmilesDrawer.Drawer+getEdgeNormals) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
     * [.getTreeDepth(vertexId, parentVertexId)](#SmilesDrawer.Drawer+getTreeDepth) ⇒ <code>Number</code>
     * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])](#SmilesDrawer.Drawer+traverseTree)
@@ -1827,18 +1828,6 @@ Check whether or not a ring is an implicitly defined aromatic ring (lower case s
 | --- | --- | --- |
 | ring | <code>[Ring](#SmilesDrawer.Ring)</code> | A ring. |
 
-<a name="SmilesDrawer.Drawer+isEdgeInAromaticRing"></a>
-
-#### drawer.isEdgeInAromaticRing(edge) ⇒ <code>Boolean</code>
-Checks whether or not an edge is part of an explicit aromatic ring (lower case smiles).
-
-**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not the vertex is part of an explicit aromatic ring.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| edge | <code>[Edge](#SmilesDrawer.Edge)</code> | An edge. |
-
 <a name="SmilesDrawer.Drawer+getEdgeNormals"></a>
 
 #### drawer.getEdgeNormals(edge) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
@@ -1924,7 +1913,7 @@ A class representing an edge.
 | targetId | <code>Number</code> |  | The id of the target vertex. |
 | weight | <code>Number</code> |  | The weight of this edge. |
 | bondType | <code>String</code> | <code>&#x27;-&#x27;</code> | The bond type of this edge. |
-| isInAromaticRing | <code>Boolean</code> | <code>false</code> | Whether or not this edge is part of an aromatic ring. |
+| isPartOfAromaticRing | <code>Boolean</code> | <code>false</code> | Whether or not this edge is part of an aromatic ring. |
 | center | <code>Boolean</code> | <code>false</code> | Wheter or not the bond is centered. For example, this affects straight double bonds. |
 | chiral | <code>String</code> | <code>&#x27;&#x27;</code> | Chirality information. |
 
@@ -2646,6 +2635,7 @@ A class representing a ring.
 | center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The center of this ring. |
 | rings | <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code> | The rings contained within this ring if this ring is bridged. |
 | isBridged | <code>Boolean</code> | A boolean whether or not this ring is bridged. |
+| isPartOfBridged | <code>Boolean</code> | A boolean whether or not this ring is part of a bridge ring. |
 | isSpiro | <code>Boolean</code> | A boolean whether or not this ring is part of a spiro. |
 | isFused | <code>Boolean</code> | A boolean whether or not this ring is part of a fused ring. |
 | centralAngle | <code>Number</code> | The central angle of this ring. |

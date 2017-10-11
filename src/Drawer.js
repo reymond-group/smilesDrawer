@@ -34,6 +34,7 @@ SmilesDrawer.Drawer = class Drawer {
             isomeric: false,
             debug: false,
             terminalCarbons: false,
+            explicitHydrogens: false, // TODO: Add to doc
             compactDrawing: true,
             fontSizeLarge: 6,
             fontSizeSmall: 4,
@@ -139,6 +140,14 @@ SmilesDrawer.Drawer = class Drawer {
         this.bridgedRing = false;
 
         this.initRings();
+
+        if (!this.explicitHydrogens) {
+            for (var i = 0; i < this.graph.vertices.length; i++) {
+                if (this.graph.vertices[i].value.element === 'H') {
+                    this.graph.vertices[i].value.isDrawn = false;
+                }
+            }
+        }
         
         if (this.opts.isomeric) {
             this.annotateChirality();
@@ -591,6 +600,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         for (var i = 0; i < ringIds.length; i++) {
             let ring = this.getRing(ringIds[i]);
+            ring.isPartOfBridged = true;
             
             for (var j = 0; j < ring.members.length; j++) {
                 vertices.push(ring.members[j]);
@@ -1278,11 +1288,13 @@ SmilesDrawer.Drawer = class Drawer {
         });
 
         // Draw ring for implicitly defined aromatic rings
-        for (var i = 0; i < this.rings.length; i++) {
-            let ring = this.rings[i];
-
-            if (this.isRingAromatic(ring)) {
-                this.canvasWrapper.drawAromaticityRing(ring);
+        if (!this.bridgedRing) {
+            for (var i = 0; i < this.rings.length; i++) {
+                let ring = this.rings[i];
+                
+                if (this.isRingAromatic(ring)) {
+                    this.canvasWrapper.drawAromaticityRing(ring);
+                }
             }
         }
     }
@@ -1295,7 +1307,6 @@ SmilesDrawer.Drawer = class Drawer {
      */
     drawEdge(edgeId, debug) {
         let that = this;
-
         let edge = this.graph.edges[edgeId];
         let vertexA = this.graph.vertices[edge.sourceId];
         let vertexB = this.graph.vertices[edge.targetId];
@@ -1316,7 +1327,8 @@ SmilesDrawer.Drawer = class Drawer {
         sides[0].multiplyScalar(10).add(a);
         sides[1].multiplyScalar(10).add(a);
 
-        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=') {
+        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || 
+            (edge.isPartOfAromaticRing && this.bridgedRing)) {
             // Always draw double bonds inside the ring
             let inRing = this.areVerticesInSameRing(vertexA, vertexB);
             let s = this.chooseSide(vertexA, vertexB, sides);
@@ -1344,7 +1356,11 @@ SmilesDrawer.Drawer = class Drawer {
                 line.shorten(this.opts.bondLength - this.opts.shortBondLength);
 
                 // The shortened edge
-                this.canvasWrapper.drawLine(line);
+                if (edge.isPartOfAromaticRing) {
+                    this.canvasWrapper.drawLine(line, 0.5, true, 0.25);
+                } else {
+                    this.canvasWrapper.drawLine(line);
+                }
 
                 // The normal edge
                 this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
@@ -2602,19 +2618,6 @@ SmilesDrawer.Drawer = class Drawer {
         }
 
         return true;
-    }
-
-    /**
-     * Checks whether or not an edge is part of an explicit aromatic ring (lower case smiles).
-     *
-     * @param {SmilesDrawer.Edge} edge An edge.
-     * @returns {Boolean} A boolean indicating whether or not the vertex is part of an explicit aromatic ring.
-     */
-    isEdgeInAromaticRing(edge) {
-        let source = this.graph.vertices[edge.sourceId].value;
-        let target = this.graph.vertices[edge.targetId].value;
-
-        return source.isPartOfAromaticRing && target.isPartOfAromaticRing;
     }
 
     /**

@@ -6,7 +6,7 @@
  * @property {Number} targetId The id of the target vertex.
  * @property {Number} weight The weight of this edge.
  * @property {String} [bondType='-'] The bond type of this edge.
- * @property {Boolean} [isInAromaticRing=false] Whether or not this edge is part of an aromatic ring.
+ * @property {Boolean} [isPartOfAromaticRing=false] Whether or not this edge is part of an aromatic ring.
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
  * @property {String} [chiral=''] Chirality information.
  */
@@ -24,7 +24,7 @@ SmilesDrawer.Edge = class Edge {
         this.targetId = targetId;
         this.weight = weight;
         this.bondType = '-';
-        this.isInAromaticRing = false;
+        this.isPartOfAromaticRing = false;
         this.center = false;
         this.chiral = '';
     }

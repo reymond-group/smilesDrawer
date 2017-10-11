@@ -1499,11 +1499,18 @@ SmilesDrawer.Atom.mass = {
          * Draw a line to a canvas.
          *
          * @param {SmilesDrawer.Line} line A line.
+         * @param {Number} [thickness=1.5] The thickness of the line.
+         * @param {Boolean} [dashed=false] Whether or not the line is dashed.
+         * @param {Number} [alpha=1.0] The alpha value of the color.
          */
 
     }, {
         key: 'drawLine',
         value: function drawLine(line) {
+            var thickness = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1.5;
+            var dashed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+            var alpha = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1.0;
+
             if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
                 return;
             }
@@ -1525,18 +1532,19 @@ SmilesDrawer.Atom.mass = {
             r.y += offsetY;
 
             // Draw the "shadow"
-
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath();
-            ctx.moveTo(l.x, l.y);
-            ctx.lineTo(r.x, r.y);
-            ctx.lineCap = 'round';
-            ctx.lineWidth = 2.5;
-            ctx.strokeStyle = this.getColor('BACKGROUND');
-            ctx.stroke();
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.restore();
+            if (!dashed) {
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.moveTo(l.x, l.y);
+                ctx.lineTo(r.x, r.y);
+                ctx.lineCap = 'round';
+                ctx.lineWidth = thickness * 2.0;
+                ctx.strokeStyle = this.getColor('BACKGROUND');
+                ctx.stroke();
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.restore();
+            }
 
             l = line.getLeftVector().clone();
             r = line.getRightVector().clone();
@@ -1552,11 +1560,19 @@ SmilesDrawer.Atom.mass = {
             ctx.moveTo(l.x, l.y);
             ctx.lineTo(r.x, r.y);
             ctx.lineCap = 'round';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = thickness;
 
             var gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
             gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || this.getColor('C'));
             gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
+
+            if (dashed) {
+                ctx.setLineDash([1, 1]);
+            }
+
+            if (alpha < 1.0) {
+                ctx.globalAlpha = alpha;
+            }
 
             ctx.strokeStyle = gradient;
 
@@ -2165,6 +2181,7 @@ SmilesDrawer.Drawer = function () {
             isomeric: false,
             debug: false,
             terminalCarbons: false,
+            explicitHydrogens: false, // TODO: Add to doc
             compactDrawing: true,
             fontSizeLarge: 6,
             fontSizeSmall: 4,
@@ -2279,6 +2296,14 @@ SmilesDrawer.Drawer = function () {
             this.bridgedRing = false;
 
             this.initRings();
+
+            if (!this.explicitHydrogens) {
+                for (var i = 0; i < this.graph.vertices.length; i++) {
+                    if (this.graph.vertices[i].value.element === 'H') {
+                        this.graph.vertices[i].value.isDrawn = false;
+                    }
+                }
+            }
 
             if (this.opts.isomeric) {
                 this.annotateChirality();
@@ -2769,6 +2794,7 @@ SmilesDrawer.Drawer = function () {
 
             for (var i = 0; i < ringIds.length; i++) {
                 var _ring4 = this.getRing(ringIds[i]);
+                _ring4.isPartOfBridged = true;
 
                 for (var j = 0; j < _ring4.members.length; j++) {
                     vertices.push(_ring4.members[j]);
@@ -3522,11 +3548,13 @@ SmilesDrawer.Drawer = function () {
             });
 
             // Draw ring for implicitly defined aromatic rings
-            for (var i = 0; i < this.rings.length; i++) {
-                var ring = this.rings[i];
+            if (!this.bridgedRing) {
+                for (var i = 0; i < this.rings.length; i++) {
+                    var ring = this.rings[i];
 
-                if (this.isRingAromatic(ring)) {
-                    this.canvasWrapper.drawAromaticityRing(ring);
+                    if (this.isRingAromatic(ring)) {
+                        this.canvasWrapper.drawAromaticityRing(ring);
+                    }
                 }
             }
         }
@@ -3542,7 +3570,6 @@ SmilesDrawer.Drawer = function () {
         key: 'drawEdge',
         value: function drawEdge(edgeId, debug) {
             var that = this;
-
             var edge = this.graph.edges[edgeId];
             var vertexA = this.graph.vertices[edge.sourceId];
             var vertexB = this.graph.vertices[edge.targetId];
@@ -3563,7 +3590,7 @@ SmilesDrawer.Drawer = function () {
             sides[0].multiplyScalar(10).add(a);
             sides[1].multiplyScalar(10).add(a);
 
-            if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=') {
+            if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || edge.isPartOfAromaticRing && this.bridgedRing) {
                 // Always draw double bonds inside the ring
                 var inRing = this.areVerticesInSameRing(vertexA, vertexB);
                 var s = this.chooseSide(vertexA, vertexB, sides);
@@ -3591,7 +3618,11 @@ SmilesDrawer.Drawer = function () {
                     line.shorten(this.opts.bondLength - this.opts.shortBondLength);
 
                     // The shortened edge
-                    this.canvasWrapper.drawLine(line);
+                    if (edge.isPartOfAromaticRing) {
+                        this.canvasWrapper.drawLine(line, 0.5, true, 0.25);
+                    } else {
+                        this.canvasWrapper.drawLine(line);
+                    }
 
                     // The normal edge
                     this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
@@ -4906,22 +4937,6 @@ SmilesDrawer.Drawer = function () {
         }
 
         /**
-         * Checks whether or not an edge is part of an explicit aromatic ring (lower case smiles).
-         *
-         * @param {SmilesDrawer.Edge} edge An edge.
-         * @returns {Boolean} A boolean indicating whether or not the vertex is part of an explicit aromatic ring.
-         */
-
-    }, {
-        key: 'isEdgeInAromaticRing',
-        value: function isEdgeInAromaticRing(edge) {
-            var source = this.graph.vertices[edge.sourceId].value;
-            var target = this.graph.vertices[edge.targetId].value;
-
-            return source.isPartOfAromaticRing && target.isPartOfAromaticRing;
-        }
-
-        /**
          * Get the normals of an edge.
          *
          * @param {SmilesDrawer.Edge} edge An edge.
@@ -5181,7 +5196,7 @@ SmilesDrawer.Drawer = function () {
  * @property {Number} targetId The id of the target vertex.
  * @property {Number} weight The weight of this edge.
  * @property {String} [bondType='-'] The bond type of this edge.
- * @property {Boolean} [isInAromaticRing=false] Whether or not this edge is part of an aromatic ring.
+ * @property {Boolean} [isPartOfAromaticRing=false] Whether or not this edge is part of an aromatic ring.
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
  * @property {String} [chiral=''] Chirality information.
  */
@@ -5203,7 +5218,7 @@ SmilesDrawer.Edge = function () {
         this.targetId = targetId;
         this.weight = weight;
         this.bondType = '-';
-        this.isInAromaticRing = false;
+        this.isPartOfAromaticRing = false;
         this.center = false;
         this.chiral = '';
     }
@@ -5415,6 +5430,7 @@ SmilesDrawer.Graph = function () {
 
             this.vertexIdsToEdgeId[edge.sourceId + '_' + edge.targetId] = edge.id;
             this.vertexIdsToEdgeId[edge.targetId + '_' + edge.sourceId] = edge.id;
+            edge.isPartOfAromaticRing = this.vertices[edge.sourceId].value.isPartOfAromaticRing && this.vertices[edge.targetId].value.isPartOfAromaticRing;
 
             return edge.id;
         }
@@ -5957,7 +5973,7 @@ SmilesDrawer.Graph = function () {
             // Setting parameters
             var threshold = 0.01;
             var innerThreshold = 1.0;
-            var maxIteration = 500;
+            var maxIteration = 1000;
             var maxInnerIteration = 10;
             var maxEnergy = 1e9;
 
@@ -8434,6 +8450,7 @@ SmilesDrawer.Parser = function () {
  * @property {SmilesDrawer.Vector2} center The center of this ring.
  * @property {SmilesDrawer.Ring[]} rings The rings contained within this ring if this ring is bridged.
  * @property {Boolean} isBridged A boolean whether or not this ring is bridged.
+ * @property {Boolean} isPartOfBridged A boolean whether or not this ring is part of a bridge ring.
  * @property {Boolean} isSpiro A boolean whether or not this ring is part of a spiro.
  * @property {Boolean} isFused A boolean whether or not this ring is part of a fused ring.
  * @property {Number} centralAngle The central angle of this ring.
@@ -8457,6 +8474,7 @@ SmilesDrawer.Ring = function () {
         this.center = new SmilesDrawer.Vector2();
         this.rings = [];
         this.isBridged = false;
+        this.isPartOfBridged = false;
         this.isSpiro = false;
         this.isFused = false;
         this.centralAngle = 0.0;
@@ -8482,6 +8500,7 @@ SmilesDrawer.Ring = function () {
             clone.center = this.center.clone();
             clone.rings = SmilesDrawer.ArrayHelper.clone(this.rings);
             clone.isBridged = this.isBridged;
+            clone.isPartOfBridged = this.isPartOfBridged;
             clone.isSpiro = this.isSpiro;
             clone.isFused = this.isFused;
             clone.centralAngle = this.centralAngle;

@@ -145,6 +145,7 @@ SmilesDrawer.Graph = class Graph {
 
         this.vertexIdsToEdgeId[edge.sourceId + '_' + edge.targetId] = edge.id;
         this.vertexIdsToEdgeId[edge.targetId + '_' + edge.sourceId] = edge.id;
+        edge.isPartOfAromaticRing = this.vertices[edge.sourceId].value.isPartOfAromaticRing && this.vertices[edge.targetId].value.isPartOfAromaticRing;
 
         return edge.id;
     }
@@ -643,7 +644,7 @@ SmilesDrawer.Graph = class Graph {
         // Setting parameters
         let threshold = 0.01;
         let innerThreshold = 1.0;
-        let maxIteration = 500;
+        let maxIteration = 1000;
         let maxInnerIteration = 10;
         let maxEnergy = 1e9;
 

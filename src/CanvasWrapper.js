@@ -197,8 +197,11 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
      * Draw a line to a canvas.
      *
      * @param {SmilesDrawer.Line} line A line.
+     * @param {Number} [thickness=1.5] The thickness of the line.
+     * @param {Boolean} [dashed=false] Whether or not the line is dashed.
+     * @param {Number} [alpha=1.0] The alpha value of the color.
      */
-    drawLine(line) {
+    drawLine(line, thickness = 1.5, dashed = false, alpha = 1.0) {
         if (isNaN(line.from.x) || isNaN(line.from.y) ||
             isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
@@ -221,18 +224,19 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         r.y += offsetY;
 
         // Draw the "shadow"
-        
-        ctx.save();
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.moveTo(l.x, l.y);
-        ctx.lineTo(r.x, r.y);
-        ctx.lineCap = 'round';
-        ctx.lineWidth = 2.5;
-        ctx.strokeStyle = this.getColor('BACKGROUND');
-        ctx.stroke();
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.restore();
+        if (!dashed) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.moveTo(l.x, l.y);
+            ctx.lineTo(r.x, r.y);
+            ctx.lineCap = 'round';
+            ctx.lineWidth = thickness * 2.0;
+            ctx.strokeStyle = this.getColor('BACKGROUND');
+            ctx.stroke();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.restore();
+        }
         
         l = line.getLeftVector().clone();
         r = line.getRightVector().clone();
@@ -248,13 +252,21 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         ctx.moveTo(l.x, l.y);
         ctx.lineTo(r.x, r.y);
         ctx.lineCap = 'round';
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = thickness;
 
         let gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
         gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
             this.getColor('C'));
         gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
             this.getColor('C'));
+
+        if (dashed) {
+            ctx.setLineDash([1, 1]);
+        }
+
+        if (alpha < 1.0) {
+            ctx.globalAlpha = alpha;
+        }
 
         ctx.strokeStyle = gradient;
 

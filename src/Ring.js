@@ -10,6 +10,7 @@
  * @property {SmilesDrawer.Vector2} center The center of this ring.
  * @property {SmilesDrawer.Ring[]} rings The rings contained within this ring if this ring is bridged.
  * @property {Boolean} isBridged A boolean whether or not this ring is bridged.
+ * @property {Boolean} isPartOfBridged A boolean whether or not this ring is part of a bridge ring.
  * @property {Boolean} isSpiro A boolean whether or not this ring is part of a spiro.
  * @property {Boolean} isFused A boolean whether or not this ring is part of a fused ring.
  * @property {Number} centralAngle The central angle of this ring.
@@ -31,6 +32,7 @@ SmilesDrawer.Ring = class Ring {
         this.center = new SmilesDrawer.Vector2();
         this.rings = [];
         this.isBridged = false;
+        this.isPartOfBridged = false;
         this.isSpiro = false;
         this.isFused = false;
         this.centralAngle = 0.0;
@@ -52,6 +54,7 @@ SmilesDrawer.Ring = class Ring {
         clone.center = this.center.clone();
         clone.rings = SmilesDrawer.ArrayHelper.clone(this.rings);
         clone.isBridged = this.isBridged;
+        clone.isPartOfBridged = this.isPartOfBridged;
         clone.isSpiro = this.isSpiro;
         clone.isFused = this.isFused;
         clone.centralAngle = this.centralAngle;
