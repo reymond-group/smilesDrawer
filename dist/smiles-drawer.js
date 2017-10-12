@@ -9017,16 +9017,28 @@ SmilesDrawer.SSSR = function () {
                 var connectedComponent = connectedComponents[i];
                 var ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix(connectedComponent);
 
+                var arrBondCount = Array(ccAdjacencyMatrix.length);
+                var arrRingCount = Array(ccAdjacencyMatrix.length);
+
+                for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
+                    arrRingCount[j] = 0;
+                    arrBondCount[j] = 0;
+
+                    for (var k = 0; k < ccAdjacencyMatrix[j].length; k++) {
+                        arrBondCount[j] += ccAdjacencyMatrix[j][k];
+                    }
+                }
+
                 // Get the edge list and the theoretical number of rings in SSSR
                 var nSssr = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length - ccAdjacencyMatrix.length + 1;
 
                 var _SmilesDrawer$SSSR$ge = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix),
                     d = _SmilesDrawer$SSSR$ge.d,
-                    pe1 = _SmilesDrawer$SSSR$ge.pe1,
-                    pe2 = _SmilesDrawer$SSSR$ge.pe2;
+                    pe = _SmilesDrawer$SSSR$ge.pe,
+                    pe_prime = _SmilesDrawer$SSSR$ge.pe_prime;
 
-                var c = SmilesDrawer.SSSR.getRingCandidates(d, pe1, pe2);
-                var sssr = SmilesDrawer.SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe1, pe2, nSssr);
+                var c = SmilesDrawer.SSSR.getRingCandidates(d, pe, pe_prime);
+                var sssr = SmilesDrawer.SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
 
                 for (var _i4 = 0; _i4 < sssr.length; _i4++) {
                     var ring = new Array(sssr[_i4].length);
@@ -9101,27 +9113,27 @@ SmilesDrawer.SSSR = function () {
         value: function getPathIncludedDistanceMatrices(adjacencyMatrix) {
             var length = adjacencyMatrix.length;
             var d = Array(length);
-            var pe1 = Array(length);
-            var pe2 = Array(length);
+            var pe = Array(length);
+            var pe_prime = Array(length);
             var l = 0;
             var m = 0;
             var n = 0;
 
             for (var i = 0; i < length; i++) {
                 d[i] = Array(length);
-                pe1[i] = Array(length);
-                pe2[i] = Array(length);
+                pe[i] = Array(length);
+                pe_prime[i] = Array(length);
 
                 for (var j = 0; j < length; j++) {
                     d[i][j] = i === j || adjacencyMatrix[i][j] === 1 ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
 
                     if (d[i][j] === 1) {
-                        pe1[i][j] = [[[i, j]]];
+                        pe[i][j] = [[[i, j]]];
                     } else {
-                        pe1[i][j] = [];
+                        pe[i][j] = [];
                     }
 
-                    pe2[i][j] = [];
+                    pe_prime[i][j] = [];
                 }
             }
 
@@ -9133,79 +9145,79 @@ SmilesDrawer.SSSR = function () {
 
                         if (previousPathLength > newPathLength) {
                             if (previousPathLength === newPathLength + 1) {
-                                pe2[_i5][_j2] = [pe1[_i5][_j2].length];
-                                for (l = 0; l < pe1[_i5][_j2].length; l++) {
-                                    pe2[_i5][_j2][l] = [pe1[_i5][_j2][l].length];
-                                    for (m = 0; m < pe1[_i5][_j2][l].length; m++) {
-                                        pe2[_i5][_j2][l][m] = [pe1[_i5][_j2][l][m].length];
-                                        for (n = 0; n < pe1[_i5][_j2][l][m].length; n++) {
-                                            pe2[_i5][_j2][l][m][n] = [pe1[_i5][_j2][l][m][0], pe1[_i5][_j2][l][m][1]];
+                                pe_prime[_i5][_j2] = [pe[_i5][_j2].length];
+                                for (l = 0; l < pe[_i5][_j2].length; l++) {
+                                    pe_prime[_i5][_j2][l] = [pe[_i5][_j2][l].length];
+                                    for (m = 0; m < pe[_i5][_j2][l].length; m++) {
+                                        pe_prime[_i5][_j2][l][m] = [pe[_i5][_j2][l][m].length];
+                                        for (n = 0; n < pe[_i5][_j2][l][m].length; n++) {
+                                            pe_prime[_i5][_j2][l][m][n] = [pe[_i5][_j2][l][m][0], pe[_i5][_j2][l][m][1]];
                                         }
                                     }
                                 }
                             } else {
-                                pe2[_i5][_j2] = [];
+                                pe_prime[_i5][_j2] = [];
                             }
 
                             d[_i5][_j2] = newPathLength;
 
-                            pe1[_i5][_j2] = [[]];
+                            pe[_i5][_j2] = [[]];
 
-                            for (l = 0; l < pe1[_i5][k][0].length; l++) {
-                                pe1[_i5][_j2][0].push(pe1[_i5][k][0][l]);
+                            for (l = 0; l < pe[_i5][k][0].length; l++) {
+                                pe[_i5][_j2][0].push(pe[_i5][k][0][l]);
                             }
-                            for (l = 0; l < pe1[k][_j2][0].length; l++) {
-                                pe1[_i5][_j2][0].push(pe1[k][_j2][0][l]);
+                            for (l = 0; l < pe[k][_j2][0].length; l++) {
+                                pe[_i5][_j2][0].push(pe[k][_j2][0][l]);
                             }
                         } else if (previousPathLength === newPathLength) {
-                            if (pe1[_i5][k].length && pe1[k][_j2].length) {
-                                if (pe1[_i5][_j2].length) {
+                            if (pe[_i5][k].length && pe[k][_j2].length) {
+                                if (pe[_i5][_j2].length) {
                                     var tmp = [];
 
-                                    for (l = 0; l < pe1[_i5][k][0].length; l++) {
-                                        tmp.push(pe1[_i5][k][0][l]);
+                                    for (l = 0; l < pe[_i5][k][0].length; l++) {
+                                        tmp.push(pe[_i5][k][0][l]);
                                     }
-                                    for (l = 0; l < pe1[k][_j2][0].length; l++) {
-                                        tmp.push(pe1[k][_j2][0][l]);
+                                    for (l = 0; l < pe[k][_j2][0].length; l++) {
+                                        tmp.push(pe[k][_j2][0][l]);
                                     }
 
-                                    pe1[_i5][_j2].push(tmp);
+                                    pe[_i5][_j2].push(tmp);
                                 } else {
                                     var _tmp = [];
 
-                                    for (l = 0; l < pe1[_i5][k][0].length; l++) {
-                                        _tmp.push(pe1[_i5][k][0][l]);
+                                    for (l = 0; l < pe[_i5][k][0].length; l++) {
+                                        _tmp.push(pe[_i5][k][0][l]);
                                     }
-                                    for (l = 0; l < pe1[k][_j2][0].length; l++) {
-                                        _tmp.push(pe1[k][_j2][0][l]);
+                                    for (l = 0; l < pe[k][_j2][0].length; l++) {
+                                        _tmp.push(pe[k][_j2][0][l]);
                                     }
 
-                                    pe1[_i5][_j2][0] = _tmp;
+                                    pe[_i5][_j2][0] = _tmp;
                                 }
                             }
                         } else if (previousPathLength === newPathLength - 1) {
-                            if (pe2[_i5][_j2].length) {
+                            if (pe_prime[_i5][_j2].length) {
                                 var _tmp2 = [];
 
-                                for (var l = 0; l < pe1[_i5][k][0].length; l++) {
-                                    _tmp2.push(pe1[_i5][k][0][l]);
+                                for (var l = 0; l < pe[_i5][k][0].length; l++) {
+                                    _tmp2.push(pe[_i5][k][0][l]);
                                 }
-                                for (var l = 0; l < pe1[k][_j2][0].length; l++) {
-                                    _tmp2.push(pe1[k][_j2][0][l]);
+                                for (var l = 0; l < pe[k][_j2][0].length; l++) {
+                                    _tmp2.push(pe[k][_j2][0][l]);
                                 }
 
-                                pe2[_i5][_j2].push(_tmp2);
+                                pe_prime[_i5][_j2].push(_tmp2);
                             } else {
                                 var _tmp3 = [];
 
-                                for (var l = 0; l < pe1[_i5][k][0].length; l++) {
-                                    _tmp3.push(pe1[_i5][k][0][l]);
+                                for (var l = 0; l < pe[_i5][k][0].length; l++) {
+                                    _tmp3.push(pe[_i5][k][0][l]);
                                 }
-                                for (var l = 0; l < pe1[k][_j2][0].length; l++) {
-                                    _tmp3.push(pe1[k][_j2][0][l]);
+                                for (var l = 0; l < pe[k][_j2][0].length; l++) {
+                                    _tmp3.push(pe[k][_j2][0][l]);
                                 }
 
-                                pe2[_i5][_j2][0] = _tmp3;
+                                pe_prime[_i5][_j2][0] = _tmp3;
                             }
                         }
                     }
@@ -9214,8 +9226,8 @@ SmilesDrawer.SSSR = function () {
 
             return {
                 d: d,
-                pe1: pe1,
-                pe2: pe2
+                pe: pe,
+                pe_prime: pe_prime
             };
         }
 
@@ -9223,32 +9235,32 @@ SmilesDrawer.SSSR = function () {
          * Get the ring candidates from the path-included distance matrices.
          * 
          * @param {Array[]} d The distance matrix.
-         * @param {Array[]} pe1 A matrix containing the shortest paths.
-         * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
+         * @param {Array[]} pe A matrix containing the shortest paths.
+         * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
          * @returns {Array[]} The ring candidates.
          */
 
     }, {
         key: 'getRingCandidates',
-        value: function getRingCandidates(d, pe1, pe2) {
+        value: function getRingCandidates(d, pe, pe_prime) {
             var length = d.length;
             var candidates = [];
             var c = 0;
 
             for (var i = 0; i < length; i++) {
                 for (var j = 0; j < length; j++) {
-                    if (d[i][j] === 0 || pe1[i][j].length === 1 && pe2[i][j] === 0) {
+                    if (d[i][j] === 0 || pe[i][j].length === 1 && pe_prime[i][j] === 0) {
                         continue;
                     } else {
                         // c is the number of vertices in the cycle.
-                        if (pe2[i][j].length !== 0) {
+                        if (pe_prime[i][j].length !== 0) {
                             c = 2 * (d[i][j] + 0.5);
                         } else {
                             c = 2 * d[i][j];
                         }
 
                         if (c !== Infinity) {
-                            candidates.push([c, pe1[i][j], pe2[i][j]]);
+                            candidates.push([c, pe[i][j], pe_prime[i][j]]);
                         }
                     }
                 }
@@ -9268,15 +9280,17 @@ SmilesDrawer.SSSR = function () {
          * @param {Array[]} c The candidates.
          * @param {Array[]} d The distance matrix.
          * @param {Array[]} adjacencyMatrix An adjacency matrix.
-         * @param {Array[]} pe1 A matrix containing the shortest paths.
-         * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
+         * @param {Array[]} pe A matrix containing the shortest paths.
+         * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
+         * @param {Array[]} arrBondCount A matrix containing the bond count of each vertex.
+         * @param {Array[]} arrRingCount A matrix containing the number of rings associated with each vertex.
          * @param {Number} nsssr The theoretical number of rings in the graph.
          * @returns {Set[]} The smallest set of smallest rings.
          */
 
     }, {
         key: 'getSSSR',
-        value: function getSSSR(c, d, adjacencyMatrix, pe1, pe2, nsssr) {
+        value: function getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) {
             var cSssr = [];
             var allBonds = [];
 
@@ -9285,14 +9299,15 @@ SmilesDrawer.SSSR = function () {
                     for (var j = 0; j < c[i][2].length; j++) {
                         var bonds = c[i][1][0].concat(c[i][2][j]);
                         // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
-                        // TODO: This is a workaround, fix later.
+                        // TODO: This is a workaround, fix later. Probably should be a set rather than an array, however the computational overhead
+                        //       is probably bigger compared to leaving it like this.
                         for (var k = 0; k < bonds.length; k++) {
                             if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
                         }
 
                         var atoms = SSSR.bondsToAtoms(bonds);
 
-                        if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds)) {
+                        if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds, arrBondCount, arrRingCount)) {
                             cSssr.push(atoms);
                             allBonds = allBonds.concat(bonds);
                         }
@@ -9305,14 +9320,15 @@ SmilesDrawer.SSSR = function () {
                     for (var _j3 = 0; _j3 < c[i][1].length - 1; _j3++) {
                         var _bonds = c[i][1][_j3].concat(c[i][1][_j3 + 1]);
                         // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
-                        // TODO: This is a workaround, fix later.
+                        // TODO: This is a workaround, fix later. Probably should be a set rather than an array, however the computational overhead
+                        //       is probably bigger compared to leaving it like this.
                         for (var k = 0; k < _bonds.length; k++) {
                             if (_bonds[k][0].constructor === Array) _bonds[k] = _bonds[k][0];
                         }
 
                         var _atoms = SSSR.bondsToAtoms(_bonds);
 
-                        if (SSSR.getBondCount(_atoms, adjacencyMatrix) === _atoms.size && !SSSR.pathSetsContain(cSssr, _atoms, _bonds, allBonds)) {
+                        if (SSSR.getBondCount(_atoms, adjacencyMatrix) === _atoms.size && !SSSR.pathSetsContain(cSssr, _atoms, _bonds, allBonds, arrBondCount, arrRingCount)) {
                             cSssr.push(_atoms);
                             allBonds = allBonds.concat(_bonds);
                         }
@@ -9466,12 +9482,14 @@ SmilesDrawer.SSSR = function () {
          * @param {Set<Number>} pathSet A set representing a path.
          * @param {Array[]} bonds The bonds associated with the current path.
          * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
+         * @param {Array[]} arrBondCount A matrix containing the bond count of each vertex.
+         * @param {Array[]} arrRingCount A matrix containing the number of rings associated with each vertex.
          * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
          */
 
     }, {
         key: 'pathSetsContain',
-        value: function pathSetsContain(pathSets, pathSet, bonds, allBonds) {
+        value: function pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) {
             for (var _i6 = 0; _i6 < pathSets.length; _i6++) {
                 if (SSSR.isSupersetOf(pathSet, pathSets[_i6])) {
                     return true;
@@ -9489,6 +9507,7 @@ SmilesDrawer.SSSR = function () {
             // Check if the edges from the candidate are already all contained within the paths of the set of paths.
             // TODO: For some reason, this does not replace the isSupersetOf method above -> why?
             var count = 0;
+            var allContained = false;
             for (var i = 0; i < bonds.length; i++) {
                 for (var j = 0; j < allBonds.length; j++) {
                     if (bonds[i][0] === allBonds[j][0] && bonds[i][1] === allBonds[j][1] || bonds[i][1] === allBonds[j][0] && bonds[i][0] === allBonds[j][1]) {
@@ -9496,7 +9515,68 @@ SmilesDrawer.SSSR = function () {
                     }
 
                     if (count === bonds.length) {
-                        return true;
+                        allContained = true;
+                    }
+                }
+            }
+
+            // If all the bonds and thus vertices are already contained within other rings
+            // check if there's one vertex with ringCount < bondCount - 1
+            var specialCase = false;
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+                for (var _iterator5 = pathSet[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var _element4 = _step5.value;
+
+                    if (arrRingCount[_element4] < arrBondCount[_element4]) {
+                        specialCase = true;
+                        break;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
+                    }
+                } finally {
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
+                    }
+                }
+            }
+
+            if (allContained && !specialCase) {
+                return true;
+            }
+
+            // Update the ring counts for the vertices
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+                for (var _iterator6 = pathSet[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var _element5 = _step6.value;
+
+                    arrRingCount[_element5]++;
+                }
+            } catch (err) {
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
+                    }
+                } finally {
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
                     }
                 }
             }
@@ -9519,29 +9599,29 @@ SmilesDrawer.SSSR = function () {
                 return false;
             }
 
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
 
             try {
-                for (var _iterator5 = setA[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var _element4 = _step5.value;
+                for (var _iterator7 = setA[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var _element6 = _step7.value;
 
-                    if (!setB.has(_element4)) {
+                    if (!setB.has(_element6)) {
                         return false;
                     }
                 }
             } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
+                _didIteratorError7 = true;
+                _iteratorError7 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                        _iterator5.return();
+                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                        _iterator7.return();
                     }
                 } finally {
-                    if (_didIteratorError5) {
-                        throw _iteratorError5;
+                    if (_didIteratorError7) {
+                        throw _iteratorError7;
                     }
                 }
             }
@@ -9560,29 +9640,29 @@ SmilesDrawer.SSSR = function () {
     }, {
         key: 'isSupersetOf',
         value: function isSupersetOf(setA, setB) {
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
+            var _iteratorNormalCompletion8 = true;
+            var _didIteratorError8 = false;
+            var _iteratorError8 = undefined;
 
             try {
-                for (var _iterator6 = setB[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                    var element = _step6.value;
+                for (var _iterator8 = setB[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                    var element = _step8.value;
 
                     if (!setA.has(element)) {
                         return false;
                     }
                 }
             } catch (err) {
-                _didIteratorError6 = true;
-                _iteratorError6 = err;
+                _didIteratorError8 = true;
+                _iteratorError8 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                        _iterator6.return();
+                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                        _iterator8.return();
                     }
                 } finally {
-                    if (_didIteratorError6) {
-                        throw _iteratorError6;
+                    if (_didIteratorError8) {
+                        throw _iteratorError8;
                     }
                 }
             }

@@ -169,7 +169,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line423">line 423</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line461">line 461</a>
     </li></ul></dd>
     
 
@@ -347,7 +347,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line342">line 342</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line358">line 358</a>
     </li></ul></dd>
     
 
@@ -502,7 +502,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line359">line 359</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line375">line 375</a>
     </li></ul></dd>
     
 
@@ -680,7 +680,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line300">line 300</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line316">line 316</a>
     </li></ul></dd>
     
 
@@ -835,7 +835,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line321">line 321</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line337">line 337</a>
     </li></ul></dd>
     
 
@@ -990,7 +990,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line71">line 71</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line83">line 83</a>
     </li></ul></dd>
     
 
@@ -1133,7 +1133,7 @@
 
     
 
-    <h4 class="name" id=".getRingCandidates"><span class="type-signature">(static) </span>getRingCandidates<span class="signature">(d, pe1, pe2)</span><span class="type-signature"> &rarr; {Array.&lt;Array>}</span></h4>
+    <h4 class="name" id=".getRingCandidates"><span class="type-signature">(static) </span>getRingCandidates<span class="signature">(d, pe, pe_prime)</span><span class="type-signature"> &rarr; {Array.&lt;Array>}</span></h4>
 
     
 
@@ -1145,7 +1145,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line200">line 200</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line212">line 212</a>
     </li></ul></dd>
     
 
@@ -1246,7 +1246,7 @@
 
         <tr>
             
-                <td class="name"><code>pe1</code></td>
+                <td class="name"><code>pe</code></td>
             
 
             <td class="type">
@@ -1269,7 +1269,7 @@
 
         <tr>
             
-                <td class="name"><code>pe2</code></td>
+                <td class="name"><code>pe_prime</code></td>
             
 
             <td class="type">
@@ -1489,7 +1489,7 @@
 
     
 
-    <h4 class="name" id=".getSSSR"><span class="type-signature">(static) </span>getSSSR<span class="signature">(c, d, adjacencyMatrix, pe1, pe2, nsssr)</span><span class="type-signature"> &rarr; {Array.&lt;Set>}</span></h4>
+    <h4 class="name" id=".getSSSR"><span class="type-signature">(static) </span>getSSSR<span class="signature">(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr)</span><span class="type-signature"> &rarr; {Array.&lt;Set>}</span></h4>
 
     
 
@@ -1501,7 +1501,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line243">line 243</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line257">line 257</a>
     </li></ul></dd>
     
 
@@ -1648,7 +1648,7 @@
 
         <tr>
             
-                <td class="name"><code>pe1</code></td>
+                <td class="name"><code>pe</code></td>
             
 
             <td class="type">
@@ -1671,7 +1671,7 @@
 
         <tr>
             
-                <td class="name"><code>pe2</code></td>
+                <td class="name"><code>pe_prime</code></td>
             
 
             <td class="type">
@@ -1688,6 +1688,52 @@
             
 
             <td class="description last"><p>A matrix containing the shortest paths + one vertex.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>arrBondCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Array></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A matrix containing the bond count of each vertex.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>arrRingCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Array></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A matrix containing the number of rings associated with each vertex.</p></td>
         </tr>
 
     
@@ -1771,7 +1817,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line444">line 444</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line482">line 482</a>
     </li></ul></dd>
     
 
@@ -1949,7 +1995,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line51">line 51</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -2092,7 +2138,7 @@
 
     
 
-    <h4 class="name" id=".pathSetsContain"><span class="type-signature">(static) </span>pathSetsContain<span class="signature">(pathSets, pathSet, bonds, allBonds)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    <h4 class="name" id=".pathSetsContain"><span class="type-signature">(static) </span>pathSetsContain<span class="signature">(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
 
     
 
@@ -2104,7 +2150,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line382">line 382</a>
+        <a href="SSSR.js.html">SSSR.js</a>, <a href="SSSR.js.html#line400">line 400</a>
     </li></ul></dd>
     
 
@@ -2271,6 +2317,52 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>arrBondCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Array></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A matrix containing the bond count of each vertex.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>arrRingCount</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Array></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A matrix containing the number of rings associated with each vertex.</p></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -2329,7 +2421,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 11 2017 16:04:14 GMT+0200 (W. Europe Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Oct 12 2017 16:38:01 GMT+0200 (W. Europe Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

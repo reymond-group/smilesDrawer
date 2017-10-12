@@ -19,12 +19,24 @@ SmilesDrawer.SSSR = class SSSR {
             let connectedComponent = connectedComponents[i];
             let ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix(connectedComponent);
 
+            let arrBondCount = Array(ccAdjacencyMatrix.length);
+            let arrRingCount = Array(ccAdjacencyMatrix.length);
+    
+            for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
+                arrRingCount[j] = 0;
+                arrBondCount[j] = 0;
+    
+                for (var k = 0; k < ccAdjacencyMatrix[j].length; k++) {
+                    arrBondCount[j] += ccAdjacencyMatrix[j][k];
+                }
+            }
+
             // Get the edge list and the theoretical number of rings in SSSR
             let nSssr = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length - ccAdjacencyMatrix.length + 1;
-            let {d, pe1, pe2} = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
-            let c = SmilesDrawer.SSSR.getRingCandidates(d, pe1, pe2);
-            let sssr = SmilesDrawer.SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe1, pe2, nSssr);
-
+            let {d, pe, pe_prime} = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
+            let c = SmilesDrawer.SSSR.getRingCandidates(d, pe, pe_prime);
+            let sssr = SmilesDrawer.SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
+            
             for (let i = 0; i < sssr.length; i++) {
                 let ring = new Array(sssr[i].length);
                 
@@ -71,27 +83,27 @@ SmilesDrawer.SSSR = class SSSR {
     static getPathIncludedDistanceMatrices(adjacencyMatrix) {
         let length = adjacencyMatrix.length;
         let d = Array(length);
-        let pe1 = Array(length);
-        let pe2 = Array(length);
+        let pe = Array(length);
+        let pe_prime = Array(length);
         var l = 0;
         var m = 0;
         var n = 0;
 
         for (let i = 0; i < length; i++) {
             d[i] = Array(length);
-            pe1[i] = Array(length);
-            pe2[i] = Array(length);
+            pe[i] = Array(length);
+            pe_prime[i] = Array(length);
             
             for (let j = 0; j < length; j++) {
                 d[i][j] = (i === j || adjacencyMatrix[i][j] === 1) ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
 
                 if (d[i][j] === 1) {
-                    pe1[i][j] = [[[i, j]]];
+                    pe[i][j] = [[[i, j]]];
                 } else {
-                    pe1[i][j] = [];
+                    pe[i][j] = [];
                 }
 
-                pe2[i][j] = [];
+                pe_prime[i][j] = [];
             }
         }
 
@@ -103,79 +115,79 @@ SmilesDrawer.SSSR = class SSSR {
 
                     if (previousPathLength > newPathLength) {
                         if (previousPathLength === newPathLength + 1) {
-                            pe2[i][j] = [pe1[i][j].length];
-                            for (l = 0; l < pe1[i][j].length; l++) {
-                                pe2[i][j][l] = [pe1[i][j][l].length];
-                                for (m = 0; m < pe1[i][j][l].length; m++) {
-                                    pe2[i][j][l][m] = [pe1[i][j][l][m].length];
-                                    for (n = 0; n < pe1[i][j][l][m].length; n++) {
-                                        pe2[i][j][l][m][n] = [pe1[i][j][l][m][0], pe1[i][j][l][m][1]];
+                            pe_prime[i][j] = [pe[i][j].length];
+                            for (l = 0; l < pe[i][j].length; l++) {
+                                pe_prime[i][j][l] = [pe[i][j][l].length];
+                                for (m = 0; m < pe[i][j][l].length; m++) {
+                                    pe_prime[i][j][l][m] = [pe[i][j][l][m].length];
+                                    for (n = 0; n < pe[i][j][l][m].length; n++) {
+                                        pe_prime[i][j][l][m][n] = [pe[i][j][l][m][0], pe[i][j][l][m][1]];
                                     }
                                 }
                             }
                         } else {
-                            pe2[i][j] = [];
+                            pe_prime[i][j] = [];
                         }
 
                         d[i][j] = newPathLength;
                         
-                        pe1[i][j] = [[]];
+                        pe[i][j] = [[]];
 
-                        for (l = 0; l < pe1[i][k][0].length; l++) {
-                            pe1[i][j][0].push(pe1[i][k][0][l]);
+                        for (l = 0; l < pe[i][k][0].length; l++) {
+                            pe[i][j][0].push(pe[i][k][0][l]);
                         }
-                        for (l = 0; l < pe1[k][j][0].length; l++) {
-                            pe1[i][j][0].push(pe1[k][j][0][l]);
+                        for (l = 0; l < pe[k][j][0].length; l++) {
+                            pe[i][j][0].push(pe[k][j][0][l]);
                         }
                     } else if (previousPathLength === newPathLength) {
-                        if (pe1[i][k].length && pe1[k][j].length) {
-                            if (pe1[i][j].length) {
+                        if (pe[i][k].length && pe[k][j].length) {
+                            if (pe[i][j].length) {
                                 let tmp = [];
 
-                                for (l = 0; l < pe1[i][k][0].length; l++) {
-                                    tmp.push(pe1[i][k][0][l]);
+                                for (l = 0; l < pe[i][k][0].length; l++) {
+                                    tmp.push(pe[i][k][0][l]);
                                 }
-                                for (l = 0; l < pe1[k][j][0].length; l++) {
-                                    tmp.push(pe1[k][j][0][l]);
+                                for (l = 0; l < pe[k][j][0].length; l++) {
+                                    tmp.push(pe[k][j][0][l]);
                                 }
 
-                                pe1[i][j].push(tmp);
+                                pe[i][j].push(tmp);
                             } else {
                                 let tmp = [];
 
-                                for (l = 0; l < pe1[i][k][0].length; l++) {
-                                    tmp.push(pe1[i][k][0][l]);
+                                for (l = 0; l < pe[i][k][0].length; l++) {
+                                    tmp.push(pe[i][k][0][l]);
                                 }
-                                for (l = 0; l < pe1[k][j][0].length; l++) {
-                                    tmp.push(pe1[k][j][0][l]);
+                                for (l = 0; l < pe[k][j][0].length; l++) {
+                                    tmp.push(pe[k][j][0][l]);
                                 }
 
-                                pe1[i][j][0] = tmp
+                                pe[i][j][0] = tmp
                             }
                         }
                     } else if (previousPathLength === newPathLength - 1) {
-                        if (pe2[i][j].length) {
+                        if (pe_prime[i][j].length) {
                             let tmp = [];
 
-                            for (var l = 0; l < pe1[i][k][0].length; l++) {
-                                tmp.push(pe1[i][k][0][l]);
+                            for (var l = 0; l < pe[i][k][0].length; l++) {
+                                tmp.push(pe[i][k][0][l]);
                             }
-                            for (var l = 0; l < pe1[k][j][0].length; l++) {
-                                tmp.push(pe1[k][j][0][l]);
+                            for (var l = 0; l < pe[k][j][0].length; l++) {
+                                tmp.push(pe[k][j][0][l]);
                             }
 
-                            pe2[i][j].push(tmp);
+                            pe_prime[i][j].push(tmp);
                         } else {
                             let tmp = [];
 
-                            for (var l = 0; l < pe1[i][k][0].length; l++) {
-                                tmp.push(pe1[i][k][0][l]);
+                            for (var l = 0; l < pe[i][k][0].length; l++) {
+                                tmp.push(pe[i][k][0][l]);
                             }
-                            for (var l = 0; l < pe1[k][j][0].length; l++) {
-                                tmp.push(pe1[k][j][0][l]);
+                            for (var l = 0; l < pe[k][j][0].length; l++) {
+                                tmp.push(pe[k][j][0][l]);
                             }
 
-                            pe2[i][j][0] = tmp;
+                            pe_prime[i][j][0] = tmp;
                         }
                     }
                 }
@@ -184,8 +196,8 @@ SmilesDrawer.SSSR = class SSSR {
 
         return {
             d: d,
-            pe1: pe1, 
-            pe2: pe2 
+            pe: pe, 
+            pe_prime: pe_prime 
         };
     }
 
@@ -193,29 +205,29 @@ SmilesDrawer.SSSR = class SSSR {
      * Get the ring candidates from the path-included distance matrices.
      * 
      * @param {Array[]} d The distance matrix.
-     * @param {Array[]} pe1 A matrix containing the shortest paths.
-     * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
+     * @param {Array[]} pe A matrix containing the shortest paths.
+     * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
      * @returns {Array[]} The ring candidates.
      */
-    static getRingCandidates(d, pe1, pe2) {
+    static getRingCandidates(d, pe, pe_prime) {
         let length = d.length;
         let candidates = [];
         let c = 0;
 
         for (let i = 0; i < length; i++) {
             for (let j = 0; j < length; j++) {
-                if (d[i][j] === 0 || (pe1[i][j].length === 1 && pe2[i][j] === 0)) {
+                if (d[i][j] === 0 || (pe[i][j].length === 1 && pe_prime[i][j] === 0)) {
                     continue;
                 } else {
                     // c is the number of vertices in the cycle.
-                    if (pe2[i][j].length !== 0) {
+                    if (pe_prime[i][j].length !== 0) {
                         c = 2 * (d[i][j] + 0.5);
                     } else {
                         c = 2 * d[i][j];
                     }
                     
                     if (c !== Infinity) {
-                        candidates.push([c, pe1[i][j], pe2[i][j]]);
+                        candidates.push([c, pe[i][j], pe_prime[i][j]]);
                     }
                 }
             }
@@ -235,12 +247,14 @@ SmilesDrawer.SSSR = class SSSR {
      * @param {Array[]} c The candidates.
      * @param {Array[]} d The distance matrix.
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @param {Array[]} pe1 A matrix containing the shortest paths.
-     * @param {Array[]} pe2 A matrix containing the shortest paths + one vertex.
+     * @param {Array[]} pe A matrix containing the shortest paths.
+     * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
+     * @param {Array[]} arrBondCount A matrix containing the bond count of each vertex.
+     * @param {Array[]} arrRingCount A matrix containing the number of rings associated with each vertex.
      * @param {Number} nsssr The theoretical number of rings in the graph.
      * @returns {Set[]} The smallest set of smallest rings.
      */
-    static getSSSR(c, d, adjacencyMatrix, pe1, pe2, nsssr) {
+    static getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) {
         let cSssr = [];
         let allBonds = [];
 
@@ -249,14 +263,15 @@ SmilesDrawer.SSSR = class SSSR {
                 for (let j = 0; j < c[i][2].length; j++) {
                     let bonds = c[i][1][0].concat(c[i][2][j]);
                     // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
-                    // TODO: This is a workaround, fix later.
+                    // TODO: This is a workaround, fix later. Probably should be a set rather than an array, however the computational overhead
+                    //       is probably bigger compared to leaving it like this.
                     for (var k = 0; k < bonds.length; k++) {
                         if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
                     }
 
                     let atoms = SSSR.bondsToAtoms(bonds);
                     
-                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds)) {
+                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds, arrBondCount, arrRingCount)) {
                         cSssr.push(atoms);
                         allBonds = allBonds.concat(bonds);
                     }
@@ -269,14 +284,15 @@ SmilesDrawer.SSSR = class SSSR {
                 for (let j = 0; j < c[i][1].length - 1; j++) {
                     let bonds = c[i][1][j].concat(c[i][1][j + 1]);
                     // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
-                    // TODO: This is a workaround, fix later.
+                    // TODO: This is a workaround, fix later. Probably should be a set rather than an array, however the computational overhead
+                    //       is probably bigger compared to leaving it like this.
                     for (var k = 0; k < bonds.length; k++) {
                         if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
                     }
 
                     let atoms = SSSR.bondsToAtoms(bonds);
                     
-                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds)) {
+                    if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds, arrBondCount, arrRingCount)) {
                         cSssr.push(atoms);
                         allBonds = allBonds.concat(bonds);
                     }
@@ -377,9 +393,11 @@ SmilesDrawer.SSSR = class SSSR {
      * @param {Set<Number>} pathSet A set representing a path.
      * @param {Array[]} bonds The bonds associated with the current path.
      * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
+     * @param {Array[]} arrBondCount A matrix containing the bond count of each vertex.
+     * @param {Array[]} arrRingCount A matrix containing the number of rings associated with each vertex.
      * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
      */
-    static pathSetsContain(pathSets, pathSet, bonds, allBonds) {
+    static pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) {
         for (let i = 0; i < pathSets.length; i++) {
             if (SSSR.isSupersetOf(pathSet, pathSets[i])) {
                 return true;
@@ -397,6 +415,7 @@ SmilesDrawer.SSSR = class SSSR {
         // Check if the edges from the candidate are already all contained within the paths of the set of paths.
         // TODO: For some reason, this does not replace the isSupersetOf method above -> why?
         let count = 0;
+        let allContained = false;
         for (var i = 0; i < bonds.length; i++) {
             for (var j = 0; j < allBonds.length; j++) {
                 if (bonds[i][0] === allBonds[j][0] && bonds[i][1] === allBonds[j][1] ||
@@ -405,9 +424,28 @@ SmilesDrawer.SSSR = class SSSR {
                 }
 
                 if (count === bonds.length) {
-                    return true;
+                    allContained = true;
                 }
             }
+        }
+
+        // If all the bonds and thus vertices are already contained within other rings
+        // check if there's one vertex with ringCount < bondCount - 1
+        let specialCase = false;
+        for (let element of pathSet) {
+            if (arrRingCount[element] < arrBondCount[element]) {
+                specialCase = true;
+                break;
+            }
+        }
+
+        if (allContained && !specialCase) {
+            return true;
+        }
+
+        // Update the ring counts for the vertices
+        for (let element of pathSet) {
+            arrRingCount[element]++;
         }
 
         return false;
