@@ -3047,13 +3047,13 @@ SmilesDrawer.Drawer = function () {
         }
 
         /**
-        * Returns an array of vertices positioned at a specified location.
-        *
-        * @param {SmilesDrawer.Vector2} position The position to search for vertices.
-        * @param {Number} radius The radius within to search.
-        * @param {Number} excludeVertexId A vertex id to be excluded from the search results.
-        * @returns {Number[]} An array containing vertex ids in a given location.
-        */
+         * Returns an array of vertices positioned at a specified location.
+         *
+         * @param {SmilesDrawer.Vector2} position The position to search for vertices.
+         * @param {Number} radius The radius within to search.
+         * @param {Number} excludeVertexId A vertex id to be excluded from the search results.
+         * @returns {Number[]} An array containing vertex ids in a given location.
+         */
 
     }, {
         key: 'getVerticesAt',
@@ -4198,7 +4198,10 @@ SmilesDrawer.Drawer = function () {
 
             center.divide(score);
 
-            return { value: score, center: center };
+            return {
+                value: score,
+                center: center
+            };
         }
 
         /**
@@ -4485,7 +4488,39 @@ SmilesDrawer.Drawer = function () {
                 if (vertex.value.bridgedRing === null) {
                     vertex.positioned = true;
                 }
-            } else if (previousVertex.value.rings.length === 0 && !vertex.value.isBridge && !previousVertex.value.isBridge) {
+            } else if (previousVertex.value.rings.length === 1) {
+                var vecs = Array();
+                var neighbours = previousVertex.getNeighbours();
+
+                for (var i = 0; i < neighbours.length; i++) {
+                    var neighbour = this.graph.vertices[neighbours[i]];
+
+                    if (neighbour.positioned && neighbour.value.rings.length > 0) {
+                        vecs.push(SmilesDrawer.Vector2.subtract(neighbour.position, previousVertex.position));
+                    }
+                }
+
+                var avg = SmilesDrawer.Vector2.averageDirection(vecs);
+                vertex.setPositionFromVector(avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
+                vertex.previousPosition = previousVertex.position;
+                vertex.positioned = true;
+            } else if (previousVertex.value.rings.length > 1) {
+                var _vecs = Array();
+                var _neighbours = previousVertex.getNeighbours();
+
+                for (var i = 0; i < _neighbours.length; i++) {
+                    var _neighbour = this.graph.vertices[_neighbours[i]];
+
+                    if (_neighbour.positioned && _neighbour.value.rings.length > 1) {
+                        _vecs.push(SmilesDrawer.Vector2.subtract(_neighbour.position, previousVertex.position));
+                    }
+                }
+
+                var _avg = SmilesDrawer.Vector2.averageDirection(_vecs);
+                vertex.setPositionFromVector(_avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
+                vertex.previousPosition = previousVertex.position;
+                vertex.positioned = true;
+            } else {
                 // Here, ringOrAngle is always an angle
 
                 // If the previous vertex was not part of a ring, draw a bond based
@@ -4496,53 +4531,6 @@ SmilesDrawer.Drawer = function () {
 
                 vertex.globalAngle = ringOrAngle;
                 vertex.setPositionFromVector(v);
-                vertex.previousPosition = previousVertex.position;
-                vertex.positioned = true;
-            } else if (previousVertex.value.isBridgeNode && vertex.value.isBridge) {
-                // If the previous atom is in a bridged ring and this one is inside the ring
-                var pos = SmilesDrawer.Vector2.subtract(ringOrAngle, previousVertex.position);
-                pos.normalize();
-
-                // Unlike with the ring, do not multiply with radius but with bond length
-                pos.multiplyScalar(this.opts.bondLength);
-                vertex.position.add(previousVertex.position);
-                vertex.position.add(pos);
-                vertex.previousPosition = previousVertex.position;
-                vertex.positioned = true;
-            } else if (vertex.value.isBridge) {
-                // The previous atom is in a bridged ring and this one is in it as well
-                var _v2 = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
-                _v2.rotate(ringOrAngle);
-                _v2.add(previousVertex.position);
-
-                vertex.globalAngle = ringOrAngle;
-                vertex.setPositionFromVector(_v2);
-                vertex.previousPosition = previousVertex.position;
-                vertex.positioned = true;
-            } else if (previousVertex.value.rings.length === 1 || previousVertex.value.isBridge) {
-                // Here, ringOrAngle is always a ring (THIS IS CURRENTLY NOT TRUE - WHY?)
-                // Use the same approach as with rings that are connected at one vertex
-                // and draw the atom in the opposite direction of the center.
-                var _pos = SmilesDrawer.Vector2.subtract(ringOrAngle, previousVertex.position);
-
-                _pos.invert();
-                _pos.normalize();
-                // Unlike with the ring, do not multiply with radius but with bond length
-                _pos.multiplyScalar(this.opts.bondLength);
-                vertex.position.add(previousVertex.position);
-                vertex.position.add(_pos);
-                vertex.previousPosition = previousVertex.position;
-                vertex.positioned = true;
-            } else if (previousVertex.value.rings.length === 2) {
-                // Here, ringOrAngle is always a ring
-                var ringA = this.getRing(previousVertex.value.rings[0]);
-                var ringB = this.getRing(previousVertex.value.rings[1]);
-
-                var midpoint = SmilesDrawer.Vector2.midpoint(ringA.center, ringB.center);
-                var direction = SmilesDrawer.Vector2.subtract(previousVertex.position, midpoint);
-                direction.normalize().multiplyScalar(this.opts.bondLength);
-
-                vertex.position.add(previousVertex.position).add(direction);
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
             }
@@ -4580,16 +4568,16 @@ SmilesDrawer.Drawer = function () {
                 }
             } else {
                 // Draw the non-ring vertices connected to this one        
-                var neighbours = vertex.getNeighbours();
+                var _neighbours2 = vertex.getNeighbours();
 
                 if (previousVertex) {
-                    neighbours = SmilesDrawer.ArrayHelper.remove(neighbours, previousVertex.id);
+                    _neighbours2 = SmilesDrawer.ArrayHelper.remove(_neighbours2, previousVertex.id);
                 }
 
                 var angle = vertex.getAngle();
 
-                if (neighbours.length === 1) {
-                    var nextVertex = this.graph.vertices[neighbours[0]];
+                if (_neighbours2.length === 1) {
+                    var nextVertex = this.graph.vertices[_neighbours2[0]];
 
                     // Make a single chain always cis except when there's a tribble bond
                     // or if there are successive double bonds
@@ -4663,10 +4651,10 @@ SmilesDrawer.Drawer = function () {
                         nextVertex.globalAngle = angle + nextVertex.angle;
                         this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
                     }
-                } else if (neighbours.length === 2) {
+                } else if (_neighbours2.length === 2) {
                     // Check for the longer subtree - always go with cis for the longer subtree
-                    var subTreeDepthA = this.getTreeDepth(neighbours[0], vertex.id);
-                    var subTreeDepthB = this.getTreeDepth(neighbours[1], vertex.id);
+                    var subTreeDepthA = this.getTreeDepth(_neighbours2[0], vertex.id);
+                    var subTreeDepthB = this.getTreeDepth(_neighbours2[1], vertex.id);
 
                     // Also get the subtree for the previous direction (this is important when
                     // the previous vertex is the shortest path)
@@ -4680,8 +4668,8 @@ SmilesDrawer.Drawer = function () {
                         trans = 0;
                     }
 
-                    var cisVertex = this.graph.vertices[neighbours[cis]];
-                    var transVertex = this.graph.vertices[neighbours[trans]];
+                    var cisVertex = this.graph.vertices[_neighbours2[cis]];
+                    var transVertex = this.graph.vertices[_neighbours2[trans]];
 
                     // If the origin tree is the shortest, set both vertices to trans
                     if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
@@ -4721,24 +4709,24 @@ SmilesDrawer.Drawer = function () {
                             this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
                         }
                     }
-                } else if (neighbours.length === 3) {
+                } else if (_neighbours2.length === 3) {
                     // The vertex with the longest sub-tree should always go straight
-                    var d1 = this.getTreeDepth(neighbours[0], vertex.id);
-                    var d2 = this.getTreeDepth(neighbours[1], vertex.id);
-                    var d3 = this.getTreeDepth(neighbours[2], vertex.id);
+                    var d1 = this.getTreeDepth(_neighbours2[0], vertex.id);
+                    var d2 = this.getTreeDepth(_neighbours2[1], vertex.id);
+                    var d3 = this.getTreeDepth(_neighbours2[2], vertex.id);
 
-                    var s = this.graph.vertices[neighbours[0]];
-                    var l = this.graph.vertices[neighbours[1]];
-                    var _r2 = this.graph.vertices[neighbours[2]];
+                    var s = this.graph.vertices[_neighbours2[0]];
+                    var l = this.graph.vertices[_neighbours2[1]];
+                    var _r2 = this.graph.vertices[_neighbours2[2]];
 
                     if (d2 > d1 && d2 > d3) {
-                        s = this.graph.vertices[neighbours[1]];
-                        l = this.graph.vertices[neighbours[0]];
-                        _r2 = this.graph.vertices[neighbours[2]];
+                        s = this.graph.vertices[_neighbours2[1]];
+                        l = this.graph.vertices[_neighbours2[0]];
+                        _r2 = this.graph.vertices[_neighbours2[2]];
                     } else if (d3 > d1 && d3 > d2) {
-                        s = this.graph.vertices[neighbours[2]];
-                        l = this.graph.vertices[neighbours[0]];
-                        _r2 = this.graph.vertices[neighbours[1]];
+                        s = this.graph.vertices[_neighbours2[2]];
+                        l = this.graph.vertices[_neighbours2[0]];
+                        _r2 = this.graph.vertices[_neighbours2[1]];
                     }
 
                     if (this.getTreeDepth(l.id, vertex.id) === 1 && this.getTreeDepth(_r2.id, vertex.id) === 1 && this.getTreeDepth(s.id, vertex.id) > 1) {
@@ -4808,33 +4796,33 @@ SmilesDrawer.Drawer = function () {
                         this.createNextBond(l, vertex, l.globalAngle);
                         this.createNextBond(_r2, vertex, _r2.globalAngle);
                     }
-                } else if (neighbours.length === 4) {
+                } else if (_neighbours2.length === 4) {
                     // The vertex with the longest sub-tree should always go to the reflected opposide direction
-                    var _d = this.getTreeDepth(neighbours[0], vertex.id);
-                    var _d2 = this.getTreeDepth(neighbours[1], vertex.id);
-                    var _d3 = this.getTreeDepth(neighbours[2], vertex.id);
-                    var d4 = this.getTreeDepth(neighbours[3], vertex.id);
+                    var _d = this.getTreeDepth(_neighbours2[0], vertex.id);
+                    var _d2 = this.getTreeDepth(_neighbours2[1], vertex.id);
+                    var _d3 = this.getTreeDepth(_neighbours2[2], vertex.id);
+                    var d4 = this.getTreeDepth(_neighbours2[3], vertex.id);
 
-                    var w = this.graph.vertices[neighbours[0]];
-                    var x = this.graph.vertices[neighbours[1]];
-                    var y = this.graph.vertices[neighbours[2]];
-                    var z = this.graph.vertices[neighbours[3]];
+                    var w = this.graph.vertices[_neighbours2[0]];
+                    var x = this.graph.vertices[_neighbours2[1]];
+                    var y = this.graph.vertices[_neighbours2[2]];
+                    var z = this.graph.vertices[_neighbours2[3]];
 
                     if (_d2 > _d && _d2 > _d3 && _d2 > d4) {
-                        w = this.graph.vertices[neighbours[1]];
-                        x = this.graph.vertices[neighbours[0]];
-                        y = this.graph.vertices[neighbours[2]];
-                        z = this.graph.vertices[neighbours[3]];
+                        w = this.graph.vertices[_neighbours2[1]];
+                        x = this.graph.vertices[_neighbours2[0]];
+                        y = this.graph.vertices[_neighbours2[2]];
+                        z = this.graph.vertices[_neighbours2[3]];
                     } else if (_d3 > _d && _d3 > _d2 && _d3 > d4) {
-                        w = this.graph.vertices[neighbours[2]];
-                        x = this.graph.vertices[neighbours[0]];
-                        y = this.graph.vertices[neighbours[1]];
-                        z = this.graph.vertices[neighbours[3]];
+                        w = this.graph.vertices[_neighbours2[2]];
+                        x = this.graph.vertices[_neighbours2[0]];
+                        y = this.graph.vertices[_neighbours2[1]];
+                        z = this.graph.vertices[_neighbours2[3]];
                     } else if (d4 > _d && d4 > _d2 && d4 > _d3) {
-                        w = this.graph.vertices[neighbours[3]];
-                        x = this.graph.vertices[neighbours[0]];
-                        y = this.graph.vertices[neighbours[1]];
-                        z = this.graph.vertices[neighbours[2]];
+                        w = this.graph.vertices[_neighbours2[3]];
+                        x = this.graph.vertices[_neighbours2[0]];
+                        y = this.graph.vertices[_neighbours2[1]];
+                        z = this.graph.vertices[_neighbours2[2]];
                     }
 
                     w.angle = -SmilesDrawer.MathHelper.toRad(36);
@@ -5164,29 +5152,29 @@ SmilesDrawer.Drawer = function () {
                 var previous = null;
 
                 for (var j = 0; j < neighbours.length; j++) {
-                    var _neighbour = neighbours[j];
+                    var _neighbour2 = neighbours[j];
 
-                    if (_neighbour.getNeighbourCount() > 1) {
-                        previous = _neighbour;
+                    if (_neighbour2.getNeighbourCount() > 1) {
+                        previous = _neighbour2;
                     }
                 }
 
                 for (var j = 0; j < neighbours.length; j++) {
-                    var _neighbour2 = neighbours[j];
+                    var _neighbour3 = neighbours[j];
 
-                    if (_neighbour2.getNeighbourCount() > 1) {
+                    if (_neighbour3.getNeighbourCount() > 1) {
                         continue;
                     }
 
-                    _neighbour2.value.isDrawn = false;
+                    _neighbour3.value.isDrawn = false;
 
-                    var hydrogens = SmilesDrawer.Atom.maxBonds[_neighbour2.value.element] - this.getBondCount(_neighbour2);
+                    var hydrogens = SmilesDrawer.Atom.maxBonds[_neighbour3.value.element] - this.getBondCount(_neighbour3);
 
-                    if (_neighbour2.value.bracket) {
-                        hydrogens = _neighbour2.value.bracket.hcount;
+                    if (_neighbour3.value.bracket) {
+                        hydrogens = _neighbour3.value.bracket.hcount;
                     }
 
-                    vertex.value.attachPseudoElement(_neighbour2.value.element, previous ? previous.value.element : null, hydrogens);
+                    vertex.value.attachPseudoElement(_neighbour3.value.element, previous ? previous.value.element : null, hydrogens);
                 }
             }
 
@@ -5201,23 +5189,23 @@ SmilesDrawer.Drawer = function () {
                 }
 
                 var _neighbourIds = _vertex5.getNeighbours();
-                var _neighbours = [];
+                var _neighbours3 = [];
 
                 for (var j = 0; j < _neighbourIds.length; j++) {
-                    _neighbours.push(this.graph.vertices[_neighbourIds[j]]);
+                    _neighbours3.push(this.graph.vertices[_neighbourIds[j]]);
                 }
 
-                for (var j = 0; j < _neighbours.length; j++) {
-                    var _neighbour3 = _neighbours[j].value;
+                for (var j = 0; j < _neighbours3.length; j++) {
+                    var _neighbour4 = _neighbours3[j].value;
 
-                    if (!_neighbour3.hasAttachedPseudoElements || _neighbour3.getAttachedPseudoElementsCount() !== 2) {
+                    if (!_neighbour4.hasAttachedPseudoElements || _neighbour4.getAttachedPseudoElementsCount() !== 2) {
                         continue;
                     }
 
-                    var pseudoElements = _neighbour3.getAttachedPseudoElements();
+                    var pseudoElements = _neighbour4.getAttachedPseudoElements();
 
                     if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
-                        _neighbour3.isDrawn = false;
+                        _neighbour4.isDrawn = false;
                         _vertex5.value.attachPseudoElement('Ac', '', 0);
                     }
                 }
@@ -5968,13 +5956,13 @@ SmilesDrawer.Graph = function () {
                         continue;
                     }
 
-                    var _v3 = arrPosition[i];
+                    var _v2 = arrPosition[i];
                     var l = arrL[i];
                     var k = arrK[i];
-                    var _denom = 1.0 / Math.pow(Math.pow(u[0] - _v3[0], 2) + Math.pow(u[1] - _v3[1], 2), 1.5);
-                    dxx += k * (1 - l * Math.pow(u[1] - _v3[1], 2) * _denom);
-                    dyy += k * (1 - l * Math.pow(u[0] - _v3[0], 2) * _denom);
-                    dxy += k * (l * (u[0] - _v3[0]) * (u[1] - _v3[1]) * _denom);
+                    var _denom = 1.0 / Math.pow(Math.pow(u[0] - _v2[0], 2) + Math.pow(u[1] - _v2[1], 2), 1.5);
+                    dxx += k * (1 - l * Math.pow(u[1] - _v2[1], 2) * _denom);
+                    dyy += k * (1 - l * Math.pow(u[0] - _v2[0], 2) * _denom);
+                    dxy += k * (l * (u[0] - _v2[0]) * (u[1] - _v2[1]) * _denom);
                 }
 
                 var dy = dE[0] / dxx + dE[1] / dxy;
@@ -5992,13 +5980,13 @@ SmilesDrawer.Graph = function () {
                     if (index === i) {
                         continue;
                     }
-                    var _v4 = arrPosition[i];
+                    var _v3 = arrPosition[i];
                     // Store old energies
                     var prevEx = arrE[i][0];
                     var prevEy = arrE[i][1];
-                    var _denom2 = 1.0 / Math.sqrt(Math.pow(u[0] - _v4[0], 2) + Math.pow(u[1] - _v4[1], 2));
-                    var _dx = arrK[i] * (u[0] - _v4[0] - arrL[i] * (u[0] - _v4[0]) * _denom2);
-                    var _dy = arrK[i] * (u[1] - _v4[1] - arrL[i] * (u[1] - _v4[1]) * _denom2);
+                    var _denom2 = 1.0 / Math.sqrt(Math.pow(u[0] - _v3[0], 2) + Math.pow(u[1] - _v3[1], 2));
+                    var _dx = arrK[i] * (u[0] - _v3[0] - arrL[i] * (u[0] - _v3[0]) * _denom2);
+                    var _dy = arrK[i] * (u[1] - _v3[1] - arrL[i] * (u[1] - _v3[1]) * _denom2);
 
                     arrE[i] = [_dx, _dy];
                     dE[0] += _dx;
@@ -10347,7 +10335,7 @@ SmilesDrawer.Vector2 = function () {
          * Returns the scalar projection of a vector on another vector.
          *
          * @static
-         * @param {SmilesDrawer.Vector2} vecA Thecreate jsdoc babel vector to be projected.
+         * @param {SmilesDrawer.Vector2} vecA The vector to be projected.
          * @param {SmilesDrawer.Vector2} vecB The vector to be projection upon.
          * @returns {Number} The scalar component.
          */
@@ -10358,6 +10346,27 @@ SmilesDrawer.Vector2 = function () {
             var unit = vecB.normalized();
 
             return SmilesDrawer.Vector2.dot(vecA, unit);
+        }
+
+        /**
+        * Returns the average vector (normalized) of the input vectors.
+        *
+        * @static
+        * @param {Array()} vecs An array containing vectors.
+        * @returns {SmilesDrawer.Vector2} The resulting vector (normalized).
+        */
+
+    }, {
+        key: 'averageDirection',
+        value: function averageDirection(vecs) {
+            var avg = new SmilesDrawer.Vector2(0.0, 0.0);
+
+            for (var i = 0; i < vecs.length; i++) {
+                var vec = vecs[i];
+                avg.add(vec);
+            }
+
+            return avg.normalize();
         }
     }]);
 

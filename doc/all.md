@@ -288,6 +288,7 @@ The SmilesDrawer namespace.
             * [.angle(vecA, vecB)](#SmilesDrawer.Vector2.angle) ⇒ <code>Number</code>
             * [.threePointangle(vecA, vecB, vecC)](#SmilesDrawer.Vector2.threePointangle) ⇒ <code>Number</code>
             * [.scalarProjection(vecA, vecB)](#SmilesDrawer.Vector2.scalarProjection) ⇒ <code>Number</code>
+            * [.averageDirection(vecs)](#SmilesDrawer.Vector2.averageDirection) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
     * [.Vertex](#SmilesDrawer.Vertex)
         * [new SmilesDrawer.Vertex(value, [x], [y])](#new_SmilesDrawer.Vertex_new)
         * [.setPosition(x, y)](#SmilesDrawer.Vertex+setPosition)
@@ -1558,13 +1559,13 @@ When drawing a double bond, choose the side to place the double bond. E.g. a dou
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 **Returns**: <code>Object</code> - Returns an object containing the following information: {
-            totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
-            totalPosition: Same as position, but based on entire molecule,
-            sideCount: Counts the sides of each neighbour, is an array [ a, b ],
-            position: which side to position the second bond, is 0 or 1, represents the index in the normal array. This is based on only the neighbours
-            anCount: the number of neighbours of vertexA,
-            bnCount: the number of neighbours of vertexB
-        }  
+          totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
+          totalPosition: Same as position, but based on entire molecule,
+          sideCount: Counts the sides of each neighbour, is an array [ a, b ],
+          position: which side to position the second bond, is 0 or 1, represents the index in the normal array. This is based on only the neighbours
+          anCount: the number of neighbours of vertexA,
+          bnCount: the number of neighbours of vertexB
+      }  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -3183,6 +3184,7 @@ A class representing a 2D vector.
         * [.angle(vecA, vecB)](#SmilesDrawer.Vector2.angle) ⇒ <code>Number</code>
         * [.threePointangle(vecA, vecB, vecC)](#SmilesDrawer.Vector2.threePointangle) ⇒ <code>Number</code>
         * [.scalarProjection(vecA, vecB)](#SmilesDrawer.Vector2.scalarProjection) ⇒ <code>Number</code>
+        * [.averageDirection(vecs)](#SmilesDrawer.Vector2.averageDirection) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
 
 <a name="new_SmilesDrawer.Vector2_new"></a>
 
@@ -3626,8 +3628,20 @@ Returns the scalar projection of a vector on another vector.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | Thecreate jsdoc babel vector to be projected. |
+| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The vector to be projected. |
 | vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The vector to be projection upon. |
+
+<a name="SmilesDrawer.Vector2.averageDirection"></a>
+
+#### Vector2.averageDirection(vecs) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
+Returns the average vector (normalized) of the input vectors.
+
+**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
+**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The resulting vector (normalized).  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecs | <code>Array()</code> | An array containing vectors. |
 
 <a name="SmilesDrawer.Vertex"></a>
 

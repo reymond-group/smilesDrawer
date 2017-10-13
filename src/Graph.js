@@ -517,7 +517,7 @@ SmilesDrawer.Graph = class Graph {
             arrPositioned[i] = vertex.positioned;
             a += angle;
         }
-
+        
         // Create the matrix containing the lengths
         let matLength = Array(length);
         for (var i = 0; i < length; i++) {

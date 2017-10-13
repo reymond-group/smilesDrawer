@@ -557,7 +557,7 @@ SmilesDrawer.Vector2 = class Vector2 {
      * Returns the scalar projection of a vector on another vector.
      *
      * @static
-     * @param {SmilesDrawer.Vector2} vecA Thecreate jsdoc babel vector to be projected.
+     * @param {SmilesDrawer.Vector2} vecA The vector to be projected.
      * @param {SmilesDrawer.Vector2} vecB The vector to be projection upon.
      * @returns {Number} The scalar component.
      */
@@ -565,5 +565,23 @@ SmilesDrawer.Vector2 = class Vector2 {
         let unit = vecB.normalized();
         
         return SmilesDrawer.Vector2.dot(vecA, unit);
+    }
+
+     /**
+     * Returns the average vector (normalized) of the input vectors.
+     *
+     * @static
+     * @param {Array()} vecs An array containing vectors.
+     * @returns {SmilesDrawer.Vector2} The resulting vector (normalized).
+     */
+    static averageDirection(vecs) {
+        let avg = new SmilesDrawer.Vector2(0.0, 0.0);
+
+        for (var i = 0; i < vecs.length; i++) {
+          let vec = vecs[i];
+          avg.add(vec);
+        }
+
+        return avg.normalize();
     }
 }
