@@ -21,7 +21,7 @@ SmilesDrawer.SSSR = class SSSR {
 
             let arrBondCount = Array(ccAdjacencyMatrix.length);
             let arrRingCount = Array(ccAdjacencyMatrix.length);
-    
+            
             for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
                 arrRingCount[j] = 0;
                 arrBondCount[j] = 0;
@@ -32,14 +32,27 @@ SmilesDrawer.SSSR = class SSSR {
             }
 
             // Get the edge list and the theoretical number of rings in SSSR
-            let nSssr = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length - ccAdjacencyMatrix.length + 1;
+            let nEdges = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length;
+            let nSssr = nEdges - ccAdjacencyMatrix.length + 1;
+
+            // If all vertices have 3 incident edges, calculate with different formula (see Euler)
+            let allThree = true;
+            for (var j = 0; j < arrBondCount.length; j++) {
+                if (arrBondCount[j] !== 3) {
+                    allThree = false;
+                }
+            }
+
+            if (allThree) {
+                nSssr = 2.0 + nEdges - ccAdjacencyMatrix.length;
+            }
+
             let {d, pe, pe_prime} = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
             let c = SmilesDrawer.SSSR.getRingCandidates(d, pe, pe_prime);
             let sssr = SmilesDrawer.SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
             
             for (let i = 0; i < sssr.length; i++) {
                 let ring = new Array(sssr[i].length);
-                
                 let index = 0;
     
                 for (let val of sssr[i]) {

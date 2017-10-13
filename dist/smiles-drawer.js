@@ -9030,7 +9030,20 @@ SmilesDrawer.SSSR = function () {
                 }
 
                 // Get the edge list and the theoretical number of rings in SSSR
-                var nSssr = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length - ccAdjacencyMatrix.length + 1;
+                var nEdges = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length;
+                var nSssr = nEdges - ccAdjacencyMatrix.length + 1;
+
+                // If all vertices have 3 incident edges, calculate with different formula (see Euler)
+                var allThree = true;
+                for (var j = 0; j < arrBondCount.length; j++) {
+                    if (arrBondCount[j] !== 3) {
+                        allThree = false;
+                    }
+                }
+
+                if (allThree) {
+                    nSssr = 2.0 + nEdges - ccAdjacencyMatrix.length;
+                }
 
                 var _SmilesDrawer$SSSR$ge = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix),
                     d = _SmilesDrawer$SSSR$ge.d,
@@ -9042,7 +9055,6 @@ SmilesDrawer.SSSR = function () {
 
                 for (var _i4 = 0; _i4 < sssr.length; _i4++) {
                     var ring = new Array(sssr[_i4].length);
-
                     var index = 0;
 
                     var _iteratorNormalCompletion2 = true;
