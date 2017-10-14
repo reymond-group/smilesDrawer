@@ -2,114 +2,143 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>SMILES Parser Demo</title>
-    <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
-    <script src="../dist/smiles-drawer.js"></script>
+  <meta charset="utf-8">
+  <title>SMILES Parser Demo</title>
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+  <script src="../dist/smiles-drawer.js"></script>
+  <style>
+    input[type=text] {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      border: 1px solid #aaa;
+      padding: 5px;
+      margin-bottom: 5px;
+      font-size: 1.25em;
+      outline: none;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+    }
+
+    #log {
+      font-family: Consolas, Courier New, Courier, monospace;
+      font-weight: bold;
+      color: rgba(255, 38, 0, 0.8)
+    }
+  </style>
 </head>
 
 <body>
-    <input id="input" type="text" class="parser" style="width: 490px; padding: 5px; border: 1px solid black; margin-bottom: 5px; font-size: 1.2em;" />
-    <br />
-    <canvas id="output-canvas" width="500" height="500"></canvas>
-    <br />
-    <div>
-        <label><input id="debug" name="debug" type="checkbox">Debug</label>
-    </div>
-    <div>
-        <label for="bondLength">Bond Length</label>
-        <input type="range" id="bondLength" name="bondLength" value="16"
-               min="1" max="99" step="1" />
-    </div>
-    <div>
-        <label for="shortBondLength">Short Bond Length</label>
-        <input type="range" id="shortBondLength" name="shortBondLength" value="9"
-               min="1" max="22" step="1" />
-    </div>
-    <div>
-        <label for="bondSpacing">Bond Spacing</label>
-        <input type="range" id="bondSpacing" name="bondSpacing" value="4"
-               min="1" max="99" step="1" />
-    </div>
-    <div>
-        <label for="k">Size</label>
-        <input type="range" id="size" name="size" value="500"
-               min="250" max="1000" step="1" />
-    </div>
-    <script>
-        var input = document.getElementById('input');
-        var debugCheckbox = document.getElementById('debug');
-        var bondLengthInput = document.getElementById('bondLength');
-        var shortBondLengthInput = document.getElementById('shortBondLength');
-        var bondSpacingInput = document.getElementById('bondSpacing');
-        var sizeInput = document.getElementById('size');
+  <label>SMILES</label>
+  <input id="input" type="text" class="parser" />
+  <div id="log">&nbsp;</div>
+  <br />
+  <canvas id="output-canvas" width="500" height="500"></canvas>
+  <br />
+  <div>
+    <label><input id="debug" name="debug" type="checkbox">Debug</label>
+  </div>
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          <label for="bondLength">Bond Length</label>
+          <input type="range" id="bondLength" name="bondLength" value="16" min="1" max="99" step="1" />
+        </td>
+        <td>
+          <label for="shortBondLength">Short Bond Length</label>
+          <input type="range" id="shortBondLength" name="shortBondLength" value="9" min="1" max="22" step="1" />
+        </td>
+        <td>
+          <label for="bondSpacing">Bond Spacing</label>
+          <input type="range" id="bondSpacing" name="bondSpacing" value="4" min="1" max="99" step="1" />
+        </td>
+        <td>
+          <label for="k">Size</label>
+          <input type="range" id="size" name="size" value="500" min="250" max="1000" step="1" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <script>
+    var input = document.getElementById('input');
+    var debugCheckbox = document.getElementById('debug');
+    var bondLengthInput = document.getElementById('bondLength');
+    var shortBondLengthInput = document.getElementById('shortBondLength');
+    var bondSpacingInput = document.getElementById('bondSpacing');
+    var sizeInput = document.getElementById('size');
 
-        var options = { 
-            debug: false,
-            bondLength: 16,
-            shortBondLength: 9,
-            bondSpacing: 4,
-            k: 8,
-            atomVisualization: 'default'
-        }
+    var options = {
+      debug: false,
+      bondLength: 16,
+      shortBondLength: 9,
+      bondSpacing: 4,
+      k: 8,
+      atomVisualization: 'default'
+    }
 
-        var smilesDrawer = new SmilesDrawer.Drawer(options);
-        var input = document.getElementById('input');
+    var smilesDrawer = new SmilesDrawer.Drawer(options);
+    var input = document.getElementById('input');
+    var log = document.getElementById('log');
 
-        function draw() {
-            let t = performance.now();
-    
-            SmilesDrawer.parse(input.value, function(tree) {
-                smilesDrawer.draw(tree, 'output-canvas', 'light', false);
-            }, function(err) {
-                console.log(err);
-            });
+    function draw() {
+      let t = performance.now();
 
-            let td = performance.now() - t;
+      SmilesDrawer.parse(input.value, function (tree) {
+        smilesDrawer.draw(tree, 'output-canvas', 'light', false);
+        log.innerHTML = '&nbsp;';
+      }, function (err) { 
+        log.innerHTML = err;
+      });
 
-            console.log(td);
-            console.log('Heavy Atom Count', smilesDrawer.getHeavyAtomCount());
-        }
+      let td = performance.now() - t;
 
-        function updateOptions() {
-            smilesDrawer = new SmilesDrawer.Drawer(options);
-            draw();
-        }
+      console.log(td);
+      console.log('Heavy Atom Count', smilesDrawer.getHeavyAtomCount());
+    }
 
-        document.addEventListener('DOMContentLoaded', function(event) {
-            input.addEventListener('input', function() {
-                draw();
-            });
+    function updateOptions() {
+      smilesDrawer = new SmilesDrawer.Drawer(options);
+      draw();
+    }
 
-            debugCheckbox.addEventListener('click', function() {
-               options.debug = debugCheckbox.checked ? true : false;
-               updateOptions();
-            });
+    document.addEventListener('DOMContentLoaded', function (event) {
+      input.addEventListener('input', function () {
+        draw();
+      });
 
-            bondLengthInput.addEventListener('input', function() {
-                options.bondLength = parseInt(bondLengthInput.value);
-                shortBondLengthInput.max = options.bondLength;
-                updateOptions();
-            });
+      debugCheckbox.addEventListener('click', function () {
+        options.debug = debugCheckbox.checked ? true : false;
+        updateOptions();
+      });
 
-            shortBondLengthInput.addEventListener('input', function() {
-                options.shortBondLength = parseInt(shortBondLengthInput.value);
-                updateOptions();
-            });
+      bondLengthInput.addEventListener('input', function () {
+        options.bondLength = parseInt(bondLengthInput.value);
+        shortBondLengthInput.max = options.bondLength;
+        updateOptions();
+      });
 
-            bondSpacingInput.addEventListener('input', function() {
-                options.bondSpacing = parseInt(bondSpacingInput.value);
-                updateOptions();
-            });
+      shortBondLengthInput.addEventListener('input', function () {
+        options.shortBondLength = parseInt(shortBondLengthInput.value);
+        updateOptions();
+      });
 
-            sizeInput.addEventListener('input', function() {
-                options.width = parseInt(sizeInput.value);
-                options.height = parseInt(sizeInput.value);
-                console.log(options);
-                updateOptions();
-            });
-        });
-    </script>
+      bondSpacingInput.addEventListener('input', function () {
+        options.bondSpacing = parseInt(bondSpacingInput.value);
+        updateOptions();
+      });
+
+      sizeInput.addEventListener('input', function () {
+        options.width = parseInt(sizeInput.value);
+        options.height = parseInt(sizeInput.value);
+        updateOptions();
+      });
+    });
+  </script>
 </body>
 
 </html>
