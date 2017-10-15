@@ -9534,32 +9534,35 @@ SmilesDrawer.SSSR = function () {
             }
 
             // If all the bonds and thus vertices are already contained within other rings
-            // check if there's one vertex with ringCount < bondCount - 1
+            // check if there's one vertex with ringCount < bondCount
             var specialCase = false;
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
+            if (allContained) {
+                var _iteratorNormalCompletion5 = true;
+                var _didIteratorError5 = false;
+                var _iteratorError5 = undefined;
 
-            try {
-                for (var _iterator5 = pathSet[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var _element4 = _step5.value;
-
-                    if (arrRingCount[_element4] < arrBondCount[_element4]) {
-                        specialCase = true;
-                        break;
-                    }
-                }
-            } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
-            } finally {
                 try {
-                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                        _iterator5.return();
+                    for (var _iterator5 = pathSet[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                        var _element4 = _step5.value;
+
+                        console.log(_element4, arrRingCount[_element4], arrBondCount[_element4]);
+                        if (arrRingCount[_element4] < arrBondCount[_element4]) {
+                            specialCase = true;
+                            break;
+                        }
                     }
+                } catch (err) {
+                    _didIteratorError5 = true;
+                    _iteratorError5 = err;
                 } finally {
-                    if (_didIteratorError5) {
-                        throw _iteratorError5;
+                    try {
+                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                            _iterator5.return();
+                        }
+                    } finally {
+                        if (_didIteratorError5) {
+                            throw _iteratorError5;
+                        }
                     }
                 }
             }

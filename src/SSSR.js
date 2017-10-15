@@ -443,13 +443,16 @@ SmilesDrawer.SSSR = class SSSR {
         }
 
         // If all the bonds and thus vertices are already contained within other rings
-        // check if there's one vertex with ringCount < bondCount - 1
+        // check if there's one vertex with ringCount < bondCount
         let specialCase = false;
-        for (let element of pathSet) {
-            if (arrRingCount[element] < arrBondCount[element]) {
-                specialCase = true;
-                break;
-            }
+        if (allContained) {
+          for (let element of pathSet) {
+              console.log(element, arrRingCount[element], arrBondCount[element]);
+              if (arrRingCount[element] < arrBondCount[element]) {
+                  specialCase = true;
+                  break;
+              }
+          }
         }
 
         if (allContained && !specialCase) {
