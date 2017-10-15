@@ -51,12 +51,14 @@
                 totalOverlap += smilesDrawer.getTotalOverlapScore();
                 nSuccesses++;
 
+                if (smilesDrawer.getTotalOverlapScore() > 10) {
                 str += td + ',' + 
                        td2 + ',' + 
                        smilesDrawer.getTotalOverlapScore() + ',' +
                        smilesDrawer.getRingCount() + ',' + 
                        smilesDrawer.getHeavyAtomCount() + ',' +
                        smilesDrawer.hasBridgedRing() + '\n';
+                }
             }
 
             console.log(str);

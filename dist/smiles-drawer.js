@@ -3664,9 +3664,6 @@ SmilesDrawer.Drawer = function () {
                     var lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
                     var lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
 
-                    lineA.shorten(this.opts.bondLength - this.opts.shortBondLength);
-                    lineB.shorten(this.opts.bondLength - this.opts.shortBondLength);
-
                     this.canvasWrapper.drawLine(lineA);
                     this.canvasWrapper.drawLine(lineB);
                 } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
@@ -4488,14 +4485,14 @@ SmilesDrawer.Drawer = function () {
                 if (vertex.value.bridgedRing === null) {
                     vertex.positioned = true;
                 }
-            } else if (previousVertex.value.rings.length === 1) {
+            } else if (previousVertex.value.originalRings.length === 1) {
                 var vecs = Array();
                 var neighbours = previousVertex.getNeighbours();
 
                 for (var i = 0; i < neighbours.length; i++) {
                     var neighbour = this.graph.vertices[neighbours[i]];
 
-                    if (neighbour.positioned && neighbour.value.rings.length > 0) {
+                    if (neighbour.positioned && neighbour.value.originalRings.length > 0) {
                         vecs.push(SmilesDrawer.Vector2.subtract(neighbour.position, previousVertex.position));
                     }
                 }
@@ -4504,21 +4501,37 @@ SmilesDrawer.Drawer = function () {
                 vertex.setPositionFromVector(avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
                 vertex.previousPosition = previousVertex.position;
                 vertex.positioned = true;
-            } else if (previousVertex.value.rings.length > 1) {
+            } else if (previousVertex.value.originalRings.length > 1) {
                 var _vecs = Array();
                 var _neighbours = previousVertex.getNeighbours();
 
                 for (var i = 0; i < _neighbours.length; i++) {
                     var _neighbour = this.graph.vertices[_neighbours[i]];
 
-                    if (_neighbour.positioned && _neighbour.value.rings.length > 1) {
+                    if (_neighbour.positioned && _neighbour.value.originalRings.length > 1) {
                         _vecs.push(SmilesDrawer.Vector2.subtract(_neighbour.position, previousVertex.position));
                     }
                 }
 
                 var _avg = SmilesDrawer.Vector2.averageDirection(_vecs);
-                vertex.setPositionFromVector(_avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
+                _avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+
+                // Invert if too close to another of the averaged vertices (resolve situations like: CC1CC2NCC3(N)CC1(C)C23CC#C)
+                for (var i = 0; i < _neighbours.length; i++) {
+                    var _neighbour2 = this.graph.vertices[_neighbours[i]];
+
+                    if (!_neighbour2.positioned) {
+                        continue;
+                    }
+
+                    if (SmilesDrawer.Vector2.threePointangle(_avg, previousVertex.position, _neighbour2.position) > 3.1) {
+                        _avg.rotateAround(Math.PI, previousVertex.position);
+                        break;
+                    }
+                }
+
                 vertex.previousPosition = previousVertex.position;
+                vertex.setPositionFromVector(_avg);
                 vertex.positioned = true;
             } else {
                 // Here, ringOrAngle is always an angle
@@ -5152,29 +5165,29 @@ SmilesDrawer.Drawer = function () {
                 var previous = null;
 
                 for (var j = 0; j < neighbours.length; j++) {
-                    var _neighbour2 = neighbours[j];
+                    var _neighbour3 = neighbours[j];
 
-                    if (_neighbour2.getNeighbourCount() > 1) {
-                        previous = _neighbour2;
+                    if (_neighbour3.getNeighbourCount() > 1) {
+                        previous = _neighbour3;
                     }
                 }
 
                 for (var j = 0; j < neighbours.length; j++) {
-                    var _neighbour3 = neighbours[j];
+                    var _neighbour4 = neighbours[j];
 
-                    if (_neighbour3.getNeighbourCount() > 1) {
+                    if (_neighbour4.getNeighbourCount() > 1) {
                         continue;
                     }
 
-                    _neighbour3.value.isDrawn = false;
+                    _neighbour4.value.isDrawn = false;
 
-                    var hydrogens = SmilesDrawer.Atom.maxBonds[_neighbour3.value.element] - this.getBondCount(_neighbour3);
+                    var hydrogens = SmilesDrawer.Atom.maxBonds[_neighbour4.value.element] - this.getBondCount(_neighbour4);
 
-                    if (_neighbour3.value.bracket) {
-                        hydrogens = _neighbour3.value.bracket.hcount;
+                    if (_neighbour4.value.bracket) {
+                        hydrogens = _neighbour4.value.bracket.hcount;
                     }
 
-                    vertex.value.attachPseudoElement(_neighbour3.value.element, previous ? previous.value.element : null, hydrogens);
+                    vertex.value.attachPseudoElement(_neighbour4.value.element, previous ? previous.value.element : null, hydrogens);
                 }
             }
 
@@ -5196,16 +5209,16 @@ SmilesDrawer.Drawer = function () {
                 }
 
                 for (var j = 0; j < _neighbours3.length; j++) {
-                    var _neighbour4 = _neighbours3[j].value;
+                    var _neighbour5 = _neighbours3[j].value;
 
-                    if (!_neighbour4.hasAttachedPseudoElements || _neighbour4.getAttachedPseudoElementsCount() !== 2) {
+                    if (!_neighbour5.hasAttachedPseudoElements || _neighbour5.getAttachedPseudoElementsCount() !== 2) {
                         continue;
                     }
 
-                    var pseudoElements = _neighbour4.getAttachedPseudoElements();
+                    var pseudoElements = _neighbour5.getAttachedPseudoElements();
 
                     if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
-                        _neighbour4.isDrawn = false;
+                        _neighbour5.isDrawn = false;
                         _vertex5.value.attachPseudoElement('Ac', '', 0);
                     }
                 }
@@ -5858,7 +5871,7 @@ SmilesDrawer.Graph = function () {
             var length = vertexIds.length;
 
             // Initialize the positions. Place all vertices on a ring around the center
-            var radius = SmilesDrawer.MathHelper.polyCircumradius(100, length);
+            var radius = SmilesDrawer.MathHelper.polyCircumradius(500, length);
             var angle = SmilesDrawer.MathHelper.centralAngle(length);
             var a = 0.0;
             var arrPosition = Array(length);

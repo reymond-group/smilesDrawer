@@ -502,7 +502,7 @@ SmilesDrawer.Graph = class Graph {
         let length = vertexIds.length;
 
         // Initialize the positions. Place all vertices on a ring around the center
-        let radius = SmilesDrawer.MathHelper.polyCircumradius(100, length);
+        let radius = SmilesDrawer.MathHelper.polyCircumradius(500, length);
         let angle = SmilesDrawer.MathHelper.centralAngle(length);
         let a = 0.0;
         let arrPosition = Array(length);
