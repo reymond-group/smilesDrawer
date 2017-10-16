@@ -2000,9 +2000,14 @@ SmilesDrawer.Drawer = class Drawer {
           this.rotateSubtree(a.id, overlap.common.id, angle, overlap.common.position);
         }
       } else if (overlap.vertices.length === 2) {
-        let angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
         let a = overlap.vertices[0];
         let b = overlap.vertices[1];
+
+        if (!a.value.isDrawn || !b.value.isDrawn) {
+            continue;
+        }
+
+        let angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
 
         a.backAngle -= angle;
         b.backAngle += angle;

@@ -594,7 +594,7 @@ SmilesDrawer.Graph = class Graph {
             let u = arrPosition[index];
             let arrL = matLength[index];
             let arrK = matStrength[index];
-
+            
             for (var i = 0; i < length; i++) {
                 if (i === index) {
                     continue;
@@ -608,6 +608,19 @@ SmilesDrawer.Graph = class Graph {
                 dyy += k * (1 - l * Math.pow(u[0] - v[0], 2) * denom);
                 dxy += k * (l * (u[0] - v[0]) * (u[1] - v[1]) * denom);
             }
+
+            // Prevent division by zero
+            if (dxx === 0) {
+                dxx = 0.1;
+            } 
+
+            if (dyy === 0) {
+                dyy = 0.1;
+            } 
+
+            if (dxy === 0) {
+                dxy = 0.1;
+            } 
 
             let dy = (dE[0] / dxx + dE[1] / dxy);
             dy /= (dxy / dxx - dyy / dxy); // had to split this onto two lines because the syntax highlighter went crazy.

@@ -4336,9 +4336,14 @@ SmilesDrawer.Drawer = function () {
                         this.rotateSubtree(a.id, overlap.common.id, _angle, overlap.common.position);
                     }
                 } else if (overlap.vertices.length === 2) {
-                    var _angle2 = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
                     var _a = overlap.vertices[0];
                     var b = overlap.vertices[1];
+
+                    if (!_a.value.isDrawn || !b.value.isDrawn) {
+                        continue;
+                    }
+
+                    var _angle2 = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
 
                     _a.backAngle -= _angle2;
                     b.backAngle += _angle2;
@@ -5976,6 +5981,19 @@ SmilesDrawer.Graph = function () {
                     dxx += k * (1 - l * Math.pow(u[1] - _v2[1], 2) * _denom);
                     dyy += k * (1 - l * Math.pow(u[0] - _v2[0], 2) * _denom);
                     dxy += k * (l * (u[0] - _v2[0]) * (u[1] - _v2[1]) * _denom);
+                }
+
+                // Prevent division by zero
+                if (dxx === 0) {
+                    dxx = 0.1;
+                }
+
+                if (dyy === 0) {
+                    dyy = 0.1;
+                }
+
+                if (dxy === 0) {
+                    dxy = 0.1;
                 }
 
                 var dy = dE[0] / dxx + dE[1] / dxy;
