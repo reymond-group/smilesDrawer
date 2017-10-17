@@ -498,6 +498,18 @@ SmilesDrawer.Graph = class Graph {
      */
     kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
         let edgeStrength = 10.0;
+
+        // Add vertices that are directly connected to the ring
+        // for (var i = vertexIds.length - 1; i >= 0; i--) {
+        //   let vertex = this.vertices[vertexIds[i]];
+        //   for (var j = 0; j < vertex.neighbours.length; j++) {
+        //     let neighbour = this.vertices[vertex.neighbours[j]];
+        //     if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
+        //       vertexIds.push(neighbour.id);
+        //     }
+        //   }
+        // }
+
         let matDist = this.getSubgraphDistanceMatrix(vertexIds);
         let length = vertexIds.length;
 

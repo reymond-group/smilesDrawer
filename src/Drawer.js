@@ -2097,6 +2097,8 @@ SmilesDrawer.Drawer = class Drawer {
         }
       }
 
+      console.log('1', vertex.id, neighbours, vecs);
+
       let avg = SmilesDrawer.Vector2.averageDirection(vecs);
       avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
 

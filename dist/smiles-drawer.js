@@ -4437,6 +4437,8 @@ SmilesDrawer.Drawer = function () {
                     }
                 }
 
+                console.log('1', vertex.id, _neighbours, _vecs);
+
                 var _avg = SmilesDrawer.Vector2.averageDirection(_vecs);
                 _avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
 
@@ -5792,6 +5794,18 @@ SmilesDrawer.Graph = function () {
         key: 'kkLayout',
         value: function kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
             var edgeStrength = 10.0;
+
+            // Add vertices that are directly connected to the ring
+            for (var i = vertexIds.length - 1; i >= 0; i--) {
+                var vertex = this.vertices[vertexIds[i]];
+                for (var j = 0; j < vertex.neighbours.length; j++) {
+                    var neighbour = this.vertices[vertex.neighbours[j]];
+                    if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
+                        vertexIds.push(neighbour.id);
+                    }
+                }
+            }
+
             var matDist = this.getSubgraphDistanceMatrix(vertexIds);
             var length = vertexIds.length;
 
@@ -5802,13 +5816,13 @@ SmilesDrawer.Graph = function () {
             var arrPosition = Array(length);
             var arrPositioned = Array(length);
             for (var i = 0; i < length; i++) {
-                var vertex = this.vertices[vertexIds[i]];
-                if (!vertex.positioned) {
+                var _vertex5 = this.vertices[vertexIds[i]];
+                if (!_vertex5.positioned) {
                     arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
                 } else {
-                    arrPosition[i] = [vertex.position.x, vertex.position.y];
+                    arrPosition[i] = [_vertex5.position.x, _vertex5.position.y];
                 }
-                arrPositioned[i] = vertex.positioned;
+                arrPositioned[i] = _vertex5.positioned;
                 a += angle;
             }
 
