@@ -35,8 +35,8 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         this.offsetX = 0.0;
         this.offsetY = 0.0;
 
-        this.fontLarge = this.opts.fontSizeLarge + 'pt Arial, sans-serif';
-        this.fontSmall = this.opts.fontSizeSmall + 'pt Arial, sans-serif';
+        this.fontLarge = this.opts.fontSizeLarge + 'pt Helvetica, Arial, sans-serif';
+        this.fontSmall = this.opts.fontSizeSmall + 'pt Helvetica, Arial, sans-serif';
 
         this.updateSize(this.opts.width, this.opts.height);
 
@@ -197,11 +197,10 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
      * Draw a line to a canvas.
      *
      * @param {SmilesDrawer.Line} line A line.
-     * @param {Number} [thickness=1.5] The thickness of the line.
      * @param {Boolean} [dashed=false] Whether or not the line is dashed.
      * @param {Number} [alpha=1.0] The alpha value of the color.
      */
-    drawLine(line, thickness = 1.5, dashed = false, alpha = 1.0) {
+    drawLine(line, dashed = false, alpha = 1.0) {
         if (isNaN(line.from.x) || isNaN(line.from.y) ||
             isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
@@ -231,7 +230,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
             ctx.moveTo(l.x, l.y);
             ctx.lineTo(r.x, r.y);
             ctx.lineCap = 'round';
-            ctx.lineWidth = thickness * 2.0;
+            ctx.lineWidth = this.opts.bondThickness * 2.0;
             ctx.strokeStyle = this.getColor('BACKGROUND');
             ctx.stroke();
             ctx.globalCompositeOperation = 'source-over';
@@ -252,7 +251,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         ctx.moveTo(l.x, l.y);
         ctx.lineTo(r.x, r.y);
         ctx.lineCap = 'round';
-        ctx.lineWidth = thickness;
+        ctx.lineWidth = this.opts.bondThickness;
 
         let gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
         gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
@@ -820,7 +819,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
         ctx.save();
         ctx.strokeStyle = this.getColor('C');
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = this.opts.bondThickness;
         ctx.beginPath();
         ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, 
                 radius - this.opts.bondSpacing, 0, Math.PI * 2, true); 

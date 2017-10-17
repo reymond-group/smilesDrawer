@@ -65,11 +65,11 @@ SmilesDrawer.Drawer = class Drawer {
     this.defaultOptions = {
       width: 500,
       height: 500,
-      bondLength: 16,
-      shortBondLength: 9,
-      bondSpacing: 4,
+      bondThickness: 0.6, // TODO: Add to doc
+      bondLength: 14.4,
+      shortBondLength: 0.85 * 14.4,
+      bondSpacing: 0.18 * 14.4,
       atomVisualization: 'default',
-      allowFlips: false,
       isomeric: false,
       debug: false,
       terminalCarbons: false,
@@ -1396,7 +1396,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // The shortened edge
         if (edge.isPartOfAromaticRing) {
-          this.canvasWrapper.drawLine(line, 0.5, true, 0.25);
+          this.canvasWrapper.drawLine(line, true, 0.25);
         } else {
           this.canvasWrapper.drawLine(line);
         }
@@ -1965,9 +1965,10 @@ SmilesDrawer.Drawer = class Drawer {
    */
   resolvePrimaryOverlaps() {
     let overlaps = [];
-    let sharedSideChains = []; // side chains attached to an atom shared by two rings
-    let done = [this.graph.vertices.length];
+    let done = Array(this.graph.vertices.length);
 
+    // Looking for overlaps created by two bonds coming out of a ring atom, which both point straight
+    // away from the ring and are thus perfectly overlapping.
     for (var i = 0; i &lt; this.rings.length; i++) {
       let ring = this.rings[i];
 
@@ -1982,6 +1983,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // Look for rings where there are atoms with two bonds outside the ring (overlaps)
         let nonRingNeighbours = this.getNonRingNeighbours(vertex.id);
+
         if (nonRingNeighbours.length > 1) {
           let rings = [];
 
@@ -1998,47 +2000,10 @@ SmilesDrawer.Drawer = class Drawer {
       }
     }
 
-    for (var i = 0; i &lt; sharedSideChains.length; i++) {
-      let chain = sharedSideChains[i];
-      let angle = -chain.vertex.position.getRotateToAngle(chain.other.position, chain.common.position);
-      this.rotateSubtree(chain.vertex.id, chain.common.id, angle + Math.PI, chain.common.position);
-    }
-
     for (var i = 0; i &lt; overlaps.length; i++) {
       let overlap = overlaps[i];
-
-      if (overlap.vertices.length === 1) {
-        let a = overlap.vertices[0];
-
-        if (a.getNeighbourCount() === 1) {
-          a.flippable = true;
-          a.flipCenter = overlap.common.id;
-
-          for (var j = 0; j &lt; overlap.rings.length; j++) {
-            a.flipRings.push(overlap.rings[j]);
-          }
-        }
-
-        // If the vertex comes out of two rings, it has to be rotated to point straight away (angles between it and both rings the same)
-        if (overlap.rings.length === 2) {
-          let neighbours = overlap.common.getNeighbours();
-          let positions = [];
-
-          for (var j = 0; j &lt; neighbours.length; j++) {
-            let vertex = this.graph.vertices[neighbours[j]];
-
-            if (!this.isRingConnection(vertex.id, overlap.common.id) &amp;&amp; vertex.id !== a.id) {
-              positions.push(vertex.position);
-            }
-          }
-
-          let midpoint = SmilesDrawer.Vector2.midpoint(positions[0], positions[1]);
-          let angle = a.position.getRotateToAngle(midpoint, overlap.common.position);
-
-          angle *= a.position.clockwise(midpoint);
-          this.rotateSubtree(a.id, overlap.common.id, angle, overlap.common.position);
-        }
-      } else if (overlap.vertices.length === 2) {
+    
+      if (overlap.vertices.length === 2) {
         let a = overlap.vertices[0];
         let b = overlap.vertices[1];
 
@@ -2048,29 +2013,25 @@ SmilesDrawer.Drawer = class Drawer {
 
         let angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
 
-        a.backAngle -= angle;
-        b.backAngle += angle;
-
         this.rotateSubtree(a.id, overlap.common.id, angle, overlap.common.position);
         this.rotateSubtree(b.id, overlap.common.id, -angle, overlap.common.position);
 
-        if (a.getNeighbourCount() === 1) {
-          a.flippable = true;
-          a.flipCenter = overlap.common.id;
-          a.flipNeighbour = b.id;
+        // Decide which way to rotate the vertices depending on the effect it has on the overlap score
+        let overlapScore = this.getOverlapScore();        
+        let subTreeOverlapA = this.getSubtreeOverlapScore(a.id, overlap.common.id, overlapScore.vertexScores);
+        let subTreeOverlapB = this.getSubtreeOverlapScore(b.id, overlap.common.id, overlapScore.vertexScores);
+        let total = subTreeOverlapA.value + subTreeOverlapB.value;
 
-          for (var j = 0; j &lt; overlap.rings.length; j++) {
-            a.flipRings.push(overlap.rings[j]);
-          }
-        }
-        if (b.getNeighbourCount() === 1) {
-          b.flippable = true;
-          b.flipCenter = overlap.common.id;
-          b.flipNeighbour = a.id;
+        this.rotateSubtree(a.id, overlap.common.id, -2.0 * angle, overlap.common.position);
+        this.rotateSubtree(b.id, overlap.common.id, 2.0 * angle, overlap.common.position);
 
-          for (var j = 0; j &lt; overlap.rings.length; j++) {
-            b.flipRings.push(overlap.rings[j]);
-          }
+        overlapScore = this.getOverlapScore();        
+        subTreeOverlapA = this.getSubtreeOverlapScore(a.id, overlap.common.id, overlapScore.vertexScores);
+        subTreeOverlapB = this.getSubtreeOverlapScore(b.id, overlap.common.id, overlapScore.vertexScores);
+        
+        if (subTreeOverlapA.value + subTreeOverlapB.value > total) {
+            this.rotateSubtree(a.id, overlap.common.id, 2.0 * angle, overlap.common.position);
+            this.rotateSubtree(b.id, overlap.common.id, -2.0 * angle, overlap.common.position);
         }
       }
     }
@@ -2106,48 +2067,6 @@ SmilesDrawer.Drawer = class Drawer {
 
             vertex.position.rotateAwayFrom(closestPosition, vertexPreviousPosition, SmilesDrawer.MathHelper.toRad(20));
           }
-        }
-
-        if (vertex.flippable) {
-          let a = vertex.flipRings[0] ? this.rings[vertex.flipRings[0]] : null;
-          let b = vertex.flipRings[1] ? this.rings[vertex.flipRings[1]] : null;
-          let flipCenter = this.graph.vertices[vertex.flipCenter].position;
-
-          // Make a always the bigger ring than b
-          if (a &amp;&amp; b) {
-            let tmp = (a.members.length > b.members.length) ? a : b;
-
-            b = (a.members.length &lt; b.members.length) ? a : b;
-            a = tmp;
-          }
-
-          if (this.opts.allowFlips) {
-            if (a &amp;&amp; a.allowsFlip()) {
-              vertex.position.rotateTo(a.center, flipCenter);
-              a.setFlipped();
-
-              if (vertex.flipNeighbour !== null) {
-                // It's better to not straighten the other one, since it will possibly overlap
-                // var flipNeighbour = this.graph.vertices[vertex.flipNeighbour];
-                // flipNeighbour.position.rotate(flipNeighbour.backAngle);
-              }
-            } else if (b &amp;&amp; b.allowsFlip()) {
-              vertex.position.rotateTo(b.center, flipCenter);
-              b.setFlipped();
-
-              if (vertex.flipNeighbour !== null) {
-                // It's better to not straighten the other one, since it will possibly overlap
-                // var flipNeighbour = this.graph.vertices[vertex.flipNeighbour];
-                // flipNeighbour.position.rotate(flipNeighbour.backAngle);
-              }
-            }
-          } else {
-
-          }
-
-          // Only do a refresh of the remaining!
-          // recalculate scores (how expensive?)
-          // scores = this.getOverlapScore().scores;
         }
       }
     }
@@ -2208,10 +2127,10 @@ SmilesDrawer.Drawer = class Drawer {
     } else if (previousVertex.value.originalRings.length > 1) {
       let vecs = Array()
       let neighbours = previousVertex.getNeighbours();
-
+      
       for (var i = 0; i &lt; neighbours.length; i++) {
         let neighbour = this.graph.vertices[neighbours[i]];
-
+        
         if (neighbour.positioned &amp;&amp; neighbour.value.originalRings.length > 1) {
           vecs.push(SmilesDrawer.Vector2.subtract(neighbour.position, previousVertex.position));
         }
@@ -2297,7 +2216,7 @@ SmilesDrawer.Drawer = class Drawer {
       if (neighbours.length === 1) {
         let nextVertex = this.graph.vertices[neighbours[0]];
 
-        // Make a single chain always cis except when there's a tribble bond
+        // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
         // or if there are successive double bonds
         if ((vertex.value.bondType === '#' || (previousVertex &amp;&amp; previousVertex.value.bondType === '#')) ||
           vertex.value.bondType === '=' &amp;&amp; previousVertex &amp;&amp; previousVertex.value.bondType === '=') {
@@ -2311,6 +2230,7 @@ SmilesDrawer.Drawer = class Drawer {
           let straightEdge2 = this.graph.getEdge(vertex.id, nextVertex.id);
           straightEdge2.center = true;
 
+          nextVertex.drawExplicit = true;
           nextVertex.globalAngle = angle;
           nextVertex.angle = 0.0;
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, -dir);
@@ -2909,7 +2829,7 @@ SmilesDrawer.Drawer = class Drawer {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 16 2017 11:35:54 GMT+0200 (W. Europe Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 17 2017 16:59:24 GMT+0200 (W. Europe Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

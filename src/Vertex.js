@@ -13,11 +13,6 @@
  * @property {Number} angle The angle of this vertex.
  * @property {Number} globalAngle The global angle of this vertex.
  * @property {Number} dir The direction of this vertex.
- * @property {Number} backAngle The back angle associated with this vertex.
- * @property {Boolean} flippable A boolean indicating whether or not this vertex can be flipped into a ring.
- * @property {Number|null} flipCenter The id of the vertex on which this one can be flipped.
- * @property {Number|null} flipNeighbour The id of the vertex which caused this vertex to be flipped.
- * @property {Number[]} flipRings An array of ring ids which specify candidates for this vertex to be flipped into.
  * @property {Number} neighbourCount The number of neighbouring vertices.
  * @property {Number[]} neighbours The vertex ids of neighbouring vertices.
  * @property {String[]} neighbouringElements The element symbols associated with neighbouring vertices.         
@@ -43,11 +38,6 @@ SmilesDrawer.Vertex = class Vertex {
         this.angle = 0.0;
         this.globalAngle = 0.0;
         this.dir = 1.0;
-        this.backAngle = 0.0;
-        this.flippable = false; // can be flipped into a ring
-        this.flipCenter = null;
-        this.flipNeighbour = null;
-        this.flipRings = new Array();
         this.neighbourCount = 0;
         this.neighbours = [];
         this.neighbouringElements = [];
@@ -129,10 +119,6 @@ SmilesDrawer.Vertex = class Vertex {
         clone.edges = SmilesDrawer.ArrayHelper.clone(this.edges);
         clone.positioned = this.positioned;
         clone.angle = this.angle;
-        clone.backAngle = this.backAngle;
-        clone.flippable = this.flippable;
-        clone.flipCenter = this.flipCenter;
-        clone.flipRings = SmilesDrawer.ArrayHelper.clone(this.flipRings);
         return clone;
     }
 

@@ -61,7 +61,7 @@ The SmilesDrawer namespace.
         * [.reset()](#SmilesDrawer.CanvasWrapper+reset)
         * [.getColor(key)](#SmilesDrawer.CanvasWrapper+getColor) ⇒ <code>String</code>
         * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#SmilesDrawer.CanvasWrapper+drawCircle)
-        * [.drawLine(line, [thickness], [dashed], [alpha])](#SmilesDrawer.CanvasWrapper+drawLine)
+        * [.drawLine(line, [dashed], [alpha])](#SmilesDrawer.CanvasWrapper+drawLine)
         * [.drawWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawWedge)
         * [.drawDashedWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawDashedWedge)
         * [.drawDebugText(x, y, text)](#SmilesDrawer.CanvasWrapper+drawDebugText)
@@ -883,7 +883,7 @@ A class wrapping a canvas element.
     * [.reset()](#SmilesDrawer.CanvasWrapper+reset)
     * [.getColor(key)](#SmilesDrawer.CanvasWrapper+getColor) ⇒ <code>String</code>
     * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#SmilesDrawer.CanvasWrapper+drawCircle)
-    * [.drawLine(line, [thickness], [dashed], [alpha])](#SmilesDrawer.CanvasWrapper+drawLine)
+    * [.drawLine(line, [dashed], [alpha])](#SmilesDrawer.CanvasWrapper+drawLine)
     * [.drawWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawWedge)
     * [.drawDashedWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawDashedWedge)
     * [.drawDebugText(x, y, text)](#SmilesDrawer.CanvasWrapper+drawDebugText)
@@ -977,7 +977,7 @@ Draws a circle to a canvas context.
 
 <a name="SmilesDrawer.CanvasWrapper+drawLine"></a>
 
-#### canvasWrapper.drawLine(line, [thickness], [dashed], [alpha])
+#### canvasWrapper.drawLine(line, [dashed], [alpha])
 Draw a line to a canvas.
 
 **Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
@@ -985,7 +985,6 @@ Draw a line to a canvas.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | line | <code>[Line](#SmilesDrawer.Line)</code> |  | A line. |
-| [thickness] | <code>Number</code> | <code>1.5</code> | The thickness of the line. |
 | [dashed] | <code>Boolean</code> | <code>false</code> | Whether or not the line is dashed. |
 | [alpha] | <code>Number</code> | <code>1.0</code> | The alpha value of the color. |
 
@@ -3665,11 +3664,6 @@ A class representing a vertex.
 | angle | <code>Number</code> | The angle of this vertex. |
 | globalAngle | <code>Number</code> | The global angle of this vertex. |
 | dir | <code>Number</code> | The direction of this vertex. |
-| backAngle | <code>Number</code> | The back angle associated with this vertex. |
-| flippable | <code>Boolean</code> | A boolean indicating whether or not this vertex can be flipped into a ring. |
-| flipCenter | <code>Number</code> &#124; <code>null</code> | The id of the vertex on which this one can be flipped. |
-| flipNeighbour | <code>Number</code> &#124; <code>null</code> | The id of the vertex which caused this vertex to be flipped. |
-| flipRings | <code>Array.&lt;Number&gt;</code> | An array of ring ids which specify candidates for this vertex to be flipped into. |
 | neighbourCount | <code>Number</code> | The number of neighbouring vertices. |
 | neighbours | <code>Array.&lt;Number&gt;</code> | The vertex ids of neighbouring vertices. |
 | neighbouringElements | <code>Array.&lt;String&gt;</code> | The element symbols associated with neighbouring vertices. |

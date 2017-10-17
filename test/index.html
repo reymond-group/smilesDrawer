@@ -13,6 +13,7 @@
         <script src="../dist/smiles-drawer.min.js"></script>
         <script src="drugbank.js"></script>
         <script src="schembl.js"></script>
+        <script src="gdb17.js"></script>
         <script>
             let options = {};
             
@@ -25,7 +26,7 @@
             let str = 'parsetime,rendertime,overlap,rings,hac,bridged\n';
             
             let failed = '';
-            for (let i = 0; i < drugbank.length; i++) {
+            for (let i = 0; i < gdb17.length; i++) {
                 console.log(i);
                 
                 let td = null;
@@ -33,14 +34,14 @@
                 let td2 = null;
                 let t = performance.now();
                 
-                SmilesDrawer.parse(drugbank[i], function(tree) {
+                SmilesDrawer.parse(gdb17[i], function(tree) {
                     td = performance.now() - t;
                     t2 = performance.now();
                     smilesDrawer.draw(tree, 'example-canvas', 'light', false);
                     td2 = performance.now() - t2;
                 }, function(err) {
                     nErrors++;
-                    failed += drugbank[i] + '\n';
+                    failed += gdb17[i] + '\n';
                 });
 
                 if (td2 === null) {
@@ -51,13 +52,13 @@
                 totalOverlap += smilesDrawer.getTotalOverlapScore();
                 nSuccesses++;
 
-                if (smilesDrawer.getTotalOverlapScore() > 10) {
+                if (smilesDrawer.getTotalOverlapScore() > 1) {
                 str += td + ',' + 
                        td2 + ',' + 
                        smilesDrawer.getTotalOverlapScore() + ',' +
                        smilesDrawer.getRingCount() + ',' + 
                        smilesDrawer.getHeavyAtomCount() + ',' +
-                       smilesDrawer.hasBridgedRing() + '\n';
+                       smilesDrawer.hasBridgedRing() + '\n' + gdb17[i] + '\n';
                 }
             }
 
