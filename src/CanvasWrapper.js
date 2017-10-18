@@ -236,7 +236,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
             ctx.globalCompositeOperation = 'source-over';
             ctx.restore();
         }
-        
+
         l = line.getLeftVector().clone();
         r = line.getRightVector().clone();
 
@@ -261,6 +261,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
         if (dashed) {
             ctx.setLineDash([1, 1]);
+            ctx.lineWidth = this.opts.bondThickness;
         }
 
         if (alpha < 1.0) {

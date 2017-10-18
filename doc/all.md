@@ -126,7 +126,7 @@ The SmilesDrawer namespace.
         * [.getCurrentCenterOfMassInNeigbourhood(vec, [r])](#SmilesDrawer.Drawer+getCurrentCenterOfMassInNeigbourhood) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
         * [.resolvePrimaryOverlaps()](#SmilesDrawer.Drawer+resolvePrimaryOverlaps)
         * [.resolveSecondaryOverlaps(scores)](#SmilesDrawer.Drawer+resolveSecondaryOverlaps)
-        * [.createNextBond(vertex, previousVertex, ringOrAngle, dir)](#SmilesDrawer.Drawer+createNextBond)
+        * [.createNextBond(vertex, previousVertex, ringOrAngle, dir, [skipPositioning])](#SmilesDrawer.Drawer+createNextBond)
         * [.getCommonRingbondNeighbour(vertex)](#SmilesDrawer.Drawer+getCommonRingbondNeighbour) ⇒ <code>Number</code> &#124; <code>null</code>
         * [.isPointInRing(vec)](#SmilesDrawer.Drawer+isPointInRing) ⇒ <code>Boolean</code>
         * [.isEdgeInRing(edge)](#SmilesDrawer.Drawer+isEdgeInRing) ⇒ <code>Boolean</code>
@@ -166,7 +166,7 @@ The SmilesDrawer namespace.
             * [.getSubgraphAdjacencyList(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
             * [.getBridges()](#SmilesDrawer.Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
             * [.traverseBF(startVertexId, callback)](#SmilesDrawer.Graph+traverseBF)
-            * [.kkLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
+            * [.kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
             * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
         * _static_
             * [.getConnectedComponents(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
@@ -1179,7 +1179,7 @@ The main class of the application representing the smiles drawer
     * [.getCurrentCenterOfMassInNeigbourhood(vec, [r])](#SmilesDrawer.Drawer+getCurrentCenterOfMassInNeigbourhood) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
     * [.resolvePrimaryOverlaps()](#SmilesDrawer.Drawer+resolvePrimaryOverlaps)
     * [.resolveSecondaryOverlaps(scores)](#SmilesDrawer.Drawer+resolveSecondaryOverlaps)
-    * [.createNextBond(vertex, previousVertex, ringOrAngle, dir)](#SmilesDrawer.Drawer+createNextBond)
+    * [.createNextBond(vertex, previousVertex, ringOrAngle, dir, [skipPositioning])](#SmilesDrawer.Drawer+createNextBond)
     * [.getCommonRingbondNeighbour(vertex)](#SmilesDrawer.Drawer+getCommonRingbondNeighbour) ⇒ <code>Number</code> &#124; <code>null</code>
     * [.isPointInRing(vec)](#SmilesDrawer.Drawer+isPointInRing) ⇒ <code>Boolean</code>
     * [.isEdgeInRing(edge)](#SmilesDrawer.Drawer+isEdgeInRing) ⇒ <code>Boolean</code>
@@ -1770,17 +1770,18 @@ Resolve secondary overlaps. Those overlaps are due to the structure turning back
 
 <a name="SmilesDrawer.Drawer+createNextBond"></a>
 
-#### drawer.createNextBond(vertex, previousVertex, ringOrAngle, dir)
+#### drawer.createNextBond(vertex, previousVertex, ringOrAngle, dir, [skipPositioning])
 Positiones the next vertex thus creating a bond.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-| previousVertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | The previous vertex which has been positioned. |
-| ringOrAngle | <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>Number</code> | Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied. |
-| dir | <code>Number</code> | Either 1 or -1 to break ties (if no angle can be elucidated). |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> |  | A vertex. |
+| previousVertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> |  | The previous vertex which has been positioned. |
+| ringOrAngle | <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>Number</code> |  | Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied. |
+| dir | <code>Number</code> |  | Either 1 or -1 to break ties (if no angle can be elucidated). |
+| [skipPositioning] | <code>Boolean</code> | <code>false</code> | Whether or not to skip positioning and just check the neighbours. |
 
 <a name="SmilesDrawer.Drawer+getCommonRingbondNeighbour"></a>
 
@@ -2004,7 +2005,7 @@ A class representing the molecular graph.
         * [.getSubgraphAdjacencyList(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
         * [.getBridges()](#SmilesDrawer.Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.traverseBF(startVertexId, callback)](#SmilesDrawer.Graph+traverseBF)
-        * [.kkLayout(vertexIds, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
+        * [.kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
         * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
     * _static_
         * [.getConnectedComponents(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
@@ -2209,7 +2210,7 @@ Traverses the graph in breadth-first order.
 
 <a name="SmilesDrawer.Graph+kkLayout"></a>
 
-#### graph.kkLayout(vertexIds, center, startVertexId, ring)
+#### graph.kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)
 Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
 
 **Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
@@ -2217,6 +2218,7 @@ Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general 
 | Param | Type | Description |
 | --- | --- | --- |
 | vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing vertexIds to be placed using the force based layout. |
+| outAdditionallyPositioned | <code>Array.&lt;Array&gt;</code> | Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ]. |
 | center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The center of the layout. |
 | startVertexId | <code>Number</code> | A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex. |
 | ring | <code>[Ring](#SmilesDrawer.Ring)</code> | The bridged ring associated with this force-based layout. |
@@ -3781,7 +3783,7 @@ Returns the angle of this vertexes positional vector. If a reference vector is s
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [referenceVector] | <code>[Vertex](#SmilesDrawer.Vertex)</code> | <code></code> | The refernece vector. |
+| [referenceVector] | <code>[Vertex](#SmilesDrawer.Vertex)</code> | <code></code> | The reference vector. |
 | [returnAsDegrees] | <code>Boolean</code> | <code>false</code> | If true, returns angle in degrees, else in radians. |
 
 <a name="SmilesDrawer.Vertex+getTextDirection"></a>

@@ -135,7 +135,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
      *
-     * @param {SmilesDrawer.Vertex} [referenceVector=null] - The refernece vector.
+     * @param {SmilesDrawer.Vertex} [referenceVector=null] - The reference vector.
      * @param {Boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
      * @returns {Number} The angle of this vertex.
      */

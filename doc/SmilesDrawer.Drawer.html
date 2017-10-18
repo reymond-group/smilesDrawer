@@ -1643,7 +1643,7 @@
 
     
 
-    <h4 class="name" id="createNextBond"><span class="type-signature"></span>createNextBond<span class="signature">(vertex, previousVertex, ringOrAngle, dir)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="createNextBond"><span class="type-signature"></span>createNextBond<span class="signature">(vertex, previousVertex, ringOrAngle, dir, skipPositioning<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -1655,7 +1655,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2044">line 2044</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2056">line 2056</a>
     </li></ul></dd>
     
 
@@ -1721,7 +1721,11 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -1746,7 +1750,19 @@
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last"><p>A vertex.</p></td>
@@ -1769,7 +1785,19 @@
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last"><p>The previous vertex which has been positioned.</p></td>
@@ -1795,7 +1823,19 @@
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last"><p>Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.</p></td>
@@ -1818,10 +1858,61 @@
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last"><p>Either 1 or -1 to break ties (if no angle can be elucidated).</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>skipPositioning</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>false</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether or not to skip positioning and just check the neighbours.</p></td>
         </tr>
 
     
@@ -3062,7 +3153,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2639">line 2639</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2651">line 2651</a>
     </li></ul></dd>
     
 
@@ -3788,7 +3879,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2456">line 2456</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2468">line 2468</a>
     </li></ul></dd>
     
 
@@ -4124,7 +4215,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1884">line 1884</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1895">line 1895</a>
     </li></ul></dd>
     
 
@@ -4230,7 +4321,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1907">line 1907</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1918">line 1918</a>
     </li></ul></dd>
     
 
@@ -4440,7 +4531,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2562">line 2562</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2574">line 2574</a>
     </li></ul></dd>
     
 
@@ -5169,7 +5260,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2655">line 2655</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2667">line 2667</a>
     </li></ul></dd>
     
 
@@ -6708,7 +6799,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1857">line 1857</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1868">line 1868</a>
     </li></ul></dd>
     
 
@@ -7015,7 +7106,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2579">line 2579</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2591">line 2591</a>
     </li></ul></dd>
     
 
@@ -7500,7 +7591,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2680">line 2680</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2692">line 2692</a>
     </li></ul></dd>
     
 
@@ -7669,7 +7760,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2501">line 2501</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2513">line 2513</a>
     </li></ul></dd>
     
 
@@ -7824,7 +7915,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2514">line 2514</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2526">line 2526</a>
     </li></ul></dd>
     
 
@@ -8134,7 +8225,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2476">line 2476</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2488">line 2488</a>
     </li></ul></dd>
     
 
@@ -8289,7 +8380,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2544">line 2544</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2556">line 2556</a>
     </li></ul></dd>
     
 
@@ -9234,7 +9325,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1927">line 1927</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1938">line 1938</a>
     </li></ul></dd>
     
 
@@ -9318,7 +9409,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2008">line 2008</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2019">line 2019</a>
     </li></ul></dd>
     
 
@@ -9691,7 +9782,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1833">line 1833</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line1844">line 1844</a>
     </li></ul></dd>
     
 
@@ -10026,7 +10117,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2608">line 2608</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2620">line 2620</a>
     </li></ul></dd>
     
 
@@ -10324,7 +10415,7 @@ the involved atoms not to be displayed.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 17 2017 21:26:20 GMT+0200 (W. Europe Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 18 2017 17:05:39 GMT+0200 (W. Europe Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

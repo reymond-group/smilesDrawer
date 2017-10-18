@@ -492,23 +492,25 @@ SmilesDrawer.Graph = class Graph {
      * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
      * 
      * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
+     * @param {Array[]} outAdditionallyPositioned Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ].
      * @param {SmilesDrawer.Vector2} center The center of the layout.
      * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
      * @param {SmilesDrawer.Ring} ring The bridged ring associated with this force-based layout.
      */
-    kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
-        let edgeStrength = 10.0;
+    kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring, bondLength) {
+        let edgeStrength = bondLength;
 
         // Add vertices that are directly connected to the ring
-        // for (var i = vertexIds.length - 1; i >= 0; i--) {
-        //   let vertex = this.vertices[vertexIds[i]];
-        //   for (var j = 0; j < vertex.neighbours.length; j++) {
-        //     let neighbour = this.vertices[vertex.neighbours[j]];
-        //     if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
-        //       vertexIds.push(neighbour.id);
-        //     }
-        //   }
-        // }
+        for (var i = vertexIds.length - 1; i >= 0; i--) {
+          let vertex = this.vertices[vertexIds[i]];
+          for (var j = 0; j < vertex.neighbours.length; j++) {
+            let neighbour = this.vertices[vertex.neighbours[j]];
+            if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
+              vertexIds.push(neighbour.id);
+              outAdditionallyPositioned.push([neighbour.id, vertex.id]);
+            }
+          }
+        }
 
         let matDist = this.getSubgraphDistanceMatrix(vertexIds);
         let length = vertexIds.length;
@@ -548,7 +550,7 @@ SmilesDrawer.Graph = class Graph {
             }
         }
 
-        // Create the metrix containing the energies
+        // Create the matrix containing the energies
         let matEnergy = Array(length);
         let arrEnergySum = Array(length);
         for (var i = 0; i < length; i++) {
@@ -668,9 +670,9 @@ SmilesDrawer.Graph = class Graph {
 
         // Setting parameters
         let threshold = 0.01;
-        let innerThreshold = 1.0;
-        let maxIteration = 750;
-        let maxInnerIteration = 20;
+        let innerThreshold = 0.1;
+        let maxIteration = 1500;
+        let maxInnerIteration = 50;
         let maxEnergy = 1e9;
 
         // Setting up variables for the while loops

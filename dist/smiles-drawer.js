@@ -1566,6 +1566,7 @@ SmilesDrawer.Atom.mass = {
 
             if (dashed) {
                 ctx.setLineDash([1, 1]);
+                ctx.lineWidth = this.opts.bondThickness;
             }
 
             if (alpha < 1.0) {
@@ -3647,7 +3648,7 @@ SmilesDrawer.Drawer = function () {
 
                     // The shortened edge
                     if (edge.isPartOfAromaticRing) {
-                        this.canvasWrapper.drawLine(line, true, 0.25);
+                        this.canvasWrapper.drawLine(line, true);
                     } else {
                         this.canvasWrapper.drawLine(line);
                     }
@@ -3998,10 +3999,13 @@ SmilesDrawer.Drawer = function () {
                 startVertexId = ring.members[0];
             }
 
+            // For bridged rings, vertices directly connected to the ring are also positioned.
+            var positioned = Array();
+
             // If the ring is bridged, then draw the vertices inside the ring
             // using a force based approach
             if (ring.isBridged) {
-                this.graph.kkLayout(ring.members, center, startVertex.id, ring, this.opts.bondLength);
+                this.graph.kkLayout(ring.members.slice(), positioned, center, startVertex.id, ring, this.opts.bondLength);
                 ring.positioned = true;
 
                 // Update the center of the bridged ring
@@ -4136,6 +4140,13 @@ SmilesDrawer.Drawer = function () {
                     v.value.isConnectedToRing = true;
                     this.createNextBond(v, ringMember, this.getSubringCenter(ring, ringMember));
                 }
+            }
+
+            for (var i = 0; i < positioned.length; i++) {
+                var u = this.graph.vertices[positioned[i][1]]; // this is the ring vertex
+                var _v2 = this.graph.vertices[positioned[i][0]]; // this is the vertex attached to the ring vertex
+                _v2.previousPosition = u.position;
+                this.createNextBond(_v2, u, 0, 0, true);
             }
         }
 
@@ -4377,101 +4388,104 @@ SmilesDrawer.Drawer = function () {
          * @param {SmilesDrawer.Vertex} previousVertex The previous vertex which has been positioned.
          * @param {SmilesDrawer.Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
          * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated).
+         * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
          */
 
     }, {
         key: 'createNextBond',
         value: function createNextBond(vertex, previousVertex, ringOrAngle, dir) {
-            if (vertex.positioned) {
+            var skipPositioning = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+
+            if (vertex.positioned && !skipPositioning) {
                 return;
             }
 
             // If the current node is the member of one ring, then point straight away
             // from the center of the ring. However, if the current node is a member of
             // two rings, point away from the middle of the centers of the two rings
-            if (!previousVertex) {
-                // Here, ringOrAngle is always an angle
+            if (!skipPositioning) {
+                if (!previousVertex) {
+                    // Here, ringOrAngle is always an angle
 
-                // Add a (dummy) previous position if there is no previous vertex defined
-                // Since the first vertex is at (0, 0), create a vector at (bondLength, 0)
-                // and rotate it by 90°
+                    // Add a (dummy) previous position if there is no previous vertex defined
+                    // Since the first vertex is at (0, 0), create a vector at (bondLength, 0)
+                    // and rotate it by 90°
 
 
-                var dummy = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
-                dummy.rotate(SmilesDrawer.MathHelper.toRad(-120));
+                    var dummy = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
+                    dummy.rotate(SmilesDrawer.MathHelper.toRad(-120));
 
-                vertex.previousPosition = dummy;
-                vertex.setPosition(this.opts.bondLength, 0);
-                vertex.angle = SmilesDrawer.MathHelper.toRad(-120);
-                vertex.globalAngle = vertex.angle;
+                    vertex.previousPosition = dummy;
+                    vertex.setPosition(this.opts.bondLength, 0);
+                    vertex.angle = SmilesDrawer.MathHelper.toRad(-120);
+                    vertex.globalAngle = vertex.angle;
 
-                // Do not position the vertex if it belongs to a bridged ring that is positioned using a layout algorithm.
-                if (vertex.value.bridgedRing === null) {
+                    // Do not position the vertex if it belongs to a bridged ring that is positioned using a layout algorithm.
+                    if (vertex.value.bridgedRing === null) {
+                        vertex.positioned = true;
+                    }
+                } else if (previousVertex.value.originalRings.length === 1) {
+                    var vecs = Array();
+                    var neighbours = previousVertex.getNeighbours();
+
+                    for (var i = 0; i < neighbours.length; i++) {
+                        var neighbour = this.graph.vertices[neighbours[i]];
+
+                        if (neighbour.positioned && neighbour.value.originalRings.length > 0) {
+                            vecs.push(SmilesDrawer.Vector2.subtract(neighbour.position, previousVertex.position));
+                        }
+                    }
+
+                    var avg = SmilesDrawer.Vector2.averageDirection(vecs);
+                    vertex.setPositionFromVector(avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
+                    vertex.previousPosition = previousVertex.position;
+                    vertex.positioned = true;
+                } else if (previousVertex.value.originalRings.length > 1) {
+                    var _vecs = Array();
+                    var _neighbours = previousVertex.getNeighbours();
+
+                    for (var i = 0; i < _neighbours.length; i++) {
+                        var _neighbour = this.graph.vertices[_neighbours[i]];
+
+                        if (_neighbour.positioned && _neighbour.value.originalRings.length > 1) {
+                            _vecs.push(SmilesDrawer.Vector2.subtract(_neighbour.position, previousVertex.position));
+                        }
+                    }
+
+                    var _avg = SmilesDrawer.Vector2.averageDirection(_vecs);
+                    _avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+
+                    // Invert if too close to another of the averaged vertices (resolve situations like: CC1CC2NCC3(N)CC1(C)C23CC#C)
+                    for (var i = 0; i < _neighbours.length; i++) {
+                        var _neighbour2 = this.graph.vertices[_neighbours[i]];
+
+                        if (!_neighbour2.positioned) {
+                            continue;
+                        }
+
+                        if (SmilesDrawer.Vector2.threePointangle(_avg, previousVertex.position, _neighbour2.position) > 3.1) {
+                            _avg.rotateAround(Math.PI, previousVertex.position);
+                            break;
+                        }
+                    }
+
+                    vertex.previousPosition = previousVertex.position;
+                    vertex.setPositionFromVector(_avg);
+                    vertex.positioned = true;
+                } else {
+                    // Here, ringOrAngle is always an angle
+
+                    // If the previous vertex was not part of a ring, draw a bond based
+                    // on the global angle of the previous bond
+                    var v = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
+                    v.rotate(ringOrAngle);
+                    v.add(previousVertex.position);
+
+                    vertex.globalAngle = ringOrAngle;
+                    vertex.setPositionFromVector(v);
+                    vertex.previousPosition = previousVertex.position;
                     vertex.positioned = true;
                 }
-            } else if (previousVertex.value.originalRings.length === 1) {
-                var vecs = Array();
-                var neighbours = previousVertex.getNeighbours();
-
-                for (var i = 0; i < neighbours.length; i++) {
-                    var neighbour = this.graph.vertices[neighbours[i]];
-
-                    if (neighbour.positioned && neighbour.value.originalRings.length > 0) {
-                        vecs.push(SmilesDrawer.Vector2.subtract(neighbour.position, previousVertex.position));
-                    }
-                }
-
-                var avg = SmilesDrawer.Vector2.averageDirection(vecs);
-                vertex.setPositionFromVector(avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
-                vertex.previousPosition = previousVertex.position;
-                vertex.positioned = true;
-            } else if (previousVertex.value.originalRings.length > 1) {
-                var _vecs = Array();
-                var _neighbours = previousVertex.getNeighbours();
-
-                for (var i = 0; i < _neighbours.length; i++) {
-                    var _neighbour = this.graph.vertices[_neighbours[i]];
-
-                    if (_neighbour.positioned && _neighbour.value.originalRings.length > 1) {
-                        _vecs.push(SmilesDrawer.Vector2.subtract(_neighbour.position, previousVertex.position));
-                    }
-                }
-
-                console.log('1', vertex.id, _neighbours, _vecs);
-
-                var _avg = SmilesDrawer.Vector2.averageDirection(_vecs);
-                _avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
-
-                // Invert if too close to another of the averaged vertices (resolve situations like: CC1CC2NCC3(N)CC1(C)C23CC#C)
-                for (var i = 0; i < _neighbours.length; i++) {
-                    var _neighbour2 = this.graph.vertices[_neighbours[i]];
-
-                    if (!_neighbour2.positioned) {
-                        continue;
-                    }
-
-                    if (SmilesDrawer.Vector2.threePointangle(_avg, previousVertex.position, _neighbour2.position) > 3.1) {
-                        _avg.rotateAround(Math.PI, previousVertex.position);
-                        break;
-                    }
-                }
-
-                vertex.previousPosition = previousVertex.position;
-                vertex.setPositionFromVector(_avg);
-                vertex.positioned = true;
-            } else {
-                // Here, ringOrAngle is always an angle
-
-                // If the previous vertex was not part of a ring, draw a bond based
-                // on the global angle of the previous bond
-                var v = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
-                v.rotate(ringOrAngle);
-                v.add(previousVertex.position);
-
-                vertex.globalAngle = ringOrAngle;
-                vertex.setPositionFromVector(v);
-                vertex.previousPosition = previousVertex.position;
-                vertex.positioned = true;
             }
 
             // Go to next vertex
@@ -5785,6 +5799,7 @@ SmilesDrawer.Graph = function () {
          * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
          * 
          * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
+         * @param {Array[]} outAdditionallyPositioned Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ].
          * @param {SmilesDrawer.Vector2} center The center of the layout.
          * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
          * @param {SmilesDrawer.Ring} ring The bridged ring associated with this force-based layout.
@@ -5792,8 +5807,8 @@ SmilesDrawer.Graph = function () {
 
     }, {
         key: 'kkLayout',
-        value: function kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
-            var edgeStrength = 10.0;
+        value: function kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring, bondLength) {
+            var edgeStrength = bondLength;
 
             // Add vertices that are directly connected to the ring
             for (var i = vertexIds.length - 1; i >= 0; i--) {
@@ -5802,6 +5817,7 @@ SmilesDrawer.Graph = function () {
                     var neighbour = this.vertices[vertex.neighbours[j]];
                     if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
                         vertexIds.push(neighbour.id);
+                        outAdditionallyPositioned.push([neighbour.id, vertex.id]);
                     }
                 }
             }
@@ -5844,7 +5860,7 @@ SmilesDrawer.Graph = function () {
                 }
             }
 
-            // Create the metrix containing the energies
+            // Create the matrix containing the energies
             var matEnergy = Array(length);
             var arrEnergySum = Array(length);
             for (var i = 0; i < length; i++) {
@@ -5908,13 +5924,13 @@ SmilesDrawer.Graph = function () {
                         continue;
                     }
 
-                    var _v2 = arrPosition[i];
+                    var _v3 = arrPosition[i];
                     var l = arrL[i];
                     var k = arrK[i];
-                    var _denom = 1.0 / Math.pow(Math.pow(u[0] - _v2[0], 2) + Math.pow(u[1] - _v2[1], 2), 1.5);
-                    dxx += k * (1 - l * Math.pow(u[1] - _v2[1], 2) * _denom);
-                    dyy += k * (1 - l * Math.pow(u[0] - _v2[0], 2) * _denom);
-                    dxy += k * (l * (u[0] - _v2[0]) * (u[1] - _v2[1]) * _denom);
+                    var _denom = 1.0 / Math.pow(Math.pow(u[0] - _v3[0], 2) + Math.pow(u[1] - _v3[1], 2), 1.5);
+                    dxx += k * (1 - l * Math.pow(u[1] - _v3[1], 2) * _denom);
+                    dyy += k * (1 - l * Math.pow(u[0] - _v3[0], 2) * _denom);
+                    dxy += k * (l * (u[0] - _v3[0]) * (u[1] - _v3[1]) * _denom);
                 }
 
                 // Prevent division by zero
@@ -5945,13 +5961,13 @@ SmilesDrawer.Graph = function () {
                     if (index === i) {
                         continue;
                     }
-                    var _v3 = arrPosition[i];
+                    var _v4 = arrPosition[i];
                     // Store old energies
                     var prevEx = arrE[i][0];
                     var prevEy = arrE[i][1];
-                    var _denom2 = 1.0 / Math.sqrt(Math.pow(u[0] - _v3[0], 2) + Math.pow(u[1] - _v3[1], 2));
-                    var _dx = arrK[i] * (u[0] - _v3[0] - arrL[i] * (u[0] - _v3[0]) * _denom2);
-                    var _dy = arrK[i] * (u[1] - _v3[1] - arrL[i] * (u[1] - _v3[1]) * _denom2);
+                    var _denom2 = 1.0 / Math.sqrt(Math.pow(u[0] - _v4[0], 2) + Math.pow(u[1] - _v4[1], 2));
+                    var _dx = arrK[i] * (u[0] - _v4[0] - arrL[i] * (u[0] - _v4[0]) * _denom2);
+                    var _dy = arrK[i] * (u[1] - _v4[1] - arrL[i] * (u[1] - _v4[1]) * _denom2);
 
                     arrE[i] = [_dx, _dy];
                     dE[0] += _dx;
@@ -5964,9 +5980,9 @@ SmilesDrawer.Graph = function () {
 
             // Setting parameters
             var threshold = 0.01;
-            var innerThreshold = 1.0;
-            var maxIteration = 750;
-            var maxInnerIteration = 20;
+            var innerThreshold = 0.1;
+            var maxIteration = 1500;
+            var maxInnerIteration = 50;
             var maxEnergy = 1e9;
 
             // Setting up variables for the while loops
@@ -10505,7 +10521,7 @@ SmilesDrawer.Vertex = function () {
         /**
          * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
          *
-         * @param {SmilesDrawer.Vertex} [referenceVector=null] - The refernece vector.
+         * @param {SmilesDrawer.Vertex} [referenceVector=null] - The reference vector.
          * @param {Boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
          * @returns {Number} The angle of this vertex.
          */

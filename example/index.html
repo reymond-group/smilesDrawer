@@ -89,6 +89,7 @@
         log.innerHTML = '&nbsp;';
       }, function (err) { 
         log.innerHTML = err;
+        console.log(err);
       });
 
       let td = performance.now() - t;
