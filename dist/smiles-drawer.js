@@ -1537,7 +1537,7 @@ SmilesDrawer.Atom.mass = {
                 ctx.moveTo(l.x, l.y);
                 ctx.lineTo(r.x, r.y);
                 ctx.lineCap = 'round';
-                ctx.lineWidth = this.opts.bondThickness * 2.0;
+                ctx.lineWidth = this.opts.bondThickness * 2.5;
                 ctx.strokeStyle = this.getColor('BACKGROUND');
                 ctx.stroke();
                 ctx.globalCompositeOperation = 'source-over';
@@ -2817,81 +2817,117 @@ SmilesDrawer.Drawer = function () {
     }, {
         key: 'createBridgedRing',
         value: function createBridgedRing(ringIds, sourceVertexId) {
-            var bridgedRing = [];
-            var vertices = [];
-            var neighbours = [];
+            var ringMembers = new Set();
+            var vertices = new Set();
+            var neighbours = new Set();
 
             for (var i = 0; i < ringIds.length; i++) {
                 var _ring4 = this.getRing(ringIds[i]);
                 _ring4.isPartOfBridged = true;
 
                 for (var j = 0; j < _ring4.members.length; j++) {
-                    vertices.push(_ring4.members[j]);
+                    vertices.add(_ring4.members[j]);
                 }
 
                 for (var j = 0; j < _ring4.neighbours.length; j++) {
-                    neighbours.push(_ring4.neighbours[j]);
+                    var id = _ring4.neighbours[j];
+
+                    if (ringIds.indexOf(id) === -1) {
+                        neighbours.add(_ring4.neighbours[j]);
+                    }
                 }
             }
-
-            // Remove duplicates
-            vertices = SmilesDrawer.ArrayHelper.unique(vertices);
 
             // A vertex is part of the bridged ring if it only belongs to
             // one of the rings (or to another ring
             // which is not part of the bridged ring).
-            var leftovers = [];
+            var leftovers = new Set();
 
-            for (var i = 0; i < vertices.length; i++) {
-                var vertex = this.graph.vertices[vertices[i]];
-                var intersection = SmilesDrawer.ArrayHelper.intersection(ringIds, vertex.value.rings);
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
 
-                if (vertex.value.rings.length === 1 || intersection.length === 1) {
-                    bridgedRing.push(vertex.id);
-                } else {
-                    leftovers.push(vertex.id);
-                }
-            }
+            try {
+                for (var _iterator = vertices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var _id = _step.value;
 
-            // Vertices can also be part of multiple rings and lay on the bridged ring,
-            // however, they have to have at least two neighbours that are not part of
-            // two rings
-            var tmp = [];
-            var insideRing = [];
+                    var _vertex = this.graph.vertices[_id];
+                    var intersection = SmilesDrawer.ArrayHelper.intersection(ringIds, _vertex.value.rings);
 
-            for (var i = 0; i < leftovers.length; i++) {
-                var _vertex = this.graph.vertices[leftovers[i]];
-                var onRing = false;
-
-                for (var _j = 0; _j < _vertex.edges.length; _j++) {
-                    if (this.edgeRingCount(_vertex.edges[_j]) === 1) {
-                        onRing = true;
+                    if (_vertex.value.rings.length === 1 || intersection.length === 1) {
+                        ringMembers.add(_vertex.id);
+                    } else {
+                        leftovers.add(_vertex.id);
                     }
                 }
 
-                if (onRing) {
-                    _vertex.value.isBridgeNode = true;
-                    tmp.push(_vertex.id);
-                } else {
-                    _vertex.value.isBridge = true;
-                    insideRing.push(_vertex.id);
+                // Vertices can also be part of multiple rings and lay on the bridged ring,
+                // however, they have to have at least two neighbours that are not part of
+                // two rings
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
                 }
             }
 
-            // Merge the two arrays containing members of the bridged ring
-            var ringMembers = SmilesDrawer.ArrayHelper.merge(bridgedRing, tmp);
-            ringMembers = SmilesDrawer.ArrayHelper.merge(ringMembers, insideRing);
+            var tmp = [];
+            var insideRing = [];
 
-            // The neighbours of the rings in the bridged ring that are not connected by a
-            // bridge are now the neighbours of the bridged ring
-            neighbours = SmilesDrawer.ArrayHelper.unique(neighbours);
-            neighbours = SmilesDrawer.ArrayHelper.removeAll(neighbours, ringIds);
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
-            // Create the ring
-            var ring = new SmilesDrawer.Ring(ringMembers);
+            try {
+                for (var _iterator2 = leftovers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var _id2 = _step2.value;
+
+                    var _vertex2 = this.graph.vertices[_id2];
+                    var onRing = false;
+
+                    for (var _j = 0; _j < _vertex2.edges.length; _j++) {
+                        if (this.edgeRingCount(_vertex2.edges[_j]) === 1) {
+                            onRing = true;
+                        }
+                    }
+
+                    if (onRing) {
+                        _vertex2.value.isBridgeNode = true;
+                        ringMembers.add(_vertex2.id);
+                    } else {
+                        _vertex2.value.isBridge = true;
+                        ringMembers.add(_vertex2.id);
+                    }
+                }
+
+                // Create the ring
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
+            var ring = new SmilesDrawer.Ring([].concat(_toConsumableArray(ringMembers)));
 
             ring.isBridged = true;
-            ring.neighbours = neighbours;
+            ring.neighbours = [].concat(_toConsumableArray(neighbours));
 
             for (var i = 0; i < ringIds.length; i++) {
                 ring.rings.push(this.getRing(ringIds[i]).clone());
@@ -2906,20 +2942,40 @@ SmilesDrawer.Drawer = function () {
             // Atoms inside the ring are no longer part of a ring but are now
             // associated with the bridged ring
             for (var i = 0; i < insideRing.length; i++) {
-                var _vertex2 = this.graph.vertices[insideRing[i]];
-
-                _vertex2.value.rings = [];
+                var vertex = this.graph.vertices[insideRing[i]];
+                vertex.value.rings = Array();
             }
 
             // Remove former rings from members of the bridged ring and add the bridged ring
-            for (var i = 0; i < ringMembers.length; i++) {
-                var _vertex3 = this.graph.vertices[ringMembers[i]];
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
 
-                _vertex3.value.rings = SmilesDrawer.ArrayHelper.removeAll(_vertex3.value.rings, ringIds);
-                _vertex3.value.rings.push(ring.id);
+            try {
+                for (var _iterator3 = ringMembers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var _id3 = _step3.value;
+
+                    var _vertex3 = this.graph.vertices[_id3];
+                    _vertex3.value.rings = SmilesDrawer.ArrayHelper.removeAll(_vertex3.value.rings, ringIds);
+                    _vertex3.value.rings.push(ring.id);
+                }
+
+                // Remove all the ring connections no longer used
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
             }
 
-            // Remove all the ring connections no longer used
             for (var i = 0; i < ringIds.length; i++) {
                 for (var j = i + 1; j < ringIds.length; j++) {
                     this.removeRingConnectionsBetween(ringIds[i], ringIds[j]);
@@ -2927,14 +2983,35 @@ SmilesDrawer.Drawer = function () {
             }
 
             // Update the ring connections and add this ring to the neighbours neighbours
-            for (var i = 0; i < neighbours.length; i++) {
-                var connections = this.getRingConnections(neighbours[i], ringIds);
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
 
-                for (var j = 0; j < connections.length; j++) {
-                    this.getRingConnection(connections[j]).updateOther(ring.id, neighbours[i]);
+            try {
+                for (var _iterator4 = neighbours[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var _id4 = _step4.value;
+
+                    var connections = this.getRingConnections(_id4, ringIds);
+
+                    for (var j = 0; j < connections.length; j++) {
+                        this.getRingConnection(connections[j]).updateOther(ring.id, _id4);
+                    }
+
+                    this.getRing(_id4).neighbours.push(ring.id);
                 }
-
-                this.getRing(neighbours[i]).neighbours.push(ring.id);
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
+                }
             }
 
             return ring;
@@ -2986,33 +3063,6 @@ SmilesDrawer.Drawer = function () {
             }
 
             return commonRings;
-        }
-
-        /**
-         * Returns the smallest ring shared by the two vertices.
-         *
-         * @param {SmilesDrawer.Vertex} vertexA A vertex.
-         * @param {SmilesDrawer.Vertex} vertexB A vertex.
-         * @returns {SmilesDrawer.Ring|null} If a smallest common ring exists, that ring, else null.
-         */
-
-    }, {
-        key: 'getSmallestCommonRing',
-        value: function getSmallestCommonRing(vertexA, vertexB) {
-            var commonRings = this.getCommonRings(vertexA, vertexB);
-            var minSize = Number.MAX_VALUE;
-            var smallestCommonRing = null;
-
-            for (var i = 0; i < commonRings.length; i++) {
-                var size = this.getRing(commonRings[i]).getSize();
-
-                if (size < minSize) {
-                    minSize = size;
-                    smallestCommonRing = this.getRing(commonRings[i]);
-                }
-            }
-
-            return smallestCommonRing;
         }
 
         /**
@@ -3093,37 +3143,6 @@ SmilesDrawer.Drawer = function () {
                 var v = this.graph.vertices[i];
 
                 if (v.id === vertex.id) {
-                    continue;
-                }
-
-                var distSq = vertex.position.distanceSq(v.position);
-
-                if (distSq < minDist) {
-                    minDist = distSq;
-                    minVertex = v;
-                }
-            }
-
-            return minVertex;
-        }
-
-        /**
-         * Returns the closest vertex (connected as well as unconnected), which is an endpoint.
-         *
-         * @param {SmilesDrawer.Vertex} vertex The vertex of which to find the closest other vertex.
-         * @returns {SmilesDrawer.Vertex} The closest endpoint vertex.
-         */
-
-    }, {
-        key: 'getClosestEndpointVertex',
-        value: function getClosestEndpointVertex(vertex) {
-            var minDist = 99999;
-            var minVertex = null;
-
-            for (var i = 0; i < this.graph.vertices.length; i++) {
-                var v = this.graph.vertices[i];
-
-                if (v.id === vertex.id || v.getNeighbourCount() > 1) {
                     continue;
                 }
 
@@ -3270,76 +3289,31 @@ SmilesDrawer.Drawer = function () {
         }
 
         /**
-         * Get the ring connections associated with a ring, the ring connections between two rings or the ring connections between one ring and multiple other rings.
+         * Get the ring connections between a ring and a set of rings.
          *
          * @param {Number} ringId A ring id.
-         * @param {Number|Number[]|null} [ringIds=null] A ring id, an array of ring ids or null.
+         * @param {Number[]} ringIds An array of ring ids.
          * @returns {Number[]} An array of ring connection ids.
          */
 
     }, {
         key: 'getRingConnections',
-        value: function getRingConnections(ringId) {
-            var ringIds = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
+        value: function getRingConnections(ringId, ringIds) {
             var ringConnections = [];
 
-            if (ringIds === null) {
-                for (var i = 0; i < this.ringConnections.length; i++) {
-                    var ringConnection = this.ringConnections[i];
+            for (var i = 0; i < this.ringConnections.length; i++) {
+                var rc = this.ringConnections[i];
 
-                    if (ringConnection.firstRingId === ringId || ringConnection.secondRingId === ringId) {
-                        ringConnections.push(ringConnection.id);
-                    }
-                }
-            } else if (ringIds.constructor !== Array) {
-                for (var i = 0; i < this.ringConnections.length; i++) {
-                    var _ringConnection = this.ringConnections[i];
+                for (var j = 0; j < ringIds.length; j++) {
+                    var id = ringIds[j];
 
-                    if (_ringConnection.firstRingId === ringId && _ringConnection.secondRingId === ringIds || _ringConnection.firstRingId === ringIds && _ringConnection.secondRingId === ringId) {
-                        ringConnections.push(_ringConnection.id);
-                    }
-                }
-            } else {
-                for (var i = 0; i < this.ringConnections.length; i++) {
-                    for (var j = 0; j < ringIds.length; j++) {
-                        var id = ringIds[j];
-                        var _ringConnection2 = this.ringConnections[i];
-
-                        if (_ringConnection2.firstRingId === ringId && _ringConnection2.secondRingId === id || _ringConnection2.firstRingId === id && _ringConnection2.secondRingId === ringId) {
-                            ringConnections.push(_ringConnection2.id);
-                        }
+                    if (rc.firstRingId === ringId && rc.secondRingId === id || rc.firstRingId === id && rc.secondRingId === ringId) {
+                        ringConnections.push(rc.id);
                     }
                 }
             }
 
             return ringConnections;
-        }
-
-        /**
-         * Check whether or not the two vertices specified span a bond which is a ring connection (fused rings).
-         * 
-         * @param {Number} vertexIdA A vertex id.
-         * @param {Number} vertexIdB A vertex id.
-         * @returns {Boolean} Returns a boolean indicating whether or not the two vertices specify a ringbond.
-         */
-
-    }, {
-        key: 'isRingConnection',
-        value: function isRingConnection(vertexIdA, vertexIdB) {
-            for (var i = 0; i < this.ringConnections.length; i++) {
-                var ringConnection = this.ringConnections[i];
-
-                if (ringConnection.vertices.size !== 2) {
-                    continue;
-                }
-
-                if (ringConnection.vertices.has(vertexIdA) && ringConnection.vertices.has(vertexIdB)) {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /**
@@ -3354,16 +3328,18 @@ SmilesDrawer.Drawer = function () {
             var total = 0.0;
             var overlapScores = new Float32Array(this.graph.vertices.length);
 
-            for (var i = 0; i < this.graph.vertices.length; i++) {
+            var i = this.graph.vertices.length;
+            while (i--) {
                 overlapScores[i] = 0;
             }
 
-            for (var i = 0; i < this.graph.vertices.length; i++) {
-                for (var j = i + 1; j < this.graph.vertices.length; j++) {
-                    var a = this.graph.vertices[i];
-                    var b = this.graph.vertices[j];
-
-                    var dist = SmilesDrawer.Vector2.subtract(a.position, b.position).length();
+            i = this.graph.vertices.length;
+            while (i--) {
+                var j = this.graph.vertices.length;
+                while (--j > i) {
+                    var a = this.graph.vertices[i].position;
+                    var b = this.graph.vertices[j].position;
+                    var dist = SmilesDrawer.Vector2.subtract(a, b).length();
 
                     if (dist < this.opts.bondLength) {
                         var weighted = (this.opts.bondLength - dist) / this.opts.bondLength;
@@ -3375,8 +3351,8 @@ SmilesDrawer.Drawer = function () {
             }
 
             var sortable = [];
-
-            for (var i = 0; i < this.graph.vertices.length; i++) {
+            i = this.graph.vertices.length;
+            while (i--) {
                 sortable.push({
                     id: i,
                     score: overlapScores[i]
@@ -3461,50 +3437,7 @@ SmilesDrawer.Drawer = function () {
         }
 
         /**
-         * Checks whether or not two vertices are connected.
-         *
-         * @param {Number} vertexIdA A vertex id.
-         * @param {Number} vertexIdA A vertex id.
-         * @returns {Boolean} A boolean indicating whether or not two vertices are connected.
-         */
-
-    }, {
-        key: 'areConnected',
-        value: function areConnected(vertexIdA, vertexIdB) {
-            for (var i = 0; i < this.graph.edges.length; i++) {
-                var edge = this.graph.edges[i];
-
-                if (edge.sourceId === vertexIdA && edge.targetId === vertexIdB || edge.sourceId === vertexIdB && edge.targetId === vertexIdA) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Returns the weight of the edge between two given vertices.
-         *
-         * @param {Number} vertexIdA A vertex id.
-         * @param {Number} vertexIdB A vertex id.
-         * @returns {Number|null} The weight of the edge or, if no edge can be found, null.
-         */
-
-    }, {
-        key: 'getEdgeWeight',
-        value: function getEdgeWeight(vertexIdA, vertexIdB) {
-            for (var i = 0; i < this.graph.edges.length; i++) {
-                var edge = this.graph.edges[i];
-
-                if (edge.sourceId == vertexIdA && edge.targetId == vertexIdB || edge.targetId == vertexIdA && edge.sourceId == vertexIdB) {
-                    return edge.weight;
-                }
-            }
-
-            return null;
-        }
-
-        /**
-         * Returns the weight of the edge between two given vertices.
+         * Sets the center for a ring.
          *
          * @param {SmilesDrawer.Ring} ring A ring.
          */
@@ -3515,7 +3448,8 @@ SmilesDrawer.Drawer = function () {
             var ringSize = ring.getSize();
             var total = new SmilesDrawer.Vector2();
 
-            for (var i = 0; i < ringSize; i++) {
+            var i = ringSize;
+            while (i--) {
                 total.add(this.graph.vertices[ring.members[i]].position);
             }
 
@@ -3538,8 +3472,10 @@ SmilesDrawer.Drawer = function () {
             var smallest = Number.MAX_VALUE;
 
             // Always get the smallest ring.
-            for (var i = 0; i < rings.length; i++) {
-                for (var j = 0; j < ring.rings.length; j++) {
+            var i = rings.length;
+            while (i--) {
+                var j = ring.rings.length;
+                while (j--) {
                     if (rings[i] === ring.rings[j].id) {
                         if (ring.rings[j].getSize() < smallest) {
                             center = ring.rings[j].center;
@@ -3567,7 +3503,8 @@ SmilesDrawer.Drawer = function () {
 
             this.graph.traverseBF(0, function (vertex) {
                 var edges = that.graph.getEdges(vertex.id);
-                for (var i = 0; i < edges.length; i++) {
+                var i = edges.length;
+                while (i--) {
                     var edgeId = edges[i];
                     if (!drawn[edgeId]) {
                         drawn[edgeId] = true;
@@ -3578,7 +3515,8 @@ SmilesDrawer.Drawer = function () {
 
             // Draw ring for implicitly defined aromatic rings
             if (!this.bridgedRing) {
-                for (var i = 0; i < this.rings.length; i++) {
+                var i = this.rings.length;
+                while (i--) {
                     var ring = this.rings[i];
 
                     if (this.isRingAromatic(ring)) {
@@ -3760,7 +3698,8 @@ SmilesDrawer.Drawer = function () {
     }, {
         key: 'drawVertices',
         value: function drawVertices(debug) {
-            for (var i = 0; i < this.graph.vertices.length; i++) {
+            var i = this.graph.vertices.length;
+            while (i--) {
                 var vertex = this.graph.vertices[i];
                 var atom = vertex.value;
                 var charge = 0;
@@ -3786,7 +3725,7 @@ SmilesDrawer.Drawer = function () {
                     } else if (this.opts.atomVisualization === 'balls') {
                         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, _element2);
                     }
-                } else if (vertex.getNeighbourCount() === 2) {
+                } else if (vertex.getNeighbourCount() === 2 && vertex.forcePositioned == true) {
                     // If there is a carbon which bonds are in a straight line, draw a dot
                     var a = this.graph.vertices[vertex.neighbours[0]].position;
                     var b = this.graph.vertices[vertex.neighbours[1]].position;
@@ -3846,51 +3785,6 @@ SmilesDrawer.Drawer = function () {
             }
 
             this.createNextBond(startVertex);
-        }
-
-        /**
-         * Reset the positions of rings and vertices. The previous positions will be backed up.
-         */
-
-    }, {
-        key: 'clearPositions',
-        value: function clearPositions() {
-            this.vertexPositionsBackup = [];
-            this.ringPositionsBackup = [];
-
-            for (var i = 0; i < this.graph.vertices.length; i++) {
-                var vertex = this.graph.vertices[i];
-
-                this.vertexPositionsBackup.push(vertex.position.clone());
-                vertex.positioned = false;
-                vertex.setPositionFromVector(new SmilesDrawer.Vector2());
-            }
-
-            for (var i = 0; i < this.rings.length; i++) {
-                var ring = this.rings[i];
-
-                this.ringPositionsBackup.push(ring.center.clone());
-                ring.positioned = false;
-                ring.center = new SmilesDrawer.Vector2();
-            }
-        }
-
-        /**
-         * Restore the positions backed up during the last clearPositions() call.
-         */
-
-    }, {
-        key: 'restorePositions',
-        value: function restorePositions() {
-            for (var i = 0; i < this.vertexPositionsBackup.length; i++) {
-                this.graph.vertices[i].setPositionFromVector(this.vertexPositionsBackup[i]);
-                this.graph.vertices[i].positioned = true;
-            }
-
-            for (var i = 0; i < this.ringPositionsBackup.length; i++) {
-                this.rings[i].center = this.ringPositionsBackup[i];
-                this.rings[i].positioned = true;
-            }
         }
 
         /**
@@ -4535,7 +4429,7 @@ SmilesDrawer.Drawer = function () {
                     // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
                     // or if there are successive double bonds
                     if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#' || vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
-                        vertex.value.drawExplicit = true;
+                        vertex.value.drawExplicit = false;
 
                         if (previousVertex) {
                             var straightEdge1 = this.graph.getEdge(vertex.id, previousVertex.id);
@@ -5811,9 +5705,11 @@ SmilesDrawer.Graph = function () {
             var edgeStrength = bondLength;
 
             // Add vertices that are directly connected to the ring
-            for (var i = vertexIds.length - 1; i >= 0; i--) {
+            var i = vertexIds.length;
+            while (i--) {
                 var vertex = this.vertices[vertexIds[i]];
-                for (var j = 0; j < vertex.neighbours.length; j++) {
+                var j = vertex.neighbours.length;
+                while (j--) {
                     var neighbour = this.vertices[vertex.neighbours[j]];
                     if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
                         vertexIds.push(neighbour.id);
@@ -5831,7 +5727,8 @@ SmilesDrawer.Graph = function () {
             var a = 0.0;
             var arrPosition = Array(length);
             var arrPositioned = Array(length);
-            for (var i = 0; i < length; i++) {
+            i = length;
+            while (i--) {
                 var _vertex5 = this.vertices[vertexIds[i]];
                 if (!_vertex5.positioned) {
                     arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
@@ -5844,18 +5741,22 @@ SmilesDrawer.Graph = function () {
 
             // Create the matrix containing the lengths
             var matLength = Array(length);
-            for (var i = 0; i < length; i++) {
+            i = length;
+            while (i--) {
                 matLength[i] = new Array(length);
-                for (var j = 0; j < length; j++) {
+                var j = length;
+                while (j--) {
                     matLength[i][j] = bondLength * matDist[i][j];
                 }
             }
 
             // Create the matrix containing the spring strenghts
             var matStrength = Array(length);
-            for (var i = 0; i < length; i++) {
+            i = length;
+            while (i--) {
                 matStrength[i] = Array(length);
-                for (var j = 0; j < length; j++) {
+                var j = length;
+                while (j--) {
                     matStrength[i][j] = edgeStrength * Math.pow(matDist[i][j], -2);
                 }
             }
@@ -5863,14 +5764,18 @@ SmilesDrawer.Graph = function () {
             // Create the matrix containing the energies
             var matEnergy = Array(length);
             var arrEnergySum = Array(length);
-            for (var i = 0; i < length; i++) {
+            i = length;
+            while (i--) {
                 matEnergy[i] = Array(length);
             }
-            for (var i = 0; i < length; i++) {
+
+            i = length;
+            while (i--) {
                 var u = arrPosition[i];
                 var dEx = 0.0;
                 var dEy = 0.0;
-                for (var j = i; j < length; j++) {
+                var j = length;
+                while (j--) {
                     if (i === j) {
                         continue;
                     }
@@ -5895,7 +5800,8 @@ SmilesDrawer.Graph = function () {
                 var maxEnergyId = 0;
                 var maxDE = [0.0, 0.0];
 
-                for (var i = 0; i < length; i++) {
+                i = length;
+                while (i--) {
                     var _energy = energy(i),
                         _energy2 = _slicedToArray(_energy, 2),
                         _delta = _energy2[0],
@@ -5919,7 +5825,8 @@ SmilesDrawer.Graph = function () {
                 var arrL = matLength[index];
                 var arrK = matStrength[index];
 
-                for (var i = 0; i < length; i++) {
+                i = length;
+                while (i--) {
                     if (i === index) {
                         continue;
                     }
@@ -5957,7 +5864,8 @@ SmilesDrawer.Graph = function () {
                 var arrE = matEnergy[index];
                 dE = [0.0, 0.0];
 
-                for (var i = 0; i < length; i++) {
+                i = length;
+                while (i--) {
                     if (index === i) {
                         continue;
                     }
@@ -6018,11 +5926,14 @@ SmilesDrawer.Graph = function () {
                 }
             }
 
-            for (var i = 0; i < length; i++) {
+            i = length;
+            while (i--) {
                 var index = vertexIds[i];
-                this.vertices[index].position.x = arrPosition[i][0];
-                this.vertices[index].position.y = arrPosition[i][1];
-                this.vertices[index].positioned = true;
+                var _vertex6 = this.vertices[index];
+                _vertex6.position.x = arrPosition[i][0];
+                _vertex6.position.y = arrPosition[i][1];
+                _vertex6.positioned = true;
+                _vertex6.forcePositioned = true;
             }
         }
 
@@ -8819,29 +8730,29 @@ SmilesDrawer.RingConnection = function () {
                 return true;
             }
 
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
 
             try {
-                for (var _iterator = this.vertices[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var vertexId = _step.value;
+                for (var _iterator5 = this.vertices[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var vertexId = _step5.value;
 
                     if (vertices[vertexId].value.rings.length > 2) {
                         return true;
                     }
                 }
             } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
                     }
                 } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
                     }
                 }
             }
@@ -9026,28 +8937,28 @@ SmilesDrawer.SSSR = function () {
                     var ring = new Array(sssr[_i4].length);
                     var index = 0;
 
-                    var _iteratorNormalCompletion2 = true;
-                    var _didIteratorError2 = false;
-                    var _iteratorError2 = undefined;
+                    var _iteratorNormalCompletion6 = true;
+                    var _didIteratorError6 = false;
+                    var _iteratorError6 = undefined;
 
                     try {
-                        for (var _iterator2 = sssr[_i4][Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                            var val = _step2.value;
+                        for (var _iterator6 = sssr[_i4][Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                            var val = _step6.value;
 
                             // Get the original id of the vertex back
                             ring[index++] = connectedComponent[val];
                         }
                     } catch (err) {
-                        _didIteratorError2 = true;
-                        _iteratorError2 = err;
+                        _didIteratorError6 = true;
+                        _iteratorError6 = err;
                     } finally {
                         try {
-                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                _iterator2.return();
+                            if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                                _iterator6.return();
                             }
                         } finally {
-                            if (_didIteratorError2) {
-                                throw _iteratorError2;
+                            if (_didIteratorError6) {
+                                throw _iteratorError6;
                             }
                         }
                     }
@@ -9100,12 +9011,14 @@ SmilesDrawer.SSSR = function () {
             var m = 0;
             var n = 0;
 
-            for (var i = 0; i < length; i++) {
+            var i = length;
+            while (i--) {
                 d[i] = Array(length);
                 pe[i] = Array(length);
                 pe_prime[i] = Array(length);
 
-                for (var j = 0; j < length; j++) {
+                var j = length;
+                while (j--) {
                     d[i][j] = i === j || adjacencyMatrix[i][j] === 1 ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
 
                     if (d[i][j] === 1) {
@@ -9118,87 +9031,111 @@ SmilesDrawer.SSSR = function () {
                 }
             }
 
-            for (var k = 0; k < length; k++) {
-                for (var _i5 = 0; _i5 < length; _i5++) {
-                    for (var _j2 = 0; _j2 < length; _j2++) {
-                        var previousPathLength = d[_i5][_j2];
-                        var newPathLength = d[_i5][k] + d[k][_j2];
+            var k = length;
+            var j;
+            while (k--) {
+                i = length;
+                while (i--) {
+                    j = length;
+                    while (j--) {
+                        var previousPathLength = d[i][j];
+                        var newPathLength = d[i][k] + d[k][j];
 
                         if (previousPathLength > newPathLength) {
+                            var l, m, n;
                             if (previousPathLength === newPathLength + 1) {
-                                pe_prime[_i5][_j2] = [pe[_i5][_j2].length];
-                                for (l = 0; l < pe[_i5][_j2].length; l++) {
-                                    pe_prime[_i5][_j2][l] = [pe[_i5][_j2][l].length];
-                                    for (m = 0; m < pe[_i5][_j2][l].length; m++) {
-                                        pe_prime[_i5][_j2][l][m] = [pe[_i5][_j2][l][m].length];
-                                        for (n = 0; n < pe[_i5][_j2][l][m].length; n++) {
-                                            pe_prime[_i5][_j2][l][m][n] = [pe[_i5][_j2][l][m][0], pe[_i5][_j2][l][m][1]];
+                                pe_prime[i][j] = [pe[i][j].length];
+                                l = pe[i][j].length;
+                                while (l--) {
+                                    pe_prime[i][j][l] = [pe[i][j][l].length];
+                                    m = pe[i][j][l].length;
+                                    while (m--) {
+                                        pe_prime[i][j][l][m] = [pe[i][j][l][m].length];
+                                        n = pe[i][j][l][m].length;
+                                        while (n--) {
+                                            pe_prime[i][j][l][m][n] = [pe[i][j][l][m][0], pe[i][j][l][m][1]];
                                         }
                                     }
                                 }
                             } else {
-                                pe_prime[_i5][_j2] = [];
+                                pe_prime[i][j] = [];
                             }
 
-                            d[_i5][_j2] = newPathLength;
+                            d[i][j] = newPathLength;
 
-                            pe[_i5][_j2] = [[]];
+                            pe[i][j] = [[]];
 
-                            for (l = 0; l < pe[_i5][k][0].length; l++) {
-                                pe[_i5][_j2][0].push(pe[_i5][k][0][l]);
+                            l = pe[i][k][0].length;
+                            while (l--) {
+                                pe[i][j][0].push(pe[i][k][0][l]);
                             }
-                            for (l = 0; l < pe[k][_j2][0].length; l++) {
-                                pe[_i5][_j2][0].push(pe[k][_j2][0][l]);
+
+                            l = pe[k][j][0].length;
+                            while (l--) {
+                                pe[i][j][0].push(pe[k][j][0][l]);
                             }
                         } else if (previousPathLength === newPathLength) {
-                            if (pe[_i5][k].length && pe[k][_j2].length) {
-                                if (pe[_i5][_j2].length) {
+                            if (pe[i][k].length && pe[k][j].length) {
+                                var l;
+                                if (pe[i][j].length) {
                                     var tmp = [];
 
-                                    for (l = 0; l < pe[_i5][k][0].length; l++) {
-                                        tmp.push(pe[_i5][k][0][l]);
-                                    }
-                                    for (l = 0; l < pe[k][_j2][0].length; l++) {
-                                        tmp.push(pe[k][_j2][0][l]);
+                                    l = pe[i][k][0].length;
+                                    while (l--) {
+                                        tmp.push(pe[i][k][0][l]);
                                     }
 
-                                    pe[_i5][_j2].push(tmp);
+                                    l = pe[k][j][0].length;
+                                    while (l--) {
+                                        tmp.push(pe[k][j][0][l]);
+                                    }
+
+                                    pe[i][j].push(tmp);
                                 } else {
                                     var _tmp = [];
-
-                                    for (l = 0; l < pe[_i5][k][0].length; l++) {
-                                        _tmp.push(pe[_i5][k][0][l]);
-                                    }
-                                    for (l = 0; l < pe[k][_j2][0].length; l++) {
-                                        _tmp.push(pe[k][_j2][0][l]);
+                                    l = pe[i][k][0].length;
+                                    while (l--) {
+                                        _tmp.push(pe[i][k][0][l]);
                                     }
 
-                                    pe[_i5][_j2][0] = _tmp;
+                                    l = pe[k][j][0].length;
+                                    while (l--) {
+                                        _tmp.push(pe[k][j][0][l]);
+                                    }
+
+                                    pe[i][j][0] = _tmp;
                                 }
                             }
                         } else if (previousPathLength === newPathLength - 1) {
-                            if (pe_prime[_i5][_j2].length) {
+                            var l;
+                            if (pe_prime[i][j].length) {
                                 var _tmp2 = [];
 
-                                for (var l = 0; l < pe[_i5][k][0].length; l++) {
-                                    _tmp2.push(pe[_i5][k][0][l]);
-                                }
-                                for (var l = 0; l < pe[k][_j2][0].length; l++) {
-                                    _tmp2.push(pe[k][_j2][0][l]);
+                                l = pe[i][k][0].length;
+                                while (l--) {
+                                    _tmp2.push(pe[i][k][0][l]);
                                 }
 
-                                pe_prime[_i5][_j2].push(_tmp2);
+                                l = pe[k][j][0].length;
+                                while (l--) {
+                                    _tmp2.push(pe[k][j][0][l]);
+                                }
+
+                                pe_prime[i][j].push(_tmp2);
                             } else {
                                 var _tmp3 = [];
 
-                                for (var l = 0; l < pe[_i5][k][0].length; l++) {
-                                    _tmp3.push(pe[_i5][k][0][l]);
-                                }
-                                for (var l = 0; l < pe[k][_j2][0].length; l++) {
-                                    _tmp3.push(pe[k][_j2][0][l]);
+                                l = pe[i][k][0].length;
+                                while (l--) {
+                                    _tmp3.push(pe[i][k][0][l]);
                                 }
 
-                                pe_prime[_i5][_j2][0] = _tmp3;
+                                l = pe[k][j][0].length;
+                                while (l--) {
+                                    _tmp3.push(pe[k][j][0][l]);
+                                }
+
+                                pe_prime[i][j][0] = _tmp3;
                             }
                         }
                     }
@@ -9293,13 +9230,13 @@ SmilesDrawer.SSSR = function () {
                             allBonds = allBonds.concat(bonds);
                         }
 
-                        if (cSssr.length === nsssr) {
+                        if (cSssr.length > nsssr) {
                             return cSssr;
                         }
                     }
                 } else {
-                    for (var _j3 = 0; _j3 < c[i][1].length - 1; _j3++) {
-                        var _bonds = c[i][1][_j3].concat(c[i][1][_j3 + 1]);
+                    for (var _j2 = 0; _j2 < c[i][1].length - 1; _j2++) {
+                        var _bonds = c[i][1][_j2].concat(c[i][1][_j2 + 1]);
                         // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
                         // TODO: This is a workaround, fix later. Probably should be a set rather than an array, however the computational overhead
                         //       is probably bigger compared to leaving it like this.
@@ -9314,7 +9251,7 @@ SmilesDrawer.SSSR = function () {
                             allBonds = allBonds.concat(_bonds);
                         }
 
-                        if (cSssr.length === nsssr) {
+                        if (cSssr.length > nsssr) {
                             return cSssr;
                         }
                     }
@@ -9337,8 +9274,10 @@ SmilesDrawer.SSSR = function () {
             var edgeCount = 0;
             var length = adjacencyMatrix.length;
 
-            for (var i = 0; i < length - 1; i++) {
-                for (var j = i + 1; j < length; j++) {
+            var i = length - 1;
+            while (i--) {
+                var j = length;
+                while (j--) {
                     if (adjacencyMatrix[i][j] === 1) {
                         edgeCount++;
                     }
@@ -9361,8 +9300,10 @@ SmilesDrawer.SSSR = function () {
             var length = adjacencyMatrix.length;
             var edgeList = [];
 
-            for (var i = 0; i < length - 1; i++) {
-                for (var j = i + 1; j < length; j++) {
+            var i = length - 1;
+            while (i--) {
+                var j = length;
+                while (j--) {
                     if (adjacencyMatrix[i][j] === 1) {
                         edgeList.push([i, j]);
                     }
@@ -9384,7 +9325,8 @@ SmilesDrawer.SSSR = function () {
         value: function bondsToAtoms(bonds) {
             var atoms = new Set();
 
-            for (var i = 0; i < bonds.length; i++) {
+            var i = bonds.length;
+            while (i--) {
                 atoms.add(bonds[i][0]);
                 atoms.add(bonds[i][1]);
             }
@@ -9403,20 +9345,20 @@ SmilesDrawer.SSSR = function () {
         key: 'getBondCount',
         value: function getBondCount(atoms, adjacencyMatrix) {
             var count = 0;
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
 
             try {
-                for (var _iterator3 = atoms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var u = _step3.value;
-                    var _iteratorNormalCompletion4 = true;
-                    var _didIteratorError4 = false;
-                    var _iteratorError4 = undefined;
+                for (var _iterator7 = atoms[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var u = _step7.value;
+                    var _iteratorNormalCompletion8 = true;
+                    var _didIteratorError8 = false;
+                    var _iteratorError8 = undefined;
 
                     try {
-                        for (var _iterator4 = atoms[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                            var v = _step4.value;
+                        for (var _iterator8 = atoms[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                            var v = _step8.value;
 
                             if (u === v) {
                                 continue;
@@ -9424,31 +9366,31 @@ SmilesDrawer.SSSR = function () {
                             count += adjacencyMatrix[u][v];
                         }
                     } catch (err) {
-                        _didIteratorError4 = true;
-                        _iteratorError4 = err;
+                        _didIteratorError8 = true;
+                        _iteratorError8 = err;
                     } finally {
                         try {
-                            if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                _iterator4.return();
+                            if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                                _iterator8.return();
                             }
                         } finally {
-                            if (_didIteratorError4) {
-                                throw _iteratorError4;
+                            if (_didIteratorError8) {
+                                throw _iteratorError8;
                             }
                         }
                     }
                 }
             } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
+                _didIteratorError7 = true;
+                _iteratorError7 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
+                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                        _iterator7.return();
                     }
                 } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
+                    if (_didIteratorError7) {
+                        throw _iteratorError7;
                     }
                 }
             }
@@ -9471,16 +9413,17 @@ SmilesDrawer.SSSR = function () {
     }, {
         key: 'pathSetsContain',
         value: function pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) {
-            for (var _i6 = 0; _i6 < pathSets.length; _i6++) {
-                if (SSSR.isSupersetOf(pathSet, pathSets[_i6])) {
+            var i = pathSets.length;
+            while (i--) {
+                if (SSSR.isSupersetOf(pathSet, pathSets[i])) {
                     return true;
                 }
 
-                if (pathSets[_i6].size !== pathSet.size) {
+                if (pathSets[i].size !== pathSet.size) {
                     continue;
                 }
 
-                if (SSSR.areSetsEqual(pathSets[_i6], pathSet)) {
+                if (SSSR.areSetsEqual(pathSets[i], pathSet)) {
                     return true;
                 }
             }
@@ -9489,8 +9432,10 @@ SmilesDrawer.SSSR = function () {
             // TODO: For some reason, this does not replace the isSupersetOf method above -> why?
             var count = 0;
             var allContained = false;
-            for (var i = 0; i < bonds.length; i++) {
-                for (var j = 0; j < allBonds.length; j++) {
+            i = bonds.length;
+            while (i--) {
+                var j = allBonds.length;
+                while (j--) {
                     if (bonds[i][0] === allBonds[j][0] && bonds[i][1] === allBonds[j][1] || bonds[i][1] === allBonds[j][0] && bonds[i][0] === allBonds[j][1]) {
                         count++;
                     }
@@ -9505,31 +9450,30 @@ SmilesDrawer.SSSR = function () {
             // check if there's one vertex with ringCount < bondCount
             var specialCase = false;
             if (allContained) {
-                var _iteratorNormalCompletion5 = true;
-                var _didIteratorError5 = false;
-                var _iteratorError5 = undefined;
+                var _iteratorNormalCompletion9 = true;
+                var _didIteratorError9 = false;
+                var _iteratorError9 = undefined;
 
                 try {
-                    for (var _iterator5 = pathSet[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                        var _element4 = _step5.value;
+                    for (var _iterator9 = pathSet[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                        var _element4 = _step9.value;
 
-                        console.log(_element4, arrRingCount[_element4], arrBondCount[_element4]);
                         if (arrRingCount[_element4] < arrBondCount[_element4]) {
                             specialCase = true;
                             break;
                         }
                     }
                 } catch (err) {
-                    _didIteratorError5 = true;
-                    _iteratorError5 = err;
+                    _didIteratorError9 = true;
+                    _iteratorError9 = err;
                 } finally {
                     try {
-                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                            _iterator5.return();
+                        if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                            _iterator9.return();
                         }
                     } finally {
-                        if (_didIteratorError5) {
-                            throw _iteratorError5;
+                        if (_didIteratorError9) {
+                            throw _iteratorError9;
                         }
                     }
                 }
@@ -9540,27 +9484,27 @@ SmilesDrawer.SSSR = function () {
             }
 
             // Update the ring counts for the vertices
-            var _iteratorNormalCompletion6 = true;
-            var _didIteratorError6 = false;
-            var _iteratorError6 = undefined;
+            var _iteratorNormalCompletion10 = true;
+            var _didIteratorError10 = false;
+            var _iteratorError10 = undefined;
 
             try {
-                for (var _iterator6 = pathSet[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-                    var _element5 = _step6.value;
+                for (var _iterator10 = pathSet[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                    var _element5 = _step10.value;
 
                     arrRingCount[_element5]++;
                 }
             } catch (err) {
-                _didIteratorError6 = true;
-                _iteratorError6 = err;
+                _didIteratorError10 = true;
+                _iteratorError10 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                        _iterator6.return();
+                    if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                        _iterator10.return();
                     }
                 } finally {
-                    if (_didIteratorError6) {
-                        throw _iteratorError6;
+                    if (_didIteratorError10) {
+                        throw _iteratorError10;
                     }
                 }
             }
@@ -9583,29 +9527,29 @@ SmilesDrawer.SSSR = function () {
                 return false;
             }
 
-            var _iteratorNormalCompletion7 = true;
-            var _didIteratorError7 = false;
-            var _iteratorError7 = undefined;
+            var _iteratorNormalCompletion11 = true;
+            var _didIteratorError11 = false;
+            var _iteratorError11 = undefined;
 
             try {
-                for (var _iterator7 = setA[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                    var _element6 = _step7.value;
+                for (var _iterator11 = setA[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+                    var _element6 = _step11.value;
 
                     if (!setB.has(_element6)) {
                         return false;
                     }
                 }
             } catch (err) {
-                _didIteratorError7 = true;
-                _iteratorError7 = err;
+                _didIteratorError11 = true;
+                _iteratorError11 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                        _iterator7.return();
+                    if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                        _iterator11.return();
                     }
                 } finally {
-                    if (_didIteratorError7) {
-                        throw _iteratorError7;
+                    if (_didIteratorError11) {
+                        throw _iteratorError11;
                     }
                 }
             }
@@ -9624,29 +9568,29 @@ SmilesDrawer.SSSR = function () {
     }, {
         key: 'isSupersetOf',
         value: function isSupersetOf(setA, setB) {
-            var _iteratorNormalCompletion8 = true;
-            var _didIteratorError8 = false;
-            var _iteratorError8 = undefined;
+            var _iteratorNormalCompletion12 = true;
+            var _didIteratorError12 = false;
+            var _iteratorError12 = undefined;
 
             try {
-                for (var _iterator8 = setB[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                    var element = _step8.value;
+                for (var _iterator12 = setB[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+                    var element = _step12.value;
 
                     if (!setA.has(element)) {
                         return false;
                     }
                 }
             } catch (err) {
-                _didIteratorError8 = true;
-                _iteratorError8 = err;
+                _didIteratorError12 = true;
+                _iteratorError12 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                        _iterator8.return();
+                    if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                        _iterator12.return();
                     }
                 } finally {
-                    if (_didIteratorError8) {
-                        throw _iteratorError8;
+                    if (_didIteratorError12) {
+                        throw _iteratorError12;
                     }
                 }
             }
@@ -10374,7 +10318,8 @@ SmilesDrawer.Vector2 = function () {
  * @property {Number} dir The direction of this vertex.
  * @property {Number} neighbourCount The number of neighbouring vertices.
  * @property {Number[]} neighbours The vertex ids of neighbouring vertices.
- * @property {String[]} neighbouringElements The element symbols associated with neighbouring vertices.         
+ * @property {String[]} neighbouringElements The element symbols associated with neighbouring vertices.
+ * @property {Boolean} forcePositioned A boolean indicating whether or not this vertex was positioned using a force-based approach.
  */
 SmilesDrawer.Vertex = function () {
     /**
@@ -10405,6 +10350,7 @@ SmilesDrawer.Vertex = function () {
         this.neighbourCount = 0;
         this.neighbours = [];
         this.neighbouringElements = [];
+        this.forcePositioned = false;
     }
 
     /**
@@ -10502,6 +10448,7 @@ SmilesDrawer.Vertex = function () {
             clone.edges = SmilesDrawer.ArrayHelper.clone(this.edges);
             clone.positioned = this.positioned;
             clone.angle = this.angle;
+            clone.forcePositioned = this.forcePositioned;
             return clone;
         }
 

@@ -15,7 +15,8 @@
  * @property {Number} dir The direction of this vertex.
  * @property {Number} neighbourCount The number of neighbouring vertices.
  * @property {Number[]} neighbours The vertex ids of neighbouring vertices.
- * @property {String[]} neighbouringElements The element symbols associated with neighbouring vertices.         
+ * @property {String[]} neighbouringElements The element symbols associated with neighbouring vertices.
+ * @property {Boolean} forcePositioned A boolean indicating whether or not this vertex was positioned using a force-based approach.
  */
 SmilesDrawer.Vertex = class Vertex {
     /**
@@ -41,6 +42,7 @@ SmilesDrawer.Vertex = class Vertex {
         this.neighbourCount = 0;
         this.neighbours = [];
         this.neighbouringElements = [];
+        this.forcePositioned = false;
     }
 
     /**
@@ -119,6 +121,7 @@ SmilesDrawer.Vertex = class Vertex {
         clone.edges = SmilesDrawer.ArrayHelper.clone(this.edges);
         clone.positioned = this.positioned;
         clone.angle = this.angle;
+        clone.forcePositioned = this.forcePositioned;
         return clone;
     }
 

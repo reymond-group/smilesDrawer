@@ -230,7 +230,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
             ctx.moveTo(l.x, l.y);
             ctx.lineTo(r.x, r.y);
             ctx.lineCap = 'round';
-            ctx.lineWidth = this.opts.bondThickness * 2.0;
+            ctx.lineWidth = this.opts.bondThickness * 2.5;
             ctx.strokeStyle = this.getColor('BACKGROUND');
             ctx.stroke();
             ctx.globalCompositeOperation = 'source-over';

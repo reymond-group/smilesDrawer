@@ -594,39 +594,40 @@ SmilesDrawer.Drawer = class Drawer {
    * @returns {SmilesDrawer.Ring} The bridged ring.
    */
   createBridgedRing(ringIds, sourceVertexId) {
-    let bridgedRing = [];
-    let vertices = [];
-    let neighbours = [];
+    let ringMembers = new Set();
+    let vertices = new Set();
+    let neighbours = new Set();
 
     for (var i = 0; i < ringIds.length; i++) {
       let ring = this.getRing(ringIds[i]);
       ring.isPartOfBridged = true;
 
       for (var j = 0; j < ring.members.length; j++) {
-        vertices.push(ring.members[j]);
+        vertices.add(ring.members[j]);
       }
 
       for (var j = 0; j < ring.neighbours.length; j++) {
-        neighbours.push(ring.neighbours[j]);
+        let id  = ring.neighbours[j];
+
+        if (ringIds.indexOf(id) === -1) {
+          neighbours.add(ring.neighbours[j]);
+        }
       }
     }
-
-    // Remove duplicates
-    vertices = SmilesDrawer.ArrayHelper.unique(vertices);
 
     // A vertex is part of the bridged ring if it only belongs to
     // one of the rings (or to another ring
     // which is not part of the bridged ring).
-    let leftovers = [];
+    let leftovers = new Set();
 
-    for (var i = 0; i < vertices.length; i++) {
-      let vertex = this.graph.vertices[vertices[i]];
+    for (let id of vertices) {
+      let vertex = this.graph.vertices[id];
       let intersection = SmilesDrawer.ArrayHelper.intersection(ringIds, vertex.value.rings);
 
       if (vertex.value.rings.length === 1 || intersection.length === 1) {
-        bridgedRing.push(vertex.id);
+        ringMembers.add(vertex.id);
       } else {
-        leftovers.push(vertex.id);
+        leftovers.add(vertex.id);
       }
     }
 
@@ -636,8 +637,8 @@ SmilesDrawer.Drawer = class Drawer {
     let tmp = [];
     let insideRing = [];
 
-    for (var i = 0; i < leftovers.length; i++) {
-      let vertex = this.graph.vertices[leftovers[i]];
+    for (let id of leftovers) {
+      let vertex = this.graph.vertices[id];
       let onRing = false;
 
       for (let j = 0; j < vertex.edges.length; j++) {
@@ -648,27 +649,18 @@ SmilesDrawer.Drawer = class Drawer {
 
       if (onRing) {
         vertex.value.isBridgeNode = true;
-        tmp.push(vertex.id);
+        ringMembers.add(vertex.id);
       } else {
         vertex.value.isBridge = true;
-        insideRing.push(vertex.id);
+        ringMembers.add(vertex.id);
       }
     }
 
-    // Merge the two arrays containing members of the bridged ring
-    let ringMembers = SmilesDrawer.ArrayHelper.merge(bridgedRing, tmp)
-    ringMembers = SmilesDrawer.ArrayHelper.merge(ringMembers, insideRing);
-
-    // The neighbours of the rings in the bridged ring that are not connected by a
-    // bridge are now the neighbours of the bridged ring
-    neighbours = SmilesDrawer.ArrayHelper.unique(neighbours);
-    neighbours = SmilesDrawer.ArrayHelper.removeAll(neighbours, ringIds);
-
     // Create the ring
-    let ring = new SmilesDrawer.Ring(ringMembers);
+    let ring = new SmilesDrawer.Ring([...ringMembers]);
 
     ring.isBridged = true;
-    ring.neighbours = neighbours;
+    ring.neighbours = [...neighbours];
 
     for (var i = 0; i < ringIds.length; i++) {
       ring.rings.push(this.getRing(ringIds[i]).clone());
@@ -684,14 +676,12 @@ SmilesDrawer.Drawer = class Drawer {
     // associated with the bridged ring
     for (var i = 0; i < insideRing.length; i++) {
       let vertex = this.graph.vertices[insideRing[i]];
-
-      vertex.value.rings = [];
+      vertex.value.rings = Array();
     }
 
     // Remove former rings from members of the bridged ring and add the bridged ring
-    for (var i = 0; i < ringMembers.length; i++) {
-      let vertex = this.graph.vertices[ringMembers[i]];
-
+    for (let id of ringMembers) {
+      let vertex = this.graph.vertices[id];
       vertex.value.rings = SmilesDrawer.ArrayHelper.removeAll(vertex.value.rings, ringIds);
       vertex.value.rings.push(ring.id);
     }
@@ -704,14 +694,14 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     // Update the ring connections and add this ring to the neighbours neighbours
-    for (var i = 0; i < neighbours.length; i++) {
-      let connections = this.getRingConnections(neighbours[i], ringIds);
+    for (let id of neighbours) {
+      let connections = this.getRingConnections(id, ringIds);
 
       for (var j = 0; j < connections.length; j++) {
-        this.getRingConnection(connections[j]).updateOther(ring.id, neighbours[i]);
+        this.getRingConnection(connections[j]).updateOther(ring.id, id);
       }
 
-      this.getRing(neighbours[i]).neighbours.push(ring.id);
+      this.getRing(id).neighbours.push(ring.id);
     }
 
     return ring;
@@ -757,30 +747,6 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     return commonRings;
-  }
-
-  /**
-   * Returns the smallest ring shared by the two vertices.
-   *
-   * @param {SmilesDrawer.Vertex} vertexA A vertex.
-   * @param {SmilesDrawer.Vertex} vertexB A vertex.
-   * @returns {SmilesDrawer.Ring|null} If a smallest common ring exists, that ring, else null.
-   */
-  getSmallestCommonRing(vertexA, vertexB) {
-    let commonRings = this.getCommonRings(vertexA, vertexB);
-    let minSize = Number.MAX_VALUE;
-    let smallestCommonRing = null;
-
-    for (var i = 0; i < commonRings.length; i++) {
-      let size = this.getRing(commonRings[i]).getSize();
-
-      if (size < minSize) {
-        minSize = size;
-        smallestCommonRing = this.getRing(commonRings[i]);
-      }
-    }
-
-    return smallestCommonRing;
   }
 
   /**
@@ -852,34 +818,6 @@ SmilesDrawer.Drawer = class Drawer {
       let v = this.graph.vertices[i];
 
       if (v.id === vertex.id) {
-        continue;
-      }
-
-      let distSq = vertex.position.distanceSq(v.position);
-
-      if (distSq < minDist) {
-        minDist = distSq;
-        minVertex = v;
-      }
-    }
-
-    return minVertex;
-  }
-
-  /**
-   * Returns the closest vertex (connected as well as unconnected), which is an endpoint.
-   *
-   * @param {SmilesDrawer.Vertex} vertex The vertex of which to find the closest other vertex.
-   * @returns {SmilesDrawer.Vertex} The closest endpoint vertex.
-   */
-  getClosestEndpointVertex(vertex) {
-    let minDist = 99999;
-    let minVertex = null;
-
-    for (var i = 0; i < this.graph.vertices.length; i++) {
-      let v = this.graph.vertices[i];
-
-      if (v.id === vertex.id || v.getNeighbourCount() > 1) {
         continue;
       }
 
@@ -1006,70 +944,29 @@ SmilesDrawer.Drawer = class Drawer {
   }
 
   /**
-   * Get the ring connections associated with a ring, the ring connections between two rings or the ring connections between one ring and multiple other rings.
+   * Get the ring connections between a ring and a set of rings.
    *
    * @param {Number} ringId A ring id.
-   * @param {Number|Number[]|null} [ringIds=null] A ring id, an array of ring ids or null.
+   * @param {Number[]} ringIds An array of ring ids.
    * @returns {Number[]} An array of ring connection ids.
    */
-  getRingConnections(ringId, ringIds = null) {
+  getRingConnections(ringId, ringIds) {
     let ringConnections = [];
 
-    if (ringIds === null) {
-      for (var i = 0; i < this.ringConnections.length; i++) {
-        let ringConnection = this.ringConnections[i];
+    for (var i = 0; i < this.ringConnections.length; i++) {
+      let rc = this.ringConnections[i];
 
-        if (ringConnection.firstRingId === ringId || ringConnection.secondRingId === ringId) {
-          ringConnections.push(ringConnection.id);
-        }
-      }
-    } else if (ringIds.constructor !== Array) {
-      for (var i = 0; i < this.ringConnections.length; i++) {
-        let ringConnection = this.ringConnections[i];
+      for (var j = 0; j < ringIds.length; j++) {
+        let id = ringIds[j];
 
-        if (ringConnection.firstRingId === ringId && ringConnection.secondRingId === ringIds ||
-          ringConnection.firstRingId === ringIds && ringConnection.secondRingId === ringId) {
-          ringConnections.push(ringConnection.id);
-        }
-      }
-    } else {
-      for (var i = 0; i < this.ringConnections.length; i++) {
-        for (var j = 0; j < ringIds.length; j++) {
-          let id = ringIds[j];
-          let ringConnection = this.ringConnections[i];
-
-          if (ringConnection.firstRingId === ringId && ringConnection.secondRingId === id ||
-            ringConnection.firstRingId === id && ringConnection.secondRingId === ringId) {
-            ringConnections.push(ringConnection.id);
-          }
+        if (rc.firstRingId === ringId && rc.secondRingId === id ||
+          rc.firstRingId === id && rc.secondRingId === ringId) {
+          ringConnections.push(rc.id);
         }
       }
     }
 
     return ringConnections;
-  }
-
-  /**
-   * Check whether or not the two vertices specified span a bond which is a ring connection (fused rings).
-   * 
-   * @param {Number} vertexIdA A vertex id.
-   * @param {Number} vertexIdB A vertex id.
-   * @returns {Boolean} Returns a boolean indicating whether or not the two vertices specify a ringbond.
-   */
-  isRingConnection(vertexIdA, vertexIdB) {
-    for (var i = 0; i < this.ringConnections.length; i++) {
-      let ringConnection = this.ringConnections[i];
-
-      if (ringConnection.vertices.size !== 2) {
-        continue;
-      }
-
-      if (ringConnection.vertices.has(vertexIdA) && ringConnection.vertices.has(vertexIdB)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   /**
@@ -1081,16 +978,18 @@ SmilesDrawer.Drawer = class Drawer {
     let total = 0.0;
     let overlapScores = new Float32Array(this.graph.vertices.length);
 
-    for (var i = 0; i < this.graph.vertices.length; i++) {
+    var i = this.graph.vertices.length;
+    while (i--) {
       overlapScores[i] = 0;
     }
 
-    for (var i = 0; i < this.graph.vertices.length; i++) {
-      for (var j = i + 1; j < this.graph.vertices.length; j++) {
-        let a = this.graph.vertices[i];
-        let b = this.graph.vertices[j];
-
-        let dist = SmilesDrawer.Vector2.subtract(a.position, b.position).length();
+    i = this.graph.vertices.length;
+    while (i--) {
+      var j = this.graph.vertices.length;
+      while (--j > i) {
+        let a = this.graph.vertices[i].position;
+        let b = this.graph.vertices[j].position;
+        let dist = SmilesDrawer.Vector2.subtract(a, b).length();
 
         if (dist < this.opts.bondLength) {
           let weighted = (this.opts.bondLength - dist) / this.opts.bondLength;
@@ -1102,8 +1001,8 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     let sortable = [];
-
-    for (var i = 0; i < this.graph.vertices.length; i++) {
+    i = this.graph.vertices.length;
+    while (i--) {
       sortable.push({
         id: i,
         score: overlapScores[i]
@@ -1185,46 +1084,7 @@ SmilesDrawer.Drawer = class Drawer {
   }
 
   /**
-   * Checks whether or not two vertices are connected.
-   *
-   * @param {Number} vertexIdA A vertex id.
-   * @param {Number} vertexIdA A vertex id.
-   * @returns {Boolean} A boolean indicating whether or not two vertices are connected.
-   */
-  areConnected(vertexIdA, vertexIdB) {
-    for (var i = 0; i < this.graph.edges.length; i++) {
-      let edge = this.graph.edges[i];
-
-      if (edge.sourceId === vertexIdA && edge.targetId === vertexIdB ||
-        edge.sourceId === vertexIdB && edge.targetId === vertexIdA) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Returns the weight of the edge between two given vertices.
-   *
-   * @param {Number} vertexIdA A vertex id.
-   * @param {Number} vertexIdB A vertex id.
-   * @returns {Number|null} The weight of the edge or, if no edge can be found, null.
-   */
-  getEdgeWeight(vertexIdA, vertexIdB) {
-    for (var i = 0; i < this.graph.edges.length; i++) {
-      let edge = this.graph.edges[i];
-
-      if (edge.sourceId == vertexIdA && edge.targetId == vertexIdB ||
-        edge.targetId == vertexIdA && edge.sourceId == vertexIdB) {
-        return edge.weight;
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Returns the weight of the edge between two given vertices.
+   * Sets the center for a ring.
    *
    * @param {SmilesDrawer.Ring} ring A ring.
    */
@@ -1232,7 +1092,8 @@ SmilesDrawer.Drawer = class Drawer {
     let ringSize = ring.getSize();
     let total = new SmilesDrawer.Vector2();
 
-    for (var i = 0; i < ringSize; i++) {
+    var i = ringSize;
+    while (i--) {
       total.add(this.graph.vertices[ring.members[i]].position);
     }
 
@@ -1252,8 +1113,10 @@ SmilesDrawer.Drawer = class Drawer {
     let smallest = Number.MAX_VALUE;
 
     // Always get the smallest ring.
-    for (var i = 0; i < rings.length; i++) {
-      for (var j = 0; j < ring.rings.length; j++) {
+    var i = rings.length;
+    while (i--) {
+      var j = ring.rings.length;
+      while (j--) {
         if (rings[i] === ring.rings[j].id) {
           if (ring.rings[j].getSize() < smallest) {
             center = ring.rings[j].center;
@@ -1278,7 +1141,8 @@ SmilesDrawer.Drawer = class Drawer {
 
     this.graph.traverseBF(0, function (vertex) {
       let edges = that.graph.getEdges(vertex.id);
-      for (var i = 0; i < edges.length; i++) {
+      var i = edges.length;
+      while (i--) {
         let edgeId = edges[i];
         if (!drawn[edgeId]) {
           drawn[edgeId] = true;
@@ -1289,7 +1153,8 @@ SmilesDrawer.Drawer = class Drawer {
 
     // Draw ring for implicitly defined aromatic rings
     if (!this.bridgedRing) {
-      for (var i = 0; i < this.rings.length; i++) {
+      var i = this.rings.length;
+      while (i--) {
         let ring = this.rings[i];
 
         if (this.isRingAromatic(ring)) {
@@ -1468,7 +1333,8 @@ SmilesDrawer.Drawer = class Drawer {
    * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
    */
   drawVertices(debug) {
-    for (var i = 0; i < this.graph.vertices.length; i++) {
+    var i = this.graph.vertices.length;
+    while (i--) {
       let vertex = this.graph.vertices[i];
       let atom = vertex.value;
       let charge = 0;
@@ -1495,7 +1361,7 @@ SmilesDrawer.Drawer = class Drawer {
         } else if (this.opts.atomVisualization === 'balls') {
           this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
-      } else if (vertex.getNeighbourCount() === 2) {
+      } else if (vertex.getNeighbourCount() === 2 && vertex.forcePositioned == true) {
         // If there is a carbon which bonds are in a straight line, draw a dot
         let a = this.graph.vertices[vertex.neighbours[0]].position;
         let b = this.graph.vertices[vertex.neighbours[1]].position;
@@ -1552,45 +1418,6 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     this.createNextBond(startVertex);
-  }
-
-  /**
-   * Reset the positions of rings and vertices. The previous positions will be backed up.
-   */
-  clearPositions() {
-    this.vertexPositionsBackup = [];
-    this.ringPositionsBackup = [];
-
-    for (var i = 0; i < this.graph.vertices.length; i++) {
-      let vertex = this.graph.vertices[i];
-
-      this.vertexPositionsBackup.push(vertex.position.clone());
-      vertex.positioned = false;
-      vertex.setPositionFromVector(new SmilesDrawer.Vector2());
-    }
-
-    for (var i = 0; i < this.rings.length; i++) {
-      let ring = this.rings[i];
-
-      this.ringPositionsBackup.push(ring.center.clone());
-      ring.positioned = false;
-      ring.center = new SmilesDrawer.Vector2();
-    }
-  }
-
-  /**
-   * Restore the positions backed up during the last clearPositions() call.
-   */
-  restorePositions() {
-    for (var i = 0; i < this.vertexPositionsBackup.length; i++) {
-      this.graph.vertices[i].setPositionFromVector(this.vertexPositionsBackup[i]);
-      this.graph.vertices[i].positioned = true;
-    }
-
-    for (var i = 0; i < this.ringPositionsBackup.length; i++) {
-      this.rings[i].center = this.ringPositionsBackup[i];
-      this.rings[i].positioned = true;
-    }
   }
 
   /**
@@ -2195,7 +2022,7 @@ SmilesDrawer.Drawer = class Drawer {
         // or if there are successive double bonds
         if ((vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) ||
           vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
-          vertex.value.drawExplicit = true;
+          vertex.value.drawExplicit = false;
 
           if (previousVertex) {
             let straightEdge1 = this.graph.getEdge(vertex.id, previousVertex.id);

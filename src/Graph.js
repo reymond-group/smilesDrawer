@@ -501,9 +501,11 @@ SmilesDrawer.Graph = class Graph {
         let edgeStrength = bondLength;
 
         // Add vertices that are directly connected to the ring
-        for (var i = vertexIds.length - 1; i >= 0; i--) {
+        var i = vertexIds.length;
+        while (i--) {
           let vertex = this.vertices[vertexIds[i]];
-          for (var j = 0; j < vertex.neighbours.length; j++) {
+          var j = vertex.neighbours.length;
+          while (j--) {
             let neighbour = this.vertices[vertex.neighbours[j]];
             if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
               vertexIds.push(neighbour.id);
@@ -521,7 +523,8 @@ SmilesDrawer.Graph = class Graph {
         let a = 0.0;
         let arrPosition = Array(length);
         let arrPositioned = Array(length);
-        for (var i = 0; i < length; i++) {
+        i = length;
+        while (i--) {
             let vertex = this.vertices[vertexIds[i]];
             if (!vertex.positioned) {
                 arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
@@ -534,18 +537,22 @@ SmilesDrawer.Graph = class Graph {
         
         // Create the matrix containing the lengths
         let matLength = Array(length);
-        for (var i = 0; i < length; i++) {
+        i = length;
+        while (i--) {
             matLength[i] = new Array(length);
-            for (var j = 0; j < length; j++) {
+            var j = length;
+            while (j--) {
                 matLength[i][j] = bondLength * matDist[i][j];
             }
         }
 
         // Create the matrix containing the spring strenghts
         let matStrength = Array(length);
-        for (var i = 0; i < length; i++) {
+        i = length;
+        while (i--) {
             matStrength[i] = Array(length);
-            for (var j = 0; j < length; j++) {
+            var j = length;
+            while (j--) {
                 matStrength[i][j] = edgeStrength * Math.pow(matDist[i][j], -2);
             }
         }
@@ -553,14 +560,18 @@ SmilesDrawer.Graph = class Graph {
         // Create the matrix containing the energies
         let matEnergy = Array(length);
         let arrEnergySum = Array(length);
-        for (var i = 0; i < length; i++) {
+        i = length;
+        while (i--) {
             matEnergy[i] = Array(length);
         }
-        for (var i = 0; i < length; i++) {
+
+        i = length;
+        while (i--) {
             let u = arrPosition[i];
             let dEx = 0.0;
             let dEy = 0.0;
-            for (var j = i; j < length; j++) {
+            var j = length;
+            while (j--) {
                 if (i === j) {
                     continue;
                 }
@@ -587,8 +598,9 @@ SmilesDrawer.Graph = class Graph {
             let maxEnergy = 0.0;
             let maxEnergyId = 0;
             let maxDE = [0.0, 0.0];
-
-            for (var i = 0; i < length; i++) {
+            
+            i = length;
+            while (i--) {
                 let [delta, dE] = energy(i);
 
                 if (delta > maxEnergy && arrPositioned[i] === false) {
@@ -609,7 +621,8 @@ SmilesDrawer.Graph = class Graph {
             let arrL = matLength[index];
             let arrK = matStrength[index];
             
-            for (var i = 0; i < length; i++) {
+            i = length;
+            while (i--) {
                 if (i === index) {
                     continue;
                 }
@@ -647,7 +660,8 @@ SmilesDrawer.Graph = class Graph {
             let arrE = matEnergy[index];
             dE = [0.0, 0.0];
 
-            for (var i = 0; i < length; i++) {
+            i = length;
+            while (i--) {
                 if (index === i) {
                     continue;
                 }
@@ -693,12 +707,15 @@ SmilesDrawer.Graph = class Graph {
                 [delta, dE] = energy(maxEnergyId);
             }
         }
-
-        for (var i = 0; i < length; i++) {
+        
+        i = length;
+        while (i--) {
             let index = vertexIds[i];
-            this.vertices[index].position.x = arrPosition[i][0];
-            this.vertices[index].position.y = arrPosition[i][1];
-            this.vertices[index].positioned = true;
+            let vertex = this.vertices[index];
+            vertex.position.x = arrPosition[i][0];
+            vertex.position.y = arrPosition[i][1];
+            vertex.positioned = true;
+            vertex.forcePositioned = true;
         }
     }
 

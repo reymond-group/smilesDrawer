@@ -102,12 +102,14 @@ SmilesDrawer.SSSR = class SSSR {
         var m = 0;
         var n = 0;
 
-        for (let i = 0; i < length; i++) {
+        var i = length;
+        while (i--) {
             d[i] = Array(length);
             pe[i] = Array(length);
             pe_prime[i] = Array(length);
             
-            for (let j = 0; j < length; j++) {
+            var j = length;
+            while (j--) {
                 d[i][j] = (i === j || adjacencyMatrix[i][j] === 1) ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
 
                 if (d[i][j] === 1) {
@@ -120,20 +122,28 @@ SmilesDrawer.SSSR = class SSSR {
             }
         }
 
-        for (let k = 0; k < length; k++) {
-            for (let i = 0; i < length; i++) {
-                for (let j = 0; j < length; j++) {
+        var k = length;
+        var j;
+        while (k--) {
+            i = length;
+            while (i--) {
+                j = length;
+                while (j--) {
                     const previousPathLength = d[i][j];
                     const newPathLength = d[i][k] + d[k][j];
 
                     if (previousPathLength > newPathLength) {
+                        var l, m, n;
                         if (previousPathLength === newPathLength + 1) {
                             pe_prime[i][j] = [pe[i][j].length];
-                            for (l = 0; l < pe[i][j].length; l++) {
+                            l = pe[i][j].length
+                            while (l--) {
                                 pe_prime[i][j][l] = [pe[i][j][l].length];
-                                for (m = 0; m < pe[i][j][l].length; m++) {
+                                m = pe[i][j][l].length
+                                while (m--) {
                                     pe_prime[i][j][l][m] = [pe[i][j][l][m].length];
-                                    for (n = 0; n < pe[i][j][l][m].length; n++) {
+                                    n = pe[i][j][l][m].length;
+                                    while (n--) {
                                         pe_prime[i][j][l][m][n] = [pe[i][j][l][m][0], pe[i][j][l][m][1]];
                                     }
                                 }
@@ -146,32 +156,41 @@ SmilesDrawer.SSSR = class SSSR {
                         
                         pe[i][j] = [[]];
 
-                        for (l = 0; l < pe[i][k][0].length; l++) {
+                        l = pe[i][k][0].length;
+                        while (l--) {
                             pe[i][j][0].push(pe[i][k][0][l]);
                         }
-                        for (l = 0; l < pe[k][j][0].length; l++) {
+
+                        l = pe[k][j][0].length;
+                        while (l--) {
                             pe[i][j][0].push(pe[k][j][0][l]);
                         }
                     } else if (previousPathLength === newPathLength) {
                         if (pe[i][k].length && pe[k][j].length) {
+                            var l;
                             if (pe[i][j].length) {
                                 let tmp = [];
 
-                                for (l = 0; l < pe[i][k][0].length; l++) {
+                                l = pe[i][k][0].length;
+                                while (l--) {
                                     tmp.push(pe[i][k][0][l]);
                                 }
-                                for (l = 0; l < pe[k][j][0].length; l++) {
+
+                                l = pe[k][j][0].length;
+                                while (l--) {
                                     tmp.push(pe[k][j][0][l]);
                                 }
 
                                 pe[i][j].push(tmp);
                             } else {
                                 let tmp = [];
-
-                                for (l = 0; l < pe[i][k][0].length; l++) {
+                                l = pe[i][k][0].length;
+                                while (l--) {
                                     tmp.push(pe[i][k][0][l]);
                                 }
-                                for (l = 0; l < pe[k][j][0].length; l++) {
+
+                                l = pe[k][j][0].length;
+                                while (l--) {
                                     tmp.push(pe[k][j][0][l]);
                                 }
 
@@ -179,13 +198,17 @@ SmilesDrawer.SSSR = class SSSR {
                             }
                         }
                     } else if (previousPathLength === newPathLength - 1) {
+                        var l;
                         if (pe_prime[i][j].length) {
                             let tmp = [];
-
-                            for (var l = 0; l < pe[i][k][0].length; l++) {
+                            
+                            l = pe[i][k][0].length;
+                            while (l--) {
                                 tmp.push(pe[i][k][0][l]);
                             }
-                            for (var l = 0; l < pe[k][j][0].length; l++) {
+
+                            l = pe[k][j][0].length;
+                            while (l--) {
                                 tmp.push(pe[k][j][0][l]);
                             }
 
@@ -193,10 +216,13 @@ SmilesDrawer.SSSR = class SSSR {
                         } else {
                             let tmp = [];
 
-                            for (var l = 0; l < pe[i][k][0].length; l++) {
+                            l = pe[i][k][0].length;
+                            while (l--) {
                                 tmp.push(pe[i][k][0][l]);
                             }
-                            for (var l = 0; l < pe[k][j][0].length; l++) {
+
+                            l = pe[k][j][0].length;
+                            while (l--) {
                                 tmp.push(pe[k][j][0][l]);
                             }
 
@@ -289,7 +315,7 @@ SmilesDrawer.SSSR = class SSSR {
                         allBonds = allBonds.concat(bonds);
                     }
 
-                    if (cSssr.length === nsssr) {
+                    if (cSssr.length > nsssr) {
                         return cSssr;
                     }
                 }
@@ -310,7 +336,7 @@ SmilesDrawer.SSSR = class SSSR {
                         allBonds = allBonds.concat(bonds);
                     }
 
-                    if (cSssr.length === nsssr) {
+                    if (cSssr.length > nsssr) {
                         return cSssr;
                     }
                 }
@@ -330,8 +356,10 @@ SmilesDrawer.SSSR = class SSSR {
         let edgeCount = 0;
         let length = adjacencyMatrix.length;
 
-        for (let i = 0; i < length - 1; i++) {
-            for (let j = i + 1; j < length; j++) {
+        var i = length - 1;
+        while (i--) {
+            var j = length;
+            while (j--) {
                 if (adjacencyMatrix[i][j] === 1) {
                     edgeCount++;
                 } 
@@ -351,8 +379,10 @@ SmilesDrawer.SSSR = class SSSR {
         let length = adjacencyMatrix.length;
         let edgeList = [];
 
-        for (let i = 0; i < length - 1; i++) {
-            for (let j = i + 1; j < length; j++) {
+        var i = length - 1;
+        while (i--) {
+            var j = length;
+            while (j--) {
                 if (adjacencyMatrix[i][j] === 1) {
                     edgeList.push([i,j]);
                 }
@@ -371,7 +401,8 @@ SmilesDrawer.SSSR = class SSSR {
     static bondsToAtoms(bonds) {
         let atoms = new Set();
 
-        for (let i = 0; i < bonds.length; i++) {
+        var i = bonds.length;
+        while (i--) {
             atoms.add(bonds[i][0]);
             atoms.add(bonds[i][1]);
         }
@@ -411,7 +442,8 @@ SmilesDrawer.SSSR = class SSSR {
      * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
      */
     static pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) {
-        for (let i = 0; i < pathSets.length; i++) {
+        var i = pathSets.length;
+        while (i--) {
             if (SSSR.isSupersetOf(pathSet, pathSets[i])) {
                 return true;
             }
@@ -429,8 +461,10 @@ SmilesDrawer.SSSR = class SSSR {
         // TODO: For some reason, this does not replace the isSupersetOf method above -> why?
         let count = 0;
         let allContained = false;
-        for (var i = 0; i < bonds.length; i++) {
-            for (var j = 0; j < allBonds.length; j++) {
+        i = bonds.length;
+        while (i--) {
+            var j = allBonds.length;
+            while (j--) {
                 if (bonds[i][0] === allBonds[j][0] && bonds[i][1] === allBonds[j][1] ||
                     bonds[i][1] === allBonds[j][0] && bonds[i][0] === allBonds[j][1]) {
                     count++;
@@ -447,7 +481,6 @@ SmilesDrawer.SSSR = class SSSR {
         let specialCase = false;
         if (allContained) {
           for (let element of pathSet) {
-              console.log(element, arrRingCount[element], arrBondCount[element]);
               if (arrRingCount[element] < arrBondCount[element]) {
                   specialCase = true;
                   break;

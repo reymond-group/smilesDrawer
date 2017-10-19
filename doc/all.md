@@ -91,11 +91,9 @@ The SmilesDrawer namespace.
         * [.createBridgedRing(ringIds, sourceVertexId)](#SmilesDrawer.Drawer+createBridgedRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
         * [.areVerticesInSameRing(vertexA, vertexB)](#SmilesDrawer.Drawer+areVerticesInSameRing) ⇒ <code>Boolean</code>
         * [.getCommonRings(vertexA, vertexB)](#SmilesDrawer.Drawer+getCommonRings) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer.Drawer+getSmallestCommonRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code>
         * [.getLargestOrAromaticCommonRing(vertexA, vertexB)](#SmilesDrawer.Drawer+getLargestOrAromaticCommonRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code>
         * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer.Drawer+getVerticesAt) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.getClosestVertex(vertex)](#SmilesDrawer.Drawer+getClosestVertex) ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
-        * [.getClosestEndpointVertex(vertex)](#SmilesDrawer.Drawer+getClosestEndpointVertex) ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
         * [.addRing(ring)](#SmilesDrawer.Drawer+addRing) ⇒ <code>Number</code>
         * [.removeRing(ringId)](#SmilesDrawer.Drawer+removeRing)
         * [.getRing(ringId)](#SmilesDrawer.Drawer+getRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
@@ -103,20 +101,15 @@ The SmilesDrawer namespace.
         * [.removeRingConnection(ringConnectionId)](#SmilesDrawer.Drawer+removeRingConnection)
         * [.removeRingConnectionsBetween(vertexIdA, vertexIdB)](#SmilesDrawer.Drawer+removeRingConnectionsBetween)
         * [.getRingConnection(id)](#SmilesDrawer.Drawer+getRingConnection) ⇒ <code>[RingConnection](#SmilesDrawer.RingConnection)</code>
-        * [.getRingConnections(ringId, [ringIds])](#SmilesDrawer.Drawer+getRingConnections) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.isRingConnection(vertexIdA, vertexIdB)](#SmilesDrawer.Drawer+isRingConnection) ⇒ <code>Boolean</code>
+        * [.getRingConnections(ringId, ringIds)](#SmilesDrawer.Drawer+getRingConnections) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.getOverlapScore()](#SmilesDrawer.Drawer+getOverlapScore) ⇒ <code>Object</code>
         * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer.Drawer+chooseSide) ⇒ <code>Object</code>
-        * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer.Drawer+areConnected) ⇒ <code>Boolean</code>
-        * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer.Drawer+getEdgeWeight) ⇒ <code>Number</code> &#124; <code>null</code>
         * [.setRingCenter(ring)](#SmilesDrawer.Drawer+setRingCenter)
         * [.getSubringCenter(ring, vertex)](#SmilesDrawer.Drawer+getSubringCenter) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
         * [.drawEdges(debug)](#SmilesDrawer.Drawer+drawEdges)
         * [.drawEdge(edgeId, debug)](#SmilesDrawer.Drawer+drawEdge)
         * [.drawVertices(debug)](#SmilesDrawer.Drawer+drawVertices)
         * [.position()](#SmilesDrawer.Drawer+position)
-        * [.clearPositions()](#SmilesDrawer.Drawer+clearPositions)
-        * [.restorePositions()](#SmilesDrawer.Drawer+restorePositions)
         * [.backupRingInformation()](#SmilesDrawer.Drawer+backupRingInformation)
         * [.restoreRingInformation()](#SmilesDrawer.Drawer+restoreRingInformation)
         * [.createRing(ring, [center], [startVertex], [previousVertex], [previousVertex])](#SmilesDrawer.Drawer+createRing)
@@ -1144,11 +1137,9 @@ The main class of the application representing the smiles drawer
     * [.createBridgedRing(ringIds, sourceVertexId)](#SmilesDrawer.Drawer+createBridgedRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
     * [.areVerticesInSameRing(vertexA, vertexB)](#SmilesDrawer.Drawer+areVerticesInSameRing) ⇒ <code>Boolean</code>
     * [.getCommonRings(vertexA, vertexB)](#SmilesDrawer.Drawer+getCommonRings) ⇒ <code>Array.&lt;Number&gt;</code>
-    * [.getSmallestCommonRing(vertexA, vertexB)](#SmilesDrawer.Drawer+getSmallestCommonRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code>
     * [.getLargestOrAromaticCommonRing(vertexA, vertexB)](#SmilesDrawer.Drawer+getLargestOrAromaticCommonRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code>
     * [.getVerticesAt(position, radius, excludeVertexId)](#SmilesDrawer.Drawer+getVerticesAt) ⇒ <code>Array.&lt;Number&gt;</code>
     * [.getClosestVertex(vertex)](#SmilesDrawer.Drawer+getClosestVertex) ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
-    * [.getClosestEndpointVertex(vertex)](#SmilesDrawer.Drawer+getClosestEndpointVertex) ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
     * [.addRing(ring)](#SmilesDrawer.Drawer+addRing) ⇒ <code>Number</code>
     * [.removeRing(ringId)](#SmilesDrawer.Drawer+removeRing)
     * [.getRing(ringId)](#SmilesDrawer.Drawer+getRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
@@ -1156,20 +1147,15 @@ The main class of the application representing the smiles drawer
     * [.removeRingConnection(ringConnectionId)](#SmilesDrawer.Drawer+removeRingConnection)
     * [.removeRingConnectionsBetween(vertexIdA, vertexIdB)](#SmilesDrawer.Drawer+removeRingConnectionsBetween)
     * [.getRingConnection(id)](#SmilesDrawer.Drawer+getRingConnection) ⇒ <code>[RingConnection](#SmilesDrawer.RingConnection)</code>
-    * [.getRingConnections(ringId, [ringIds])](#SmilesDrawer.Drawer+getRingConnections) ⇒ <code>Array.&lt;Number&gt;</code>
-    * [.isRingConnection(vertexIdA, vertexIdB)](#SmilesDrawer.Drawer+isRingConnection) ⇒ <code>Boolean</code>
+    * [.getRingConnections(ringId, ringIds)](#SmilesDrawer.Drawer+getRingConnections) ⇒ <code>Array.&lt;Number&gt;</code>
     * [.getOverlapScore()](#SmilesDrawer.Drawer+getOverlapScore) ⇒ <code>Object</code>
     * [.chooseSide(vertexA, vertexB, sides)](#SmilesDrawer.Drawer+chooseSide) ⇒ <code>Object</code>
-    * [.areConnected(vertexIdA, vertexIdA)](#SmilesDrawer.Drawer+areConnected) ⇒ <code>Boolean</code>
-    * [.getEdgeWeight(vertexIdA, vertexIdB)](#SmilesDrawer.Drawer+getEdgeWeight) ⇒ <code>Number</code> &#124; <code>null</code>
     * [.setRingCenter(ring)](#SmilesDrawer.Drawer+setRingCenter)
     * [.getSubringCenter(ring, vertex)](#SmilesDrawer.Drawer+getSubringCenter) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
     * [.drawEdges(debug)](#SmilesDrawer.Drawer+drawEdges)
     * [.drawEdge(edgeId, debug)](#SmilesDrawer.Drawer+drawEdge)
     * [.drawVertices(debug)](#SmilesDrawer.Drawer+drawVertices)
     * [.position()](#SmilesDrawer.Drawer+position)
-    * [.clearPositions()](#SmilesDrawer.Drawer+clearPositions)
-    * [.restorePositions()](#SmilesDrawer.Drawer+restorePositions)
     * [.backupRingInformation()](#SmilesDrawer.Drawer+backupRingInformation)
     * [.restoreRingInformation()](#SmilesDrawer.Drawer+restoreRingInformation)
     * [.createRing(ring, [center], [startVertex], [previousVertex], [previousVertex])](#SmilesDrawer.Drawer+createRing)
@@ -1372,19 +1358,6 @@ Returns an array of ring ids shared by both vertices.
 | vertexA | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
 | vertexB | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
 
-<a name="SmilesDrawer.Drawer+getSmallestCommonRing"></a>
-
-#### drawer.getSmallestCommonRing(vertexA, vertexB) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code>
-Returns the smallest ring shared by the two vertices.
-
-**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-**Returns**: <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code> - If a smallest common ring exists, that ring, else null.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexA | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-| vertexB | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-
 <a name="SmilesDrawer.Drawer+getLargestOrAromaticCommonRing"></a>
 
 #### drawer.getLargestOrAromaticCommonRing(vertexA, vertexB) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code>
@@ -1419,18 +1392,6 @@ Returns the closest vertex (connected as well as unconnected).
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 **Returns**: <code>[Vertex](#SmilesDrawer.Vertex)</code> - The closest vertex.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | The vertex of which to find the closest other vertex. |
-
-<a name="SmilesDrawer.Drawer+getClosestEndpointVertex"></a>
-
-#### drawer.getClosestEndpointVertex(vertex) ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
-Returns the closest vertex (connected as well as unconnected), which is an endpoint.
-
-**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-**Returns**: <code>[Vertex](#SmilesDrawer.Vertex)</code> - The closest endpoint vertex.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1520,29 +1481,16 @@ Get a ring connection with a given id.
 
 <a name="SmilesDrawer.Drawer+getRingConnections"></a>
 
-#### drawer.getRingConnections(ringId, [ringIds]) ⇒ <code>Array.&lt;Number&gt;</code>
-Get the ring connections associated with a ring, the ring connections between two rings or the ring connections between one ring and multiple other rings.
+#### drawer.getRingConnections(ringId, ringIds) ⇒ <code>Array.&lt;Number&gt;</code>
+Get the ring connections between a ring and a set of rings.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 **Returns**: <code>Array.&lt;Number&gt;</code> - An array of ring connection ids.  
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| ringId | <code>Number</code> |  | A ring id. |
-| [ringIds] | <code>Number</code> &#124; <code>Array.&lt;Number&gt;</code> &#124; <code>null</code> | <code></code> | A ring id, an array of ring ids or null. |
-
-<a name="SmilesDrawer.Drawer+isRingConnection"></a>
-
-#### drawer.isRingConnection(vertexIdA, vertexIdB) ⇒ <code>Boolean</code>
-Check whether or not the two vertices specified span a bond which is a ring connection (fused rings).
-
-**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-**Returns**: <code>Boolean</code> - Returns a boolean indicating whether or not the two vertices specify a ringbond.  
-
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexIdA | <code>Number</code> | A vertex id. |
-| vertexIdB | <code>Number</code> | A vertex id. |
+| ringId | <code>Number</code> | A ring id. |
+| ringIds | <code>Array.&lt;Number&gt;</code> | An array of ring ids. |
 
 <a name="SmilesDrawer.Drawer+getOverlapScore"></a>
 
@@ -1572,36 +1520,10 @@ When drawing a double bond, choose the side to place the double bond. E.g. a dou
 | vertexB | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
 | sides | <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code> | An array containing the two normals of the line spanned by the two provided vertices. |
 
-<a name="SmilesDrawer.Drawer+areConnected"></a>
-
-#### drawer.areConnected(vertexIdA, vertexIdA) ⇒ <code>Boolean</code>
-Checks whether or not two vertices are connected.
-
-**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not two vertices are connected.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIdA | <code>Number</code> | A vertex id. |
-| vertexIdA | <code>Number</code> | A vertex id. |
-
-<a name="SmilesDrawer.Drawer+getEdgeWeight"></a>
-
-#### drawer.getEdgeWeight(vertexIdA, vertexIdB) ⇒ <code>Number</code> &#124; <code>null</code>
-Returns the weight of the edge between two given vertices.
-
-**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-**Returns**: <code>Number</code> &#124; <code>null</code> - The weight of the edge or, if no edge can be found, null.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIdA | <code>Number</code> | A vertex id. |
-| vertexIdB | <code>Number</code> | A vertex id. |
-
 <a name="SmilesDrawer.Drawer+setRingCenter"></a>
 
 #### drawer.setRingCenter(ring)
-Returns the weight of the edge between two given vertices.
+Sets the center for a ring.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 
@@ -1660,18 +1582,6 @@ Draws the vertices representing atoms to the canvas.
 
 #### drawer.position()
 Position the vertices according to their bonds and properties.
-
-**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-<a name="SmilesDrawer.Drawer+clearPositions"></a>
-
-#### drawer.clearPositions()
-Reset the positions of rings and vertices. The previous positions will be backed up.
-
-**Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
-<a name="SmilesDrawer.Drawer+restorePositions"></a>
-
-#### drawer.restorePositions()
-Restore the positions backed up during the last clearPositions() call.
 
 **Kind**: instance method of <code>[Drawer](#SmilesDrawer.Drawer)</code>  
 <a name="SmilesDrawer.Drawer+backupRingInformation"></a>
@@ -3669,6 +3579,7 @@ A class representing a vertex.
 | neighbourCount | <code>Number</code> | The number of neighbouring vertices. |
 | neighbours | <code>Array.&lt;Number&gt;</code> | The vertex ids of neighbouring vertices. |
 | neighbouringElements | <code>Array.&lt;String&gt;</code> | The element symbols associated with neighbouring vertices. |
+| forcePositioned | <code>Boolean</code> | A boolean indicating whether or not this vertex was positioned using a force-based approach. |
 
 
 * [.Vertex](#SmilesDrawer.Vertex)
