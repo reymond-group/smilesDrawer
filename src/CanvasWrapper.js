@@ -40,7 +40,8 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
         this.updateSize(this.opts.width, this.opts.height);
 
-        this.clear();
+        // TODO: Find out why clear was here.
+        // this.clear();
     }
 
     /**
@@ -201,11 +202,6 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
      * @param {Number} [alpha=1.0] The alpha value of the color.
      */
     drawLine(line, dashed = false, alpha = 1.0) {
-        if (isNaN(line.from.x) || isNaN(line.from.y) ||
-            isNaN(line.to.x) || isNaN(line.to.y)) {
-            return;
-        }
-
         let ctx = this.ctx;
         let offsetX = this.offsetX;
         let offsetY = this.offsetY;

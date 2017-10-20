@@ -73,6 +73,8 @@ SmilesDrawer.Drawer = class Drawer {
     };
 
     this.opts = this.extend(true, this.defaultOptions, options);
+    this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;
+    this.opts.bondLengthSq = this.opts.bondLength * this.opts.bondLength;
 
     // Set the default theme.
     this.theme = this.opts.themes.dark;
@@ -794,9 +796,9 @@ SmilesDrawer.Drawer = class Drawer {
         continue;
       }
 
-      let distance = position.distance(vertex.position);
+      let distance = position.distanceSq(vertex.position);
 
-      if (distance <= radius) {
+      if (distance <= radius * radius) {
         locals.push(vertex.id);
       }
     }
@@ -978,21 +980,19 @@ SmilesDrawer.Drawer = class Drawer {
     let total = 0.0;
     let overlapScores = new Float32Array(this.graph.vertices.length);
 
-    var i = this.graph.vertices.length;
-    while (i--) {
+    for (var i = 0; i < this.graph.vertices.length; i++) {
       overlapScores[i] = 0;
     }
 
-    i = this.graph.vertices.length;
-    while (i--) {
+    for (var i = 0; i < this.graph.vertices.length; i++) {
       var j = this.graph.vertices.length;
       while (--j > i) {
         let a = this.graph.vertices[i].position;
         let b = this.graph.vertices[j].position;
-        let dist = SmilesDrawer.Vector2.subtract(a, b).length();
+        let dist = SmilesDrawer.Vector2.subtract(a, b).lengthSq();
 
-        if (dist < this.opts.bondLength) {
-          let weighted = (this.opts.bondLength - dist) / this.opts.bondLength;
+        if (dist < this.opts.bondLengthSq) {
+          let weighted = (this.opts.bondLength - Math.sqrt(dist)) / this.opts.bondLength;
           total += weighted;
           overlapScores[i] += weighted;
           overlapScores[j] += weighted;
@@ -1001,8 +1001,7 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     let sortable = [];
-    i = this.graph.vertices.length;
-    while (i--) {
+    for (var i = 0; i < this.graph.vertices.length; i++) {
       sortable.push({
         id: i,
         score: overlapScores[i]
@@ -1092,8 +1091,7 @@ SmilesDrawer.Drawer = class Drawer {
     let ringSize = ring.getSize();
     let total = new SmilesDrawer.Vector2();
 
-    var i = ringSize;
-    while (i--) {
+    for (var i = 0; i < ringSize; i++) {
       total.add(this.graph.vertices[ring.members[i]].position);
     }
 
@@ -1114,9 +1112,8 @@ SmilesDrawer.Drawer = class Drawer {
 
     // Always get the smallest ring.
     var i = rings.length;
-    while (i--) {
-      var j = ring.rings.length;
-      while (j--) {
+    for (var i = 0; i < rings.length; i++) {
+      for (var j = 0; j < ring.rings.length; j++) {
         if (rings[i] === ring.rings[j].id) {
           if (ring.rings[j].getSize() < smallest) {
             center = ring.rings[j].center;
@@ -1141,8 +1138,7 @@ SmilesDrawer.Drawer = class Drawer {
 
     this.graph.traverseBF(0, function (vertex) {
       let edges = that.graph.getEdges(vertex.id);
-      var i = edges.length;
-      while (i--) {
+      for (var i = 0; i < edges.length; i++) {
         let edgeId = edges[i];
         if (!drawn[edgeId]) {
           drawn[edgeId] = true;
@@ -1153,8 +1149,7 @@ SmilesDrawer.Drawer = class Drawer {
 
     // Draw ring for implicitly defined aromatic rings
     if (!this.bridgedRing) {
-      var i = this.rings.length;
-      while (i--) {
+      for (var i = 0; i < this.rings.length; i++) {
         let ring = this.rings[i];
 
         if (this.isRingAromatic(ring)) {
@@ -1205,9 +1200,8 @@ SmilesDrawer.Drawer = class Drawer {
         let lcr = this.getLargestOrAromaticCommonRing(vertexA, vertexB);
         let center = lcr.center;
 
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.multiplyScalar(that.opts.bondSpacing);
-        });
+        normals[0].multiplyScalar(that.opts.bondSpacing);
+        normals[1].multiplyScalar(that.opts.bondSpacing);
 
         // Choose the normal that is on the same side as the center
         let line = null;
@@ -1230,9 +1224,8 @@ SmilesDrawer.Drawer = class Drawer {
         // The normal edge
         this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
       } else if (edge.center) {
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.multiplyScalar(that.opts.bondSpacing / 2.0)
-        });
+        normals[0].multiplyScalar(that.opts.halfBondSpacing);
+        normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
         let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
         let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
@@ -1242,9 +1235,8 @@ SmilesDrawer.Drawer = class Drawer {
       } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
         // Both lines are the same length here
         // Add the spacing to the edges (which are of unit length)
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.multiplyScalar(that.opts.bondSpacing / 2)
-        });
+        normals[0].multiplyScalar(that.opts.halfBondSpacing);
+        normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
         let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
         let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
@@ -1252,9 +1244,8 @@ SmilesDrawer.Drawer = class Drawer {
         this.canvasWrapper.drawLine(lineA);
         this.canvasWrapper.drawLine(lineB);
       } else if (s.sideCount[0] > s.sideCount[1]) {
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.multiplyScalar(that.opts.bondSpacing)
-        });
+        normals[0].multiplyScalar(that.opts.bondSpacing);
+        normals[1].multiplyScalar(that.opts.bondSpacing);
 
         let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
 
@@ -1262,9 +1253,8 @@ SmilesDrawer.Drawer = class Drawer {
         this.canvasWrapper.drawLine(line);
         this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
       } else if (s.sideCount[0] < s.sideCount[1]) {
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.multiplyScalar(that.opts.bondSpacing)
-        });
+        normals[0].multiplyScalar(that.opts.bondSpacing);
+        normals[1].multiplyScalar(that.opts.bondSpacing);
 
         let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
 
@@ -1272,9 +1262,8 @@ SmilesDrawer.Drawer = class Drawer {
         this.canvasWrapper.drawLine(line);
         this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
       } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.multiplyScalar(that.opts.bondSpacing)
-        });
+        normals[0].multiplyScalar(that.opts.bondSpacing);
+        normals[1].multiplyScalar(that.opts.bondSpacing);
 
         let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
 
@@ -1282,9 +1271,8 @@ SmilesDrawer.Drawer = class Drawer {
         this.canvasWrapper.drawLine(line);
         this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
       } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.multiplyScalar(that.opts.bondSpacing)
-        });
+        normals[0].multiplyScalar(that.opts.bondSpacing);
+        normals[1].multiplyScalar(that.opts.bondSpacing);
 
         let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
 
@@ -1295,9 +1283,8 @@ SmilesDrawer.Drawer = class Drawer {
 
       }
     } else if (edge.bondType === '#') {
-      SmilesDrawer.ArrayHelper.each(normals, function (v) {
-        v.multiplyScalar(that.opts.bondSpacing / 1.5)
-      });
+      normals[0].multiplyScalar(that.opts.bondSpacing / 1.5);
+      normals[1].multiplyScalar(that.opts.bondSpacing / 1.5);
 
       let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
       let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
@@ -1334,7 +1321,7 @@ SmilesDrawer.Drawer = class Drawer {
    */
   drawVertices(debug) {
     var i = this.graph.vertices.length;
-    while (i--) {
+    for (var i = 0; i < this.graph.vertices.length; i++) {
       let vertex = this.graph.vertices[i];
       let atom = vertex.value;
       let charge = 0;
@@ -1571,27 +1558,20 @@ SmilesDrawer.Drawer = class Drawer {
         let normals = SmilesDrawer.Vector2.normals(vertexA.position, vertexB.position);
 
         // Normalize the normals
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.normalize()
-        });
+        normals[0].normalize();
+        normals[1].normalize();
 
         // Set length from middle of side to center (the apothem)
         let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
         let apothem = SmilesDrawer.MathHelper.apothem(r, neighbour.getSize());
 
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.multiplyScalar(apothem)
-        });
-
-        // Move normals to the middle of the line between a and b
-        SmilesDrawer.ArrayHelper.each(normals, function (v) {
-          v.add(midpoint)
-        });
+        normals[0].multiplyScalar(apothem).add(midpoint);
+        normals[1].multiplyScalar(apothem).add(midpoint);
 
         // Pick the normal which results in a larger distance to the previous center
         // Also check whether it's inside another ring
         let nextCenter = normals[0];
-        if (SmilesDrawer.Vector2.subtract(center, normals[1]).length() > SmilesDrawer.Vector2.subtract(center, normals[0]).length()) {
+        if (SmilesDrawer.Vector2.subtract(center, normals[1]).lengthSq() > SmilesDrawer.Vector2.subtract(center, normals[0]).lengthSq()) {
           nextCenter = normals[1];
         }
 
@@ -2049,8 +2029,8 @@ SmilesDrawer.Drawer = class Drawer {
 
           // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
           let centerOfMass = this.getCurrentCenterOfMass();
-          let distanceA = proposedVectorA.distance(centerOfMass);
-          let distanceB = proposedVectorB.distance(centerOfMass);
+          let distanceA = proposedVectorA.distanceSq(centerOfMass);
+          let distanceB = proposedVectorB.distanceSq(centerOfMass);
 
           nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
 
@@ -2074,8 +2054,8 @@ SmilesDrawer.Drawer = class Drawer {
             proposedVectorB.rotate(proposedAngleB).add(vertex.position);
 
             let centerOfMass = this.getCurrentCenterOfMass();
-            let distanceA = proposedVectorA.distance(centerOfMass);
-            let distanceB = proposedVectorB.distance(centerOfMass);
+            let distanceA = proposedVectorA.distanceSq(centerOfMass);
+            let distanceB = proposedVectorB.distanceSq(centerOfMass);
 
             nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
 
@@ -2186,8 +2166,8 @@ SmilesDrawer.Drawer = class Drawer {
 
             // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
             let centerOfMass = this.getCurrentCenterOfMass();
-            let distanceA = proposedVectorA.distance(centerOfMass);
-            let distanceB = proposedVectorB.distance(centerOfMass);
+            let distanceA = proposedVectorA.distanceSq(centerOfMass);
+            let distanceB = proposedVectorB.distanceSq(centerOfMass);
 
             s.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
 

@@ -521,15 +521,18 @@ SmilesDrawer.Graph = class Graph {
         let radius = SmilesDrawer.MathHelper.polyCircumradius(500, length);
         let angle = SmilesDrawer.MathHelper.centralAngle(length);
         let a = 0.0;
-        let arrPosition = Array(length);
+        let arrPositionX = new Float32Array(length);
+        let arrPositionY = new Float32Array(length);
         let arrPositioned = Array(length);
         i = length;
         while (i--) {
             let vertex = this.vertices[vertexIds[i]];
             if (!vertex.positioned) {
-                arrPosition[i] = [center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius];
+                arrPositionX[i] = center.x + Math.cos(a) * radius;
+                arrPositionY[i] = center.y + Math.sin(a) * radius;
             } else {
-                arrPosition[i] = [vertex.position.x, vertex.position.y];
+                arrPositionX[i] = vertex.position.x;
+                arrPositionY[i] = vertex.position.y;
             }
             arrPositioned[i] = vertex.positioned;
             a += angle;
@@ -559,65 +562,73 @@ SmilesDrawer.Graph = class Graph {
 
         // Create the matrix containing the energies
         let matEnergy = Array(length);
-        let arrEnergySum = Array(length);
+        let arrEnergySumX = new Float32Array(length);
+        let arrEnergySumY = new Float32Array(length);
         i = length;
         while (i--) {
             matEnergy[i] = Array(length);
         }
 
         i = length;
+        let ux, uy, dEx, dEy, vx, vy, denom;
+
         while (i--) {
-            let u = arrPosition[i];
-            let dEx = 0.0;
-            let dEy = 0.0;
-            var j = length;
+            ux = arrPositionX[i];
+            uy = arrPositionY[i];
+            dEx = 0.0;
+            dEy = 0.0;
+            let j = length;
             while (j--) {
                 if (i === j) {
                     continue;
                 }
-                let v = arrPosition[j];
-                let denom = 1.0 / Math.sqrt(Math.pow(u[0] - v[0], 2) + Math.pow(u[1] - v[1], 2));
+                vx = arrPositionX[j];
+                vy = arrPositionY[j];
+                denom = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
                 matEnergy[i][j] = [
-                    matStrength[i][j] * ((u[0] - v[0]) - matLength[i][j] * (u[0] - v[0]) * denom),
-                    matStrength[i][j] * ((u[1] - v[1]) - matLength[i][j] * (u[1] - v[1]) * denom)
+                    matStrength[i][j] * ((ux - vx) - matLength[i][j] * (ux - vx) * denom),
+                    matStrength[i][j] * ((uy - vy) - matLength[i][j] * (uy - vy) * denom)
                 ]
                 matEnergy[j][i] = matEnergy[i][j];
                 dEx += matEnergy[i][j][0];
                 dEy += matEnergy[i][j][1];
             }
-            arrEnergySum[i] = [dEx, dEy];
+            arrEnergySumX[i] = dEx;
+            arrEnergySumY[i] = dEy;
         }
 
         // Utility functions, maybe inline them later
         let energy = function (index) {
-            let dE = arrEnergySum[index];
-            return [Math.sqrt(Math.pow(dE[0], 2) + Math.pow(dE[1], 2)), dE];
+            return [arrEnergySumX[index] * arrEnergySumX[index] + arrEnergySumY[index] * arrEnergySumY[index], arrEnergySumX[index], arrEnergySumY[index]];
         }
 
         let highestEnergy = function () {
             let maxEnergy = 0.0;
             let maxEnergyId = 0;
-            let maxDE = [0.0, 0.0];
+            let maxDEX = 0.0;
+            let maxDEY = 0.0
             
             i = length;
             while (i--) {
-                let [delta, dE] = energy(i);
+                let [delta, dEX, dEY] = energy(i);
 
                 if (delta > maxEnergy && arrPositioned[i] === false) {
                     maxEnergy = delta;
                     maxEnergyId = i;
-                    maxDE = dE;
+                    maxDEX = dEX;
+                    maxDEY = dEY;
                 }
             }
 
-            return [maxEnergyId, maxEnergy, maxDE];
+            return [maxEnergyId, maxEnergy, maxDEX, maxDEY];
         }
 
-        let update = function (index, dE) {
+        let update = function (index, dEX, dEY) {
             let dxx = 0.0;
             let dyy = 0.0;
             let dxy = 0.0;
-            let u = arrPosition[index];
+            let ux = arrPositionX[index];
+            let uy = arrPositionY[index];
             let arrL = matLength[index];
             let arrK = matStrength[index];
             
@@ -627,13 +638,15 @@ SmilesDrawer.Graph = class Graph {
                     continue;
                 }
 
-                let v = arrPosition[i];
+                let vx = arrPositionX[i];
+                let vy = arrPositionY[i];
                 let l = arrL[i];
                 let k = arrK[i];
-                let denom = 1.0 / Math.pow(Math.pow(u[0] - v[0], 2) + Math.pow(u[1] - v[1], 2), 1.5);
-                dxx += k * (1 - l * Math.pow(u[1] - v[1], 2) * denom);
-                dyy += k * (1 - l * Math.pow(u[0] - v[0], 2) * denom);
-                dxy += k * (l * (u[0] - v[0]) * (u[1] - v[1]) * denom);
+                let m = (ux - vx) * (ux - vx);
+                let denom = 1.0 / Math.pow(m + (uy - vy) * (uy - vy), 1.5);
+                dxx += k * (1 - l * (uy - vy) * (uy - vy) * denom);
+                dyy += k * (1 - l * m * denom);
+                dxy += k * (l * (ux - vx) * (uy - vy) * denom);
             }
 
             // Prevent division by zero
@@ -649,62 +662,71 @@ SmilesDrawer.Graph = class Graph {
                 dxy = 0.1;
             } 
 
-            let dy = (dE[0] / dxx + dE[1] / dxy);
+            let dy = (dEX / dxx + dEY / dxy);
             dy /= (dxy / dxx - dyy / dxy); // had to split this onto two lines because the syntax highlighter went crazy.
-            let dx = -(dxy * dy + dE[0]) / dxx;
+            let dx = -(dxy * dy + dEX) / dxx;
 
-            arrPosition[index][0] += dx;
-            arrPosition[index][1] += dy;
+            arrPositionX[index] += dx;
+            arrPositionY[index] += dy;
 
             // Update the energies
             let arrE = matEnergy[index];
-            dE = [0.0, 0.0];
+            dEX = 0.0;
+            dEY = 0.0;
+
+            ux = arrPositionX[index];
+            uy = arrPositionY[index];
+
+            let vx, vy, prevEx, prevEy, denom;
 
             i = length;
             while (i--) {
                 if (index === i) {
                     continue;
                 }
-                let v = arrPosition[i];
+                vx = arrPositionX[i];
+                vy = arrPositionY[i];
                 // Store old energies
-                let prevEx = arrE[i][0];
-                let prevEy = arrE[i][1];
-                let denom = 1.0 / Math.sqrt(Math.pow(u[0] - v[0], 2) + Math.pow(u[1] - v[1], 2));
-                let dx = arrK[i] * ((u[0] - v[0]) - arrL[i] * (u[0] - v[0]) * denom);
-                let dy = arrK[i] * ((u[1] - v[1]) - arrL[i] * (u[1] - v[1]) * denom);
+                prevEx = arrE[i][0];
+                prevEy = arrE[i][1];
+                denom = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
+                dx = arrK[i] * ((ux - vx) - arrL[i] * (ux - vx) * denom);
+                dy = arrK[i] * ((uy - vy) - arrL[i] * (uy - vy) * denom);
 
                 arrE[i] = [dx, dy];
-                dE[0] += dx;
-                dE[1] += dy;
-                arrEnergySum[i][0] += dx - prevEx;
-                arrEnergySum[i][1] += dy - prevEy;
+                dEX += dx;
+                dEY += dy;
+                arrEnergySumX[i] += dx - prevEx;
+                arrEnergySumY[i] += dy - prevEy;
             }
-            arrEnergySum[index] = [dE[0], dE[1]];
+            arrEnergySumX[index] = dEX;
+            arrEnergySumY[index] = dEY;
         }
 
         // Setting parameters
-        let threshold = 0.01;
+        let threshold = 0.1;
         let innerThreshold = 0.1;
-        let maxIteration = 1500;
+        let maxIteration = 1000;
         let maxInnerIteration = 50;
         let maxEnergy = 1e9;
 
         // Setting up variables for the while loops
         let maxEnergyId = 0;
-        let dE = [0.0, 0.0];
+        let dEX = 0.0;
+        let dEY = 0.0;
         let delta = 0.0;
         let iteration = 0;
         let innerIteration = 0;
 
         while (maxEnergy > threshold && maxIteration > iteration) {
             iteration++;
-            [maxEnergyId, maxEnergy, dE] = highestEnergy();
+            [maxEnergyId, maxEnergy, dEX, dEY] = highestEnergy();
             delta = maxEnergy;
             innerIteration = 0;
             while (delta > innerThreshold && maxInnerIteration > innerIteration) {
                 innerIteration++;
-                update(maxEnergyId, dE);
-                [delta, dE] = energy(maxEnergyId);
+                update(maxEnergyId, dEX, dEY);
+                [delta, dEX, dEY] = energy(maxEnergyId);
             }
         }
         
@@ -712,8 +734,8 @@ SmilesDrawer.Graph = class Graph {
         while (i--) {
             let index = vertexIds[i];
             let vertex = this.vertices[index];
-            vertex.position.x = arrPosition[i][0];
-            vertex.position.y = arrPosition[i][1];
+            vertex.position.x = arrPositionX[i];
+            vertex.position.y = arrPositionY[i];
             vertex.positioned = true;
             vertex.forcePositioned = true;
         }

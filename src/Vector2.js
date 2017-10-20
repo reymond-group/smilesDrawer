@@ -354,6 +354,15 @@ SmilesDrawer.Vector2 = class Vector2 {
     }
 
     /**
+     * Returns the square of the length of this vector.
+     *
+     * @returns {Number} The square of the length of this vector.
+     */
+    lengthSq() {
+        return (this.x * this.x) + (this.y * this.y);
+    }
+
+    /**
      * Normalizes this vector.
      *
      * @returns {SmilesDrawer.Vector2} Returns itself.

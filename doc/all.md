@@ -264,6 +264,7 @@ The SmilesDrawer namespace.
             * [.getRotateToAngle(vec, center)](#SmilesDrawer.Vector2+getRotateToAngle) ⇒ <code>Number</code>
             * [.isInPolygon(polygon)](#SmilesDrawer.Vector2+isInPolygon) ⇒ <code>Boolean</code>
             * [.length()](#SmilesDrawer.Vector2+length) ⇒ <code>Number</code>
+            * [.lengthSq()](#SmilesDrawer.Vector2+lengthSq) ⇒ <code>Number</code>
             * [.normalize()](#SmilesDrawer.Vector2+normalize) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
             * [.normalized()](#SmilesDrawer.Vector2+normalized) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
             * [.whichSide(vecA, vecB)](#SmilesDrawer.Vector2+whichSide) ⇒ <code>Number</code>
@@ -3078,6 +3079,7 @@ A class representing a 2D vector.
         * [.getRotateToAngle(vec, center)](#SmilesDrawer.Vector2+getRotateToAngle) ⇒ <code>Number</code>
         * [.isInPolygon(polygon)](#SmilesDrawer.Vector2+isInPolygon) ⇒ <code>Boolean</code>
         * [.length()](#SmilesDrawer.Vector2+length) ⇒ <code>Number</code>
+        * [.lengthSq()](#SmilesDrawer.Vector2+lengthSq) ⇒ <code>Number</code>
         * [.normalize()](#SmilesDrawer.Vector2+normalize) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
         * [.normalized()](#SmilesDrawer.Vector2+normalized) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
         * [.whichSide(vecA, vecB)](#SmilesDrawer.Vector2+whichSide) ⇒ <code>Number</code>
@@ -3344,6 +3346,13 @@ Returns the length of this vector.
 
 **Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
 **Returns**: <code>Number</code> - The length of this vector.  
+<a name="SmilesDrawer.Vector2+lengthSq"></a>
+
+#### vector2.lengthSq() ⇒ <code>Number</code>
+Returns the square of the length of this vector.
+
+**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
+**Returns**: <code>Number</code> - The square of the length of this vector.  
 <a name="SmilesDrawer.Vector2+normalize"></a>
 
 #### vector2.normalize() ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
