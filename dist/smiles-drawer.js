@@ -3334,9 +3334,14 @@ SmilesDrawer.Drawer = function () {
             for (var i = 0; i < this.graph.vertices.length; i++) {
                 var j = this.graph.vertices.length;
                 while (--j > i) {
-                    var a = this.graph.vertices[i].position;
-                    var b = this.graph.vertices[j].position;
-                    var dist = SmilesDrawer.Vector2.subtract(a, b).lengthSq();
+                    var a = this.graph.vertices[i];
+                    var b = this.graph.vertices[j];
+
+                    if (!a.value.isDrawn || !b.value.isDrawn) {
+                        continue;
+                    }
+
+                    var dist = SmilesDrawer.Vector2.subtract(a.position, b.position).lengthSq();
 
                     if (dist < this.opts.bondLengthSq) {
                         var weighted = (this.opts.bondLength - Math.sqrt(dist)) / this.opts.bondLength;

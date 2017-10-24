@@ -987,9 +987,14 @@ SmilesDrawer.Drawer = class Drawer {
     for (var i = 0; i < this.graph.vertices.length; i++) {
       var j = this.graph.vertices.length;
       while (--j > i) {
-        let a = this.graph.vertices[i].position;
-        let b = this.graph.vertices[j].position;
-        let dist = SmilesDrawer.Vector2.subtract(a, b).lengthSq();
+        let a = this.graph.vertices[i];
+        let b = this.graph.vertices[j];
+
+        if (!a.value.isDrawn || !b.value.isDrawn) {
+          continue;
+        }
+
+        let dist = SmilesDrawer.Vector2.subtract(a.position, b.position).lengthSq();
 
         if (dist < this.opts.bondLengthSq) {
           let weighted = (this.opts.bondLength - Math.sqrt(dist)) / this.opts.bondLength;
