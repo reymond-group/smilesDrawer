@@ -15,7 +15,7 @@
         <script src="schembl.js"></script>
         <script src="gdb17.js"></script>
         <script>
-            let options = {};
+            let options = { compactDrawing: true };
             
             // Initialize the drawer
             let smilesDrawer = new SmilesDrawer.Drawer(options);
@@ -26,9 +26,7 @@
             let str = 'parsetime,rendertime,overlap,rings,hac,bridged,smiles\n';
             
             let failed = '';
-            for (let i = 0; i < drugbank.length; i++) {
-                console.log(i);
-                
+            for (let i = 0; i < drugbank.length; i++) {                
                 let td = null;
                 let t2 = null;
                 let td2 = null;
@@ -56,7 +54,7 @@
                        smilesDrawer.getTotalOverlapScore() + ',' +
                        smilesDrawer.getRingCount() + ',' + 
                        smilesDrawer.getHeavyAtomCount() + ',' +
-                       smilesDrawer.hasBridgedRing() + ',' + schembl[i] + '\n';
+                       smilesDrawer.hasBridgedRing() + ',' + drugbank[i] + '\n';
             }
 
             console.log(str);

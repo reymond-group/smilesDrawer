@@ -1515,7 +1515,7 @@ SmilesDrawer.Atom.mass = {
             var offsetY = this.offsetY;
 
             // Add a shadow behind the line
-            var shortLine = line.clone().shorten(6.0);
+            var shortLine = line.clone().shorten(4.0);
 
             var l = shortLine.getLeftVector().clone();
             var r = shortLine.getRightVector().clone();
@@ -1857,9 +1857,6 @@ SmilesDrawer.Atom.mass = {
 
             ctx.save();
 
-            var fontSizeLarge = this.opts.fontSizeLarge;
-            var fontSizeSmall = this.opts.fontSizeSmall;
-
             ctx.textAlign = 'start';
             ctx.textBaseline = 'alphabetic';
 
@@ -1899,7 +1896,7 @@ SmilesDrawer.Atom.mass = {
             dim.totalWidth = dim.width + chargeWidth;
             dim.height = parseInt(this.fontLarge, 10);
 
-            var r = dim.width > fontSizeLarge ? dim.width : this.opts.fontSizeLarge;
+            var r = dim.width > this.opts.fontSizeLarge ? dim.width : this.opts.fontSizeLarge;
             r /= 1.25;
 
             ctx.globalCompositeOperation = 'destination-out';
@@ -1913,18 +1910,18 @@ SmilesDrawer.Atom.mass = {
             var cursorPosLeft = -dim.width / 2.0;
 
             ctx.fillStyle = this.getColor(elementName);
-            ctx.fillText(elementName, x + offsetX + cursorPos, y + this.opts.fontSizeLarge / 2.0 + offsetY);
+            ctx.fillText(elementName, x + offsetX + cursorPos, y + this.opts.halfFontSizeLarge + offsetY);
             cursorPos += dim.width;
 
             if (charge) {
                 ctx.font = this.fontSmall;
-                ctx.fillText(chargeText, x + offsetX + cursorPos, y - this.opts.fontSizeSmall / 5.0 + offsetY);
+                ctx.fillText(chargeText, x + offsetX + cursorPos, y - this.opts.fifthFontSizeSmall + offsetY);
                 cursorPos += chargeWidth;
             }
 
             if (isotope > 0) {
                 ctx.font = this.fontSmall;
-                ctx.fillText(isotopeText, x + offsetX + cursorPosLeft - isotopeWidth, y - this.opts.fontSizeSmall / 5.0 + offsetY);
+                ctx.fillText(isotopeText, x + offsetX + cursorPosLeft - isotopeWidth, y - this.opts.fifthFontSizeSmall + offsetY);
                 cursorPosLeft -= isotopeWidth;
             }
 
@@ -1935,7 +1932,7 @@ SmilesDrawer.Atom.mass = {
 
             if (hydrogens === 1) {
                 var hx = x + offsetX;
-                var hy = y + offsetY + fontSizeLarge / 2.0;
+                var hy = y + offsetY + this.opts.halfFontSizeLarge;
 
                 hydrogenWidth = ctx.measureText('H').width;
                 cursorPosLeft -= hydrogenWidth;
@@ -1949,10 +1946,10 @@ SmilesDrawer.Atom.mass = {
                 } else if (direction === 'down' && isTerminal) {
                     hx += cursorPos;
                 } else if (direction === 'up' && !isTerminal) {
-                    hy -= this.opts.fontSizeLarge + this.opts.fontSizeLarge / 4.0;
+                    hy -= this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
                     hx -= hydrogenWidth / 2.0;
                 } else if (direction === 'down' && !isTerminal) {
-                    hy += this.opts.fontSizeLarge + this.opts.fontSizeLarge / 4.0;
+                    hy += this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
                     hx -= hydrogenWidth / 2.0;
                 }
 
@@ -1961,7 +1958,7 @@ SmilesDrawer.Atom.mass = {
                 cursorPos += hydrogenWidth;
             } else if (hydrogens > 1) {
                 var _hx = x + offsetX;
-                var _hy = y + offsetY + fontSizeLarge / 2.0;
+                var _hy = y + offsetY + this.opts.halfFontSizeLarge;
 
                 hydrogenWidth = ctx.measureText('H').width;
                 ctx.font = this.fontSmall;
@@ -1977,10 +1974,10 @@ SmilesDrawer.Atom.mass = {
                 } else if (direction === 'down' && isTerminal) {
                     _hx += cursorPos;
                 } else if (direction === 'up' && !isTerminal) {
-                    _hy -= this.opts.fontSizeLarge + this.opts.fontSizeLarge / 4.0;
+                    _hy -= this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
                     _hx -= hydrogenWidth / 2.0;
                 } else if (direction === 'down' && !isTerminal) {
-                    _hy += this.opts.fontSizeLarge + this.opts.fontSizeLarge / 4.0;
+                    _hy += this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
                     _hx -= hydrogenWidth / 2.0;
                 }
 
@@ -1988,7 +1985,7 @@ SmilesDrawer.Atom.mass = {
                 ctx.fillText('H', _hx, _hy);
 
                 ctx.font = this.fontSmall;
-                ctx.fillText(hydrogens, _hx + hydrogenWidth / 2.0 + hydrogenCountWidth, _hy + this.opts.fontSizeSmall / 5.0);
+                ctx.fillText(hydrogens, _hx + hydrogenWidth / 2.0 + hydrogenCountWidth, _hy + fifthFontSizeSmall);
 
                 cursorPos += hydrogenWidth + hydrogenWidth / 2.0 + hydrogenCountWidth;
             }
@@ -2041,7 +2038,7 @@ SmilesDrawer.Atom.mass = {
                 ctx.font = this.fontLarge;
 
                 var _hx2 = x + offsetX;
-                var _hy2 = y + offsetY + fontSizeLarge / 2.0;
+                var _hy2 = y + offsetY + this.opts.halfFontSizeLarge;
 
                 ctx.fillStyle = this.getColor(_element);
 
@@ -2074,7 +2071,7 @@ SmilesDrawer.Atom.mass = {
 
                         if (hydrogenCount > 1) {
                             ctx.font = this.fontSmall;
-                            ctx.fillText(hydrogenCount, _hx2 + cursorPosLeft + hydrogenWidth, _hy2 + this.opts.fontSizeSmall / 5.0);
+                            ctx.fillText(hydrogenCount, _hx2 + cursorPosLeft + hydrogenWidth, _hy2 + this.opts.fifthFontSizeSmall);
                         }
                     } else {
                         ctx.fillText('H', _hx2 + cursorPos, _hy2);
@@ -2082,7 +2079,7 @@ SmilesDrawer.Atom.mass = {
 
                         if (hydrogenCount > 1) {
                             ctx.font = this.fontSmall;
-                            ctx.fillText(hydrogenCount, _hx2 + cursorPos, _hy2 + this.opts.fontSizeSmall / 5.0);
+                            ctx.fillText(hydrogenCount, _hx2 + cursorPos, _hy2 + this.opts.fifthFontSizeSmall);
                             cursorPos += hydrogenCountWidth;
                         }
                     }
@@ -2104,9 +2101,9 @@ SmilesDrawer.Atom.mass = {
 
                 if (elementCount > 1) {
                     if (direction === 'left') {
-                        ctx.fillText(elementCount, _hx2 + cursorPosLeft + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, _hy2 + this.opts.fontSizeSmall / 5.0);
+                        ctx.fillText(elementCount, _hx2 + cursorPosLeft + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + hydrogenCountWidth + elementWidth, _hy2 + this.opts.fifthFontSizeSmall);
                     } else {
-                        ctx.fillText(elementCount, _hx2 + cursorPos, _hy2 + this.opts.fontSizeSmall / 5.0);
+                        ctx.fillText(elementCount, _hx2 + cursorPos, _hy2 + this.opts.fifthFontSizeSmall);
                         cursorPos += elementCountWidth;
                     }
                 }
@@ -2248,6 +2245,9 @@ SmilesDrawer.Drawer = function () {
         this.opts = this.extend(true, this.defaultOptions, options);
         this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;
         this.opts.bondLengthSq = this.opts.bondLength * this.opts.bondLength;
+        this.opts.halfFontSizeLarge = this.opts.fontSizeLarge / 2.0;
+        this.opts.quarterFontSizeLarge = this.opts.fontSizeLarge / 4.0;
+        this.opts.fifthFontSizeSmall = this.opts.fontSizeSmall / 5.0;
 
         // Set the default theme.
         this.theme = this.opts.themes.dark;
