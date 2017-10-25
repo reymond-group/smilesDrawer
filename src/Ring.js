@@ -64,24 +64,6 @@ SmilesDrawer.Ring = class Ring {
     }
 
     /**
-     * Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.
-     *
-     * @returns {Boolean} Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.
-     */
-    allowsFlip() {
-        return this.canFlip && this.members.length > 4;
-    }
-
-    /**
-     * Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.
-     */
-    setFlipped() {
-        if (this.members.length < 8) {
-            this.canFlip = false;
-        }
-    }
-
-    /**
      * Returns the size (number of members) of this ring.
      *
      * @returns {Number} The size (number of members) of this ring.
@@ -139,13 +121,6 @@ SmilesDrawer.Ring = class Ring {
             if (current == startVertexId) {
                 current = null;
             }
-            
-            // Currently, there can be rings where the start vertex is never
-            // reached again (bridged rings)
-            if (max == 99) {
-                console.log('Smiles-drawer was not able to loop over the members of this ring.', this);
-                throw 'Smiles-drawer was not able to loop over the members of this ring.'; 
-            }
 
             max++;
         }
@@ -158,15 +133,15 @@ SmilesDrawer.Ring = class Ring {
      * @returns {Object[]} An array of neighbouring rings sorted by ring size. Example: { n: 5, neighbour: 1 }.
      */
     getOrderedNeighbours(ringConnections) {
-        let orderedNeighbours = [];
+        let orderedNeighbours = Array(this.neighbours.length);
         
         for (let i = 0; i < this.neighbours.length; i++) {
             let vertices = SmilesDrawer.RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
             
-            orderedNeighbours.push({
+            orderedNeighbours[i] = {
                 n: vertices.size,
                 neighbour: this.neighbours[i]
-            });
+            };
         }
 
         orderedNeighbours.sort(function (a, b) {
@@ -225,41 +200,5 @@ SmilesDrawer.Ring = class Ring {
         }
 
         return false;
-    }
-
-    /**
-     * Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.
-     *
-     * @param {SmilesDrawer.Ring[]} rings An array of rings associated with this molecule.
-     * @param {Number} vertexId A vertex id.
-     * @returns {Boolean} A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.
-     */
-    thisOrNeighboursContain(rings, vertexId) {
-        for (let i = 0; i < this.neighbours.length; i++) {
-            if (Ring.getRing(rings, this.neighbours[i]).contains(vertexId)) {
-                return true;
-            }
-        }
-
-        if (this.contains(vertexId)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns a ring based on a provided ring id.
-     *
-     * @param {SmilesDrawer.Ring[]} rings An array of rings associated with the current molecule.
-     * @param {Number} id A ring id.
-     * @returns {SmilesDrawer.Ring} A ring with a given id.
-     */
-    static getRing(rings, id) {
-        for (let i = 0; i < rings.length; i++) {
-            if (rings[i].id == id) {
-                return rings[i];
-            }
-        }
     }
 }

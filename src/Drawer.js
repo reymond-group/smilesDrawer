@@ -1007,8 +1007,9 @@ SmilesDrawer.Drawer = class Drawer {
         }
       }
     }
-
+    
     let sortable = [];
+    
     for (var i = 0; i < this.graph.vertices.length; i++) {
       sortable.push({
         id: i,
@@ -1019,7 +1020,7 @@ SmilesDrawer.Drawer = class Drawer {
     sortable.sort(function (a, b) {
       return b.score - a.score;
     });
-
+    
     return {
       total: total,
       scores: sortable,
@@ -1644,7 +1645,6 @@ SmilesDrawer.Drawer = class Drawer {
       let v = this.graph.vertices[positioned[i][0]]; // this is the vertex attached to the ring vertex
       v.previousPosition = u.position;
       this.createNextBond(v, u, 0, 0, true);
-
     }
   }
 

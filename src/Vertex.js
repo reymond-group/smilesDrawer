@@ -239,48 +239,6 @@ SmilesDrawer.Vertex = class Vertex {
     getNeighbourCount() {
         return this.neighbourCount;
     }
-
-    /**
-     * Gets the common neighbours of this and another vertex.
-     *
-     * @param {Vertex} vertex The vertex to check for common neighbours.
-     * @returns {Number[]} An array containing the ids of common neighbours.
-     */
-    getCommonNeighbours(vertex) {
-        // There can only be one common neighbour of a Vertex
-        // outside of a ring
-        let commonNeighbours = new Array();
-        let neighboursA = this.getNeighbours();
-        let neighboursB = vertex.getNeighbours();
-
-        for (let i = 0; i < neighboursA.length; i++) {
-            for (let j = 0; j < neighboursB.length; j++) {
-                if (neighboursA[i] === neighboursB[j]) {
-                    commonNeighbours.push(neighboursA[i]);
-                }
-            }
-        }
-
-        return commonNeighbours;
-    }
-
-    /**
-     * Checks whether or not a vertex is a neighbour of this vertex.
-     *
-     * @param {Number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
-     * @returns {Boolean} A boolean indicating whether or not the two vertices are neighbours.
-     */
-    isNeighbour(vertexId) {
-        if (this.parentVertexId === vertexId) {
-            return true;
-        }
-
-        for (let i = 0; i < this.children.length; i++) {
-            if (this.children[i] === vertexId) {
-                return true;
-            }
-        }
-    }
     
     /**
      * Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.

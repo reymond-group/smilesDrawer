@@ -39,6 +39,10 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         this.fontSmall = this.opts.fontSizeSmall + 'pt Helvetica, Arial, sans-serif';
 
         this.updateSize(this.opts.width, this.opts.height);
+        
+        this.ctx.font = this.fontLarge;
+        this.hydrogenWidth = this.ctx.measureText('H').width;
+        this.halfHydrogenWidth = this.hydrogenWidth / 2.0;
 
         // TODO: Find out why clear was here.
         // this.clear();
@@ -610,7 +614,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
             let hx = x + offsetX;
             let hy = y + offsetY + this.opts.halfFontSizeLarge;
 
-            hydrogenWidth = ctx.measureText('H').width;
+            hydrogenWidth = this.hydrogenWidth;
             cursorPosLeft -= hydrogenWidth;
 
             if (direction === 'left') {
@@ -623,10 +627,10 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
                 hx += cursorPos;
             } else if (direction === 'up' && !isTerminal) {
                 hy -= this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
-                hx -= hydrogenWidth / 2.0;
+                hx -= this.halfHydrogenWidth;
             } else if (direction === 'down' && !isTerminal) {
                 hy += this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
-                hx -= hydrogenWidth / 2.0;
+                hx -= this.halfHydrogenWidth;
             }
 
             ctx.fillText('H', hx, hy);
@@ -636,7 +640,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
             let hx = x + offsetX;
             let hy = y + offsetY + this.opts.halfFontSizeLarge;
 
-            hydrogenWidth = ctx.measureText('H').width;
+            hydrogenWidth = this.hydrogenWidth;
             ctx.font = this.fontSmall;
             hydrogenCountWidth = ctx.measureText(hydrogens).width;
             cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
@@ -651,19 +655,19 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
                 hx += cursorPos;
             } else if (direction === 'up' && !isTerminal) {
                 hy -= this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
-                hx -= hydrogenWidth / 2.0;
+                hx -= this.halfHydrogenWidth;
             } else if (direction === 'down' && !isTerminal) {
                 hy += this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
-                hx -= hydrogenWidth / 2.0;
+                hx -= this.halfHydrogenWidth;
             }
 
             ctx.font = this.fontLarge;
             ctx.fillText('H', hx, hy)
 
             ctx.font = this.fontSmall;
-            ctx.fillText(hydrogens, hx + hydrogenWidth / 2.0 + hydrogenCountWidth, hy + fifthFontSizeSmall);
+            ctx.fillText(hydrogens, hx + this.halfHydrogenWidth + hydrogenCountWidth, hy + this.opts.fifthFontSizeSmall);
 
-            cursorPos += hydrogenWidth + hydrogenWidth / 2.0 + hydrogenCountWidth;
+            cursorPos += hydrogenWidth + this.halfHydrogenWidth + hydrogenCountWidth;
         }
 
         if (pseudoElementHandled) {
@@ -696,7 +700,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
             hydrogenWidth = 0;
 
             if (hydrogenCount > 0) {
-                hydrogenWidth = ctx.measureText('H').width;
+                hydrogenWidth = this.hydrogenWidth;
             }
 
             ctx.font = this.fontSmall;

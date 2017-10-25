@@ -692,90 +692,16 @@ SmilesDrawer.Atom = function () {
         }
 
         /**
-         * Check whether or not this atom is rotatable. The atom is deemed rotatable if it is neither a member of a ring nor participating in a bond other than a single bond. TODO: Check the chemistry.
-         *
-         * @returns {Boolean} A boolean indicating whether or not this atom is rotatable.
-         */
-
-    }, {
-        key: 'canRotate',
-        value: function canRotate() {
-            return this.bondType === '-' && this.rings.length == 0;
-        }
-
-        /**
-         * Returns whether or not this atom participates in ringbonds (breaks in the ring in the MST).
-         *
-         * @returns {Boolean} A boolean indicating whether or not this atom is associated with a ringbond.
-         */
-
-    }, {
-        key: 'hasRingbonds',
-        value: function hasRingbonds() {
-            return this.ringbonds.length > 0;
-        }
-
-        /**
-         * Returns the id of the ringbond with the highest id.
-         *
-         * @returns {Number} The highest ringbond id associated with this atom.
-         */
-
-    }, {
-        key: 'getMaxRingbond',
-        value: function getMaxRingbond() {
-            var max = 0;
-            for (var i = 0; i < this.ringbonds.length; i++) {
-                if (this.ringbonds[i].id > max) {
-                    max = this.ringbonds[i].id;
-                }
-            }
-
-            return max;
-        }
-
-        /**
-         * Checks whether or not this atom is part of a ring.
-         * 
-         * @returns {Boolean} A boolean indicating whether or not this atom is part of a ring.
-         */
-
-    }, {
-        key: 'isInRing',
-        value: function isInRing() {
-            return this.rings.length > 0;
-        }
-
-        /**
-         * Checks whether or not this atom is a member of a given ring.
-         *
-         * @param {Number} ringId A ring id.
-         * @returns {Boolean} A boolean indicating whether or not this atom is a member of a given ring.
-         */
-
-    }, {
-        key: 'hasRing',
-        value: function hasRing(ringId) {
-            for (var i = 0; i < this.rings; i++) {
-                if (ringId === this.rings[i]) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /**
          * Backs up the current rings.
          */
 
     }, {
         key: 'backupRings',
         value: function backupRings() {
-            this.originalRings = [];
+            this.originalRings = Array(this.rings.length);
 
             for (var i = 0; i < this.rings.length; i++) {
-                this.originalRings.push(this.rings[i]);
+                this.originalRings[i] = this.rings[i];
             }
         }
 
@@ -786,10 +712,10 @@ SmilesDrawer.Atom = function () {
     }, {
         key: 'restoreRings',
         value: function restoreRings() {
-            this.rings = [];
+            this.rings = Array(this.originalRings.length);
 
             for (var i = 0; i < this.originalRings.length; i++) {
-                this.rings.push(this.originalRings[i]);
+                this.rings[i] = this.originalRings[i];
             }
         }
 
@@ -813,38 +739,6 @@ SmilesDrawer.Atom = function () {
             }
 
             return false;
-        }
-
-        /**
-         * Get the highest numbered ringbond shared by two atoms. A ringbond is a break in a ring created when generating the spanning tree of a structure.
-         *
-         * @param {SmilesDrawer.Atom} atomA An atom.
-         * @param {SmilesDrawer.Atom} atomB An atom.
-         * @returns {Number} The number of the maximum ringbond shared by two atoms.
-         */
-
-    }, {
-        key: 'maxCommonRingbond',
-        value: function maxCommonRingbond(atomA, atomB) {
-            var commonMax = 0;
-            var maxA = 0;
-            var maxB = 0;
-
-            for (var i = 0; i < atomA.ringbonds.length; i++) {
-                if (atomA.ringbonds[i].id > maxA) {
-                    maxA = atomA.ringbonds[i].id;
-                }
-
-                for (var j = 0; j < atomB.ringbonds.length; j++) {
-                    if (atomB.ringbonds[j].id > maxB) {
-                        maxB = atomB.ringbonds[j].id;
-                    } else if (maxA == maxB) {
-                        commonMax = maxA;
-                    }
-                }
-            }
-
-            return commonMax;
         }
 
         /**
@@ -1320,6 +1214,10 @@ SmilesDrawer.Atom.mass = {
         this.fontSmall = this.opts.fontSizeSmall + 'pt Helvetica, Arial, sans-serif';
 
         this.updateSize(this.opts.width, this.opts.height);
+
+        this.ctx.font = this.fontLarge;
+        this.hydrogenWidth = this.ctx.measureText('H').width;
+        this.halfHydrogenWidth = this.hydrogenWidth / 2.0;
 
         // TODO: Find out why clear was here.
         // this.clear();
@@ -1934,7 +1832,7 @@ SmilesDrawer.Atom.mass = {
                 var hx = x + offsetX;
                 var hy = y + offsetY + this.opts.halfFontSizeLarge;
 
-                hydrogenWidth = ctx.measureText('H').width;
+                hydrogenWidth = this.hydrogenWidth;
                 cursorPosLeft -= hydrogenWidth;
 
                 if (direction === 'left') {
@@ -1947,10 +1845,10 @@ SmilesDrawer.Atom.mass = {
                     hx += cursorPos;
                 } else if (direction === 'up' && !isTerminal) {
                     hy -= this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
-                    hx -= hydrogenWidth / 2.0;
+                    hx -= this.halfHydrogenWidth;
                 } else if (direction === 'down' && !isTerminal) {
                     hy += this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
-                    hx -= hydrogenWidth / 2.0;
+                    hx -= this.halfHydrogenWidth;
                 }
 
                 ctx.fillText('H', hx, hy);
@@ -1960,7 +1858,7 @@ SmilesDrawer.Atom.mass = {
                 var _hx = x + offsetX;
                 var _hy = y + offsetY + this.opts.halfFontSizeLarge;
 
-                hydrogenWidth = ctx.measureText('H').width;
+                hydrogenWidth = this.hydrogenWidth;
                 ctx.font = this.fontSmall;
                 hydrogenCountWidth = ctx.measureText(hydrogens).width;
                 cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
@@ -1975,19 +1873,19 @@ SmilesDrawer.Atom.mass = {
                     _hx += cursorPos;
                 } else if (direction === 'up' && !isTerminal) {
                     _hy -= this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
-                    _hx -= hydrogenWidth / 2.0;
+                    _hx -= this.halfHydrogenWidth;
                 } else if (direction === 'down' && !isTerminal) {
                     _hy += this.opts.fontSizeLarge + this.opts.quarterFontSizeLarge;
-                    _hx -= hydrogenWidth / 2.0;
+                    _hx -= this.halfHydrogenWidth;
                 }
 
                 ctx.font = this.fontLarge;
                 ctx.fillText('H', _hx, _hy);
 
                 ctx.font = this.fontSmall;
-                ctx.fillText(hydrogens, _hx + hydrogenWidth / 2.0 + hydrogenCountWidth, _hy + fifthFontSizeSmall);
+                ctx.fillText(hydrogens, _hx + this.halfHydrogenWidth + hydrogenCountWidth, _hy + this.opts.fifthFontSizeSmall);
 
-                cursorPos += hydrogenWidth + hydrogenWidth / 2.0 + hydrogenCountWidth;
+                cursorPos += hydrogenWidth + this.halfHydrogenWidth + hydrogenCountWidth;
             }
 
             if (pseudoElementHandled) {
@@ -2020,7 +1918,7 @@ SmilesDrawer.Atom.mass = {
                 hydrogenWidth = 0;
 
                 if (hydrogenCount > 0) {
-                    hydrogenWidth = ctx.measureText('H').width;
+                    hydrogenWidth = this.hydrogenWidth;
                 }
 
                 ctx.font = this.fontSmall;
@@ -3353,6 +3251,7 @@ SmilesDrawer.Drawer = function () {
             }
 
             var sortable = [];
+
             for (var i = 0; i < this.graph.vertices.length; i++) {
                 sortable.push({
                     id: i,
@@ -8441,30 +8340,6 @@ SmilesDrawer.Ring = function () {
         }
 
         /**
-         * Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.
-         *
-         * @returns {Boolean} Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.
-         */
-
-    }, {
-        key: 'allowsFlip',
-        value: function allowsFlip() {
-            return this.canFlip && this.members.length > 4;
-        }
-
-        /**
-         * Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.
-         */
-
-    }, {
-        key: 'setFlipped',
-        value: function setFlipped() {
-            if (this.members.length < 8) {
-                this.canFlip = false;
-            }
-        }
-
-        /**
          * Returns the size (number of members) of this ring.
          *
          * @returns {Number} The size (number of members) of this ring.
@@ -8535,13 +8410,6 @@ SmilesDrawer.Ring = function () {
                     current = null;
                 }
 
-                // Currently, there can be rings where the start vertex is never
-                // reached again (bridged rings)
-                if (max == 99) {
-                    console.log('Smiles-drawer was not able to loop over the members of this ring.', this);
-                    throw 'Smiles-drawer was not able to loop over the members of this ring.';
-                }
-
                 max++;
             }
         }
@@ -8556,15 +8424,15 @@ SmilesDrawer.Ring = function () {
     }, {
         key: 'getOrderedNeighbours',
         value: function getOrderedNeighbours(ringConnections) {
-            var orderedNeighbours = [];
+            var orderedNeighbours = Array(this.neighbours.length);
 
             for (var i = 0; i < this.neighbours.length; i++) {
                 var vertices = SmilesDrawer.RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
 
-                orderedNeighbours.push({
+                orderedNeighbours[i] = {
                     n: vertices.size,
                     neighbour: this.neighbours[i]
-                });
+                };
             }
 
             orderedNeighbours.sort(function (a, b) {
@@ -8631,48 +8499,6 @@ SmilesDrawer.Ring = function () {
             }
 
             return false;
-        }
-
-        /**
-         * Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.
-         *
-         * @param {SmilesDrawer.Ring[]} rings An array of rings associated with this molecule.
-         * @param {Number} vertexId A vertex id.
-         * @returns {Boolean} A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.
-         */
-
-    }, {
-        key: 'thisOrNeighboursContain',
-        value: function thisOrNeighboursContain(rings, vertexId) {
-            for (var i = 0; i < this.neighbours.length; i++) {
-                if (Ring.getRing(rings, this.neighbours[i]).contains(vertexId)) {
-                    return true;
-                }
-            }
-
-            if (this.contains(vertexId)) {
-                return true;
-            }
-
-            return false;
-        }
-
-        /**
-         * Returns a ring based on a provided ring id.
-         *
-         * @param {SmilesDrawer.Ring[]} rings An array of rings associated with the current molecule.
-         * @param {Number} id A ring id.
-         * @returns {SmilesDrawer.Ring} A ring with a given id.
-         */
-
-    }], [{
-        key: 'getRing',
-        value: function getRing(rings, id) {
-            for (var i = 0; i < rings.length; i++) {
-                if (rings[i].id == id) {
-                    return rings[i];
-                }
-            }
         }
     }]);
 
@@ -10612,54 +10438,6 @@ SmilesDrawer.Vertex = function () {
         key: 'getNeighbourCount',
         value: function getNeighbourCount() {
             return this.neighbourCount;
-        }
-
-        /**
-         * Gets the common neighbours of this and another vertex.
-         *
-         * @param {Vertex} vertex The vertex to check for common neighbours.
-         * @returns {Number[]} An array containing the ids of common neighbours.
-         */
-
-    }, {
-        key: 'getCommonNeighbours',
-        value: function getCommonNeighbours(vertex) {
-            // There can only be one common neighbour of a Vertex
-            // outside of a ring
-            var commonNeighbours = new Array();
-            var neighboursA = this.getNeighbours();
-            var neighboursB = vertex.getNeighbours();
-
-            for (var i = 0; i < neighboursA.length; i++) {
-                for (var j = 0; j < neighboursB.length; j++) {
-                    if (neighboursA[i] === neighboursB[j]) {
-                        commonNeighbours.push(neighboursA[i]);
-                    }
-                }
-            }
-
-            return commonNeighbours;
-        }
-
-        /**
-         * Checks whether or not a vertex is a neighbour of this vertex.
-         *
-         * @param {Number} vertexId The id of the vertex to check if it is a neighbour of this vertex.
-         * @returns {Boolean} A boolean indicating whether or not the two vertices are neighbours.
-         */
-
-    }, {
-        key: 'isNeighbour',
-        value: function isNeighbour(vertexId) {
-            if (this.parentVertexId === vertexId) {
-                return true;
-            }
-
-            for (var i = 0; i < this.children.length; i++) {
-                if (this.children[i] === vertexId) {
-                    return true;
-                }
-            }
         }
 
         /**

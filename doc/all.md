@@ -34,15 +34,9 @@ The SmilesDrawer namespace.
             * [.getAttachedPseudoElementsCount()](#SmilesDrawer.Atom+getAttachedPseudoElementsCount) ⇒ <code>Number</code>
             * [.addAnchoredRing(ringId)](#SmilesDrawer.Atom+addAnchoredRing)
             * [.getRingbondCount()](#SmilesDrawer.Atom+getRingbondCount) ⇒ <code>Number</code>
-            * [.canRotate()](#SmilesDrawer.Atom+canRotate) ⇒ <code>Boolean</code>
-            * [.hasRingbonds()](#SmilesDrawer.Atom+hasRingbonds) ⇒ <code>Boolean</code>
-            * [.getMaxRingbond()](#SmilesDrawer.Atom+getMaxRingbond) ⇒ <code>Number</code>
-            * [.isInRing()](#SmilesDrawer.Atom+isInRing) ⇒ <code>Boolean</code>
-            * [.hasRing(ringId)](#SmilesDrawer.Atom+hasRing) ⇒ <code>Boolean</code>
             * [.backupRings()](#SmilesDrawer.Atom+backupRings)
             * [.restoreRings()](#SmilesDrawer.Atom+restoreRings)
             * [.haveCommonRingbond(atomA, atomB)](#SmilesDrawer.Atom+haveCommonRingbond) ⇒ <code>Boolean</code>
-            * [.maxCommonRingbond(atomA, atomB)](#SmilesDrawer.Atom+maxCommonRingbond) ⇒ <code>Number</code>
             * [.getOrder(center)](#SmilesDrawer.Atom+getOrder) ⇒ <code>Number</code>
             * [.setOrder(center, order)](#SmilesDrawer.Atom+setOrder)
             * [.neighbouringElementsEqual(arr)](#SmilesDrawer.Atom+neighbouringElementsEqual) ⇒ <code>Boolean</code>
@@ -201,21 +195,15 @@ The SmilesDrawer namespace.
         * [.toRad(deg)](#SmilesDrawer.MathHelper.toRad) ⇒ <code>Number</code>
     * [.Ring](#SmilesDrawer.Ring)
         * [new SmilesDrawer.Ring(members)](#new_SmilesDrawer.Ring_new)
-        * _instance_
-            * [.clone()](#SmilesDrawer.Ring+clone) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
-            * [.allowsFlip()](#SmilesDrawer.Ring+allowsFlip) ⇒ <code>Boolean</code>
-            * [.setFlipped()](#SmilesDrawer.Ring+setFlipped)
-            * [.getSize()](#SmilesDrawer.Ring+getSize) ⇒ <code>Number</code>
-            * [.getPolygon(vertices)](#SmilesDrawer.Ring+getPolygon) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-            * [.getAngle()](#SmilesDrawer.Ring+getAngle) ⇒ <code>Number</code>
-            * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#SmilesDrawer.Ring+eachMember)
-            * [.getOrderedNeighbours(ringConnections)](#SmilesDrawer.Ring+getOrderedNeighbours) ⇒ <code>Array.&lt;Object&gt;</code>
-            * [.isBenzeneLike(vertices)](#SmilesDrawer.Ring+isBenzeneLike) ⇒ <code>Boolean</code>
-            * [.getDoubleBondCount(vertices)](#SmilesDrawer.Ring+getDoubleBondCount) ⇒ <code>Number</code>
-            * [.contains(vertexId)](#SmilesDrawer.Ring+contains) ⇒ <code>Boolean</code>
-            * [.thisOrNeighboursContain(rings, vertexId)](#SmilesDrawer.Ring+thisOrNeighboursContain) ⇒ <code>Boolean</code>
-        * _static_
-            * [.getRing(rings, id)](#SmilesDrawer.Ring.getRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
+        * [.clone()](#SmilesDrawer.Ring+clone) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
+        * [.getSize()](#SmilesDrawer.Ring+getSize) ⇒ <code>Number</code>
+        * [.getPolygon(vertices)](#SmilesDrawer.Ring+getPolygon) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
+        * [.getAngle()](#SmilesDrawer.Ring+getAngle) ⇒ <code>Number</code>
+        * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#SmilesDrawer.Ring+eachMember)
+        * [.getOrderedNeighbours(ringConnections)](#SmilesDrawer.Ring+getOrderedNeighbours) ⇒ <code>Array.&lt;Object&gt;</code>
+        * [.isBenzeneLike(vertices)](#SmilesDrawer.Ring+isBenzeneLike) ⇒ <code>Boolean</code>
+        * [.getDoubleBondCount(vertices)](#SmilesDrawer.Ring+getDoubleBondCount) ⇒ <code>Number</code>
+        * [.contains(vertexId)](#SmilesDrawer.Ring+contains) ⇒ <code>Boolean</code>
     * [.RingConnection](#SmilesDrawer.RingConnection)
         * [new SmilesDrawer.RingConnection(firstRing, secondRing)](#new_SmilesDrawer.RingConnection_new)
         * _instance_
@@ -297,8 +285,6 @@ The SmilesDrawer namespace.
         * [.getNeighbours([vertexId])](#SmilesDrawer.Vertex+getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.getDrawnNeighbours(vertices)](#SmilesDrawer.Vertex+getDrawnNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.getNeighbourCount()](#SmilesDrawer.Vertex+getNeighbourCount) ⇒ <code>Number</code>
-        * [.getCommonNeighbours(vertex)](#SmilesDrawer.Vertex+getCommonNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.isNeighbour(vertexId)](#SmilesDrawer.Vertex+isNeighbour) ⇒ <code>Boolean</code>
         * [.getSpanningTreeNeighbours([vertexId])](#SmilesDrawer.Vertex+getSpanningTreeNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.getNextInRing(vertices, ringId, previousVertexId)](#SmilesDrawer.Vertex+getNextInRing) ⇒ <code>Number</code>
     * [.clean(smiles)](#SmilesDrawer.clean) ⇒ <code>String</code>
@@ -584,15 +570,9 @@ A class representing an atom.
         * [.getAttachedPseudoElementsCount()](#SmilesDrawer.Atom+getAttachedPseudoElementsCount) ⇒ <code>Number</code>
         * [.addAnchoredRing(ringId)](#SmilesDrawer.Atom+addAnchoredRing)
         * [.getRingbondCount()](#SmilesDrawer.Atom+getRingbondCount) ⇒ <code>Number</code>
-        * [.canRotate()](#SmilesDrawer.Atom+canRotate) ⇒ <code>Boolean</code>
-        * [.hasRingbonds()](#SmilesDrawer.Atom+hasRingbonds) ⇒ <code>Boolean</code>
-        * [.getMaxRingbond()](#SmilesDrawer.Atom+getMaxRingbond) ⇒ <code>Number</code>
-        * [.isInRing()](#SmilesDrawer.Atom+isInRing) ⇒ <code>Boolean</code>
-        * [.hasRing(ringId)](#SmilesDrawer.Atom+hasRing) ⇒ <code>Boolean</code>
         * [.backupRings()](#SmilesDrawer.Atom+backupRings)
         * [.restoreRings()](#SmilesDrawer.Atom+restoreRings)
         * [.haveCommonRingbond(atomA, atomB)](#SmilesDrawer.Atom+haveCommonRingbond) ⇒ <code>Boolean</code>
-        * [.maxCommonRingbond(atomA, atomB)](#SmilesDrawer.Atom+maxCommonRingbond) ⇒ <code>Number</code>
         * [.getOrder(center)](#SmilesDrawer.Atom+getOrder) ⇒ <code>Number</code>
         * [.setOrder(center, order)](#SmilesDrawer.Atom+setOrder)
         * [.neighbouringElementsEqual(arr)](#SmilesDrawer.Atom+neighbouringElementsEqual) ⇒ <code>Boolean</code>
@@ -671,46 +651,6 @@ Returns the number of ringbonds (breaks in rings to generate the MST of the smil
 
 **Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
 **Returns**: <code>Number</code> - The number of ringbonds this atom is connected to.  
-<a name="SmilesDrawer.Atom+canRotate"></a>
-
-#### atom.canRotate() ⇒ <code>Boolean</code>
-Check whether or not this atom is rotatable. The atom is deemed rotatable if it is neither a member of a ring nor participating in a bond other than a single bond. TODO: Check the chemistry.
-
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this atom is rotatable.  
-<a name="SmilesDrawer.Atom+hasRingbonds"></a>
-
-#### atom.hasRingbonds() ⇒ <code>Boolean</code>
-Returns whether or not this atom participates in ringbonds (breaks in the ring in the MST).
-
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this atom is associated with a ringbond.  
-<a name="SmilesDrawer.Atom+getMaxRingbond"></a>
-
-#### atom.getMaxRingbond() ⇒ <code>Number</code>
-Returns the id of the ringbond with the highest id.
-
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
-**Returns**: <code>Number</code> - The highest ringbond id associated with this atom.  
-<a name="SmilesDrawer.Atom+isInRing"></a>
-
-#### atom.isInRing() ⇒ <code>Boolean</code>
-Checks whether or not this atom is part of a ring.
-
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this atom is part of a ring.  
-<a name="SmilesDrawer.Atom+hasRing"></a>
-
-#### atom.hasRing(ringId) ⇒ <code>Boolean</code>
-Checks whether or not this atom is a member of a given ring.
-
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this atom is a member of a given ring.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ringId | <code>Number</code> | A ring id. |
-
 <a name="SmilesDrawer.Atom+backupRings"></a>
 
 #### atom.backupRings()
@@ -730,19 +670,6 @@ Checks whether or not two atoms share a common ringbond id. A ringbond is a brea
 
 **Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
 **Returns**: <code>Boolean</code> - A boolean indicating whether or not two atoms share a common ringbond.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| atomA | <code>[Atom](#SmilesDrawer.Atom)</code> | An atom. |
-| atomB | <code>[Atom](#SmilesDrawer.Atom)</code> | An atom. |
-
-<a name="SmilesDrawer.Atom+maxCommonRingbond"></a>
-
-#### atom.maxCommonRingbond(atomA, atomB) ⇒ <code>Number</code>
-Get the highest numbered ringbond shared by two atoms. A ringbond is a break in a ring created when generating the spanning tree of a structure.
-
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
-**Returns**: <code>Number</code> - The number of the maximum ringbond shared by two atoms.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2571,21 +2498,15 @@ A class representing a ring.
 
 * [.Ring](#SmilesDrawer.Ring)
     * [new SmilesDrawer.Ring(members)](#new_SmilesDrawer.Ring_new)
-    * _instance_
-        * [.clone()](#SmilesDrawer.Ring+clone) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
-        * [.allowsFlip()](#SmilesDrawer.Ring+allowsFlip) ⇒ <code>Boolean</code>
-        * [.setFlipped()](#SmilesDrawer.Ring+setFlipped)
-        * [.getSize()](#SmilesDrawer.Ring+getSize) ⇒ <code>Number</code>
-        * [.getPolygon(vertices)](#SmilesDrawer.Ring+getPolygon) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-        * [.getAngle()](#SmilesDrawer.Ring+getAngle) ⇒ <code>Number</code>
-        * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#SmilesDrawer.Ring+eachMember)
-        * [.getOrderedNeighbours(ringConnections)](#SmilesDrawer.Ring+getOrderedNeighbours) ⇒ <code>Array.&lt;Object&gt;</code>
-        * [.isBenzeneLike(vertices)](#SmilesDrawer.Ring+isBenzeneLike) ⇒ <code>Boolean</code>
-        * [.getDoubleBondCount(vertices)](#SmilesDrawer.Ring+getDoubleBondCount) ⇒ <code>Number</code>
-        * [.contains(vertexId)](#SmilesDrawer.Ring+contains) ⇒ <code>Boolean</code>
-        * [.thisOrNeighboursContain(rings, vertexId)](#SmilesDrawer.Ring+thisOrNeighboursContain) ⇒ <code>Boolean</code>
-    * _static_
-        * [.getRing(rings, id)](#SmilesDrawer.Ring.getRing) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
+    * [.clone()](#SmilesDrawer.Ring+clone) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
+    * [.getSize()](#SmilesDrawer.Ring+getSize) ⇒ <code>Number</code>
+    * [.getPolygon(vertices)](#SmilesDrawer.Ring+getPolygon) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
+    * [.getAngle()](#SmilesDrawer.Ring+getAngle) ⇒ <code>Number</code>
+    * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#SmilesDrawer.Ring+eachMember)
+    * [.getOrderedNeighbours(ringConnections)](#SmilesDrawer.Ring+getOrderedNeighbours) ⇒ <code>Array.&lt;Object&gt;</code>
+    * [.isBenzeneLike(vertices)](#SmilesDrawer.Ring+isBenzeneLike) ⇒ <code>Boolean</code>
+    * [.getDoubleBondCount(vertices)](#SmilesDrawer.Ring+getDoubleBondCount) ⇒ <code>Number</code>
+    * [.contains(vertexId)](#SmilesDrawer.Ring+contains) ⇒ <code>Boolean</code>
 
 <a name="new_SmilesDrawer.Ring_new"></a>
 
@@ -2604,19 +2525,6 @@ Clones this ring and returns the clone.
 
 **Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
 **Returns**: <code>[Ring](#SmilesDrawer.Ring)</code> - A clone of this ring.  
-<a name="SmilesDrawer.Ring+allowsFlip"></a>
-
-#### ring.allowsFlip() ⇒ <code>Boolean</code>
-Returns a boolean indicating whether or not this ring is allowed to flip attached vertices (atoms) to the inside of the ring. Is only allowed for rings with more than 4 members. Can be disabling by setting the canFlip property of the ring to false.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>Boolean</code> - Returns a boolean indicating whether or not vertices (atoms) attached to this ring can be flipped to the inside of the ring.  
-<a name="SmilesDrawer.Ring+setFlipped"></a>
-
-#### ring.setFlipped()
-Sets the canFlip property of this ring to false if the ring has less than 8 members. If the ring has more than 8 members, the value of canFlip is not changed.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
 <a name="SmilesDrawer.Ring+getSize"></a>
 
 #### ring.getSize() ⇒ <code>Number</code>
@@ -2704,32 +2612,6 @@ Checks whether or not this ring contains a member with a given vertex id.
 | Param | Type | Description |
 | --- | --- | --- |
 | vertexId | <code>Number</code> | A vertex id. |
-
-<a name="SmilesDrawer.Ring+thisOrNeighboursContain"></a>
-
-#### ring.thisOrNeighboursContain(rings, vertexId) ⇒ <code>Boolean</code>
-Checks whether or not this ring or one of its neighbouring rings contains a member with a given vertex id.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this ring or one of its neighbouring rings contains a emember with the given vertex id.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| rings | <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code> | An array of rings associated with this molecule. |
-| vertexId | <code>Number</code> | A vertex id. |
-
-<a name="SmilesDrawer.Ring.getRing"></a>
-
-#### Ring.getRing(rings, id) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
-Returns a ring based on a provided ring id.
-
-**Kind**: static method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>[Ring](#SmilesDrawer.Ring)</code> - A ring with a given id.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| rings | <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code> | An array of rings associated with the current molecule. |
-| id | <code>Number</code> | A ring id. |
 
 <a name="SmilesDrawer.RingConnection"></a>
 
@@ -3605,8 +3487,6 @@ A class representing a vertex.
     * [.getNeighbours([vertexId])](#SmilesDrawer.Vertex+getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
     * [.getDrawnNeighbours(vertices)](#SmilesDrawer.Vertex+getDrawnNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
     * [.getNeighbourCount()](#SmilesDrawer.Vertex+getNeighbourCount) ⇒ <code>Number</code>
-    * [.getCommonNeighbours(vertex)](#SmilesDrawer.Vertex+getCommonNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-    * [.isNeighbour(vertexId)](#SmilesDrawer.Vertex+isNeighbour) ⇒ <code>Boolean</code>
     * [.getSpanningTreeNeighbours([vertexId])](#SmilesDrawer.Vertex+getSpanningTreeNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
     * [.getNextInRing(vertices, ringId, previousVertexId)](#SmilesDrawer.Vertex+getNextInRing) ⇒ <code>Number</code>
 
@@ -3749,30 +3629,6 @@ Returns the number of neighbours of this vertex.
 
 **Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
 **Returns**: <code>Number</code> - The number of neighbours.  
-<a name="SmilesDrawer.Vertex+getCommonNeighbours"></a>
-
-#### vertex.getCommonNeighbours(vertex) ⇒ <code>Array.&lt;Number&gt;</code>
-Gets the common neighbours of this and another vertex.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of common neighbours.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertex | <code>Vertex</code> | The vertex to check for common neighbours. |
-
-<a name="SmilesDrawer.Vertex+isNeighbour"></a>
-
-#### vertex.isNeighbour(vertexId) ⇒ <code>Boolean</code>
-Checks whether or not a vertex is a neighbour of this vertex.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not the two vertices are neighbours.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexId | <code>Number</code> | The id of the vertex to check if it is a neighbour of this vertex. |
-
 <a name="SmilesDrawer.Vertex+getSpanningTreeNeighbours"></a>
 
 #### vertex.getSpanningTreeNeighbours([vertexId]) ⇒ <code>Array.&lt;Number&gt;</code>
