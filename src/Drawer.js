@@ -145,6 +145,7 @@ SmilesDrawer.Drawer = class Drawer {
     this.bridgedRing = false;
 
     this.initRings();
+    this.annotateStereochemistry();
 
     if (!this.explicitHydrogens) {
       for (var i = 0; i < this.graph.vertices.length; i++) {
@@ -155,7 +156,7 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     if (this.opts.isomeric) {
-      this.annotateChirality();
+      this.annotateStereochemistry();
     }
 
     if (!this.infoOnly) {
@@ -2496,8 +2497,35 @@ SmilesDrawer.Drawer = class Drawer {
     return nrneighbours;
   }
 
-  annotateChirality() {
+  annotateStereochemistry() {
+    let maxDepth = 5;
+    // For each stereo-center
+    for (var i = 0; i < this.graph.vertices.length; i++) {
+      let vertex = this.graph.vertices[i];
+      
+      if (!vertex.value.bracket.chirality) {
+        continue;
+      }
 
+
+      let neighbours = vertex.getNeighbours();
+      for (var i = 0; i < vertex.neighbour)
+
+      let visited = new Uint8Array(this.graph.vertices.length);
+      let priorities = new Uint16Array(maxDepth);
+
+      
+    }
+  }
+
+  visitStereochemistry(vertexId, visited, level) {
+    if (visited === 0) {
+      return;
+    }
+    
+    visited[vertexId] = 1;
+
+    
   }
 
   /**

@@ -208,11 +208,9 @@ The SmilesDrawer namespace.
         * [new SmilesDrawer.RingConnection(firstRing, secondRing)](#new_SmilesDrawer.RingConnection_new)
         * _instance_
             * [.addVertex(vertexId)](#SmilesDrawer.RingConnection+addVertex)
-            * [.isBridge()](#SmilesDrawer.RingConnection+isBridge) ⇒ <code>Boolean</code>
             * [.updateOther(ringId, otherRingId)](#SmilesDrawer.RingConnection+updateOther)
             * [.containsRing(ringId)](#SmilesDrawer.RingConnection+containsRing) ⇒ <code>Boolean</code>
         * _static_
-            * [.isBridge(ringConnections, vertices, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.isBridge) ⇒ <code>Boolean</code>
             * [.getNeighbours(ringConnections, ringId)](#SmilesDrawer.RingConnection.getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
             * [.getVertices(ringConnections, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.getVertices) ⇒ <code>Array.&lt;Number&gt;</code>
     * [.SSSR](#SmilesDrawer.SSSR)
@@ -548,7 +546,7 @@ A class representing an atom.
 | bridgedRing | <code>Number</code> | The id of the bridged ring if the atom is part of a bridged ring. |
 | anchoredRings | <code>Array.&lt;Number&gt;</code> | The ids of the rings that are anchored to this atom. The centers of anchored rings are translated when this atom is translated. |
 | bracket | <code>Object</code> | If this atom is defined as a bracket atom in the original SMILES, this object contains all the bracket information. Example: { hcount: {Number}, charge: ['--', '-', '+', '++'], isotope: {Number} }. |
-| chiral | <code>Number</code> | EXPERIMENTAL: Specifies chirality. |
+| plane | <code>Number</code> | Specifies on which "plane" the atoms is in stereochemical deptictions (-1 back, 0 middle, 1 front). |
 | attachedPseudoElements | <code>Array.&lt;Object&gt;</code> | A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count. |
 | attachedPseudoElement[].element | <code>String</code> | The element symbol. |
 | attachedPseudoElement[].count | <code>Number</code> | The number of occurences that match the key. |
@@ -2633,11 +2631,9 @@ A class representing a ring connection.
     * [new SmilesDrawer.RingConnection(firstRing, secondRing)](#new_SmilesDrawer.RingConnection_new)
     * _instance_
         * [.addVertex(vertexId)](#SmilesDrawer.RingConnection+addVertex)
-        * [.isBridge()](#SmilesDrawer.RingConnection+isBridge) ⇒ <code>Boolean</code>
         * [.updateOther(ringId, otherRingId)](#SmilesDrawer.RingConnection+updateOther)
         * [.containsRing(ringId)](#SmilesDrawer.RingConnection+containsRing) ⇒ <code>Boolean</code>
     * _static_
-        * [.isBridge(ringConnections, vertices, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.isBridge) ⇒ <code>Boolean</code>
         * [.getNeighbours(ringConnections, ringId)](#SmilesDrawer.RingConnection.getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
         * [.getVertices(ringConnections, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.getVertices) ⇒ <code>Array.&lt;Number&gt;</code>
 
@@ -2663,18 +2659,6 @@ Adding a vertex to the ring connection.
 | --- | --- | --- |
 | vertexId | <code>Number</code> | A vertex id. |
 
-<a name="SmilesDrawer.RingConnection+isBridge"></a>
-
-#### ringConnection.isBridge() ⇒ <code>Boolean</code>
-Checks whether or not this ring connection is a bridge in a bridged ring.
-
-**Kind**: instance method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this ring connection is a bridge.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| . | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | vertices The array of vertices associated with the current molecule. |
-
 <a name="SmilesDrawer.RingConnection+updateOther"></a>
 
 #### ringConnection.updateOther(ringId, otherRingId)
@@ -2698,21 +2682,6 @@ Returns a boolean indicating whether or not a ring with a given id is participat
 | Param | Type | Description |
 | --- | --- | --- |
 | ringId | <code>Number</code> | A ring id. |
-
-<a name="SmilesDrawer.RingConnection.isBridge"></a>
-
-#### RingConnection.isBridge(ringConnections, vertices, firstRingId, secondRingId) ⇒ <code>Boolean</code>
-Checks whether or not two rings are connected by a bridged bond.
-
-**Kind**: static method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not two rings ar connected by a bridged bond.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#SmilesDrawer.RingConnection)</code> | An array of ring connections containing the ring connections associated with the current molecule. |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | An array of vertices containing the vertices associated with the current molecule. |
-| firstRingId | <code>Number</code> | A ring id. |
-| secondRingId | <code>Nmber</code> | A ring id. |
 
 <a name="SmilesDrawer.RingConnection.getNeighbours"></a>
 

@@ -14,7 +14,7 @@
  * @property {Number} bridgedRing The id of the bridged ring if the atom is part of a bridged ring.
  * @property {Number[]} anchoredRings The ids of the rings that are anchored to this atom. The centers of anchored rings are translated when this atom is translated.
  * @property {Object} bracket If this atom is defined as a bracket atom in the original SMILES, this object contains all the bracket information. Example: { hcount: {Number}, charge: ['--', '-', '+', '++'], isotope: {Number} }.
- * @property {Number} chiral EXPERIMENTAL: Specifies chirality.
+ * @property {Number} plane Specifies on which "plane" the atoms is in stereochemical deptictions (-1 back, 0 middle, 1 front).
  * @property {Object[]} attachedPseudoElements A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
  * @property {String} attachedPseudoElement[].element The element symbol.
  * @property {Number} attachedPseudoElement[].count The number of occurences that match the key.
@@ -45,7 +45,7 @@ SmilesDrawer.Atom = class Atom {
         this.bridgedRing = null;
         this.anchoredRings = [];
         this.bracket = null;
-        this.chiral = 0;
+        this.plane = 0;
         this.order = {};
         this.attachedPseudoElements = {};
         this.hasAttachedPseudoElements = false;

@@ -291,7 +291,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         let offsetY = this.offsetY;
 
         // Add a shadow behind the line
-        let shortLine = line.clone().shorten(8.0);
+        let shortLine = line.clone().shorten(5.0);
 
         let l = shortLine.getLeftVector().clone();
         let r = shortLine.getRightVector().clone();
