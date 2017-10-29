@@ -66,6 +66,51 @@ SmilesDrawer.RingConnection = class RingConnection {
     }
 
     /**
+     * Checks whether or not this ring connection is a bridge in a bridged ring.
+     *
+     * @param {SmilesDrawer.Vertex[]}. vertices The array of vertices associated with the current molecule.
+     * @returns {Boolean} A boolean indicating whether or not this ring connection is a bridge.
+     */
+    isBridge(vertices) {
+      if (this.vertices.size > 2) {
+          return true;
+      }
+
+      for (let vertexId of this.vertices) {
+          if(vertices[vertexId].value.rings.length > 2) {
+              return true;
+          }
+      }
+
+      return false;
+    }
+
+    /**
+     * Checks whether or not two rings are connected by a bridged bond.
+     *
+     * @static
+     * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing the ring connections associated with the current molecule.
+     * @param {SmilesDrawer.Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+     * @param {Number} firstRingId A ring id.
+     * @param {Nmber} secondRingId A ring id.
+     * @returns {Boolean} A boolean indicating whether or not two rings ar connected by a bridged bond.
+     */
+    static isBridge(ringConnections, vertices, firstRingId, secondRingId) {
+      let ringConnection = null;
+      
+      for (let i = 0; i < ringConnections.length; i++) {
+          ringConnection = ringConnections[i];
+
+          if (ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId ||
+              ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId) {
+              return ringConnection.isBridge(vertices);
+          }
+      }
+
+      return false;
+    }
+
+    /**
      * Retruns the neighbouring rings of a given ring.
      *
      * @static

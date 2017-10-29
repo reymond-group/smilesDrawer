@@ -2503,29 +2503,35 @@ SmilesDrawer.Drawer = class Drawer {
     for (var i = 0; i < this.graph.vertices.length; i++) {
       let vertex = this.graph.vertices[i];
       
-      if (!vertex.value.bracket.chirality) {
+      if (!vertex.value.bracket || !vertex.value.bracket.chirality) {
         continue;
       }
 
-
       let neighbours = vertex.getNeighbours();
-      for (var i = 0; i < vertex.neighbour)
 
-      let visited = new Uint8Array(this.graph.vertices.length);
-      let priorities = new Uint16Array(maxDepth);
+      // Move priorities outside, make it of length maxDepth * neighbours.length
+      // then add it with offsets (j * maxDepth) ...
+      for (var j = 0; j < neighbours.length; j++) {
+        let visited = new Uint8Array(this.graph.vertices.length);
+        let priorities = new Uint16Array(maxDepth);
 
-      
+        visited[vertex.id] = 1;
+        this.visitStereochemistry(neighbours[j], visited, priorities, maxDepth, 0);
+      }
     }
   }
 
-  visitStereochemistry(vertexId, visited, level) {
-    if (visited === 0) {
-      return;
-    }
-    
+  visitStereochemistry(vertexId, visited, priorities, maxDepth, depth) {
     visited[vertexId] = 1;
+    priorities[depth] += this.graph.vertices[vertexId].value.getAtomicNumber();
 
-    
+    let neighbours = this.graph.vertices[vertexId].getNeighbours();
+
+    for (var i = 0; i < neighbours.length; i++) {
+      if (visited[neighbours[i]] !== 1 && depth < maxDepth) {
+        this.visitStereochemistry(neighbours[i], visited, priorities, maxDepth, depth + 1);
+      }
+    }
   }
 
   /**
