@@ -4826,39 +4826,70 @@ SmilesDrawer.Drawer = function () {
     }, {
         key: 'annotateStereochemistry',
         value: function annotateStereochemistry() {
+            var _this = this;
+
             var maxDepth = 5;
             // For each stereo-center
-            for (var i = 0; i < this.graph.vertices.length; i++) {
-                var vertex = this.graph.vertices[i];
+
+            var _loop2 = function _loop2() {
+                var vertex = _this.graph.vertices[i];
 
                 if (!vertex.value.bracket || !vertex.value.bracket.chirality) {
-                    continue;
+                    return 'continue';
                 }
 
                 var neighbours = vertex.getNeighbours();
+                var nNeighbours = neighbours.length;
+                var priorities = Array(nNeighbours);
 
-                for (var j = 0; j < neighbours.length; j++) {
-                    var visited = new Uint8Array(this.graph.vertices.length);
-                    var priorities = new Uint16Array(maxDepth);
-
+                for (j = 0; j < nNeighbours; j++) {
+                    var visited = new Uint8Array(_this.graph.vertices.length);
+                    var priority = new Uint16Array(maxDepth * 2.0 + 1);
                     visited[vertex.id] = 1;
-                    this.visitStereochemistry(neighbours[j], visited, priorities, maxDepth, 0);
+                    _this.visitStereochemistry(neighbours[j], visited, priority, maxDepth, 0);
 
-                    console.log(priorities);
+                    // Break ties by the position in the smiles string as per specification
+                    priority[maxDepth * 2.0] = neighbours[j];
+                    priorities[j] = [j, priority];
                 }
+
+                priorities.sort(function (a, b) {
+                    for (var j = 0; j < nNeighbours; j++) {
+                        if (a[1][j] > b[1][j]) {
+                            return -1;
+                        } else if (a[1][j] < b[1][j]) {
+                            return 1;
+                        }
+                    }
+
+                    return 0;
+                });
+
+                console.log(priorities);
+            };
+
+            for (var i = 0; i < this.graph.vertices.length; i++) {
+                var j;
+
+                var _ret2 = _loop2();
+
+                if (_ret2 === 'continue') continue;
             }
         }
     }, {
         key: 'visitStereochemistry',
-        value: function visitStereochemistry(vertexId, visited, priorities, maxDepth, depth) {
+        value: function visitStereochemistry(vertexId, visited, priority, maxDepth, depth) {
             visited[vertexId] = 1;
-            priorities[depth] += this.graph.vertices[vertexId].value.getAtomicNumber();
+            var atomicNumber = this.graph.vertices[vertexId].value.getAtomicNumber();
+
+            priority[depth + depth] += atomicNumber;
+            priority[maxDepth] = Math.max(priority[maxDepth], atomicNumber);
 
             var neighbours = this.graph.vertices[vertexId].getNeighbours();
 
             for (var i = 0; i < neighbours.length; i++) {
-                if (visited[neighbours[i]] !== 1 && depth < maxDepth) {
-                    this.visitStereochemistry(neighbours[i], visited, priorities, maxDepth, depth + 1);
+                if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
+                    this.visitStereochemistry(neighbours[i], visited, priority, maxDepth, depth + 1);
                 }
             }
         }
@@ -4872,17 +4903,17 @@ SmilesDrawer.Drawer = function () {
         key: 'initPseudoElements',
         value: function initPseudoElements() {
             for (var i = 0; i < this.graph.vertices.length; i++) {
-                var vertex = this.graph.vertices[i];
-                var neighbourIds = vertex.getNeighbours();
-                var neighbours = [];
+                var _vertex4 = this.graph.vertices[i];
+                var neighbourIds = _vertex4.getNeighbours();
+                var _neighbours3 = [];
 
                 for (var j = 0; j < neighbourIds.length; j++) {
-                    neighbours.push(this.graph.vertices[neighbourIds[j]]);
+                    _neighbours3.push(this.graph.vertices[neighbourIds[j]]);
                 }
 
                 // Ignore atoms that have less than 3 neighbours, except if
                 // the vertex is connected to a ring and has two neighbours
-                if (vertex.getNeighbourCount() < 3 || vertex.value.rings.length > 0) {
+                if (_vertex4.getNeighbourCount() < 3 || _vertex4.value.rings.length > 0) {
                     continue;
                 }
 
@@ -4891,8 +4922,8 @@ SmilesDrawer.Drawer = function () {
                 var heteroAtomCount = 0;
                 var ctn = 0;
 
-                for (var j = 0; j < neighbours.length; j++) {
-                    var neighbour = neighbours[j];
+                for (var j = 0; j < _neighbours3.length; j++) {
+                    var neighbour = _neighbours3[j];
                     var neighbouringElement = neighbour.value.element;
                     var neighbourCount = neighbour.getNeighbourCount();
 
@@ -4912,16 +4943,16 @@ SmilesDrawer.Drawer = function () {
                 // Get the previous atom (the one which is not terminal)
                 var previous = null;
 
-                for (var j = 0; j < neighbours.length; j++) {
-                    var _neighbour3 = neighbours[j];
+                for (var j = 0; j < _neighbours3.length; j++) {
+                    var _neighbour3 = _neighbours3[j];
 
                     if (_neighbour3.getNeighbourCount() > 1) {
                         previous = _neighbour3;
                     }
                 }
 
-                for (var j = 0; j < neighbours.length; j++) {
-                    var _neighbour4 = neighbours[j];
+                for (var j = 0; j < _neighbours3.length; j++) {
+                    var _neighbour4 = _neighbours3[j];
 
                     if (_neighbour4.getNeighbourCount() > 1) {
                         continue;
@@ -4935,29 +4966,29 @@ SmilesDrawer.Drawer = function () {
                         hydrogens = _neighbour4.value.bracket.hcount;
                     }
 
-                    vertex.value.attachPseudoElement(_neighbour4.value.element, previous ? previous.value.element : null, hydrogens);
+                    _vertex4.value.attachPseudoElement(_neighbour4.value.element, previous ? previous.value.element : null, hydrogens);
                 }
             }
 
             // The second pass
             for (var i = 0; i < this.graph.vertices.length; i++) {
-                var _vertex4 = this.graph.vertices[i];
-                var atom = _vertex4.value;
+                var _vertex5 = this.graph.vertices[i];
+                var atom = _vertex5.value;
                 var _element3 = atom.element;
 
                 if (_element3 === 'C' || _element3 === 'H' || !atom.isDrawn) {
                     continue;
                 }
 
-                var _neighbourIds = _vertex4.getNeighbours();
-                var _neighbours3 = [];
+                var _neighbourIds = _vertex5.getNeighbours();
+                var _neighbours4 = [];
 
                 for (var j = 0; j < _neighbourIds.length; j++) {
-                    _neighbours3.push(this.graph.vertices[_neighbourIds[j]]);
+                    _neighbours4.push(this.graph.vertices[_neighbourIds[j]]);
                 }
 
-                for (var j = 0; j < _neighbours3.length; j++) {
-                    var _neighbour5 = _neighbours3[j].value;
+                for (var j = 0; j < _neighbours4.length; j++) {
+                    var _neighbour5 = _neighbours4[j].value;
 
                     if (!_neighbour5.hasAttachedPseudoElements || _neighbour5.getAttachedPseudoElementsCount() !== 2) {
                         continue;
@@ -4967,7 +4998,7 @@ SmilesDrawer.Drawer = function () {
 
                     if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
                         _neighbour5.isDrawn = false;
-                        _vertex4.value.attachPseudoElement('Ac', '', 0);
+                        _vertex5.value.attachPseudoElement('Ac', '', 0);
                     }
                 }
             }
@@ -5588,12 +5619,12 @@ SmilesDrawer.Graph = function () {
             while (queue.length > 0) {
                 // JavaScripts shift() is O(n) ... bad JavaScript, bad!
                 var u = queue.shift();
-                var vertex = this.vertices[u];
+                var _vertex6 = this.vertices[u];
 
-                callback(vertex);
+                callback(_vertex6);
 
-                for (var i = 0; i < vertex.neighbours.length; i++) {
-                    var v = vertex.neighbours[i];
+                for (var i = 0; i < _vertex6.neighbours.length; i++) {
+                    var v = _vertex6.neighbours[i];
                     if (!visited[v]) {
                         visited[v] = true;
                         queue.push(v);
@@ -5620,13 +5651,13 @@ SmilesDrawer.Graph = function () {
             // Add vertices that are directly connected to the ring
             var i = vertexIds.length;
             while (i--) {
-                var vertex = this.vertices[vertexIds[i]];
-                var j = vertex.neighbours.length;
+                var _vertex7 = this.vertices[vertexIds[i]];
+                var j = _vertex7.neighbours.length;
                 while (j--) {
-                    var neighbour = this.vertices[vertex.neighbours[j]];
+                    var neighbour = this.vertices[_vertex7.neighbours[j]];
                     if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
                         vertexIds.push(neighbour.id);
-                        outAdditionallyPositioned.push([neighbour.id, vertex.id]);
+                        outAdditionallyPositioned.push([neighbour.id, _vertex7.id]);
                     }
                 }
             }
@@ -5643,15 +5674,15 @@ SmilesDrawer.Graph = function () {
             var arrPositioned = Array(length);
             i = length;
             while (i--) {
-                var _vertex5 = this.vertices[vertexIds[i]];
-                if (!_vertex5.positioned) {
+                var _vertex8 = this.vertices[vertexIds[i]];
+                if (!_vertex8.positioned) {
                     arrPositionX[i] = center.x + Math.cos(a) * radius;
                     arrPositionY[i] = center.y + Math.sin(a) * radius;
                 } else {
-                    arrPositionX[i] = _vertex5.position.x;
-                    arrPositionY[i] = _vertex5.position.y;
+                    arrPositionX[i] = _vertex8.position.x;
+                    arrPositionY[i] = _vertex8.position.y;
                 }
-                arrPositioned[i] = _vertex5.positioned;
+                arrPositioned[i] = _vertex8.positioned;
                 a += angle;
             }
 
@@ -5877,11 +5908,11 @@ SmilesDrawer.Graph = function () {
             i = length;
             while (i--) {
                 var index = vertexIds[i];
-                var _vertex6 = this.vertices[index];
-                _vertex6.position.x = arrPositionX[i];
-                _vertex6.position.y = arrPositionY[i];
-                _vertex6.positioned = true;
-                _vertex6.forcePositioned = true;
+                var _vertex9 = this.vertices[index];
+                _vertex9.position.x = arrPositionX[i];
+                _vertex9.position.y = arrPositionY[i];
+                _vertex9.positioned = true;
+                _vertex9.forcePositioned = true;
             }
         }
 

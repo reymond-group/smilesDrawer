@@ -2508,28 +2508,48 @@ SmilesDrawer.Drawer = class Drawer {
       }
 
       let neighbours = vertex.getNeighbours();
+      let nNeighbours = neighbours.length;
+      let priorities = Array(nNeighbours);
 
-      // Move priorities outside, make it of length maxDepth * neighbours.length
-      // then add it with offsets (j * maxDepth) ...
-      for (var j = 0; j < neighbours.length; j++) {
+      for (var j = 0; j < nNeighbours; j++) {
         let visited = new Uint8Array(this.graph.vertices.length);
-        let priorities = new Uint16Array(maxDepth);
-
+        let priority = new Uint16Array(maxDepth * 2.0 + 1);
         visited[vertex.id] = 1;
-        this.visitStereochemistry(neighbours[j], visited, priorities, maxDepth, 0);
+        this.visitStereochemistry(neighbours[j], visited, priority, maxDepth, 0);
+        
+        // Break ties by the position in the smiles string as per specification
+        priority[maxDepth * 2.0] = neighbours[j];
+        priorities[j] = [ j, priority ];
       }
+
+      priorities.sort(function(a, b) {
+        for (var j = 0; j < nNeighbours; j++) {
+          if (a[1][j] > b[1][j]) {
+             return -1;
+          } else if (a[1][j] < b[1][j]) {
+            return 1;
+          }
+        }
+
+        return 0;
+      });
+
+      console.log(priorities);
     }
   }
 
-  visitStereochemistry(vertexId, visited, priorities, maxDepth, depth) {
+  visitStereochemistry(vertexId, visited, priority, maxDepth, depth) {
     visited[vertexId] = 1;
-    priorities[depth] += this.graph.vertices[vertexId].value.getAtomicNumber();
+    let atomicNumber = this.graph.vertices[vertexId].value.getAtomicNumber();
+
+    priority[depth + depth] += atomicNumber;
+    priority[maxDepth] = Math.max(priority[maxDepth], atomicNumber);
 
     let neighbours = this.graph.vertices[vertexId].getNeighbours();
 
     for (var i = 0; i < neighbours.length; i++) {
-      if (visited[neighbours[i]] !== 1 && depth < maxDepth) {
-        this.visitStereochemistry(neighbours[i], visited, priorities, maxDepth, depth + 1);
+      if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
+        this.visitStereochemistry(neighbours[i], visited, priority, maxDepth, depth + 1);
       }
     }
   }
