@@ -2542,8 +2542,8 @@ SmilesDrawer.Drawer = class Drawer {
     visited[vertexId] = 1;
     let atomicNumber = this.graph.vertices[vertexId].value.getAtomicNumber();
 
-    priority[depth + depth] += atomicNumber;
-    priority[maxDepth] = Math.max(priority[maxDepth], atomicNumber);
+    priority[maxDepth + depth] += atomicNumber;
+    priority[depth] = Math.max(priority[depth], atomicNumber);
 
     let neighbours = this.graph.vertices[vertexId].getNeighbours();
 
