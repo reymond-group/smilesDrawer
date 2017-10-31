@@ -34,7 +34,7 @@ SmilesDrawer.Drawer = class Drawer {
       isomeric: false,
       debug: false,
       terminalCarbons: false,
-      explicitHydrogens: false, // TODO: Add to doc
+      explicitHydrogens: true, // TODO: Add to doc
       compactDrawing: true,
       fontSizeLarge: 6,
       fontSizeSmall: 4,
@@ -147,7 +147,7 @@ SmilesDrawer.Drawer = class Drawer {
     this.initRings();
     this.annotateStereochemistry();
 
-    if (!this.explicitHydrogens) {
+    if (!this.opts.explicitHydrogens) {
       for (var i = 0; i < this.graph.vertices.length; i++) {
         if (this.graph.vertices[i].value.element === 'H') {
           this.graph.vertices[i].value.isDrawn = false;
@@ -2508,6 +2508,7 @@ SmilesDrawer.Drawer = class Drawer {
       }
 
       let neighbours = vertex.getNeighbours();
+      neighbours.sort();
       let nNeighbours = neighbours.length;
       let priorities = Array(nNeighbours);
 

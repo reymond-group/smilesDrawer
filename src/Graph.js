@@ -87,6 +87,14 @@ SmilesDrawer.Graph = class Graph {
             offset += atom.bracket.hcount;
         }
 
+        let stereoHydrogens = 0;
+        if (atom.bracket && atom.bracket.chirality) {
+            stereoHydrogens = atom.bracket.hcount;
+            for (var i = 0; i < stereoHydrogens; i++) {
+                this._init({ atom: 'H', isBracket: 'false', branches: Array(), branchCount: 0, ringbonds: Array(), ringbondCount: false, next: null, hasNext: false, bond: '-' }, i, vertex.id, true);
+            }
+        }
+
         for (var i = 0; i < node.branchCount; i++) {
             this._init(node.branches[i], i + offset, vertex.id, true);
         }
