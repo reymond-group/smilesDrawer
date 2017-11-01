@@ -107,6 +107,38 @@ SmilesDrawer.MathHelper = class MathHelper {
     static toRad(deg) {
         return deg * SmilesDrawer.MathHelper.radFactor;
     }
+
+    /**
+     * Returns the parity of the permutation (1 or -1)
+     * @param {Array} arr An array containing the permutation.
+     * @returns {Number} The parity of the permutation (1 or -1), where 1 means even and -1 means odd.
+     */
+    static parityOfPermutation(arr) {
+        let visited = new Uint8Array(arr.length);
+        let evenLengthCycleCount = 0;
+
+        let traverseCycle = function(i, cycleLength = 0) {
+            if (visited[i] === 1) {
+                return cycleLength;
+            }
+
+            cycleLength++;
+
+            visited[i] = 1;
+            return traverseCycle(arr[i], cycleLength);
+        }
+
+        for (var i = 0; i < arr.length; i++) {
+            if (visited[i] === 1) {
+                continue;
+            }
+
+            let cycleLength = traverseCycle(i);
+            evenLengthCycleCount += (1 - cycleLength % 2);
+        }
+
+        return evenLengthCycleCount % 2 ? -1 : 1;
+    }
 }
 
 /** The factor to convert degrees to radians. */

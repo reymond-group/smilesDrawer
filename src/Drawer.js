@@ -2498,7 +2498,7 @@ SmilesDrawer.Drawer = class Drawer {
   }
 
   annotateStereochemistry() {
-    let maxDepth = 5;
+    let maxDepth = 10;
     // For each stereo-center
     for (var i = 0; i < this.graph.vertices.length; i++) {
       let vertex = this.graph.vertices[i];
@@ -2526,7 +2526,7 @@ SmilesDrawer.Drawer = class Drawer {
       priorities.sort(function(a, b) {
         for (var j = 0; j < nNeighbours; j++) {
           if (a[1][j] > b[1][j]) {
-             return -1;
+            return -1;
           } else if (a[1][j] < b[1][j]) {
             return 1;
           }
@@ -2535,7 +2535,13 @@ SmilesDrawer.Drawer = class Drawer {
         return 0;
       });
 
-      console.log(priorities);
+      let order = new Uint8Array(nNeighbours);
+      for (var j = 0; j < nNeighbours; j++) {
+        order[j] = priorities[j][0];
+      }
+
+      console.log(order);
+      console.log(vertex.id, SmilesDrawer.MathHelper.parityOfPermutation(order));
     }
   }
 

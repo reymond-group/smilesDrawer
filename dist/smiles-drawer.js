@@ -4828,7 +4828,7 @@ SmilesDrawer.Drawer = function () {
         value: function annotateStereochemistry() {
             var _this = this;
 
-            var maxDepth = 5;
+            var maxDepth = 10;
             // For each stereo-center
 
             var _loop2 = function _loop2() {
@@ -4866,10 +4866,17 @@ SmilesDrawer.Drawer = function () {
                     return 0;
                 });
 
-                console.log(priorities);
+                var order = new Uint8Array(nNeighbours);
+                for (j = 0; j < nNeighbours; j++) {
+                    order[j] = priorities[j][0];
+                }
+
+                console.log(order);
+                console.log(vertex.id, SmilesDrawer.MathHelper.parityOfPermutation(order));
             };
 
             for (var i = 0; i < this.graph.vertices.length; i++) {
+                var j;
                 var j;
 
                 var _ret2 = _loop2();
@@ -6570,6 +6577,43 @@ SmilesDrawer.MathHelper = function () {
         key: 'toRad',
         value: function toRad(deg) {
             return deg * SmilesDrawer.MathHelper.radFactor;
+        }
+
+        /**
+         * Returns the parity of the permutation (1 or -1)
+         * @param {Array} arr An array containing the permutation.
+         * @returns {Number} The parity of the permutation (1 or -1), where 1 means even and -1 means odd.
+         */
+
+    }, {
+        key: 'parityOfPermutation',
+        value: function parityOfPermutation(arr) {
+            var visited = new Uint8Array(arr.length);
+            var evenLengthCycleCount = 0;
+
+            var traverseCycle = function traverseCycle(i) {
+                var cycleLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+                if (visited[i] === 1) {
+                    return cycleLength;
+                }
+
+                cycleLength++;
+
+                visited[i] = 1;
+                return traverseCycle(arr[i], cycleLength);
+            };
+
+            for (var i = 0; i < arr.length; i++) {
+                if (visited[i] === 1) {
+                    continue;
+                }
+
+                var cycleLength = traverseCycle(i);
+                evenLengthCycleCount += 1 - cycleLength % 2;
+            }
+
+            return evenLengthCycleCount % 2 ? -1 : 1;
         }
     }]);
 

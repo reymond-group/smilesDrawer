@@ -193,6 +193,7 @@ The SmilesDrawer namespace.
         * [.centralAngle(n)](#SmilesDrawer.MathHelper.centralAngle) ⇒ <code>Number</code>
         * [.toDeg(rad)](#SmilesDrawer.MathHelper.toDeg) ⇒ <code>Number</code>
         * [.toRad(deg)](#SmilesDrawer.MathHelper.toRad) ⇒ <code>Number</code>
+        * [.parityOfPermutation(arr)](#SmilesDrawer.MathHelper.parityOfPermutation) ⇒ <code>Number</code>
     * [.Ring](#SmilesDrawer.Ring)
         * [new SmilesDrawer.Ring(members)](#new_SmilesDrawer.Ring_new)
         * [.clone()](#SmilesDrawer.Ring+clone) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
@@ -2352,6 +2353,7 @@ A static class containing helper functions for math-related tasks.
     * [.centralAngle(n)](#SmilesDrawer.MathHelper.centralAngle) ⇒ <code>Number</code>
     * [.toDeg(rad)](#SmilesDrawer.MathHelper.toDeg) ⇒ <code>Number</code>
     * [.toRad(deg)](#SmilesDrawer.MathHelper.toRad) ⇒ <code>Number</code>
+    * [.parityOfPermutation(arr)](#SmilesDrawer.MathHelper.parityOfPermutation) ⇒ <code>Number</code>
 
 <a name="SmilesDrawer.MathHelper.radFactor"></a>
 
@@ -2469,6 +2471,18 @@ Converts degrees to radians.
 | Param | Type | Description |
 | --- | --- | --- |
 | deg | <code>Number</code> | An angle in degrees. |
+
+<a name="SmilesDrawer.MathHelper.parityOfPermutation"></a>
+
+#### MathHelper.parityOfPermutation(arr) ⇒ <code>Number</code>
+Returns the parity of the permutation (1 or -1)
+
+**Kind**: static method of <code>[MathHelper](#SmilesDrawer.MathHelper)</code>  
+**Returns**: <code>Number</code> - The parity of the permutation (1 or -1), where 1 means even and -1 means odd.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arr | <code>Array</code> | An array containing the permutation. |
 
 <a name="SmilesDrawer.Ring"></a>
 
