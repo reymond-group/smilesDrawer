@@ -1,7 +1,7 @@
 /** 
  * A static class containing helper functions for math-related tasks. 
  */
-SmilesDrawer.MathHelper = class MathHelper {
+export default class MathHelper {
     /**
      * Rounds a value to a given number of decimals.
      *

@@ -1,3 +1,6 @@
+//@ts-check
+import Drawer from './Drawer'
+
 /**
  * The SmilesDrawer namespace.
  * @typicalname SmilesDrawer
@@ -27,7 +30,7 @@ SmilesDrawer.clean = function(smiles) {
  * @param {Function} [onError='null'] A callback function providing an error object.
  */
 SmilesDrawer.apply = function(options, selector='canvas[data-smiles]', themeName='light', onError=null) {
-    let smilesDrawer = new SmilesDrawer.Drawer(options);
+    let smilesDrawer = new Drawer(options);
     let elements = document.querySelectorAll(selector);
 
     for (var i = 0; i < elements.length; i++) {

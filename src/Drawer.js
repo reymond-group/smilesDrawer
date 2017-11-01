@@ -1,3 +1,7 @@
+//@ts-check
+import MathHelper from './MathHelper'
+import Vector2 from './Vector2'
+
 /** 
  * The main class of the application representing the smiles drawer 
  * 
@@ -10,7 +14,7 @@
  * @property {Object} opts The merged options.
  * @property {Object} theme The current theme.
  */
-SmilesDrawer.Drawer = class Drawer {
+export default class Drawer {
   /**
    * The constructor for the class SmilesDrawer.
    *
@@ -197,7 +201,7 @@ SmilesDrawer.Drawer = class Drawer {
 
             if (neighbours.length === 1) {
               let neighbour = this.graph.vertices[neighbours[0]];
-              let angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, SmilesDrawer.MathHelper.toRad(120));
+              let angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
 
               this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
 
@@ -219,8 +223,8 @@ SmilesDrawer.Drawer = class Drawer {
               let neighbourA = this.graph.vertices[neighbours[0]];
               let neighbourB = this.graph.vertices[neighbours[1]];
 
-              let angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, SmilesDrawer.MathHelper.toRad(120));
-              let angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, SmilesDrawer.MathHelper.toRad(120));
+              let angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
+              let angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
 
               this.rotateSubtree(neighbourA.id, vertexB.id, angleA, vertexB.position);
               this.rotateSubtree(neighbourB.id, vertexB.id, angleB, vertexB.position);
@@ -785,7 +789,7 @@ SmilesDrawer.Drawer = class Drawer {
   /**
    * Returns an array of vertices positioned at a specified location.
    *
-   * @param {SmilesDrawer.Vector2} position The position to search for vertices.
+   * @param {Vector2} position The position to search for vertices.
    * @param {Number} radius The radius within to search.
    * @param {Number} excludeVertexId A vertex id to be excluded from the search results.
    * @returns {Number[]} An array containing vertex ids in a given location.
@@ -998,7 +1002,7 @@ SmilesDrawer.Drawer = class Drawer {
           continue;
         }
 
-        let dist = SmilesDrawer.Vector2.subtract(a.position, b.position).lengthSq();
+        let dist = Vector2.subtract(a.position, b.position).lengthSq();
 
         if (dist < this.opts.bondLengthSq) {
           let weighted = (this.opts.bondLength - Math.sqrt(dist)) / this.opts.bondLength;
@@ -1034,7 +1038,7 @@ SmilesDrawer.Drawer = class Drawer {
    *
    * @param {SmilesDrawer.Vertex} vertexA A vertex.
    * @param {SmilesDrawer.Vertex} vertexB A vertex.
-   * @param {SmilesDrawer.Vector2[]} sides An array containing the two normals of the line spanned by the two provided vertices.
+   * @param {Vector2[]} sides An array containing the two normals of the line spanned by the two provided vertices.
    * @returns {Object} Returns an object containing the following information: {
           totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
           totalPosition: Same as position, but based on entire molecule,
@@ -1099,7 +1103,7 @@ SmilesDrawer.Drawer = class Drawer {
    */
   setRingCenter(ring) {
     let ringSize = ring.getSize();
-    let total = new SmilesDrawer.Vector2();
+    let total = new Vector2();
 
     for (var i = 0; i < ringSize; i++) {
       total.add(this.graph.vertices[ring.members[i]].position);
@@ -1113,7 +1117,7 @@ SmilesDrawer.Drawer = class Drawer {
    *
    * @param {SmilesDrawer.Ring} ring A bridged ring.
    * @param {SmilesDrawer.Vertex} vertex A vertex.
-   * @returns {SmilesDrawer.Vector2} The center of the subring that containing the vertex.
+   * @returns {Vector2} The center of the subring that containing the vertex.
    */
   getSubringCenter(ring, vertex) {
     let rings = vertex.value.originalRings;
@@ -1216,10 +1220,10 @@ SmilesDrawer.Drawer = class Drawer {
         // Choose the normal that is on the same side as the center
         let line = null;
 
-        if (center.sameSideAs(vertexA.position, vertexB.position, SmilesDrawer.Vector2.add(a, normals[0]))) {
-          line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+        if (center.sameSideAs(vertexA.position, vertexB.position, Vector2.add(a, normals[0]))) {
+          line = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
         } else {
-          line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+          line = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
         }
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
@@ -1237,8 +1241,8 @@ SmilesDrawer.Drawer = class Drawer {
         normals[0].multiplyScalar(that.opts.halfBondSpacing);
         normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
-        let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-        let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+        let lineA = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        let lineB = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         this.canvasWrapper.drawLine(lineA);
         this.canvasWrapper.drawLine(lineB);
@@ -1248,8 +1252,8 @@ SmilesDrawer.Drawer = class Drawer {
         normals[0].multiplyScalar(that.opts.halfBondSpacing);
         normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
-        let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-        let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+        let lineA = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        let lineB = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         this.canvasWrapper.drawLine(lineA);
         this.canvasWrapper.drawLine(lineB);
@@ -1257,7 +1261,7 @@ SmilesDrawer.Drawer = class Drawer {
         normals[0].multiplyScalar(that.opts.bondSpacing);
         normals[1].multiplyScalar(that.opts.bondSpacing);
 
-        let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+        let line = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
         this.canvasWrapper.drawLine(line);
@@ -1266,7 +1270,7 @@ SmilesDrawer.Drawer = class Drawer {
         normals[0].multiplyScalar(that.opts.bondSpacing);
         normals[1].multiplyScalar(that.opts.bondSpacing);
 
-        let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+        let line = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
         this.canvasWrapper.drawLine(line);
@@ -1275,7 +1279,7 @@ SmilesDrawer.Drawer = class Drawer {
         normals[0].multiplyScalar(that.opts.bondSpacing);
         normals[1].multiplyScalar(that.opts.bondSpacing);
 
-        let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
+        let line = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
         this.canvasWrapper.drawLine(line);
@@ -1284,7 +1288,7 @@ SmilesDrawer.Drawer = class Drawer {
         normals[0].multiplyScalar(that.opts.bondSpacing);
         normals[1].multiplyScalar(that.opts.bondSpacing);
 
-        let line = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+        let line = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
         this.canvasWrapper.drawLine(line);
@@ -1296,8 +1300,8 @@ SmilesDrawer.Drawer = class Drawer {
       normals[0].multiplyScalar(that.opts.bondSpacing / 1.5);
       normals[1].multiplyScalar(that.opts.bondSpacing / 1.5);
 
-      let lineA = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[0]), SmilesDrawer.Vector2.add(b, normals[0]), elementA, elementB);
-      let lineB = new SmilesDrawer.Line(SmilesDrawer.Vector2.add(a, normals[1]), SmilesDrawer.Vector2.add(b, normals[1]), elementA, elementB);
+      let lineA = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+      let lineB = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
       this.canvasWrapper.drawLine(lineA);
       this.canvasWrapper.drawLine(lineB);
@@ -1319,7 +1323,7 @@ SmilesDrawer.Drawer = class Drawer {
     }
 
     if (debug) {
-      let midpoint = SmilesDrawer.Vector2.midpoint(a, b);
+      let midpoint = Vector2.midpoint(a, b);
       this.canvasWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
     }
   }
@@ -1362,7 +1366,7 @@ SmilesDrawer.Drawer = class Drawer {
         // If there is a carbon which bonds are in a straight line, draw a dot
         let a = this.graph.vertices[vertex.neighbours[0]].position;
         let b = this.graph.vertices[vertex.neighbours[1]].position;
-        let angle = SmilesDrawer.Vector2.threePointangle(vertex.position, a, b);
+        let angle = Vector2.threePointangle(vertex.position, a, b);
 
         if (Math.abs(Math.PI - angle) < 0.1) {
           this.canvasWrapper.drawPoint(vertex.position.x, vertex.position.y, element);
@@ -1475,7 +1479,7 @@ SmilesDrawer.Drawer = class Drawer {
    * Creates a new ring, that is, positiones all the vertices inside a ring.
    *
    * @param {SmilesDrawer.Ring} ring The ring to position.
-   * @param {SmilesDrawer.Vector2|null} [center=null] The center of the ring to be created.
+   * @param {Vector2|null} [center=null] The center of the ring to be created.
    * @param {SmilesDrawer.Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
    * @param {SmilesDrawer.Vertex|null} [previousVertex=null] The last vertex that was positioned.
    * @param {Boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
@@ -1485,13 +1489,13 @@ SmilesDrawer.Drawer = class Drawer {
       return;
     }
 
-    center = center ? center : new SmilesDrawer.Vector2(0, 0);
+    center = center ? center : new Vector2(0, 0);
 
     let orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
-    let startingAngle = startVertex ? SmilesDrawer.Vector2.subtract(startVertex.position, center).angle() : 0;
+    let startingAngle = startVertex ? Vector2.subtract(startVertex.position, center).angle() : 0;
 
-    let radius = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
-    let angle = SmilesDrawer.MathHelper.centralAngle(ring.getSize());
+    let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
+    let angle = MathHelper.centralAngle(ring.getSize());
 
     ring.centralAngle = angle;
 
@@ -1562,18 +1566,18 @@ SmilesDrawer.Drawer = class Drawer {
         let vertexB = this.graph.vertices[vertices[1]];
 
         // Get middle between vertex A and B
-        let midpoint = SmilesDrawer.Vector2.midpoint(vertexA.position, vertexB.position);
+        let midpoint = Vector2.midpoint(vertexA.position, vertexB.position);
 
         // Get the normals to the line between A and B
-        let normals = SmilesDrawer.Vector2.normals(vertexA.position, vertexB.position);
+        let normals = Vector2.normals(vertexA.position, vertexB.position);
 
         // Normalize the normals
         normals[0].normalize();
         normals[1].normalize();
 
         // Set length from middle of side to center (the apothem)
-        let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
-        let apothem = SmilesDrawer.MathHelper.apothem(r, neighbour.getSize());
+        let r = MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
+        let apothem = MathHelper.apothem(r, neighbour.getSize());
 
         normals[0].multiplyScalar(apothem).add(midpoint);
         normals[1].multiplyScalar(apothem).add(midpoint);
@@ -1581,13 +1585,13 @@ SmilesDrawer.Drawer = class Drawer {
         // Pick the normal which results in a larger distance to the previous center
         // Also check whether it's inside another ring
         let nextCenter = normals[0];
-        if (SmilesDrawer.Vector2.subtract(center, normals[1]).lengthSq() > SmilesDrawer.Vector2.subtract(center, normals[0]).lengthSq()) {
+        if (Vector2.subtract(center, normals[1]).lengthSq() > Vector2.subtract(center, normals[0]).lengthSq()) {
           nextCenter = normals[1];
         }
 
         // Get the vertex (A or B) which is in clock-wise direction of the other
-        let posA = SmilesDrawer.Vector2.subtract(vertexA.position, nextCenter);
-        let posB = SmilesDrawer.Vector2.subtract(vertexB.position, nextCenter);
+        let posA = Vector2.subtract(vertexA.position, nextCenter);
+        let posB = Vector2.subtract(vertexB.position, nextCenter);
 
         if (posA.clockwise(posB) === -1) {
           if (!neighbour.positioned) {
@@ -1606,13 +1610,13 @@ SmilesDrawer.Drawer = class Drawer {
         let vertexA = this.graph.vertices[vertices[0]];
 
         // Get the vector pointing from the shared vertex to the new centpositioner
-        let nextCenter = SmilesDrawer.Vector2.subtract(center, vertexA.position);
+        let nextCenter = Vector2.subtract(center, vertexA.position);
 
         nextCenter.invert();
         nextCenter.normalize();
 
         // Get the distance from the vertex to the center
-        let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
+        let r = MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
 
         nextCenter.multiplyScalar(r);
         nextCenter.add(vertexA.position);
@@ -1655,7 +1659,7 @@ SmilesDrawer.Drawer = class Drawer {
    * @param {Number} vertexId A vertex id (the root of the sub-tree).
    * @param {Number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
    * @param {Number} angle An angle in randians.
-   * @param {SmilesDrawer.Vector2} center The rotational center.
+   * @param {Vector2} center The rotational center.
    */
   rotateSubtree(vertexId, parentVertexId, angle, center) {
     let that = this;
@@ -1679,12 +1683,12 @@ SmilesDrawer.Drawer = class Drawer {
    * @param {Number} vertexId A vertex id (the root of the sub-tree).
    * @param {Number} parentVertexId A vertex id in the previous direction of the subtree.
    * @param {Number[]} vertexOverlapScores An array containing the vertex overlap scores indexed by vertex id.
-   * @returns {Object} An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new SmilesDrawer.Vector2() }.
+   * @returns {Object} An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new Vector2() }.
    */
   getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores) {
     let that = this;
     let score = 0;
-    let center = new SmilesDrawer.Vector2();
+    let center = new Vector2();
 
     this.traverseTree(vertexId, parentVertexId, function (vertex) {
       let s = vertexOverlapScores[vertex.id];
@@ -1706,10 +1710,10 @@ SmilesDrawer.Drawer = class Drawer {
   /**
    * Returns the current (positioned vertices so far) center of mass.
    * 
-   * @returns {SmilesDrawer.Vector2} The current center of mass.
+   * @returns {Vector2} The current center of mass.
    */
   getCurrentCenterOfMass() {
-    let total = new SmilesDrawer.Vector2();
+    let total = new Vector2();
     let count = 0;
 
     for (var i = 0; i < this.graph.vertices.length; i++) {
@@ -1727,12 +1731,12 @@ SmilesDrawer.Drawer = class Drawer {
   /**
    * Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
    *
-   * @param {SmilesDrawer.Vector2} vec The point at which to look for neighbours.
+   * @param {Vector2} vec The point at which to look for neighbours.
    * @param {Number} [r=currentBondLength*2.0] The radius of vertices to include.
-   * @returns {SmilesDrawer.Vector2} The current center of mass.
+   * @returns {Vector2} The current center of mass.
    */
   getCurrentCenterOfMassInNeigbourhood(vec, r = this.opts.bondLength * 2.0) {
-    let total = new SmilesDrawer.Vector2();
+    let total = new Vector2();
     let count = 0;
     let rSq = r * r;
 
@@ -1853,7 +1857,7 @@ SmilesDrawer.Drawer = class Drawer {
 
             let vertexPreviousPosition = vertex.id === 0 ? this.graph.vertices[1].position : vertex.previousPosition;
 
-            vertex.position.rotateAwayFrom(closestPosition, vertexPreviousPosition, SmilesDrawer.MathHelper.toRad(20));
+            vertex.position.rotateAwayFrom(closestPosition, vertexPreviousPosition, MathHelper.toRad(20));
           }
         }
       }
@@ -1886,12 +1890,12 @@ SmilesDrawer.Drawer = class Drawer {
         // and rotate it by 90°
 
 
-        let dummy = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
-        dummy.rotate(SmilesDrawer.MathHelper.toRad(-120));
+        let dummy = new Vector2(this.opts.bondLength, 0);
+        dummy.rotate(MathHelper.toRad(-120));
 
         vertex.previousPosition = dummy;
         vertex.setPosition(this.opts.bondLength, 0);
-        vertex.angle = SmilesDrawer.MathHelper.toRad(-120);
+        vertex.angle = MathHelper.toRad(-120);
         vertex.globalAngle = vertex.angle;
 
         // Do not position the vertex if it belongs to a bridged ring that is positioned using a layout algorithm.
@@ -1906,11 +1910,11 @@ SmilesDrawer.Drawer = class Drawer {
           let neighbour = this.graph.vertices[neighbours[i]];
 
           if (neighbour.positioned && neighbour.value.originalRings.length > 0) {
-            vecs.push(SmilesDrawer.Vector2.subtract(neighbour.position, previousVertex.position));
+            vecs.push(Vector2.subtract(neighbour.position, previousVertex.position));
           }
         }
 
-        let avg = SmilesDrawer.Vector2.averageDirection(vecs);
+        let avg = Vector2.averageDirection(vecs);
         vertex.setPositionFromVector(avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
         vertex.previousPosition = previousVertex.position;
         vertex.positioned = true;
@@ -1922,11 +1926,11 @@ SmilesDrawer.Drawer = class Drawer {
           let neighbour = this.graph.vertices[neighbours[i]];
           
           if (neighbour.positioned && neighbour.value.originalRings.length > 1) {
-            vecs.push(SmilesDrawer.Vector2.subtract(neighbour.position, previousVertex.position));
+            vecs.push(Vector2.subtract(neighbour.position, previousVertex.position));
           }
         }
 
-        let avg = SmilesDrawer.Vector2.averageDirection(vecs);
+        let avg = Vector2.averageDirection(vecs);
         avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
 
         // Invert if too close to another of the averaged vertices (resolve situations like: CC1CC2NCC3(N)CC1(C)C23CC#C)
@@ -1937,7 +1941,7 @@ SmilesDrawer.Drawer = class Drawer {
             continue;
           }
 
-          if (SmilesDrawer.Vector2.threePointangle(avg, previousVertex.position, neighbour.position) > 3.1) {
+          if (Vector2.threePointangle(avg, previousVertex.position, neighbour.position) > 3.1) {
             avg.rotateAround(Math.PI, previousVertex.position);
             break;
           }
@@ -1951,7 +1955,7 @@ SmilesDrawer.Drawer = class Drawer {
 
         // If the previous vertex was not part of a ring, draw a bond based
         // on the global angle of the previous bond
-        let v = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
+        let v = new Vector2(this.opts.bondLength, 0);
         v.rotate(ringOrAngle);
         v.add(previousVertex.position);
 
@@ -1966,12 +1970,12 @@ SmilesDrawer.Drawer = class Drawer {
     // If two rings are connected by a bond ...
     if (vertex.value.bridgedRing !== null) {
       let nextRing = this.getRing(vertex.value.bridgedRing);
-      let nextCenter = SmilesDrawer.Vector2.subtract(vertex.previousPosition, vertex.position);
+      let nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
 
       nextCenter.invert();
       nextCenter.normalize();
 
-      let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
+      let r = MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
       nextCenter.multiplyScalar(r);
       nextCenter.add(vertex.position);
 
@@ -1981,12 +1985,12 @@ SmilesDrawer.Drawer = class Drawer {
       }
     } else if (vertex.value.rings.length > 0) {
       let nextRing = this.getRing(vertex.value.rings[0]);
-      let nextCenter = SmilesDrawer.Vector2.subtract(vertex.previousPosition, vertex.position);
+      let nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
 
       nextCenter.invert();
       nextCenter.normalize();
 
-      let r = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, nextRing.getSize());
+      let r = MathHelper.polyCircumradius(this.opts.bondLength, nextRing.getSize());
 
       nextCenter.multiplyScalar(r);
       nextCenter.add(vertex.position);
@@ -2027,11 +2031,11 @@ SmilesDrawer.Drawer = class Drawer {
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, -dir);
         } else if (previousVertex && previousVertex.value.rings.length > 0) {
           // If coming out of a ring, always draw away from the center of mass
-          let proposedAngleA = SmilesDrawer.MathHelper.toRad(60);
+          let proposedAngleA = MathHelper.toRad(60);
           let proposedAngleB = -proposedAngleA;
 
-          let proposedVectorA = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
-          let proposedVectorB = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
+          let proposedVectorA = new Vector2(this.opts.bondLength, 0);
+          let proposedVectorB = new Vector2(this.opts.bondLength, 0);
 
           proposedVectorA.rotate(proposedAngleA).add(vertex.position);
           proposedVectorB.rotate(proposedAngleB).add(vertex.position);
@@ -2053,11 +2057,11 @@ SmilesDrawer.Drawer = class Drawer {
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
         } else {
           if (!dir) {
-            let proposedAngleA = SmilesDrawer.MathHelper.toRad(60);
+            let proposedAngleA = MathHelper.toRad(60);
             let proposedAngleB = -proposedAngleA;
 
-            let proposedVectorA = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
-            let proposedVectorB = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
+            let proposedVectorA = new Vector2(this.opts.bondLength, 0);
+            let proposedVectorB = new Vector2(this.opts.bondLength, 0);
 
             proposedVectorA.rotate(proposedAngleA).add(vertex.position);
             proposedVectorB.rotate(proposedAngleB).add(vertex.position);
@@ -2074,7 +2078,7 @@ SmilesDrawer.Drawer = class Drawer {
               dir = 1;
             }
           } else {
-            nextVertex.angle = SmilesDrawer.MathHelper.toRad(60) * dir;
+            nextVertex.angle = MathHelper.toRad(60) * dir;
             dir = -dir;
           }
 
@@ -2104,16 +2108,16 @@ SmilesDrawer.Drawer = class Drawer {
         // If the origin tree is the shortest, set both vertices to trans
         if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
           if (vertex.position.clockwise(vertex.previousPosition) === 1) {
-            transVertex.angle = SmilesDrawer.MathHelper.toRad(60);
-            cisVertex.angle = -SmilesDrawer.MathHelper.toRad(60);
+            transVertex.angle = MathHelper.toRad(60);
+            cisVertex.angle = -MathHelper.toRad(60);
             transVertex.globalAngle = angle + transVertex.angle;
             cisVertex.globalAngle = angle + cisVertex.angle;
 
             this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
             this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
           } else {
-            transVertex.angle = -SmilesDrawer.MathHelper.toRad(60);
-            cisVertex.angle = SmilesDrawer.MathHelper.toRad(60);
+            transVertex.angle = -MathHelper.toRad(60);
+            cisVertex.angle = MathHelper.toRad(60);
             transVertex.globalAngle = angle + transVertex.angle;
             cisVertex.globalAngle = angle + cisVertex.angle;
 
@@ -2122,16 +2126,16 @@ SmilesDrawer.Drawer = class Drawer {
           }
         } else {
           if (vertex.position.clockwise(vertex.previousPosition) === 1) {
-            transVertex.angle = SmilesDrawer.MathHelper.toRad(60);
-            cisVertex.angle = -SmilesDrawer.MathHelper.toRad(60);
+            transVertex.angle = MathHelper.toRad(60);
+            cisVertex.angle = -MathHelper.toRad(60);
             transVertex.globalAngle = angle + transVertex.angle;
             cisVertex.globalAngle = angle + cisVertex.angle;
 
             this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
             this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
           } else {
-            transVertex.angle = -SmilesDrawer.MathHelper.toRad(60);
-            cisVertex.angle = SmilesDrawer.MathHelper.toRad(60);
+            transVertex.angle = -MathHelper.toRad(60);
+            cisVertex.angle = MathHelper.toRad(60);
             transVertex.globalAngle = angle + transVertex.angle;
             cisVertex.globalAngle = angle + cisVertex.angle;
 
@@ -2164,11 +2168,11 @@ SmilesDrawer.Drawer = class Drawer {
           this.getTreeDepth(s.id, vertex.id) > 1) {
 
           if (!dir) {
-            let proposedAngleA = SmilesDrawer.MathHelper.toRad(60);
+            let proposedAngleA = MathHelper.toRad(60);
             let proposedAngleB = -proposedAngleA;
 
-            let proposedVectorA = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
-            let proposedVectorB = new SmilesDrawer.Vector2(this.opts.bondLength, 0);
+            let proposedVectorA = new Vector2(this.opts.bondLength, 0);
+            let proposedVectorB = new Vector2(this.opts.bondLength, 0);
 
             proposedVectorA.rotate(proposedAngleA).add(vertex.position);
             proposedVectorB.rotate(proposedAngleB).add(vertex.position);
@@ -2186,7 +2190,7 @@ SmilesDrawer.Drawer = class Drawer {
               dir = 1;
             }
           } else {
-            s.angle = SmilesDrawer.MathHelper.toRad(60) * dir;
+            s.angle = MathHelper.toRad(60) * dir;
             dir = -dir;
           }
 
@@ -2197,8 +2201,8 @@ SmilesDrawer.Drawer = class Drawer {
           // If it's chiral, the order changes - for anticlockwise, switch the draw order around
           // to keep the drawing the same
           if (vertex.value.bracket && vertex.value.bracket.chirality === '@@') {
-            r.angle = SmilesDrawer.MathHelper.toRad(30) * dir;
-            l.angle = SmilesDrawer.MathHelper.toRad(90) * dir;
+            r.angle = MathHelper.toRad(30) * dir;
+            l.angle = MathHelper.toRad(90) * dir;
 
             r.globalAngle = angle + r.angle;
             l.globalAngle = angle + l.angle;
@@ -2206,8 +2210,8 @@ SmilesDrawer.Drawer = class Drawer {
             this.createNextBond(r, vertex, r.globalAngle);
             this.createNextBond(l, vertex, l.globalAngle);
           } else {
-            l.angle = SmilesDrawer.MathHelper.toRad(30) * dir;
-            r.angle = SmilesDrawer.MathHelper.toRad(90) * dir;
+            l.angle = MathHelper.toRad(30) * dir;
+            r.angle = MathHelper.toRad(90) * dir;
 
             l.globalAngle = angle + l.angle;
             r.globalAngle = angle + r.angle;
@@ -2217,8 +2221,8 @@ SmilesDrawer.Drawer = class Drawer {
           }
         } else {
           s.angle = 0.0;
-          l.angle = SmilesDrawer.MathHelper.toRad(90);
-          r.angle = -SmilesDrawer.MathHelper.toRad(90);
+          l.angle = MathHelper.toRad(90);
+          r.angle = -MathHelper.toRad(90);
 
           s.globalAngle = angle + s.angle;
           l.globalAngle = angle + l.angle;
@@ -2257,10 +2261,10 @@ SmilesDrawer.Drawer = class Drawer {
           z = this.graph.vertices[neighbours[2]];
         }
 
-        w.angle = -SmilesDrawer.MathHelper.toRad(36);
-        x.angle = SmilesDrawer.MathHelper.toRad(36);
-        y.angle = -SmilesDrawer.MathHelper.toRad(108);
-        z.angle = SmilesDrawer.MathHelper.toRad(108);
+        w.angle = -MathHelper.toRad(36);
+        x.angle = MathHelper.toRad(36);
+        y.angle = -MathHelper.toRad(108);
+        z.angle = MathHelper.toRad(108);
 
         w.globalAngle = angle + w.angle;
         x.globalAngle = angle + x.angle;
@@ -2298,7 +2302,7 @@ SmilesDrawer.Drawer = class Drawer {
   /**
    * Check if a vector is inside any ring.
    *
-   * @param {SmilesDrawer.Vector2} vec A vector.
+   * @param {Vector2} vec A vector.
    * @returns {Boolean} A boolean indicating whether or not the point (vector) is inside any of the rings associated with the current molecule.
    */
   isPointInRing(vec) {
@@ -2309,7 +2313,7 @@ SmilesDrawer.Drawer = class Drawer {
         continue;
       }
 
-      let radius = SmilesDrawer.MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
+      let radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
       let radiusSq = radius * radius;
 
       if (vec.distanceSq(ring.center) < radiusSq) {
@@ -2385,14 +2389,14 @@ SmilesDrawer.Drawer = class Drawer {
    * Get the normals of an edge.
    *
    * @param {SmilesDrawer.Edge} edge An edge.
-   * @returns {SmilesDrawer.Vector2[]} An array containing two vectors, representing the normals.
+   * @returns {Vector2[]} An array containing two vectors, representing the normals.
    */
   getEdgeNormals(edge) {
     let v1 = this.graph.vertices[edge.sourceId].position;
     let v2 = this.graph.vertices[edge.targetId].position;
 
     // Get the normalized normals for the edge
-    let normals = SmilesDrawer.Vector2.units(v1, v2);
+    let normals = Vector2.units(v1, v2);
 
     return normals;
   }
@@ -2541,7 +2545,7 @@ SmilesDrawer.Drawer = class Drawer {
       }
 
       console.log(order);
-      console.log(vertex.id, SmilesDrawer.MathHelper.parityOfPermutation(order));
+      console.log(vertex.id, MathHelper.parityOfPermutation(order));
     }
   }
 
