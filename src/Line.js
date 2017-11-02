@@ -19,8 +19,8 @@ export default class Line {
      * @param {Vector2} [to=new Vector2(0, 0)] A vector marking the end of the line.
      * @param {string} [elementFrom=null] A one-letter representation of the element associated with the vector marking the beginning of the line.
      * @param {string} [elementTo=null] A one-letter representation of the element associated with the vector marking the end of the line.
-     * @param {boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
-     * @param {boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
+     * @param {Boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
+     * @param {Boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
      */
     constructor(from = new Vector2(0,0), to = new Vector2(0, 0), elementFrom = null, elementTo = null, chiralFrom = false, chiralTo = false) {
         this.from = from;

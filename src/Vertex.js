@@ -182,7 +182,7 @@ export default class Vertex {
 
         // Round to 0, 90, 180 or 270 degree
         let halfPi = Math.PI / 2.0;
-        textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi, 3);
+        textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi);
 
         if (textAngle === 2) {
             return 'down';

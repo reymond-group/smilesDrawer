@@ -10,7 +10,7 @@ export default class Vector2 {
     /**
      * The constructor of the class Vector2.
      *
-     * @param {Number} x The initial x coordinate value.
+     * @param {(Number|Vector2)} x The initial x coordinate value or, if the single argument, a Vector2 object.
      * @param {Number} y The initial y coordinate value.
      */
     constructor(x, y) {
@@ -590,7 +590,7 @@ export default class Vector2 {
      * Returns the average vector (normalized) of the input vectors.
      *
      * @static
-     * @param {Array()} vecs An array containing vectors.
+     * @param {Array} vecs An array containing vectors.
      * @returns {Vector2} The resulting vector (normalized).
      */
     static averageDirection(vecs) {

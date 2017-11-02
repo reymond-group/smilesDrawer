@@ -23,7 +23,7 @@ export default class CanvasWrapper {
     /**
      * The constructor for the class CanvasWrapper.
      *
-     * @param {String|HTMLElement} target The canvas id or the canvas HTMLElement.
+     * @param {(String|HTMLElement)} target The canvas id or the canvas HTMLElement.
      * @param {Object} theme A theme from the smiles drawer options.
      * @param {Object} options The smiles drawer options object.
      */

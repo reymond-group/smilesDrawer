@@ -20,7 +20,7 @@ export default class SSSR {
 
         for (var i = 0; i < connectedComponents.length; i++) {
             let connectedComponent = connectedComponents[i];
-            let ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix(connectedComponent);
+            let ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix([...connectedComponent]);
 
             let arrBondCount = Array(ccAdjacencyMatrix.length);
             let arrRingCount = Array(ccAdjacencyMatrix.length);
@@ -291,8 +291,8 @@ export default class SSSR {
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @param {Array[]} pe A matrix containing the shortest paths.
      * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
-     * @param {Array[]} arrBondCount A matrix containing the bond count of each vertex.
-     * @param {Array[]} arrRingCount A matrix containing the number of rings associated with each vertex.
+     * @param {Number[]} arrBondCount A matrix containing the bond count of each vertex.
+     * @param {Number[]} arrRingCount A matrix containing the number of rings associated with each vertex.
      * @param {Number} nsssr The theoretical number of rings in the graph.
      * @returns {Set[]} The smallest set of smallest rings.
      */
@@ -440,8 +440,8 @@ export default class SSSR {
      * @param {Set<Number>} pathSet A set representing a path.
      * @param {Array[]} bonds The bonds associated with the current path.
      * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
-     * @param {Array[]} arrBondCount A matrix containing the bond count of each vertex.
-     * @param {Array[]} arrRingCount A matrix containing the number of rings associated with each vertex.
+     * @param {Number[]} arrBondCount A matrix containing the bond count of each vertex.
+     * @param {Number[]} arrRingCount A matrix containing the number of rings associated with each vertex.
      * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
      */
     static pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) {

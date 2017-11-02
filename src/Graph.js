@@ -171,7 +171,7 @@ export default class Graph {
      *
      * @param {Number} vertexIdA A vertex id.
      * @param {Number} vertexIdB A vertex id.
-     * @returns {Edge|null} The edge or, if no edge can be found, null.
+     * @returns {(Edge|null)} The edge or, if no edge can be found, null.
      */
     getEdge(vertexIdA, vertexIdB) {
         let edgeId = this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB];
@@ -198,11 +198,11 @@ export default class Graph {
     
 
     /**
-     * Returns the edge between two given vertices.
+     * Check whether or not two vertices are connected by an edge.
      *
      * @param {Number} vertexIdA A vertex id.
      * @param {Number} vertexIdB A vertex id.
-     * @returns {Number|null} The edge or, if no edge can be found, null.
+     * @returns {Boolean} A boolean indicating whether or not two vertices are connected by an edge.
      */
     hasEdge(vertexIdA, vertexIdB) {
         return this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB] !== undefined
@@ -229,7 +229,7 @@ export default class Graph {
      * @returns {Array[]} An array containing source, target arrays of this graphs edges. Example: [ [ 2, 5 ], [ 6, 9 ] ].
      */
     getEdgeList() {
-        let arr = [this.edges.length];
+        let arr = Array(this.edges.length);
 
         for (var i = 0; i < this.edges.length; i++) {
             arr[i] = [this.edges[i].sourceId, this.edges[i].targetId];

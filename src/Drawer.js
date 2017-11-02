@@ -137,7 +137,7 @@ export default class Drawer {
    * Draws the parsed smiles data to a canvas element.
    *
    * @param {Object} data The tree returned by the smiles parser.
-   * @param {String|HTMLElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+   * @param {(String|HTMLElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
@@ -408,7 +408,7 @@ export default class Drawer {
    *
    * @param {Vertex} vertexA A vertex.
    * @param {Vertex} vertexB A vertex.
-   * @returns {String|null} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
+   * @returns {(String|null)} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
    */
   getRingbondType(vertexA, vertexB) {
     // Checks whether the two vertices are the ones connecting the ring
@@ -774,7 +774,7 @@ export default class Drawer {
    *
    * @param {Vertex} vertexA A vertex.
    * @param {Vertex} vertexB A vertex.
-   * @returns {Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
+   * @returns {(Ring|null)} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
    */
   getLargestOrAromaticCommonRing(vertexA, vertexB) {
     let commonRings = this.getCommonRings(vertexA, vertexB);
@@ -1488,9 +1488,9 @@ export default class Drawer {
    * Creates a new ring, that is, positiones all the vertices inside a ring.
    *
    * @param {Ring} ring The ring to position.
-   * @param {Vector2|null} [center=null] The center of the ring to be created.
-   * @param {Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
-   * @param {Vertex|null} [previousVertex=null] The last vertex that was positioned.
+   * @param {(Vector2|null)} [center=null] The center of the ring to be created.
+   * @param {(Vertex|null)} [startVertex=null] The first vertex to be positioned inside the ring.
+   * @param {(Vertex|null)} [previousVertex=null] The last vertex that was positioned.
    * @param {Boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
    */
   createRing(ring, center = null, startVertex = null, previousVertex = null) {
@@ -1878,7 +1878,7 @@ export default class Drawer {
    *
    * @param {Vertex} vertex A vertex.
    * @param {Vertex} previousVertex The previous vertex which has been positioned.
-   * @param {Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
+   * @param {(Ring|Number)} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
    * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated).
    * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
    */
@@ -2292,7 +2292,7 @@ export default class Drawer {
    * Gets the vetex sharing the edge that is the common bond of two rings.
    *
    * @param {Vertex} vertex A vertex.
-   * @returns {Number|null} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
+   * @returns {(Number|null)} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
    */
   getCommonRingbondNeighbour(vertex) {
     let neighbours = vertex.getNeighbours();
@@ -2553,8 +2553,8 @@ export default class Drawer {
         order[j] = priorities[j][0];
       }
 
-      // console.log(order);
-      // console.log(vertex.id, MathHelper.parityOfPermutation(order));
+      console.log(order);
+      console.log(vertex.id, MathHelper.parityOfPermutation(order));
     }
   }
 

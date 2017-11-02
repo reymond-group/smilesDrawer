@@ -227,8 +227,8 @@ var ArrayHelper = function () {
          *
          * @static
          * @param {Array} arr An array.
-         * @param {String|Number} property A property contained within an object in the array.
-         * @param {String|Number} value The value of the property.
+         * @param {(String|Number)} property A property contained within an object in the array.
+         * @param {(String|Number)} value The value of the property.
          * @returns {*} The array element matching the value.
          */
 
@@ -248,8 +248,8 @@ var ArrayHelper = function () {
          * @static
          * @param {Array} arr An array.
          * @param {Object} options See method description.
-         * @param {String} options.property The property on which to check.
          * @param {*} options.value The value for which to check.
+         * @param {String} [options.property=undefined] The property on which to check.
          * @param {Function} [options.func=undefined] A custom property function.
          * @returns {Boolean} A boolean whether or not the array contains a value.
          */
@@ -1296,7 +1296,7 @@ var CanvasWrapper = function () {
     /**
      * The constructor for the class CanvasWrapper.
      *
-     * @param {String|HTMLElement} target The canvas id or the canvas HTMLElement.
+     * @param {(String|HTMLElement)} target The canvas id or the canvas HTMLElement.
      * @param {Object} theme A theme from the smiles drawer options.
      * @param {Object} options The smiles drawer options object.
      */
@@ -2371,7 +2371,7 @@ var Drawer = function () {
      * Draws the parsed smiles data to a canvas element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {String|HTMLElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {(String|HTMLElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
@@ -2672,7 +2672,7 @@ var Drawer = function () {
      *
      * @param {Vertex} vertexA A vertex.
      * @param {Vertex} vertexB A vertex.
-     * @returns {String|null} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
+     * @returns {(String|null)} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
      */
 
   }, {
@@ -3142,7 +3142,7 @@ var Drawer = function () {
      *
      * @param {Vertex} vertexA A vertex.
      * @param {Vertex} vertexB A vertex.
-     * @returns {Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
+     * @returns {(Ring|null)} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
      */
 
   }, {
@@ -3913,9 +3913,9 @@ var Drawer = function () {
      * Creates a new ring, that is, positiones all the vertices inside a ring.
      *
      * @param {Ring} ring The ring to position.
-     * @param {Vector2|null} [center=null] The center of the ring to be created.
-     * @param {Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
-     * @param {Vertex|null} [previousVertex=null] The last vertex that was positioned.
+     * @param {(Vector2|null)} [center=null] The center of the ring to be created.
+     * @param {(Vertex|null)} [startVertex=null] The first vertex to be positioned inside the ring.
+     * @param {(Vertex|null)} [previousVertex=null] The last vertex that was positioned.
      * @param {Boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
      */
 
@@ -4330,7 +4330,7 @@ var Drawer = function () {
      *
      * @param {Vertex} vertex A vertex.
      * @param {Vertex} previousVertex The previous vertex which has been positioned.
-     * @param {Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
+     * @param {(Ring|Number)} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
      * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated).
      * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
      */
@@ -4745,7 +4745,7 @@ var Drawer = function () {
      * Gets the vetex sharing the edge that is the common bond of two rings.
      *
      * @param {Vertex} vertex A vertex.
-     * @returns {Number|null} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
+     * @returns {(Number|null)} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
      */
 
   }, {
@@ -5044,8 +5044,8 @@ var Drawer = function () {
           order[j] = priorities[j][0];
         }
 
-        // console.log(order);
-        // console.log(vertex.id, MathHelper.parityOfPermutation(order));
+        console.log(order);
+        console.log(vertex.id, _MathHelper2.default.parityOfPermutation(order));
       };
 
       for (var i = 0; i < this.graph.vertices.length; i++) {
@@ -5506,7 +5506,7 @@ var Graph = function () {
          *
          * @param {Number} vertexIdA A vertex id.
          * @param {Number} vertexIdB A vertex id.
-         * @returns {Edge|null} The edge or, if no edge can be found, null.
+         * @returns {(Edge|null)} The edge or, if no edge can be found, null.
          */
 
     }, {
@@ -5538,11 +5538,11 @@ var Graph = function () {
         }
 
         /**
-         * Returns the edge between two given vertices.
+         * Check whether or not two vertices are connected by an edge.
          *
          * @param {Number} vertexIdA A vertex id.
          * @param {Number} vertexIdB A vertex id.
-         * @returns {Number|null} The edge or, if no edge can be found, null.
+         * @returns {Boolean} A boolean indicating whether or not two vertices are connected by an edge.
          */
 
     }, {
@@ -5578,7 +5578,7 @@ var Graph = function () {
     }, {
         key: 'getEdgeList',
         value: function getEdgeList() {
-            var arr = [this.edges.length];
+            var arr = Array(this.edges.length);
 
             for (var i = 0; i < this.edges.length; i++) {
                 arr[i] = [this.edges[i].sourceId, this.edges[i].targetId];
@@ -6334,8 +6334,8 @@ var Line = function () {
      * @param {Vector2} [to=new Vector2(0, 0)] A vector marking the end of the line.
      * @param {string} [elementFrom=null] A one-letter representation of the element associated with the vector marking the beginning of the line.
      * @param {string} [elementTo=null] A one-letter representation of the element associated with the vector marking the end of the line.
-     * @param {boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
-     * @param {boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
+     * @param {Boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
+     * @param {Boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
      */
     function Line() {
         var from = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new _Vector2.default(0, 0);
@@ -6832,7 +6832,7 @@ var MathHelper = function () {
 
         /**
          * Returns the parity of the permutation (1 or -1)
-         * @param {Array} arr An array containing the permutation.
+         * @param {(Array|Uint8Array)} arr An array containing the permutation.
          * @returns {Number} The parity of the permutation (1 or -1), where 1 means even and -1 means odd.
          */
 
@@ -9179,6 +9179,8 @@ var _Graph2 = _interopRequireDefault(_Graph);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
@@ -9207,7 +9209,7 @@ var SSSR = function () {
 
             for (var i = 0; i < connectedComponents.length; i++) {
                 var connectedComponent = connectedComponents[i];
-                var ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix(connectedComponent);
+                var ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix([].concat(_toConsumableArray(connectedComponent)));
 
                 var arrBondCount = Array(ccAdjacencyMatrix.length);
                 var arrRingCount = Array(ccAdjacencyMatrix.length);
@@ -9512,8 +9514,8 @@ var SSSR = function () {
          * @param {Array[]} adjacencyMatrix An adjacency matrix.
          * @param {Array[]} pe A matrix containing the shortest paths.
          * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
-         * @param {Array[]} arrBondCount A matrix containing the bond count of each vertex.
-         * @param {Array[]} arrRingCount A matrix containing the number of rings associated with each vertex.
+         * @param {Number[]} arrBondCount A matrix containing the bond count of each vertex.
+         * @param {Number[]} arrRingCount A matrix containing the number of rings associated with each vertex.
          * @param {Number} nsssr The theoretical number of rings in the graph.
          * @returns {Set[]} The smallest set of smallest rings.
          */
@@ -9717,8 +9719,8 @@ var SSSR = function () {
          * @param {Set<Number>} pathSet A set representing a path.
          * @param {Array[]} bonds The bonds associated with the current path.
          * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
-         * @param {Array[]} arrBondCount A matrix containing the bond count of each vertex.
-         * @param {Array[]} arrRingCount A matrix containing the number of rings associated with each vertex.
+         * @param {Number[]} arrBondCount A matrix containing the bond count of each vertex.
+         * @param {Number[]} arrRingCount A matrix containing the number of rings associated with each vertex.
          * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
          */
 
@@ -9939,7 +9941,7 @@ var Vector2 = function () {
     /**
      * The constructor of the class Vector2.
      *
-     * @param {Number} x The initial x coordinate value.
+     * @param {(Number|Vector2)} x The initial x coordinate value or, if the single argument, a Vector2 object.
      * @param {Number} y The initial y coordinate value.
      */
     function Vector2(x, y) {
@@ -10631,7 +10633,7 @@ var Vector2 = function () {
         * Returns the average vector (normalized) of the input vectors.
         *
         * @static
-        * @param {Array()} vecs An array containing vectors.
+        * @param {Array} vecs An array containing vectors.
         * @returns {Vector2} The resulting vector (normalized).
         */
 
@@ -10895,7 +10897,7 @@ var Vertex = function () {
 
             // Round to 0, 90, 180 or 270 degree
             var halfPi = Math.PI / 2.0;
-            textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi, 3);
+            textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi);
 
             if (textAngle === 2) {
                 return 'down';

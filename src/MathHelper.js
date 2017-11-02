@@ -110,7 +110,7 @@ export default class MathHelper {
 
     /**
      * Returns the parity of the permutation (1 or -1)
-     * @param {Array} arr An array containing the permutation.
+     * @param {(Array|Uint8Array)} arr An array containing the permutation.
      * @returns {Number} The parity of the permutation (1 or -1), where 1 means even and -1 means odd.
      */
     static parityOfPermutation(arr) {

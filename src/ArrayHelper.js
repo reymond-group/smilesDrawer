@@ -70,8 +70,8 @@ export default class ArrayHelper {
      *
      * @static
      * @param {Array} arr An array.
-     * @param {String|Number} property A property contained within an object in the array.
-     * @param {String|Number} value The value of the property.
+     * @param {(String|Number)} property A property contained within an object in the array.
+     * @param {(String|Number)} value The value of the property.
      * @returns {*} The array element matching the value.
      */
     static get(arr, property, value) {
@@ -88,8 +88,8 @@ export default class ArrayHelper {
      * @static
      * @param {Array} arr An array.
      * @param {Object} options See method description.
-     * @param {String} options.property The property on which to check.
      * @param {*} options.value The value for which to check.
+     * @param {String} [options.property=undefined] The property on which to check.
      * @param {Function} [options.func=undefined] A custom property function.
      * @returns {Boolean} A boolean whether or not the array contains a value.
      */
