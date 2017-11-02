@@ -1,13 +1,21 @@
+//@ts-check
+import MathHelper from './MathHelper'
+import Vector2 from './Vector2'
+import Vertex from './Vertex'
+import Edge from './Edge'
+import Ring from './Ring'
+import Atom from './Atom'
+
 /** 
  * A class representing the molecular graph. 
  * 
- * @property {SmilesDrawer.Vertex[]} vertices The vertices of the graph.
- * @property {SmilesDrawer.Edge[]} edges The edges of this graph.
+ * @property {Vertex[]} vertices The vertices of the graph.
+ * @property {Edge[]} edges The edges of this graph.
  * @property {Object} vertexIdsToEdgeId A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId.
  * @property {Object} elementCount A map associating element symbols with the number of occurences in this graph.
  * @property {Boolean} isometric A boolean indicating whether or not the SMILES associated with this graph is isometric.
  */
-SmilesDrawer.Graph = class Graph {
+export default class Graph {
     /**
      * The constructor of the class Graph.
      * 
@@ -36,14 +44,14 @@ SmilesDrawer.Graph = class Graph {
      */
     _init(node, order = 0, parentVertexId = null, isBranch = false) {
         // Create a new vertex object
-        let atom = new SmilesDrawer.Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
+        let atom = new Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
 
         atom.branchBond = node.branchBond;
         atom.ringbonds = node.ringbonds;
         atom.bracket = node.atom.element ? node.atom : null;
         atom.setOrder(parentVertexId, order);
 
-        let vertex = new SmilesDrawer.Vertex(atom);
+        let vertex = new Vertex(atom);
         let parentVertex = this.vertices[parentVertexId];
 
         this.addVertex(vertex);
@@ -60,7 +68,7 @@ SmilesDrawer.Graph = class Graph {
             parentVertex.spanningTreeChildren.push(vertex.id);
 
             // Add edge between this node and its parent
-            let edge = new SmilesDrawer.Edge(parentVertexId, vertex.id, 1);
+            let edge = new Edge(parentVertexId, vertex.id, 1);
 
             if (isBranch) {
                 edge.bondType = vertex.value.branchBond;
@@ -131,7 +139,7 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Add a vertex to the graph.
      *
-     * @param {SmilesDrawer.Vertex} vertex A new vertex.
+     * @param {Vertex} vertex A new vertex.
      * @returns {Number} The vertex id of the new vertex.
      */
     addVertex(vertex) {
@@ -144,7 +152,7 @@ SmilesDrawer.Graph = class Graph {
     /**
      * Add an edge to the graph.
      *
-     * @param {SmilesDrawer.Edge} edge A new edge.
+     * @param {Edge} edge A new edge.
      * @returns {Number} The edge id of the new edge.
      */
     addEdge(edge) {
@@ -163,7 +171,7 @@ SmilesDrawer.Graph = class Graph {
      *
      * @param {Number} vertexIdA A vertex id.
      * @param {Number} vertexIdB A vertex id.
-     * @returns {Number|null} The edge or, if no edge can be found, null.
+     * @returns {Edge|null} The edge or, if no edge can be found, null.
      */
     getEdge(vertexIdA, vertexIdB) {
         let edgeId = this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB];
@@ -175,7 +183,7 @@ SmilesDrawer.Graph = class Graph {
      * Returns the ids of edges connected to a vertex.
      *
      * @param {Number} vertexId A vertex id.
-     * @returns {Array[]} An array containing the ids of edges connected to the vertex.
+     * @returns {Number[]} An array containing the ids of edges connected to the vertex.
      */
     getEdges(vertexId) {
         let edgeIds = Array();
@@ -501,9 +509,9 @@ SmilesDrawer.Graph = class Graph {
      * 
      * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
      * @param {Array[]} outAdditionallyPositioned Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ].
-     * @param {SmilesDrawer.Vector2} center The center of the layout.
+     * @param {Vector2} center The center of the layout.
      * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
-     * @param {SmilesDrawer.Ring} ring The bridged ring associated with this force-based layout.
+     * @param {Ring} ring The bridged ring associated with this force-based layout.
      */
     kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring, bondLength) {
         let edgeStrength = bondLength;
@@ -526,8 +534,8 @@ SmilesDrawer.Graph = class Graph {
         let length = vertexIds.length;
 
         // Initialize the positions. Place all vertices on a ring around the center
-        let radius = SmilesDrawer.MathHelper.polyCircumradius(500, length);
-        let angle = SmilesDrawer.MathHelper.centralAngle(length);
+        let radius = MathHelper.polyCircumradius(500, length);
+        let angle = MathHelper.centralAngle(length);
         let a = 0.0;
         let arrPositionX = new Float32Array(length);
         let arrPositionY = new Float32Array(length);

@@ -1,7 +1,9 @@
+//@ts-check
+
 /** 
  * A static class containing helper functions for array-related tasks. 
  */
-SmilesDrawer.ArrayHelper = class ArrayHelper {
+export default class ArrayHelper {
     /**
      * Clone an array or an object. If an object is passed, a shallow clone will be created.
      *
@@ -19,7 +21,7 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
                 out[key] = value.clone();
             }
             else {
-                out[key] = (typeof value === 'object') ? SmilesDrawer.ArrayHelper.clone(value) : value;
+                out[key] = (typeof value === 'object') ? ArrayHelper.clone(value) : value;
             }
         }
         
@@ -233,7 +235,7 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      * @returns {Array} An array with the element with a given value removed.
      */
     static removeUnique(arr, value) {
-        let index = array.indexOf(value);
+        let index = arr.indexOf(value);
 
         if (index > -1) {
             arr.splice(index, 1);
@@ -304,7 +306,7 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
      *
      * @param {Object[]} arr An array of vertex ids with their associated atomic numbers.
      * @param {Number} arr[].vertexId A vertex id.
-     * @param {Number} arr[].atomicNumber The atomic number associated with the vertex id.
+     * @param {String} arr[].atomicNumber The atomic number associated with the vertex id.
      * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
      */
     static sortByAtomicNumberDesc(arr) {
@@ -341,7 +343,7 @@ SmilesDrawer.ArrayHelper = class ArrayHelper {
             let item = arr[i];
 
             if (item instanceof Array) {
-                newArr[i] = SmilesDrawer.ArrayHelper.deepCopy(item);
+                newArr[i] = ArrayHelper.deepCopy(item);
             } else {
                 newArr[i] = item;
             }

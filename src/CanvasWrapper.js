@@ -1,3 +1,10 @@
+//@ts-check
+import MathHelper from './MathHelper'
+import Vector2 from './Vector2'
+import Line from './Line'
+import Vertex from './Vertex'
+import Ring from './Ring'
+
 /** 
  * A class wrapping a canvas element.
  * 
@@ -12,7 +19,7 @@
  * @property {Number} fontLarge The large font size in pt.
  * @property {Number} fontSmall The small font size in pt.
  */
-SmilesDrawer.CanvasWrapper = class CanvasWrapper {
+export default class CanvasWrapper {
     /**
      * The constructor for the class CanvasWrapper.
      *
@@ -85,7 +92,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Scale the canvas based on vertex positions.
      *
-     * @param {SmilesDrawer.Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+     * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
      */
     scale(vertices) {
         // Figure out the final size of the image
@@ -172,7 +179,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         ctx.save();
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY, radius, 0, SmilesDrawer.MathHelper.twoPI, true);
+        ctx.arc(x + offsetX, y + offsetY, radius, 0, MathHelper.twoPI, true);
         ctx.closePath();
 
         if (debug) {
@@ -201,7 +208,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draw a line to a canvas.
      *
-     * @param {SmilesDrawer.Line} line A line.
+     * @param {Line} line A line.
      * @param {Boolean} [dashed=false] Whether or not the line is dashed.
      * @param {Number} [alpha=1.0] The alpha value of the color.
      */
@@ -277,7 +284,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draw a wedge on the canvas.
      *
-     * @param {SmilesDrawer.Line} line A line.
+     * @param {Line} line A line.
      * @param {Number} width The wedge width.
      */
     drawWedge(line, width = 3.0) {
@@ -313,7 +320,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
         ctx.save();
 
-        let normals = SmilesDrawer.Vector2.normals(l, r);
+        let normals = Vector2.normals(l, r);
 
         normals[0].normalize();
         normals[1].normalize();
@@ -328,10 +335,10 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
             end = l;
         }
 
-        let t = SmilesDrawer.Vector2.add(start, SmilesDrawer.Vector2.multiplyScalar(normals[0], 0.75));
-        let u = SmilesDrawer.Vector2.add(end, SmilesDrawer.Vector2.multiplyScalar(normals[0], width));
-        let v = SmilesDrawer.Vector2.add(end, SmilesDrawer.Vector2.multiplyScalar(normals[1], width));
-        let w = SmilesDrawer.Vector2.add(start, SmilesDrawer.Vector2.multiplyScalar(normals[1], 0.75));
+        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], 0.75));
+        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], width));
+        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], width));
+        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], 0.75));
 
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
@@ -354,7 +361,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draw a dashed wedge on the canvas.
      *
-     * @param {SmilesDrawer.Line} line A line.
+     * @param {Line} line A line.
      * @param {Number} width The wedge width.
      */
     drawDashedWedge(line, width = 6.0) {
@@ -378,7 +385,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
         ctx.save();
 
-        let normals = SmilesDrawer.Vector2.normals(l, r);
+        let normals = Vector2.normals(l, r);
 
         normals[0].normalize();
         normals[1].normalize();
@@ -415,10 +422,10 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         sEnd.x += offsetX;
         sEnd.y += offsetY;
 
-        let t = SmilesDrawer.Vector2.add(start, SmilesDrawer.Vector2.multiplyScalar(normals[0], 0.75));
-        let u = SmilesDrawer.Vector2.add(end, SmilesDrawer.Vector2.multiplyScalar(normals[0], width / 2.0));
-        let v = SmilesDrawer.Vector2.add(end, SmilesDrawer.Vector2.multiplyScalar(normals[1], width / 2.0));
-        let w = SmilesDrawer.Vector2.add(start, SmilesDrawer.Vector2.multiplyScalar(normals[1], 0.75));
+        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], 0.75));
+        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], width / 2.0));
+        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], width / 2.0));
+        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], 0.75));
 
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
@@ -426,7 +433,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         ctx.lineTo(v.x, v.y);
         ctx.lineTo(w.x, w.y);
 
-        let gradient = this.ctx.createRadialGradient(r.x, r.y, this.bondLength, r.x, r.y, 0);
+        let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
         gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
             this.getColor('C'));
         gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
@@ -481,7 +488,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
         ctx.save();
         ctx.beginPath();
-        ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, SmilesDrawer.MathHelper.twoPI, false);
+        ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, MathHelper.twoPI, false);
         ctx.fillStyle = this.getColor(elementName);
         ctx.fill();
         ctx.restore();
@@ -502,13 +509,13 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY, 1.5, 0, SmilesDrawer.MathHelper.twoPI, true);
+        ctx.arc(x + offsetX, y + offsetY, 1.5, 0, MathHelper.twoPI, true);
         ctx.closePath();
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
 
         ctx.beginPath();
-        ctx.arc(x + this.offsetX, y + this.offsetY, 0.75, 0, SmilesDrawer.MathHelper.twoPI, false);
+        ctx.arc(x + this.offsetX, y + this.offsetY, 0.75, 0, MathHelper.twoPI, false);
         ctx.fillStyle = this.getColor(elementName);
         ctx.fill();
         ctx.restore();
@@ -523,7 +530,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
      * @param {Number} hydrogens The number of hydrogen atoms.
      * @param {String} direction The direction of the text in relation to the associated vertex.
      * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
-     * @param {String} charge The charge of the atom.
+     * @param {Number} charge The charge of the atom.
      * @param {Number} isotope The isotope number.
      * @param {Object[]} attachedPseudoElements A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
      * @param {String} attachedPseudoElement[].element The element symbol.
@@ -581,7 +588,7 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
 
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x + offsetX, y + offsetY, r, 0, SmilesDrawer.MathHelper.twoPI, true);
+        ctx.arc(x + offsetX, y + offsetY, r, 0, MathHelper.twoPI, true);
         ctx.closePath();
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
@@ -809,11 +816,11 @@ SmilesDrawer.CanvasWrapper = class CanvasWrapper {
     /**
      * Draws a ring inside a provided ring, indicating aromaticity.
      *
-     * @param {SmilesDrawer.Ring} ring A ring.
+     * @param {Ring} ring A ring.
      */
     drawAromaticityRing(ring) {
         let ctx = this.ctx;
-        let radius = SmilesDrawer.MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
+        let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
 
         ctx.save();
         ctx.strokeStyle = this.getColor('C');

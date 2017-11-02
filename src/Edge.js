@@ -1,3 +1,5 @@
+//@ts-check
+
 /** 
  * A class representing an edge. 
  * 
@@ -10,7 +12,7 @@
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
  * @property {String} [chiral=''] Chirality information.
  */
-SmilesDrawer.Edge = class Edge {
+export default class Edge {
     /**
      * The constructor for the class Edge.
      *

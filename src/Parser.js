@@ -1,4 +1,4 @@
-SmilesDrawer.Parser = (function () {
+export default (function () {
   "use strict";
 
   /*

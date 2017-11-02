@@ -177,7 +177,7 @@ export default class Vector2 {
      * @returns {Vector2} Returns itself.
      */
     rotate(angle) {
-        let tmp = new Vector2();
+        let tmp = new Vector2(0, 0);
         let cosAngle = Math.cos(angle);
         let sinAngle = Math.sin(angle);
 
@@ -381,7 +381,7 @@ export default class Vector2 {
      * @returns {Vector2} A normalized copy of this vector.
      */
     normalized() {
-        return Vector2.divide(this, this.length());
+        return Vector2.divideScalar(this, this.length());
     }
 
     /**
@@ -513,11 +513,19 @@ export default class Vector2 {
      * @returns {Vector2} The fraction of the two vectors.
      */
     static divide(vecA, vecB) {
-        if (vecB.x && vecB.y) {
-            return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
-        }
+      return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
+    }
 
-        return new Vector2(vecA.x / vecB, vecA.y / vecB);
+    /**
+     * Divides a vector by a scalar and returns the result as new vector.
+     *
+     * @static
+     * @param {Vector2} vecA The dividend.
+     * @param {Number} s The scalar.
+     * @returns {Vector2} The fraction of the two vectors.
+     */
+    static divideScalar(vecA, s) {
+        return new Vector2(vecA.x / s, vecA.y / s);
     }
 
     /**

@@ -1,14 +1,24 @@
 //@ts-check
 import MathHelper from './MathHelper'
+import ArrayHelper from './ArrayHelper'
 import Vector2 from './Vector2'
+import Line from './Line'
+import Vertex from './Vertex'
+import Edge from './Edge'
+import Atom from './Atom'
+import Ring from './Ring'
+import RingConnection from './RingConnection'
+import CanvasWrapper from './CanvasWrapper'
+import Graph from './Graph'
+import SSSR from './SSSR'
 
 /** 
  * The main class of the application representing the smiles drawer 
  * 
- * @property {SmilesDrawer.Graph} graph The graph associated with this SmilesDrawer.Drawer instance.
+ * @property {Graph} graph The graph associated with this SmilesDrawer.Drawer instance.
  * @property {Number} ringIdCounter An internal counter to keep track of ring ids.
  * @property {Number} ringConnectionIdCounter An internal counter to keep track of ring connection ids.
- * @property {SmilesDrawer.CanvasWrapper} canvasWrapper The SmilesDrawer.CanvasWrapper associated with this SmilesDrawer.Drawer instance.
+ * @property {CanvasWrapper} canvasWrapper The CanvasWrapper associated with this SmilesDrawer.Drawer instance.
  * @property {Number} totalOverlapScore The current internal total overlap score.
  * @property {Object} defaultOptions The default options.
  * @property {Object} opts The merged options.
@@ -133,13 +143,13 @@ export default class Drawer {
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
     this.data = data;
-    this.canvasWrapper = new SmilesDrawer.CanvasWrapper(target, this.opts.themes[themeName], this.opts);
+    this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts);
     this.infoOnly = infoOnly;
 
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
 
-    this.graph = new SmilesDrawer.Graph(data, this.opts.isomeric);
+    this.graph = new Graph(data, this.opts.isomeric);
     this.rings = [];
     this.ringConnections = [];
 
@@ -278,7 +288,7 @@ export default class Drawer {
   /**
    * Returns an array containing the bridged rings associated with this  molecule.
    *
-   * @returns {SmilesDrawer.Ring[]} An array containing all bridged rings associated with this molecule.
+   * @returns {Ring[]} An array containing all bridged rings associated with this molecule.
    */
   getBridgedRings() {
     let bridgedRings = [];
@@ -295,7 +305,7 @@ export default class Drawer {
   /**
    * Returns an array containing all fused rings associated with this molecule.
    *
-   * @returns {SmilesDrawer.Ring[]} An array containing all fused rings associated with this molecule.
+   * @returns {Ring[]} An array containing all fused rings associated with this molecule.
    */
   getFusedRings() {
     let fusedRings = [];
@@ -312,7 +322,7 @@ export default class Drawer {
   /**
    * Returns an array containing all spiros associated with this molecule.
    *
-   * @returns {SmilesDrawer.Ring[]} An array containing all spiros associated with this molecule.
+   * @returns {Ring[]} An array containing all spiros associated with this molecule.
    */
   getSpiros() {
     let spiros = [];
@@ -396,8 +406,8 @@ export default class Drawer {
   /**
    * Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond represents the break in a ring introduced when creating the MST. If the two vertices supplied as arguments are not part of a common ringbond, the method returns null.
    *
-   * @param {SmilesDrawer.Vertex} vertexA A vertex.
-   * @param {SmilesDrawer.Vertex} vertexB A vertex.
+   * @param {Vertex} vertexA A vertex.
+   * @param {Vertex} vertexB A vertex.
    * @returns {String|null} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
    */
   getRingbondType(vertexA, vertexB) {
@@ -451,7 +461,7 @@ export default class Drawer {
         } else {
           let sourceVertexId = vertex.id;
           let targetVertexId = openBonds.get(ringbondId);
-          let edgeId = this.graph.addEdge(new SmilesDrawer.Edge(sourceVertexId, targetVertexId, 1));
+          let edgeId = this.graph.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
           let targetVertex = this.graph.vertices[targetVertexId];
 
           vertex.addChild(targetVertexId);
@@ -467,7 +477,7 @@ export default class Drawer {
     }
 
     // Get the rings in the graph (the SSSR)
-    let rings = SmilesDrawer.SSSR.getRings(this.graph);
+    let rings = SSSR.getRings(this.graph);
     
     if (rings === null) {
       return;
@@ -475,7 +485,7 @@ export default class Drawer {
 
     for (var i = 0; i < rings.length; i++) {
       let ringVertices = [...rings[i]];
-      let ringId = this.addRing(new SmilesDrawer.Ring(ringVertices));
+      let ringId = this.addRing(new Ring(ringVertices));
 
       // Add the ring to the atoms
       for (var j = 0; j < ringVertices.length; j++) {
@@ -490,7 +500,7 @@ export default class Drawer {
       for (var j = i + 1; j < this.rings.length; j++) {
         let a = this.rings[i];
         let b = this.rings[j];
-        let ringConnection = new SmilesDrawer.RingConnection(a, b);
+        let ringConnection = new RingConnection(a, b);
 
         // If there are no vertices in the ring connection, then there
         // is no ring connection
@@ -503,7 +513,7 @@ export default class Drawer {
     // Add neighbours to the rings
     for (var i = 0; i < this.rings.length; i++) {
       let ring = this.rings[i];
-      ring.neighbours = SmilesDrawer.RingConnection.getNeighbours(this.ringConnections, ring.id);
+      ring.neighbours = RingConnection.getNeighbours(this.ringConnections, ring.id);
     }
 
     // Anchor the ring to one of it's members, so that the ring center will always
@@ -568,7 +578,7 @@ export default class Drawer {
 
         if (involvedRings.indexOf(n) === -1 &&
           n !== r &&
-          SmilesDrawer.RingConnection.isBridge(that.ringConnections, that.graph.vertices, r, n)) {
+          RingConnection.isBridge(that.ringConnections, that.graph.vertices, r, n)) {
           recurse(n);
         }
       }
@@ -576,7 +586,7 @@ export default class Drawer {
 
     recurse(ringId);
 
-    return SmilesDrawer.ArrayHelper.unique(involvedRings);
+    return ArrayHelper.unique(involvedRings);
   }
 
   /**
@@ -601,7 +611,7 @@ export default class Drawer {
    *
    * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
    * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
-   * @returns {SmilesDrawer.Ring} The bridged ring.
+   * @returns {Ring} The bridged ring.
    */
   createBridgedRing(ringIds, sourceVertexId) {
     let ringMembers = new Set();
@@ -632,7 +642,7 @@ export default class Drawer {
 
     for (let id of vertices) {
       let vertex = this.graph.vertices[id];
-      let intersection = SmilesDrawer.ArrayHelper.intersection(ringIds, vertex.value.rings);
+      let intersection = ArrayHelper.intersection(ringIds, vertex.value.rings);
 
       if (vertex.value.rings.length === 1 || intersection.length === 1) {
         ringMembers.add(vertex.id);
@@ -667,7 +677,7 @@ export default class Drawer {
     }
 
     // Create the ring
-    let ring = new SmilesDrawer.Ring([...ringMembers]);
+    let ring = new Ring([...ringMembers]);
 
     ring.isBridged = true;
     ring.neighbours = [...neighbours];
@@ -692,7 +702,7 @@ export default class Drawer {
     // Remove former rings from members of the bridged ring and add the bridged ring
     for (let id of ringMembers) {
       let vertex = this.graph.vertices[id];
-      vertex.value.rings = SmilesDrawer.ArrayHelper.removeAll(vertex.value.rings, ringIds);
+      vertex.value.rings = ArrayHelper.removeAll(vertex.value.rings, ringIds);
       vertex.value.rings.push(ring.id);
     }
 
@@ -720,8 +730,8 @@ export default class Drawer {
   /**
    * Checks whether or not two vertices are in the same ring.
    *
-   * @param {SmilesDrawer.Vertex} vertexA A vertex.
-   * @param {SmilesDrawer.Vertex} vertexB A vertex.
+   * @param {Vertex} vertexA A vertex.
+   * @param {Vertex} vertexB A vertex.
    * @returns {Boolean} A boolean indicating whether or not the two vertices are in the same ring.
    */
   areVerticesInSameRing(vertexA, vertexB) {
@@ -741,8 +751,8 @@ export default class Drawer {
   /**
    * Returns an array of ring ids shared by both vertices.
    *
-   * @param {SmilesDrawer.Vertex} vertexA A vertex.
-   * @param {SmilesDrawer.Vertex} vertexB A vertex.
+   * @param {Vertex} vertexA A vertex.
+   * @param {Vertex} vertexB A vertex.
    * @returns {Number[]} An array of ids of rings shared by the two vertices.
    */
   getCommonRings(vertexA, vertexB) {
@@ -762,9 +772,9 @@ export default class Drawer {
   /**
    * Returns the aromatic or largest ring shared by the two vertices.
    *
-   * @param {SmilesDrawer.Vertex} vertexA A vertex.
-   * @param {SmilesDrawer.Vertex} vertexB A vertex.
-   * @returns {SmilesDrawer.Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
+   * @param {Vertex} vertexA A vertex.
+   * @param {Vertex} vertexB A vertex.
+   * @returns {Ring|null} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
    */
   getLargestOrAromaticCommonRing(vertexA, vertexB) {
     let commonRings = this.getCommonRings(vertexA, vertexB);
@@ -817,8 +827,8 @@ export default class Drawer {
   /**
    * Returns the closest vertex (connected as well as unconnected).
    *
-   * @param {SmilesDrawer.Vertex} vertex The vertex of which to find the closest other vertex.
-   * @returns {SmilesDrawer.Vertex} The closest vertex.
+   * @param {Vertex} vertex The vertex of which to find the closest other vertex.
+   * @returns {Vertex} The closest vertex.
    */
   getClosestVertex(vertex) {
     let minDist = 99999;
@@ -845,7 +855,7 @@ export default class Drawer {
   /**
    * Add a ring to this representation of a molecule.
    *
-   * @param {SmilesDrawer.Ring} ring A new ring.
+   * @param {Ring} ring A new ring.
    * @returns {Number} The ring id of the new ring.
    */
   addRing(ring) {
@@ -883,7 +893,7 @@ export default class Drawer {
    * Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.
    *
    * @param {Number} ringId A ring id.
-   * @returns {SmilesDrawer.Ring} A ring associated with the current molecule.
+   * @returns {Ring} A ring associated with the current molecule.
    */
   getRing(ringId) {
     for (var i = 0; i < this.rings.length; i++) {
@@ -896,7 +906,7 @@ export default class Drawer {
   /**
    * Add a ring connection to this representation of a molecule.
    *
-   * @param {SmilesDrawer.RingConnection} ringConnection A new ringConnection.
+   * @param {RingConnection} ringConnection A new ringConnection.
    * @returns {Number} The ring connection id of the new ring connection.
    */
   addRingConnection(ringConnection) {
@@ -943,7 +953,7 @@ export default class Drawer {
    * Get a ring connection with a given id.
    * 
    * @param {Number} id 
-   * @returns {SmilesDrawer.RingConnection} The ring connection with the specified id.
+   * @returns {RingConnection} The ring connection with the specified id.
    */
   getRingConnection(id) {
     for (var i = 0; i < this.ringConnections.length; i++) {
@@ -1036,8 +1046,8 @@ export default class Drawer {
   /**
    * When drawing a double bond, choose the side to place the double bond. E.g. a double bond should always been drawn inside a ring.
    *
-   * @param {SmilesDrawer.Vertex} vertexA A vertex.
-   * @param {SmilesDrawer.Vertex} vertexB A vertex.
+   * @param {Vertex} vertexA A vertex.
+   * @param {Vertex} vertexB A vertex.
    * @param {Vector2[]} sides An array containing the two normals of the line spanned by the two provided vertices.
    * @returns {Object} Returns an object containing the following information: {
           totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
@@ -1057,7 +1067,7 @@ export default class Drawer {
     let bnCount = bn.length;
 
     // All vertices connected to the edge vertexA to vertexB
-    let tn = SmilesDrawer.ArrayHelper.merge(an, bn);
+    let tn = ArrayHelper.merge(an, bn);
 
     // Only considering the connected vertices
     let sideCount = [0, 0];
@@ -1099,11 +1109,11 @@ export default class Drawer {
   /**
    * Sets the center for a ring.
    *
-   * @param {SmilesDrawer.Ring} ring A ring.
+   * @param {Ring} ring A ring.
    */
   setRingCenter(ring) {
     let ringSize = ring.getSize();
-    let total = new Vector2();
+    let total = new Vector2(0,0);
 
     for (var i = 0; i < ringSize; i++) {
       total.add(this.graph.vertices[ring.members[i]].position);
@@ -1115,8 +1125,8 @@ export default class Drawer {
   /**
    * Gets the center of a ring contained within a bridged ring and containing a given vertex.
    *
-   * @param {SmilesDrawer.Ring} ring A bridged ring.
-   * @param {SmilesDrawer.Vertex} vertex A vertex.
+   * @param {Ring} ring A bridged ring.
+   * @param {Vertex} vertex A vertex.
    * @returns {Vector2} The center of the subring that containing the vertex.
    */
   getSubringCenter(ring, vertex) {
@@ -1125,7 +1135,6 @@ export default class Drawer {
     let smallest = Number.MAX_VALUE;
 
     // Always get the smallest ring.
-    var i = rings.length;
     for (var i = 0; i < rings.length; i++) {
       for (var j = 0; j < ring.rings.length; j++) {
         if (rings[i] === ring.rings[j].id) {
@@ -1196,7 +1205,7 @@ export default class Drawer {
     let normals = this.getEdgeNormals(edge);
 
     // Create a point on each side of the line
-    let sides = SmilesDrawer.ArrayHelper.clone(normals);
+    let sides = ArrayHelper.clone(normals);
 
     sides[0].multiplyScalar(10).add(a);
     sides[1].multiplyScalar(10).add(a);
@@ -1221,9 +1230,9 @@ export default class Drawer {
         let line = null;
 
         if (center.sameSideAs(vertexA.position, vertexB.position, Vector2.add(a, normals[0]))) {
-          line = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+          line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
         } else {
-          line = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+          line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
         }
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
@@ -1236,13 +1245,13 @@ export default class Drawer {
         }
         
         // The normal edge
-        this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+        this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (edge.center) {
         normals[0].multiplyScalar(that.opts.halfBondSpacing);
         normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
-        let lineA = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
-        let lineB = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+        let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         this.canvasWrapper.drawLine(lineA);
         this.canvasWrapper.drawLine(lineB);
@@ -1252,8 +1261,8 @@ export default class Drawer {
         normals[0].multiplyScalar(that.opts.halfBondSpacing);
         normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
-        let lineA = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
-        let lineB = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+        let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         this.canvasWrapper.drawLine(lineA);
         this.canvasWrapper.drawLine(lineB);
@@ -1261,38 +1270,38 @@ export default class Drawer {
         normals[0].multiplyScalar(that.opts.bondSpacing);
         normals[1].multiplyScalar(that.opts.bondSpacing);
 
-        let line = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
         this.canvasWrapper.drawLine(line);
-        this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+        this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (s.sideCount[0] < s.sideCount[1]) {
         normals[0].multiplyScalar(that.opts.bondSpacing);
         normals[1].multiplyScalar(that.opts.bondSpacing);
 
-        let line = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+        let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
         this.canvasWrapper.drawLine(line);
-        this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+        this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
         normals[0].multiplyScalar(that.opts.bondSpacing);
         normals[1].multiplyScalar(that.opts.bondSpacing);
 
-        let line = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
         this.canvasWrapper.drawLine(line);
-        this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+        this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
         normals[0].multiplyScalar(that.opts.bondSpacing);
         normals[1].multiplyScalar(that.opts.bondSpacing);
 
-        let line = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+        let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
         this.canvasWrapper.drawLine(line);
-        this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+        this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else {
 
       }
@@ -1300,13 +1309,13 @@ export default class Drawer {
       normals[0].multiplyScalar(that.opts.bondSpacing / 1.5);
       normals[1].multiplyScalar(that.opts.bondSpacing / 1.5);
 
-      let lineA = new SmilesDrawer.Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
-      let lineB = new SmilesDrawer.Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+      let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+      let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
       this.canvasWrapper.drawLine(lineA);
       this.canvasWrapper.drawLine(lineB);
 
-      this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB));
+      this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
     } else if (edge.bondType === '.') {
       // TODO: Something... maybe... version 2?
     } else {
@@ -1314,11 +1323,11 @@ export default class Drawer {
       let isChiralCenterB = vertexB.value.bracket && vertexB.value.bracket.chirality;
 
       if (edge.chiral === 'up') {
-        this.canvasWrapper.drawWedge(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+        this.canvasWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
       } else if (edge.chiral === 'down') {
-        this.canvasWrapper.drawDashedWedge(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+        this.canvasWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
       } else {
-        this.canvasWrapper.drawLine(new SmilesDrawer.Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+        this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
       }
     }
 
@@ -1342,7 +1351,7 @@ export default class Drawer {
       let isotope = 0;
       let bondCount = this.getBondCount(vertex);
       let element = atom.element;
-      let hydrogens = SmilesDrawer.Atom.maxBonds[element] - bondCount;
+      let hydrogens = Atom.maxBonds[element] - bondCount;
       let dir = vertex.getTextDirection(this.graph.vertices);
       let isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
@@ -1374,7 +1383,7 @@ export default class Drawer {
       }
 
       if (debug) {
-        let value = 'v: ' + vertex.id + ' ' + SmilesDrawer.ArrayHelper.print(atom.ringbonds);
+        let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
         this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
       }
     }
@@ -1478,10 +1487,10 @@ export default class Drawer {
   /**
    * Creates a new ring, that is, positiones all the vertices inside a ring.
    *
-   * @param {SmilesDrawer.Ring} ring The ring to position.
+   * @param {Ring} ring The ring to position.
    * @param {Vector2|null} [center=null] The center of the ring to be created.
-   * @param {SmilesDrawer.Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
-   * @param {SmilesDrawer.Vertex|null} [previousVertex=null] The last vertex that was positioned.
+   * @param {Vertex|null} [startVertex=null] The first vertex to be positioned inside the ring.
+   * @param {Vertex|null} [previousVertex=null] The last vertex that was positioned.
    * @param {Boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
    */
   createRing(ring, center = null, startVertex = null, previousVertex = null) {
@@ -1555,7 +1564,7 @@ export default class Drawer {
         continue;
       }
 
-      let vertices = SmilesDrawer.RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
+      let vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
 
       if (vertices.length === 2) {
         // This ring is a fused ring
@@ -1688,7 +1697,7 @@ export default class Drawer {
   getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores) {
     let that = this;
     let score = 0;
-    let center = new Vector2();
+    let center = new Vector2(0, 0);
 
     this.traverseTree(vertexId, parentVertexId, function (vertex) {
       let s = vertexOverlapScores[vertex.id];
@@ -1713,7 +1722,7 @@ export default class Drawer {
    * @returns {Vector2} The current center of mass.
    */
   getCurrentCenterOfMass() {
-    let total = new Vector2();
+    let total = new Vector2(0, 0);
     let count = 0;
 
     for (var i = 0; i < this.graph.vertices.length; i++) {
@@ -1736,7 +1745,7 @@ export default class Drawer {
    * @returns {Vector2} The current center of mass.
    */
   getCurrentCenterOfMassInNeigbourhood(vec, r = this.opts.bondLength * 2.0) {
-    let total = new Vector2();
+    let total = new Vector2(0, 0);
     let count = 0;
     let rSq = r * r;
 
@@ -1867,9 +1876,9 @@ export default class Drawer {
   /**
    * Positiones the next vertex thus creating a bond.
    *
-   * @param {SmilesDrawer.Vertex} vertex A vertex.
-   * @param {SmilesDrawer.Vertex} previousVertex The previous vertex which has been positioned.
-   * @param {SmilesDrawer.Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
+   * @param {Vertex} vertex A vertex.
+   * @param {Vertex} previousVertex The previous vertex which has been positioned.
+   * @param {Ring|Number} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
    * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated).
    * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
    */
@@ -2003,7 +2012,7 @@ export default class Drawer {
       let neighbours = vertex.getNeighbours();
 
       if (previousVertex) {
-        neighbours = SmilesDrawer.ArrayHelper.remove(neighbours, previousVertex.id);
+        neighbours = ArrayHelper.remove(neighbours, previousVertex.id);
       }
 
       let angle = vertex.getAngle();
@@ -2282,7 +2291,7 @@ export default class Drawer {
   /**
    * Gets the vetex sharing the edge that is the common bond of two rings.
    *
-   * @param {SmilesDrawer.Vertex} vertex A vertex.
+   * @param {Vertex} vertex A vertex.
    * @returns {Number|null} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
    */
   getCommonRingbondNeighbour(vertex) {
@@ -2291,7 +2300,7 @@ export default class Drawer {
     for (var i = 0; i < neighbours.length; i++) {
       let neighbour = this.graph.vertices[neighbours[i]];
 
-      if (SmilesDrawer.ArrayHelper.All(neighbour.value.rings, vertex.value.rings)) {
+      if (ArrayHelper.containsAll(neighbour.value.rings, vertex.value.rings)) {
         return neighbour;
       }
     }
@@ -2327,7 +2336,7 @@ export default class Drawer {
   /**
    * Check whether or not an edge is part of a ring.
    *
-   * @param {SmilesDrawer.Edge} edge An edge.
+   * @param {Edge} edge An edge.
    * @returns {Boolean} A boolean indicating whether or not the edge is part of a ring.
    */
   isEdgeInRing(edge) {
@@ -2340,7 +2349,7 @@ export default class Drawer {
   /**
    * Check whether or not an edge is rotatable.
    *
-   * @param {SmilesDrawer.Edge} edge An edge.
+   * @param {Edge} edge An edge.
    * @returns {Boolean} A boolean indicating whether or not the edge is rotatable.
    */
   isEdgeRotatable(edge) {
@@ -2370,7 +2379,7 @@ export default class Drawer {
   /**
    * Check whether or not a ring is an implicitly defined aromatic ring (lower case smiles).
    *
-   * @param {SmilesDrawer.Ring} ring A ring.
+   * @param {Ring} ring A ring.
    * @returns {Boolean} A boolean indicating whether or not a ring is implicitly defined as aromatic.
    */
   isRingAromatic(ring) {
@@ -2388,7 +2397,7 @@ export default class Drawer {
   /**
    * Get the normals of an edge.
    *
-   * @param {SmilesDrawer.Edge} edge An edge.
+   * @param {Edge} edge An edge.
    * @returns {Vector2[]} An array containing two vectors, representing the normals.
    */
   getEdgeNormals(edge) {
@@ -2465,7 +2474,7 @@ export default class Drawer {
   /**
    * Gets the number of bonds of a vertex.
    *
-   * @param {SmilesDrawer.Vertex} vertex A vertex.
+   * @param {Vertex} vertex A vertex.
    * @returns {Number} The number of bonds the vertex participates in.
    */
   getBondCount(vertex) {
@@ -2482,7 +2491,7 @@ export default class Drawer {
    * Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
    *
    * @param {Number} vertexId A vertex id.
-   * @returns {SmilesDrawer.Vertex[]} An array of vertices.
+   * @returns {Vertex[]} An array of vertices.
    */
   getNonRingNeighbours(vertexId) {
     let nrneighbours = [];
@@ -2491,7 +2500,7 @@ export default class Drawer {
 
     for (var i = 0; i < neighbours.length; i++) {
       let neighbour = this.graph.vertices[neighbours[i]];
-      let nIntersections = SmilesDrawer.ArrayHelper.intersection(vertex.value.rings, neighbour.value.rings).length;
+      let nIntersections = ArrayHelper.intersection(vertex.value.rings, neighbour.value.rings).length;
 
       if (nIntersections === 0 && neighbour.value.isBridge == false) {
         nrneighbours.push(neighbour);
@@ -2544,8 +2553,8 @@ export default class Drawer {
         order[j] = priorities[j][0];
       }
 
-      console.log(order);
-      console.log(vertex.id, MathHelper.parityOfPermutation(order));
+      // console.log(order);
+      // console.log(vertex.id, MathHelper.parityOfPermutation(order));
     }
   }
 
@@ -2629,7 +2638,7 @@ export default class Drawer {
 
         neighbour.value.isDrawn = false;
 
-        let hydrogens = SmilesDrawer.Atom.maxBonds[neighbour.value.element] - this.getBondCount(neighbour);
+        let hydrogens = Atom.maxBonds[neighbour.value.element] - this.getBondCount(neighbour);
 
         if (neighbour.value.bracket) {
           hydrogens = neighbour.value.bracket.hcount;

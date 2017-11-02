@@ -1,3 +1,7 @@
+//@ts-check
+import Vertex from './Vertex'
+import Ring from './Ring'
+
 /** 
  * A class representing a ring connection.
  * 
@@ -6,12 +10,12 @@
  * @property {Number} secondRingId A ring id.
  * @property {Set<Number>} vertices A set containing the vertex ids participating in the ring connection.
  */
-SmilesDrawer.RingConnection = class RingConnection {
+export default class RingConnection {
     /**
      * The constructor for the class RingConnection.
      *
-     * @param {SmilesDrawer.Ring} firstRing A ring.
-     * @param {SmilesDrawer.Ring} secondRing A ring.
+     * @param {Ring} firstRing A ring.
+     * @param {Ring} secondRing A ring.
      */
     constructor(firstRing, secondRing) {
         this.id = null;
@@ -68,7 +72,7 @@ SmilesDrawer.RingConnection = class RingConnection {
     /**
      * Checks whether or not this ring connection is a bridge in a bridged ring.
      *
-     * @param {SmilesDrawer.Vertex[]}. vertices The array of vertices associated with the current molecule.
+     * @param {Vertex[]} vertices The array of vertices associated with the current molecule.
      * @returns {Boolean} A boolean indicating whether or not this ring connection is a bridge.
      */
     isBridge(vertices) {
@@ -89,10 +93,10 @@ SmilesDrawer.RingConnection = class RingConnection {
      * Checks whether or not two rings are connected by a bridged bond.
      *
      * @static
-     * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing the ring connections associated with the current molecule.
-     * @param {SmilesDrawer.Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+     * @param {RingConnection[]} ringConnections An array of ring connections containing the ring connections associated with the current molecule.
+     * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
      * @param {Number} firstRingId A ring id.
-     * @param {Nmber} secondRingId A ring id.
+     * @param {Number} secondRingId A ring id.
      * @returns {Boolean} A boolean indicating whether or not two rings ar connected by a bridged bond.
      */
     static isBridge(ringConnections, vertices, firstRingId, secondRingId) {
@@ -114,7 +118,7 @@ SmilesDrawer.RingConnection = class RingConnection {
      * Retruns the neighbouring rings of a given ring.
      *
      * @static
-     * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing ring connections associated with the current molecule.
+     * @param {RingConnection[]} ringConnections An array of ring connections containing ring connections associated with the current molecule.
      * @param {Number} ringId A ring id.
      * @returns {Number[]} An array of ring ids of neighbouring rings.
      */
@@ -138,7 +142,7 @@ SmilesDrawer.RingConnection = class RingConnection {
      * Returns an array of vertex ids associated with a given ring connection.
      *
      * @static
-     * @param {SmilesDrawer.RingConnection[]} ringConnections An array of ring connections containing ring connections associated with the current molecule.
+     * @param {RingConnection[]} ringConnections An array of ring connections containing ring connections associated with the current molecule.
      * @param {Number} firstRingId A ring id.
      * @param {Number} secondRingId A ring id.
      * @returns {Number[]} An array of vertex ids associated with the ring connection.

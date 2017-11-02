@@ -42,7 +42,7 @@ export default class MathHelper {
      * @returns {Number} The inner angle of a given regular polygon.
      */
     static innerAngle(n) {
-        return SmilesDrawer.MathHelper.toRad((n - 2) * 180 / n);
+        return MathHelper.toRad((n - 2) * 180 / n);
     }
 
     /**
@@ -70,9 +70,9 @@ export default class MathHelper {
     }
 
     static apothemFromSideLength(s, n) {
-        let r = SmilesDrawer.MathHelper.polyCircumradius(s, n);
+        let r = MathHelper.polyCircumradius(s, n);
         
-        return SmilesDrawer.MathHelper.apothem(r, n);
+        return MathHelper.apothem(r, n);
     }
 
     /**
@@ -83,7 +83,7 @@ export default class MathHelper {
      * @returns {Number} The central angle of the n-sided polygon in radians.
      */
     static centralAngle(n) {
-        return SmilesDrawer.MathHelper.toRad(360 / n);
+        return MathHelper.toRad(360 / n);
     }
 
     /**
@@ -94,7 +94,7 @@ export default class MathHelper {
      * @returns {Number} The angle in degrees.
      */
     static toDeg(rad) {
-        return rad * SmilesDrawer.MathHelper.degFactor;
+        return rad * MathHelper.degFactor;
     }
 
     /**
@@ -105,7 +105,7 @@ export default class MathHelper {
      * @returns {Number} The angle in radians.
      */
     static toRad(deg) {
-        return deg * SmilesDrawer.MathHelper.radFactor;
+        return deg * MathHelper.radFactor;
     }
 
     /**
@@ -139,13 +139,19 @@ export default class MathHelper {
 
         return evenLengthCycleCount % 2 ? -1 : 1;
     }
+
+    /** The factor to convert degrees to radians. */
+    static get radFactor() {
+      return Math.PI / 180.0;
+    }
+
+    /** The factor to convert radians to degrees. */
+    static get degFactor() {
+      return 180.0 / Math.PI;
+    }
+
+    /** Two times PI. */
+    static get twoPI() {
+      return 2.0 * Math.PI;
+    }
 }
-
-/** The factor to convert degrees to radians. */
-SmilesDrawer.MathHelper.radFactor = Math.PI / 180;
-
-/** The factor to convert radians to degrees. */
-SmilesDrawer.MathHelper.degFactor = 180 / Math.PI;
-
-/** Two times PI. */
-SmilesDrawer.MathHelper.twoPI = 2 * Math.PI;

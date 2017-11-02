@@ -1,13 +1,17 @@
 //@ts-check
-import Drawer from './src/Drawer.js'
+import Drawer from './src/Drawer'
+import Parser from './src/Parser'
 
 /**
  * The SmilesDrawer namespace.
  * @typicalname SmilesDrawer
  */
-let SmilesDrawer = {
+window.SmilesDrawer = {
   Version: '1.0.0'
 };
+
+window.SmilesDrawer.Drawer = Drawer;
+window.SmilesDrawer.Parser = Parser;
 
 /**
 * Cleans a SMILES string (removes non-valid characters)
@@ -16,7 +20,7 @@ let SmilesDrawer = {
 * @param {String} smiles A SMILES string.
 * @returns {String} The clean SMILES string.
 */
-SmilesDrawer.clean = function(smiles) {
+window.SmilesDrawer.clean = function(smiles) {
   return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g,'');
 }
 
@@ -29,7 +33,7 @@ SmilesDrawer.clean = function(smiles) {
 * @param {String} [themeName='light'] The theme to apply.
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
-SmilesDrawer.apply = function(options, selector='canvas[data-smiles]', themeName='light', onError=null) {
+window.SmilesDrawer.apply = function(options, selector='canvas[data-smiles]', themeName='light', onError=null) {
   let smilesDrawer = new Drawer(options);
   let elements = document.querySelectorAll(selector);
 
@@ -54,10 +58,10 @@ SmilesDrawer.apply = function(options, selector='canvas[data-smiles]', themeName
 * @param {Function} successCallback A callback that is called on success with the parse tree.
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
-SmilesDrawer.parse = function(smiles, successCallback, errorCallback) {
+window.SmilesDrawer.parse = function(smiles, successCallback, errorCallback) {
   try {
       if (successCallback) {
-          successCallback(SmilesDrawer.Parser.parse(smiles));
+          successCallback(Parser.parse(smiles));
       }
   } catch (err) {
       if (errorCallback) {

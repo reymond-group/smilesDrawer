@@ -1,10 +1,15 @@
+//@ts-check
+import MathHelper from './MathHelper'
+import ArrayHelper from './ArrayHelper'
+import Vector2 from './Vector2'
+
 /** 
  * A class representing a vertex.
  * 
  * @property {Number} id The id of this vertex.
  * @property {Atom} value The atom associated with this vertex.
- * @property {SmilesDrawer.Vector2} position The position of this vertex.
- * @property {SmilesDrawer.Vector2} previousPosition The position of the previous vertex.
+ * @property {Vector2} position The position of this vertex.
+ * @property {Vector2} previousPosition The position of the previous vertex.
  * @property {Number|null} parentVertexId The id of the previous vertex.
  * @property {Number[]} children The ids of the children of this vertex.
  * @property {Number[]} spanningTreeChildren The ids of the children of this vertex as defined in the spanning tree defined by the SMILES.
@@ -18,7 +23,8 @@
  * @property {String[]} neighbouringElements The element symbols associated with neighbouring vertices.
  * @property {Boolean} forcePositioned A boolean indicating whether or not this vertex was positioned using a force-based approach.
  */
-SmilesDrawer.Vertex = class Vertex {
+
+export default class Vertex {
     /**
      * The constructor for the class Vertex.
      *
@@ -29,8 +35,8 @@ SmilesDrawer.Vertex = class Vertex {
     constructor(value, x = 0, y = 0) {
         this.id = null;
         this.value = value;
-        this.position = new SmilesDrawer.Vector2(x ? x : 0, y ? y : 0);
-        this.previousPosition = new SmilesDrawer.Vector2(0, 0);
+        this.position = new Vector2(x ? x : 0, y ? y : 0);
+        this.previousPosition = new Vector2(0, 0);
         this.parentVertexId = null;
         this.children = [];
         this.spanningTreeChildren = [];
@@ -60,7 +66,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Set the 2D coordinates of the vertex from a Vector2.
      * 
-     * @param {SmilesDrawer.Vector2} v A 2D vector.
+     * @param {Vector2} v A 2D vector.
      * 
      */
     setPositionFromVector(v) {
@@ -109,16 +115,16 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Clones this vertex and returns the clone.
      *
-     * @returns {SmilesDrawer.Vertex} A clone of this vertex.
+     * @returns {Vertex} A clone of this vertex.
      */
     clone() {
         let clone = new Vertex(this.value, this.position.x, this.position.y);
         clone.id = this.id;
-        clone.previousPosition = new SmilesDrawer.Vector2(this.previousPosition.x, this.previousPosition.y);
+        clone.previousPosition = new Vector2(this.previousPosition.x, this.previousPosition.y);
         clone.parentVertexId = this.parentVertexId;
-        clone.children = SmilesDrawer.ArrayHelper.clone(this.children);
-        clone.spanningTreeChildren = SmilesDrawer.ArrayHelper.clone(this.spanningTreeChildren);
-        clone.edges = SmilesDrawer.ArrayHelper.clone(this.edges);
+        clone.children = ArrayHelper.clone(this.children);
+        clone.spanningTreeChildren = ArrayHelper.clone(this.spanningTreeChildren);
+        clone.edges = ArrayHelper.clone(this.edges);
         clone.positioned = this.positioned;
         clone.angle = this.angle;
         clone.forcePositioned = this.forcePositioned;
@@ -128,7 +134,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns true if this vertex and the supplied vertex both have the same id, else returns false.
      *
-     * @param {SmilesDrawer.Vertex} vertex The vertex to check.
+     * @param {Vertex} vertex The vertex to check.
      * @returns {Boolean} A boolean indicating whether or not the two vertices have the same id.
      */
     equals(vertex) {
@@ -138,7 +144,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
      *
-     * @param {SmilesDrawer.Vertex} [referenceVector=null] - The reference vector.
+     * @param {Vector2} [referenceVector=null] - The reference vector.
      * @param {Boolean} [returnAsDegrees=false] - If true, returns angle in degrees, else in radians.
      * @returns {Number} The angle of this vertex.
      */
@@ -146,13 +152,13 @@ SmilesDrawer.Vertex = class Vertex {
         let u = null;
         
         if (!referenceVector) {
-            u = SmilesDrawer.Vector2.subtract(this.position, this.previousPosition);
+            u = Vector2.subtract(this.position, this.previousPosition);
         } else {
-            u = SmilesDrawer.Vector2.subtract(this.position, referenceVector);
+            u = Vector2.subtract(this.position, referenceVector);
         }
 
         if (returnAsDegrees) {
-            return SmilesDrawer.MathHelper.toDeg(u.angle());
+            return MathHelper.toDeg(u.angle());
         }
 
         return u.angle();
@@ -161,7 +167,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns the suggested text direction when text is added at the position of this vertex.
      *
-     * @param {SmilesDrawer.Vertex[]} vertices The array of vertices for the current molecule.
+     * @param {Vertex[]} vertices The array of vertices for the current molecule.
      * @returns {String} The suggested direction of the text.
      */
     getTextDirection(vertices) {
@@ -172,7 +178,7 @@ SmilesDrawer.Vertex = class Vertex {
             angles.push(this.getAngle(vertices[neighbours[i]].position));
         }
 
-        let textAngle = SmilesDrawer.MathHelper.meanAngle(angles);
+        let textAngle = MathHelper.meanAngle(angles);
 
         // Round to 0, 90, 180 or 270 degree
         let halfPi = Math.PI / 2.0;
@@ -216,7 +222,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
      * 
-     * @param {SmilesDrawer.Vertex[]} vertices An array containing the vertices associated with the current molecule.
+     * @param {Vertex[]} vertices An array containing the vertices associated with the current molecule.
      * @returns {Number[]} An array containing the ids of neighbouring vertices that will be drawn.
      */
     getDrawnNeighbours(vertices) {
@@ -267,7 +273,7 @@ SmilesDrawer.Vertex = class Vertex {
     /**
      * Gets the next vertex in the ring in opposide direction to the supplied vertex id.
      *
-     * @param {SmilesDrawer.Vertex[]} vertices The array of vertices for the current molecule.
+     * @param {Vertex[]} vertices The array of vertices for the current molecule.
      * @param {Number} ringId The id of the ring containing this vertex.
      * @param {Number} previousVertexId The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex.
      * @returns {Number} The id of the next vertex in the ring.
@@ -276,7 +282,7 @@ SmilesDrawer.Vertex = class Vertex {
         let neighbours = this.getNeighbours();
 
         for (let i = 0; i < neighbours.length; i++) {
-            if (SmilesDrawer.ArrayHelper.contains(vertices[neighbours[i]].value.rings, { value: ringId }) && 
+            if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, { value: ringId }) && 
                 neighbours[i] != previousVertexId) {
                 return neighbours[i];
             }

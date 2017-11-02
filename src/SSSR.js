@@ -1,9 +1,12 @@
+//@ts-check
+import Graph from './Graph'
+
 /** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
-SmilesDrawer.SSSR = class SSSR {
+export default class SSSR {
     /**
      * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
      * 
-     * @param {SmilesDrawer.Graph} graph A SmilesDrawer.Graph object.
+     * @param {Graph} graph A Graph object.
      * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
      */
     static getRings(graph) {
@@ -12,7 +15,7 @@ SmilesDrawer.SSSR = class SSSR {
             return null;
         }
 
-        let connectedComponents = SmilesDrawer.Graph.getConnectedComponents(adjacencyMatrix);
+        let connectedComponents = Graph.getConnectedComponents(adjacencyMatrix);
         let rings = new Array();
 
         for (var i = 0; i < connectedComponents.length; i++) {
@@ -32,7 +35,7 @@ SmilesDrawer.SSSR = class SSSR {
             }
 
             // Get the edge list and the theoretical number of rings in SSSR
-            let nEdges = SmilesDrawer.SSSR.getEdgeList(ccAdjacencyMatrix).length;
+            let nEdges = SSSR.getEdgeList(ccAdjacencyMatrix).length;
             let nSssr = nEdges - ccAdjacencyMatrix.length + 1;
 
             // If all vertices have 3 incident edges, calculate with different formula (see Euler)
@@ -47,12 +50,12 @@ SmilesDrawer.SSSR = class SSSR {
                 nSssr = 2.0 + nEdges - ccAdjacencyMatrix.length;
             }
 
-            let {d, pe, pe_prime} = SmilesDrawer.SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
-            let c = SmilesDrawer.SSSR.getRingCandidates(d, pe, pe_prime);
-            let sssr = SmilesDrawer.SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
+            let {d, pe, pe_prime} = SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
+            let c = SSSR.getRingCandidates(d, pe, pe_prime);
+            let sssr = SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
             
             for (let i = 0; i < sssr.length; i++) {
-                let ring = new Array(sssr[i].length);
+                let ring = new Array(sssr[i].size);
                 let index = 0;
     
                 for (let val of sssr[i]) {
