@@ -150,11 +150,11 @@ export default class Drawer {
     this.ringConnectionIdCounter = 0;
 
     this.graph = new Graph(data, this.opts.isomeric);
-    this.rings = [];
-    this.ringConnections = [];
+    this.rings = Array();
+    this.ringConnections = Array();
 
-    this.originalRings = [];
-    this.originalRingConnections = [];
+    this.originalRings = Array();
+    this.originalRingConnections = Array();
 
     this.bridgedRing = false;
 
@@ -291,7 +291,7 @@ export default class Drawer {
    * @returns {Ring[]} An array containing all bridged rings associated with this molecule.
    */
   getBridgedRings() {
-    let bridgedRings = [];
+    let bridgedRings = Array();
 
     for (var i = 0; i < this.rings.length; i++) {
       if (this.rings[i].isBridged) {
@@ -308,7 +308,7 @@ export default class Drawer {
    * @returns {Ring[]} An array containing all fused rings associated with this molecule.
    */
   getFusedRings() {
-    let fusedRings = [];
+    let fusedRings = Array();
 
     for (var i = 0; i < this.rings.length; i++) {
       if (this.rings[i].isFused) {
@@ -325,7 +325,7 @@ export default class Drawer {
    * @returns {Ring[]} An array containing all spiros associated with this molecule.
    */
   getSpiros() {
-    let spiros = [];
+    let spiros = Array();
 
     for (var i = 0; i < this.rings.length; i++) {
       if (this.rings[i].isSpiro) {
@@ -565,7 +565,7 @@ export default class Drawer {
    * @returns {Number[]} An array containing all ring ids of rings part of a bridged ring system.
    */
   getBridgedRingRings(ringId) {
-    let involvedRings = [];
+    let involvedRings = Array();
     let that = this;
 
     let recurse = function (r) {
@@ -654,8 +654,8 @@ export default class Drawer {
     // Vertices can also be part of multiple rings and lay on the bridged ring,
     // however, they have to have at least two neighbours that are not part of
     // two rings
-    let tmp = [];
-    let insideRing = [];
+    let tmp = Array();
+    let insideRing = Array();
 
     for (let id of leftovers) {
       let vertex = this.graph.vertices[id];
@@ -756,7 +756,7 @@ export default class Drawer {
    * @returns {Number[]} An array of ids of rings shared by the two vertices.
    */
   getCommonRings(vertexA, vertexB) {
-    let commonRings = [];
+    let commonRings = Array();
 
     for (var i = 0; i < vertexA.value.rings.length; i++) {
       for (var j = 0; j < vertexB.value.rings.length; j++) {
@@ -805,7 +805,7 @@ export default class Drawer {
    * @returns {Number[]} An array containing vertex ids in a given location.
    */
   getVerticesAt(position, radius, excludeVertexId) {
-    let locals = [];
+    let locals = Array();
 
     for (var i = 0; i < this.graph.vertices.length; i++) {
       let vertex = this.graph.vertices[i];
@@ -934,7 +934,7 @@ export default class Drawer {
    * @param {Number} vertexIdB A vertex id.
    */
   removeRingConnectionsBetween(vertexIdA, vertexIdB) {
-    let toRemove = [];
+    let toRemove = Array();
     for (var i = 0; i < this.ringConnections.length; i++) {
       let ringConnection = this.ringConnections[i];
 
@@ -971,7 +971,7 @@ export default class Drawer {
    * @returns {Number[]} An array of ring connection ids.
    */
   getRingConnections(ringId, ringIds) {
-    let ringConnections = [];
+    let ringConnections = Array();
 
     for (var i = 0; i < this.ringConnections.length; i++) {
       let rc = this.ringConnections[i];
@@ -1023,7 +1023,7 @@ export default class Drawer {
       }
     }
     
-    let sortable = [];
+    let sortable = Array();
     
     for (var i = 0; i < this.graph.vertices.length; i++) {
       sortable.push({
@@ -1434,8 +1434,8 @@ export default class Drawer {
    * Stores the current information associated with rings.
    */
   backupRingInformation() {
-    this.originalRings = [];
-    this.originalRingConnections = [];
+    this.originalRings = Array();
+    this.originalRingConnections = Array();
 
     for (var i = 0; i < this.rings.length; i++) {
       this.originalRings.push(this.rings[i]);
@@ -1457,8 +1457,8 @@ export default class Drawer {
     // Get the subring centers from the bridged rings
     let bridgedRings = this.getBridgedRings();
 
-    this.rings = [];
-    this.ringConnections = [];
+    this.rings = Array();
+    this.ringConnections = Array();
 
     for (var i = 0; i < bridgedRings.length; i++) {
       let bridgedRing = bridgedRings[i];
@@ -1650,7 +1650,7 @@ export default class Drawer {
         }
 
         v.value.isConnectedToRing = true;
-        this.createNextBond(v, ringMember, this.getSubringCenter(ring, ringMember));
+        this.createNextBond(v, ringMember);
       }
     }
 
@@ -1765,7 +1765,7 @@ export default class Drawer {
    * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
    */
   resolvePrimaryOverlaps() {
-    let overlaps = [];
+    let overlaps = Array();
     let done = Array(this.graph.vertices.length);
 
     // Looking for overlaps created by two bonds coming out of a ring atom, which both point straight
@@ -1786,7 +1786,7 @@ export default class Drawer {
         let nonRingNeighbours = this.getNonRingNeighbours(vertex.id);
 
         if (nonRingNeighbours.length > 1) {
-          let rings = [];
+          let rings = Array();
 
           for (var k = 0; k < vertex.value.rings.length; k++) {
             rings.push(vertex.value.rings[k]);
@@ -1877,12 +1877,12 @@ export default class Drawer {
    * Positiones the next vertex thus creating a bond.
    *
    * @param {Vertex} vertex A vertex.
-   * @param {Vertex} previousVertex The previous vertex which has been positioned.
-   * @param {(Ring|Number)} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
-   * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated).
+   * @param {Vertex} [previousVertex=null] The previous vertex which has been positioned.
+   * @param {Number} [previousAngle=0.0] The global angle of the previous vertex.
+   * @param {Number} [dir=1] Either 1 or -1 to break ties (if no angle can be elucidated).
    * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
    */
-  createNextBond(vertex, previousVertex, ringOrAngle, dir, skipPositioning = false) {
+  createNextBond(vertex, previousVertex = null, previousAngle = 0.0, dir = 1, skipPositioning = false) {
     if (vertex.positioned && !skipPositioning) {
       return;
     }
@@ -1892,12 +1892,9 @@ export default class Drawer {
     // two rings, point away from the middle of the centers of the two rings
     if (!skipPositioning) {
       if (!previousVertex) {
-        // Here, ringOrAngle is always an angle
-
         // Add a (dummy) previous position if there is no previous vertex defined
         // Since the first vertex is at (0, 0), create a vector at (bondLength, 0)
         // and rotate it by 90°
-
 
         let dummy = new Vector2(this.opts.bondLength, 0);
         dummy.rotate(MathHelper.toRad(-120));
@@ -1960,15 +1957,13 @@ export default class Drawer {
         vertex.setPositionFromVector(avg);
         vertex.positioned = true;
       } else {
-        // Here, ringOrAngle is always an angle
-
         // If the previous vertex was not part of a ring, draw a bond based
         // on the global angle of the previous bond
         let v = new Vector2(this.opts.bondLength, 0);
-        v.rotate(ringOrAngle);
+        v.rotate(previousAngle);
         v.add(previousVertex.position);
 
-        vertex.globalAngle = ringOrAngle;
+        vertex.globalAngle = previousAngle;
         vertex.setPositionFromVector(v);
         vertex.previousPosition = previousVertex.position;
         vertex.positioned = true;
@@ -2433,7 +2428,7 @@ export default class Drawer {
    * @returns {Vertex[]} An array of vertices.
    */
   getNonRingNeighbours(vertexId) {
-    let nrneighbours = [];
+    let nrneighbours = Array();
     let vertex = this.graph.vertices[vertexId];
     let neighbours = vertex.getNeighbours();
 
@@ -2451,7 +2446,7 @@ export default class Drawer {
 
   annotateStereochemistry() {
     let maxDepth = 10;
-    
+
     // For each stereo-center
     for (var i = 0; i < this.graph.vertices.length; i++) {
       let vertex = this.graph.vertices[i];
@@ -2493,8 +2488,8 @@ export default class Drawer {
         order[j] = priorities[j][0];
       }
 
-      console.log(order);
-      console.log(vertex.id, MathHelper.parityOfPermutation(order));
+      // console.log(order);
+      // console.log(vertex.id, MathHelper.parityOfPermutation(order));
     }
   }
 
@@ -2522,10 +2517,10 @@ export default class Drawer {
     for (var i = 0; i < this.graph.vertices.length; i++) {
       const vertex = this.graph.vertices[i];
       const neighbourIds = vertex.getNeighbours();
-      let neighbours = [];
+      let neighbours = Array(neighbourIds.length);
 
       for (var j = 0; j < neighbourIds.length; j++) {
-        neighbours.push(this.graph.vertices[neighbourIds[j]]);
+        neighbours[j] = this.graph.vertices[neighbourIds[j]];
       }
 
       // Ignore atoms that have less than 3 neighbours, except if
@@ -2599,10 +2594,10 @@ export default class Drawer {
       }
 
       const neighbourIds = vertex.getNeighbours();
-      let neighbours = [];
+      let neighbours = Array(neighbourIds.length);
 
       for (var j = 0; j < neighbourIds.length; j++) {
-        neighbours.push(this.graph.vertices[neighbourIds[j]]);
+        neighbours[j] = this.graph.vertices[neighbourIds[j]];
       }
 
       for (var j = 0; j < neighbours.length; j++) {

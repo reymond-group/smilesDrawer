@@ -38,16 +38,16 @@ export default class Vertex {
         this.position = new Vector2(x ? x : 0, y ? y : 0);
         this.previousPosition = new Vector2(0, 0);
         this.parentVertexId = null;
-        this.children = [];
-        this.spanningTreeChildren = [];
-        this.edges = [];
+        this.children = Array();
+        this.spanningTreeChildren = Array();
+        this.edges = Array();
         this.positioned = false;
         this.angle = 0.0;
         this.globalAngle = 0.0;
         this.dir = 1.0;
         this.neighbourCount = 0;
-        this.neighbours = [];
-        this.neighbouringElements = [];
+        this.neighbours = Array();
+        this.neighbouringElements = Array();
         this.forcePositioned = false;
     }
 
@@ -172,7 +172,7 @@ export default class Vertex {
      */
     getTextDirection(vertices) {
         let neighbours = this.getDrawnNeighbours(vertices);
-        let angles = [];
+        let angles = Array();
         
         for (let i = 0; i < neighbours.length; i++) {
             angles.push(this.getAngle(vertices[neighbours[i]].position));
@@ -208,7 +208,7 @@ export default class Vertex {
             return this.neighbours;
         }
 
-        let arr = [];
+        let arr = Array();
 
         for (let i = 0; i < this.neighbours.length; i++) {
             if (this.neighbours[i] !== vertexId) {
@@ -226,7 +226,7 @@ export default class Vertex {
      * @returns {Number[]} An array containing the ids of neighbouring vertices that will be drawn.
      */
     getDrawnNeighbours(vertices) {
-        let arr = [];
+        let arr = Array();
 
         for (let i = 0; i < this.neighbours.length; i++) {
             if (vertices[this.neighbours[i]].value.isDrawn) {
@@ -253,7 +253,7 @@ export default class Vertex {
      * @returns {Number[]} An array containing the ids of the neighbouring vertices.
      */
     getSpanningTreeNeighbours(vertexId = null) {
-        let neighbours = [];
+        let neighbours = Array();
 
         for (let i = 0; i < this.spanningTreeChildren.length; i++) {
             if (vertexId === undefined || vertexId != this.spanningTreeChildren[i]) {

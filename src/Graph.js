@@ -23,8 +23,8 @@ export default class Graph {
    * @param {Boolean} [isomeric=false] A boolean specifying whether or not the SMILES is isomeric.
    */
   constructor(parseTree, isomeric = false) {
-    this.vertices = [];
-    this.edges = [];
+    this.vertices = Array();
+    this.edges = Array();
     this.vertexIdsToEdgeId = {};
     this.elementCount = {};
     this.isomeric = isomeric;
@@ -89,7 +89,7 @@ export default class Graph {
               element: 'H',
               bond: '-'
             },
-            ringbonds: []
+            ringbonds: Array()
           }, i + 1, vertex.id);
         }
       }
@@ -147,8 +147,8 @@ export default class Graph {
    * Clears all the elements in this graph (edges and vertices).
    */
   clear() {
-    this.vertices = [];
-    this.edges = [];
+    this.vertices = Array();
+    this.edges = Array();
     this.vertexIdsToEdgeId = {};
   }
 
@@ -446,7 +446,7 @@ export default class Graph {
     let adjacencyList = Array(length);
 
     for (var i = 0; i < length; i++) {
-      adjacencyList[i] = [];
+      adjacencyList[i] = Array();
 
       for (var j = 0; j < length; j++) {
         if (i === j) {
@@ -474,7 +474,7 @@ export default class Graph {
     let low = new Array(length);
     let parent = new Array(length);
     let adj = this.getAdjacencyList();
-    let outBridges = [];
+    let outBridges = Array();
 
     visited.fill(false);
     parent.fill(null);
@@ -553,21 +553,21 @@ export default class Graph {
    * @param {Number} vertexId A vertex id.
    * @param {Number} parentVertexId A neighbouring vertex.
    * @param {Function} callback The callback function that is called with each visited as an argument.
-   * @param {Number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
+   * @param {Number} [maxDepth=Number.MAX_SAFE_INTEGER] The maximum depth of the recursion.
    * @param {Boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
+   * @param {Number} [depth=1] The current depth in the tree.
+   * @param {Uint8Array} [visited=null] An array holding a flag on whether or not a node has been visited.
    */
-  traverseTree(vertexId, parentVertexId, callback, maxDepth = null, ignoreFirst = false, depth = 1, visited = []) {
-    if (maxDepth !== null && depth > maxDepth + 1) {
+  traverseTree(vertexId, parentVertexId, callback, maxDepth = Number.MAX_SAFE_INTEGER, ignoreFirst = false, depth = 1, visited = null) {
+    if (visited === null) {
+      visited = new Uint8Array(this.vertices.length);
+    }
+
+    if (depth > maxDepth + 1 || visited[vertexId] === 1) {
       return;
     }
 
-    for (var j = 0; j < visited.length; j++) {
-      if (visited[j] === vertexId) {
-        return;
-      }
-    }
-
-    visited.push(vertexId);
+    visited[vertexId] = 1;
 
     let vertex = this.vertices[vertexId];
     let neighbours = vertex.getNeighbours(parentVertexId);

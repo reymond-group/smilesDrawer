@@ -164,7 +164,7 @@ var ArrayHelper = function () {
          * @returns {*} A clone of the array or object.
          */
         value: function clone(arr) {
-            var out = Array.isArray(arr) ? [] : {};
+            var out = Array.isArray(arr) ? Array() : {};
 
             for (var key in arr) {
                 var value = arr[key];
@@ -358,7 +358,7 @@ var ArrayHelper = function () {
     }, {
         key: 'toggle',
         value: function toggle(arr, value) {
-            var newArr = [];
+            var newArr = Array();
 
             var removed = false;
             for (var i = 0; i < arr.length; i++) {
@@ -393,7 +393,7 @@ var ArrayHelper = function () {
     }, {
         key: 'remove',
         value: function remove(arr, value) {
-            var tmp = [];
+            var tmp = Array();
 
             for (var i = 0; i < arr.length; i++) {
                 if (arr[i] !== value) {
@@ -533,7 +533,7 @@ var ArrayHelper = function () {
     }, {
         key: 'deepCopy',
         value: function deepCopy(arr) {
-            var newArr = [];
+            var newArr = Array();
 
             for (var i = 0; i < arr.length; i++) {
                 var item = arr[i];
@@ -2387,11 +2387,11 @@ var Drawer = function () {
       this.ringConnectionIdCounter = 0;
 
       this.graph = new _Graph2.default(data, this.opts.isomeric);
-      this.rings = [];
-      this.ringConnections = [];
+      this.rings = Array();
+      this.ringConnections = Array();
 
-      this.originalRings = [];
-      this.originalRingConnections = [];
+      this.originalRings = Array();
+      this.originalRingConnections = Array();
 
       this.bridgedRing = false;
 
@@ -2534,7 +2534,7 @@ var Drawer = function () {
   }, {
     key: 'getBridgedRings',
     value: function getBridgedRings() {
-      var bridgedRings = [];
+      var bridgedRings = Array();
 
       for (var i = 0; i < this.rings.length; i++) {
         if (this.rings[i].isBridged) {
@@ -2554,7 +2554,7 @@ var Drawer = function () {
   }, {
     key: 'getFusedRings',
     value: function getFusedRings() {
-      var fusedRings = [];
+      var fusedRings = Array();
 
       for (var i = 0; i < this.rings.length; i++) {
         if (this.rings[i].isFused) {
@@ -2574,7 +2574,7 @@ var Drawer = function () {
   }, {
     key: 'getSpiros',
     value: function getSpiros() {
-      var spiros = [];
+      var spiros = Array();
 
       for (var i = 0; i < this.rings.length; i++) {
         if (this.rings[i].isSpiro) {
@@ -2837,7 +2837,7 @@ var Drawer = function () {
   }, {
     key: 'getBridgedRingRings',
     value: function getBridgedRingRings(ringId) {
-      var involvedRings = [];
+      var involvedRings = Array();
       var that = this;
 
       var recurse = function recurse(r) {
@@ -2951,8 +2951,8 @@ var Drawer = function () {
         }
       }
 
-      var tmp = [];
-      var insideRing = [];
+      var tmp = Array();
+      var insideRing = Array();
 
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
@@ -3124,7 +3124,7 @@ var Drawer = function () {
   }, {
     key: 'getCommonRings',
     value: function getCommonRings(vertexA, vertexB) {
-      var commonRings = [];
+      var commonRings = Array();
 
       for (var i = 0; i < vertexA.value.rings.length; i++) {
         for (var j = 0; j < vertexB.value.rings.length; j++) {
@@ -3179,7 +3179,7 @@ var Drawer = function () {
   }, {
     key: 'getVerticesAt',
     value: function getVerticesAt(position, radius, excludeVertexId) {
-      var locals = [];
+      var locals = Array();
 
       for (var i = 0; i < this.graph.vertices.length; i++) {
         var vertex = this.graph.vertices[i];
@@ -3329,7 +3329,7 @@ var Drawer = function () {
   }, {
     key: 'removeRingConnectionsBetween',
     value: function removeRingConnectionsBetween(vertexIdA, vertexIdB) {
-      var toRemove = [];
+      var toRemove = Array();
       for (var i = 0; i < this.ringConnections.length; i++) {
         var ringConnection = this.ringConnections[i];
 
@@ -3371,7 +3371,7 @@ var Drawer = function () {
   }, {
     key: 'getRingConnections',
     value: function getRingConnections(ringId, ringIds) {
-      var ringConnections = [];
+      var ringConnections = Array();
 
       for (var i = 0; i < this.ringConnections.length; i++) {
         var rc = this.ringConnections[i];
@@ -3425,7 +3425,7 @@ var Drawer = function () {
         }
       }
 
-      var sortable = [];
+      var sortable = Array();
 
       for (var i = 0; i < this.graph.vertices.length; i++) {
         sortable.push({
@@ -3856,8 +3856,8 @@ var Drawer = function () {
   }, {
     key: 'backupRingInformation',
     value: function backupRingInformation() {
-      this.originalRings = [];
-      this.originalRingConnections = [];
+      this.originalRings = Array();
+      this.originalRingConnections = Array();
 
       for (var i = 0; i < this.rings.length; i++) {
         this.originalRings.push(this.rings[i]);
@@ -3882,8 +3882,8 @@ var Drawer = function () {
       // Get the subring centers from the bridged rings
       var bridgedRings = this.getBridgedRings();
 
-      this.rings = [];
-      this.ringConnections = [];
+      this.rings = Array();
+      this.ringConnections = Array();
 
       for (var i = 0; i < bridgedRings.length; i++) {
         var bridgedRing = bridgedRings[i];
@@ -4082,7 +4082,7 @@ var Drawer = function () {
           }
 
           v.value.isConnectedToRing = true;
-          this.createNextBond(v, ringMember, this.getSubringCenter(ring, ringMember));
+          this.createNextBond(v, ringMember);
         }
       }
 
@@ -4214,7 +4214,7 @@ var Drawer = function () {
   }, {
     key: 'resolvePrimaryOverlaps',
     value: function resolvePrimaryOverlaps() {
-      var overlaps = [];
+      var overlaps = Array();
       var done = Array(this.graph.vertices.length);
 
       // Looking for overlaps created by two bonds coming out of a ring atom, which both point straight
@@ -4235,7 +4235,7 @@ var Drawer = function () {
           var nonRingNeighbours = this.getNonRingNeighbours(vertex.id);
 
           if (nonRingNeighbours.length > 1) {
-            var rings = [];
+            var rings = Array();
 
             for (var k = 0; k < vertex.value.rings.length; k++) {
               rings.push(vertex.value.rings[k]);
@@ -4329,15 +4329,18 @@ var Drawer = function () {
      * Positiones the next vertex thus creating a bond.
      *
      * @param {Vertex} vertex A vertex.
-     * @param {Vertex} previousVertex The previous vertex which has been positioned.
-     * @param {(Ring|Number)} ringOrAngle Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.
-     * @param {Number} dir Either 1 or -1 to break ties (if no angle can be elucidated).
+     * @param {Vertex} [previousVertex=null] The previous vertex which has been positioned.
+     * @param {Number} [previousAngle=0.0] The global angle of the previous vertex.
+     * @param {Number} [dir=1] Either 1 or -1 to break ties (if no angle can be elucidated).
      * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
      */
 
   }, {
     key: 'createNextBond',
-    value: function createNextBond(vertex, previousVertex, ringOrAngle, dir) {
+    value: function createNextBond(vertex) {
+      var previousVertex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var previousAngle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.0;
+      var dir = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
       var skipPositioning = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
       if (vertex.positioned && !skipPositioning) {
@@ -4349,12 +4352,9 @@ var Drawer = function () {
       // two rings, point away from the middle of the centers of the two rings
       if (!skipPositioning) {
         if (!previousVertex) {
-          // Here, ringOrAngle is always an angle
-
           // Add a (dummy) previous position if there is no previous vertex defined
           // Since the first vertex is at (0, 0), create a vector at (bondLength, 0)
           // and rotate it by 90°
-
 
           var dummy = new _Vector2.default(this.opts.bondLength, 0);
           dummy.rotate(_MathHelper2.default.toRad(-120));
@@ -4417,15 +4417,13 @@ var Drawer = function () {
           vertex.setPositionFromVector(_avg);
           vertex.positioned = true;
         } else {
-          // Here, ringOrAngle is always an angle
-
           // If the previous vertex was not part of a ring, draw a bond based
           // on the global angle of the previous bond
           var v = new _Vector2.default(this.opts.bondLength, 0);
-          v.rotate(ringOrAngle);
+          v.rotate(previousAngle);
           v.add(previousVertex.position);
 
-          vertex.globalAngle = ringOrAngle;
+          vertex.globalAngle = previousAngle;
           vertex.setPositionFromVector(v);
           vertex.previousPosition = previousVertex.position;
           vertex.positioned = true;
@@ -4909,7 +4907,7 @@ var Drawer = function () {
   }, {
     key: 'getNonRingNeighbours',
     value: function getNonRingNeighbours(vertexId) {
-      var nrneighbours = [];
+      var nrneighbours = Array();
       var vertex = this.graph.vertices[vertexId];
       var neighbours = vertex.getNeighbours();
 
@@ -4930,6 +4928,7 @@ var Drawer = function () {
       var _this = this;
 
       var maxDepth = 10;
+
       // For each stereo-center
 
       var _loop = function _loop() {
@@ -5014,10 +5013,10 @@ var Drawer = function () {
       for (var i = 0; i < this.graph.vertices.length; i++) {
         var _vertex4 = this.graph.vertices[i];
         var neighbourIds = _vertex4.getNeighbours();
-        var _neighbours3 = [];
+        var _neighbours3 = Array(neighbourIds.length);
 
         for (var j = 0; j < neighbourIds.length; j++) {
-          _neighbours3.push(this.graph.vertices[neighbourIds[j]]);
+          _neighbours3[j] = this.graph.vertices[neighbourIds[j]];
         }
 
         // Ignore atoms that have less than 3 neighbours, except if
@@ -5090,10 +5089,10 @@ var Drawer = function () {
         }
 
         var _neighbourIds = _vertex5.getNeighbours();
-        var _neighbours4 = [];
+        var _neighbours4 = Array(_neighbourIds.length);
 
         for (var j = 0; j < _neighbourIds.length; j++) {
-          _neighbours4.push(this.graph.vertices[_neighbourIds[j]]);
+          _neighbours4[j] = this.graph.vertices[_neighbourIds[j]];
         }
 
         for (var j = 0; j < _neighbours4.length; j++) {
@@ -5266,8 +5265,8 @@ var Graph = function () {
 
     _classCallCheck(this, Graph);
 
-    this.vertices = [];
-    this.edges = [];
+    this.vertices = Array();
+    this.edges = Array();
     this.vertexIdsToEdgeId = {};
     this.elementCount = {};
     this.isomeric = isomeric;
@@ -5340,7 +5339,7 @@ var Graph = function () {
                 element: 'H',
                 bond: '-'
               },
-              ringbonds: []
+              ringbonds: Array()
             }, i + 1, vertex.id);
           }
         }
@@ -5404,8 +5403,8 @@ var Graph = function () {
   }, {
     key: 'clear',
     value: function clear() {
-      this.vertices = [];
-      this.edges = [];
+      this.vertices = Array();
+      this.edges = Array();
       this.vertexIdsToEdgeId = {};
     }
 
@@ -5744,7 +5743,7 @@ var Graph = function () {
       var adjacencyList = Array(length);
 
       for (var i = 0; i < length; i++) {
-        adjacencyList[i] = [];
+        adjacencyList[i] = Array();
 
         for (var j = 0; j < length; j++) {
           if (i === j) {
@@ -5775,7 +5774,7 @@ var Graph = function () {
       var low = new Array(length);
       var parent = new Array(length);
       var adj = this.getAdjacencyList();
-      var outBridges = [];
+      var outBridges = Array();
 
       visited.fill(false);
       parent.fill(null);
@@ -5860,29 +5859,29 @@ var Graph = function () {
      * @param {Number} vertexId A vertex id.
      * @param {Number} parentVertexId A neighbouring vertex.
      * @param {Function} callback The callback function that is called with each visited as an argument.
-     * @param {Number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
+     * @param {Number} [maxDepth=Number.MAX_SAFE_INTEGER] The maximum depth of the recursion.
      * @param {Boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
+     * @param {Number} [depth=1] The current depth in the tree.
+     * @param {Uint8Array} [visited=null] An array holding a flag on whether or not a node has been visited.
      */
 
   }, {
     key: 'traverseTree',
     value: function traverseTree(vertexId, parentVertexId, callback) {
-      var maxDepth = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      var maxDepth = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : Number.MAX_SAFE_INTEGER;
       var ignoreFirst = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
       var depth = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
-      var visited = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : [];
+      var visited = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
 
-      if (maxDepth !== null && depth > maxDepth + 1) {
+      if (visited === null) {
+        visited = new Uint8Array(this.vertices.length);
+      }
+
+      if (depth > maxDepth + 1 || visited[vertexId] === 1) {
         return;
       }
 
-      for (var j = 0; j < visited.length; j++) {
-        if (visited[j] === vertexId) {
-          return;
-        }
-      }
-
-      visited.push(vertexId);
+      visited[vertexId] = 1;
 
       var vertex = this.vertices[vertexId];
       var neighbours = vertex.getNeighbours(parentVertexId);
@@ -9354,10 +9353,10 @@ var SSSR = function () {
                     if (d[i][j] === 1) {
                         pe[i][j] = [[[i, j]]];
                     } else {
-                        pe[i][j] = [];
+                        pe[i][j] = Array();
                     }
 
-                    pe_prime[i][j] = [];
+                    pe_prime[i][j] = Array();
                 }
             }
 
@@ -9388,7 +9387,7 @@ var SSSR = function () {
                                     }
                                 }
                             } else {
-                                pe_prime[i][j] = [];
+                                pe_prime[i][j] = Array();
                             }
 
                             d[i][j] = newPathLength;
@@ -9408,7 +9407,7 @@ var SSSR = function () {
                             if (pe[i][k].length && pe[k][j].length) {
                                 var l;
                                 if (pe[i][j].length) {
-                                    var tmp = [];
+                                    var tmp = Array();
 
                                     l = pe[i][k][0].length;
                                     while (l--) {
@@ -9422,7 +9421,7 @@ var SSSR = function () {
 
                                     pe[i][j].push(tmp);
                                 } else {
-                                    var _tmp = [];
+                                    var _tmp = Array();
                                     l = pe[i][k][0].length;
                                     while (l--) {
                                         _tmp.push(pe[i][k][0][l]);
@@ -9439,7 +9438,7 @@ var SSSR = function () {
                         } else if (previousPathLength === newPathLength - 1) {
                             var l;
                             if (pe_prime[i][j].length) {
-                                var _tmp2 = [];
+                                var _tmp2 = Array();
 
                                 l = pe[i][k][0].length;
                                 while (l--) {
@@ -9453,7 +9452,7 @@ var SSSR = function () {
 
                                 pe_prime[i][j].push(_tmp2);
                             } else {
-                                var _tmp3 = [];
+                                var _tmp3 = Array();
 
                                 l = pe[i][k][0].length;
                                 while (l--) {
@@ -9492,7 +9491,7 @@ var SSSR = function () {
         key: 'getRingCandidates',
         value: function getRingCandidates(d, pe, pe_prime) {
             var length = d.length;
-            var candidates = [];
+            var candidates = Array();
             var c = 0;
 
             for (var i = 0; i < length; i++) {
@@ -9539,8 +9538,8 @@ var SSSR = function () {
     }, {
         key: 'getSSSR',
         value: function getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) {
-            var cSssr = [];
-            var allBonds = [];
+            var cSssr = Array();
+            var allBonds = Array();
 
             for (var i = 0; i < c.length; i++) {
                 if (c[i][0] % 2 !== 0) {
@@ -9628,7 +9627,7 @@ var SSSR = function () {
         key: 'getEdgeList',
         value: function getEdgeList(adjacencyMatrix) {
             var length = adjacencyMatrix.length;
-            var edgeList = [];
+            var edgeList = Array();
 
             var i = length - 1;
             while (i--) {
@@ -10738,16 +10737,16 @@ var Vertex = function () {
         this.position = new _Vector2.default(x ? x : 0, y ? y : 0);
         this.previousPosition = new _Vector2.default(0, 0);
         this.parentVertexId = null;
-        this.children = [];
-        this.spanningTreeChildren = [];
-        this.edges = [];
+        this.children = Array();
+        this.spanningTreeChildren = Array();
+        this.edges = Array();
         this.positioned = false;
         this.angle = 0.0;
         this.globalAngle = 0.0;
         this.dir = 1.0;
         this.neighbourCount = 0;
-        this.neighbours = [];
-        this.neighbouringElements = [];
+        this.neighbours = Array();
+        this.neighbouringElements = Array();
         this.forcePositioned = false;
     }
 
@@ -10903,7 +10902,7 @@ var Vertex = function () {
         key: 'getTextDirection',
         value: function getTextDirection(vertices) {
             var neighbours = this.getDrawnNeighbours(vertices);
-            var angles = [];
+            var angles = Array();
 
             for (var i = 0; i < neighbours.length; i++) {
                 angles.push(this.getAngle(vertices[neighbours[i]].position));
@@ -10944,7 +10943,7 @@ var Vertex = function () {
                 return this.neighbours;
             }
 
-            var arr = [];
+            var arr = Array();
 
             for (var i = 0; i < this.neighbours.length; i++) {
                 if (this.neighbours[i] !== vertexId) {
@@ -10965,7 +10964,7 @@ var Vertex = function () {
     }, {
         key: 'getDrawnNeighbours',
         value: function getDrawnNeighbours(vertices) {
-            var arr = [];
+            var arr = Array();
 
             for (var i = 0; i < this.neighbours.length; i++) {
                 if (vertices[this.neighbours[i]].value.isDrawn) {
@@ -11000,7 +10999,7 @@ var Vertex = function () {
         value: function getSpanningTreeNeighbours() {
             var vertexId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-            var neighbours = [];
+            var neighbours = Array();
 
             for (var i = 0; i < this.spanningTreeChildren.length; i++) {
                 if (vertexId === undefined || vertexId != this.spanningTreeChildren[i]) {

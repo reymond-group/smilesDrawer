@@ -570,7 +570,7 @@ export default class CanvasWrapper {
         let isotopeWidth = 0;
 
         if (isotope > 0) {
-            isotopeText = isotope;
+            isotopeText = isotope.toString();
             ctx.font = this.fontSmall;
             isotopeWidth = ctx.measureText(isotopeText).width;
         }

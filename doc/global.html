@@ -6509,7 +6509,7 @@
 
     
 
-    <h4 class="name" id="createNextBond"><span class="type-signature"></span>createNextBond<span class="signature">(vertex, previousVertex, ringOrAngle, dir, skipPositioning<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="createNextBond"><span class="type-signature"></span>createNextBond<span class="signature">(vertex, previousVertex<span class="signature-attributes">opt</span>, previousAngle<span class="signature-attributes">opt</span>, dir<span class="signature-attributes">opt</span>, skipPositioning<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -6653,6 +6653,8 @@
             
                 <td class="attributes">
                 
+                    &lt;optional><br>
+                
 
                 
 
@@ -6662,6 +6664,8 @@
 
             
                 <td class="default">
+                
+                    <code>null</code>
                 
                 </td>
             
@@ -6673,15 +6677,12 @@
 
         <tr>
             
-                <td class="name"><code>ringOrAngle</code></td>
+                <td class="name"><code>previousAngle</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Ring</span>
-|
-
 <span class="param-type">Number</span>
 
 
@@ -6690,6 +6691,8 @@
 
             
                 <td class="attributes">
+                
+                    &lt;optional><br>
                 
 
                 
@@ -6701,10 +6704,12 @@
             
                 <td class="default">
                 
+                    <code>0.0</code>
+                
                 </td>
             
 
-            <td class="description last"><p>Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied.</p></td>
+            <td class="description last"><p>The global angle of the previous vertex.</p></td>
         </tr>
 
     
@@ -6726,6 +6731,8 @@
             
                 <td class="attributes">
                 
+                    &lt;optional><br>
+                
 
                 
 
@@ -6735,6 +6742,8 @@
 
             
                 <td class="default">
+                
+                    <code>1</code>
                 
                 </td>
             
@@ -13101,7 +13110,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2419">line 2419</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2414">line 2414</a>
     </li></ul></dd>
     
 
@@ -14111,7 +14120,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2297">line 2297</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2292">line 2292</a>
     </li></ul></dd>
     
 
@@ -16419,7 +16428,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2403">line 2403</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2398">line 2398</a>
     </li></ul></dd>
     
 
@@ -18206,7 +18215,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2435">line 2435</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2430">line 2430</a>
     </li></ul></dd>
     
 
@@ -24405,7 +24414,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2520">line 2520</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2516">line 2516</a>
     </li></ul></dd>
     
 
@@ -25547,7 +25556,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2342">line 2342</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2337">line 2337</a>
     </li></ul></dd>
     
 
@@ -25702,7 +25711,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2355">line 2355</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2350">line 2350</a>
     </li></ul></dd>
     
 
@@ -26167,7 +26176,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2317">line 2317</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2312">line 2312</a>
     </li></ul></dd>
     
 
@@ -26322,7 +26331,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2385">line 2385</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2380">line 2380</a>
     </li></ul></dd>
     
 
@@ -37313,7 +37322,7 @@ the involved atoms not to be displayed.</p>
 
     
 
-    <h4 class="name" id="traverseTree"><span class="type-signature"></span>traverseTree<span class="signature">(vertexId, parentVertexId, callback, maxDepth<span class="signature-attributes">opt</span>, ignoreFirst<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="traverseTree"><span class="type-signature"></span>traverseTree<span class="signature">(vertexId, parentVertexId, callback, maxDepth<span class="signature-attributes">opt</span>, ignoreFirst<span class="signature-attributes">opt</span>, depth<span class="signature-attributes">opt</span>, visited<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -37325,7 +37334,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Graph.js.html">Graph.js</a>, <a href="Graph.js.html#line559">line 559</a>
+        <a href="Graph.js.html">Graph.js</a>, <a href="Graph.js.html#line561">line 561</a>
     </li></ul></dd>
     
 
@@ -37539,12 +37548,12 @@ the involved atoms not to be displayed.</p>
             
                 <td class="default">
                 
-                    <code>null</code>
+                    <code>Number.MAX_SAFE_INTEGER</code>
                 
                 </td>
             
 
-            <td class="description last"><p>The maximum depth of the recursion. If null, there is no limit.</p></td>
+            <td class="description last"><p>The maximum depth of the recursion.</p></td>
         </tr>
 
     
@@ -37584,6 +37593,84 @@ the involved atoms not to be displayed.</p>
             
 
             <td class="description last"><p>Whether or not to ignore the starting vertex supplied as vertexId in the callback.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>depth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>1</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>The current depth in the tree.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>visited</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Uint8Array</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>An array holding a flag on whether or not a node has been visited.</p></td>
         </tr>
 
     
@@ -38446,7 +38533,7 @@ the involved atoms not to be displayed.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 02 2017 14:59:12 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 02 2017 15:52:32 GMT+0100 (CET) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

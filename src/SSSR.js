@@ -118,10 +118,10 @@ export default class SSSR {
                 if (d[i][j] === 1) {
                     pe[i][j] = [[[i, j]]];
                 } else {
-                    pe[i][j] = [];
+                    pe[i][j] = Array();
                 }
 
-                pe_prime[i][j] = [];
+                pe_prime[i][j] = Array();
             }
         }
 
@@ -152,7 +152,7 @@ export default class SSSR {
                                 }
                             }
                         } else {
-                            pe_prime[i][j] = [];
+                            pe_prime[i][j] = Array();
                         }
 
                         d[i][j] = newPathLength;
@@ -172,7 +172,7 @@ export default class SSSR {
                         if (pe[i][k].length && pe[k][j].length) {
                             var l;
                             if (pe[i][j].length) {
-                                let tmp = [];
+                                let tmp = Array();
 
                                 l = pe[i][k][0].length;
                                 while (l--) {
@@ -186,7 +186,7 @@ export default class SSSR {
 
                                 pe[i][j].push(tmp);
                             } else {
-                                let tmp = [];
+                                let tmp = Array();
                                 l = pe[i][k][0].length;
                                 while (l--) {
                                     tmp.push(pe[i][k][0][l]);
@@ -203,7 +203,7 @@ export default class SSSR {
                     } else if (previousPathLength === newPathLength - 1) {
                         var l;
                         if (pe_prime[i][j].length) {
-                            let tmp = [];
+                            let tmp = Array();
                             
                             l = pe[i][k][0].length;
                             while (l--) {
@@ -217,7 +217,7 @@ export default class SSSR {
 
                             pe_prime[i][j].push(tmp);
                         } else {
-                            let tmp = [];
+                            let tmp = Array();
 
                             l = pe[i][k][0].length;
                             while (l--) {
@@ -253,7 +253,7 @@ export default class SSSR {
      */
     static getRingCandidates(d, pe, pe_prime) {
         let length = d.length;
-        let candidates = [];
+        let candidates = Array();
         let c = 0;
 
         for (let i = 0; i < length; i++) {
@@ -297,8 +297,8 @@ export default class SSSR {
      * @returns {Set[]} The smallest set of smallest rings.
      */
     static getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) {
-        let cSssr = [];
-        let allBonds = [];
+        let cSssr = Array();
+        let allBonds = Array();
 
         for (let i = 0; i < c.length; i++) {
             if (c[i][0] % 2 !== 0) {
@@ -380,7 +380,7 @@ export default class SSSR {
      */
     static getEdgeList(adjacencyMatrix) {
         let length = adjacencyMatrix.length;
-        let edgeList = [];
+        let edgeList = Array();
 
         var i = length - 1;
         while (i--) {

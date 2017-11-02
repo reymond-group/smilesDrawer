@@ -12,7 +12,7 @@ export default class ArrayHelper {
      * @returns {*} A clone of the array or object.
      */
     static clone(arr) {
-        let out = Array.isArray(arr) ? [] : {};
+        let out = Array.isArray(arr) ? Array() : {};
         
         for (let key in arr) {
             let value = arr[key];
@@ -183,7 +183,7 @@ export default class ArrayHelper {
      * @returns {Array} The toggled array.
      */
     static toggle(arr, value) {
-        let newArr = [];
+        let newArr = Array();
 
         let removed = false;
         for (let i = 0; i < arr.length; i++) {
@@ -215,7 +215,7 @@ export default class ArrayHelper {
      * @returns {Array} A new array with the element with a given value removed.
      */
     static remove(arr, value) {
-        let tmp = [];
+        let tmp = Array();
 
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] !== value) {
@@ -337,7 +337,7 @@ export default class ArrayHelper {
      * @returns {Array} The copy.
      */
     static deepCopy(arr) {
-        let newArr = [];
+        let newArr = Array();
 
         for (let i = 0; i < arr.length; i++) {
             let item = arr[i];

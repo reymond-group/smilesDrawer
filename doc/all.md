@@ -3,14 +3,176 @@
 ## Members
 
 <dl>
-<dt><a href="#SmilesDrawer">SmilesDrawer</a></dt>
-<dd><p>The SmilesDrawer namespace.</p>
+<dt><a href="#maxBonds">maxBonds</a></dt>
+<dd><p>A map mapping element symbols to their maximum bonds.</p>
+</dd>
+<dt><a href="#atomicNumbers">atomicNumbers</a></dt>
+<dd><p>A map mapping element symbols to the atomic number.</p>
+</dd>
+<dt><a href="#mass">mass</a></dt>
+<dd><p>A map mapping element symbols to the atomic mass.</p>
+</dd>
+<dt><a href="#bonds">bonds</a> ⇒ <code>Object</code></dt>
+<dd><p>An object mapping the bond type to the number of bonds.</p>
+</dd>
+<dt><a href="#radFactor">radFactor</a></dt>
+<dd><p>The factor to convert degrees to radians.</p>
+</dd>
+<dt><a href="#degFactor">degFactor</a></dt>
+<dd><p>The factor to convert radians to degrees.</p>
+</dd>
+<dt><a href="#twoPI">twoPI</a></dt>
+<dd><p>Two times PI.</p>
 </dd>
 </dl>
 
 ## Functions
 
 <dl>
+<dt><a href="#clone">clone(arr)</a> ⇒ <code>*</code></dt>
+<dd><p>Clone an array or an object. If an object is passed, a shallow clone will be created.</p>
+</dd>
+<dt><a href="#print">print(arr)</a> ⇒ <code>String</code></dt>
+<dd><p>Returns a string representation of an array. If the array contains objects with an id property, the id property is printed for each of the elements.</p>
+</dd>
+<dt><a href="#each">each(arr, callback)</a></dt>
+<dd><p>Run a function for each element in the array. The element is supplied as an argument for the callback function</p>
+</dd>
+<dt><a href="#get">get(arr, property, value)</a> ⇒ <code>*</code></dt>
+<dd><p>Return the array element from an array containing objects, where a property of the object is set to a given value.</p>
+</dd>
+<dt><a href="#contains">contains(arr, options)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not an array contains a given value. the options object passed as a second argument can contain three properties. value: The value to be searched for. property: The property that is to be searched for a given value. func: A function that is used as a callback to return either true or false in order to do a custom comparison.</p>
+</dd>
+<dt><a href="#intersection">intersection(arrA, arrB)</a> ⇒ <code>Array</code></dt>
+<dd><p>Returns an array containing the intersection between two arrays. That is, values that are common to both arrays.</p>
+</dd>
+<dt><a href="#unique">unique(arr)</a> ⇒ <code>Array</code></dt>
+<dd><p>Returns an array of unique elements contained in an array.</p>
+</dd>
+<dt><a href="#count">count(arr, value)</a> ⇒ <code>Number</code></dt>
+<dd><p>Count the number of occurences of a value in an array.</p>
+</dd>
+<dt><a href="#toggle">toggle(arr, value)</a> ⇒ <code>Array</code></dt>
+<dd><p>Toggles the value of an array. If a value is not contained in an array, the array returned will contain all the values of the original array including the value. If a value is contained in an array, the array returned will contain all the values of the original array excluding the value.</p>
+</dd>
+<dt><a href="#remove">remove(arr, value)</a> ⇒ <code>Array</code></dt>
+<dd><p>Remove a value from an array.</p>
+</dd>
+<dt><a href="#removeUnique">removeUnique(arr, value)</a> ⇒ <code>Array</code></dt>
+<dd><p>Remove a value from an array with unique values.</p>
+</dd>
+<dt><a href="#removeAll">removeAll(arrA, arrB)</a> ⇒ <code>Array</code></dt>
+<dd><p>Remove all elements contained in one array from another array.</p>
+</dd>
+<dt><a href="#merge">merge(arrA, arrB)</a> ⇒ <code>Array</code></dt>
+<dd><p>Merges two arrays and returns the result. The first array will be appended to the second array.</p>
+</dd>
+<dt><a href="#containsAll">containsAll(arrA, arrB)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not an array contains all the elements of another array, without regard to the order.</p>
+</dd>
+<dt><a href="#sortByAtomicNumberDesc">sortByAtomicNumberDesc(arr)</a> ⇒ <code>Array.&lt;Object&gt;</code></dt>
+<dd><p>Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...</p>
+</dd>
+<dt><a href="#deepCopy">deepCopy(arr)</a> ⇒ <code>Array</code></dt>
+<dd><p>Copies a an n-dimensional array.</p>
+</dd>
+<dt><a href="#addNeighbouringElement">addNeighbouringElement(element)</a></dt>
+<dd><p>Adds a neighbouring element to this atom.</p>
+</dd>
+<dt><a href="#attachPseudoElement">attachPseudoElement(element, previousElement, [hydrogenCount])</a></dt>
+<dd><p>Attaches a pseudo element (e.g. Ac) to the atom.</p>
+</dd>
+<dt><a href="#getAttachedPseudoElements">getAttachedPseudoElements()</a> ⇒ <code>Object</code></dt>
+<dd><p>Returns the attached pseudo elements sorted by hydrogen count (ascending).</p>
+</dd>
+<dt><a href="#getAttachedPseudoElementsCount">getAttachedPseudoElementsCount()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the number of attached pseudo elements.</p>
+</dd>
+<dt><a href="#addAnchoredRing">addAnchoredRing(ringId)</a></dt>
+<dd><p>Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.</p>
+</dd>
+<dt><a href="#getRingbondCount">getRingbondCount()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the number of ringbonds (breaks in rings to generate the MST of the smiles) within this atom is connected to.</p>
+</dd>
+<dt><a href="#backupRings">backupRings()</a></dt>
+<dd><p>Backs up the current rings.</p>
+</dd>
+<dt><a href="#restoreRings">restoreRings()</a></dt>
+<dd><p>Restores the most recent backed up rings.</p>
+</dd>
+<dt><a href="#haveCommonRingbond">haveCommonRingbond(atomA, atomB)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.</p>
+</dd>
+<dt><a href="#getOrder">getOrder(center)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the order of this atom given a central atom.</p>
+</dd>
+<dt><a href="#setOrder">setOrder(center, order)</a></dt>
+<dd><p>Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.</p>
+</dd>
+<dt><a href="#neighbouringElementsEqual">neighbouringElementsEqual(arr)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Check whether or not the neighbouring elements of this atom equal the supplied array.</p>
+</dd>
+<dt><a href="#getAtomicNumber">getAtomicNumber()</a> ⇒ <code>Number</code></dt>
+<dd><p>Get the atomic number of this atom.</p>
+</dd>
+<dt><a href="#sortByAtomicNumber">sortByAtomicNumber(root, neighbours, vertices, rings)</a> ⇒ <code>Array.&lt;Object&gt;</code></dt>
+<dd><p>Sorts an array of vertices by their respecitve atomic number.</p>
+</dd>
+<dt><a href="#hasDuplicateAtomicNumbers">hasDuplicateAtomicNumbers(sortedAtomicNumbers)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks wheter or not two atoms have the same atomic number</p>
+</dd>
+<dt><a href="#getDuplicateAtomicNumbers">getDuplicateAtomicNumbers(sortedAtomicNumbers)</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Returns sets of duplicate atomic numbers.</p>
+</dd>
+<dt><a href="#updateSize">updateSize(width, height)</a></dt>
+<dd><p>Update the width and height of the canvas</p>
+</dd>
+<dt><a href="#setTheme">setTheme(theme)</a></dt>
+<dd><p>Sets a provided theme.</p>
+</dd>
+<dt><a href="#scale">scale(vertices)</a></dt>
+<dd><p>Scale the canvas based on vertex positions.</p>
+</dd>
+<dt><a href="#reset">reset()</a></dt>
+<dd><p>Resets the transform of the canvas.</p>
+</dd>
+<dt><a href="#getColor">getColor(key)</a> ⇒ <code>String</code></dt>
+<dd><p>Returns the hex code of a color associated with a key from the current theme.</p>
+</dd>
+<dt><a href="#drawCircle">drawCircle(x, y, radius, color, [fill], [debug], [debugText])</a></dt>
+<dd><p>Draws a circle to a canvas context.</p>
+</dd>
+<dt><a href="#drawLine">drawLine(line, [dashed], [alpha])</a></dt>
+<dd><p>Draw a line to a canvas.</p>
+</dd>
+<dt><a href="#drawWedge">drawWedge(line, width)</a></dt>
+<dd><p>Draw a wedge on the canvas.</p>
+</dd>
+<dt><a href="#drawDashedWedge">drawDashedWedge(line, width)</a></dt>
+<dd><p>Draw a dashed wedge on the canvas.</p>
+</dd>
+<dt><a href="#drawDebugText">drawDebugText(x, y, text)</a></dt>
+<dd><p>Draws a debug text message at a given position</p>
+</dd>
+<dt><a href="#drawBall">drawBall(x, y, elementName)</a></dt>
+<dd><p>Draw a ball to the canvas.</p>
+</dd>
+<dt><a href="#drawPoint">drawPoint(x, y, elementName)</a></dt>
+<dd><p>Draw a point to the canvas.</p>
+</dd>
+<dt><a href="#drawText">drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)</a></dt>
+<dd><p>Draw a text to the canvas.</p>
+</dd>
+<dt><a href="#drawDebugPoint">drawDebugPoint(x, y, [debugText], [color])</a></dt>
+<dd><p>Draws a dubug dot at a given coordinate and adds text.</p>
+</dd>
+<dt><a href="#drawAromaticityRing">drawAromaticityRing(ring)</a></dt>
+<dd><p>Draws a ring inside a provided ring, indicating aromaticity.</p>
+</dd>
+<dt><a href="#clear">clear()</a></dt>
+<dd><p>Clear the canvas.</p>
+</dd>
 <dt><a href="#extend">extend()</a></dt>
 <dd><p>A helper method to extend the default options with user supplied ones.</p>
 </dd>
@@ -20,13 +182,13 @@
 <dt><a href="#edgeRingCount">edgeRingCount(edgeId)</a> ⇒ <code>Number</code></dt>
 <dd><p>Returns the number of rings this edge is a part of.</p>
 </dd>
-<dt><a href="#getBridgedRings">getBridgedRings()</a> ⇒ <code><a href="#SmilesDrawer.Ring">Array.&lt;Ring&gt;</a></code></dt>
+<dt><a href="#getBridgedRings">getBridgedRings()</a> ⇒ <code>Array.&lt;Ring&gt;</code></dt>
 <dd><p>Returns an array containing the bridged rings associated with this  molecule.</p>
 </dd>
-<dt><a href="#getFusedRings">getFusedRings()</a> ⇒ <code><a href="#SmilesDrawer.Ring">Array.&lt;Ring&gt;</a></code></dt>
+<dt><a href="#getFusedRings">getFusedRings()</a> ⇒ <code>Array.&lt;Ring&gt;</code></dt>
 <dd><p>Returns an array containing all fused rings associated with this molecule.</p>
 </dd>
-<dt><a href="#getSpiros">getSpiros()</a> ⇒ <code><a href="#SmilesDrawer.Ring">Array.&lt;Ring&gt;</a></code></dt>
+<dt><a href="#getSpiros">getSpiros()</a> ⇒ <code>Array.&lt;Ring&gt;</code></dt>
 <dd><p>Returns an array containing all spiros associated with this molecule.</p>
 </dd>
 <dt><a href="#printRingInfo">printRingInfo()</a> ⇒ <code>String</code></dt>
@@ -56,7 +218,7 @@
 <dt><a href="#isPartOfBridgedRing">isPartOfBridgedRing(ringId)</a> ⇒ <code>Boolean</code></dt>
 <dd><p>Checks whether or not a ring is part of a bridged ring.</p>
 </dd>
-<dt><a href="#createBridgedRing">createBridgedRing(ringIds, sourceVertexId)</a> ⇒ <code><a href="#SmilesDrawer.Ring">Ring</a></code></dt>
+<dt><a href="#createBridgedRing">createBridgedRing(ringIds, sourceVertexId)</a> ⇒ <code>Ring</code></dt>
 <dd><p>Creates a bridged ring.</p>
 </dd>
 <dt><a href="#areVerticesInSameRing">areVerticesInSameRing(vertexA, vertexB)</a> ⇒ <code>Boolean</code></dt>
@@ -65,13 +227,13 @@
 <dt><a href="#getCommonRings">getCommonRings(vertexA, vertexB)</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
 <dd><p>Returns an array of ring ids shared by both vertices.</p>
 </dd>
-<dt><a href="#getLargestOrAromaticCommonRing">getLargestOrAromaticCommonRing(vertexA, vertexB)</a> ⇒ <code><a href="#SmilesDrawer.Ring">Ring</a></code> | <code>null</code></dt>
+<dt><a href="#getLargestOrAromaticCommonRing">getLargestOrAromaticCommonRing(vertexA, vertexB)</a> ⇒ <code>Ring</code> | <code>null</code></dt>
 <dd><p>Returns the aromatic or largest ring shared by the two vertices.</p>
 </dd>
 <dt><a href="#getVerticesAt">getVerticesAt(position, radius, excludeVertexId)</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
 <dd><p>Returns an array of vertices positioned at a specified location.</p>
 </dd>
-<dt><a href="#getClosestVertex">getClosestVertex(vertex)</a> ⇒ <code><a href="#SmilesDrawer.Vertex">Vertex</a></code></dt>
+<dt><a href="#getClosestVertex">getClosestVertex(vertex)</a> ⇒ <code>Vertex</code></dt>
 <dd><p>Returns the closest vertex (connected as well as unconnected).</p>
 </dd>
 <dt><a href="#addRing">addRing(ring)</a> ⇒ <code>Number</code></dt>
@@ -80,7 +242,7 @@
 <dt><a href="#removeRing">removeRing(ringId)</a></dt>
 <dd><p>Removes a ring from the array of rings associated with the current molecule.</p>
 </dd>
-<dt><a href="#getRing">getRing(ringId)</a> ⇒ <code><a href="#SmilesDrawer.Ring">Ring</a></code></dt>
+<dt><a href="#getRing">getRing(ringId)</a> ⇒ <code>Ring</code></dt>
 <dd><p>Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.</p>
 </dd>
 <dt><a href="#addRingConnection">addRingConnection(ringConnection)</a> ⇒ <code>Number</code></dt>
@@ -92,7 +254,7 @@
 <dt><a href="#removeRingConnectionsBetween">removeRingConnectionsBetween(vertexIdA, vertexIdB)</a></dt>
 <dd><p>Removes all ring connections between two vertices.</p>
 </dd>
-<dt><a href="#getRingConnection">getRingConnection(id)</a> ⇒ <code><a href="#SmilesDrawer.RingConnection">RingConnection</a></code></dt>
+<dt><a href="#getRingConnection">getRingConnection(id)</a> ⇒ <code>RingConnection</code></dt>
 <dd><p>Get a ring connection with a given id.</p>
 </dd>
 <dt><a href="#getRingConnections">getRingConnections(ringId, ringIds)</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
@@ -107,7 +269,7 @@
 <dt><a href="#setRingCenter">setRingCenter(ring)</a></dt>
 <dd><p>Sets the center for a ring.</p>
 </dd>
-<dt><a href="#getSubringCenter">getSubringCenter(ring, vertex)</a> ⇒ <code><a href="#SmilesDrawer.Vector2">Vector2</a></code></dt>
+<dt><a href="#getSubringCenter">getSubringCenter(ring, vertex)</a> ⇒ <code>Vector2</code></dt>
 <dd><p>Gets the center of a ring contained within a bridged ring and containing a given vertex.</p>
 </dd>
 <dt><a href="#drawEdges">drawEdges(debug)</a></dt>
@@ -137,10 +299,10 @@
 <dt><a href="#getSubtreeOverlapScore">getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores)</a> ⇒ <code>Object</code></dt>
 <dd><p>Gets the overlap score of a subtree.</p>
 </dd>
-<dt><a href="#getCurrentCenterOfMass">getCurrentCenterOfMass()</a> ⇒ <code><a href="#SmilesDrawer.Vector2">Vector2</a></code></dt>
+<dt><a href="#getCurrentCenterOfMass">getCurrentCenterOfMass()</a> ⇒ <code>Vector2</code></dt>
 <dd><p>Returns the current (positioned vertices so far) center of mass.</p>
 </dd>
-<dt><a href="#getCurrentCenterOfMassInNeigbourhood">getCurrentCenterOfMassInNeigbourhood(vec, [r])</a> ⇒ <code><a href="#SmilesDrawer.Vector2">Vector2</a></code></dt>
+<dt><a href="#getCurrentCenterOfMassInNeigbourhood">getCurrentCenterOfMassInNeigbourhood(vec, [r])</a> ⇒ <code>Vector2</code></dt>
 <dd><p>Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.</p>
 </dd>
 <dt><a href="#resolvePrimaryOverlaps">resolvePrimaryOverlaps()</a></dt>
@@ -149,7 +311,7 @@
 <dt><a href="#resolveSecondaryOverlaps">resolveSecondaryOverlaps(scores)</a></dt>
 <dd><p>Resolve secondary overlaps. Those overlaps are due to the structure turning back on itself.</p>
 </dd>
-<dt><a href="#createNextBond">createNextBond(vertex, previousVertex, ringOrAngle, dir, [skipPositioning])</a></dt>
+<dt><a href="#createNextBond">createNextBond(vertex, [previousVertex], [previousAngle], [dir], [skipPositioning])</a></dt>
 <dd><p>Positiones the next vertex thus creating a bond.</p>
 </dd>
 <dt><a href="#getCommonRingbondNeighbour">getCommonRingbondNeighbour(vertex)</a> ⇒ <code>Number</code> | <code>null</code></dt>
@@ -167,8 +329,78 @@
 <dt><a href="#isRingAromatic">isRingAromatic(ring)</a> ⇒ <code>Boolean</code></dt>
 <dd><p>Check whether or not a ring is an implicitly defined aromatic ring (lower case smiles).</p>
 </dd>
-<dt><a href="#getEdgeNormals">getEdgeNormals(edge)</a> ⇒ <code><a href="#SmilesDrawer.Vector2">Array.&lt;Vector2&gt;</a></code></dt>
+<dt><a href="#getEdgeNormals">getEdgeNormals(edge)</a> ⇒ <code>Array.&lt;Vector2&gt;</code></dt>
 <dd><p>Get the normals of an edge.</p>
+</dd>
+<dt><a href="#getBondCount">getBondCount(vertex)</a> ⇒ <code>Number</code></dt>
+<dd><p>Gets the number of bonds of a vertex.</p>
+</dd>
+<dt><a href="#getNonRingNeighbours">getNonRingNeighbours(vertexId)</a> ⇒ <code>Array.&lt;Vertex&gt;</code></dt>
+<dd><p>Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).</p>
+</dd>
+<dt><a href="#initPseudoElements">initPseudoElements()</a></dt>
+<dd><p>Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.</p>
+</dd>
+<dt><a href="#setBondType">setBondType(bondType)</a></dt>
+<dd><p>Set the bond type of this edge. This also sets the edge weight.</p>
+</dd>
+<dt><a href="#_init">_init(node, parentVertexId, isBranch)</a></dt>
+<dd><p>PRIVATE FUNCTION. Initializing the graph from the parse tree.</p>
+</dd>
+<dt><a href="#_initInfos">_initInfos()</a></dt>
+<dd><p>PRIVATE FUNCTION. Initializes element counts etc.</p>
+</dd>
+<dt><a href="#clear">clear()</a></dt>
+<dd><p>Clears all the elements in this graph (edges and vertices).</p>
+</dd>
+<dt><a href="#addVertex">addVertex(vertex)</a> ⇒ <code>Number</code></dt>
+<dd><p>Add a vertex to the graph.</p>
+</dd>
+<dt><a href="#addEdge">addEdge(edge)</a> ⇒ <code>Number</code></dt>
+<dd><p>Add an edge to the graph.</p>
+</dd>
+<dt><a href="#getEdge">getEdge(vertexIdA, vertexIdB)</a> ⇒ <code>Edge</code> | <code>null</code></dt>
+<dd><p>Returns the edge between two given vertices.</p>
+</dd>
+<dt><a href="#getEdges">getEdges(vertexId)</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
+<dd><p>Returns the ids of edges connected to a vertex.</p>
+</dd>
+<dt><a href="#hasEdge">hasEdge(vertexIdA, vertexIdB)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Check whether or not two vertices are connected by an edge.</p>
+</dd>
+<dt><a href="#getVertexList">getVertexList()</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
+<dd><p>Returns an array containing the vertex ids of this graph.</p>
+</dd>
+<dt><a href="#getEdgeList">getEdgeList()</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Returns an array containing source, target arrays of this graphs edges.</p>
+</dd>
+<dt><a href="#getAdjacencyMatrix">getAdjacencyMatrix()</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Get the adjacency matrix of the graph.</p>
+</dd>
+<dt><a href="#getComponentsAdjacencyMatrix">getComponentsAdjacencyMatrix()</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Get the adjacency matrix of the graph with all bridges removed (thus the components). Thus the remaining vertices are all part of ring systems.</p>
+</dd>
+<dt><a href="#getSubgraphAdjacencyMatrix">getSubgraphAdjacencyMatrix(vertexIds)</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Get the adjacency matrix of a subgraph.</p>
+</dd>
+<dt><a href="#getDistanceMatrix">getDistanceMatrix()</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Get the distance matrix of the graph.</p>
+</dd>
+<dt><a href="#getSubgraphDistanceMatrix">getSubgraphDistanceMatrix(vertexIds)</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Get the distance matrix of a subgraph.</p>
+</dd>
+<dt><a href="#getAdjacencyList">getAdjacencyList()</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Get the adjacency list of the graph.</p>
+</dd>
+<dt><a href="#getSubgraphAdjacencyList">getSubgraphAdjacencyList(vertexIds)</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Get the adjacency list of a subgraph.</p>
+</dd>
+<dt><a href="#getBridges">getBridges()</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
+<dd><p>Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.</p>
+</dd>
+<dt><a href="#traverseBF">traverseBF(startVertexId, callback)</a></dt>
+<dd><p>Traverses the graph in breadth-first order.</p>
 </dd>
 <dt><a href="#getTreeDepth">getTreeDepth(vertexId, parentVertexId)</a> ⇒ <code>Number</code></dt>
 <dd><p>Get the depth of a subtree in the direction opposite to the vertex specified as the parent vertex.</p>
@@ -176,15 +408,77 @@
 <dt><a href="#traverseTree">traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])</a></dt>
 <dd><p>Traverse a sub-tree in the graph.</p>
 </dd>
-<dt><a href="#getBondCount">getBondCount(vertex)</a> ⇒ <code>Number</code></dt>
-<dd><p>Gets the number of bonds of a vertex.</p>
+<dt><a href="#kkLayout">kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)</a></dt>
+<dd><p>Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. <a href="https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf">https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf</a></p>
 </dd>
-<dt><a href="#getNonRingNeighbours">getNonRingNeighbours(vertexId)</a> ⇒ <code><a href="#SmilesDrawer.Vertex">Array.&lt;Vertex&gt;</a></code></dt>
-<dd><p>Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).</p>
+<dt><a href="#_bridgeDfs">_bridgeDfs()</a></dt>
+<dd><p>PRIVATE FUNCTION used by getBridges().</p>
 </dd>
-<dt><a href="#initPseudoElements">initPseudoElements()</a></dt>
-<dd><p>Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
-the involved atoms not to be displayed.</p>
+<dt><a href="#getConnectedComponents">getConnectedComponents(adjacencyMatrix)</a> ⇒ <code>Array.&lt;Set&gt;</code></dt>
+<dd><p>Returns the connected components of the graph.</p>
+</dd>
+<dt><a href="#getConnectedComponentCount">getConnectedComponentCount(adjacencyMatrix)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the number of connected components for the graph.</p>
+</dd>
+<dt><a href="#_ccCountDfs">_ccCountDfs()</a></dt>
+<dd><p>PRIVATE FUNCTION used by getConnectedComponentCount().</p>
+</dd>
+<dt><a href="#_ccGetDfs">_ccGetDfs()</a></dt>
+<dd><p>PRIVATE FUNCTION used by getConnectedComponents().</p>
+</dd>
+<dt><a href="#clone">clone()</a> ⇒ <code>Line</code></dt>
+<dd><p>Clones this line and returns the clone.</p>
+</dd>
+<dt><a href="#getLength">getLength()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the length of this line.</p>
+</dd>
+<dt><a href="#getAngle">getAngle()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the angle of the line in relation to the coordinate system (the x-axis).</p>
+</dd>
+<dt><a href="#getRightVector">getRightVector()</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Returns the right vector (the vector with the larger x value).</p>
+</dd>
+<dt><a href="#getLeftVector">getLeftVector()</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Returns the left vector (the vector with the smaller x value).</p>
+</dd>
+<dt><a href="#getRightElement">getRightElement()</a> ⇒ <code>String</code></dt>
+<dd><p>Returns the element associated with the right vector (the vector with the larger x value).</p>
+</dd>
+<dt><a href="#getLeftElement">getLeftElement()</a> ⇒ <code>String</code></dt>
+<dd><p>Returns the element associated with the left vector (the vector with the smaller x value).</p>
+</dd>
+<dt><a href="#getRightChiral">getRightChiral()</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.</p>
+</dd>
+<dt><a href="#getLeftChiral">getLeftChiral()</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.</p>
+</dd>
+<dt><a href="#setRightVector">setRightVector(x, y)</a> ⇒ <code>Line</code></dt>
+<dd><p>Set the value of the right vector.</p>
+</dd>
+<dt><a href="#setLeftVector">setLeftVector(x, y)</a> ⇒ <code>Line</code></dt>
+<dd><p>Set the value of the left vector.</p>
+</dd>
+<dt><a href="#rotateToXAxis">rotateToXAxis()</a> ⇒ <code>Line</code></dt>
+<dd><p>Rotates this line to be aligned with the x-axis. The center of rotation is the left vector.</p>
+</dd>
+<dt><a href="#rotate">rotate(theta)</a> ⇒ <code>Line</code></dt>
+<dd><p>Rotate the line by a given value (in radians). The center of rotation is the left vector.</p>
+</dd>
+<dt><a href="#shortenFrom">shortenFrom(by)</a> ⇒ <code>Line</code></dt>
+<dd><p>Shortens this line from the &quot;from&quot; direction by a given value (in pixels).</p>
+</dd>
+<dt><a href="#shortenTo">shortenTo(by)</a> ⇒ <code>Line</code></dt>
+<dd><p>Shortens this line from the &quot;to&quot; direction by a given value (in pixels).</p>
+</dd>
+<dt><a href="#shortenRight">shortenRight(by)</a> ⇒ <code>Line</code></dt>
+<dd><p>Shorten the right side.</p>
+</dd>
+<dt><a href="#shortenLeft">shortenLeft(by)</a> ⇒ <code>Line</code></dt>
+<dd><p>Shorten the left side.</p>
+</dd>
+<dt><a href="#shorten">shorten(by)</a> ⇒ <code>Line</code></dt>
+<dd><p>Shortens this line from both directions by a given value (in pixels).</p>
 </dd>
 <dt><a href="#round">round(value, decimals)</a> ⇒ <code>Number</code></dt>
 <dd><p>Rounds a value to a given number of decimals.</p>
@@ -213,270 +507,315 @@ the involved atoms not to be displayed.</p>
 <dt><a href="#parityOfPermutation">parityOfPermutation(arr)</a> ⇒ <code>Number</code></dt>
 <dd><p>Returns the parity of the permutation (1 or -1)</p>
 </dd>
+<dt><a href="#clone">clone()</a> ⇒ <code>Ring</code></dt>
+<dd><p>Clones this ring and returns the clone.</p>
+</dd>
+<dt><a href="#getSize">getSize()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the size (number of members) of this ring.</p>
+</dd>
+<dt><a href="#getPolygon">getPolygon(vertices)</a> ⇒ <code>Array.&lt;Vector2&gt;</code></dt>
+<dd><p>Gets the polygon representation (an array of the ring-members positional vectors) of this ring.</p>
+</dd>
+<dt><a href="#getAngle">getAngle()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the angle of this ring in relation to the coordinate system.</p>
+</dd>
+<dt><a href="#eachMember">eachMember(vertices, callback, startVertexId, previousVertexId)</a></dt>
+<dd><p>Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.</p>
+</dd>
+<dt><a href="#getOrderedNeighbours">getOrderedNeighbours(ringConnections)</a> ⇒ <code>Array.&lt;Object&gt;</code></dt>
+<dd><p>Returns an array containing the neighbouring rings of this ring ordered by ring size.</p>
+</dd>
+<dt><a href="#isBenzeneLike">isBenzeneLike(vertices)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Check whether this ring is an implicitly defined benzene-like (e.g. C1=CC=CC=C1) with 6 members and 3 double bonds.</p>
+</dd>
+<dt><a href="#getDoubleBondCount">getDoubleBondCount(vertices)</a> ⇒ <code>Number</code></dt>
+<dd><p>Get the number of double bonds inside this ring.</p>
+</dd>
+<dt><a href="#contains">contains(vertexId)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not this ring contains a member with a given vertex id.</p>
+</dd>
+<dt><a href="#addVertex">addVertex(vertexId)</a></dt>
+<dd><p>Adding a vertex to the ring connection.</p>
+</dd>
+<dt><a href="#updateOther">updateOther(ringId, otherRingId)</a></dt>
+<dd><p>Update the ring id of this ring connection that is not the ring id supplied as the second argument.</p>
+</dd>
+<dt><a href="#containsRing">containsRing(ringId)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Returns a boolean indicating whether or not a ring with a given id is participating in this ring connection.</p>
+</dd>
+<dt><a href="#isBridge">isBridge(vertices)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not this ring connection is a bridge in a bridged ring.</p>
+</dd>
+<dt><a href="#isBridge">isBridge(ringConnections, vertices, firstRingId, secondRingId)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not two rings are connected by a bridged bond.</p>
+</dd>
+<dt><a href="#getNeighbours">getNeighbours(ringConnections, ringId)</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
+<dd><p>Retruns the neighbouring rings of a given ring.</p>
+</dd>
+<dt><a href="#getVertices">getVertices(ringConnections, firstRingId, secondRingId)</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
+<dd><p>Returns an array of vertex ids associated with a given ring connection.</p>
+</dd>
+<dt><a href="#getRings">getRings(graph)</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.</p>
+</dd>
+<dt><a href="#matrixToString">matrixToString(matrix)</a> ⇒ <code>String</code></dt>
+<dd><p>Creates a printable string from a matrix (2D array).</p>
+</dd>
+<dt><a href="#getPathIncludedDistanceMatrices">getPathIncludedDistanceMatrices(adjacencyMatrix)</a> ⇒ <code>Object</code></dt>
+<dd><p>Returnes the two path-included distance matrices used to find the sssr.</p>
+</dd>
+<dt><a href="#getRingCandidates">getRingCandidates(d, pe, pe_prime)</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Get the ring candidates from the path-included distance matrices.</p>
+</dd>
+<dt><a href="#getSSSR">getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr)</a> ⇒ <code>Array.&lt;Set&gt;</code></dt>
+<dd><p>Searches the candidates for the smallest set of smallest rings.</p>
+</dd>
+<dt><a href="#getEdgeCount">getEdgeCount(adjacencyMatrix)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the number of edges in a graph defined by an adjacency matrix.</p>
+</dd>
+<dt><a href="#getEdgeList">getEdgeList(adjacencyMatrix)</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
+<dd><p>Returns an edge list constructed form an adjacency matrix.</p>
+</dd>
+<dt><a href="#bondsToAtoms">bondsToAtoms(bonds)</a> ⇒ <code>Set.&lt;Number&gt;</code></dt>
+<dd><p>Return a set of vertex indices contained in an array of bonds.</p>
+</dd>
+<dt><a href="#getBondCount">getBondCount(atoms, adjacencyMatrix)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the number of bonds within a set of atoms.</p>
+</dd>
+<dt><a href="#pathSetsContain">pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not a given path already exists in an array of paths.</p>
+</dd>
+<dt><a href="#areSetsEqual">areSetsEqual(setA, setB)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not two sets are equal (contain the same elements).</p>
+</dd>
+<dt><a href="#isSupersetOf">isSupersetOf(setA, setB)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not a set (setA) is a superset of another set (setB).</p>
+</dd>
+<dt><a href="#clone">clone()</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Clones this vector and returns the clone.</p>
+</dd>
+<dt><a href="#toString">toString()</a> ⇒ <code>String</code></dt>
+<dd><p>Returns a string representation of this vector.</p>
+</dd>
+<dt><a href="#add">add(vec)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.</p>
+</dd>
+<dt><a href="#subtract">subtract(vec)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.</p>
+</dd>
+<dt><a href="#divide">divide(scalar)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Divide the x and y coordinate values of this vector by a scalar.</p>
+</dd>
+<dt><a href="#multiply">multiply(v)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Multiply the x and y coordinate values of this vector by the values of another vector.</p>
+</dd>
+<dt><a href="#multiplyScalar">multiplyScalar(scalar)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Multiply the x and y coordinate values of this vector by a scalar.</p>
+</dd>
+<dt><a href="#invert">invert()</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Inverts this vector. Same as multiply(-1.0).</p>
+</dd>
+<dt><a href="#angle">angle()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the angle of this vector in relation to the coordinate system.</p>
+</dd>
+<dt><a href="#distance">distance(vec)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the euclidean distance between this vector and another vector.</p>
+</dd>
+<dt><a href="#distanceSq">distanceSq(vec)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).</p>
+</dd>
+<dt><a href="#clockwise">clockwise(vec)</a> ⇒ <code>Number</code></dt>
+<dd><p>Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.</p>
+</dd>
+<dt><a href="#rotate">rotate(angle)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Rotates this vector by a given number of radians around the origin of the coordinate system.</p>
+</dd>
+<dt><a href="#rotateAround">rotateAround(angle, vec)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Rotates this vector around another vector.</p>
+</dd>
+<dt><a href="#rotateTo">rotateTo(vec, center, [offsetAngle])</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.</p>
+</dd>
+<dt><a href="#rotateAwayFrom">rotateAwayFrom(vec, center, angle)</a></dt>
+<dd><p>Rotates the vector away from a specified vector around a center.</p>
+</dd>
+<dt><a href="#getRotateAwayFromAngle">getRotateAwayFromAngle(vec, center, angle)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the angle in radians used to rotate this vector away from a given vector.</p>
+</dd>
+<dt><a href="#getRotateTowardsAngle">getRotateTowardsAngle(vec, center, angle)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the angle in radians used to rotate this vector towards a given vector.</p>
+</dd>
+<dt><a href="#getRotateToAngle">getRotateToAngle(vec, center)</a> ⇒ <code>Number</code></dt>
+<dd><p>Gets the angles between this vector and another vector around a common center of rotation.</p>
+</dd>
+<dt><a href="#isInPolygon">isInPolygon(polygon)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether a vector lies within a polygon spanned by a set of vectors.</p>
+</dd>
+<dt><a href="#length">length()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the length of this vector.</p>
+</dd>
+<dt><a href="#lengthSq">lengthSq()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the square of the length of this vector.</p>
+</dd>
+<dt><a href="#normalize">normalize()</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Normalizes this vector.</p>
+</dd>
+<dt><a href="#normalized">normalized()</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Returns a normalized copy of this vector.</p>
+</dd>
+<dt><a href="#whichSide">whichSide(vecA, vecB)</a> ⇒ <code>Number</code></dt>
+<dd><p>Calculates which side of a line spanned by two vectors this vector is.</p>
+</dd>
+<dt><a href="#sameSideAs">sameSideAs(vecA, vecB, vecC)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.</p>
+</dd>
+<dt><a href="#add">add(vecA, vecB)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Adds two vectors and returns the result as a new vector.</p>
+</dd>
+<dt><a href="#subtract">subtract(vecA, vecB)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Subtracts one vector from another and returns the result as a new vector.</p>
+</dd>
+<dt><a href="#multiply">multiply(vecA, vecB)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Multiplies two vectors (value by value) and returns the result.</p>
+</dd>
+<dt><a href="#multiplyScalar">multiplyScalar(vec, scalar)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Multiplies two vectors (value by value) and returns the result.</p>
+</dd>
+<dt><a href="#midpoint">midpoint(vecA, vecB)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Returns the midpoint of a line spanned by two vectors.</p>
+</dd>
+<dt><a href="#normals">normals(vecA, vecB)</a> ⇒ <code>Array.&lt;Vector2&gt;</code></dt>
+<dd><p>Returns the normals of a line spanned by two vectors.</p>
+</dd>
+<dt><a href="#units">units(vecA, vecB)</a> ⇒ <code>Array.&lt;Vector2&gt;</code></dt>
+<dd><p>Returns the unit (normalized normal) vectors of a line spanned by two vectors.</p>
+</dd>
+<dt><a href="#divide">divide(vecA, vecB)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Divides a vector by another vector and returns the result as new vector.</p>
+</dd>
+<dt><a href="#divideScalar">divideScalar(vecA, s)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Divides a vector by a scalar and returns the result as new vector.</p>
+</dd>
+<dt><a href="#dot">dot(vecA, vecB)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the dot product of two vectors.</p>
+</dd>
+<dt><a href="#angle">angle(vecA, vecB)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the angle between two vectors.</p>
+</dd>
+<dt><a href="#threePointangle">threePointangle(vecA, vecB, vecC)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the angle between two vectors based on a third vector in between.</p>
+</dd>
+<dt><a href="#scalarProjection">scalarProjection(vecA, vecB)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the scalar projection of a vector on another vector.</p>
+</dd>
+<dt><a href="#averageDirection">averageDirection(vecs)</a> ⇒ <code>Vector2</code></dt>
+<dd><p>Returns the average vector (normalized) of the input vectors.</p>
+</dd>
+<dt><a href="#setPosition">setPosition(x, y)</a></dt>
+<dd><p>Set the 2D coordinates of the vertex.</p>
+</dd>
+<dt><a href="#setPositionFromVector">setPositionFromVector(v)</a></dt>
+<dd><p>Set the 2D coordinates of the vertex from a Vector2.</p>
+</dd>
+<dt><a href="#addChild">addChild(vertexID)</a></dt>
+<dd><p>Add a child vertex id to this vertex.</p>
+</dd>
+<dt><a href="#setParentVertexId">setParentVertexId(parentVertexId)</a></dt>
+<dd><p>Set the vertex id of the parent.</p>
+</dd>
+<dt><a href="#isTerminal">isTerminal()</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false. Always returns true if associated value has property hasAttachedPseudoElements set to true.</p>
+</dd>
+<dt><a href="#clone">clone()</a> ⇒ <code>Vertex</code></dt>
+<dd><p>Clones this vertex and returns the clone.</p>
+</dd>
+<dt><a href="#equals">equals(vertex)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Returns true if this vertex and the supplied vertex both have the same id, else returns false.</p>
+</dd>
+<dt><a href="#getAngle">getAngle([referenceVector], [returnAsDegrees])</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.</p>
+</dd>
+<dt><a href="#getTextDirection">getTextDirection(vertices)</a> ⇒ <code>String</code></dt>
+<dd><p>Returns the suggested text direction when text is added at the position of this vertex.</p>
+</dd>
+<dt><a href="#getNeighbours">getNeighbours([vertexId])</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
+<dd><p>Returns an array of ids of neighbouring vertices.</p>
+</dd>
+<dt><a href="#getDrawnNeighbours">getDrawnNeighbours(vertices)</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
+<dd><p>Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).</p>
+</dd>
+<dt><a href="#getNeighbourCount">getNeighbourCount()</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the number of neighbours of this vertex.</p>
+</dd>
+<dt><a href="#getSpanningTreeNeighbours">getSpanningTreeNeighbours([vertexId])</a> ⇒ <code>Array.&lt;Number&gt;</code></dt>
+<dd><p>Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.</p>
+</dd>
+<dt><a href="#getNextInRing">getNextInRing(vertices, ringId, previousVertexId)</a> ⇒ <code>Number</code></dt>
+<dd><p>Gets the next vertex in the ring in opposide direction to the supplied vertex id.</p>
+</dd>
 </dl>
 
-<a name="SmilesDrawer"></a>
+<a name="maxBonds"></a>
 
-## SmilesDrawer
-The SmilesDrawer namespace.
+## maxBonds
+A map mapping element symbols to their maximum bonds.
 
 **Kind**: global variable  
+<a name="atomicNumbers"></a>
 
-* [SmilesDrawer](#SmilesDrawer)
-    * [.ArrayHelper](#SmilesDrawer.ArrayHelper)
-        * [.clone(arr)](#SmilesDrawer.ArrayHelper.clone) ⇒ <code>\*</code>
-        * [.print(arr)](#SmilesDrawer.ArrayHelper.print) ⇒ <code>String</code>
-        * [.each(arr, callback)](#SmilesDrawer.ArrayHelper.each)
-        * [.get(arr, property, value)](#SmilesDrawer.ArrayHelper.get) ⇒ <code>\*</code>
-        * [.contains(arr, options)](#SmilesDrawer.ArrayHelper.contains) ⇒ <code>Boolean</code>
-        * [.intersection(arrA, arrB)](#SmilesDrawer.ArrayHelper.intersection) ⇒ <code>Array</code>
-        * [.unique(arr)](#SmilesDrawer.ArrayHelper.unique) ⇒ <code>Array</code>
-        * [.count(arr, value)](#SmilesDrawer.ArrayHelper.count) ⇒ <code>Number</code>
-        * [.toggle(arr, value)](#SmilesDrawer.ArrayHelper.toggle) ⇒ <code>Array</code>
-        * [.remove(arr, value)](#SmilesDrawer.ArrayHelper.remove) ⇒ <code>Array</code>
-        * [.removeUnique(arr, value)](#SmilesDrawer.ArrayHelper.removeUnique) ⇒ <code>Array</code>
-        * [.removeAll(arrA, arrB)](#SmilesDrawer.ArrayHelper.removeAll) ⇒ <code>Array</code>
-        * [.merge(arrA, arrB)](#SmilesDrawer.ArrayHelper.merge) ⇒ <code>Array</code>
-        * [.containsAll(arrA, arrB)](#SmilesDrawer.ArrayHelper.containsAll) ⇒ <code>Boolean</code>
-        * [.sortByAtomicNumberDesc(arr)](#SmilesDrawer.ArrayHelper.sortByAtomicNumberDesc) ⇒ <code>Array.&lt;Object&gt;</code>
-        * [.deepCopy(arr)](#SmilesDrawer.ArrayHelper.deepCopy) ⇒ <code>Array</code>
-    * [.Atom](#SmilesDrawer.Atom)
-        * [new SmilesDrawer.Atom(element, [bondType])](#new_SmilesDrawer.Atom_new)
-        * _instance_
-            * [.addNeighbouringElement(element)](#SmilesDrawer.Atom+addNeighbouringElement)
-            * [.attachPseudoElement(element, previousElement, [hydrogenCount])](#SmilesDrawer.Atom+attachPseudoElement)
-            * [.getAttachedPseudoElements()](#SmilesDrawer.Atom+getAttachedPseudoElements) ⇒ <code>Object</code>
-            * [.getAttachedPseudoElementsCount()](#SmilesDrawer.Atom+getAttachedPseudoElementsCount) ⇒ <code>Number</code>
-            * [.addAnchoredRing(ringId)](#SmilesDrawer.Atom+addAnchoredRing)
-            * [.getRingbondCount()](#SmilesDrawer.Atom+getRingbondCount) ⇒ <code>Number</code>
-            * [.backupRings()](#SmilesDrawer.Atom+backupRings)
-            * [.restoreRings()](#SmilesDrawer.Atom+restoreRings)
-            * [.haveCommonRingbond(atomA, atomB)](#SmilesDrawer.Atom+haveCommonRingbond) ⇒ <code>Boolean</code>
-            * [.getOrder(center)](#SmilesDrawer.Atom+getOrder) ⇒ <code>Number</code>
-            * [.setOrder(center, order)](#SmilesDrawer.Atom+setOrder)
-            * [.neighbouringElementsEqual(arr)](#SmilesDrawer.Atom+neighbouringElementsEqual) ⇒ <code>Boolean</code>
-            * [.getAtomicNumber()](#SmilesDrawer.Atom+getAtomicNumber) ⇒ <code>Number</code>
-        * _static_
-            * [.maxBonds](#SmilesDrawer.Atom.maxBonds)
-            * [.atomicNumbers](#SmilesDrawer.Atom.atomicNumbers)
-            * [.sortByAtomicNumber(root, neighbours, vertices, rings)](#SmilesDrawer.Atom.sortByAtomicNumber) ⇒ <code>Array.&lt;Object&gt;</code>
-            * [.hasDuplicateAtomicNumbers(sortedAtomicNumbers)](#SmilesDrawer.Atom.hasDuplicateAtomicNumbers) ⇒ <code>Boolean</code>
-            * [.getDuplicateAtomicNumbers(sortedAtomicNumbers)](#SmilesDrawer.Atom.getDuplicateAtomicNumbers) ⇒ <code>Array.&lt;Array&gt;</code>
-    * [.CanvasWrapper](#SmilesDrawer.CanvasWrapper)
-        * [new SmilesDrawer.CanvasWrapper(target, theme, options)](#new_SmilesDrawer.CanvasWrapper_new)
-        * [.updateSize(width, height)](#SmilesDrawer.CanvasWrapper+updateSize)
-        * [.setTheme(theme)](#SmilesDrawer.CanvasWrapper+setTheme)
-        * [.scale(vertices)](#SmilesDrawer.CanvasWrapper+scale)
-        * [.reset()](#SmilesDrawer.CanvasWrapper+reset)
-        * [.getColor(key)](#SmilesDrawer.CanvasWrapper+getColor) ⇒ <code>String</code>
-        * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#SmilesDrawer.CanvasWrapper+drawCircle)
-        * [.drawLine(line, [dashed], [alpha])](#SmilesDrawer.CanvasWrapper+drawLine)
-        * [.drawWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawWedge)
-        * [.drawDashedWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawDashedWedge)
-        * [.drawDebugText(x, y, text)](#SmilesDrawer.CanvasWrapper+drawDebugText)
-        * [.drawBall(x, y, elementName)](#SmilesDrawer.CanvasWrapper+drawBall)
-        * [.drawPoint(x, y, elementName)](#SmilesDrawer.CanvasWrapper+drawPoint)
-        * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)](#SmilesDrawer.CanvasWrapper+drawText)
-        * [.drawDebugPoint(x, y, [debugText], [color])](#SmilesDrawer.CanvasWrapper+drawDebugPoint)
-        * [.drawAromaticityRing(ring)](#SmilesDrawer.CanvasWrapper+drawAromaticityRing)
-        * [.clear()](#SmilesDrawer.CanvasWrapper+clear)
-    * [.Edge](#SmilesDrawer.Edge)
-        * [new SmilesDrawer.Edge(sourceId, targetId, [weight])](#new_SmilesDrawer.Edge_new)
-        * _instance_
-            * [.getBondCount()](#SmilesDrawer.Edge+getBondCount) ⇒ <code>Number</code>
-        * _static_
-            * [.bonds](#SmilesDrawer.Edge.bonds) ⇒ <code>Object</code>
-    * [.Graph](#SmilesDrawer.Graph)
-        * [new SmilesDrawer.Graph(parseTree, [isomeric])](#new_SmilesDrawer.Graph_new)
-        * _instance_
-            * [._init(node, parentVertexId, isBranch)](#SmilesDrawer.Graph+_init)
-            * [._initInfos()](#SmilesDrawer.Graph+_initInfos)
-            * [.clear()](#SmilesDrawer.Graph+clear)
-            * [.addVertex(vertex)](#SmilesDrawer.Graph+addVertex) ⇒ <code>Number</code>
-            * [.addEdge(edge)](#SmilesDrawer.Graph+addEdge) ⇒ <code>Number</code>
-            * [.getEdge(vertexIdA, vertexIdB)](#SmilesDrawer.Graph+getEdge) ⇒ <code>Number</code> &#124; <code>null</code>
-            * [.getEdges(vertexId)](#SmilesDrawer.Graph+getEdges) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.hasEdge(vertexIdA, vertexIdB)](#SmilesDrawer.Graph+hasEdge) ⇒ <code>Number</code> &#124; <code>null</code>
-            * [.getVertexList()](#SmilesDrawer.Graph+getVertexList) ⇒ <code>Array.&lt;Number&gt;</code>
-            * [.getEdgeList()](#SmilesDrawer.Graph+getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.getAdjacencyMatrix()](#SmilesDrawer.Graph+getAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.getComponentsAdjacencyMatrix()](#SmilesDrawer.Graph+getComponentsAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.getSubgraphAdjacencyMatrix(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.getDistanceMatrix()](#SmilesDrawer.Graph+getDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.getSubgraphDistanceMatrix(vertexIds)](#SmilesDrawer.Graph+getSubgraphDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.getAdjacencyList()](#SmilesDrawer.Graph+getAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.getSubgraphAdjacencyList(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
-            * [.getBridges()](#SmilesDrawer.Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
-            * [.traverseBF(startVertexId, callback)](#SmilesDrawer.Graph+traverseBF)
-            * [.kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
-            * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
-        * _static_
-            * [.getConnectedComponents(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
-            * [.getConnectedComponentCount(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponentCount) ⇒ <code>Number</code>
-            * [._ccCountDfs()](#SmilesDrawer.Graph._ccCountDfs)
-            * [._ccGetDfs()](#SmilesDrawer.Graph._ccGetDfs)
-    * [.Line](#SmilesDrawer.Line)
-        * [new SmilesDrawer.Line([from], [to], [elementFrom], [elementTo], [chiralFrom], [chiralTo])](#new_SmilesDrawer.Line_new)
-        * [.clone()](#SmilesDrawer.Line+clone) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.getLength()](#SmilesDrawer.Line+getLength) ⇒ <code>Number</code>
-        * [.getAngle()](#SmilesDrawer.Line+getAngle) ⇒ <code>Number</code>
-        * [.getRightVector()](#SmilesDrawer.Line+getRightVector) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.getLeftVector()](#SmilesDrawer.Line+getLeftVector) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.getRightElement()](#SmilesDrawer.Line+getRightElement) ⇒ <code>String</code>
-        * [.getLeftElement()](#SmilesDrawer.Line+getLeftElement) ⇒ <code>String</code>
-        * [.getRightChiral()](#SmilesDrawer.Line+getRightChiral) ⇒ <code>Boolean</code>
-        * [.getLeftChiral()](#SmilesDrawer.Line+getLeftChiral) ⇒ <code>Boolean</code>
-        * [.setRightVector(x, y)](#SmilesDrawer.Line+setRightVector) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.setLeftVector(x, y)](#SmilesDrawer.Line+setLeftVector) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.rotateToXAxis()](#SmilesDrawer.Line+rotateToXAxis) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.rotate(theta)](#SmilesDrawer.Line+rotate) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.shortenFrom(by)](#SmilesDrawer.Line+shortenFrom) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.shortenTo(by)](#SmilesDrawer.Line+shortenTo) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.shortenRight(by)](#SmilesDrawer.Line+shortenRight) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.shortenLeft(by)](#SmilesDrawer.Line+shortenLeft) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.shorten(by)](#SmilesDrawer.Line+shorten) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-        * [.getNormals()](#SmilesDrawer.Line+getNormals) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-    * [.Ring](#SmilesDrawer.Ring)
-        * [new SmilesDrawer.Ring(members)](#new_SmilesDrawer.Ring_new)
-        * [.clone()](#SmilesDrawer.Ring+clone) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
-        * [.getSize()](#SmilesDrawer.Ring+getSize) ⇒ <code>Number</code>
-        * [.getPolygon(vertices)](#SmilesDrawer.Ring+getPolygon) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-        * [.getAngle()](#SmilesDrawer.Ring+getAngle) ⇒ <code>Number</code>
-        * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#SmilesDrawer.Ring+eachMember)
-        * [.getOrderedNeighbours(ringConnections)](#SmilesDrawer.Ring+getOrderedNeighbours) ⇒ <code>Array.&lt;Object&gt;</code>
-        * [.isBenzeneLike(vertices)](#SmilesDrawer.Ring+isBenzeneLike) ⇒ <code>Boolean</code>
-        * [.getDoubleBondCount(vertices)](#SmilesDrawer.Ring+getDoubleBondCount) ⇒ <code>Number</code>
-        * [.contains(vertexId)](#SmilesDrawer.Ring+contains) ⇒ <code>Boolean</code>
-    * [.RingConnection](#SmilesDrawer.RingConnection)
-        * [new SmilesDrawer.RingConnection(firstRing, secondRing)](#new_SmilesDrawer.RingConnection_new)
-        * _instance_
-            * [.addVertex(vertexId)](#SmilesDrawer.RingConnection+addVertex)
-            * [.updateOther(ringId, otherRingId)](#SmilesDrawer.RingConnection+updateOther)
-            * [.containsRing(ringId)](#SmilesDrawer.RingConnection+containsRing) ⇒ <code>Boolean</code>
-            * [.isBridge()](#SmilesDrawer.RingConnection+isBridge) ⇒ <code>Boolean</code>
-        * _static_
-            * [.isBridge(ringConnections, vertices, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.isBridge) ⇒ <code>Boolean</code>
-            * [.getNeighbours(ringConnections, ringId)](#SmilesDrawer.RingConnection.getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-            * [.getVertices(ringConnections, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.getVertices) ⇒ <code>Array.&lt;Number&gt;</code>
-    * [.SSSR](#SmilesDrawer.SSSR)
-        * [.getRings(graph)](#SmilesDrawer.SSSR.getRings) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.matrixToString(matrix)](#SmilesDrawer.SSSR.matrixToString) ⇒ <code>String</code>
-        * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer.SSSR.getPathIncludedDistanceMatrices) ⇒ <code>Object</code>
-        * [.getRingCandidates(d, pe, pe_prime)](#SmilesDrawer.SSSR.getRingCandidates) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr)](#SmilesDrawer.SSSR.getSSSR) ⇒ <code>Array.&lt;Set&gt;</code>
-        * [.getEdgeCount(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeCount) ⇒ <code>Number</code>
-        * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.bondsToAtoms(bonds)](#SmilesDrawer.SSSR.bondsToAtoms) ⇒ <code>Set.&lt;Number&gt;</code>
-        * [.getBondCount(atoms, adjacencyMatrix)](#SmilesDrawer.SSSR.getBondCount) ⇒ <code>Number</code>
-        * [.pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount)](#SmilesDrawer.SSSR.pathSetsContain) ⇒ <code>Boolean</code>
-        * [.areSetsEqual(setA, setB)](#SmilesDrawer.SSSR.areSetsEqual) ⇒ <code>Boolean</code>
-        * [.isSupersetOf(setA, setB)](#SmilesDrawer.SSSR.isSupersetOf) ⇒ <code>Boolean</code>
-    * [.Vector2](#SmilesDrawer.Vector2)
-        * [new SmilesDrawer.Vector2(x, y)](#new_SmilesDrawer.Vector2_new)
-        * _instance_
-            * [.clone()](#SmilesDrawer.Vector2+clone) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.toString()](#SmilesDrawer.Vector2+toString) ⇒ <code>String</code>
-            * [.add(vec)](#SmilesDrawer.Vector2+add) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.subtract(vec)](#SmilesDrawer.Vector2+subtract) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.divide(scalar)](#SmilesDrawer.Vector2+divide) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.multiply(v)](#SmilesDrawer.Vector2+multiply) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.multiplyScalar(scalar)](#SmilesDrawer.Vector2+multiplyScalar) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.invert()](#SmilesDrawer.Vector2+invert) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.angle()](#SmilesDrawer.Vector2+angle) ⇒ <code>Number</code>
-            * [.distance(vec)](#SmilesDrawer.Vector2+distance) ⇒ <code>Number</code>
-            * [.distanceSq(vec)](#SmilesDrawer.Vector2+distanceSq) ⇒ <code>Number</code>
-            * [.clockwise(vec)](#SmilesDrawer.Vector2+clockwise) ⇒ <code>Number</code>
-            * [.rotate(angle)](#SmilesDrawer.Vector2+rotate) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.rotateAround(angle, vec)](#SmilesDrawer.Vector2+rotateAround) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.rotateTo(vec, center, [offsetAngle])](#SmilesDrawer.Vector2+rotateTo) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.rotateAwayFrom(vec, center, angle)](#SmilesDrawer.Vector2+rotateAwayFrom)
-            * [.getRotateAwayFromAngle(vec, center, angle)](#SmilesDrawer.Vector2+getRotateAwayFromAngle) ⇒ <code>Number</code>
-            * [.getRotateTowardsAngle(vec, center, angle)](#SmilesDrawer.Vector2+getRotateTowardsAngle) ⇒ <code>Number</code>
-            * [.getRotateToAngle(vec, center)](#SmilesDrawer.Vector2+getRotateToAngle) ⇒ <code>Number</code>
-            * [.isInPolygon(polygon)](#SmilesDrawer.Vector2+isInPolygon) ⇒ <code>Boolean</code>
-            * [.length()](#SmilesDrawer.Vector2+length) ⇒ <code>Number</code>
-            * [.lengthSq()](#SmilesDrawer.Vector2+lengthSq) ⇒ <code>Number</code>
-            * [.normalize()](#SmilesDrawer.Vector2+normalize) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.normalized()](#SmilesDrawer.Vector2+normalized) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.whichSide(vecA, vecB)](#SmilesDrawer.Vector2+whichSide) ⇒ <code>Number</code>
-            * [.sameSideAs(vecA, vecB, vecC)](#SmilesDrawer.Vector2+sameSideAs) ⇒ <code>Boolean</code>
-        * _static_
-            * [.add(vecA, vecB)](#SmilesDrawer.Vector2.add) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.subtract(vecA, vecB)](#SmilesDrawer.Vector2.subtract) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.multiply(vecA, vecB)](#SmilesDrawer.Vector2.multiply) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.multiplyScalar(vec, scalar)](#SmilesDrawer.Vector2.multiplyScalar) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.midpoint(vecA, vecB)](#SmilesDrawer.Vector2.midpoint) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.normals(vecA, vecB)](#SmilesDrawer.Vector2.normals) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-            * [.units(vecA, vecB)](#SmilesDrawer.Vector2.units) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-            * [.divide(vecA, vecB)](#SmilesDrawer.Vector2.divide) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-            * [.dot(vecA, vecB)](#SmilesDrawer.Vector2.dot) ⇒ <code>Number</code>
-            * [.angle(vecA, vecB)](#SmilesDrawer.Vector2.angle) ⇒ <code>Number</code>
-            * [.threePointangle(vecA, vecB, vecC)](#SmilesDrawer.Vector2.threePointangle) ⇒ <code>Number</code>
-            * [.scalarProjection(vecA, vecB)](#SmilesDrawer.Vector2.scalarProjection) ⇒ <code>Number</code>
-            * [.averageDirection(vecs)](#SmilesDrawer.Vector2.averageDirection) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-    * [.Vertex](#SmilesDrawer.Vertex)
-        * [new SmilesDrawer.Vertex(value, [x], [y])](#new_SmilesDrawer.Vertex_new)
-        * [.setPosition(x, y)](#SmilesDrawer.Vertex+setPosition)
-        * [.setPositionFromVector(v)](#SmilesDrawer.Vertex+setPositionFromVector)
-        * [.addChild(vertexID)](#SmilesDrawer.Vertex+addChild)
-        * [.setParentVertexId(parentVertexId)](#SmilesDrawer.Vertex+setParentVertexId)
-        * [.isTerminal()](#SmilesDrawer.Vertex+isTerminal) ⇒ <code>Boolean</code>
-        * [.clone()](#SmilesDrawer.Vertex+clone) ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
-        * [.equals(vertex)](#SmilesDrawer.Vertex+equals) ⇒ <code>Boolean</code>
-        * [.getAngle([referenceVector], [returnAsDegrees])](#SmilesDrawer.Vertex+getAngle) ⇒ <code>Number</code>
-        * [.getTextDirection(vertices)](#SmilesDrawer.Vertex+getTextDirection) ⇒ <code>String</code>
-        * [.getNeighbours([vertexId])](#SmilesDrawer.Vertex+getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.getDrawnNeighbours(vertices)](#SmilesDrawer.Vertex+getDrawnNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.getNeighbourCount()](#SmilesDrawer.Vertex+getNeighbourCount) ⇒ <code>Number</code>
-        * [.getSpanningTreeNeighbours([vertexId])](#SmilesDrawer.Vertex+getSpanningTreeNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.getNextInRing(vertices, ringId, previousVertexId)](#SmilesDrawer.Vertex+getNextInRing) ⇒ <code>Number</code>
-    * [.clean(smiles)](#SmilesDrawer.clean) ⇒ <code>String</code>
-    * [.apply(options, [selector], [themeName], [onError])](#SmilesDrawer.apply)
-    * [.parse(smiles, successCallback, errorCallback)](#SmilesDrawer.parse)
+## atomicNumbers
+A map mapping element symbols to the atomic number.
 
-<a name="SmilesDrawer.ArrayHelper"></a>
+**Kind**: global variable  
+<a name="mass"></a>
 
-### SmilesDrawer.ArrayHelper
-A static class containing helper functions for array-related tasks.
+## mass
+A map mapping element symbols to the atomic mass.
 
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
+**Kind**: global variable  
+<a name="bonds"></a>
 
-* [.ArrayHelper](#SmilesDrawer.ArrayHelper)
-    * [.clone(arr)](#SmilesDrawer.ArrayHelper.clone) ⇒ <code>\*</code>
-    * [.print(arr)](#SmilesDrawer.ArrayHelper.print) ⇒ <code>String</code>
-    * [.each(arr, callback)](#SmilesDrawer.ArrayHelper.each)
-    * [.get(arr, property, value)](#SmilesDrawer.ArrayHelper.get) ⇒ <code>\*</code>
-    * [.contains(arr, options)](#SmilesDrawer.ArrayHelper.contains) ⇒ <code>Boolean</code>
-    * [.intersection(arrA, arrB)](#SmilesDrawer.ArrayHelper.intersection) ⇒ <code>Array</code>
-    * [.unique(arr)](#SmilesDrawer.ArrayHelper.unique) ⇒ <code>Array</code>
-    * [.count(arr, value)](#SmilesDrawer.ArrayHelper.count) ⇒ <code>Number</code>
-    * [.toggle(arr, value)](#SmilesDrawer.ArrayHelper.toggle) ⇒ <code>Array</code>
-    * [.remove(arr, value)](#SmilesDrawer.ArrayHelper.remove) ⇒ <code>Array</code>
-    * [.removeUnique(arr, value)](#SmilesDrawer.ArrayHelper.removeUnique) ⇒ <code>Array</code>
-    * [.removeAll(arrA, arrB)](#SmilesDrawer.ArrayHelper.removeAll) ⇒ <code>Array</code>
-    * [.merge(arrA, arrB)](#SmilesDrawer.ArrayHelper.merge) ⇒ <code>Array</code>
-    * [.containsAll(arrA, arrB)](#SmilesDrawer.ArrayHelper.containsAll) ⇒ <code>Boolean</code>
-    * [.sortByAtomicNumberDesc(arr)](#SmilesDrawer.ArrayHelper.sortByAtomicNumberDesc) ⇒ <code>Array.&lt;Object&gt;</code>
-    * [.deepCopy(arr)](#SmilesDrawer.ArrayHelper.deepCopy) ⇒ <code>Array</code>
+## bonds ⇒ <code>Object</code>
+An object mapping the bond type to the number of bonds.
 
-<a name="SmilesDrawer.ArrayHelper.clone"></a>
+**Kind**: global variable  
+**Returns**: <code>Object</code> - The object containing the map.  
+<a name="radFactor"></a>
 
-#### ArrayHelper.clone(arr) ⇒ <code>\*</code>
+## radFactor
+The factor to convert degrees to radians.
+
+**Kind**: global variable  
+<a name="degFactor"></a>
+
+## degFactor
+The factor to convert radians to degrees.
+
+**Kind**: global variable  
+<a name="twoPI"></a>
+
+## twoPI
+Two times PI.
+
+**Kind**: global variable  
+<a name="clone"></a>
+
+## clone(arr) ⇒ <code>\*</code>
 Clone an array or an object. If an object is passed, a shallow clone will be created.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>\*</code> - A clone of the array or object.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>\*</code> | The array or object to be cloned. |
 
-<a name="SmilesDrawer.ArrayHelper.print"></a>
+<a name="print"></a>
 
-#### ArrayHelper.print(arr) ⇒ <code>String</code>
+## print(arr) ⇒ <code>String</code>
 Returns a string representation of an array. If the array contains objects with an id property, the id property is printed for each of the elements.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>String</code> - A string representation of the array.  
 
 | Param | Type | Description |
@@ -484,24 +823,24 @@ Returns a string representation of an array. If the array contains objects with 
 | arr | <code>Array.&lt;Object&gt;</code> | An array. |
 | arr[].id | <code>\*</code> | If the array contains an object with the property 'id', the properties value is printed. Else, the array elements value is printend. |
 
-<a name="SmilesDrawer.ArrayHelper.each"></a>
+<a name="each"></a>
 
-#### ArrayHelper.each(arr, callback)
+## each(arr, callback)
 Run a function for each element in the array. The element is supplied as an argument for the callback function
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array</code> | An array. |
 | callback | <code>function</code> | The callback function that is called for each element. |
 
-<a name="SmilesDrawer.ArrayHelper.get"></a>
+<a name="get"></a>
 
-#### ArrayHelper.get(arr, property, value) ⇒ <code>\*</code>
+## get(arr, property, value) ⇒ <code>\*</code>
 Return the array element from an array containing objects, where a property of the object is set to a given value.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>\*</code> - The array element matching the value.  
 
 | Param | Type | Description |
@@ -510,28 +849,28 @@ Return the array element from an array containing objects, where a property of t
 | property | <code>String</code> &#124; <code>Number</code> | A property contained within an object in the array. |
 | value | <code>String</code> &#124; <code>Number</code> | The value of the property. |
 
-<a name="SmilesDrawer.ArrayHelper.contains"></a>
+<a name="contains"></a>
 
-#### ArrayHelper.contains(arr, options) ⇒ <code>Boolean</code>
+## contains(arr, options) ⇒ <code>Boolean</code>
 Checks whether or not an array contains a given value. the options object passed as a second argument can contain three properties. value: The value to be searched for. property: The property that is to be searched for a given value. func: A function that is used as a callback to return either true or false in order to do a custom comparison.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Boolean</code> - A boolean whether or not the array contains a value.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array</code> | An array. |
 | options | <code>Object</code> | See method description. |
-| options.property | <code>String</code> | The property on which to check. |
 | options.value | <code>\*</code> | The value for which to check. |
+| [options.property] | <code>String</code> | The property on which to check. |
 | [options.func] | <code>function</code> | A custom property function. |
 
-<a name="SmilesDrawer.ArrayHelper.intersection"></a>
+<a name="intersection"></a>
 
-#### ArrayHelper.intersection(arrA, arrB) ⇒ <code>Array</code>
+## intersection(arrA, arrB) ⇒ <code>Array</code>
 Returns an array containing the intersection between two arrays. That is, values that are common to both arrays.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array</code> - The intersecting vlaues.  
 
 | Param | Type | Description |
@@ -539,24 +878,24 @@ Returns an array containing the intersection between two arrays. That is, values
 | arrA | <code>Array</code> | An array. |
 | arrB | <code>Array</code> | An array. |
 
-<a name="SmilesDrawer.ArrayHelper.unique"></a>
+<a name="unique"></a>
 
-#### ArrayHelper.unique(arr) ⇒ <code>Array</code>
+## unique(arr) ⇒ <code>Array</code>
 Returns an array of unique elements contained in an array.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array</code> - An array of unique elements contained within the array supplied as an argument.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array</code> | An array. |
 
-<a name="SmilesDrawer.ArrayHelper.count"></a>
+<a name="count"></a>
 
-#### ArrayHelper.count(arr, value) ⇒ <code>Number</code>
+## count(arr, value) ⇒ <code>Number</code>
 Count the number of occurences of a value in an array.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Number</code> - The number of occurences of a value in the array.  
 
 | Param | Type | Description |
@@ -564,12 +903,12 @@ Count the number of occurences of a value in an array.
 | arr | <code>Array</code> | An array. |
 | value | <code>\*</code> | A value to be counted. |
 
-<a name="SmilesDrawer.ArrayHelper.toggle"></a>
+<a name="toggle"></a>
 
-#### ArrayHelper.toggle(arr, value) ⇒ <code>Array</code>
+## toggle(arr, value) ⇒ <code>Array</code>
 Toggles the value of an array. If a value is not contained in an array, the array returned will contain all the values of the original array including the value. If a value is contained in an array, the array returned will contain all the values of the original array excluding the value.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array</code> - The toggled array.  
 
 | Param | Type | Description |
@@ -577,12 +916,12 @@ Toggles the value of an array. If a value is not contained in an array, the arra
 | arr | <code>Array</code> | An array. |
 | value | <code>\*</code> | A value to be toggled. |
 
-<a name="SmilesDrawer.ArrayHelper.remove"></a>
+<a name="remove"></a>
 
-#### ArrayHelper.remove(arr, value) ⇒ <code>Array</code>
+## remove(arr, value) ⇒ <code>Array</code>
 Remove a value from an array.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array</code> - A new array with the element with a given value removed.  
 
 | Param | Type | Description |
@@ -590,12 +929,12 @@ Remove a value from an array.
 | arr | <code>Array</code> | An array. |
 | value | <code>\*</code> | A value to be removed. |
 
-<a name="SmilesDrawer.ArrayHelper.removeUnique"></a>
+<a name="removeUnique"></a>
 
-#### ArrayHelper.removeUnique(arr, value) ⇒ <code>Array</code>
+## removeUnique(arr, value) ⇒ <code>Array</code>
 Remove a value from an array with unique values.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array</code> - An array with the element with a given value removed.  
 
 | Param | Type | Description |
@@ -603,12 +942,12 @@ Remove a value from an array with unique values.
 | arr | <code>Array</code> | An array. |
 | value | <code>\*</code> | A value to be removed. |
 
-<a name="SmilesDrawer.ArrayHelper.removeAll"></a>
+<a name="removeAll"></a>
 
-#### ArrayHelper.removeAll(arrA, arrB) ⇒ <code>Array</code>
+## removeAll(arrA, arrB) ⇒ <code>Array</code>
 Remove all elements contained in one array from another array.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array</code> - The filtered array.  
 
 | Param | Type | Description |
@@ -616,12 +955,12 @@ Remove all elements contained in one array from another array.
 | arrA | <code>Array</code> | The array to be filtered. |
 | arrB | <code>Array</code> | The array containing elements that will be removed from the other array. |
 
-<a name="SmilesDrawer.ArrayHelper.merge"></a>
+<a name="merge"></a>
 
-#### ArrayHelper.merge(arrA, arrB) ⇒ <code>Array</code>
+## merge(arrA, arrB) ⇒ <code>Array</code>
 Merges two arrays and returns the result. The first array will be appended to the second array.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array</code> - The merged array.  
 
 | Param | Type | Description |
@@ -629,12 +968,12 @@ Merges two arrays and returns the result. The first array will be appended to th
 | arrA | <code>Array</code> | An array. |
 | arrB | <code>Array</code> | An array. |
 
-<a name="SmilesDrawer.ArrayHelper.containsAll"></a>
+<a name="containsAll"></a>
 
-#### ArrayHelper.containsAll(arrA, arrB) ⇒ <code>Boolean</code>
+## containsAll(arrA, arrB) ⇒ <code>Boolean</code>
 Checks whether or not an array contains all the elements of another array, without regard to the order.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Boolean</code> - A boolean indicating whether or not both array contain the same elements.  
 
 | Param | Type | Description |
@@ -642,119 +981,49 @@ Checks whether or not an array contains all the elements of another array, witho
 | arrA | <code>Array</code> | An array. |
 | arrB | <code>Array</code> | An array. |
 
-<a name="SmilesDrawer.ArrayHelper.sortByAtomicNumberDesc"></a>
+<a name="sortByAtomicNumberDesc"></a>
 
-#### ArrayHelper.sortByAtomicNumberDesc(arr) ⇒ <code>Array.&lt;Object&gt;</code>
+## sortByAtomicNumberDesc(arr) ⇒ <code>Array.&lt;Object&gt;</code>
 Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array.&lt;Object&gt;</code> - The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array.&lt;Object&gt;</code> | An array of vertex ids with their associated atomic numbers. |
 | arr[].vertexId | <code>Number</code> | A vertex id. |
-| arr[].atomicNumber | <code>Number</code> | The atomic number associated with the vertex id. |
+| arr[].atomicNumber | <code>String</code> | The atomic number associated with the vertex id. |
 
-<a name="SmilesDrawer.ArrayHelper.deepCopy"></a>
+<a name="deepCopy"></a>
 
-#### ArrayHelper.deepCopy(arr) ⇒ <code>Array</code>
+## deepCopy(arr) ⇒ <code>Array</code>
 Copies a an n-dimensional array.
 
-**Kind**: static method of <code>[ArrayHelper](#SmilesDrawer.ArrayHelper)</code>  
+**Kind**: global function  
 **Returns**: <code>Array</code> - The copy.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array</code> | The array to be copied. |
 
-<a name="SmilesDrawer.Atom"></a>
+<a name="addNeighbouringElement"></a>
 
-### SmilesDrawer.Atom
-A class representing an atom.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| element | <code>String</code> | The element symbol of this atom. Single-letter symbols are always uppercase. Examples: H, C, F, Br, Si, ... |
-| drawExplicit | <code>Boolean</code> | A boolean indicating whether or not this atom is drawn explicitly (for example, a carbon atom). This overrides the default behaviour. |
-| ringbonds | <code>Array.&lt;Object&gt;</code> | An array containing the ringbond ids and bond types as specified in the original SMILE. |
-| ringbonds[].id | <code>Number</code> | The ringbond id as defined in the SMILES. |
-| ringbonds[].bondType | <code>String</code> | The bond type of the ringbond as defined in the SMILES. |
-| rings | <code>Array.&lt;Number&gt;</code> | The ids of rings which contain this atom. |
-| bondType | <code>String</code> | The bond type associated with this array. Examples: -, =, #, ... |
-| isBridge | <code>Boolean</code> | A boolean indicating whether or not this atom is part of a bridge in a bridged ring (contained by the largest ring). |
-| isBridgeNode | <code>Boolean</code> | A boolean indicating whether or not this atom is a bridge node (a member of the largest ring in a bridged ring which is connected to a bridge-atom). |
-| originalRings | <code>Array.&lt;Number&gt;</code> | Used to back up rings when they are replaced by a bridged ring. |
-| bridgedRing | <code>Number</code> | The id of the bridged ring if the atom is part of a bridged ring. |
-| anchoredRings | <code>Array.&lt;Number&gt;</code> | The ids of the rings that are anchored to this atom. The centers of anchored rings are translated when this atom is translated. |
-| bracket | <code>Object</code> | If this atom is defined as a bracket atom in the original SMILES, this object contains all the bracket information. Example: { hcount: {Number}, charge: ['--', '-', '+', '++'], isotope: {Number} }. |
-| plane | <code>Number</code> | Specifies on which "plane" the atoms is in stereochemical deptictions (-1 back, 0 middle, 1 front). |
-| attachedPseudoElements | <code>Array.&lt;Object&gt;</code> | A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count. |
-| attachedPseudoElement[].element | <code>String</code> | The element symbol. |
-| attachedPseudoElement[].count | <code>Number</code> | The number of occurences that match the key. |
-| attachedPseudoElement[].hyrogenCount | <code>Number</code> | The number of hydrogens attached to each atom matching the key. |
-| hasAttachedPseudoElements | <code>Boolean</code> | A boolean indicating whether or not this attom will be drawn with an attached pseudo element or concatinated elements. |
-| isDrawn | <code>Boolean</code> | A boolean indicating whether or not this atom is drawn. In contrast to drawExplicit, the bond is drawn neither. |
-| isConnectedToRing | <code>Boolean</code> | A boolean indicating whether or not this atom is directly connected (but not a member of) a ring. |
-| neighbouringElements | <code>Array.&lt;String&gt;</code> | An array containing the element symbols of neighbouring atoms. |
-| isPartOfAromaticRing | <code>Boolean</code> | A boolean indicating whether or not this atom is part of an explicitly defined aromatic ring. Example: c1ccccc1. |
-| bondCount | <code>Number</code> | The number of bonds in which this atom is participating. |
-
-
-* [.Atom](#SmilesDrawer.Atom)
-    * [new SmilesDrawer.Atom(element, [bondType])](#new_SmilesDrawer.Atom_new)
-    * _instance_
-        * [.addNeighbouringElement(element)](#SmilesDrawer.Atom+addNeighbouringElement)
-        * [.attachPseudoElement(element, previousElement, [hydrogenCount])](#SmilesDrawer.Atom+attachPseudoElement)
-        * [.getAttachedPseudoElements()](#SmilesDrawer.Atom+getAttachedPseudoElements) ⇒ <code>Object</code>
-        * [.getAttachedPseudoElementsCount()](#SmilesDrawer.Atom+getAttachedPseudoElementsCount) ⇒ <code>Number</code>
-        * [.addAnchoredRing(ringId)](#SmilesDrawer.Atom+addAnchoredRing)
-        * [.getRingbondCount()](#SmilesDrawer.Atom+getRingbondCount) ⇒ <code>Number</code>
-        * [.backupRings()](#SmilesDrawer.Atom+backupRings)
-        * [.restoreRings()](#SmilesDrawer.Atom+restoreRings)
-        * [.haveCommonRingbond(atomA, atomB)](#SmilesDrawer.Atom+haveCommonRingbond) ⇒ <code>Boolean</code>
-        * [.getOrder(center)](#SmilesDrawer.Atom+getOrder) ⇒ <code>Number</code>
-        * [.setOrder(center, order)](#SmilesDrawer.Atom+setOrder)
-        * [.neighbouringElementsEqual(arr)](#SmilesDrawer.Atom+neighbouringElementsEqual) ⇒ <code>Boolean</code>
-        * [.getAtomicNumber()](#SmilesDrawer.Atom+getAtomicNumber) ⇒ <code>Number</code>
-    * _static_
-        * [.maxBonds](#SmilesDrawer.Atom.maxBonds)
-        * [.atomicNumbers](#SmilesDrawer.Atom.atomicNumbers)
-        * [.sortByAtomicNumber(root, neighbours, vertices, rings)](#SmilesDrawer.Atom.sortByAtomicNumber) ⇒ <code>Array.&lt;Object&gt;</code>
-        * [.hasDuplicateAtomicNumbers(sortedAtomicNumbers)](#SmilesDrawer.Atom.hasDuplicateAtomicNumbers) ⇒ <code>Boolean</code>
-        * [.getDuplicateAtomicNumbers(sortedAtomicNumbers)](#SmilesDrawer.Atom.getDuplicateAtomicNumbers) ⇒ <code>Array.&lt;Array&gt;</code>
-
-<a name="new_SmilesDrawer.Atom_new"></a>
-
-#### new SmilesDrawer.Atom(element, [bondType])
-The constructor of the class Atom.
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| element | <code>String</code> |  | The one-letter code of the element. |
-| [bondType] | <code>String</code> | <code>&#x27;-&#x27;</code> | The type of the bond associated with this atom. |
-
-<a name="SmilesDrawer.Atom+addNeighbouringElement"></a>
-
-#### atom.addNeighbouringElement(element)
+## addNeighbouringElement(element)
 Adds a neighbouring element to this atom.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | element | <code>String</code> | A string representing an element. |
 
-<a name="SmilesDrawer.Atom+attachPseudoElement"></a>
+<a name="attachPseudoElement"></a>
 
-#### atom.attachPseudoElement(element, previousElement, [hydrogenCount])
+## attachPseudoElement(element, previousElement, [hydrogenCount])
 Attaches a pseudo element (e.g. Ac) to the atom.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -762,139 +1031,127 @@ Attaches a pseudo element (e.g. Ac) to the atom.
 | previousElement | <code>String</code> |  | The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated). |
 | [hydrogenCount] | <code>Number</code> | <code>0</code> | The number of hydrogens for the element. |
 
-<a name="SmilesDrawer.Atom+getAttachedPseudoElements"></a>
+<a name="getAttachedPseudoElements"></a>
 
-#### atom.getAttachedPseudoElements() ⇒ <code>Object</code>
+## getAttachedPseudoElements() ⇒ <code>Object</code>
 Returns the attached pseudo elements sorted by hydrogen count (ascending).
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Object</code> - The sorted attached pseudo elements.  
-<a name="SmilesDrawer.Atom+getAttachedPseudoElementsCount"></a>
+<a name="getAttachedPseudoElementsCount"></a>
 
-#### atom.getAttachedPseudoElementsCount() ⇒ <code>Number</code>
+## getAttachedPseudoElementsCount() ⇒ <code>Number</code>
 Returns the number of attached pseudo elements.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Number</code> - The number of attached pseudo elements.  
-<a name="SmilesDrawer.Atom+addAnchoredRing"></a>
+<a name="addAnchoredRing"></a>
 
-#### atom.addAnchoredRing(ringId)
+## addAnchoredRing(ringId)
 Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | ringId | <code>Number</code> | A ring id. |
 
-<a name="SmilesDrawer.Atom+getRingbondCount"></a>
+<a name="getRingbondCount"></a>
 
-#### atom.getRingbondCount() ⇒ <code>Number</code>
+## getRingbondCount() ⇒ <code>Number</code>
 Returns the number of ringbonds (breaks in rings to generate the MST of the smiles) within this atom is connected to.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Number</code> - The number of ringbonds this atom is connected to.  
-<a name="SmilesDrawer.Atom+backupRings"></a>
+<a name="backupRings"></a>
 
-#### atom.backupRings()
+## backupRings()
 Backs up the current rings.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
-<a name="SmilesDrawer.Atom+restoreRings"></a>
+**Kind**: global function  
+<a name="restoreRings"></a>
 
-#### atom.restoreRings()
+## restoreRings()
 Restores the most recent backed up rings.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
-<a name="SmilesDrawer.Atom+haveCommonRingbond"></a>
+**Kind**: global function  
+<a name="haveCommonRingbond"></a>
 
-#### atom.haveCommonRingbond(atomA, atomB) ⇒ <code>Boolean</code>
+## haveCommonRingbond(atomA, atomB) ⇒ <code>Boolean</code>
 Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Boolean</code> - A boolean indicating whether or not two atoms share a common ringbond.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| atomA | <code>[Atom](#SmilesDrawer.Atom)</code> | An atom. |
-| atomB | <code>[Atom](#SmilesDrawer.Atom)</code> | An atom. |
+| atomA | <code>Atom</code> | An atom. |
+| atomB | <code>Atom</code> | An atom. |
 
-<a name="SmilesDrawer.Atom+getOrder"></a>
+<a name="getOrder"></a>
 
-#### atom.getOrder(center) ⇒ <code>Number</code>
+## getOrder(center) ⇒ <code>Number</code>
 Returns the order of this atom given a central atom.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Number</code> - The order of this atom in respect to the center atom.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | center | <code>Number</code> | The id of the central atom in respect to which the order is defined. |
 
-<a name="SmilesDrawer.Atom+setOrder"></a>
+<a name="setOrder"></a>
 
-#### atom.setOrder(center, order)
+## setOrder(center, order)
 Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | center | <code>Number</code> | The id of the central atom in respect to which the order is defined. |
 | order | <code>Number</code> | The order of this atom. |
 
-<a name="SmilesDrawer.Atom+neighbouringElementsEqual"></a>
+<a name="neighbouringElementsEqual"></a>
 
-#### atom.neighbouringElementsEqual(arr) ⇒ <code>Boolean</code>
+## neighbouringElementsEqual(arr) ⇒ <code>Boolean</code>
 Check whether or not the neighbouring elements of this atom equal the supplied array.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Boolean</code> - A boolean indicating whether or not the neighbours match the supplied array of elements.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array.&lt;String&gt;</code> | An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N'] |
 
-<a name="SmilesDrawer.Atom+getAtomicNumber"></a>
+<a name="getAtomicNumber"></a>
 
-#### atom.getAtomicNumber() ⇒ <code>Number</code>
+## getAtomicNumber() ⇒ <code>Number</code>
 Get the atomic number of this atom.
 
-**Kind**: instance method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Number</code> - The atomic number of this atom.  
-<a name="SmilesDrawer.Atom.maxBonds"></a>
+<a name="sortByAtomicNumber"></a>
 
-#### Atom.maxBonds
-A map mapping element symbols to their maximum bonds.
-
-**Kind**: static property of <code>[Atom](#SmilesDrawer.Atom)</code>  
-<a name="SmilesDrawer.Atom.atomicNumbers"></a>
-
-#### Atom.atomicNumbers
-A map mapping element symbols to the atomic number.
-
-**Kind**: static property of <code>[Atom](#SmilesDrawer.Atom)</code>  
-<a name="SmilesDrawer.Atom.sortByAtomicNumber"></a>
-
-#### Atom.sortByAtomicNumber(root, neighbours, vertices, rings) ⇒ <code>Array.&lt;Object&gt;</code>
+## sortByAtomicNumber(root, neighbours, vertices, rings) ⇒ <code>Array.&lt;Object&gt;</code>
 Sorts an array of vertices by their respecitve atomic number.
 
-**Kind**: static method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Array.&lt;Object&gt;</code> - The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| root | <code>[Vertex](#SmilesDrawer.Vertex)</code> | The central vertex |
+| root | <code>Vertex</code> | The central vertex |
 | neighbours | <code>Array.&lt;Number&gt;</code> | An array of vertex ids. |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | An array containing the vertices associated with the current molecule. |
-| rings | <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code> | An array containing the rings associated with the current molecule. |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | An array containing the vertices associated with the current molecule. |
+| rings | <code>Array.&lt;Ring&gt;</code> | An array containing the rings associated with the current molecule. |
 
-<a name="SmilesDrawer.Atom.hasDuplicateAtomicNumbers"></a>
+<a name="hasDuplicateAtomicNumbers"></a>
 
-#### Atom.hasDuplicateAtomicNumbers(sortedAtomicNumbers) ⇒ <code>Boolean</code>
+## hasDuplicateAtomicNumbers(sortedAtomicNumbers) ⇒ <code>Boolean</code>
 Checks wheter or not two atoms have the same atomic number
 
-**Kind**: static method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Boolean</code> - A boolean indicating whether or not there are duplicate atomic numbers.  
 
 | Param | Type | Description |
@@ -903,12 +1160,12 @@ Checks wheter or not two atoms have the same atomic number
 | sortedAtomicNumbers[].vertexId | <code>Number</code> | A vertex id. |
 | sortedAtomicNumbers[].atomicNumber | <code>Number</code> | The atomic number associated with the vertex id. |
 
-<a name="SmilesDrawer.Atom.getDuplicateAtomicNumbers"></a>
+<a name="getDuplicateAtomicNumbers"></a>
 
-#### Atom.getDuplicateAtomicNumbers(sortedAtomicNumbers) ⇒ <code>Array.&lt;Array&gt;</code>
+## getDuplicateAtomicNumbers(sortedAtomicNumbers) ⇒ <code>Array.&lt;Array&gt;</code>
 Returns sets of duplicate atomic numbers.
 
-**Kind**: static method of <code>[Atom](#SmilesDrawer.Atom)</code>  
+**Kind**: global function  
 **Returns**: <code>Array.&lt;Array&gt;</code> - An array of arrays containing the indices of duplicate atomic numbers.  
 
 | Param | Type | Description |
@@ -917,117 +1174,64 @@ Returns sets of duplicate atomic numbers.
 | sortedAtomicNumbers[].vertexId | <code>Number</code> | A vertex id. |
 | sortedAtomicNumbers[].atomicNumber | <code>Number</code> | The atomic number associated with the vertex id. |
 
-<a name="SmilesDrawer.CanvasWrapper"></a>
+<a name="updateSize"></a>
 
-### SmilesDrawer.CanvasWrapper
-A class wrapping a canvas element.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| canvas | <code>HTMLElement</code> | The HTML element for the canvas associated with this CanvasWrapper instance. |
-| ctx | <code>CanvasRenderingContext2D</code> | The CanvasRenderingContext2D of the canvas associated with this CanvasWrapper instance. |
-| colors | <code>Object</code> | The colors object as defined in the SmilesDrawer options. |
-| opts | <code>Object</code> | The SmilesDrawer options. |
-| drawingWidth | <code>Number</code> | The width of the canvas. |
-| drawingHeight | <code>Number</code> | The height of the canvas. |
-| offsetX | <code>Number</code> | The horizontal offset required for centering the drawing. |
-| offsetY | <code>Number</code> | The vertical offset required for centering the drawing. |
-| fontLarge | <code>Number</code> | The large font size in pt. |
-| fontSmall | <code>Number</code> | The small font size in pt. |
-
-
-* [.CanvasWrapper](#SmilesDrawer.CanvasWrapper)
-    * [new SmilesDrawer.CanvasWrapper(target, theme, options)](#new_SmilesDrawer.CanvasWrapper_new)
-    * [.updateSize(width, height)](#SmilesDrawer.CanvasWrapper+updateSize)
-    * [.setTheme(theme)](#SmilesDrawer.CanvasWrapper+setTheme)
-    * [.scale(vertices)](#SmilesDrawer.CanvasWrapper+scale)
-    * [.reset()](#SmilesDrawer.CanvasWrapper+reset)
-    * [.getColor(key)](#SmilesDrawer.CanvasWrapper+getColor) ⇒ <code>String</code>
-    * [.drawCircle(x, y, radius, color, [fill], [debug], [debugText])](#SmilesDrawer.CanvasWrapper+drawCircle)
-    * [.drawLine(line, [dashed], [alpha])](#SmilesDrawer.CanvasWrapper+drawLine)
-    * [.drawWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawWedge)
-    * [.drawDashedWedge(line, width)](#SmilesDrawer.CanvasWrapper+drawDashedWedge)
-    * [.drawDebugText(x, y, text)](#SmilesDrawer.CanvasWrapper+drawDebugText)
-    * [.drawBall(x, y, elementName)](#SmilesDrawer.CanvasWrapper+drawBall)
-    * [.drawPoint(x, y, elementName)](#SmilesDrawer.CanvasWrapper+drawPoint)
-    * [.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)](#SmilesDrawer.CanvasWrapper+drawText)
-    * [.drawDebugPoint(x, y, [debugText], [color])](#SmilesDrawer.CanvasWrapper+drawDebugPoint)
-    * [.drawAromaticityRing(ring)](#SmilesDrawer.CanvasWrapper+drawAromaticityRing)
-    * [.clear()](#SmilesDrawer.CanvasWrapper+clear)
-
-<a name="new_SmilesDrawer.CanvasWrapper_new"></a>
-
-#### new SmilesDrawer.CanvasWrapper(target, theme, options)
-The constructor for the class CanvasWrapper.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| target | <code>String</code> &#124; <code>HTMLElement</code> | The canvas id or the canvas HTMLElement. |
-| theme | <code>Object</code> | A theme from the smiles drawer options. |
-| options | <code>Object</code> | The smiles drawer options object. |
-
-<a name="SmilesDrawer.CanvasWrapper+updateSize"></a>
-
-#### canvasWrapper.updateSize(width, height)
+## updateSize(width, height)
 Update the width and height of the canvas
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
 | width | <code>Number</code> | 
 | height | <code>Number</code> | 
 
-<a name="SmilesDrawer.CanvasWrapper+setTheme"></a>
+<a name="setTheme"></a>
 
-#### canvasWrapper.setTheme(theme)
+## setTheme(theme)
 Sets a provided theme.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | theme | <code>Object</code> | A theme from the smiles drawer options. |
 
-<a name="SmilesDrawer.CanvasWrapper+scale"></a>
+<a name="scale"></a>
 
-#### canvasWrapper.scale(vertices)
+## scale(vertices)
 Scale the canvas based on vertex positions.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | An array of vertices containing the vertices associated with the current molecule. |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | An array of vertices containing the vertices associated with the current molecule. |
 
-<a name="SmilesDrawer.CanvasWrapper+reset"></a>
+<a name="reset"></a>
 
-#### canvasWrapper.reset()
+## reset()
 Resets the transform of the canvas.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
-<a name="SmilesDrawer.CanvasWrapper+getColor"></a>
+**Kind**: global function  
+<a name="getColor"></a>
 
-#### canvasWrapper.getColor(key) ⇒ <code>String</code>
+## getColor(key) ⇒ <code>String</code>
 Returns the hex code of a color associated with a key from the current theme.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 **Returns**: <code>String</code> - A color hex value.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | key | <code>String</code> | The color key in the theme (e.g. C, N, BACKGROUND, ...). |
 
-<a name="SmilesDrawer.CanvasWrapper+drawCircle"></a>
+<a name="drawCircle"></a>
 
-#### canvasWrapper.drawCircle(x, y, radius, color, [fill], [debug], [debugText])
+## drawCircle(x, y, radius, color, [fill], [debug], [debugText])
 Draws a circle to a canvas context.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1039,49 +1243,49 @@ Draws a circle to a canvas context.
 | [debug] | <code>Boolean</code> | <code>false</code> | Draw in debug mode. |
 | [debugText] | <code>String</code> | <code>&#x27;&#x27;</code> | A debug message. |
 
-<a name="SmilesDrawer.CanvasWrapper+drawLine"></a>
+<a name="drawLine"></a>
 
-#### canvasWrapper.drawLine(line, [dashed], [alpha])
+## drawLine(line, [dashed], [alpha])
 Draw a line to a canvas.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| line | <code>[Line](#SmilesDrawer.Line)</code> |  | A line. |
+| line | <code>Line</code> |  | A line. |
 | [dashed] | <code>Boolean</code> | <code>false</code> | Whether or not the line is dashed. |
 | [alpha] | <code>Number</code> | <code>1.0</code> | The alpha value of the color. |
 
-<a name="SmilesDrawer.CanvasWrapper+drawWedge"></a>
+<a name="drawWedge"></a>
 
-#### canvasWrapper.drawWedge(line, width)
+## drawWedge(line, width)
 Draw a wedge on the canvas.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| line | <code>[Line](#SmilesDrawer.Line)</code> |  | A line. |
+| line | <code>Line</code> |  | A line. |
 | width | <code>Number</code> | <code>3</code> | The wedge width. |
 
-<a name="SmilesDrawer.CanvasWrapper+drawDashedWedge"></a>
+<a name="drawDashedWedge"></a>
 
-#### canvasWrapper.drawDashedWedge(line, width)
+## drawDashedWedge(line, width)
 Draw a dashed wedge on the canvas.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| line | <code>[Line](#SmilesDrawer.Line)</code> |  | A line. |
+| line | <code>Line</code> |  | A line. |
 | width | <code>Number</code> | <code>6</code> | The wedge width. |
 
-<a name="SmilesDrawer.CanvasWrapper+drawDebugText"></a>
+<a name="drawDebugText"></a>
 
-#### canvasWrapper.drawDebugText(x, y, text)
+## drawDebugText(x, y, text)
 Draws a debug text message at a given position
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1089,12 +1293,12 @@ Draws a debug text message at a given position
 | y | <code>Number</code> | The y coordinate. |
 | text | <code>String</code> | The debug text. |
 
-<a name="SmilesDrawer.CanvasWrapper+drawBall"></a>
+<a name="drawBall"></a>
 
-#### canvasWrapper.drawBall(x, y, elementName)
+## drawBall(x, y, elementName)
 Draw a ball to the canvas.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1102,12 +1306,12 @@ Draw a ball to the canvas.
 | y | <code>Number</code> | The y position of the text. |
 | elementName | <code>String</code> | The name of the element (single-letter). |
 
-<a name="SmilesDrawer.CanvasWrapper+drawPoint"></a>
+<a name="drawPoint"></a>
 
-#### canvasWrapper.drawPoint(x, y, elementName)
+## drawPoint(x, y, elementName)
 Draw a point to the canvas.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1115,12 +1319,12 @@ Draw a point to the canvas.
 | y | <code>Number</code> | The y position of the point. |
 | elementName | <code>String</code> | The name of the element (single-letter). |
 
-<a name="SmilesDrawer.CanvasWrapper+drawText"></a>
+<a name="drawText"></a>
 
-#### canvasWrapper.drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)
+## drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)
 Draw a text to the canvas.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1130,19 +1334,19 @@ Draw a text to the canvas.
 | hydrogens | <code>Number</code> | The number of hydrogen atoms. |
 | direction | <code>String</code> | The direction of the text in relation to the associated vertex. |
 | isTerminal | <code>Boolean</code> | A boolean indicating whether or not the vertex is terminal. |
-| charge | <code>String</code> | The charge of the atom. |
+| charge | <code>Number</code> | The charge of the atom. |
 | isotope | <code>Number</code> | The isotope number. |
 | attachedPseudoElements | <code>Array.&lt;Object&gt;</code> | A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count. |
 | attachedPseudoElement[].element | <code>String</code> | The element symbol. |
 | attachedPseudoElement[].count | <code>Number</code> | The number of occurences that match the key. |
 | attachedPseudoElement[].hyrogenCount | <code>Number</code> | The number of hydrogens attached to each atom matching the key. |
 
-<a name="SmilesDrawer.CanvasWrapper+drawDebugPoint"></a>
+<a name="drawDebugPoint"></a>
 
-#### canvasWrapper.drawDebugPoint(x, y, [debugText], [color])
+## drawDebugPoint(x, y, [debugText], [color])
 Draws a dubug dot at a given coordinate and adds text.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -1151,1829 +1355,23 @@ Draws a dubug dot at a given coordinate and adds text.
 | [debugText] | <code>String</code> | <code>&#x27;&#x27;</code> | A string. |
 | [color] | <code>String</code> | <code>&#x27;#f00&#x27;</code> | A color in hex form. |
 
-<a name="SmilesDrawer.CanvasWrapper+drawAromaticityRing"></a>
+<a name="drawAromaticityRing"></a>
 
-#### canvasWrapper.drawAromaticityRing(ring)
+## drawAromaticityRing(ring)
 Draws a ring inside a provided ring, indicating aromaticity.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
+**Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | A ring. |
+| ring | <code>Ring</code> | A ring. |
 
-<a name="SmilesDrawer.CanvasWrapper+clear"></a>
+<a name="clear"></a>
 
-#### canvasWrapper.clear()
+## clear()
 Clear the canvas.
 
-**Kind**: instance method of <code>[CanvasWrapper](#SmilesDrawer.CanvasWrapper)</code>  
-<a name="SmilesDrawer.Edge"></a>
-
-### SmilesDrawer.Edge
-A class representing an edge.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Default | Description |
-| --- | --- | --- | --- |
-| id | <code>Number</code> |  | The id of this edge. |
-| sourceId | <code>Number</code> |  | The id of the source vertex. |
-| targetId | <code>Number</code> |  | The id of the target vertex. |
-| weight | <code>Number</code> |  | The weight of this edge. |
-| bondType | <code>String</code> | <code>&#x27;-&#x27;</code> | The bond type of this edge. |
-| isPartOfAromaticRing | <code>Boolean</code> | <code>false</code> | Whether or not this edge is part of an aromatic ring. |
-| center | <code>Boolean</code> | <code>false</code> | Wheter or not the bond is centered. For example, this affects straight double bonds. |
-| chiral | <code>String</code> | <code>&#x27;&#x27;</code> | Chirality information. |
-
-
-* [.Edge](#SmilesDrawer.Edge)
-    * [new SmilesDrawer.Edge(sourceId, targetId, [weight])](#new_SmilesDrawer.Edge_new)
-    * _instance_
-        * [.getBondCount()](#SmilesDrawer.Edge+getBondCount) ⇒ <code>Number</code>
-    * _static_
-        * [.bonds](#SmilesDrawer.Edge.bonds) ⇒ <code>Object</code>
-
-<a name="new_SmilesDrawer.Edge_new"></a>
-
-#### new SmilesDrawer.Edge(sourceId, targetId, [weight])
-The constructor for the class Edge.
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| sourceId | <code>Number</code> |  | A vertex id. |
-| targetId | <code>Number</code> |  | A vertex id. |
-| [weight] | <code>Number</code> | <code>1</code> | The weight of the edge. |
-
-<a name="SmilesDrawer.Edge+getBondCount"></a>
-
-#### edge.getBondCount() ⇒ <code>Number</code>
-Returns the number of bonds associated with the bond type of this edge.
-
-**Kind**: instance method of <code>[Edge](#SmilesDrawer.Edge)</code>  
-**Returns**: <code>Number</code> - The number of bonds associated with this edge.  
-<a name="SmilesDrawer.Edge.bonds"></a>
-
-#### Edge.bonds ⇒ <code>Object</code>
-An object mapping the bond type to the number of bonds.
-
-**Kind**: static property of <code>[Edge](#SmilesDrawer.Edge)</code>  
-**Returns**: <code>Object</code> - The object containing the map.  
-<a name="SmilesDrawer.Graph"></a>
-
-### SmilesDrawer.Graph
-A class representing the molecular graph.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | The vertices of the graph. |
-| edges | <code>[Array.&lt;Edge&gt;](#SmilesDrawer.Edge)</code> | The edges of this graph. |
-| vertexIdsToEdgeId | <code>Object</code> | A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId. |
-| elementCount | <code>Object</code> | A map associating element symbols with the number of occurences in this graph. |
-| isometric | <code>Boolean</code> | A boolean indicating whether or not the SMILES associated with this graph is isometric. |
-
-
-* [.Graph](#SmilesDrawer.Graph)
-    * [new SmilesDrawer.Graph(parseTree, [isomeric])](#new_SmilesDrawer.Graph_new)
-    * _instance_
-        * [._init(node, parentVertexId, isBranch)](#SmilesDrawer.Graph+_init)
-        * [._initInfos()](#SmilesDrawer.Graph+_initInfos)
-        * [.clear()](#SmilesDrawer.Graph+clear)
-        * [.addVertex(vertex)](#SmilesDrawer.Graph+addVertex) ⇒ <code>Number</code>
-        * [.addEdge(edge)](#SmilesDrawer.Graph+addEdge) ⇒ <code>Number</code>
-        * [.getEdge(vertexIdA, vertexIdB)](#SmilesDrawer.Graph+getEdge) ⇒ <code>Number</code> &#124; <code>null</code>
-        * [.getEdges(vertexId)](#SmilesDrawer.Graph+getEdges) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.hasEdge(vertexIdA, vertexIdB)](#SmilesDrawer.Graph+hasEdge) ⇒ <code>Number</code> &#124; <code>null</code>
-        * [.getVertexList()](#SmilesDrawer.Graph+getVertexList) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.getEdgeList()](#SmilesDrawer.Graph+getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getAdjacencyMatrix()](#SmilesDrawer.Graph+getAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getComponentsAdjacencyMatrix()](#SmilesDrawer.Graph+getComponentsAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getSubgraphAdjacencyMatrix(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getDistanceMatrix()](#SmilesDrawer.Graph+getDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getSubgraphDistanceMatrix(vertexIds)](#SmilesDrawer.Graph+getSubgraphDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getAdjacencyList()](#SmilesDrawer.Graph+getAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getSubgraphAdjacencyList(vertexIds)](#SmilesDrawer.Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getBridges()](#SmilesDrawer.Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.traverseBF(startVertexId, callback)](#SmilesDrawer.Graph+traverseBF)
-        * [.kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)](#SmilesDrawer.Graph+kkLayout)
-        * [._bridgeDfs()](#SmilesDrawer.Graph+_bridgeDfs)
-    * _static_
-        * [.getConnectedComponents(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
-        * [.getConnectedComponentCount(adjacencyMatrix)](#SmilesDrawer.Graph.getConnectedComponentCount) ⇒ <code>Number</code>
-        * [._ccCountDfs()](#SmilesDrawer.Graph._ccCountDfs)
-        * [._ccGetDfs()](#SmilesDrawer.Graph._ccGetDfs)
-
-<a name="new_SmilesDrawer.Graph_new"></a>
-
-#### new SmilesDrawer.Graph(parseTree, [isomeric])
-The constructor of the class Graph.
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| parseTree | <code>Object</code> |  | A SMILES parse tree. |
-| [isomeric] | <code>Boolean</code> | <code>false</code> | A boolean specifying whether or not the SMILES is isomeric. |
-
-<a name="SmilesDrawer.Graph+_init"></a>
-
-#### graph._init(node, parentVertexId, isBranch)
-PRIVATE FUNCTION. Initializing the graph from the parse tree.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| node | <code>Object</code> |  | The current node in the parse tree. |
-| parentVertexId | <code>Number</code> | <code></code> | The id of the previous vertex. |
-| isBranch | <code>Boolean</code> | <code>false</code> | Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C). |
-
-<a name="SmilesDrawer.Graph+_initInfos"></a>
-
-#### graph._initInfos()
-PRIVATE FUNCTION. Initializes element counts etc.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-<a name="SmilesDrawer.Graph+clear"></a>
-
-#### graph.clear()
-Clears all the elements in this graph (edges and vertices).
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-<a name="SmilesDrawer.Graph+addVertex"></a>
-
-#### graph.addVertex(vertex) ⇒ <code>Number</code>
-Add a vertex to the graph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Number</code> - The vertex id of the new vertex.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A new vertex. |
-
-<a name="SmilesDrawer.Graph+addEdge"></a>
-
-#### graph.addEdge(edge) ⇒ <code>Number</code>
-Add an edge to the graph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Number</code> - The edge id of the new edge.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| edge | <code>[Edge](#SmilesDrawer.Edge)</code> | A new edge. |
-
-<a name="SmilesDrawer.Graph+getEdge"></a>
-
-#### graph.getEdge(vertexIdA, vertexIdB) ⇒ <code>Number</code> &#124; <code>null</code>
-Returns the edge between two given vertices.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Number</code> &#124; <code>null</code> - The edge or, if no edge can be found, null.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIdA | <code>Number</code> | A vertex id. |
-| vertexIdB | <code>Number</code> | A vertex id. |
-
-<a name="SmilesDrawer.Graph+getEdges"></a>
-
-#### graph.getEdges(vertexId) ⇒ <code>Array.&lt;Array&gt;</code>
-Returns the ids of edges connected to a vertex.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - An array containing the ids of edges connected to the vertex.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexId | <code>Number</code> | A vertex id. |
-
-<a name="SmilesDrawer.Graph+hasEdge"></a>
-
-#### graph.hasEdge(vertexIdA, vertexIdB) ⇒ <code>Number</code> &#124; <code>null</code>
-Returns the edge between two given vertices.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Number</code> &#124; <code>null</code> - The edge or, if no edge can be found, null.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIdA | <code>Number</code> | A vertex id. |
-| vertexIdB | <code>Number</code> | A vertex id. |
-
-<a name="SmilesDrawer.Graph+getVertexList"></a>
-
-#### graph.getVertexList() ⇒ <code>Array.&lt;Number&gt;</code>
-Returns an array containing the vertex ids of this graph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing all vertex ids of this graph.  
-<a name="SmilesDrawer.Graph+getEdgeList"></a>
-
-#### graph.getEdgeList() ⇒ <code>Array.&lt;Array&gt;</code>
-Returns an array containing source, target arrays of this graphs edges.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - An array containing source, target arrays of this graphs edges. Example: [ [ 2, 5 ], [ 6, 9 ] ].  
-<a name="SmilesDrawer.Graph+getAdjacencyMatrix"></a>
-
-#### graph.getAdjacencyMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
-Get the adjacency matrix of the graph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the molecular graph.  
-<a name="SmilesDrawer.Graph+getComponentsAdjacencyMatrix"></a>
-
-#### graph.getComponentsAdjacencyMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
-Get the adjacency matrix of the graph with all bridges removed (thus the components). Thus the remaining vertices are all part of ring systems.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the molecular graph with all bridges removed.  
-<a name="SmilesDrawer.Graph+getSubgraphAdjacencyMatrix"></a>
-
-#### graph.getSubgraphAdjacencyMatrix(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
-Get the adjacency matrix of a subgraph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the subgraph.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
-
-<a name="SmilesDrawer.Graph+getDistanceMatrix"></a>
-
-#### graph.getDistanceMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
-Get the distance matrix of the graph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The distance matrix of the graph.  
-<a name="SmilesDrawer.Graph+getSubgraphDistanceMatrix"></a>
-
-#### graph.getSubgraphDistanceMatrix(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
-Get the distance matrix of a subgraph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The distance matrix of the subgraph.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
-
-<a name="SmilesDrawer.Graph+getAdjacencyList"></a>
-
-#### graph.getAdjacencyList() ⇒ <code>Array.&lt;Array&gt;</code>
-Get the adjacency list of the graph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency list of the graph.  
-<a name="SmilesDrawer.Graph+getSubgraphAdjacencyList"></a>
-
-#### graph.getSubgraphAdjacencyList(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
-Get the adjacency list of a subgraph.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency list of the subgraph.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
-
-<a name="SmilesDrawer.Graph+getBridges"></a>
-
-#### graph.getBridges() ⇒ <code>Array.&lt;Number&gt;</code>
-Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the edge ids of the bridges.  
-<a name="SmilesDrawer.Graph+traverseBF"></a>
-
-#### graph.traverseBF(startVertexId, callback)
-Traverses the graph in breadth-first order.
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| startVertexId | <code>Number</code> | The id of the starting vertex. |
-| callback | <code>function</code> | The callback function to be called on every vertex. |
-
-<a name="SmilesDrawer.Graph+kkLayout"></a>
-
-#### graph.kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)
-Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing vertexIds to be placed using the force based layout. |
-| outAdditionallyPositioned | <code>Array.&lt;Array&gt;</code> | Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ]. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The center of the layout. |
-| startVertexId | <code>Number</code> | A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex. |
-| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | The bridged ring associated with this force-based layout. |
-
-<a name="SmilesDrawer.Graph+_bridgeDfs"></a>
-
-#### graph._bridgeDfs()
-PRIVATE FUNCTION used by getBridges().
-
-**Kind**: instance method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-<a name="SmilesDrawer.Graph.getConnectedComponents"></a>
-
-#### Graph.getConnectedComponents(adjacencyMatrix) ⇒ <code>Array.&lt;Set&gt;</code>
-Returns the connected components of the graph.
-
-**Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Array.&lt;Set&gt;</code> - Connected components as sets.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer.Graph.getConnectedComponentCount"></a>
-
-#### Graph.getConnectedComponentCount(adjacencyMatrix) ⇒ <code>Number</code>
-Returns the number of connected components for the graph.
-
-**Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-**Returns**: <code>Number</code> - The number of connected components of the supplied graph.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer.Graph._ccCountDfs"></a>
-
-#### Graph._ccCountDfs()
-PRIVATE FUNCTION used by getConnectedComponentCount().
-
-**Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-<a name="SmilesDrawer.Graph._ccGetDfs"></a>
-
-#### Graph._ccGetDfs()
-PRIVATE FUNCTION used by getConnectedComponents().
-
-**Kind**: static method of <code>[Graph](#SmilesDrawer.Graph)</code>  
-<a name="SmilesDrawer.Line"></a>
-
-### SmilesDrawer.Line
-A class representing a line.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| from | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The SmilesDrawer.Vector2 defining the start of the line. |
-| to | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The SmilesDrawer.Vector2 defining the end of the line. |
-| elementFrom | <code>String</code> | The element symbol associated with the start of the line. |
-| elementTo | <code>String</code> | The element symbol associated with the end of the line. |
-| chiralFrom | <code>Boolean</code> | A boolean indicating whether or not the source atom is a chiral center. |
-| chiralTo | <code>Boolean</code> | A boolean indicating whether or tno the target atom is a chiral center. |
-
-
-* [.Line](#SmilesDrawer.Line)
-    * [new SmilesDrawer.Line([from], [to], [elementFrom], [elementTo], [chiralFrom], [chiralTo])](#new_SmilesDrawer.Line_new)
-    * [.clone()](#SmilesDrawer.Line+clone) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.getLength()](#SmilesDrawer.Line+getLength) ⇒ <code>Number</code>
-    * [.getAngle()](#SmilesDrawer.Line+getAngle) ⇒ <code>Number</code>
-    * [.getRightVector()](#SmilesDrawer.Line+getRightVector) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-    * [.getLeftVector()](#SmilesDrawer.Line+getLeftVector) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-    * [.getRightElement()](#SmilesDrawer.Line+getRightElement) ⇒ <code>String</code>
-    * [.getLeftElement()](#SmilesDrawer.Line+getLeftElement) ⇒ <code>String</code>
-    * [.getRightChiral()](#SmilesDrawer.Line+getRightChiral) ⇒ <code>Boolean</code>
-    * [.getLeftChiral()](#SmilesDrawer.Line+getLeftChiral) ⇒ <code>Boolean</code>
-    * [.setRightVector(x, y)](#SmilesDrawer.Line+setRightVector) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.setLeftVector(x, y)](#SmilesDrawer.Line+setLeftVector) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.rotateToXAxis()](#SmilesDrawer.Line+rotateToXAxis) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.rotate(theta)](#SmilesDrawer.Line+rotate) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.shortenFrom(by)](#SmilesDrawer.Line+shortenFrom) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.shortenTo(by)](#SmilesDrawer.Line+shortenTo) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.shortenRight(by)](#SmilesDrawer.Line+shortenRight) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.shortenLeft(by)](#SmilesDrawer.Line+shortenLeft) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.shorten(by)](#SmilesDrawer.Line+shorten) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-    * [.getNormals()](#SmilesDrawer.Line+getNormals) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-
-<a name="new_SmilesDrawer.Line_new"></a>
-
-#### new SmilesDrawer.Line([from], [to], [elementFrom], [elementTo], [chiralFrom], [chiralTo])
-The constructor for the class Line.
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [from] | <code>Vector2</code> | <code>new Vector2(0, 0)</code> | A vector marking the beginning of the line. |
-| [to] | <code>Vector2</code> | <code>new Vector2(0, 0)</code> | A vector marking the end of the line. |
-| [elementFrom] | <code>string</code> | <code>null</code> | A one-letter representation of the element associated with the vector marking the beginning of the line. |
-| [elementTo] | <code>string</code> | <code>null</code> | A one-letter representation of the element associated with the vector marking the end of the line. |
-| [chiralFrom] | <code>boolean</code> | <code>false</code> | Whether or not the from atom is a chiral center. |
-| [chiralTo] | <code>boolean</code> | <code>false</code> | Whether or not the to atom is a chiral center. |
-
-<a name="SmilesDrawer.Line+clone"></a>
-
-#### line.clone() ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Clones this line and returns the clone.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - A clone of this line.  
-<a name="SmilesDrawer.Line+getLength"></a>
-
-#### line.getLength() ⇒ <code>Number</code>
-Returns the length of this line.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>Number</code> - The length of this line.  
-<a name="SmilesDrawer.Line+getAngle"></a>
-
-#### line.getAngle() ⇒ <code>Number</code>
-Returns the angle of the line in relation to the coordinate system (the x-axis).
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>Number</code> - The angle in radians.  
-<a name="SmilesDrawer.Line+getRightVector"></a>
-
-#### line.getRightVector() ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Returns the right vector (the vector with the larger x value).
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The right vector.  
-<a name="SmilesDrawer.Line+getLeftVector"></a>
-
-#### line.getLeftVector() ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Returns the left vector (the vector with the smaller x value).
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The left vector.  
-<a name="SmilesDrawer.Line+getRightElement"></a>
-
-#### line.getRightElement() ⇒ <code>String</code>
-Returns the element associated with the right vector (the vector with the larger x value).
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>String</code> - The element associated with the right vector.  
-<a name="SmilesDrawer.Line+getLeftElement"></a>
-
-#### line.getLeftElement() ⇒ <code>String</code>
-Returns the element associated with the left vector (the vector with the smaller x value).
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>String</code> - The element associated with the left vector.  
-<a name="SmilesDrawer.Line+getRightChiral"></a>
-
-#### line.getRightChiral() ⇒ <code>Boolean</code>
-Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>Boolean</code> - Whether or not the atom associated with the right vector is a chiral center.  
-<a name="SmilesDrawer.Line+getLeftChiral"></a>
-
-#### line.getLeftChiral() ⇒ <code>Boolean</code>
-Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>Boolean</code> - Whether or not the atom  associated with the left vector is a chiral center.  
-<a name="SmilesDrawer.Line+setRightVector"></a>
-
-#### line.setRightVector(x, y) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Set the value of the right vector.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - This line.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| x | <code>Number</code> | The x value. |
-| y | <code>Number</code> | The y value. |
-
-<a name="SmilesDrawer.Line+setLeftVector"></a>
-
-#### line.setLeftVector(x, y) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Set the value of the left vector.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - This line.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| x | <code>Number</code> | The x value. |
-| y | <code>Number</code> | The y value. |
-
-<a name="SmilesDrawer.Line+rotateToXAxis"></a>
-
-#### line.rotateToXAxis() ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Rotates this line to be aligned with the x-axis. The center of rotation is the left vector.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - This line.  
-<a name="SmilesDrawer.Line+rotate"></a>
-
-#### line.rotate(theta) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Rotate the line by a given value (in radians). The center of rotation is the left vector.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - This line.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| theta | <code>Number</code> | The angle (in radians) to rotate the line. |
-
-<a name="SmilesDrawer.Line+shortenFrom"></a>
-
-#### line.shortenFrom(by) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Shortens this line from the "from" direction by a given value (in pixels).
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - This line.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| by | <code>Number</code> | The length in pixels to shorten the vector by. |
-
-<a name="SmilesDrawer.Line+shortenTo"></a>
-
-#### line.shortenTo(by) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Shortens this line from the "to" direction by a given value (in pixels).
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - This line.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| by | <code>Number</code> | The length in pixels to shorten the vector by. |
-
-<a name="SmilesDrawer.Line+shortenRight"></a>
-
-#### line.shortenRight(by) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Shorten the right side.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| by | <code>Number</code> | The length in pixels to shorten the vector by. |
-
-<a name="SmilesDrawer.Line+shortenLeft"></a>
-
-#### line.shortenLeft(by) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Shorten the left side.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| by | <code>Number</code> | The length in pixels to shorten the vector by. |
-
-<a name="SmilesDrawer.Line+shorten"></a>
-
-#### line.shorten(by) ⇒ <code>[Line](#SmilesDrawer.Line)</code>
-Shortens this line from both directions by a given value (in pixels).
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Line](#SmilesDrawer.Line)</code> - This line.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| by | <code>Number</code> | The length in pixels to shorten the vector by. |
-
-<a name="SmilesDrawer.Line+getNormals"></a>
-
-#### line.getNormals() ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-Returns the normals of this line.
-
-**Kind**: instance method of <code>[Line](#SmilesDrawer.Line)</code>  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code> - An array containing the two normals as vertices.  
-<a name="SmilesDrawer.Ring"></a>
-
-### SmilesDrawer.Ring
-A class representing a ring.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| id | <code>Number</code> | The id of this ring. |
-| members | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids of the ring members. |
-| edges | <code>Array.&lt;Number&gt;</code> | An array containing the edge ids of the edges between the ring members. |
-| insiders | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids of the vertices contained within the ring if it is a bridged ring. |
-| neighbours | <code>Array.&lt;Number&gt;</code> | An array containing the ids of neighbouring rings. |
-| positioned | <code>Boolean</code> | A boolean indicating whether or not this ring has been positioned. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The center of this ring. |
-| rings | <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code> | The rings contained within this ring if this ring is bridged. |
-| isBridged | <code>Boolean</code> | A boolean whether or not this ring is bridged. |
-| isPartOfBridged | <code>Boolean</code> | A boolean whether or not this ring is part of a bridge ring. |
-| isSpiro | <code>Boolean</code> | A boolean whether or not this ring is part of a spiro. |
-| isFused | <code>Boolean</code> | A boolean whether or not this ring is part of a fused ring. |
-| centralAngle | <code>Number</code> | The central angle of this ring. |
-| canFlip | <code>Boolean</code> | A boolean indicating whether or not this ring allows flipping of attached vertices to the inside of the ring. |
-
-
-* [.Ring](#SmilesDrawer.Ring)
-    * [new SmilesDrawer.Ring(members)](#new_SmilesDrawer.Ring_new)
-    * [.clone()](#SmilesDrawer.Ring+clone) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
-    * [.getSize()](#SmilesDrawer.Ring+getSize) ⇒ <code>Number</code>
-    * [.getPolygon(vertices)](#SmilesDrawer.Ring+getPolygon) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-    * [.getAngle()](#SmilesDrawer.Ring+getAngle) ⇒ <code>Number</code>
-    * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#SmilesDrawer.Ring+eachMember)
-    * [.getOrderedNeighbours(ringConnections)](#SmilesDrawer.Ring+getOrderedNeighbours) ⇒ <code>Array.&lt;Object&gt;</code>
-    * [.isBenzeneLike(vertices)](#SmilesDrawer.Ring+isBenzeneLike) ⇒ <code>Boolean</code>
-    * [.getDoubleBondCount(vertices)](#SmilesDrawer.Ring+getDoubleBondCount) ⇒ <code>Number</code>
-    * [.contains(vertexId)](#SmilesDrawer.Ring+contains) ⇒ <code>Boolean</code>
-
-<a name="new_SmilesDrawer.Ring_new"></a>
-
-#### new SmilesDrawer.Ring(members)
-The constructor for the class Ring.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| members | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids of the members of the ring to be created. |
-
-<a name="SmilesDrawer.Ring+clone"></a>
-
-#### ring.clone() ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
-Clones this ring and returns the clone.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>[Ring](#SmilesDrawer.Ring)</code> - A clone of this ring.  
-<a name="SmilesDrawer.Ring+getSize"></a>
-
-#### ring.getSize() ⇒ <code>Number</code>
-Returns the size (number of members) of this ring.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>Number</code> - The size (number of members) of this ring.  
-<a name="SmilesDrawer.Ring+getPolygon"></a>
-
-#### ring.getPolygon(vertices) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-Gets the polygon representation (an array of the ring-members positional vectors) of this ring.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code> - An array of the positional vectors of the ring members.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | An array of vertices representing the current molecule. |
-
-<a name="SmilesDrawer.Ring+getAngle"></a>
-
-#### ring.getAngle() ⇒ <code>Number</code>
-Returns the angle of this ring in relation to the coordinate system.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>Number</code> - The angle in radians.  
-<a name="SmilesDrawer.Ring+eachMember"></a>
-
-#### ring.eachMember(vertices, callback, startVertexId, previousVertexId)
-Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | The vertices associated with the current molecule. |
-| callback | <code>function</code> | A callback with the current vertex id as a parameter. |
-| startVertexId | <code>Number</code> | The vertex id of the start vertex. |
-| previousVertexId | <code>Number</code> | The vertex id of the previous vertex (the loop calling the callback function will run in the opposite direction of this vertex). |
-
-<a name="SmilesDrawer.Ring+getOrderedNeighbours"></a>
-
-#### ring.getOrderedNeighbours(ringConnections) ⇒ <code>Array.&lt;Object&gt;</code>
-Returns an array containing the neighbouring rings of this ring ordered by ring size.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>Array.&lt;Object&gt;</code> - An array of neighbouring rings sorted by ring size. Example: { n: 5, neighbour: 1 }.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#SmilesDrawer.RingConnection)</code> | An array of ring connections associated with the current molecule. |
-
-<a name="SmilesDrawer.Ring+isBenzeneLike"></a>
-
-#### ring.isBenzeneLike(vertices) ⇒ <code>Boolean</code>
-Check whether this ring is an implicitly defined benzene-like (e.g. C1=CC=CC=C1) with 6 members and 3 double bonds.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this ring is an implicitly defined benzene-like.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | An array of vertices associated with the current molecule. |
-
-<a name="SmilesDrawer.Ring+getDoubleBondCount"></a>
-
-#### ring.getDoubleBondCount(vertices) ⇒ <code>Number</code>
-Get the number of double bonds inside this ring.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>Number</code> - The number of double bonds inside this ring.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | An array of vertices associated with the current molecule. |
-
-<a name="SmilesDrawer.Ring+contains"></a>
-
-#### ring.contains(vertexId) ⇒ <code>Boolean</code>
-Checks whether or not this ring contains a member with a given vertex id.
-
-**Kind**: instance method of <code>[Ring](#SmilesDrawer.Ring)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this ring contains a member with the given vertex id.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexId | <code>Number</code> | A vertex id. |
-
-<a name="SmilesDrawer.RingConnection"></a>
-
-### SmilesDrawer.RingConnection
-A class representing a ring connection.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| id | <code>Number</code> | The id of this ring connection. |
-| firstRingId | <code>Number</code> | A ring id. |
-| secondRingId | <code>Number</code> | A ring id. |
-| vertices | <code>Set.&lt;Number&gt;</code> | A set containing the vertex ids participating in the ring connection. |
-
-
-* [.RingConnection](#SmilesDrawer.RingConnection)
-    * [new SmilesDrawer.RingConnection(firstRing, secondRing)](#new_SmilesDrawer.RingConnection_new)
-    * _instance_
-        * [.addVertex(vertexId)](#SmilesDrawer.RingConnection+addVertex)
-        * [.updateOther(ringId, otherRingId)](#SmilesDrawer.RingConnection+updateOther)
-        * [.containsRing(ringId)](#SmilesDrawer.RingConnection+containsRing) ⇒ <code>Boolean</code>
-        * [.isBridge()](#SmilesDrawer.RingConnection+isBridge) ⇒ <code>Boolean</code>
-    * _static_
-        * [.isBridge(ringConnections, vertices, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.isBridge) ⇒ <code>Boolean</code>
-        * [.getNeighbours(ringConnections, ringId)](#SmilesDrawer.RingConnection.getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.getVertices(ringConnections, firstRingId, secondRingId)](#SmilesDrawer.RingConnection.getVertices) ⇒ <code>Array.&lt;Number&gt;</code>
-
-<a name="new_SmilesDrawer.RingConnection_new"></a>
-
-#### new SmilesDrawer.RingConnection(firstRing, secondRing)
-The constructor for the class RingConnection.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| firstRing | <code>[Ring](#SmilesDrawer.Ring)</code> | A ring. |
-| secondRing | <code>[Ring](#SmilesDrawer.Ring)</code> | A ring. |
-
-<a name="SmilesDrawer.RingConnection+addVertex"></a>
-
-#### ringConnection.addVertex(vertexId)
-Adding a vertex to the ring connection.
-
-**Kind**: instance method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexId | <code>Number</code> | A vertex id. |
-
-<a name="SmilesDrawer.RingConnection+updateOther"></a>
-
-#### ringConnection.updateOther(ringId, otherRingId)
-Update the ring id of this ring connection that is not the ring id supplied as the second argument.
-
-**Kind**: instance method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ringId | <code>Number</code> | A ring id. The new ring id to be set. |
-| otherRingId | <code>Number</code> | A ring id. The id that is NOT to be updated. |
-
-<a name="SmilesDrawer.RingConnection+containsRing"></a>
-
-#### ringConnection.containsRing(ringId) ⇒ <code>Boolean</code>
-Returns a boolean indicating whether or not a ring with a given id is participating in this ring connection.
-
-**Kind**: instance method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not a ring with a given id participates in this ring connection.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ringId | <code>Number</code> | A ring id. |
-
-<a name="SmilesDrawer.RingConnection+isBridge"></a>
-
-#### ringConnection.isBridge() ⇒ <code>Boolean</code>
-Checks whether or not this ring connection is a bridge in a bridged ring.
-
-**Kind**: instance method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this ring connection is a bridge.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| . | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | vertices The array of vertices associated with the current molecule. |
-
-<a name="SmilesDrawer.RingConnection.isBridge"></a>
-
-#### RingConnection.isBridge(ringConnections, vertices, firstRingId, secondRingId) ⇒ <code>Boolean</code>
-Checks whether or not two rings are connected by a bridged bond.
-
-**Kind**: static method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not two rings ar connected by a bridged bond.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#SmilesDrawer.RingConnection)</code> | An array of ring connections containing the ring connections associated with the current molecule. |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | An array of vertices containing the vertices associated with the current molecule. |
-| firstRingId | <code>Number</code> | A ring id. |
-| secondRingId | <code>Nmber</code> | A ring id. |
-
-<a name="SmilesDrawer.RingConnection.getNeighbours"></a>
-
-#### RingConnection.getNeighbours(ringConnections, ringId) ⇒ <code>Array.&lt;Number&gt;</code>
-Retruns the neighbouring rings of a given ring.
-
-**Kind**: static method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array of ring ids of neighbouring rings.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#SmilesDrawer.RingConnection)</code> | An array of ring connections containing ring connections associated with the current molecule. |
-| ringId | <code>Number</code> | A ring id. |
-
-<a name="SmilesDrawer.RingConnection.getVertices"></a>
-
-#### RingConnection.getVertices(ringConnections, firstRingId, secondRingId) ⇒ <code>Array.&lt;Number&gt;</code>
-Returns an array of vertex ids associated with a given ring connection.
-
-**Kind**: static method of <code>[RingConnection](#SmilesDrawer.RingConnection)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array of vertex ids associated with the ring connection.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#SmilesDrawer.RingConnection)</code> | An array of ring connections containing ring connections associated with the current molecule. |
-| firstRingId | <code>Number</code> | A ring id. |
-| secondRingId | <code>Number</code> | A ring id. |
-
-<a name="SmilesDrawer.SSSR"></a>
-
-### SmilesDrawer.SSSR
-A class encapsulating the functionality to find the smallest set of smallest rings in a graph.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-
-* [.SSSR](#SmilesDrawer.SSSR)
-    * [.getRings(graph)](#SmilesDrawer.SSSR.getRings) ⇒ <code>Array.&lt;Array&gt;</code>
-    * [.matrixToString(matrix)](#SmilesDrawer.SSSR.matrixToString) ⇒ <code>String</code>
-    * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SmilesDrawer.SSSR.getPathIncludedDistanceMatrices) ⇒ <code>Object</code>
-    * [.getRingCandidates(d, pe, pe_prime)](#SmilesDrawer.SSSR.getRingCandidates) ⇒ <code>Array.&lt;Array&gt;</code>
-    * [.getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr)](#SmilesDrawer.SSSR.getSSSR) ⇒ <code>Array.&lt;Set&gt;</code>
-    * [.getEdgeCount(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeCount) ⇒ <code>Number</code>
-    * [.getEdgeList(adjacencyMatrix)](#SmilesDrawer.SSSR.getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
-    * [.bondsToAtoms(bonds)](#SmilesDrawer.SSSR.bondsToAtoms) ⇒ <code>Set.&lt;Number&gt;</code>
-    * [.getBondCount(atoms, adjacencyMatrix)](#SmilesDrawer.SSSR.getBondCount) ⇒ <code>Number</code>
-    * [.pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount)](#SmilesDrawer.SSSR.pathSetsContain) ⇒ <code>Boolean</code>
-    * [.areSetsEqual(setA, setB)](#SmilesDrawer.SSSR.areSetsEqual) ⇒ <code>Boolean</code>
-    * [.isSupersetOf(setA, setB)](#SmilesDrawer.SSSR.isSupersetOf) ⇒ <code>Boolean</code>
-
-<a name="SmilesDrawer.SSSR.getRings"></a>
-
-#### SSSR.getRings(graph) ⇒ <code>Array.&lt;Array&gt;</code>
-Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| graph | <code>[Graph](#SmilesDrawer.Graph)</code> | A SmilesDrawer.Graph object. |
-
-<a name="SmilesDrawer.SSSR.matrixToString"></a>
-
-#### SSSR.matrixToString(matrix) ⇒ <code>String</code>
-Creates a printable string from a matrix (2D array).
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>String</code> - A string representing the matrix.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| matrix | <code>Array.&lt;Array&gt;</code> | A 2D array. |
-
-<a name="SmilesDrawer.SSSR.getPathIncludedDistanceMatrices"></a>
-
-#### SSSR.getPathIncludedDistanceMatrices(adjacencyMatrix) ⇒ <code>Object</code>
-Returnes the two path-included distance matrices used to find the sssr.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Object</code> - The path-included distance matrices. { p1, p2 }  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer.SSSR.getRingCandidates"></a>
-
-#### SSSR.getRingCandidates(d, pe, pe_prime) ⇒ <code>Array.&lt;Array&gt;</code>
-Get the ring candidates from the path-included distance matrices.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The ring candidates.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| d | <code>Array.&lt;Array&gt;</code> | The distance matrix. |
-| pe | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths. |
-| pe_prime | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
-
-<a name="SmilesDrawer.SSSR.getSSSR"></a>
-
-#### SSSR.getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) ⇒ <code>Array.&lt;Set&gt;</code>
-Searches the candidates for the smallest set of smallest rings.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Array.&lt;Set&gt;</code> - The smallest set of smallest rings.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| c | <code>Array.&lt;Array&gt;</code> | The candidates. |
-| d | <code>Array.&lt;Array&gt;</code> | The distance matrix. |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
-| pe | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths. |
-| pe_prime | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
-| arrBondCount | <code>Array.&lt;Array&gt;</code> | A matrix containing the bond count of each vertex. |
-| arrRingCount | <code>Array.&lt;Array&gt;</code> | A matrix containing the number of rings associated with each vertex. |
-| nsssr | <code>Number</code> | The theoretical number of rings in the graph. |
-
-<a name="SmilesDrawer.SSSR.getEdgeCount"></a>
-
-#### SSSR.getEdgeCount(adjacencyMatrix) ⇒ <code>Number</code>
-Returns the number of edges in a graph defined by an adjacency matrix.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Number</code> - The number of edges in the graph defined by the adjacency matrix.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer.SSSR.getEdgeList"></a>
-
-#### SSSR.getEdgeList(adjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-Returns an edge list constructed form an adjacency matrix.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer.SSSR.bondsToAtoms"></a>
-
-#### SSSR.bondsToAtoms(bonds) ⇒ <code>Set.&lt;Number&gt;</code>
-Return a set of vertex indices contained in an array of bonds.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Set.&lt;Number&gt;</code> - An array of vertices.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| bonds | <code>Array</code> | An array of bonds. A bond is defined as [ sourceVertexId, targetVertexId ]. |
-
-<a name="SmilesDrawer.SSSR.getBondCount"></a>
-
-#### SSSR.getBondCount(atoms, adjacencyMatrix) ⇒ <code>Number</code>
-Returns the number of bonds within a set of atoms.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Number</code> - The number of bonds in a set of atoms.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| atoms | <code>Set.&lt;Number&gt;</code> | An array of atom ids. |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
-
-<a name="SmilesDrawer.SSSR.pathSetsContain"></a>
-
-#### SSSR.pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) ⇒ <code>Boolean</code>
-Checks whether or not a given path already exists in an array of paths.
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not a give path is contained within a set.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| pathSets | <code>Array.&lt;Set&gt;</code> | An array of sets each representing a path. |
-| pathSet | <code>Set.&lt;Number&gt;</code> | A set representing a path. |
-| bonds | <code>Array.&lt;Array&gt;</code> | The bonds associated with the current path. |
-| allBonds | <code>Array.&lt;Array&gt;</code> | All bonds currently associated with rings in the SSSR set. |
-| arrBondCount | <code>Array.&lt;Array&gt;</code> | A matrix containing the bond count of each vertex. |
-| arrRingCount | <code>Array.&lt;Array&gt;</code> | A matrix containing the number of rings associated with each vertex. |
-
-<a name="SmilesDrawer.SSSR.areSetsEqual"></a>
-
-#### SSSR.areSetsEqual(setA, setB) ⇒ <code>Boolean</code>
-Checks whether or not two sets are equal (contain the same elements).
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not the two sets are equal.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| setA | <code>Set.&lt;Number&gt;</code> | A set. |
-| setB | <code>Set.&lt;Number&gt;</code> | A set. |
-
-<a name="SmilesDrawer.SSSR.isSupersetOf"></a>
-
-#### SSSR.isSupersetOf(setA, setB) ⇒ <code>Boolean</code>
-Checks whether or not a set (setA) is a superset of another set (setB).
-
-**Kind**: static method of <code>[SSSR](#SmilesDrawer.SSSR)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not setB is a superset of setA.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| setA | <code>Set.&lt;Number&gt;</code> | A set. |
-| setB | <code>Set.&lt;Number&gt;</code> | A set. |
-
-<a name="SmilesDrawer.Vector2"></a>
-
-### SmilesDrawer.Vector2
-A class representing a 2D vector.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| x | <code>Number</code> | The x component of the vector. |
-| y | <code>Number</code> | The y component of the vector. |
-
-
-* [.Vector2](#SmilesDrawer.Vector2)
-    * [new SmilesDrawer.Vector2(x, y)](#new_SmilesDrawer.Vector2_new)
-    * _instance_
-        * [.clone()](#SmilesDrawer.Vector2+clone) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.toString()](#SmilesDrawer.Vector2+toString) ⇒ <code>String</code>
-        * [.add(vec)](#SmilesDrawer.Vector2+add) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.subtract(vec)](#SmilesDrawer.Vector2+subtract) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.divide(scalar)](#SmilesDrawer.Vector2+divide) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.multiply(v)](#SmilesDrawer.Vector2+multiply) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.multiplyScalar(scalar)](#SmilesDrawer.Vector2+multiplyScalar) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.invert()](#SmilesDrawer.Vector2+invert) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.angle()](#SmilesDrawer.Vector2+angle) ⇒ <code>Number</code>
-        * [.distance(vec)](#SmilesDrawer.Vector2+distance) ⇒ <code>Number</code>
-        * [.distanceSq(vec)](#SmilesDrawer.Vector2+distanceSq) ⇒ <code>Number</code>
-        * [.clockwise(vec)](#SmilesDrawer.Vector2+clockwise) ⇒ <code>Number</code>
-        * [.rotate(angle)](#SmilesDrawer.Vector2+rotate) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.rotateAround(angle, vec)](#SmilesDrawer.Vector2+rotateAround) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.rotateTo(vec, center, [offsetAngle])](#SmilesDrawer.Vector2+rotateTo) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.rotateAwayFrom(vec, center, angle)](#SmilesDrawer.Vector2+rotateAwayFrom)
-        * [.getRotateAwayFromAngle(vec, center, angle)](#SmilesDrawer.Vector2+getRotateAwayFromAngle) ⇒ <code>Number</code>
-        * [.getRotateTowardsAngle(vec, center, angle)](#SmilesDrawer.Vector2+getRotateTowardsAngle) ⇒ <code>Number</code>
-        * [.getRotateToAngle(vec, center)](#SmilesDrawer.Vector2+getRotateToAngle) ⇒ <code>Number</code>
-        * [.isInPolygon(polygon)](#SmilesDrawer.Vector2+isInPolygon) ⇒ <code>Boolean</code>
-        * [.length()](#SmilesDrawer.Vector2+length) ⇒ <code>Number</code>
-        * [.lengthSq()](#SmilesDrawer.Vector2+lengthSq) ⇒ <code>Number</code>
-        * [.normalize()](#SmilesDrawer.Vector2+normalize) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.normalized()](#SmilesDrawer.Vector2+normalized) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.whichSide(vecA, vecB)](#SmilesDrawer.Vector2+whichSide) ⇒ <code>Number</code>
-        * [.sameSideAs(vecA, vecB, vecC)](#SmilesDrawer.Vector2+sameSideAs) ⇒ <code>Boolean</code>
-    * _static_
-        * [.add(vecA, vecB)](#SmilesDrawer.Vector2.add) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.subtract(vecA, vecB)](#SmilesDrawer.Vector2.subtract) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.multiply(vecA, vecB)](#SmilesDrawer.Vector2.multiply) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.multiplyScalar(vec, scalar)](#SmilesDrawer.Vector2.multiplyScalar) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.midpoint(vecA, vecB)](#SmilesDrawer.Vector2.midpoint) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.normals(vecA, vecB)](#SmilesDrawer.Vector2.normals) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-        * [.units(vecA, vecB)](#SmilesDrawer.Vector2.units) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-        * [.divide(vecA, vecB)](#SmilesDrawer.Vector2.divide) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-        * [.dot(vecA, vecB)](#SmilesDrawer.Vector2.dot) ⇒ <code>Number</code>
-        * [.angle(vecA, vecB)](#SmilesDrawer.Vector2.angle) ⇒ <code>Number</code>
-        * [.threePointangle(vecA, vecB, vecC)](#SmilesDrawer.Vector2.threePointangle) ⇒ <code>Number</code>
-        * [.scalarProjection(vecA, vecB)](#SmilesDrawer.Vector2.scalarProjection) ⇒ <code>Number</code>
-        * [.averageDirection(vecs)](#SmilesDrawer.Vector2.averageDirection) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-
-<a name="new_SmilesDrawer.Vector2_new"></a>
-
-#### new SmilesDrawer.Vector2(x, y)
-The constructor of the class Vector2.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| x | <code>Number</code> | The initial x coordinate value. |
-| y | <code>Number</code> | The initial y coordinate value. |
-
-<a name="SmilesDrawer.Vector2+clone"></a>
-
-#### vector2.clone() ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Clones this vector and returns the clone.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The clone of this vector.  
-<a name="SmilesDrawer.Vector2+toString"></a>
-
-#### vector2.toString() ⇒ <code>String</code>
-Returns a string representation of this vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>String</code> - A string representation of this vector.  
-<a name="SmilesDrawer.Vector2+add"></a>
-
-#### vector2.add(vec) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | Another vector. |
-
-<a name="SmilesDrawer.Vector2+subtract"></a>
-
-#### vector2.subtract(vec) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | Another vector. |
-
-<a name="SmilesDrawer.Vector2+divide"></a>
-
-#### vector2.divide(scalar) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Divide the x and y coordinate values of this vector by a scalar.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| scalar | <code>Number</code> | The scalar. |
-
-<a name="SmilesDrawer.Vector2+multiply"></a>
-
-#### vector2.multiply(v) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Multiply the x and y coordinate values of this vector by the values of another vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| v | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-
-<a name="SmilesDrawer.Vector2+multiplyScalar"></a>
-
-#### vector2.multiplyScalar(scalar) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Multiply the x and y coordinate values of this vector by a scalar.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| scalar | <code>Number</code> | The scalar. |
-
-<a name="SmilesDrawer.Vector2+invert"></a>
-
-#### vector2.invert() ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Inverts this vector. Same as multiply(-1.0).
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-<a name="SmilesDrawer.Vector2+angle"></a>
-
-#### vector2.angle() ⇒ <code>Number</code>
-Returns the angle of this vector in relation to the coordinate system.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The angle in radians.  
-<a name="SmilesDrawer.Vector2+distance"></a>
-
-#### vector2.distance(vec) ⇒ <code>Number</code>
-Returns the euclidean distance between this vector and another vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The euclidean distance between the two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-
-<a name="SmilesDrawer.Vector2+distanceSq"></a>
-
-#### vector2.distanceSq(vec) ⇒ <code>Number</code>
-Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The squared euclidean distance of the two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | Another vector. |
-
-<a name="SmilesDrawer.Vector2+clockwise"></a>
-
-#### vector2.clockwise(vec) ⇒ <code>Number</code>
-Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | Another vector. |
-
-<a name="SmilesDrawer.Vector2+rotate"></a>
-
-#### vector2.rotate(angle) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Rotates this vector by a given number of radians around the origin of the coordinate system.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| angle | <code>Number</code> | The angle in radians to rotate the vector. |
-
-<a name="SmilesDrawer.Vector2+rotateAround"></a>
-
-#### vector2.rotateAround(angle, vec) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Rotates this vector around another vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| angle | <code>Number</code> | The angle in radians to rotate the vector. |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The vector which is used as the rotational center. |
-
-<a name="SmilesDrawer.Vector2+rotateTo"></a>
-
-#### vector2.rotateTo(vec, center, [offsetAngle]) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> |  | The vector to rotate this vector to. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> |  | The rotational center. |
-| [offsetAngle] | <code>Number</code> | <code>0.0</code> | An additional amount of radians to rotate the vector. |
-
-<a name="SmilesDrawer.Vector2+rotateAwayFrom"></a>
-
-#### vector2.rotateAwayFrom(vec, center, angle)
-Rotates the vector away from a specified vector around a center.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The vector this one is rotated away from. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The rotational center. |
-| angle | <code>Number</code> | The angle by which to rotate. |
-
-<a name="SmilesDrawer.Vector2+getRotateAwayFromAngle"></a>
-
-#### vector2.getRotateAwayFromAngle(vec, center, angle) ⇒ <code>Number</code>
-Returns the angle in radians used to rotate this vector away from a given vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The angle in radians.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The vector this one is rotated away from. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The rotational center. |
-| angle | <code>Number</code> | The angle by which to rotate. |
-
-<a name="SmilesDrawer.Vector2+getRotateTowardsAngle"></a>
-
-#### vector2.getRotateTowardsAngle(vec, center, angle) ⇒ <code>Number</code>
-Returns the angle in radians used to rotate this vector towards a given vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The angle in radians.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The vector this one is rotated towards to. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The rotational center. |
-| angle | <code>Number</code> | The angle by which to rotate. |
-
-<a name="SmilesDrawer.Vector2+getRotateToAngle"></a>
-
-#### vector2.getRotateToAngle(vec, center) ⇒ <code>Number</code>
-Gets the angles between this vector and another vector around a common center of rotation.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The angle between this vector and another vector around a center of rotation in radians.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | Another vector. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The center of rotation. |
-
-<a name="SmilesDrawer.Vector2+isInPolygon"></a>
-
-#### vector2.isInPolygon(polygon) ⇒ <code>Boolean</code>
-Checks whether a vector lies within a polygon spanned by a set of vectors.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this vector is within a polygon.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| polygon | <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code> | An array of vectors spanning the polygon. |
-
-<a name="SmilesDrawer.Vector2+length"></a>
-
-#### vector2.length() ⇒ <code>Number</code>
-Returns the length of this vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The length of this vector.  
-<a name="SmilesDrawer.Vector2+lengthSq"></a>
-
-#### vector2.lengthSq() ⇒ <code>Number</code>
-Returns the square of the length of this vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The square of the length of this vector.  
-<a name="SmilesDrawer.Vector2+normalize"></a>
-
-#### vector2.normalize() ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Normalizes this vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns itself.  
-<a name="SmilesDrawer.Vector2+normalized"></a>
-
-#### vector2.normalized() ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Returns a normalized copy of this vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - A normalized copy of this vector.  
-<a name="SmilesDrawer.Vector2+whichSide"></a>
-
-#### vector2.whichSide(vecA, vecB) ⇒ <code>Number</code>
-Calculates which side of a line spanned by two vectors this vector is.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - A number indicating the side of this vector, given a line spanned by two other vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-
-<a name="SmilesDrawer.Vector2+sameSideAs"></a>
-
-#### vector2.sameSideAs(vecA, vecB, vecC) ⇒ <code>Boolean</code>
-Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.
-
-**Kind**: instance method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Boolean</code> - Returns a boolean indicating whether or not this vector is on the same side as another vector.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector spanning the line. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector spanning the line. |
-| vecC | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector to check whether or not it is on the same side as this vector. |
-
-<a name="SmilesDrawer.Vector2.add"></a>
-
-#### Vector2.add(vecA, vecB) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Adds two vectors and returns the result as a new vector.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns the sum of two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A summand. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A summand. |
-
-<a name="SmilesDrawer.Vector2.subtract"></a>
-
-#### Vector2.subtract(vecA, vecB) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Subtracts one vector from another and returns the result as a new vector.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns the difference of two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The minuend. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The subtrahend. |
-
-<a name="SmilesDrawer.Vector2.multiply"></a>
-
-#### Vector2.multiply(vecA, vecB) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Multiplies two vectors (value by value) and returns the result.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns the product of two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-
-<a name="SmilesDrawer.Vector2.multiplyScalar"></a>
-
-#### Vector2.multiplyScalar(vec, scalar) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Multiplies two vectors (value by value) and returns the result.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - Returns the product of two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-| scalar | <code>Number</code> | A scalar. |
-
-<a name="SmilesDrawer.Vector2.midpoint"></a>
-
-#### Vector2.midpoint(vecA, vecB) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Returns the midpoint of a line spanned by two vectors.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The midpoint of the line spanned by two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector spanning the line. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector spanning the line. |
-
-<a name="SmilesDrawer.Vector2.normals"></a>
-
-#### Vector2.normals(vecA, vecB) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-Returns the normals of a line spanned by two vectors.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code> - An array containing the two normals, each represented by a vector.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector spanning the line. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector spanning the line. |
-
-<a name="SmilesDrawer.Vector2.units"></a>
-
-#### Vector2.units(vecA, vecB) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
-Returns the unit (normalized normal) vectors of a line spanned by two vectors.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code> - An array containing the two unit vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector spanning the line. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector spanning the line. |
-
-<a name="SmilesDrawer.Vector2.divide"></a>
-
-#### Vector2.divide(vecA, vecB) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Divides a vector by another vector and returns the result as new vector.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The fraction of the two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The dividend. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The divisor. |
-
-<a name="SmilesDrawer.Vector2.dot"></a>
-
-#### Vector2.dot(vecA, vecB) ⇒ <code>Number</code>
-Returns the dot product of two vectors.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The dot product of two vectors.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-
-<a name="SmilesDrawer.Vector2.angle"></a>
-
-#### Vector2.angle(vecA, vecB) ⇒ <code>Number</code>
-Returns the angle between two vectors.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The angle between two vectors in radians.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-
-<a name="SmilesDrawer.Vector2.threePointangle"></a>
-
-#### Vector2.threePointangle(vecA, vecB, vecC) ⇒ <code>Number</code>
-Returns the angle between two vectors based on a third vector in between.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The angle in radians.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-| vecC | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
-
-<a name="SmilesDrawer.Vector2.scalarProjection"></a>
-
-#### Vector2.scalarProjection(vecA, vecB) ⇒ <code>Number</code>
-Returns the scalar projection of a vector on another vector.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>Number</code> - The scalar component.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecA | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The vector to be projected. |
-| vecB | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The vector to be projection upon. |
-
-<a name="SmilesDrawer.Vector2.averageDirection"></a>
-
-#### Vector2.averageDirection(vecs) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
-Returns the average vector (normalized) of the input vectors.
-
-**Kind**: static method of <code>[Vector2](#SmilesDrawer.Vector2)</code>  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The resulting vector (normalized).  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vecs | <code>Array()</code> | An array containing vectors. |
-
-<a name="SmilesDrawer.Vertex"></a>
-
-### SmilesDrawer.Vertex
-A class representing a vertex.
-
-**Kind**: static class of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Properties**
-
-| Name | Type | Description |
-| --- | --- | --- |
-| id | <code>Number</code> | The id of this vertex. |
-| value | <code>Atom</code> | The atom associated with this vertex. |
-| position | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The position of this vertex. |
-| previousPosition | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The position of the previous vertex. |
-| parentVertexId | <code>Number</code> &#124; <code>null</code> | The id of the previous vertex. |
-| children | <code>Array.&lt;Number&gt;</code> | The ids of the children of this vertex. |
-| spanningTreeChildren | <code>Array.&lt;Number&gt;</code> | The ids of the children of this vertex as defined in the spanning tree defined by the SMILES. |
-| edges | <code>Array.&lt;Number&gt;</code> | The ids of edges associated with this vertex. |
-| positioned | <code>Boolean</code> | A boolean indicating whether or not this vertex has been positioned. |
-| angle | <code>Number</code> | The angle of this vertex. |
-| globalAngle | <code>Number</code> | The global angle of this vertex. |
-| dir | <code>Number</code> | The direction of this vertex. |
-| neighbourCount | <code>Number</code> | The number of neighbouring vertices. |
-| neighbours | <code>Array.&lt;Number&gt;</code> | The vertex ids of neighbouring vertices. |
-| neighbouringElements | <code>Array.&lt;String&gt;</code> | The element symbols associated with neighbouring vertices. |
-| forcePositioned | <code>Boolean</code> | A boolean indicating whether or not this vertex was positioned using a force-based approach. |
-
-
-* [.Vertex](#SmilesDrawer.Vertex)
-    * [new SmilesDrawer.Vertex(value, [x], [y])](#new_SmilesDrawer.Vertex_new)
-    * [.setPosition(x, y)](#SmilesDrawer.Vertex+setPosition)
-    * [.setPositionFromVector(v)](#SmilesDrawer.Vertex+setPositionFromVector)
-    * [.addChild(vertexID)](#SmilesDrawer.Vertex+addChild)
-    * [.setParentVertexId(parentVertexId)](#SmilesDrawer.Vertex+setParentVertexId)
-    * [.isTerminal()](#SmilesDrawer.Vertex+isTerminal) ⇒ <code>Boolean</code>
-    * [.clone()](#SmilesDrawer.Vertex+clone) ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
-    * [.equals(vertex)](#SmilesDrawer.Vertex+equals) ⇒ <code>Boolean</code>
-    * [.getAngle([referenceVector], [returnAsDegrees])](#SmilesDrawer.Vertex+getAngle) ⇒ <code>Number</code>
-    * [.getTextDirection(vertices)](#SmilesDrawer.Vertex+getTextDirection) ⇒ <code>String</code>
-    * [.getNeighbours([vertexId])](#SmilesDrawer.Vertex+getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-    * [.getDrawnNeighbours(vertices)](#SmilesDrawer.Vertex+getDrawnNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-    * [.getNeighbourCount()](#SmilesDrawer.Vertex+getNeighbourCount) ⇒ <code>Number</code>
-    * [.getSpanningTreeNeighbours([vertexId])](#SmilesDrawer.Vertex+getSpanningTreeNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-    * [.getNextInRing(vertices, ringId, previousVertexId)](#SmilesDrawer.Vertex+getNextInRing) ⇒ <code>Number</code>
-
-<a name="new_SmilesDrawer.Vertex_new"></a>
-
-#### new SmilesDrawer.Vertex(value, [x], [y])
-The constructor for the class Vertex.
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| value | <code>\*</code> |  | The value associated with this vertex. |
-| [x] | <code>Number</code> | <code>0</code> | The initial x coordinate of the positional vector of this vertex. |
-| [y] | <code>Number</code> | <code>0</code> | The initial y coordinate of the positional vector of this vertex. |
-
-<a name="SmilesDrawer.Vertex+setPosition"></a>
-
-#### vertex.setPosition(x, y)
-Set the 2D coordinates of the vertex.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| x | <code>Number</code> | The x component of the coordinates. |
-| y | <code>Number</code> | The y component of the coordinates. |
-
-<a name="SmilesDrawer.Vertex+setPositionFromVector"></a>
-
-#### vertex.setPositionFromVector(v)
-Set the 2D coordinates of the vertex from a Vector2.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| v | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A 2D vector. |
-
-<a name="SmilesDrawer.Vertex+addChild"></a>
-
-#### vertex.addChild(vertexID)
-Add a child vertex id to this vertex.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertexID | <code>Number</code> | The id of a vertex to be added as a child to this vertex. |
-
-<a name="SmilesDrawer.Vertex+setParentVertexId"></a>
-
-#### vertex.setParentVertexId(parentVertexId)
-Set the vertex id of the parent.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| parentVertexId | <code>Number</code> | The parents vertex id. |
-
-<a name="SmilesDrawer.Vertex+isTerminal"></a>
-
-#### vertex.isTerminal() ⇒ <code>Boolean</code>
-Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false. Always returns true if associated value has property hasAttachedPseudoElements set to true.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not this vertex is terminal.  
-<a name="SmilesDrawer.Vertex+clone"></a>
-
-#### vertex.clone() ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
-Clones this vertex and returns the clone.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>[Vertex](#SmilesDrawer.Vertex)</code> - A clone of this vertex.  
-<a name="SmilesDrawer.Vertex+equals"></a>
-
-#### vertex.equals(vertex) ⇒ <code>Boolean</code>
-Returns true if this vertex and the supplied vertex both have the same id, else returns false.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not the two vertices have the same id.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | The vertex to check. |
-
-<a name="SmilesDrawer.Vertex+getAngle"></a>
-
-#### vertex.getAngle([referenceVector], [returnAsDegrees]) ⇒ <code>Number</code>
-Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Number</code> - The angle of this vertex.  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [referenceVector] | <code>[Vertex](#SmilesDrawer.Vertex)</code> | <code></code> | The reference vector. |
-| [returnAsDegrees] | <code>Boolean</code> | <code>false</code> | If true, returns angle in degrees, else in radians. |
-
-<a name="SmilesDrawer.Vertex+getTextDirection"></a>
-
-#### vertex.getTextDirection(vertices) ⇒ <code>String</code>
-Returns the suggested text direction when text is added at the position of this vertex.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>String</code> - The suggested direction of the text.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | The array of vertices for the current molecule. |
-
-<a name="SmilesDrawer.Vertex+getNeighbours"></a>
-
-#### vertex.getNeighbours([vertexId]) ⇒ <code>Array.&lt;Number&gt;</code>
-Returns an array of ids of neighbouring vertices.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of neighbouring vertices.  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [vertexId] | <code>Number</code> | <code></code> | If a value is supplied, the vertex with this id is excluded from the returned indices. |
-
-<a name="SmilesDrawer.Vertex+getDrawnNeighbours"></a>
-
-#### vertex.getDrawnNeighbours(vertices) ⇒ <code>Array.&lt;Number&gt;</code>
-Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of neighbouring vertices that will be drawn.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | An array containing the vertices associated with the current molecule. |
-
-<a name="SmilesDrawer.Vertex+getNeighbourCount"></a>
-
-#### vertex.getNeighbourCount() ⇒ <code>Number</code>
-Returns the number of neighbours of this vertex.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Number</code> - The number of neighbours.  
-<a name="SmilesDrawer.Vertex+getSpanningTreeNeighbours"></a>
-
-#### vertex.getSpanningTreeNeighbours([vertexId]) ⇒ <code>Array.&lt;Number&gt;</code>
-Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of the neighbouring vertices.  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [vertexId] | <code>Number</code> | <code></code> | If supplied, the vertex with this id is excluded from the array returned. |
-
-<a name="SmilesDrawer.Vertex+getNextInRing"></a>
-
-#### vertex.getNextInRing(vertices, ringId, previousVertexId) ⇒ <code>Number</code>
-Gets the next vertex in the ring in opposide direction to the supplied vertex id.
-
-**Kind**: instance method of <code>[Vertex](#SmilesDrawer.Vertex)</code>  
-**Returns**: <code>Number</code> - The id of the next vertex in the ring.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> | The array of vertices for the current molecule. |
-| ringId | <code>Number</code> | The id of the ring containing this vertex. |
-| previousVertexId | <code>Number</code> | The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex. |
-
-<a name="SmilesDrawer.clean"></a>
-
-### SmilesDrawer.clean(smiles) ⇒ <code>String</code>
-Cleans a SMILES string (removes non-valid characters)
-
-**Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-**Returns**: <code>String</code> - The clean SMILES string.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| smiles | <code>String</code> | A SMILES string. |
-
-<a name="SmilesDrawer.apply"></a>
-
-### SmilesDrawer.apply(options, [selector], [themeName], [onError])
-Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
-
-**Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| options | <code>Object</code> |  | SmilesDrawer options. |
-| [selector] | <code>String</code> | <code>&#x27;canvas[data-smiles]&#x27;</code> | Selectors for the draw areas (canvas elements). |
-| [themeName] | <code>String</code> | <code>&#x27;light&#x27;</code> | The theme to apply. |
-| [onError] | <code>function</code> | <code>&#x27;null&#x27;</code> | A callback function providing an error object. |
-
-<a name="SmilesDrawer.parse"></a>
-
-### SmilesDrawer.parse(smiles, successCallback, errorCallback)
-Parses the entered smiles string.
-
-**Kind**: static method of <code>[SmilesDrawer](#SmilesDrawer)</code>  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| smiles | <code>String</code> | A SMILES string. |
-| successCallback | <code>function</code> | A callback that is called on success with the parse tree. |
-| errorCallback | <code>function</code> | A callback that is called with the error object on error. |
-
+**Kind**: global function  
 <a name="extend"></a>
 
 ## extend()
@@ -3008,25 +1406,25 @@ Returns the number of rings this edge is a part of.
 
 <a name="getBridgedRings"></a>
 
-## getBridgedRings() ⇒ <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code>
+## getBridgedRings() ⇒ <code>Array.&lt;Ring&gt;</code>
 Returns an array containing the bridged rings associated with this  molecule.
 
 **Kind**: global function  
-**Returns**: <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code> - An array containing all bridged rings associated with this molecule.  
+**Returns**: <code>Array.&lt;Ring&gt;</code> - An array containing all bridged rings associated with this molecule.  
 <a name="getFusedRings"></a>
 
-## getFusedRings() ⇒ <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code>
+## getFusedRings() ⇒ <code>Array.&lt;Ring&gt;</code>
 Returns an array containing all fused rings associated with this molecule.
 
 **Kind**: global function  
-**Returns**: <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code> - An array containing all fused rings associated with this molecule.  
+**Returns**: <code>Array.&lt;Ring&gt;</code> - An array containing all fused rings associated with this molecule.  
 <a name="getSpiros"></a>
 
-## getSpiros() ⇒ <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code>
+## getSpiros() ⇒ <code>Array.&lt;Ring&gt;</code>
 Returns an array containing all spiros associated with this molecule.
 
 **Kind**: global function  
-**Returns**: <code>[Array.&lt;Ring&gt;](#SmilesDrawer.Ring)</code> - An array containing all spiros associated with this molecule.  
+**Returns**: <code>Array.&lt;Ring&gt;</code> - An array containing all spiros associated with this molecule.  
 <a name="printRingInfo"></a>
 
 ## printRingInfo() ⇒ <code>String</code>
@@ -3072,8 +1470,8 @@ Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond repr
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexA | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-| vertexB | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
+| vertexA | <code>Vertex</code> | A vertex. |
+| vertexB | <code>Vertex</code> | A vertex. |
 
 <a name="initRings"></a>
 
@@ -3107,11 +1505,11 @@ Checks whether or not a ring is part of a bridged ring.
 
 <a name="createBridgedRing"></a>
 
-## createBridgedRing(ringIds, sourceVertexId) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
+## createBridgedRing(ringIds, sourceVertexId) ⇒ <code>Ring</code>
 Creates a bridged ring.
 
 **Kind**: global function  
-**Returns**: <code>[Ring](#SmilesDrawer.Ring)</code> - The bridged ring.  
+**Returns**: <code>Ring</code> - The bridged ring.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -3128,8 +1526,8 @@ Checks whether or not two vertices are in the same ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexA | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-| vertexB | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
+| vertexA | <code>Vertex</code> | A vertex. |
+| vertexB | <code>Vertex</code> | A vertex. |
 
 <a name="getCommonRings"></a>
 
@@ -3141,21 +1539,21 @@ Returns an array of ring ids shared by both vertices.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexA | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-| vertexB | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
+| vertexA | <code>Vertex</code> | A vertex. |
+| vertexB | <code>Vertex</code> | A vertex. |
 
 <a name="getLargestOrAromaticCommonRing"></a>
 
-## getLargestOrAromaticCommonRing(vertexA, vertexB) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code>
+## getLargestOrAromaticCommonRing(vertexA, vertexB) ⇒ <code>Ring</code> &#124; <code>null</code>
 Returns the aromatic or largest ring shared by the two vertices.
 
 **Kind**: global function  
-**Returns**: <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>null</code> - If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.  
+**Returns**: <code>Ring</code> &#124; <code>null</code> - If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexA | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-| vertexB | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
+| vertexA | <code>Vertex</code> | A vertex. |
+| vertexB | <code>Vertex</code> | A vertex. |
 
 <a name="getVerticesAt"></a>
 
@@ -3167,21 +1565,21 @@ Returns an array of vertices positioned at a specified location.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| position | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The position to search for vertices. |
+| position | <code>Vector2</code> | The position to search for vertices. |
 | radius | <code>Number</code> | The radius within to search. |
 | excludeVertexId | <code>Number</code> | A vertex id to be excluded from the search results. |
 
 <a name="getClosestVertex"></a>
 
-## getClosestVertex(vertex) ⇒ <code>[Vertex](#SmilesDrawer.Vertex)</code>
+## getClosestVertex(vertex) ⇒ <code>Vertex</code>
 Returns the closest vertex (connected as well as unconnected).
 
 **Kind**: global function  
-**Returns**: <code>[Vertex](#SmilesDrawer.Vertex)</code> - The closest vertex.  
+**Returns**: <code>Vertex</code> - The closest vertex.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | The vertex of which to find the closest other vertex. |
+| vertex | <code>Vertex</code> | The vertex of which to find the closest other vertex. |
 
 <a name="addRing"></a>
 
@@ -3193,7 +1591,7 @@ Add a ring to this representation of a molecule.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | A new ring. |
+| ring | <code>Ring</code> | A new ring. |
 
 <a name="removeRing"></a>
 
@@ -3208,11 +1606,11 @@ Removes a ring from the array of rings associated with the current molecule.
 
 <a name="getRing"></a>
 
-## getRing(ringId) ⇒ <code>[Ring](#SmilesDrawer.Ring)</code>
+## getRing(ringId) ⇒ <code>Ring</code>
 Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.
 
 **Kind**: global function  
-**Returns**: <code>[Ring](#SmilesDrawer.Ring)</code> - A ring associated with the current molecule.  
+**Returns**: <code>Ring</code> - A ring associated with the current molecule.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -3228,7 +1626,7 @@ Add a ring connection to this representation of a molecule.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ringConnection | <code>[RingConnection](#SmilesDrawer.RingConnection)</code> | A new ringConnection. |
+| ringConnection | <code>RingConnection</code> | A new ringConnection. |
 
 <a name="removeRingConnection"></a>
 
@@ -3255,11 +1653,11 @@ Removes all ring connections between two vertices.
 
 <a name="getRingConnection"></a>
 
-## getRingConnection(id) ⇒ <code>[RingConnection](#SmilesDrawer.RingConnection)</code>
+## getRingConnection(id) ⇒ <code>RingConnection</code>
 Get a ring connection with a given id.
 
 **Kind**: global function  
-**Returns**: <code>[RingConnection](#SmilesDrawer.RingConnection)</code> - The ring connection with the specified id.  
+**Returns**: <code>RingConnection</code> - The ring connection with the specified id.  
 
 | Param | Type |
 | --- | --- |
@@ -3302,9 +1700,9 @@ When drawing a double bond, choose the side to place the double bond. E.g. a dou
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexA | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-| vertexB | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
-| sides | <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code> | An array containing the two normals of the line spanned by the two provided vertices. |
+| vertexA | <code>Vertex</code> | A vertex. |
+| vertexB | <code>Vertex</code> | A vertex. |
+| sides | <code>Array.&lt;Vector2&gt;</code> | An array containing the two normals of the line spanned by the two provided vertices. |
 
 <a name="setRingCenter"></a>
 
@@ -3315,20 +1713,20 @@ Sets the center for a ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | A ring. |
+| ring | <code>Ring</code> | A ring. |
 
 <a name="getSubringCenter"></a>
 
-## getSubringCenter(ring, vertex) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
+## getSubringCenter(ring, vertex) ⇒ <code>Vector2</code>
 Gets the center of a ring contained within a bridged ring and containing a given vertex.
 
 **Kind**: global function  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The center of the subring that containing the vertex.  
+**Returns**: <code>Vector2</code> - The center of the subring that containing the vertex.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | A bridged ring. |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
+| ring | <code>Ring</code> | A bridged ring. |
+| vertex | <code>Vertex</code> | A vertex. |
 
 <a name="drawEdges"></a>
 
@@ -3391,10 +1789,10 @@ Creates a new ring, that is, positiones all the vertices inside a ring.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| ring | <code>[Ring](#SmilesDrawer.Ring)</code> |  | The ring to position. |
-| [center] | <code>[Vector2](#SmilesDrawer.Vector2)</code> &#124; <code>null</code> | <code></code> | The center of the ring to be created. |
-| [startVertex] | <code>[Vertex](#SmilesDrawer.Vertex)</code> &#124; <code>null</code> | <code></code> | The first vertex to be positioned inside the ring. |
-| [previousVertex] | <code>[Vertex](#SmilesDrawer.Vertex)</code> &#124; <code>null</code> | <code></code> | The last vertex that was positioned. |
+| ring | <code>Ring</code> |  | The ring to position. |
+| [center] | <code>Vector2</code> &#124; <code>null</code> | <code></code> | The center of the ring to be created. |
+| [startVertex] | <code>Vertex</code> &#124; <code>null</code> | <code></code> | The first vertex to be positioned inside the ring. |
+| [previousVertex] | <code>Vertex</code> &#124; <code>null</code> | <code></code> | The last vertex that was positioned. |
 | [previousVertex] | <code>Boolean</code> | <code>false</code> | A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it. |
 
 <a name="rotateSubtree"></a>
@@ -3409,7 +1807,7 @@ Rotate an entire subtree by an angle around a center.
 | vertexId | <code>Number</code> | A vertex id (the root of the sub-tree). |
 | parentVertexId | <code>Number</code> | A vertex id in the previous direction of the subtree that is to rotate. |
 | angle | <code>Number</code> | An angle in randians. |
-| center | <code>[Vector2](#SmilesDrawer.Vector2)</code> | The rotational center. |
+| center | <code>Vector2</code> | The rotational center. |
 
 <a name="getSubtreeOverlapScore"></a>
 
@@ -3417,7 +1815,7 @@ Rotate an entire subtree by an angle around a center.
 Gets the overlap score of a subtree.
 
 **Kind**: global function  
-**Returns**: <code>Object</code> - An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new SmilesDrawer.Vector2() }.  
+**Returns**: <code>Object</code> - An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new Vector2() }.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -3427,22 +1825,22 @@ Gets the overlap score of a subtree.
 
 <a name="getCurrentCenterOfMass"></a>
 
-## getCurrentCenterOfMass() ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
+## getCurrentCenterOfMass() ⇒ <code>Vector2</code>
 Returns the current (positioned vertices so far) center of mass.
 
 **Kind**: global function  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The current center of mass.  
+**Returns**: <code>Vector2</code> - The current center of mass.  
 <a name="getCurrentCenterOfMassInNeigbourhood"></a>
 
-## getCurrentCenterOfMassInNeigbourhood(vec, [r]) ⇒ <code>[Vector2](#SmilesDrawer.Vector2)</code>
+## getCurrentCenterOfMassInNeigbourhood(vec, [r]) ⇒ <code>Vector2</code>
 Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
 
 **Kind**: global function  
-**Returns**: <code>[Vector2](#SmilesDrawer.Vector2)</code> - The current center of mass.  
+**Returns**: <code>Vector2</code> - The current center of mass.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> |  | The point at which to look for neighbours. |
+| vec | <code>Vector2</code> |  | The point at which to look for neighbours. |
 | [r] | <code>Number</code> | <code>currentBondLength*2.0</code> | The radius of vertices to include. |
 
 <a name="resolvePrimaryOverlaps"></a>
@@ -3466,17 +1864,17 @@ Resolve secondary overlaps. Those overlaps are due to the structure turning back
 
 <a name="createNextBond"></a>
 
-## createNextBond(vertex, previousVertex, ringOrAngle, dir, [skipPositioning])
+## createNextBond(vertex, [previousVertex], [previousAngle], [dir], [skipPositioning])
 Positiones the next vertex thus creating a bond.
 
 **Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> |  | A vertex. |
-| previousVertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> |  | The previous vertex which has been positioned. |
-| ringOrAngle | <code>[Ring](#SmilesDrawer.Ring)</code> &#124; <code>Number</code> |  | Either a ring or a number. If the vertex is connected to a ring, it is positioned based on the ring center and thus the ring is supplied. If the vertex is not in a ring, an angle (in radians) is supplied. |
-| dir | <code>Number</code> |  | Either 1 or -1 to break ties (if no angle can be elucidated). |
+| vertex | <code>Vertex</code> |  | A vertex. |
+| [previousVertex] | <code>Vertex</code> | <code></code> | The previous vertex which has been positioned. |
+| [previousAngle] | <code>Number</code> | <code>0.0</code> | The global angle of the previous vertex. |
+| [dir] | <code>Number</code> | <code>1</code> | Either 1 or -1 to break ties (if no angle can be elucidated). |
 | [skipPositioning] | <code>Boolean</code> | <code>false</code> | Whether or not to skip positioning and just check the neighbours. |
 
 <a name="getCommonRingbondNeighbour"></a>
@@ -3489,7 +1887,7 @@ Gets the vetex sharing the edge that is the common bond of two rings.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
+| vertex | <code>Vertex</code> | A vertex. |
 
 <a name="isPointInRing"></a>
 
@@ -3501,7 +1899,7 @@ Check if a vector is inside any ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vec | <code>[Vector2](#SmilesDrawer.Vector2)</code> | A vector. |
+| vec | <code>Vector2</code> | A vector. |
 
 <a name="isEdgeInRing"></a>
 
@@ -3513,7 +1911,7 @@ Check whether or not an edge is part of a ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| edge | <code>[Edge](#SmilesDrawer.Edge)</code> | An edge. |
+| edge | <code>Edge</code> | An edge. |
 
 <a name="isEdgeRotatable"></a>
 
@@ -3525,7 +1923,7 @@ Check whether or not an edge is rotatable.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| edge | <code>[Edge](#SmilesDrawer.Edge)</code> | An edge. |
+| edge | <code>Edge</code> | An edge. |
 
 <a name="isRingAromatic"></a>
 
@@ -3537,19 +1935,245 @@ Check whether or not a ring is an implicitly defined aromatic ring (lower case s
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ring | <code>[Ring](#SmilesDrawer.Ring)</code> | A ring. |
+| ring | <code>Ring</code> | A ring. |
 
 <a name="getEdgeNormals"></a>
 
-## getEdgeNormals(edge) ⇒ <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code>
+## getEdgeNormals(edge) ⇒ <code>Array.&lt;Vector2&gt;</code>
 Get the normals of an edge.
 
 **Kind**: global function  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#SmilesDrawer.Vector2)</code> - An array containing two vectors, representing the normals.  
+**Returns**: <code>Array.&lt;Vector2&gt;</code> - An array containing two vectors, representing the normals.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| edge | <code>[Edge](#SmilesDrawer.Edge)</code> | An edge. |
+| edge | <code>Edge</code> | An edge. |
+
+<a name="getBondCount"></a>
+
+## getBondCount(vertex) ⇒ <code>Number</code>
+Gets the number of bonds of a vertex.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The number of bonds the vertex participates in.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertex | <code>Vertex</code> | A vertex. |
+
+<a name="getNonRingNeighbours"></a>
+
+## getNonRingNeighbours(vertexId) ⇒ <code>Array.&lt;Vertex&gt;</code>
+Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Vertex&gt;</code> - An array of vertices.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>Number</code> | A vertex id. |
+
+<a name="initPseudoElements"></a>
+
+## initPseudoElements()
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
+
+**Kind**: global function  
+<a name="setBondType"></a>
+
+## setBondType(bondType)
+Set the bond type of this edge. This also sets the edge weight.
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| bondType | <code>String</code> | 
+
+<a name="_init"></a>
+
+## _init(node, parentVertexId, isBranch)
+PRIVATE FUNCTION. Initializing the graph from the parse tree.
+
+**Kind**: global function  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| node | <code>Object</code> |  | The current node in the parse tree. |
+| parentVertexId | <code>Number</code> | <code></code> | The id of the previous vertex. |
+| isBranch | <code>Boolean</code> | <code>false</code> | Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C). |
+
+<a name="_initInfos"></a>
+
+## _initInfos()
+PRIVATE FUNCTION. Initializes element counts etc.
+
+**Kind**: global function  
+<a name="clear"></a>
+
+## clear()
+Clears all the elements in this graph (edges and vertices).
+
+**Kind**: global function  
+<a name="addVertex"></a>
+
+## addVertex(vertex) ⇒ <code>Number</code>
+Add a vertex to the graph.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The vertex id of the new vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertex | <code>Vertex</code> | A new vertex. |
+
+<a name="addEdge"></a>
+
+## addEdge(edge) ⇒ <code>Number</code>
+Add an edge to the graph.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The edge id of the new edge.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| edge | <code>Edge</code> | A new edge. |
+
+<a name="getEdge"></a>
+
+## getEdge(vertexIdA, vertexIdB) ⇒ <code>Edge</code> &#124; <code>null</code>
+Returns the edge between two given vertices.
+
+**Kind**: global function  
+**Returns**: <code>Edge</code> &#124; <code>null</code> - The edge or, if no edge can be found, null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>Number</code> | A vertex id. |
+| vertexIdB | <code>Number</code> | A vertex id. |
+
+<a name="getEdges"></a>
+
+## getEdges(vertexId) ⇒ <code>Array.&lt;Number&gt;</code>
+Returns the ids of edges connected to a vertex.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of edges connected to the vertex.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>Number</code> | A vertex id. |
+
+<a name="hasEdge"></a>
+
+## hasEdge(vertexIdA, vertexIdB) ⇒ <code>Boolean</code>
+Check whether or not two vertices are connected by an edge.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not two vertices are connected by an edge.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIdA | <code>Number</code> | A vertex id. |
+| vertexIdB | <code>Number</code> | A vertex id. |
+
+<a name="getVertexList"></a>
+
+## getVertexList() ⇒ <code>Array.&lt;Number&gt;</code>
+Returns an array containing the vertex ids of this graph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing all vertex ids of this graph.  
+<a name="getEdgeList"></a>
+
+## getEdgeList() ⇒ <code>Array.&lt;Array&gt;</code>
+Returns an array containing source, target arrays of this graphs edges.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - An array containing source, target arrays of this graphs edges. Example: [ [ 2, 5 ], [ 6, 9 ] ].  
+<a name="getAdjacencyMatrix"></a>
+
+## getAdjacencyMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
+Get the adjacency matrix of the graph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the molecular graph.  
+<a name="getComponentsAdjacencyMatrix"></a>
+
+## getComponentsAdjacencyMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
+Get the adjacency matrix of the graph with all bridges removed (thus the components). Thus the remaining vertices are all part of ring systems.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the molecular graph with all bridges removed.  
+<a name="getSubgraphAdjacencyMatrix"></a>
+
+## getSubgraphAdjacencyMatrix(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
+Get the adjacency matrix of a subgraph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the subgraph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
+
+<a name="getDistanceMatrix"></a>
+
+## getDistanceMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
+Get the distance matrix of the graph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The distance matrix of the graph.  
+<a name="getSubgraphDistanceMatrix"></a>
+
+## getSubgraphDistanceMatrix(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
+Get the distance matrix of a subgraph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The distance matrix of the subgraph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
+
+<a name="getAdjacencyList"></a>
+
+## getAdjacencyList() ⇒ <code>Array.&lt;Array&gt;</code>
+Get the adjacency list of the graph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency list of the graph.  
+<a name="getSubgraphAdjacencyList"></a>
+
+## getSubgraphAdjacencyList(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
+Get the adjacency list of a subgraph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency list of the subgraph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
+
+<a name="getBridges"></a>
+
+## getBridges() ⇒ <code>Array.&lt;Number&gt;</code>
+Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the edge ids of the bridges.  
+<a name="traverseBF"></a>
+
+## traverseBF(startVertexId, callback)
+Traverses the graph in breadth-first order.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| startVertexId | <code>Number</code> | The id of the starting vertex. |
+| callback | <code>function</code> | The callback function to be called on every vertex. |
 
 <a name="getTreeDepth"></a>
 
@@ -3579,36 +2203,231 @@ Traverse a sub-tree in the graph.
 | [maxDepth] | <code>Number</code> | <code></code> | The maximum depth of the recursion. If null, there is no limit. |
 | [ignoreFirst] | <code>Boolean</code> | <code>false</code> | Whether or not to ignore the starting vertex supplied as vertexId in the callback. |
 
-<a name="getBondCount"></a>
+<a name="kkLayout"></a>
 
-## getBondCount(vertex) ⇒ <code>Number</code>
-Gets the number of bonds of a vertex.
+## kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)
+Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
 
 **Kind**: global function  
-**Returns**: <code>Number</code> - The number of bonds the vertex participates in.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertex | <code>[Vertex](#SmilesDrawer.Vertex)</code> | A vertex. |
+| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing vertexIds to be placed using the force based layout. |
+| outAdditionallyPositioned | <code>Array.&lt;Array&gt;</code> | Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ]. |
+| center | <code>Vector2</code> | The center of the layout. |
+| startVertexId | <code>Number</code> | A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex. |
+| ring | <code>Ring</code> | The bridged ring associated with this force-based layout. |
 
-<a name="getNonRingNeighbours"></a>
+<a name="_bridgeDfs"></a>
 
-## getNonRingNeighbours(vertexId) ⇒ <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code>
-Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
+## _bridgeDfs()
+PRIVATE FUNCTION used by getBridges().
 
 **Kind**: global function  
-**Returns**: <code>[Array.&lt;Vertex&gt;](#SmilesDrawer.Vertex)</code> - An array of vertices.  
+<a name="getConnectedComponents"></a>
+
+## getConnectedComponents(adjacencyMatrix) ⇒ <code>Array.&lt;Set&gt;</code>
+Returns the connected components of the graph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Set&gt;</code> - Connected components as sets.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexId | <code>Number</code> | A vertex id. |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
 
-<a name="initPseudoElements"></a>
+<a name="getConnectedComponentCount"></a>
 
-## initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
+## getConnectedComponentCount(adjacencyMatrix) ⇒ <code>Number</code>
+Returns the number of connected components for the graph.
 
 **Kind**: global function  
+**Returns**: <code>Number</code> - The number of connected components of the supplied graph.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+
+<a name="_ccCountDfs"></a>
+
+## _ccCountDfs()
+PRIVATE FUNCTION used by getConnectedComponentCount().
+
+**Kind**: global function  
+<a name="_ccGetDfs"></a>
+
+## _ccGetDfs()
+PRIVATE FUNCTION used by getConnectedComponents().
+
+**Kind**: global function  
+<a name="clone"></a>
+
+## clone() ⇒ <code>Line</code>
+Clones this line and returns the clone.
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - A clone of this line.  
+<a name="getLength"></a>
+
+## getLength() ⇒ <code>Number</code>
+Returns the length of this line.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The length of this line.  
+<a name="getAngle"></a>
+
+## getAngle() ⇒ <code>Number</code>
+Returns the angle of the line in relation to the coordinate system (the x-axis).
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle in radians.  
+<a name="getRightVector"></a>
+
+## getRightVector() ⇒ <code>Vector2</code>
+Returns the right vector (the vector with the larger x value).
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - The right vector.  
+<a name="getLeftVector"></a>
+
+## getLeftVector() ⇒ <code>Vector2</code>
+Returns the left vector (the vector with the smaller x value).
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - The left vector.  
+<a name="getRightElement"></a>
+
+## getRightElement() ⇒ <code>String</code>
+Returns the element associated with the right vector (the vector with the larger x value).
+
+**Kind**: global function  
+**Returns**: <code>String</code> - The element associated with the right vector.  
+<a name="getLeftElement"></a>
+
+## getLeftElement() ⇒ <code>String</code>
+Returns the element associated with the left vector (the vector with the smaller x value).
+
+**Kind**: global function  
+**Returns**: <code>String</code> - The element associated with the left vector.  
+<a name="getRightChiral"></a>
+
+## getRightChiral() ⇒ <code>Boolean</code>
+Returns whether or not the atom associated with the right vector (the vector with the larger x value) is a chiral center.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - Whether or not the atom associated with the right vector is a chiral center.  
+<a name="getLeftChiral"></a>
+
+## getLeftChiral() ⇒ <code>Boolean</code>
+Returns whether or not the atom associated with the left vector (the vector with the smaller x value) is a chiral center.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - Whether or not the atom  associated with the left vector is a chiral center.  
+<a name="setRightVector"></a>
+
+## setRightVector(x, y) ⇒ <code>Line</code>
+Set the value of the right vector.
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - This line.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| x | <code>Number</code> | The x value. |
+| y | <code>Number</code> | The y value. |
+
+<a name="setLeftVector"></a>
+
+## setLeftVector(x, y) ⇒ <code>Line</code>
+Set the value of the left vector.
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - This line.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| x | <code>Number</code> | The x value. |
+| y | <code>Number</code> | The y value. |
+
+<a name="rotateToXAxis"></a>
+
+## rotateToXAxis() ⇒ <code>Line</code>
+Rotates this line to be aligned with the x-axis. The center of rotation is the left vector.
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - This line.  
+<a name="rotate"></a>
+
+## rotate(theta) ⇒ <code>Line</code>
+Rotate the line by a given value (in radians). The center of rotation is the left vector.
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - This line.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| theta | <code>Number</code> | The angle (in radians) to rotate the line. |
+
+<a name="shortenFrom"></a>
+
+## shortenFrom(by) ⇒ <code>Line</code>
+Shortens this line from the "from" direction by a given value (in pixels).
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - This line.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| by | <code>Number</code> | The length in pixels to shorten the vector by. |
+
+<a name="shortenTo"></a>
+
+## shortenTo(by) ⇒ <code>Line</code>
+Shortens this line from the "to" direction by a given value (in pixels).
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - This line.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| by | <code>Number</code> | The length in pixels to shorten the vector by. |
+
+<a name="shortenRight"></a>
+
+## shortenRight(by) ⇒ <code>Line</code>
+Shorten the right side.
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| by | <code>Number</code> | The length in pixels to shorten the vector by. |
+
+<a name="shortenLeft"></a>
+
+## shortenLeft(by) ⇒ <code>Line</code>
+Shorten the left side.
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| by | <code>Number</code> | The length in pixels to shorten the vector by. |
+
+<a name="shorten"></a>
+
+## shorten(by) ⇒ <code>Line</code>
+Shortens this line from both directions by a given value (in pixels).
+
+**Kind**: global function  
+**Returns**: <code>Line</code> - This line.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| by | <code>Number</code> | The length in pixels to shorten the vector by. |
+
 <a name="round"></a>
 
 ## round(value, decimals) ⇒ <code>Number</code>
@@ -3718,7 +2537,971 @@ Returns the parity of the permutation (1 or -1)
 
 | Param | Type | Description |
 | --- | --- | --- |
-| arr | <code>Array</code> | An array containing the permutation. |
+| arr | <code>Array</code> &#124; <code>Uint8Array</code> | An array containing the permutation. |
+
+<a name="clone"></a>
+
+## clone() ⇒ <code>Ring</code>
+Clones this ring and returns the clone.
+
+**Kind**: global function  
+**Returns**: <code>Ring</code> - A clone of this ring.  
+<a name="getSize"></a>
+
+## getSize() ⇒ <code>Number</code>
+Returns the size (number of members) of this ring.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The size (number of members) of this ring.  
+<a name="getPolygon"></a>
+
+## getPolygon(vertices) ⇒ <code>Array.&lt;Vector2&gt;</code>
+Gets the polygon representation (an array of the ring-members positional vectors) of this ring.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Vector2&gt;</code> - An array of the positional vectors of the ring members.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | An array of vertices representing the current molecule. |
+
+<a name="getAngle"></a>
+
+## getAngle() ⇒ <code>Number</code>
+Returns the angle of this ring in relation to the coordinate system.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle in radians.  
+<a name="eachMember"></a>
+
+## eachMember(vertices, callback, startVertexId, previousVertexId)
+Loops over the members of this ring from a given start position in a direction opposite to the vertex id passed as the previousId.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | The vertices associated with the current molecule. |
+| callback | <code>function</code> | A callback with the current vertex id as a parameter. |
+| startVertexId | <code>Number</code> | The vertex id of the start vertex. |
+| previousVertexId | <code>Number</code> | The vertex id of the previous vertex (the loop calling the callback function will run in the opposite direction of this vertex). |
+
+<a name="getOrderedNeighbours"></a>
+
+## getOrderedNeighbours(ringConnections) ⇒ <code>Array.&lt;Object&gt;</code>
+Returns an array containing the neighbouring rings of this ring ordered by ring size.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Object&gt;</code> - An array of neighbouring rings sorted by ring size. Example: { n: 5, neighbour: 1 }.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnections | <code>Array.&lt;RingConnection&gt;</code> | An array of ring connections associated with the current molecule. |
+
+<a name="isBenzeneLike"></a>
+
+## isBenzeneLike(vertices) ⇒ <code>Boolean</code>
+Check whether this ring is an implicitly defined benzene-like (e.g. C1=CC=CC=C1) with 6 members and 3 double bonds.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not this ring is an implicitly defined benzene-like.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | An array of vertices associated with the current molecule. |
+
+<a name="getDoubleBondCount"></a>
+
+## getDoubleBondCount(vertices) ⇒ <code>Number</code>
+Get the number of double bonds inside this ring.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The number of double bonds inside this ring.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | An array of vertices associated with the current molecule. |
+
+<a name="contains"></a>
+
+## contains(vertexId) ⇒ <code>Boolean</code>
+Checks whether or not this ring contains a member with a given vertex id.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not this ring contains a member with the given vertex id.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>Number</code> | A vertex id. |
+
+<a name="addVertex"></a>
+
+## addVertex(vertexId)
+Adding a vertex to the ring connection.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>Number</code> | A vertex id. |
+
+<a name="updateOther"></a>
+
+## updateOther(ringId, otherRingId)
+Update the ring id of this ring connection that is not the ring id supplied as the second argument.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringId | <code>Number</code> | A ring id. The new ring id to be set. |
+| otherRingId | <code>Number</code> | A ring id. The id that is NOT to be updated. |
+
+<a name="containsRing"></a>
+
+## containsRing(ringId) ⇒ <code>Boolean</code>
+Returns a boolean indicating whether or not a ring with a given id is participating in this ring connection.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not a ring with a given id participates in this ring connection.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringId | <code>Number</code> | A ring id. |
+
+<a name="isBridge"></a>
+
+## isBridge(vertices) ⇒ <code>Boolean</code>
+Checks whether or not this ring connection is a bridge in a bridged ring.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not this ring connection is a bridge.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | The array of vertices associated with the current molecule. |
+
+<a name="isBridge"></a>
+
+## isBridge(ringConnections, vertices, firstRingId, secondRingId) ⇒ <code>Boolean</code>
+Checks whether or not two rings are connected by a bridged bond.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not two rings ar connected by a bridged bond.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnections | <code>Array.&lt;RingConnection&gt;</code> | An array of ring connections containing the ring connections associated with the current molecule. |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | An array of vertices containing the vertices associated with the current molecule. |
+| firstRingId | <code>Number</code> | A ring id. |
+| secondRingId | <code>Number</code> | A ring id. |
+
+<a name="getNeighbours"></a>
+
+## getNeighbours(ringConnections, ringId) ⇒ <code>Array.&lt;Number&gt;</code>
+Retruns the neighbouring rings of a given ring.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Number&gt;</code> - An array of ring ids of neighbouring rings.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnections | <code>Array.&lt;RingConnection&gt;</code> | An array of ring connections containing ring connections associated with the current molecule. |
+| ringId | <code>Number</code> | A ring id. |
+
+<a name="getVertices"></a>
+
+## getVertices(ringConnections, firstRingId, secondRingId) ⇒ <code>Array.&lt;Number&gt;</code>
+Returns an array of vertex ids associated with a given ring connection.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Number&gt;</code> - An array of vertex ids associated with the ring connection.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ringConnections | <code>Array.&lt;RingConnection&gt;</code> | An array of ring connections containing ring connections associated with the current molecule. |
+| firstRingId | <code>Number</code> | A ring id. |
+| secondRingId | <code>Number</code> | A ring id. |
+
+<a name="getRings"></a>
+
+## getRings(graph) ⇒ <code>Array.&lt;Array&gt;</code>
+Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| graph | <code>Graph</code> | A Graph object. |
+
+<a name="matrixToString"></a>
+
+## matrixToString(matrix) ⇒ <code>String</code>
+Creates a printable string from a matrix (2D array).
+
+**Kind**: global function  
+**Returns**: <code>String</code> - A string representing the matrix.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| matrix | <code>Array.&lt;Array&gt;</code> | A 2D array. |
+
+<a name="getPathIncludedDistanceMatrices"></a>
+
+## getPathIncludedDistanceMatrices(adjacencyMatrix) ⇒ <code>Object</code>
+Returnes the two path-included distance matrices used to find the sssr.
+
+**Kind**: global function  
+**Returns**: <code>Object</code> - The path-included distance matrices. { p1, p2 }  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+
+<a name="getRingCandidates"></a>
+
+## getRingCandidates(d, pe, pe_prime) ⇒ <code>Array.&lt;Array&gt;</code>
+Get the ring candidates from the path-included distance matrices.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - The ring candidates.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| d | <code>Array.&lt;Array&gt;</code> | The distance matrix. |
+| pe | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths. |
+| pe_prime | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
+
+<a name="getSSSR"></a>
+
+## getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) ⇒ <code>Array.&lt;Set&gt;</code>
+Searches the candidates for the smallest set of smallest rings.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Set&gt;</code> - The smallest set of smallest rings.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| c | <code>Array.&lt;Array&gt;</code> | The candidates. |
+| d | <code>Array.&lt;Array&gt;</code> | The distance matrix. |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+| pe | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths. |
+| pe_prime | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
+| arrBondCount | <code>Array.&lt;Number&gt;</code> | A matrix containing the bond count of each vertex. |
+| arrRingCount | <code>Array.&lt;Number&gt;</code> | A matrix containing the number of rings associated with each vertex. |
+| nsssr | <code>Number</code> | The theoretical number of rings in the graph. |
+
+<a name="getEdgeCount"></a>
+
+## getEdgeCount(adjacencyMatrix) ⇒ <code>Number</code>
+Returns the number of edges in a graph defined by an adjacency matrix.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The number of edges in the graph defined by the adjacency matrix.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+
+<a name="getEdgeList"></a>
+
+## getEdgeList(adjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
+Returns an edge list constructed form an adjacency matrix.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Array&gt;</code> - An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+
+<a name="bondsToAtoms"></a>
+
+## bondsToAtoms(bonds) ⇒ <code>Set.&lt;Number&gt;</code>
+Return a set of vertex indices contained in an array of bonds.
+
+**Kind**: global function  
+**Returns**: <code>Set.&lt;Number&gt;</code> - An array of vertices.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| bonds | <code>Array</code> | An array of bonds. A bond is defined as [ sourceVertexId, targetVertexId ]. |
+
+<a name="getBondCount"></a>
+
+## getBondCount(atoms, adjacencyMatrix) ⇒ <code>Number</code>
+Returns the number of bonds within a set of atoms.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The number of bonds in a set of atoms.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| atoms | <code>Set.&lt;Number&gt;</code> | An array of atom ids. |
+| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+
+<a name="pathSetsContain"></a>
+
+## pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) ⇒ <code>Boolean</code>
+Checks whether or not a given path already exists in an array of paths.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not a give path is contained within a set.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| pathSets | <code>Array.&lt;Set&gt;</code> | An array of sets each representing a path. |
+| pathSet | <code>Set.&lt;Number&gt;</code> | A set representing a path. |
+| bonds | <code>Array.&lt;Array&gt;</code> | The bonds associated with the current path. |
+| allBonds | <code>Array.&lt;Array&gt;</code> | All bonds currently associated with rings in the SSSR set. |
+| arrBondCount | <code>Array.&lt;Number&gt;</code> | A matrix containing the bond count of each vertex. |
+| arrRingCount | <code>Array.&lt;Number&gt;</code> | A matrix containing the number of rings associated with each vertex. |
+
+<a name="areSetsEqual"></a>
+
+## areSetsEqual(setA, setB) ⇒ <code>Boolean</code>
+Checks whether or not two sets are equal (contain the same elements).
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not the two sets are equal.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| setA | <code>Set.&lt;Number&gt;</code> | A set. |
+| setB | <code>Set.&lt;Number&gt;</code> | A set. |
+
+<a name="isSupersetOf"></a>
+
+## isSupersetOf(setA, setB) ⇒ <code>Boolean</code>
+Checks whether or not a set (setA) is a superset of another set (setB).
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not setB is a superset of setA.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| setA | <code>Set.&lt;Number&gt;</code> | A set. |
+| setB | <code>Set.&lt;Number&gt;</code> | A set. |
+
+<a name="clone"></a>
+
+## clone() ⇒ <code>Vector2</code>
+Clones this vector and returns the clone.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - The clone of this vector.  
+<a name="toString"></a>
+
+## toString() ⇒ <code>String</code>
+Returns a string representation of this vector.
+
+**Kind**: global function  
+**Returns**: <code>String</code> - A string representation of this vector.  
+<a name="add"></a>
+
+## add(vec) ⇒ <code>Vector2</code>
+Add the x and y coordinate values of a vector to the x and y coordinate values of this vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | Another vector. |
+
+<a name="subtract"></a>
+
+## subtract(vec) ⇒ <code>Vector2</code>
+Subtract the x and y coordinate values of a vector from the x and y coordinate values of this vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | Another vector. |
+
+<a name="divide"></a>
+
+## divide(scalar) ⇒ <code>Vector2</code>
+Divide the x and y coordinate values of this vector by a scalar.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| scalar | <code>Number</code> | The scalar. |
+
+<a name="multiply"></a>
+
+## multiply(v) ⇒ <code>Vector2</code>
+Multiply the x and y coordinate values of this vector by the values of another vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| v | <code>Vector2</code> | A vector. |
+
+<a name="multiplyScalar"></a>
+
+## multiplyScalar(scalar) ⇒ <code>Vector2</code>
+Multiply the x and y coordinate values of this vector by a scalar.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| scalar | <code>Number</code> | The scalar. |
+
+<a name="invert"></a>
+
+## invert() ⇒ <code>Vector2</code>
+Inverts this vector. Same as multiply(-1.0).
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+<a name="angle"></a>
+
+## angle() ⇒ <code>Number</code>
+Returns the angle of this vector in relation to the coordinate system.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle in radians.  
+<a name="distance"></a>
+
+## distance(vec) ⇒ <code>Number</code>
+Returns the euclidean distance between this vector and another vector.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The euclidean distance between the two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | A vector. |
+
+<a name="distanceSq"></a>
+
+## distanceSq(vec) ⇒ <code>Number</code>
+Returns the squared euclidean distance between this vector and another vector. When only the relative distances of a set of vectors are needed, this is is less expensive than using distance(vec).
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The squared euclidean distance of the two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | Another vector. |
+
+<a name="clockwise"></a>
+
+## clockwise(vec) ⇒ <code>Number</code>
+Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to the coordinate system.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | Another vector. |
+
+<a name="rotate"></a>
+
+## rotate(angle) ⇒ <code>Vector2</code>
+Rotates this vector by a given number of radians around the origin of the coordinate system.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| angle | <code>Number</code> | The angle in radians to rotate the vector. |
+
+<a name="rotateAround"></a>
+
+## rotateAround(angle, vec) ⇒ <code>Vector2</code>
+Rotates this vector around another vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| angle | <code>Number</code> | The angle in radians to rotate the vector. |
+| vec | <code>Vector2</code> | The vector which is used as the rotational center. |
+
+<a name="rotateTo"></a>
+
+## rotateTo(vec, center, [offsetAngle]) ⇒ <code>Vector2</code>
+Rotate a vector around a given center to the same angle as another vector (so that the two vectors and the center are in a line, with both vectors on one side of the center), keeps the distance from this vector to the center.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| vec | <code>Vector2</code> |  | The vector to rotate this vector to. |
+| center | <code>Vector2</code> |  | The rotational center. |
+| [offsetAngle] | <code>Number</code> | <code>0.0</code> | An additional amount of radians to rotate the vector. |
+
+<a name="rotateAwayFrom"></a>
+
+## rotateAwayFrom(vec, center, angle)
+Rotates the vector away from a specified vector around a center.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | The vector this one is rotated away from. |
+| center | <code>Vector2</code> | The rotational center. |
+| angle | <code>Number</code> | The angle by which to rotate. |
+
+<a name="getRotateAwayFromAngle"></a>
+
+## getRotateAwayFromAngle(vec, center, angle) ⇒ <code>Number</code>
+Returns the angle in radians used to rotate this vector away from a given vector.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | The vector this one is rotated away from. |
+| center | <code>Vector2</code> | The rotational center. |
+| angle | <code>Number</code> | The angle by which to rotate. |
+
+<a name="getRotateTowardsAngle"></a>
+
+## getRotateTowardsAngle(vec, center, angle) ⇒ <code>Number</code>
+Returns the angle in radians used to rotate this vector towards a given vector.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | The vector this one is rotated towards to. |
+| center | <code>Vector2</code> | The rotational center. |
+| angle | <code>Number</code> | The angle by which to rotate. |
+
+<a name="getRotateToAngle"></a>
+
+## getRotateToAngle(vec, center) ⇒ <code>Number</code>
+Gets the angles between this vector and another vector around a common center of rotation.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle between this vector and another vector around a center of rotation in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | Another vector. |
+| center | <code>Vector2</code> | The center of rotation. |
+
+<a name="isInPolygon"></a>
+
+## isInPolygon(polygon) ⇒ <code>Boolean</code>
+Checks whether a vector lies within a polygon spanned by a set of vectors.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not this vector is within a polygon.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| polygon | <code>Array.&lt;Vector2&gt;</code> | An array of vectors spanning the polygon. |
+
+<a name="length"></a>
+
+## length() ⇒ <code>Number</code>
+Returns the length of this vector.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The length of this vector.  
+<a name="lengthSq"></a>
+
+## lengthSq() ⇒ <code>Number</code>
+Returns the square of the length of this vector.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The square of the length of this vector.  
+<a name="normalize"></a>
+
+## normalize() ⇒ <code>Vector2</code>
+Normalizes this vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns itself.  
+<a name="normalized"></a>
+
+## normalized() ⇒ <code>Vector2</code>
+Returns a normalized copy of this vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - A normalized copy of this vector.  
+<a name="whichSide"></a>
+
+## whichSide(vecA, vecB) ⇒ <code>Number</code>
+Calculates which side of a line spanned by two vectors this vector is.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - A number indicating the side of this vector, given a line spanned by two other vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector. |
+| vecB | <code>Vector2</code> | A vector. |
+
+<a name="sameSideAs"></a>
+
+## sameSideAs(vecA, vecB, vecC) ⇒ <code>Boolean</code>
+Checks whether or not this vector is on the same side of a line spanned by two vectors as another vector.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - Returns a boolean indicating whether or not this vector is on the same side as another vector.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector spanning the line. |
+| vecB | <code>Vector2</code> | A vector spanning the line. |
+| vecC | <code>Vector2</code> | A vector to check whether or not it is on the same side as this vector. |
+
+<a name="add"></a>
+
+## add(vecA, vecB) ⇒ <code>Vector2</code>
+Adds two vectors and returns the result as a new vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns the sum of two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A summand. |
+| vecB | <code>Vector2</code> | A summand. |
+
+<a name="subtract"></a>
+
+## subtract(vecA, vecB) ⇒ <code>Vector2</code>
+Subtracts one vector from another and returns the result as a new vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns the difference of two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | The minuend. |
+| vecB | <code>Vector2</code> | The subtrahend. |
+
+<a name="multiply"></a>
+
+## multiply(vecA, vecB) ⇒ <code>Vector2</code>
+Multiplies two vectors (value by value) and returns the result.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns the product of two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector. |
+| vecB | <code>Vector2</code> | A vector. |
+
+<a name="multiplyScalar"></a>
+
+## multiplyScalar(vec, scalar) ⇒ <code>Vector2</code>
+Multiplies two vectors (value by value) and returns the result.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - Returns the product of two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vec | <code>Vector2</code> | A vector. |
+| scalar | <code>Number</code> | A scalar. |
+
+<a name="midpoint"></a>
+
+## midpoint(vecA, vecB) ⇒ <code>Vector2</code>
+Returns the midpoint of a line spanned by two vectors.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - The midpoint of the line spanned by two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector spanning the line. |
+| vecB | <code>Vector2</code> | A vector spanning the line. |
+
+<a name="normals"></a>
+
+## normals(vecA, vecB) ⇒ <code>Array.&lt;Vector2&gt;</code>
+Returns the normals of a line spanned by two vectors.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Vector2&gt;</code> - An array containing the two normals, each represented by a vector.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector spanning the line. |
+| vecB | <code>Vector2</code> | A vector spanning the line. |
+
+<a name="units"></a>
+
+## units(vecA, vecB) ⇒ <code>Array.&lt;Vector2&gt;</code>
+Returns the unit (normalized normal) vectors of a line spanned by two vectors.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Vector2&gt;</code> - An array containing the two unit vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector spanning the line. |
+| vecB | <code>Vector2</code> | A vector spanning the line. |
+
+<a name="divide"></a>
+
+## divide(vecA, vecB) ⇒ <code>Vector2</code>
+Divides a vector by another vector and returns the result as new vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - The fraction of the two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | The dividend. |
+| vecB | <code>Vector2</code> | The divisor. |
+
+<a name="divideScalar"></a>
+
+## divideScalar(vecA, s) ⇒ <code>Vector2</code>
+Divides a vector by a scalar and returns the result as new vector.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - The fraction of the two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | The dividend. |
+| s | <code>Number</code> | The scalar. |
+
+<a name="dot"></a>
+
+## dot(vecA, vecB) ⇒ <code>Number</code>
+Returns the dot product of two vectors.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The dot product of two vectors.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector. |
+| vecB | <code>Vector2</code> | A vector. |
+
+<a name="angle"></a>
+
+## angle(vecA, vecB) ⇒ <code>Number</code>
+Returns the angle between two vectors.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle between two vectors in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector. |
+| vecB | <code>Vector2</code> | A vector. |
+
+<a name="threePointangle"></a>
+
+## threePointangle(vecA, vecB, vecC) ⇒ <code>Number</code>
+Returns the angle between two vectors based on a third vector in between.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector. |
+| vecB | <code>Vector2</code> | A vector. |
+| vecC | <code>Vector2</code> | A vector. |
+
+<a name="scalarProjection"></a>
+
+## scalarProjection(vecA, vecB) ⇒ <code>Number</code>
+Returns the scalar projection of a vector on another vector.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The scalar component.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | The vector to be projected. |
+| vecB | <code>Vector2</code> | The vector to be projection upon. |
+
+<a name="averageDirection"></a>
+
+## averageDirection(vecs) ⇒ <code>Vector2</code>
+Returns the average vector (normalized) of the input vectors.
+
+**Kind**: global function  
+**Returns**: <code>Vector2</code> - The resulting vector (normalized).  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecs | <code>Array</code> | An array containing vectors. |
+
+<a name="setPosition"></a>
+
+## setPosition(x, y)
+Set the 2D coordinates of the vertex.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| x | <code>Number</code> | The x component of the coordinates. |
+| y | <code>Number</code> | The y component of the coordinates. |
+
+<a name="setPositionFromVector"></a>
+
+## setPositionFromVector(v)
+Set the 2D coordinates of the vertex from a Vector2.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| v | <code>Vector2</code> | A 2D vector. |
+
+<a name="addChild"></a>
+
+## addChild(vertexID)
+Add a child vertex id to this vertex.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexID | <code>Number</code> | The id of a vertex to be added as a child to this vertex. |
+
+<a name="setParentVertexId"></a>
+
+## setParentVertexId(parentVertexId)
+Set the vertex id of the parent.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| parentVertexId | <code>Number</code> | The parents vertex id. |
+
+<a name="isTerminal"></a>
+
+## isTerminal() ⇒ <code>Boolean</code>
+Returns true if this vertex is terminal (has no parent or child vertices), otherwise returns false. Always returns true if associated value has property hasAttachedPseudoElements set to true.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not this vertex is terminal.  
+<a name="clone"></a>
+
+## clone() ⇒ <code>Vertex</code>
+Clones this vertex and returns the clone.
+
+**Kind**: global function  
+**Returns**: <code>Vertex</code> - A clone of this vertex.  
+<a name="equals"></a>
+
+## equals(vertex) ⇒ <code>Boolean</code>
+Returns true if this vertex and the supplied vertex both have the same id, else returns false.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not the two vertices have the same id.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertex | <code>Vertex</code> | The vertex to check. |
+
+<a name="getAngle"></a>
+
+## getAngle([referenceVector], [returnAsDegrees]) ⇒ <code>Number</code>
+Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The angle of this vertex.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [referenceVector] | <code>Vector2</code> | <code></code> | The reference vector. |
+| [returnAsDegrees] | <code>Boolean</code> | <code>false</code> | If true, returns angle in degrees, else in radians. |
+
+<a name="getTextDirection"></a>
+
+## getTextDirection(vertices) ⇒ <code>String</code>
+Returns the suggested text direction when text is added at the position of this vertex.
+
+**Kind**: global function  
+**Returns**: <code>String</code> - The suggested direction of the text.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | The array of vertices for the current molecule. |
+
+<a name="getNeighbours"></a>
+
+## getNeighbours([vertexId]) ⇒ <code>Array.&lt;Number&gt;</code>
+Returns an array of ids of neighbouring vertices.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of neighbouring vertices.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [vertexId] | <code>Number</code> | <code></code> | If a value is supplied, the vertex with this id is excluded from the returned indices. |
+
+<a name="getDrawnNeighbours"></a>
+
+## getDrawnNeighbours(vertices) ⇒ <code>Array.&lt;Number&gt;</code>
+Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of neighbouring vertices that will be drawn.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | An array containing the vertices associated with the current molecule. |
+
+<a name="getNeighbourCount"></a>
+
+## getNeighbourCount() ⇒ <code>Number</code>
+Returns the number of neighbours of this vertex.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The number of neighbours.  
+<a name="getSpanningTreeNeighbours"></a>
+
+## getSpanningTreeNeighbours([vertexId]) ⇒ <code>Array.&lt;Number&gt;</code>
+Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
+
+**Kind**: global function  
+**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of the neighbouring vertices.  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [vertexId] | <code>Number</code> | <code></code> | If supplied, the vertex with this id is excluded from the array returned. |
+
+<a name="getNextInRing"></a>
+
+## getNextInRing(vertices, ringId, previousVertexId) ⇒ <code>Number</code>
+Gets the next vertex in the ring in opposide direction to the supplied vertex id.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The id of the next vertex in the ring.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertices | <code>Array.&lt;Vertex&gt;</code> | The array of vertices for the current molecule. |
+| ringId | <code>Number</code> | The id of the ring containing this vertex. |
+| previousVertexId | <code>Number</code> | The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex. |
 
 
 * * *
