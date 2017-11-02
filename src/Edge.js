@@ -6,7 +6,7 @@
  * @property {Number} id The id of this edge.
  * @property {Number} sourceId The id of the source vertex.
  * @property {Number} targetId The id of the target vertex.
- * @property {Number} weight The weight of this edge.
+ * @property {Number} weight The weight of this edge. That is, the degree of the bond (single bond = 1, double bond = 2, etc).
  * @property {String} [bondType='-'] The bond type of this edge.
  * @property {Boolean} [isPartOfAromaticRing=false] Whether or not this edge is part of an aromatic ring.
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
@@ -32,12 +32,12 @@ export default class Edge {
     }
 
     /**
-     * Returns the number of bonds associated with the bond type of this edge.
-     *
-     * @returns {Number} The number of bonds associated with this edge.
+     * Set the bond type of this edge. This also sets the edge weight.
+     * @param {String} bondType 
      */
-    getBondCount() {
-        return Edge.bonds[this.bondType];
+    setBondType(bondType) {
+      this.bondType = bondType;
+      this.weight = Edge.bonds[bondType];
     }
 
     /**

@@ -190,8 +190,8 @@ export default class Drawer {
         let edge = this.graph.edges[i];
 
         if (this.isEdgeRotatable(edge)) {
-          let subTreeDepthA = this.getTreeDepth(edge.sourceId, edge.targetId);
-          let subTreeDepthB = this.getTreeDepth(edge.targetId, edge.sourceId);
+          let subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
+          let subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
 
           // Only rotate the shorter subtree
           let a = edge.targetId;
@@ -1673,7 +1673,7 @@ export default class Drawer {
   rotateSubtree(vertexId, parentVertexId, angle, center) {
     let that = this;
 
-    this.traverseTree(vertexId, parentVertexId, function (vertex) {
+    this.graph.traverseTree(vertexId, parentVertexId, function (vertex) {
       vertex.position.rotateAround(angle, center);
 
       for (var i = 0; i < vertex.value.anchoredRings.length; i++) {
@@ -1699,7 +1699,7 @@ export default class Drawer {
     let score = 0;
     let center = new Vector2(0, 0);
 
-    this.traverseTree(vertexId, parentVertexId, function (vertex) {
+    this.graph.traverseTree(vertexId, parentVertexId, function (vertex) {
       let s = vertexOverlapScores[vertex.id];
       score += s;
 
@@ -2096,12 +2096,12 @@ export default class Drawer {
         }
       } else if (neighbours.length === 2) {
         // Check for the longer subtree - always go with cis for the longer subtree
-        let subTreeDepthA = this.getTreeDepth(neighbours[0], vertex.id);
-        let subTreeDepthB = this.getTreeDepth(neighbours[1], vertex.id);
+        let subTreeDepthA = this.graph.getTreeDepth(neighbours[0], vertex.id);
+        let subTreeDepthB = this.graph.getTreeDepth(neighbours[1], vertex.id);
 
         // Also get the subtree for the previous direction (this is important when
         // the previous vertex is the shortest path)
-        let subTreeDepthC = this.getTreeDepth(previousVertex ? previousVertex.id : null, vertex.id);
+        let subTreeDepthC = this.graph.getTreeDepth(previousVertex ? previousVertex.id : null, vertex.id);
 
         let cis = 0;
         let trans = 1;
@@ -2154,9 +2154,9 @@ export default class Drawer {
         }
       } else if (neighbours.length === 3) {
         // The vertex with the longest sub-tree should always go straight
-        let d1 = this.getTreeDepth(neighbours[0], vertex.id);
-        let d2 = this.getTreeDepth(neighbours[1], vertex.id);
-        let d3 = this.getTreeDepth(neighbours[2], vertex.id);
+        let d1 = this.graph.getTreeDepth(neighbours[0], vertex.id);
+        let d2 = this.graph.getTreeDepth(neighbours[1], vertex.id);
+        let d3 = this.graph.getTreeDepth(neighbours[2], vertex.id);
 
         let s = this.graph.vertices[neighbours[0]];
         let l = this.graph.vertices[neighbours[1]];
@@ -2172,9 +2172,9 @@ export default class Drawer {
           r = this.graph.vertices[neighbours[1]];
         }
 
-        if (this.getTreeDepth(l.id, vertex.id) === 1 &&
-          this.getTreeDepth(r.id, vertex.id) === 1 &&
-          this.getTreeDepth(s.id, vertex.id) > 1) {
+        if (this.graph.getTreeDepth(l.id, vertex.id) === 1 &&
+          this.graph.getTreeDepth(r.id, vertex.id) === 1 &&
+          this.graph.getTreeDepth(s.id, vertex.id) > 1) {
 
           if (!dir) {
             let proposedAngleA = MathHelper.toRad(60);
@@ -2243,10 +2243,10 @@ export default class Drawer {
         }
       } else if (neighbours.length === 4) {
         // The vertex with the longest sub-tree should always go to the reflected opposide direction
-        let d1 = this.getTreeDepth(neighbours[0], vertex.id);
-        let d2 = this.getTreeDepth(neighbours[1], vertex.id);
-        let d3 = this.getTreeDepth(neighbours[2], vertex.id);
-        let d4 = this.getTreeDepth(neighbours[3], vertex.id);
+        let d1 = this.graph.getTreeDepth(neighbours[0], vertex.id);
+        let d2 = this.graph.getTreeDepth(neighbours[1], vertex.id);
+        let d3 = this.graph.getTreeDepth(neighbours[2], vertex.id);
+        let d4 = this.graph.getTreeDepth(neighbours[3], vertex.id);
 
         let w = this.graph.vertices[neighbours[0]];
         let x = this.graph.vertices[neighbours[1]];
@@ -2411,67 +2411,6 @@ export default class Drawer {
   }
 
   /**
-   * Get the depth of a subtree in the direction opposite to the vertex specified as the parent vertex.
-   *
-   * @param {Number} vertexId A vertex id.
-   * @param {Number} parentVertexId The id of a neighbouring vertex.
-   * @returns {Number} The depth of the sub-tree.
-   */
-  getTreeDepth(vertexId, parentVertexId) {
-    if (vertexId === null || parentVertexId === null) {
-      return 0;
-    }
-
-    let neighbours = this.graph.vertices[vertexId].getSpanningTreeNeighbours(parentVertexId);
-    let max = 0;
-
-    for (var i = 0; i < neighbours.length; i++) {
-      let childId = neighbours[i];
-      let d = this.getTreeDepth(childId, vertexId);
-
-      if (d > max) {
-        max = d;
-      }
-    }
-
-    return max + 1;
-  }
-
-  /**
-   * Traverse a sub-tree in the graph.
-   *
-   * @param {Number} vertexId A vertex id.
-   * @param {Number} parentVertexId A neighbouring vertex.
-   * @param {Function} callback The callback function that is called with each visited as an argument.
-   * @param {Number} [maxDepth=null] The maximum depth of the recursion. If null, there is no limit.
-   * @param {Boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
-   */
-  traverseTree(vertexId, parentVertexId, callback, maxDepth = null, ignoreFirst = false, depth = 1, visited = []) {
-    if (maxDepth !== null && depth > maxDepth + 1) {
-      return;
-    }
-
-    for (var j = 0; j < visited.length; j++) {
-      if (visited[j] === vertexId) {
-        return;
-      }
-    }
-
-    visited.push(vertexId);
-
-    let vertex = this.graph.vertices[vertexId];
-    let neighbours = vertex.getNeighbours(parentVertexId);
-
-    if (!ignoreFirst || depth > 1) {
-      callback(vertex);
-    }
-
-    for (var i = 0; i < neighbours.length; i++) {
-      this.traverseTree(neighbours[i], vertexId, callback, maxDepth, ignoreFirst, depth + 1, visited);
-    }
-  }
-
-  /**
    * Gets the number of bonds of a vertex.
    *
    * @param {Vertex} vertex A vertex.
@@ -2481,7 +2420,7 @@ export default class Drawer {
     let count = 0;
 
     for (var i = 0; i < vertex.edges.length; i++) {
-      count += this.graph.edges[vertex.edges[i]].getBondCount();
+      count += this.graph.edges[vertex.edges[i]].weight;
     }
 
     return count;
@@ -2512,6 +2451,7 @@ export default class Drawer {
 
   annotateStereochemistry() {
     let maxDepth = 10;
+    
     // For each stereo-center
     for (var i = 0; i < this.graph.vertices.length; i++) {
       let vertex = this.graph.vertices[i];

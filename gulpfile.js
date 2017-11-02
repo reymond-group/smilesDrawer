@@ -68,24 +68,6 @@ function watch() {
   return compile(true);
 }
 
-
-
-
-
-// gulp.task('build', function () {
-//   return gulp.src(['./src/SmilesDrawer.js', './src/*.js'])
-//     .pipe(concat('smiles-drawer.js'))
-//     .pipe(babel({
-//       presets: ['es2015']
-//     }))
-//     .pipe(gulp.dest('./dist/'))
-//     .pipe(uglify())
-//     .pipe(rename({
-//       extname: '.min.js'
-//     }))
-//     .pipe(gulp.dest('./dist/'));
-// });
-
 gulp.task('build', function () {
   return compile();
 });
