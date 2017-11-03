@@ -79,10 +79,29 @@ export default class Vertex {
      * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
      */
     addChild(vertexId) {
-        this.neighbourCount++;
         this.children.push(vertexId);
         this.neighbours.push(vertexId);
 
+        this.neighbourCount++;
+        this.value.bondCount++;
+    }
+
+    /**
+     * Add a child vertex id to this vertex as the second child of the neighbours array,
+     * except this vertex is the first vertex of the SMILE string, then it is added as the first.
+     * This is used to get the correct ordering of neighbours for parity calculations.
+     * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
+     */
+    addAsSecondChild(vertexId) {
+        this.children.push(vertexId);
+
+        if (this.id === 0) {
+            this.neighbours.splice(0, 0, vertexId);
+        } else {
+            this.neighbours.splice(1, 0, vertexId);
+        }
+
+        this.neighbourCount++;
         this.value.bondCount++;
     }
 
@@ -140,7 +159,7 @@ export default class Vertex {
     equals(vertex) {
         return this.id === vertex.id;
     }
-    
+
     /**
      * Returns the angle of this vertexes positional vector. If a reference vector is supplied in relations to this vector, else in relations to the coordinate system.
      *
@@ -150,7 +169,7 @@ export default class Vertex {
      */
     getAngle(referenceVector = null, returnAsDegrees = false) {
         let u = null;
-        
+
         if (!referenceVector) {
             u = Vector2.subtract(this.position, this.previousPosition);
         } else {
@@ -173,7 +192,7 @@ export default class Vertex {
     getTextDirection(vertices) {
         let neighbours = this.getDrawnNeighbours(vertices);
         let angles = Array();
-        
+
         for (let i = 0; i < neighbours.length; i++) {
             angles.push(this.getAngle(vertices[neighbours[i]].position));
         }
@@ -245,7 +264,7 @@ export default class Vertex {
     getNeighbourCount() {
         return this.neighbourCount;
     }
-    
+
     /**
      * Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
      *
@@ -282,7 +301,7 @@ export default class Vertex {
         let neighbours = this.getNeighbours();
 
         for (let i = 0; i < neighbours.length; i++) {
-            if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, { value: ringId }) && 
+            if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, { value: ringId }) &&
                 neighbours[i] != previousVertexId) {
                 return neighbours[i];
             }

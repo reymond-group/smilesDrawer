@@ -12,9 +12,8 @@ var buffer = require('vinyl-buffer');
 var sourcemaps = require('gulp-sourcemaps');
 
 var concat = require('gulp-concat');
-var babel = require('gulp-babel');
 var rename = require('gulp-rename');
-var uglify = require('gulp-uglify');
+var minify = require('gulp-babel-minify');
 var jsdoc = require('gulp-jsdoc3');
 var gulpJsdoc2md = require('gulp-jsdoc-to-markdown');
 var gutil = require('gulp-util');
@@ -28,7 +27,7 @@ function compile(watch) {
     debug: true
   }).transform(babelify, {
     // Use all of the ES2015 spec
-    presets: ["es2015"],
+    presets: ['es2015'],
     sourceMaps: true
   }));
 
@@ -46,7 +45,7 @@ function compile(watch) {
         loadMaps: true
       }))
       .pipe(gulp.dest('./dist/'))
-      .pipe(uglify())
+      .pipe(minify())
       .pipe(rename('smiles-drawer.min.js'))
       .pipe(sourcemaps.write('./'))
       .pipe(gulp.dest('./dist'));

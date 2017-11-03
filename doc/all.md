@@ -338,6 +338,11 @@
 <dt><a href="#getNonRingNeighbours">getNonRingNeighbours(vertexId)</a> ⇒ <code>Array.&lt;Vertex&gt;</code></dt>
 <dd><p>Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).</p>
 </dd>
+<dt><a href="#annotateStereochemistry">annotateStereochemistry()</a></dt>
+<dd><p>Annotaed stereochemistry information for visualization.</p>
+</dd>
+<dt><a href="#visitStereochemistry">visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth)</a></dt>
+<dd></dd>
 <dt><a href="#initPseudoElements">initPseudoElements()</a></dt>
 <dd><p>Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
 the involved atoms not to be displayed.</p>
@@ -405,7 +410,7 @@ the involved atoms not to be displayed.</p>
 <dt><a href="#getTreeDepth">getTreeDepth(vertexId, parentVertexId)</a> ⇒ <code>Number</code></dt>
 <dd><p>Get the depth of a subtree in the direction opposite to the vertex specified as the parent vertex.</p>
 </dd>
-<dt><a href="#traverseTree">traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])</a></dt>
+<dt><a href="#traverseTree">traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst], [depth], [visited])</a></dt>
 <dd><p>Traverse a sub-tree in the graph.</p>
 </dd>
 <dt><a href="#kkLayout">kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)</a></dt>
@@ -1973,11 +1978,30 @@ Returns an array of vertices that are neighbouring a vertix but are not members 
 | --- | --- | --- |
 | vertexId | <code>Number</code> | A vertex id. |
 
+<a name="annotateStereochemistry"></a>
+
+## annotateStereochemistry()
+Annotaed stereochemistry information for visualization.
+
+**Kind**: global function  
+<a name="visitStereochemistry"></a>
+
+## visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth)
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>Number</code> | The id of a vertex. |
+| previousVertexId | <code>Number</code> &#124; <code>null</code> | The id of the parent vertex of the vertex. |
+| visited | <code>Uint8Array</code> | An array containing the visited flag for all vertices in the graph. |
+| priority | <code>Uint16Array</code> | An array storing the priorities (max and sum) for all levels in the subtree. |
+| maxDepth | <code>Number</code> | The maximum depth. |
+| depth | <code>Number</code> | The current depth. |
+
 <a name="initPseudoElements"></a>
 
 ## initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
-the involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
 
 **Kind**: global function  
 <a name="setBondType"></a>
@@ -2190,7 +2214,7 @@ Get the depth of a subtree in the direction opposite to the vertex specified as 
 
 <a name="traverseTree"></a>
 
-## traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst])
+## traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst], [depth], [visited])
 Traverse a sub-tree in the graph.
 
 **Kind**: global function  
@@ -2200,8 +2224,10 @@ Traverse a sub-tree in the graph.
 | vertexId | <code>Number</code> |  | A vertex id. |
 | parentVertexId | <code>Number</code> |  | A neighbouring vertex. |
 | callback | <code>function</code> |  | The callback function that is called with each visited as an argument. |
-| [maxDepth] | <code>Number</code> | <code></code> | The maximum depth of the recursion. If null, there is no limit. |
+| [maxDepth] | <code>Number</code> | <code>Number.MAX_SAFE_INTEGER</code> | The maximum depth of the recursion. |
 | [ignoreFirst] | <code>Boolean</code> | <code>false</code> | Whether or not to ignore the starting vertex supplied as vertexId in the callback. |
+| [depth] | <code>Number</code> | <code>1</code> | The current depth in the tree. |
+| [visited] | <code>Uint8Array</code> | <code></code> | An array holding a flag on whether or not a node has been visited. |
 
 <a name="kkLayout"></a>
 

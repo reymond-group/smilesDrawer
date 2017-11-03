@@ -48,7 +48,7 @@ export default class Drawer {
       isomeric: false,
       debug: false,
       terminalCarbons: false,
-      explicitHydrogens: true, // TODO: Add to doc
+      explicitHydrogens: false, // TODO: Add to doc
       compactDrawing: true,
       fontSizeLarge: 6,
       fontSizeSmall: 4,
@@ -1639,7 +1639,7 @@ export default class Drawer {
     // Next, draw atoms that are not part of a ring that are directly attached to this ring
     for (var i = 0; i < ring.members.length; i++) {
       let ringMember = this.graph.vertices[ring.members[i]];
-      let ringMemberNeighbours = ringMember.getNeighbours();
+      let ringMemberNeighbours = ringMember.neighbours;
 
       // If there are multiple, the ovlerap will be resolved in the appropriate step
       for (var j = 0; j < ringMemberNeighbours.length; j++) {
@@ -1910,7 +1910,7 @@ export default class Drawer {
         }
       } else if (previousVertex.value.originalRings.length === 1) {
         let vecs = Array()
-        let neighbours = previousVertex.getNeighbours();
+        let neighbours = previousVertex.neighbours;
 
         for (var i = 0; i < neighbours.length; i++) {
           let neighbour = this.graph.vertices[neighbours[i]];
@@ -1926,7 +1926,7 @@ export default class Drawer {
         vertex.positioned = true;
       } else if (previousVertex.value.originalRings.length > 1) {
         let vecs = Array()
-        let neighbours = previousVertex.getNeighbours();
+        let neighbours = previousVertex.neighbours;
         
         for (var i = 0; i < neighbours.length; i++) {
           let neighbour = this.graph.vertices[neighbours[i]];
@@ -2290,7 +2290,7 @@ export default class Drawer {
    * @returns {(Number|null)} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
    */
   getCommonRingbondNeighbour(vertex) {
-    let neighbours = vertex.getNeighbours();
+    let neighbours = vertex.neighbours;
 
     for (var i = 0; i < neighbours.length; i++) {
       let neighbour = this.graph.vertices[neighbours[i]];
@@ -2430,7 +2430,7 @@ export default class Drawer {
   getNonRingNeighbours(vertexId) {
     let nrneighbours = Array();
     let vertex = this.graph.vertices[vertexId];
-    let neighbours = vertex.getNeighbours();
+    let neighbours = vertex.neighbours;
 
     for (var i = 0; i < neighbours.length; i++) {
       let neighbour = this.graph.vertices[neighbours[i]];
@@ -2444,6 +2444,9 @@ export default class Drawer {
     return nrneighbours;
   }
 
+  /**
+   * Annotaed stereochemistry information for visualization.
+   */
   annotateStereochemistry() {
     let maxDepth = 10;
 
@@ -2457,6 +2460,7 @@ export default class Drawer {
 
       let neighbours = vertex.getNeighbours();
       neighbours.sort();
+      
       let nNeighbours = neighbours.length;
       let priorities = Array(nNeighbours);
 
@@ -2464,7 +2468,7 @@ export default class Drawer {
         let visited = new Uint8Array(this.graph.vertices.length);
         let priority = new Uint16Array(maxDepth * 2.0 + 1);
         visited[vertex.id] = 1;
-        this.visitStereochemistry(neighbours[j], visited, priority, maxDepth, 0);
+        this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
         
         // Break ties by the position in the smiles string as per specification
         priority[maxDepth * 2.0] = neighbours[j];
@@ -2488,23 +2492,39 @@ export default class Drawer {
         order[j] = priorities[j][0];
       }
 
-      // console.log(order);
-      // console.log(vertex.id, MathHelper.parityOfPermutation(order));
+      console.log(order);
+      console.log(vertex.id, MathHelper.parityOfPermutation(order));
     }
   }
 
-  visitStereochemistry(vertexId, visited, priority, maxDepth, depth) {
+  /**
+   * 
+   * 
+   * @param {Number} vertexId The id of a vertex.
+   * @param {(Number|null)} previousVertexId The id of the parent vertex of the vertex.
+   * @param {Uint8Array} visited An array containing the visited flag for all vertices in the graph.
+   * @param {Uint16Array} priority An array storing the priorities (max and sum) for all levels in the subtree.
+   * @param {Number} maxDepth The maximum depth.
+   * @param {Number} depth The current depth.
+   */
+  visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth) {
     visited[vertexId] = 1;
     let atomicNumber = this.graph.vertices[vertexId].value.getAtomicNumber();
 
-    priority[maxDepth + depth] += atomicNumber;
     priority[depth] = Math.max(priority[depth], atomicNumber);
 
-    let neighbours = this.graph.vertices[vertexId].getNeighbours();
+    // Cloning of bonds as defined by CIP rules. Only multiply AFTER getting the max.
+    if (previousVertexId !== null) {
+      atomicNumber *= this.graph.getEdge(vertexId, previousVertexId).weight;
+    }
+
+    priority[maxDepth + depth] += atomicNumber;
+
+    let neighbours = this.graph.vertices[vertexId].neighbours;
 
     for (var i = 0; i < neighbours.length; i++) {
       if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
-        this.visitStereochemistry(neighbours[i], visited, priority, maxDepth, depth + 1);
+        this.visitStereochemistry(neighbours[i], vertexId, visited, priority, maxDepth, depth + 1);
       }
     }
   }
@@ -2516,7 +2536,7 @@ export default class Drawer {
   initPseudoElements() {
     for (var i = 0; i < this.graph.vertices.length; i++) {
       const vertex = this.graph.vertices[i];
-      const neighbourIds = vertex.getNeighbours();
+      const neighbourIds = vertex.neighbours;
       let neighbours = Array(neighbourIds.length);
 
       for (var j = 0; j < neighbourIds.length; j++) {
@@ -2593,7 +2613,7 @@ export default class Drawer {
         continue;
       }
 
-      const neighbourIds = vertex.getNeighbours();
+      const neighbourIds = vertex.neighbours;
       let neighbours = Array(neighbourIds.length);
 
       for (var j = 0; j < neighbourIds.length; j++) {
