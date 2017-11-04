@@ -725,6 +725,12 @@ the involved atoms not to be displayed.</p>
 <dt><a href="#addChild">addChild(vertexID)</a></dt>
 <dd><p>Add a child vertex id to this vertex.</p>
 </dd>
+<dt><a href="#addAsSecondChild">addAsSecondChild(vertexID)</a></dt>
+<dd><p>Add a child vertex id to this vertex as the second child of the neighbours array,
+except this vertex is the first vertex of the SMILE string, then it is added as the first.
+This is used to get the correct ordering of neighbours for parity calculations.
+If a hydrogen is implicitly attached to the chiral center, insert as the third child.</p>
+</dd>
 <dt><a href="#setParentVertexId">setParentVertexId(parentVertexId)</a></dt>
 <dd><p>Set the vertex id of the parent.</p>
 </dd>
@@ -3403,6 +3409,17 @@ Set the 2D coordinates of the vertex from a Vector2.
 
 ## addChild(vertexID)
 Add a child vertex id to this vertex.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexID | <code>Number</code> | The id of a vertex to be added as a child to this vertex. |
+
+<a name="addAsSecondChild"></a>
+
+## addAsSecondChild(vertexID)
+Add a child vertex id to this vertex as the second child of the neighbours array,except this vertex is the first vertex of the SMILE string, then it is added as the first.This is used to get the correct ordering of neighbours for parity calculations.If a hydrogen is implicitly attached to the chiral center, insert as the third child.
 
 **Kind**: global function  
 

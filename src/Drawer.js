@@ -464,9 +464,9 @@ export default class Drawer {
           let edgeId = this.graph.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
           let targetVertex = this.graph.vertices[targetVertexId];
 
-          vertex.addChild(targetVertexId);
+          vertex.addAsSecondChild(targetVertexId);
           vertex.value.addNeighbouringElement(targetVertex.value.element);
-          targetVertex.addChild(sourceVertexId);
+          targetVertex.addAsSecondChild(sourceVertexId);
           targetVertex.value.addNeighbouringElement(vertex.value.element);
           vertex.edges.push(edgeId);
           targetVertex.edges.push(edgeId);
@@ -2459,7 +2459,7 @@ export default class Drawer {
       }
 
       let neighbours = vertex.getNeighbours();
-      neighbours.sort();
+      // neighbours.sort();
       
       let nNeighbours = neighbours.length;
       let priorities = Array(nNeighbours);
@@ -2492,8 +2492,11 @@ export default class Drawer {
         order[j] = priorities[j][0];
       }
 
+      let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
+      let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
+
       console.log(order);
-      console.log(vertex.id, MathHelper.parityOfPermutation(order));
+      console.log(vertex.id, rs);
     }
   }
 
