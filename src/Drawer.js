@@ -2528,14 +2528,15 @@ export default class Drawer {
     visited[vertexId] = 1;
     let atomicNumber = this.graph.vertices[vertexId].value.getAtomicNumber();
     
-    priority[depth] = Math.max(priority[depth], atomicNumber);
+    // priority[depth * 2] = Math.max(priority[depth], atomicNumber);
 
     // Cloning of bonds as defined by CIP rules. Only multiply AFTER getting the max.
     if (previousVertexId !== null) {
       atomicNumber *= this.graph.getEdge(vertexId, previousVertexId).weight;
     }
 
-    priority[maxDepth + depth] += atomicNumber;
+    priority[(depth * 0.5) * 2] += atomicNumber;
+    priority[depth * 2] = atomicNumber;
 
     let neighbours = this.graph.vertices[vertexId].neighbours;
 
