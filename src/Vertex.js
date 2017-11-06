@@ -242,7 +242,7 @@ export default class Vertex {
    */
   getNeighbours(vertexId = null) {
     if (vertexId === null) {
-      return this.neighbours;
+      return this.neighbours.slice();
     }
 
     let arr = Array();

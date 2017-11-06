@@ -71,28 +71,14 @@ export default class Graph {
       let edge = new Edge(parentVertexId, vertex.id, 1);
 
       if (isBranch) {
-        edge.setBondType(vertex.value.branchBond);
+        edge.setBondType(vertex.value.branchBond || '-');
       } else {
-        edge.setBondType(parentVertex.value.bondType);
+        edge.setBondType(parentVertex.value.bondType || '-');
       }
 
       let edgeId = this.addEdge(edge);
       vertex.edges.push(edgeId);
       parentVertex.edges.push(edgeId);
-    }
-
-    if (atom.bracket && this.isomeric) {
-      for (var i = 0; i < atom.bracket.hcount; i++) {
-        if (this.isomeric) {
-          this._init({
-            atom: {
-              element: 'H',
-              bond: '-'
-            },
-            ringbonds: Array()
-          }, i + 1, vertex.id);
-        }
-      }
     }
 
     let offset = node.ringbondCount + 1;

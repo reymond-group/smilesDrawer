@@ -17,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 //@ts-check
 window.SmilesDrawer = {
-    Version: '1.0.0'
+  Version: '1.0.0'
 };
 
 window.SmilesDrawer.Drawer = _Drawer2.default;
@@ -31,7 +31,7 @@ window.SmilesDrawer.Parser = _Parser2.default;
 * @returns {String} The clean SMILES string.
 */
 window.SmilesDrawer.clean = function (smiles) {
-    return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
+  return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
 };
 
 /**
@@ -44,28 +44,28 @@ window.SmilesDrawer.clean = function (smiles) {
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
 window.SmilesDrawer.apply = function (options) {
-    var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
-    var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
-    var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
+  var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
+  var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-    var smilesDrawer = new _Drawer2.default(options);
-    var elements = document.querySelectorAll(selector);
+  var smilesDrawer = new _Drawer2.default(options);
+  var elements = document.querySelectorAll(selector);
 
-    var _loop = function _loop() {
-        var element = elements[i];
+  var _loop = function _loop() {
+    var element = elements[i];
 
-        SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
-            smilesDrawer.draw(tree, element, themeName, false);
-        }, function (err) {
-            if (onError) {
-                onError(err);
-            }
-        });
-    };
+    SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
+      smilesDrawer.draw(tree, element, themeName, false);
+    }, function (err) {
+      if (onError) {
+        onError(err);
+      }
+    });
+  };
 
-    for (var i = 0; i < elements.length; i++) {
-        _loop();
-    }
+  for (var i = 0; i < elements.length; i++) {
+    _loop();
+  }
 };
 
 /**
@@ -77,57 +77,57 @@ window.SmilesDrawer.apply = function (options) {
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
 window.SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
-    try {
-        if (successCallback) {
-            successCallback(_Parser2.default.parse(smiles));
-        }
-    } catch (err) {
-        if (errorCallback) {
-            errorCallback(err);
-        }
+  try {
+    if (successCallback) {
+      successCallback(_Parser2.default.parse(smiles));
     }
+  } catch (err) {
+    if (errorCallback) {
+      errorCallback(err);
+    }
+  }
 };
 
 // There be dragons (polyfills)
 
 if (!Array.prototype.fill) {
-    Object.defineProperty(Array.prototype, 'fill', {
-        value: function value(_value) {
+  Object.defineProperty(Array.prototype, 'fill', {
+    value: function value(_value) {
 
-            // Steps 1-2.
-            if (this == null) {
-                throw new TypeError('this is null or not defined');
-            }
+      // Steps 1-2.
+      if (this == null) {
+        throw new TypeError('this is null or not defined');
+      }
 
-            var O = Object(this);
+      var O = Object(this);
 
-            // Steps 3-5.
-            var len = O.length >>> 0;
+      // Steps 3-5.
+      var len = O.length >>> 0;
 
-            // Steps 6-7.
-            var start = arguments[1];
-            var relativeStart = start >> 0;
+      // Steps 6-7.
+      var start = arguments[1];
+      var relativeStart = start >> 0;
 
-            // Step 8.
-            var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
+      // Step 8.
+      var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
 
-            // Steps 9-10.
-            var end = arguments[2];
-            var relativeEnd = end === undefined ? len : end >> 0;
+      // Steps 9-10.
+      var end = arguments[2];
+      var relativeEnd = end === undefined ? len : end >> 0;
 
-            // Step 11.
-            var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
+      // Step 11.
+      var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
 
-            // Step 12.
-            while (k < final) {
-                O[k] = _value;
-                k++;
-            }
+      // Step 12.
+      while (k < final) {
+        O[k] = _value;
+        k++;
+      }
 
-            // Step 13.
-            return O;
-        }
-    });
+      // Step 13.
+      return O;
+    }
+  });
 }
 
 },{"./src/Drawer":5,"./src/Parser":10}],2:[function(require,module,exports){
@@ -558,7 +558,7 @@ exports.default = ArrayHelper;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
@@ -610,636 +610,638 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Number} bondCount The number of bonds in which this atom is participating.
  */
 var Atom = function () {
-    /**
-     * The constructor of the class Atom.
-     *
-     * @param {String} element The one-letter code of the element.
-     * @param {String} [bondType='-'] The type of the bond associated with this atom.
-     */
-    function Atom(element) {
-        var bondType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '-';
+  /**
+   * The constructor of the class Atom.
+   *
+   * @param {String} element The one-letter code of the element.
+   * @param {String} [bondType='-'] The type of the bond associated with this atom.
+   */
+  function Atom(element) {
+    var bondType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '-';
 
-        _classCallCheck(this, Atom);
+    _classCallCheck(this, Atom);
 
-        this.element = element.length === 1 ? element.toUpperCase() : element;
-        this.drawExplicit = false;
-        this.ringbonds = [];
-        this.rings = [];
-        this.bondType = bondType;
-        this.branchBond = null;
-        this.isBridge = false;
-        this.isBridgeNode = false;
-        this.originalRings = [];
-        this.bridgedRing = null;
-        this.anchoredRings = [];
-        this.bracket = null;
-        this.plane = 0;
-        this.order = {};
-        this.attachedPseudoElements = {};
-        this.hasAttachedPseudoElements = false;
-        this.isDrawn = true;
-        this.isConnectedToRing = false;
-        this.neighbouringElements = [];
-        this.isPartOfAromaticRing = element !== this.element;
-        this.bondCount = 0;
+    this.element = element.length === 1 ? element.toUpperCase() : element;
+    this.drawExplicit = false;
+    this.ringbonds = [];
+    this.rings = [];
+    this.bondType = bondType;
+    this.branchBond = null;
+    this.isBridge = false;
+    this.isBridgeNode = false;
+    this.originalRings = [];
+    this.bridgedRing = null;
+    this.anchoredRings = [];
+    this.bracket = null;
+    this.plane = 0;
+    this.order = {};
+    this.attachedPseudoElements = {};
+    this.hasAttachedPseudoElements = false;
+    this.isDrawn = true;
+    this.isConnectedToRing = false;
+    this.neighbouringElements = [];
+    this.isPartOfAromaticRing = element !== this.element;
+    this.bondCount = 0;
+  }
+
+  /**
+   * Adds a neighbouring element to this atom.
+   * 
+   * @param {String} element A string representing an element.
+   */
+
+
+  _createClass(Atom, [{
+    key: 'addNeighbouringElement',
+    value: function addNeighbouringElement(element) {
+      this.neighbouringElements.push(element);
     }
 
     /**
-     * Adds a neighbouring element to this atom.
-     * 
-     * @param {String} element A string representing an element.
+     * Attaches a pseudo element (e.g. Ac) to the atom.
+     * @param {String} element The element identifier (e.g. Br, C, ...).
+     * @param {String} previousElement The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated).
+     * @param {Number} [hydrogenCount=0] The number of hydrogens for the element.
      */
 
+  }, {
+    key: 'attachPseudoElement',
+    value: function attachPseudoElement(element, previousElement) {
+      var hydrogenCount = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
-    _createClass(Atom, [{
-        key: 'addNeighbouringElement',
-        value: function addNeighbouringElement(element) {
-            this.neighbouringElements.push(element);
-        }
+      var key = hydrogenCount + element;
 
-        /**
-         * Attaches a pseudo element (e.g. Ac) to the atom.
-         * @param {String} element The element identifier (e.g. Br, C, ...).
-         * @param {String} previousElement The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated).
-         * @param {Number} [hydrogenCount=0] The number of hydrogens for the element.
-         */
+      if (this.attachedPseudoElements[key]) {
+        this.attachedPseudoElements[key].count += 1;
+      } else {
+        this.attachedPseudoElements[key] = {
+          element: element,
+          count: 1,
+          hydrogenCount: hydrogenCount,
+          previousElement: previousElement
+        };
+      }
 
-    }, {
-        key: 'attachPseudoElement',
-        value: function attachPseudoElement(element, previousElement) {
-            var hydrogenCount = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      this.hasAttachedPseudoElements = true;
+    }
 
-            var key = hydrogenCount + element;
+    /**
+     * Returns the attached pseudo elements sorted by hydrogen count (ascending).
+     *
+     * @returns {Object} The sorted attached pseudo elements.
+     */
 
-            if (this.attachedPseudoElements[key]) {
-                this.attachedPseudoElements[key].count += 1;
-            } else {
-                this.attachedPseudoElements[key] = {
-                    element: element,
-                    count: 1,
-                    hydrogenCount: hydrogenCount,
-                    previousElement: previousElement
-                };
-            }
+  }, {
+    key: 'getAttachedPseudoElements',
+    value: function getAttachedPseudoElements() {
+      var ordered = {};
+      var that = this;
 
-            this.hasAttachedPseudoElements = true;
-        }
+      Object.keys(this.attachedPseudoElements).sort().forEach(function (key) {
+        ordered[key] = that.attachedPseudoElements[key];
+      });
 
-        /**
-         * Returns the attached pseudo elements sorted by hydrogen count (ascending).
-         *
-         * @returns {Object} The sorted attached pseudo elements.
-         */
+      return ordered;
+    }
 
-    }, {
-        key: 'getAttachedPseudoElements',
-        value: function getAttachedPseudoElements() {
-            var ordered = {};
-            var that = this;
+    /**
+     * Returns the number of attached pseudo elements.
+     *
+     * @returns {Number} The number of attached pseudo elements.
+     */
 
-            Object.keys(this.attachedPseudoElements).sort().forEach(function (key) {
-                ordered[key] = that.attachedPseudoElements[key];
-            });
+  }, {
+    key: 'getAttachedPseudoElementsCount',
+    value: function getAttachedPseudoElementsCount() {
+      return Object.keys(this.attachedPseudoElements).length;
+    }
 
-            return ordered;
-        }
+    /**
+     * Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
+     *
+     * @param {Number} ringId A ring id.
+     */
 
-        /**
-         * Returns the number of attached pseudo elements.
-         *
-         * @returns {Number} The number of attached pseudo elements.
-         */
+  }, {
+    key: 'addAnchoredRing',
+    value: function addAnchoredRing(ringId) {
+      if (!_ArrayHelper2.default.contains(this.anchoredRings, {
+        value: ringId
+      })) {
+        this.anchoredRings.push(ringId);
+      }
+    }
 
-    }, {
-        key: 'getAttachedPseudoElementsCount',
-        value: function getAttachedPseudoElementsCount() {
-            return Object.keys(this.attachedPseudoElements).length;
-        }
+    /**
+     * Returns the number of ringbonds (breaks in rings to generate the MST of the smiles) within this atom is connected to.
+     *
+     * @returns {Number} The number of ringbonds this atom is connected to.
+     */
 
-        /**
-         * Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.
-         *
-         * @param {Number} ringId A ring id.
-         */
+  }, {
+    key: 'getRingbondCount',
+    value: function getRingbondCount() {
+      return this.ringbonds.length;
+    }
 
-    }, {
-        key: 'addAnchoredRing',
-        value: function addAnchoredRing(ringId) {
-            if (!_ArrayHelper2.default.contains(this.anchoredRings, { value: ringId })) {
-                this.anchoredRings.push(ringId);
-            }
-        }
+    /**
+     * Backs up the current rings.
+     */
 
-        /**
-         * Returns the number of ringbonds (breaks in rings to generate the MST of the smiles) within this atom is connected to.
-         *
-         * @returns {Number} The number of ringbonds this atom is connected to.
-         */
+  }, {
+    key: 'backupRings',
+    value: function backupRings() {
+      this.originalRings = Array(this.rings.length);
 
-    }, {
-        key: 'getRingbondCount',
-        value: function getRingbondCount() {
-            return this.ringbonds.length;
-        }
+      for (var i = 0; i < this.rings.length; i++) {
+        this.originalRings[i] = this.rings[i];
+      }
+    }
 
-        /**
-         * Backs up the current rings.
-         */
+    /**
+     * Restores the most recent backed up rings.
+     */
 
-    }, {
-        key: 'backupRings',
-        value: function backupRings() {
-            this.originalRings = Array(this.rings.length);
+  }, {
+    key: 'restoreRings',
+    value: function restoreRings() {
+      this.rings = Array(this.originalRings.length);
 
-            for (var i = 0; i < this.rings.length; i++) {
-                this.originalRings[i] = this.rings[i];
-            }
-        }
+      for (var i = 0; i < this.originalRings.length; i++) {
+        this.rings[i] = this.originalRings[i];
+      }
+    }
 
-        /**
-         * Restores the most recent backed up rings.
-         */
+    /**
+     * Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.
+     *
+     * @param {Atom} atomA An atom.
+     * @param {Atom} atomB An atom.
+     * @returns {Boolean} A boolean indicating whether or not two atoms share a common ringbond.
+     */
 
-    }, {
-        key: 'restoreRings',
-        value: function restoreRings() {
-            this.rings = Array(this.originalRings.length);
-
-            for (var i = 0; i < this.originalRings.length; i++) {
-                this.rings[i] = this.originalRings[i];
-            }
-        }
-
-        /**
-         * Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.
-         *
-         * @param {Atom} atomA An atom.
-         * @param {Atom} atomB An atom.
-         * @returns {Boolean} A boolean indicating whether or not two atoms share a common ringbond.
-         */
-
-    }, {
-        key: 'haveCommonRingbond',
-        value: function haveCommonRingbond(atomA, atomB) {
-            for (var i = 0; i < atomA.ringbonds.length; i++) {
-                for (var j = 0; j < atomB.ringbonds.length; j++) {
-                    if (atomA.ringbonds[i].id == atomB.ringbonds[j].id) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        /**
-         * Returns the order of this atom given a central atom.
-         * 
-         * @param {Number} center The id of the central atom in respect to which the order is defined.
-         * @returns {Number} The order of this atom in respect to the center atom.
-         */
-
-    }, {
-        key: 'getOrder',
-        value: function getOrder(center) {
-            return this.order[center];
-        }
-
-        /**
-         * Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
-         *
-         * @param {Number} center The id of the central atom in respect to which the order is defined.
-         * @param {Number} order The order of this atom.
-         */
-
-    }, {
-        key: 'setOrder',
-        value: function setOrder(center, order) {
-            this.order[center] = order;
-        }
-
-        /**
-         * Check whether or not the neighbouring elements of this atom equal the supplied array.
-         * 
-         * @param {String[]} arr An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N']
-         * @returns {Boolean} A boolean indicating whether or not the neighbours match the supplied array of elements.
-         */
-
-    }, {
-        key: 'neighbouringElementsEqual',
-        value: function neighbouringElementsEqual(arr) {
-            if (arr.length !== this.neighbouringElements.length) {
-                return false;
-            }
-
-            arr.sort();
-            this.neighbouringElements.sort();
-
-            for (var i = 0; i < this.neighbouringElements.length; i++) {
-                if (arr[i] !== this.neighbouringElements[i]) {
-                    return false;
-                }
-            }
-
+  }, {
+    key: 'haveCommonRingbond',
+    value: function haveCommonRingbond(atomA, atomB) {
+      for (var i = 0; i < atomA.ringbonds.length; i++) {
+        for (var j = 0; j < atomB.ringbonds.length; j++) {
+          if (atomA.ringbonds[i].id == atomB.ringbonds[j].id) {
             return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    /**
+     * Returns the order of this atom given a central atom.
+     * 
+     * @param {Number} center The id of the central atom in respect to which the order is defined.
+     * @returns {Number} The order of this atom in respect to the center atom.
+     */
+
+  }, {
+    key: 'getOrder',
+    value: function getOrder(center) {
+      return this.order[center];
+    }
+
+    /**
+     * Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
+     *
+     * @param {Number} center The id of the central atom in respect to which the order is defined.
+     * @param {Number} order The order of this atom.
+     */
+
+  }, {
+    key: 'setOrder',
+    value: function setOrder(center, order) {
+      this.order[center] = order;
+    }
+
+    /**
+     * Check whether or not the neighbouring elements of this atom equal the supplied array.
+     * 
+     * @param {String[]} arr An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N']
+     * @returns {Boolean} A boolean indicating whether or not the neighbours match the supplied array of elements.
+     */
+
+  }, {
+    key: 'neighbouringElementsEqual',
+    value: function neighbouringElementsEqual(arr) {
+      if (arr.length !== this.neighbouringElements.length) {
+        return false;
+      }
+
+      arr.sort();
+      this.neighbouringElements.sort();
+
+      for (var i = 0; i < this.neighbouringElements.length; i++) {
+        if (arr[i] !== this.neighbouringElements[i]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    /**
+     * Get the atomic number of this atom.
+     * 
+     * @returns {Number} The atomic number of this atom.
+     */
+
+  }, {
+    key: 'getAtomicNumber',
+    value: function getAtomicNumber() {
+      return Atom.atomicNumbers[this.element];
+    }
+
+    /**
+     * Sorts an array of vertices by their respecitve atomic number.
+     *
+     * @param {Vertex} root The central vertex
+     * @param {Number[]} neighbours An array of vertex ids.
+     * @param {Vertex[]} vertices An array containing the vertices associated with the current molecule.
+     * @param {Ring[]} rings An array containing the rings associated with the current molecule.
+     * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
+     */
+
+  }], [{
+    key: 'sortByAtomicNumber',
+    value: function sortByAtomicNumber(neighbours, vertices) {
+      var orderedVertices = new Array(neighbours.length);
+
+      for (var i = 0; i < neighbours.length; i++) {
+        var vertex = vertices[neighbours[i]];
+        var val = Atom.atomicNumbers[vertex.value.element];
+
+        orderedVertices[i] = {
+          atomicNumber: val.toString(),
+          vertexId: vertex.id
+        };
+      }
+
+      return _ArrayHelper2.default.sortByAtomicNumberDesc(orderedVertices);
+    }
+
+    /**
+     * Checks wheter or not two atoms have the same atomic number
+     *
+     * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
+     * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
+     * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
+     * @returns {Boolean} A boolean indicating whether or not there are duplicate atomic numbers.
+     */
+
+  }, {
+    key: 'hasDuplicateAtomicNumbers',
+    value: function hasDuplicateAtomicNumbers(sortedAtomicNumbers) {
+      var found = {};
+
+      for (var i = 0; i < sortedAtomicNumbers.length; i++) {
+        var v = sortedAtomicNumbers[i];
+
+        if (found[v.atomicNumber] !== undefined) {
+          return true;
         }
 
-        /**
-         * Get the atomic number of this atom.
-         * 
-         * @returns {Number} The atomic number of this atom.
-         */
+        found[v.atomicNumber] = true;
+      }
 
-    }, {
-        key: 'getAtomicNumber',
-        value: function getAtomicNumber() {
-            return Atom.atomicNumbers[this.element];
+      return false;
+    }
+
+    /**
+     * Returns sets of duplicate atomic numbers.
+     *
+     * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
+     * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
+     * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
+     * @returns {Array[]} An array of arrays containing the indices of duplicate atomic numbers.
+     */
+
+  }, {
+    key: 'getDuplicateAtomicNumbers',
+    value: function getDuplicateAtomicNumbers(sortedAtomicNumbers) {
+      var duplicates = {};
+      var dpl = [];
+
+      for (var i = 0; i < sortedAtomicNumbers.length; i++) {
+        var v = sortedAtomicNumbers[i];
+
+        if (duplicates[v.atomicNumber] === undefined) {
+          duplicates[v.atomicNumber] = [];
         }
 
-        /**
-         * Sorts an array of vertices by their respecitve atomic number.
-         *
-         * @param {Vertex} root The central vertex
-         * @param {Number[]} neighbours An array of vertex ids.
-         * @param {Vertex[]} vertices An array containing the vertices associated with the current molecule.
-         * @param {Ring[]} rings An array containing the rings associated with the current molecule.
-         * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
-         */
+        duplicates[v.atomicNumber].push(i);
+      }
 
-    }], [{
-        key: 'sortByAtomicNumber',
-        value: function sortByAtomicNumber(neighbours, vertices) {
-            var orderedVertices = new Array(neighbours.length);
+      for (var key in duplicates) {
+        var arr = duplicates[key];
 
-            for (var i = 0; i < neighbours.length; i++) {
-                var vertex = vertices[neighbours[i]];
-                var val = Atom.atomicNumbers[vertex.value.element];
-
-                orderedVertices[i] = {
-                    atomicNumber: val.toString(),
-                    vertexId: vertex.id
-                };
-            }
-
-            return _ArrayHelper2.default.sortByAtomicNumberDesc(orderedVertices);
+        if (arr.length > 1) {
+          dpl.push(arr);
         }
+      }
 
-        /**
-         * Checks wheter or not two atoms have the same atomic number
-         *
-         * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
-         * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
-         * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
-         * @returns {Boolean} A boolean indicating whether or not there are duplicate atomic numbers.
-         */
+      return dpl;
+    }
 
-    }, {
-        key: 'hasDuplicateAtomicNumbers',
-        value: function hasDuplicateAtomicNumbers(sortedAtomicNumbers) {
-            var found = {};
+    /**
+     * A map mapping element symbols to their maximum bonds.
+     */
 
-            for (var i = 0; i < sortedAtomicNumbers.length; i++) {
-                var v = sortedAtomicNumbers[i];
+  }, {
+    key: 'maxBonds',
+    get: function get() {
+      return {
+        'C': 4,
+        'N': 3,
+        'O': 2,
+        'P': 3,
+        'S': 2,
+        'B': 3,
+        'F': 1,
+        'I': 1,
+        'Cl': 1,
+        'Br': 1
+      };
+    }
 
-                if (found[v.atomicNumber] !== undefined) {
-                    return true;
-                }
+    /**
+     * A map mapping element symbols to the atomic number.
+     */
 
-                found[v.atomicNumber] = true;
-            }
+  }, {
+    key: 'atomicNumbers',
+    get: function get() {
+      return {
+        'H': 1,
+        'He': 2,
+        'Li': 3,
+        'Be': 4,
+        'B': 5,
+        'b': 5,
+        'C': 6,
+        'c': 6,
+        'N': 7,
+        'n': 7,
+        'O': 8,
+        'o': 8,
+        'F': 9,
+        'Ne': 10,
+        'Na': 11,
+        'Mg': 12,
+        'Al': 13,
+        'Si': 14,
+        'P': 15,
+        'p': 15,
+        'S': 16,
+        's': 16,
+        'Cl': 17,
+        'Ar': 18,
+        'K': 19,
+        'Ca': 20,
+        'Sc': 21,
+        'Ti': 22,
+        'V': 23,
+        'Cr': 24,
+        'Mn': 25,
+        'Fe': 26,
+        'Co': 27,
+        'Ni': 28,
+        'Cu': 29,
+        'Zn': 30,
+        'Ga': 31,
+        'Ge': 32,
+        'As': 33,
+        'Se': 34,
+        'Br': 35,
+        'Kr': 36,
+        'Rb': 37,
+        'Sr': 38,
+        'Y': 39,
+        'Zr': 40,
+        'Nb': 41,
+        'Mo': 42,
+        'Tc': 43,
+        'Ru': 44,
+        'Rh': 45,
+        'Pd': 46,
+        'Ag': 47,
+        'Cd': 48,
+        'In': 49,
+        'Sn': 50,
+        'Sb': 51,
+        'Te': 52,
+        'I': 53,
+        'Xe': 54,
+        'Cs': 55,
+        'Ba': 56,
+        'La': 57,
+        'Ce': 58,
+        'Pr': 59,
+        'Nd': 60,
+        'Pm': 61,
+        'Sm': 62,
+        'Eu': 63,
+        'Gd': 64,
+        'Tb': 65,
+        'Dy': 66,
+        'Ho': 67,
+        'Er': 68,
+        'Tm': 69,
+        'Yb': 70,
+        'Lu': 71,
+        'Hf': 72,
+        'Ta': 73,
+        'W': 74,
+        'Re': 75,
+        'Os': 76,
+        'Ir': 77,
+        'Pt': 78,
+        'Au': 79,
+        'Hg': 80,
+        'Tl': 81,
+        'Pb': 82,
+        'Bi': 83,
+        'Po': 84,
+        'At': 85,
+        'Rn': 86,
+        'Fr': 87,
+        'Ra': 88,
+        'Ac': 89,
+        'Th': 90,
+        'Pa': 91,
+        'U': 92,
+        'Np': 93,
+        'Pu': 94,
+        'Am': 95,
+        'Cm': 96,
+        'Bk': 97,
+        'Cf': 98,
+        'Es': 99,
+        'Fm': 100,
+        'Md': 101,
+        'No': 102,
+        'Lr': 103,
+        'Rf': 104,
+        'Db': 105,
+        'Sg': 106,
+        'Bh': 107,
+        'Hs': 108,
+        'Mt': 109,
+        'Ds': 110,
+        'Rg': 111,
+        'Cn': 112,
+        'Uut': 113,
+        'Uuq': 114,
+        'Uup': 115,
+        'Uuh': 116,
+        'Uus': 117,
+        'Uuo': 118
+      };
+    }
 
-            return false;
-        }
+    /**
+     * A map mapping element symbols to the atomic mass.
+     */
 
-        /**
-         * Returns sets of duplicate atomic numbers.
-         *
-         * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
-         * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
-         * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
-         * @returns {Array[]} An array of arrays containing the indices of duplicate atomic numbers.
-         */
+  }, {
+    key: 'mass',
+    get: function get() {
+      return {
+        'H': 1,
+        'He': 2,
+        'Li': 3,
+        'Be': 4,
+        'B': 5,
+        'b': 5,
+        'C': 6,
+        'c': 6,
+        'N': 7,
+        'n': 7,
+        'O': 8,
+        'o': 8,
+        'F': 9,
+        'Ne': 10,
+        'Na': 11,
+        'Mg': 12,
+        'Al': 13,
+        'Si': 14,
+        'P': 15,
+        'p': 15,
+        'S': 16,
+        's': 16,
+        'Cl': 17,
+        'Ar': 18,
+        'K': 19,
+        'Ca': 20,
+        'Sc': 21,
+        'Ti': 22,
+        'V': 23,
+        'Cr': 24,
+        'Mn': 25,
+        'Fe': 26,
+        'Co': 27,
+        'Ni': 28,
+        'Cu': 29,
+        'Zn': 30,
+        'Ga': 31,
+        'Ge': 32,
+        'As': 33,
+        'Se': 34,
+        'Br': 35,
+        'Kr': 36,
+        'Rb': 37,
+        'Sr': 38,
+        'Y': 39,
+        'Zr': 40,
+        'Nb': 41,
+        'Mo': 42,
+        'Tc': 43,
+        'Ru': 44,
+        'Rh': 45,
+        'Pd': 46,
+        'Ag': 47,
+        'Cd': 48,
+        'In': 49,
+        'Sn': 50,
+        'Sb': 51,
+        'Te': 52,
+        'I': 53,
+        'Xe': 54,
+        'Cs': 55,
+        'Ba': 56,
+        'La': 57,
+        'Ce': 58,
+        'Pr': 59,
+        'Nd': 60,
+        'Pm': 61,
+        'Sm': 62,
+        'Eu': 63,
+        'Gd': 64,
+        'Tb': 65,
+        'Dy': 66,
+        'Ho': 67,
+        'Er': 68,
+        'Tm': 69,
+        'Yb': 70,
+        'Lu': 71,
+        'Hf': 72,
+        'Ta': 73,
+        'W': 74,
+        'Re': 75,
+        'Os': 76,
+        'Ir': 77,
+        'Pt': 78,
+        'Au': 79,
+        'Hg': 80,
+        'Tl': 81,
+        'Pb': 82,
+        'Bi': 83,
+        'Po': 84,
+        'At': 85,
+        'Rn': 86,
+        'Fr': 87,
+        'Ra': 88,
+        'Ac': 89,
+        'Th': 90,
+        'Pa': 91,
+        'U': 92,
+        'Np': 93,
+        'Pu': 94,
+        'Am': 95,
+        'Cm': 96,
+        'Bk': 97,
+        'Cf': 98,
+        'Es': 99,
+        'Fm': 100,
+        'Md': 101,
+        'No': 102,
+        'Lr': 103,
+        'Rf': 104,
+        'Db': 105,
+        'Sg': 106,
+        'Bh': 107,
+        'Hs': 108,
+        'Mt': 109,
+        'Ds': 110,
+        'Rg': 111,
+        'Cn': 112,
+        'Uut': 113,
+        'Uuq': 114,
+        'Uup': 115,
+        'Uuh': 116,
+        'Uus': 117,
+        'Uuo': 118
+      };
+    }
+  }]);
 
-    }, {
-        key: 'getDuplicateAtomicNumbers',
-        value: function getDuplicateAtomicNumbers(sortedAtomicNumbers) {
-            var duplicates = {};
-            var dpl = [];
-
-            for (var i = 0; i < sortedAtomicNumbers.length; i++) {
-                var v = sortedAtomicNumbers[i];
-
-                if (duplicates[v.atomicNumber] === undefined) {
-                    duplicates[v.atomicNumber] = [];
-                }
-
-                duplicates[v.atomicNumber].push(i);
-            }
-
-            for (var key in duplicates) {
-                var arr = duplicates[key];
-
-                if (arr.length > 1) {
-                    dpl.push(arr);
-                }
-            }
-
-            return dpl;
-        }
-
-        /**
-         * A map mapping element symbols to their maximum bonds.
-         */
-
-    }, {
-        key: 'maxBonds',
-        get: function get() {
-            return {
-                'C': 4,
-                'N': 3,
-                'O': 2,
-                'P': 3,
-                'S': 2,
-                'B': 3,
-                'F': 1,
-                'I': 1,
-                'Cl': 1,
-                'Br': 1
-            };
-        }
-
-        /**
-         * A map mapping element symbols to the atomic number.
-         */
-
-    }, {
-        key: 'atomicNumbers',
-        get: function get() {
-            return {
-                'H': 1,
-                'He': 2,
-                'Li': 3,
-                'Be': 4,
-                'B': 5,
-                'b': 5,
-                'C': 6,
-                'c': 6,
-                'N': 7,
-                'n': 7,
-                'O': 8,
-                'o': 8,
-                'F': 9,
-                'Ne': 10,
-                'Na': 11,
-                'Mg': 12,
-                'Al': 13,
-                'Si': 14,
-                'P': 15,
-                'p': 15,
-                'S': 16,
-                's': 16,
-                'Cl': 17,
-                'Ar': 18,
-                'K': 19,
-                'Ca': 20,
-                'Sc': 21,
-                'Ti': 22,
-                'V': 23,
-                'Cr': 24,
-                'Mn': 25,
-                'Fe': 26,
-                'Co': 27,
-                'Ni': 28,
-                'Cu': 29,
-                'Zn': 30,
-                'Ga': 31,
-                'Ge': 32,
-                'As': 33,
-                'Se': 34,
-                'Br': 35,
-                'Kr': 36,
-                'Rb': 37,
-                'Sr': 38,
-                'Y': 39,
-                'Zr': 40,
-                'Nb': 41,
-                'Mo': 42,
-                'Tc': 43,
-                'Ru': 44,
-                'Rh': 45,
-                'Pd': 46,
-                'Ag': 47,
-                'Cd': 48,
-                'In': 49,
-                'Sn': 50,
-                'Sb': 51,
-                'Te': 52,
-                'I': 53,
-                'Xe': 54,
-                'Cs': 55,
-                'Ba': 56,
-                'La': 57,
-                'Ce': 58,
-                'Pr': 59,
-                'Nd': 60,
-                'Pm': 61,
-                'Sm': 62,
-                'Eu': 63,
-                'Gd': 64,
-                'Tb': 65,
-                'Dy': 66,
-                'Ho': 67,
-                'Er': 68,
-                'Tm': 69,
-                'Yb': 70,
-                'Lu': 71,
-                'Hf': 72,
-                'Ta': 73,
-                'W': 74,
-                'Re': 75,
-                'Os': 76,
-                'Ir': 77,
-                'Pt': 78,
-                'Au': 79,
-                'Hg': 80,
-                'Tl': 81,
-                'Pb': 82,
-                'Bi': 83,
-                'Po': 84,
-                'At': 85,
-                'Rn': 86,
-                'Fr': 87,
-                'Ra': 88,
-                'Ac': 89,
-                'Th': 90,
-                'Pa': 91,
-                'U': 92,
-                'Np': 93,
-                'Pu': 94,
-                'Am': 95,
-                'Cm': 96,
-                'Bk': 97,
-                'Cf': 98,
-                'Es': 99,
-                'Fm': 100,
-                'Md': 101,
-                'No': 102,
-                'Lr': 103,
-                'Rf': 104,
-                'Db': 105,
-                'Sg': 106,
-                'Bh': 107,
-                'Hs': 108,
-                'Mt': 109,
-                'Ds': 110,
-                'Rg': 111,
-                'Cn': 112,
-                'Uut': 113,
-                'Uuq': 114,
-                'Uup': 115,
-                'Uuh': 116,
-                'Uus': 117,
-                'Uuo': 118
-            };
-        }
-
-        /**
-         * A map mapping element symbols to the atomic mass.
-         */
-
-    }, {
-        key: 'mass',
-        get: function get() {
-            return {
-                'H': 1,
-                'He': 2,
-                'Li': 3,
-                'Be': 4,
-                'B': 5,
-                'b': 5,
-                'C': 6,
-                'c': 6,
-                'N': 7,
-                'n': 7,
-                'O': 8,
-                'o': 8,
-                'F': 9,
-                'Ne': 10,
-                'Na': 11,
-                'Mg': 12,
-                'Al': 13,
-                'Si': 14,
-                'P': 15,
-                'p': 15,
-                'S': 16,
-                's': 16,
-                'Cl': 17,
-                'Ar': 18,
-                'K': 19,
-                'Ca': 20,
-                'Sc': 21,
-                'Ti': 22,
-                'V': 23,
-                'Cr': 24,
-                'Mn': 25,
-                'Fe': 26,
-                'Co': 27,
-                'Ni': 28,
-                'Cu': 29,
-                'Zn': 30,
-                'Ga': 31,
-                'Ge': 32,
-                'As': 33,
-                'Se': 34,
-                'Br': 35,
-                'Kr': 36,
-                'Rb': 37,
-                'Sr': 38,
-                'Y': 39,
-                'Zr': 40,
-                'Nb': 41,
-                'Mo': 42,
-                'Tc': 43,
-                'Ru': 44,
-                'Rh': 45,
-                'Pd': 46,
-                'Ag': 47,
-                'Cd': 48,
-                'In': 49,
-                'Sn': 50,
-                'Sb': 51,
-                'Te': 52,
-                'I': 53,
-                'Xe': 54,
-                'Cs': 55,
-                'Ba': 56,
-                'La': 57,
-                'Ce': 58,
-                'Pr': 59,
-                'Nd': 60,
-                'Pm': 61,
-                'Sm': 62,
-                'Eu': 63,
-                'Gd': 64,
-                'Tb': 65,
-                'Dy': 66,
-                'Ho': 67,
-                'Er': 68,
-                'Tm': 69,
-                'Yb': 70,
-                'Lu': 71,
-                'Hf': 72,
-                'Ta': 73,
-                'W': 74,
-                'Re': 75,
-                'Os': 76,
-                'Ir': 77,
-                'Pt': 78,
-                'Au': 79,
-                'Hg': 80,
-                'Tl': 81,
-                'Pb': 82,
-                'Bi': 83,
-                'Po': 84,
-                'At': 85,
-                'Rn': 86,
-                'Fr': 87,
-                'Ra': 88,
-                'Ac': 89,
-                'Th': 90,
-                'Pa': 91,
-                'U': 92,
-                'Np': 93,
-                'Pu': 94,
-                'Am': 95,
-                'Cm': 96,
-                'Bk': 97,
-                'Cf': 98,
-                'Es': 99,
-                'Fm': 100,
-                'Md': 101,
-                'No': 102,
-                'Lr': 103,
-                'Rf': 104,
-                'Db': 105,
-                'Sg': 106,
-                'Bh': 107,
-                'Hs': 108,
-                'Mt': 109,
-                'Ds': 110,
-                'Rg': 111,
-                'Cn': 112,
-                'Uut': 113,
-                'Uuq': 114,
-                'Uup': 115,
-                'Uuh': 116,
-                'Uus': 117,
-                'Uuo': 118
-            };
-        }
-    }]);
-
-    return Atom;
+  return Atom;
 }();
 
 exports.default = Atom;
@@ -4463,7 +4465,14 @@ var Drawer = function () {
         }
       } else {
         // Draw the non-ring vertices connected to this one        
-        var _neighbours2 = vertex.getNeighbours();
+        var tmpNeighbours = vertex.getNeighbours();
+        var _neighbours2 = Array();
+        // Remove neighbours that are not drawn
+        for (var i = 0; i < tmpNeighbours.length; i++) {
+          if (this.graph.vertices[tmpNeighbours[i]].value.isDrawn) {
+            _neighbours2.push(tmpNeighbours[i]);
+          }
+        }
 
         if (previousVertex) {
           _neighbours2 = _ArrayHelper2.default.remove(_neighbours2, previousVertex.id);
@@ -4930,33 +4939,30 @@ var Drawer = function () {
   }, {
     key: 'annotateStereochemistry',
     value: function annotateStereochemistry() {
-      var _this = this;
-
       var maxDepth = 10;
 
       // For each stereo-center
-
-      var _loop = function _loop() {
-        var vertex = _this.graph.vertices[i];
+      for (var i = 0; i < this.graph.vertices.length; i++) {
+        var vertex = this.graph.vertices[i];
 
         if (!vertex.value.bracket || !vertex.value.bracket.chirality) {
-          return 'continue';
+          continue;
         }
 
         var neighbours = vertex.getNeighbours();
         // neighbours.sort();
         console.log(neighbours);
-        console.log(_this.graph.vertices[neighbours[0]].value.element, _this.graph.vertices[neighbours[1]].value.element, _this.graph.vertices[neighbours[2]].value.element, _this.graph.vertices[neighbours[3]].value.element);
+        // console.log(this.graph.vertices[neighbours[0]].value.element, this.graph.vertices[neighbours[1]].value.element, this.graph.vertices[neighbours[2]].value.element, this.graph.vertices[neighbours[3]].value.element);
 
         var nNeighbours = neighbours.length;
         var priorities = Array(nNeighbours);
 
-        for (j = 0; j < nNeighbours; j++) {
-          var visited = new Uint8Array(_this.graph.vertices.length);
+        for (var j = 0; j < nNeighbours; j++) {
+          var visited = new Uint8Array(this.graph.vertices.length);
           var priority = new Uint16Array(maxDepth * 2.0 + 1);
           visited[vertex.id] = 1;
 
-          if (j === 3) _this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
+          this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
 
           // Break ties by the position in the smiles string as per specification
           priority[maxDepth * 2.0] = neighbours[j];
@@ -4964,7 +4970,7 @@ var Drawer = function () {
         }
 
         priorities.sort(function (a, b) {
-          for (var j = 0; j < nNeighbours; j++) {
+          for (var j = 0; j < maxDepth * 2.0; j++) {
             if (a[1][j] > b[1][j]) {
               return -1;
             } else if (a[1][j] < b[1][j]) {
@@ -4978,26 +4984,17 @@ var Drawer = function () {
         console.log(priorities);
 
         var order = new Uint8Array(nNeighbours);
-        for (j = 0; j < nNeighbours; j++) {
+        for (var j = 0; j < nNeighbours; j++) {
           order[j] = priorities[j][0];
         }
 
-        console.log(order);
+        // console.log(order);
 
         var rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
         var rs = _MathHelper2.default.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
 
-        console.log(order);
+        // console.log(order);
         console.log(vertex.id, rs);
-      };
-
-      for (var i = 0; i < this.graph.vertices.length; i++) {
-        var j;
-        var j;
-
-        var _ret = _loop();
-
-        if (_ret === 'continue') continue;
       }
     }
 
@@ -5028,10 +5025,10 @@ var Drawer = function () {
       priority[maxDepth + depth] += atomicNumber;
 
       var neighbours = this.graph.vertices[vertexId].neighbours;
-      console.log(vertexId, depth, atomicNumber, neighbours);
+
       for (var i = 0; i < neighbours.length; i++) {
         if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
-          this.visitStereochemistry(neighbours[i], vertexId, visited, priority, maxDepth, depth + 1);
+          this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1);
         }
       }
     }
@@ -5045,17 +5042,17 @@ var Drawer = function () {
     key: 'initPseudoElements',
     value: function initPseudoElements() {
       for (var i = 0; i < this.graph.vertices.length; i++) {
-        var _vertex4 = this.graph.vertices[i];
-        var neighbourIds = _vertex4.neighbours;
-        var _neighbours3 = Array(neighbourIds.length);
+        var vertex = this.graph.vertices[i];
+        var neighbourIds = vertex.neighbours;
+        var neighbours = Array(neighbourIds.length);
 
         for (var j = 0; j < neighbourIds.length; j++) {
-          _neighbours3[j] = this.graph.vertices[neighbourIds[j]];
+          neighbours[j] = this.graph.vertices[neighbourIds[j]];
         }
 
         // Ignore atoms that have less than 3 neighbours, except if
         // the vertex is connected to a ring and has two neighbours
-        if (_vertex4.getNeighbourCount() < 3 || _vertex4.value.rings.length > 0) {
+        if (vertex.getNeighbourCount() < 3 || vertex.value.rings.length > 0) {
           continue;
         }
 
@@ -5064,8 +5061,8 @@ var Drawer = function () {
         var heteroAtomCount = 0;
         var ctn = 0;
 
-        for (var j = 0; j < _neighbours3.length; j++) {
-          var neighbour = _neighbours3[j];
+        for (var j = 0; j < neighbours.length; j++) {
+          var neighbour = neighbours[j];
           var neighbouringElement = neighbour.value.element;
           var neighbourCount = neighbour.getNeighbourCount();
 
@@ -5085,16 +5082,16 @@ var Drawer = function () {
         // Get the previous atom (the one which is not terminal)
         var previous = null;
 
-        for (var j = 0; j < _neighbours3.length; j++) {
-          var _neighbour3 = _neighbours3[j];
+        for (var j = 0; j < neighbours.length; j++) {
+          var _neighbour3 = neighbours[j];
 
           if (_neighbour3.getNeighbourCount() > 1) {
             previous = _neighbour3;
           }
         }
 
-        for (var j = 0; j < _neighbours3.length; j++) {
-          var _neighbour4 = _neighbours3[j];
+        for (var j = 0; j < neighbours.length; j++) {
+          var _neighbour4 = neighbours[j];
 
           if (_neighbour4.getNeighbourCount() > 1) {
             continue;
@@ -5108,29 +5105,29 @@ var Drawer = function () {
             hydrogens = _neighbour4.value.bracket.hcount;
           }
 
-          _vertex4.value.attachPseudoElement(_neighbour4.value.element, previous ? previous.value.element : null, hydrogens);
+          vertex.value.attachPseudoElement(_neighbour4.value.element, previous ? previous.value.element : null, hydrogens);
         }
       }
 
       // The second pass
       for (var i = 0; i < this.graph.vertices.length; i++) {
-        var _vertex5 = this.graph.vertices[i];
-        var atom = _vertex5.value;
+        var _vertex4 = this.graph.vertices[i];
+        var atom = _vertex4.value;
         var element = atom.element;
 
         if (element === 'C' || element === 'H' || !atom.isDrawn) {
           continue;
         }
 
-        var _neighbourIds = _vertex5.neighbours;
-        var _neighbours4 = Array(_neighbourIds.length);
+        var _neighbourIds = _vertex4.neighbours;
+        var _neighbours3 = Array(_neighbourIds.length);
 
         for (var j = 0; j < _neighbourIds.length; j++) {
-          _neighbours4[j] = this.graph.vertices[_neighbourIds[j]];
+          _neighbours3[j] = this.graph.vertices[_neighbourIds[j]];
         }
 
-        for (var j = 0; j < _neighbours4.length; j++) {
-          var _neighbour5 = _neighbours4[j].value;
+        for (var j = 0; j < _neighbours3.length; j++) {
+          var _neighbour5 = _neighbours3[j].value;
 
           if (!_neighbour5.hasAttachedPseudoElements || _neighbour5.getAttachedPseudoElementsCount() !== 2) {
             continue;
@@ -5140,7 +5137,7 @@ var Drawer = function () {
 
           if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
             _neighbour5.isDrawn = false;
-            _vertex5.value.attachPseudoElement('Ac', '', 0);
+            _vertex4.value.attachPseudoElement('Ac', '', 0);
           }
         }
       }
@@ -5156,7 +5153,7 @@ exports.default = Drawer;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5178,62 +5175,62 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String} [chiral=''] Chirality information.
  */
 var Edge = function () {
-    /**
-     * The constructor for the class Edge.
-     *
-     * @param {Number} sourceId A vertex id.
-     * @param {Number} targetId A vertex id.
-     * @param {Number} [weight=1] The weight of the edge.
-     */
-    function Edge(sourceId, targetId) {
-        var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+  /**
+   * The constructor for the class Edge.
+   *
+   * @param {Number} sourceId A vertex id.
+   * @param {Number} targetId A vertex id.
+   * @param {Number} [weight=1] The weight of the edge.
+   */
+  function Edge(sourceId, targetId) {
+    var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-        _classCallCheck(this, Edge);
+    _classCallCheck(this, Edge);
 
-        this.id = null;
-        this.sourceId = sourceId;
-        this.targetId = targetId;
-        this.weight = weight;
-        this.bondType = '-';
-        this.isPartOfAromaticRing = false;
-        this.center = false;
-        this.chiral = '';
+    this.id = null;
+    this.sourceId = sourceId;
+    this.targetId = targetId;
+    this.weight = weight;
+    this.bondType = '-';
+    this.isPartOfAromaticRing = false;
+    this.center = false;
+    this.chiral = '';
+  }
+
+  /**
+   * Set the bond type of this edge. This also sets the edge weight.
+   * @param {String} bondType 
+   */
+
+
+  _createClass(Edge, [{
+    key: 'setBondType',
+    value: function setBondType(bondType) {
+      this.bondType = bondType;
+      this.weight = Edge.bonds[bondType];
     }
 
     /**
-     * Set the bond type of this edge. This also sets the edge weight.
-     * @param {String} bondType 
+     * An object mapping the bond type to the number of bonds.
+     *
+     * @returns {Object} The object containing the map.
      */
 
+  }], [{
+    key: 'bonds',
+    get: function get() {
+      return {
+        '-': 1,
+        '/': 1,
+        '\\': 1,
+        '=': 2,
+        '#': 3,
+        '$': 4
+      };
+    }
+  }]);
 
-    _createClass(Edge, [{
-        key: 'setBondType',
-        value: function setBondType(bondType) {
-            this.bondType = bondType;
-            this.weight = Edge.bonds[bondType];
-        }
-
-        /**
-         * An object mapping the bond type to the number of bonds.
-         *
-         * @returns {Object} The object containing the map.
-         */
-
-    }], [{
-        key: 'bonds',
-        get: function get() {
-            return {
-                '-': 1,
-                '/': 1,
-                '\\': 1,
-                '=': 2,
-                '#': 3,
-                '$': 4
-            };
-        }
-    }]);
-
-    return Edge;
+  return Edge;
 }();
 
 exports.default = Edge;
@@ -5355,28 +5352,14 @@ var Graph = function () {
         var edge = new _Edge2.default(parentVertexId, vertex.id, 1);
 
         if (isBranch) {
-          edge.setBondType(vertex.value.branchBond);
+          edge.setBondType(vertex.value.branchBond || '-');
         } else {
-          edge.setBondType(parentVertex.value.bondType);
+          edge.setBondType(parentVertex.value.bondType || '-');
         }
 
         var edgeId = this.addEdge(edge);
         vertex.edges.push(edgeId);
         parentVertex.edges.push(edgeId);
-      }
-
-      if (atom.bracket && this.isomeric) {
-        for (var i = 0; i < atom.bracket.hcount; i++) {
-          if (this.isomeric) {
-            this._init({
-              atom: {
-                element: 'H',
-                bond: '-'
-              },
-              ringbonds: Array()
-            }, i + 1, vertex.id);
-          }
-        }
       }
 
       var offset = node.ringbondCount + 1;
@@ -11017,7 +11000,7 @@ var Vertex = function () {
       var vertexId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       if (vertexId === null) {
-        return this.neighbours;
+        return this.neighbours.slice();
       }
 
       var arr = Array();

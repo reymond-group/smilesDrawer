@@ -2004,7 +2004,14 @@ export default class Drawer {
       }
     } else {
       // Draw the non-ring vertices connected to this one        
-      let neighbours = vertex.getNeighbours();
+      let tmpNeighbours = vertex.getNeighbours();
+      let neighbours = Array();
+      // Remove neighbours that are not drawn
+      for (var i = 0; i < tmpNeighbours.length; i++) {
+        if (this.graph.vertices[tmpNeighbours[i]].value.isDrawn) {
+          neighbours.push(tmpNeighbours[i]);
+        }
+      }
 
       if (previousVertex) {
         neighbours = ArrayHelper.remove(neighbours, previousVertex.id);
@@ -2461,7 +2468,7 @@ export default class Drawer {
       let neighbours = vertex.getNeighbours();
       // neighbours.sort();
       console.log(neighbours);
-      console.log(this.graph.vertices[neighbours[0]].value.element, this.graph.vertices[neighbours[1]].value.element, this.graph.vertices[neighbours[2]].value.element, this.graph.vertices[neighbours[3]].value.element);
+      // console.log(this.graph.vertices[neighbours[0]].value.element, this.graph.vertices[neighbours[1]].value.element, this.graph.vertices[neighbours[2]].value.element, this.graph.vertices[neighbours[3]].value.element);
       
       let nNeighbours = neighbours.length;
       let priorities = Array(nNeighbours);
@@ -2471,8 +2478,7 @@ export default class Drawer {
         let priority = new Uint16Array(maxDepth * 2.0 + 1);
         visited[vertex.id] = 1;
 
-        if (j === 3)
-          this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
+        this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
         
         // Break ties by the position in the smiles string as per specification
         priority[maxDepth * 2.0] = neighbours[j];
@@ -2480,7 +2486,7 @@ export default class Drawer {
       }
 
       priorities.sort(function(a, b) {
-        for (var j = 0; j < nNeighbours; j++) {
+        for (var j = 0; j < maxDepth * 2.0; j++) {
           if (a[1][j] > b[1][j]) {
             return -1;
           } else if (a[1][j] < b[1][j]) {
@@ -2498,12 +2504,12 @@ export default class Drawer {
         order[j] = priorities[j][0];
       }
 
-      console.log(order);
+      // console.log(order);
 
       let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
       let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
 
-      console.log(order);
+      // console.log(order);
       console.log(vertex.id, rs);
     }
   }
@@ -2532,10 +2538,10 @@ export default class Drawer {
     priority[maxDepth + depth] += atomicNumber;
 
     let neighbours = this.graph.vertices[vertexId].neighbours;
-    console.log(vertexId, depth, atomicNumber, neighbours);
+
     for (var i = 0; i < neighbours.length; i++) {
       if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
-        this.visitStereochemistry(neighbours[i], vertexId, visited, priority, maxDepth, depth + 1);
+        this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1);
       }
     }
   }
