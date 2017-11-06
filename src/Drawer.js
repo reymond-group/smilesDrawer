@@ -2460,6 +2460,8 @@ export default class Drawer {
 
       let neighbours = vertex.getNeighbours();
       // neighbours.sort();
+      console.log(neighbours);
+      console.log(this.graph.vertices[neighbours[0]].value.element, this.graph.vertices[neighbours[1]].value.element, this.graph.vertices[neighbours[2]].value.element, this.graph.vertices[neighbours[3]].value.element);
       
       let nNeighbours = neighbours.length;
       let priorities = Array(nNeighbours);
@@ -2468,7 +2470,9 @@ export default class Drawer {
         let visited = new Uint8Array(this.graph.vertices.length);
         let priority = new Uint16Array(maxDepth * 2.0 + 1);
         visited[vertex.id] = 1;
-        this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
+
+        if (j === 3)
+          this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
         
         // Break ties by the position in the smiles string as per specification
         priority[maxDepth * 2.0] = neighbours[j];
@@ -2487,10 +2491,14 @@ export default class Drawer {
         return 0;
       });
 
+      console.log(priorities);
+
       let order = new Uint8Array(nNeighbours);
       for (var j = 0; j < nNeighbours; j++) {
         order[j] = priorities[j][0];
       }
+
+      console.log(order);
 
       let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
       let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
@@ -2513,7 +2521,7 @@ export default class Drawer {
   visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth) {
     visited[vertexId] = 1;
     let atomicNumber = this.graph.vertices[vertexId].value.getAtomicNumber();
-
+    
     priority[depth] = Math.max(priority[depth], atomicNumber);
 
     // Cloning of bonds as defined by CIP rules. Only multiply AFTER getting the max.
@@ -2524,7 +2532,7 @@ export default class Drawer {
     priority[maxDepth + depth] += atomicNumber;
 
     let neighbours = this.graph.vertices[vertexId].neighbours;
-
+    console.log(vertexId, depth, atomicNumber, neighbours);
     for (var i = 0; i < neighbours.length; i++) {
       if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
         this.visitStereochemistry(neighbours[i], vertexId, visited, priority, maxDepth, depth + 1);

@@ -4945,6 +4945,8 @@ var Drawer = function () {
 
         var neighbours = vertex.getNeighbours();
         // neighbours.sort();
+        console.log(neighbours);
+        console.log(_this.graph.vertices[neighbours[0]].value.element, _this.graph.vertices[neighbours[1]].value.element, _this.graph.vertices[neighbours[2]].value.element, _this.graph.vertices[neighbours[3]].value.element);
 
         var nNeighbours = neighbours.length;
         var priorities = Array(nNeighbours);
@@ -4953,7 +4955,8 @@ var Drawer = function () {
           var visited = new Uint8Array(_this.graph.vertices.length);
           var priority = new Uint16Array(maxDepth * 2.0 + 1);
           visited[vertex.id] = 1;
-          _this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
+
+          if (j === 3) _this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
 
           // Break ties by the position in the smiles string as per specification
           priority[maxDepth * 2.0] = neighbours[j];
@@ -4972,10 +4975,14 @@ var Drawer = function () {
           return 0;
         });
 
+        console.log(priorities);
+
         var order = new Uint8Array(nNeighbours);
         for (j = 0; j < nNeighbours; j++) {
           order[j] = priorities[j][0];
         }
+
+        console.log(order);
 
         var rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
         var rs = _MathHelper2.default.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
@@ -5021,7 +5028,7 @@ var Drawer = function () {
       priority[maxDepth + depth] += atomicNumber;
 
       var neighbours = this.graph.vertices[vertexId].neighbours;
-
+      console.log(vertexId, depth, atomicNumber, neighbours);
       for (var i = 0; i < neighbours.length; i++) {
         if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
           this.visitStereochemistry(neighbours[i], vertexId, visited, priority, maxDepth, depth + 1);
@@ -10838,17 +10845,25 @@ var Vertex = function () {
     key: 'addAsSecondChild',
     value: function addAsSecondChild(vertexId) {
       this.children.push(vertexId);
-      console.log(this.value);
+
       if (this.value.bracket) {
-        if (this.id === 0) {
-          this.neighbours.splice(0, 0, vertexId);
-        } else if (this.id === 0 && this.value.bracket.hcount === 1) {
-          this.neighbours.splice(1, 0, vertexId);
-        } else if (this.value.bracket.hcount === 1) {
-          this.neighbours.splice(2, 0, vertexId);
-        } else {
-          this.neighbours.splice(1, 0, vertexId);
+        var index = 1;
+
+        if (this.id === 0 && this.value.bracket.hcount === 0) {
+          index = 0;
         }
+
+        if (this.value.bracket.hcount === 1) {
+          index = 2;
+        }
+
+        // Check for two ringbonds and if there are already 3 neighbours, attach
+        // at point 3 rather than 2
+        if (this.value.ringbonds.length === 2 && this.neighbours.length > 2) {
+          index = 3;
+        }
+
+        this.neighbours.splice(index, 0, vertexId);
       } else {
         this.neighbours.push(vertexId);
       }

@@ -96,19 +96,25 @@ export default class Vertex {
    */
   addAsSecondChild(vertexId) {
     this.children.push(vertexId);
-    // Check for two ringbonds and if there are already 3 neighbours, attach
-    // at point 3 rather than 2
-    console.log(this.value);
+
     if (this.value.bracket) {
-      if (this.id === 0) {
-        this.neighbours.splice(0, 0, vertexId);
-      } else if (this.id === 0 && this.value.bracket.hcount === 1) {
-        this.neighbours.splice(1, 0, vertexId);
-      } else if (this.value.bracket.hcount === 1) {
-        this.neighbours.splice(2, 0, vertexId);
-      } else {
-        this.neighbours.splice(1, 0, vertexId);
+      let index = 1;
+
+      if (this.id === 0 && this.value.bracket.hcount === 0) {
+        index = 0;
       }
+
+      if (this.value.bracket.hcount === 1) {
+        index = 2;
+      }
+
+      // Check for two ringbonds and if there are already 3 neighbours, attach
+      // at point 3 rather than 2
+      if (this.value.ringbonds.length === 2 && this.neighbours.length > 2) {
+        index = 3;
+      }
+      
+      this.neighbours.splice(index, 0, vertexId);
     } else {
       this.neighbours.push(vertexId);
     }
