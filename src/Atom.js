@@ -236,6 +236,15 @@ export default class Atom {
   }
 
   /**
+   * Get the maximum number of bonds for this atom.
+   * 
+   * @returns {Number} The maximum number of bonds of this atom.
+   */
+  getMaxBonds() {
+    return Atom.maxBonds[this.element];
+  }
+
+  /**
    * Sorts an array of vertices by their respecitve atomic number.
    *
    * @param {Vertex} root The central vertex

@@ -464,9 +464,9 @@ export default class Drawer {
           let edgeId = this.graph.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
           let targetVertex = this.graph.vertices[targetVertexId];
 
-          vertex.addAsSecondChild(targetVertexId);
+          vertex.addAsSecondChild(targetVertexId, sourceVertexId, j);
           vertex.value.addNeighbouringElement(targetVertex.value.element);
-          targetVertex.addAsSecondChild(sourceVertexId);
+          targetVertex.addAsSecondChild(sourceVertexId, sourceVertexId, j);
           targetVertex.value.addNeighbouringElement(vertex.value.element);
           vertex.edges.push(edgeId);
           targetVertex.edges.push(edgeId);
@@ -2466,6 +2466,7 @@ export default class Drawer {
       }
 
       let neighbours = vertex.getNeighbours();
+
       // neighbours.sort();
       console.log(neighbours);
       // console.log(this.graph.vertices[neighbours[0]].value.element, this.graph.vertices[neighbours[1]].value.element, this.graph.vertices[neighbours[2]].value.element, this.graph.vertices[neighbours[3]].value.element);
@@ -2475,22 +2476,61 @@ export default class Drawer {
 
       for (var j = 0; j < nNeighbours; j++) {
         let visited = new Uint8Array(this.graph.vertices.length);
-        let priority = new Uint16Array(maxDepth * 2.0 + 1);
+        let priority = Array(Array());
         visited[vertex.id] = 1;
 
-        this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
-        
-        // Break ties by the position in the smiles string as per specification
-        priority[maxDepth * 2.0] = neighbours[j];
+        this.visitStereochemistry(neighbours[j], vertex.id, visited, priority, maxDepth, 0);
+
+        // Sort each level according to atomic number
+        for (var k = 0; k < priority.length; k++) {
+          priority[k].sort(function(a, b){ return b - a });
+        }
+
         priorities[j] = [ j, priority ];
       }
 
+      let maxLevels = 0;
+      let maxEntries = 0;
+      for (var j = 0; j < priorities.length; j++) {
+        if (priorities[j][1].length > maxLevels) {
+          maxLevels = priorities[j][1].length;
+        }
+
+        for (var k = 0; k < priorities[j][1].length; k++) {
+          if (priorities[j][1][k].length > maxEntries) {
+            maxEntries = priorities[j][1][k].length;
+          }
+        }
+      }
+
+      for (var j = 0; j < priorities.length; j++) {
+        let diff = maxLevels - priorities[j][1].length;
+        for (var k = 0; k < diff; k++) {
+          priorities[j][1].push([]);
+        }
+
+        // Break ties by the position in the smiles string as per specification
+        priorities[j][1].push([neighbours[j]]);
+
+        for (var k = 0; k < priorities[j][1].length; k++) {
+          let diff = maxEntries - priorities[j][1][k].length;
+
+          for (var l = 0; l < diff; l++) {
+            priorities[j][1][k].push(0);
+          }
+        }
+      }
+
+      // console.log(priorities);
+
       priorities.sort(function(a, b) {
-        for (var j = 0; j < maxDepth * 2.0; j++) {
-          if (a[1][j] > b[1][j]) {
-            return -1;
-          } else if (a[1][j] < b[1][j]) {
-            return 1;
+        for (var j = 0; j < a[1].length; j++) {
+          for (var k = 0; k < a[1][j].length; k++) {
+            if (a[1][j][k] > b[1][j][k]) {
+              return -1;
+            } else if (a[1][j][k] < b[1][j][k]) {
+              return 1;
+            }
           }
         }
 
@@ -2520,28 +2560,45 @@ export default class Drawer {
    * @param {Number} vertexId The id of a vertex.
    * @param {(Number|null)} previousVertexId The id of the parent vertex of the vertex.
    * @param {Uint8Array} visited An array containing the visited flag for all vertices in the graph.
-   * @param {Uint16Array} priority An array storing the priorities (max and sum) for all levels in the subtree.
+   * @param {Array} priority An array of arrays storing the atomic numbers for each level.
    * @param {Number} maxDepth The maximum depth.
    * @param {Number} depth The current depth.
    */
   visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth) {
     visited[vertexId] = 1;
-    let atomicNumber = this.graph.vertices[vertexId].value.getAtomicNumber();
-    
-    priority[depth] = Math.max(priority[depth], atomicNumber);
+    let vertex = this.graph.vertices[vertexId];
+    let atomicNumber = vertex.value.getAtomicNumber();
 
-    // Cloning of bonds as defined by CIP rules. Only multiply AFTER getting the max.
-    if (previousVertexId !== null) {
-      atomicNumber *= this.graph.getEdge(vertexId, previousVertexId).weight;
+    if (priority.length <= depth) {
+      priority.push(Array());
     }
-
-    priority[maxDepth + depth] += atomicNumber;
+    
+    for (var i = 0; i < this.graph.getEdge(vertexId, previousVertexId).weight; i++) {
+      priority[depth].push(atomicNumber);
+    }
 
     let neighbours = this.graph.vertices[vertexId].neighbours;
 
     for (var i = 0; i < neighbours.length; i++) {
       if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
         this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1);
+      }
+    }
+
+    // Valences are filled with hydrogens and passed to the next level.
+    if (depth < maxDepth - 1) {
+      let bonds = 0;
+
+      for (var i = 0; i < neighbours.length; i++) {
+        bonds += this.graph.getEdge(vertexId, neighbours[i]).weight;
+      }
+
+      for (var i = 0; i < vertex.value.getMaxBonds() - bonds; i++) {
+        if (priority.length <= depth + 1) {
+          priority.push(Array());
+        }
+
+        priority[depth + 1].push(1);
       }
     }
   }

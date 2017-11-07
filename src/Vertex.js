@@ -94,7 +94,7 @@ export default class Vertex {
    * If a hydrogen is implicitly attached to the chiral center, insert as the third child.
    * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
    */
-  addAsSecondChild(vertexId) {
+  addAsSecondChild(vertexId, otherVertexId, ringbondIndex) {
     this.children.push(vertexId);
 
     if (this.value.bracket) {
@@ -103,16 +103,32 @@ export default class Vertex {
       if (this.id === 0 && this.value.bracket.hcount === 0) {
         index = 0;
       }
-
-      if (this.value.bracket.hcount === 1) {
+      
+      if (this.value.bracket.hcount === 1 && ringbondIndex === 0) {
         index = 2;
       }
 
-      // Check for two ringbonds and if there are already 3 neighbours, attach
-      // at point 3 rather than 2
-      if (this.value.ringbonds.length === 2 && this.neighbours.length > 2) {
-        index = 3;
+      if (this.value.bracket.hcount === 1 && ringbondIndex === 1) {
+        if (this.neighbours.length < 3) {
+          index = 2;
+        } else {
+          index = 3;
+        }
       }
+
+      if (this.value.bracket.hcount === null && ringbondIndex === 0) {
+        index = 1;
+      }
+
+      if (this.value.bracket.hcount === null && ringbondIndex === 1) {
+        if (this.neighbours.length < 3) {
+          index = 1;
+        } else {
+          index = 2;
+        }
+      }
+
+      console.log(index);
       
       this.neighbours.splice(index, 0, vertexId);
     } else {

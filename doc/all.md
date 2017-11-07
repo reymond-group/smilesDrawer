@@ -116,6 +116,9 @@
 <dt><a href="#getAtomicNumber">getAtomicNumber()</a> ⇒ <code>Number</code></dt>
 <dd><p>Get the atomic number of this atom.</p>
 </dd>
+<dt><a href="#getMaxBonds">getMaxBonds()</a> ⇒ <code>Number</code></dt>
+<dd><p>Get the maximum number of bonds for this atom.</p>
+</dd>
 <dt><a href="#sortByAtomicNumber">sortByAtomicNumber(root, neighbours, vertices, rings)</a> ⇒ <code>Array.&lt;Object&gt;</code></dt>
 <dd><p>Sorts an array of vertices by their respecitve atomic number.</p>
 </dd>
@@ -1142,6 +1145,13 @@ Get the atomic number of this atom.
 
 **Kind**: global function  
 **Returns**: <code>Number</code> - The atomic number of this atom.  
+<a name="getMaxBonds"></a>
+
+## getMaxBonds() ⇒ <code>Number</code>
+Get the maximum number of bonds for this atom.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The maximum number of bonds of this atom.  
 <a name="sortByAtomicNumber"></a>
 
 ## sortByAtomicNumber(root, neighbours, vertices, rings) ⇒ <code>Array.&lt;Object&gt;</code>
@@ -2000,14 +2010,15 @@ Annotaed stereochemistry information for visualization.
 | vertexId | <code>Number</code> | The id of a vertex. |
 | previousVertexId | <code>Number</code> &#124; <code>null</code> | The id of the parent vertex of the vertex. |
 | visited | <code>Uint8Array</code> | An array containing the visited flag for all vertices in the graph. |
-| priority | <code>Uint16Array</code> | An array storing the priorities (max and sum) for all levels in the subtree. |
+| priority | <code>Array</code> | An array of arrays storing the atomic numbers for each level. |
 | maxDepth | <code>Number</code> | The maximum depth. |
 | depth | <code>Number</code> | The current depth. |
 
 <a name="initPseudoElements"></a>
 
 ## initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
 
 **Kind**: global function  
 <a name="setBondType"></a>
@@ -3419,7 +3430,10 @@ Add a child vertex id to this vertex.
 <a name="addAsSecondChild"></a>
 
 ## addAsSecondChild(vertexID)
-Add a child vertex id to this vertex as the second child of the neighbours array,except this vertex is the first vertex of the SMILE string, then it is added as the first.This is used to get the correct ordering of neighbours for parity calculations.If a hydrogen is implicitly attached to the chiral center, insert as the third child.
+Add a child vertex id to this vertex as the second child of the neighbours array,
+except this vertex is the first vertex of the SMILE string, then it is added as the first.
+This is used to get the correct ordering of neighbours for parity calculations.
+If a hydrogen is implicitly attached to the chiral center, insert as the third child.
 
 **Kind**: global function  
 

@@ -17,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 //@ts-check
 window.SmilesDrawer = {
-    Version: '1.0.0'
+  Version: '1.0.0'
 };
 
 window.SmilesDrawer.Drawer = _Drawer2.default;
@@ -31,7 +31,7 @@ window.SmilesDrawer.Parser = _Parser2.default;
 * @returns {String} The clean SMILES string.
 */
 window.SmilesDrawer.clean = function (smiles) {
-    return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
+  return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
 };
 
 /**
@@ -44,28 +44,28 @@ window.SmilesDrawer.clean = function (smiles) {
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
 window.SmilesDrawer.apply = function (options) {
-    var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
-    var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
-    var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
+  var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
+  var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-    var smilesDrawer = new _Drawer2.default(options);
-    var elements = document.querySelectorAll(selector);
+  var smilesDrawer = new _Drawer2.default(options);
+  var elements = document.querySelectorAll(selector);
 
-    var _loop = function _loop() {
-        var element = elements[i];
+  var _loop = function _loop() {
+    var element = elements[i];
 
-        SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
-            smilesDrawer.draw(tree, element, themeName, false);
-        }, function (err) {
-            if (onError) {
-                onError(err);
-            }
-        });
-    };
+    SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
+      smilesDrawer.draw(tree, element, themeName, false);
+    }, function (err) {
+      if (onError) {
+        onError(err);
+      }
+    });
+  };
 
-    for (var i = 0; i < elements.length; i++) {
-        _loop();
-    }
+  for (var i = 0; i < elements.length; i++) {
+    _loop();
+  }
 };
 
 /**
@@ -77,57 +77,57 @@ window.SmilesDrawer.apply = function (options) {
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
 window.SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
-    try {
-        if (successCallback) {
-            successCallback(_Parser2.default.parse(smiles));
-        }
-    } catch (err) {
-        if (errorCallback) {
-            errorCallback(err);
-        }
+  try {
+    if (successCallback) {
+      successCallback(_Parser2.default.parse(smiles));
     }
+  } catch (err) {
+    if (errorCallback) {
+      errorCallback(err);
+    }
+  }
 };
 
 // There be dragons (polyfills)
 
 if (!Array.prototype.fill) {
-    Object.defineProperty(Array.prototype, 'fill', {
-        value: function value(_value) {
+  Object.defineProperty(Array.prototype, 'fill', {
+    value: function value(_value) {
 
-            // Steps 1-2.
-            if (this == null) {
-                throw new TypeError('this is null or not defined');
-            }
+      // Steps 1-2.
+      if (this == null) {
+        throw new TypeError('this is null or not defined');
+      }
 
-            var O = Object(this);
+      var O = Object(this);
 
-            // Steps 3-5.
-            var len = O.length >>> 0;
+      // Steps 3-5.
+      var len = O.length >>> 0;
 
-            // Steps 6-7.
-            var start = arguments[1];
-            var relativeStart = start >> 0;
+      // Steps 6-7.
+      var start = arguments[1];
+      var relativeStart = start >> 0;
 
-            // Step 8.
-            var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
+      // Step 8.
+      var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
 
-            // Steps 9-10.
-            var end = arguments[2];
-            var relativeEnd = end === undefined ? len : end >> 0;
+      // Steps 9-10.
+      var end = arguments[2];
+      var relativeEnd = end === undefined ? len : end >> 0;
 
-            // Step 11.
-            var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
+      // Step 11.
+      var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
 
-            // Step 12.
-            while (k < final) {
-                O[k] = _value;
-                k++;
-            }
+      // Step 12.
+      while (k < final) {
+        O[k] = _value;
+        k++;
+      }
 
-            // Step 13.
-            return O;
-        }
-    });
+      // Step 13.
+      return O;
+    }
+  });
 }
 
 },{"./src/Drawer":5,"./src/Parser":10}],2:[function(require,module,exports){
@@ -856,6 +856,18 @@ var Atom = function () {
     key: 'getAtomicNumber',
     value: function getAtomicNumber() {
       return Atom.atomicNumbers[this.element];
+    }
+
+    /**
+     * Get the maximum number of bonds for this atom.
+     * 
+     * @returns {Number} The maximum number of bonds of this atom.
+     */
+
+  }, {
+    key: 'getMaxBonds',
+    value: function getMaxBonds() {
+      return Atom.maxBonds[this.element];
     }
 
     /**
@@ -2736,9 +2748,9 @@ var Drawer = function () {
             var edgeId = this.graph.addEdge(new _Edge2.default(sourceVertexId, targetVertexId, 1));
             var targetVertex = this.graph.vertices[targetVertexId];
 
-            vertex.addAsSecondChild(targetVertexId);
+            vertex.addAsSecondChild(targetVertexId, sourceVertexId, j);
             vertex.value.addNeighbouringElement(targetVertex.value.element);
-            targetVertex.addAsSecondChild(sourceVertexId);
+            targetVertex.addAsSecondChild(sourceVertexId, sourceVertexId, j);
             targetVertex.value.addNeighbouringElement(vertex.value.element);
             vertex.edges.push(edgeId);
             targetVertex.edges.push(edgeId);
@@ -4950,6 +4962,7 @@ var Drawer = function () {
         }
 
         var neighbours = vertex.getNeighbours();
+
         // neighbours.sort();
         console.log(neighbours);
         // console.log(this.graph.vertices[neighbours[0]].value.element, this.graph.vertices[neighbours[1]].value.element, this.graph.vertices[neighbours[2]].value.element, this.graph.vertices[neighbours[3]].value.element);
@@ -4959,22 +4972,63 @@ var Drawer = function () {
 
         for (var j = 0; j < nNeighbours; j++) {
           var visited = new Uint8Array(this.graph.vertices.length);
-          var priority = new Uint16Array(maxDepth * 2.0 + 1);
+          var priority = Array(Array());
           visited[vertex.id] = 1;
 
-          this.visitStereochemistry(neighbours[j], null, visited, priority, maxDepth, 0);
+          this.visitStereochemistry(neighbours[j], vertex.id, visited, priority, maxDepth, 0);
 
-          // Break ties by the position in the smiles string as per specification
-          priority[maxDepth * 2.0] = neighbours[j];
+          // Sort each level according to atomic number
+          for (var k = 0; k < priority.length; k++) {
+            priority[k].sort(function (a, b) {
+              return b - a;
+            });
+          }
+
           priorities[j] = [j, priority];
         }
 
+        var maxLevels = 0;
+        var maxEntries = 0;
+        for (var j = 0; j < priorities.length; j++) {
+          if (priorities[j][1].length > maxLevels) {
+            maxLevels = priorities[j][1].length;
+          }
+
+          for (var k = 0; k < priorities[j][1].length; k++) {
+            if (priorities[j][1][k].length > maxEntries) {
+              maxEntries = priorities[j][1][k].length;
+            }
+          }
+        }
+
+        for (var j = 0; j < priorities.length; j++) {
+          var diff = maxLevels - priorities[j][1].length;
+          for (var k = 0; k < diff; k++) {
+            priorities[j][1].push([]);
+          }
+
+          // Break ties by the position in the smiles string as per specification
+          priorities[j][1].push([neighbours[j]]);
+
+          for (var k = 0; k < priorities[j][1].length; k++) {
+            var _diff = maxEntries - priorities[j][1][k].length;
+
+            for (var l = 0; l < _diff; l++) {
+              priorities[j][1][k].push(0);
+            }
+          }
+        }
+
+        // console.log(priorities);
+
         priorities.sort(function (a, b) {
-          for (var j = 0; j < maxDepth * 2.0; j++) {
-            if (a[1][j] > b[1][j]) {
-              return -1;
-            } else if (a[1][j] < b[1][j]) {
-              return 1;
+          for (var j = 0; j < a[1].length; j++) {
+            for (var k = 0; k < a[1][j].length; k++) {
+              if (a[1][j][k] > b[1][j][k]) {
+                return -1;
+              } else if (a[1][j][k] < b[1][j][k]) {
+                return 1;
+              }
             }
           }
 
@@ -5004,7 +5058,7 @@ var Drawer = function () {
      * @param {Number} vertexId The id of a vertex.
      * @param {(Number|null)} previousVertexId The id of the parent vertex of the vertex.
      * @param {Uint8Array} visited An array containing the visited flag for all vertices in the graph.
-     * @param {Uint16Array} priority An array storing the priorities (max and sum) for all levels in the subtree.
+     * @param {Array} priority An array of arrays storing the atomic numbers for each level.
      * @param {Number} maxDepth The maximum depth.
      * @param {Number} depth The current depth.
      */
@@ -5013,22 +5067,39 @@ var Drawer = function () {
     key: 'visitStereochemistry',
     value: function visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth) {
       visited[vertexId] = 1;
-      var atomicNumber = this.graph.vertices[vertexId].value.getAtomicNumber();
+      var vertex = this.graph.vertices[vertexId];
+      var atomicNumber = vertex.value.getAtomicNumber();
 
-      priority[depth] = Math.max(priority[depth], atomicNumber);
-
-      // Cloning of bonds as defined by CIP rules. Only multiply AFTER getting the max.
-      if (previousVertexId !== null) {
-        atomicNumber *= this.graph.getEdge(vertexId, previousVertexId).weight;
+      if (priority.length <= depth) {
+        priority.push(Array());
       }
 
-      priority[maxDepth + depth] += atomicNumber;
+      for (var i = 0; i < this.graph.getEdge(vertexId, previousVertexId).weight; i++) {
+        priority[depth].push(atomicNumber);
+      }
 
       var neighbours = this.graph.vertices[vertexId].neighbours;
 
       for (var i = 0; i < neighbours.length; i++) {
         if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
           this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1);
+        }
+      }
+
+      // Valences are filled with hydrogens and passed to the next level.
+      if (depth < maxDepth - 1) {
+        var bonds = 0;
+
+        for (var i = 0; i < neighbours.length; i++) {
+          bonds += this.graph.getEdge(vertexId, neighbours[i]).weight;
+        }
+
+        for (var i = 0; i < vertex.value.getMaxBonds() - bonds; i++) {
+          if (priority.length <= depth + 1) {
+            priority.push(Array());
+          }
+
+          priority[depth + 1].push(1);
         }
       }
     }
@@ -5153,7 +5224,7 @@ exports.default = Drawer;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5175,62 +5246,62 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String} [chiral=''] Chirality information.
  */
 var Edge = function () {
-    /**
-     * The constructor for the class Edge.
-     *
-     * @param {Number} sourceId A vertex id.
-     * @param {Number} targetId A vertex id.
-     * @param {Number} [weight=1] The weight of the edge.
-     */
-    function Edge(sourceId, targetId) {
-        var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+  /**
+   * The constructor for the class Edge.
+   *
+   * @param {Number} sourceId A vertex id.
+   * @param {Number} targetId A vertex id.
+   * @param {Number} [weight=1] The weight of the edge.
+   */
+  function Edge(sourceId, targetId) {
+    var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-        _classCallCheck(this, Edge);
+    _classCallCheck(this, Edge);
 
-        this.id = null;
-        this.sourceId = sourceId;
-        this.targetId = targetId;
-        this.weight = weight;
-        this.bondType = '-';
-        this.isPartOfAromaticRing = false;
-        this.center = false;
-        this.chiral = '';
+    this.id = null;
+    this.sourceId = sourceId;
+    this.targetId = targetId;
+    this.weight = weight;
+    this.bondType = '-';
+    this.isPartOfAromaticRing = false;
+    this.center = false;
+    this.chiral = '';
+  }
+
+  /**
+   * Set the bond type of this edge. This also sets the edge weight.
+   * @param {String} bondType 
+   */
+
+
+  _createClass(Edge, [{
+    key: 'setBondType',
+    value: function setBondType(bondType) {
+      this.bondType = bondType;
+      this.weight = Edge.bonds[bondType];
     }
 
     /**
-     * Set the bond type of this edge. This also sets the edge weight.
-     * @param {String} bondType 
+     * An object mapping the bond type to the number of bonds.
+     *
+     * @returns {Object} The object containing the map.
      */
 
+  }], [{
+    key: 'bonds',
+    get: function get() {
+      return {
+        '-': 1,
+        '/': 1,
+        '\\': 1,
+        '=': 2,
+        '#': 3,
+        '$': 4
+      };
+    }
+  }]);
 
-    _createClass(Edge, [{
-        key: 'setBondType',
-        value: function setBondType(bondType) {
-            this.bondType = bondType;
-            this.weight = Edge.bonds[bondType];
-        }
-
-        /**
-         * An object mapping the bond type to the number of bonds.
-         *
-         * @returns {Object} The object containing the map.
-         */
-
-    }], [{
-        key: 'bonds',
-        get: function get() {
-            return {
-                '-': 1,
-                '/': 1,
-                '\\': 1,
-                '=': 2,
-                '#': 3,
-                '$': 4
-            };
-        }
-    }]);
-
-    return Edge;
+  return Edge;
 }();
 
 exports.default = Edge;
@@ -10826,7 +10897,7 @@ var Vertex = function () {
 
   }, {
     key: 'addAsSecondChild',
-    value: function addAsSecondChild(vertexId) {
+    value: function addAsSecondChild(vertexId, otherVertexId, ringbondIndex) {
       this.children.push(vertexId);
 
       if (this.value.bracket) {
@@ -10836,15 +10907,31 @@ var Vertex = function () {
           index = 0;
         }
 
-        if (this.value.bracket.hcount === 1) {
+        if (this.value.bracket.hcount === 1 && ringbondIndex === 0) {
           index = 2;
         }
 
-        // Check for two ringbonds and if there are already 3 neighbours, attach
-        // at point 3 rather than 2
-        if (this.value.ringbonds.length === 2 && this.neighbours.length > 2) {
-          index = 3;
+        if (this.value.bracket.hcount === 1 && ringbondIndex === 1) {
+          if (this.neighbours.length < 3) {
+            index = 2;
+          } else {
+            index = 3;
+          }
         }
+
+        if (this.value.bracket.hcount === null && ringbondIndex === 0) {
+          index = 1;
+        }
+
+        if (this.value.bracket.hcount === null && ringbondIndex === 1) {
+          if (this.neighbours.length < 3) {
+            index = 1;
+          } else {
+            index = 2;
+          }
+        }
+
+        console.log(index);
 
         this.neighbours.splice(index, 0, vertexId);
       } else {
