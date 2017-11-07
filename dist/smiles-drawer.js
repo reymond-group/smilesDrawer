@@ -608,6 +608,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String[]} neighbouringElements An array containing the element symbols of neighbouring atoms.
  * @property {Boolean} isPartOfAromaticRing A boolean indicating whether or not this atom is part of an explicitly defined aromatic ring. Example: c1ccccc1.
  * @property {Number} bondCount The number of bonds in which this atom is participating.
+ * @property {String} chirality The chirality of this atom if it is a stereocenter.
  */
 var Atom = function () {
   /**
@@ -642,6 +643,7 @@ var Atom = function () {
     this.neighbouringElements = [];
     this.isPartOfAromaticRing = element !== this.element;
     this.bondCount = 0;
+    this.chirality = '';
   }
 
   /**
@@ -3815,6 +3817,8 @@ var Drawer = function () {
         if (debug) {
           var value = 'v: ' + vertex.id + ' ' + _ArrayHelper2.default.print(atom.ringbonds);
           this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
+        } else {
+          this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
         }
       }
 
@@ -5047,8 +5051,9 @@ var Drawer = function () {
         var rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
         var rs = _MathHelper2.default.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
 
+        vertex.value.chirality = rs;
         // console.log(order);
-        console.log(vertex.id, rs);
+        // console.log(vertex.id, rs);
       }
     }
 

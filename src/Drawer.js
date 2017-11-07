@@ -1385,6 +1385,8 @@ export default class Drawer {
       if (debug) {
         let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
         this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
+      } else {
+        this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
       }
     }
 
@@ -2548,9 +2550,10 @@ export default class Drawer {
 
       let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
       let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
-
+      
+      vertex.value.chirality = rs;
       // console.log(order);
-      console.log(vertex.id, rs);
+      // console.log(vertex.id, rs);
     }
   }
 

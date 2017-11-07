@@ -31,6 +31,7 @@ import Ring from './Ring'
  * @property {String[]} neighbouringElements An array containing the element symbols of neighbouring atoms.
  * @property {Boolean} isPartOfAromaticRing A boolean indicating whether or not this atom is part of an explicitly defined aromatic ring. Example: c1ccccc1.
  * @property {Number} bondCount The number of bonds in which this atom is participating.
+ * @property {String} chirality The chirality of this atom if it is a stereocenter.
  */
 export default class Atom {
   /**
@@ -61,6 +62,7 @@ export default class Atom {
     this.neighbouringElements = [];
     this.isPartOfAromaticRing = element !== this.element;
     this.bondCount = 0;
+    this.chirality = '';
   }
 
   /**
