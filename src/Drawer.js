@@ -2468,11 +2468,6 @@ export default class Drawer {
       }
 
       let neighbours = vertex.getNeighbours();
-
-      // neighbours.sort();
-      console.log(neighbours);
-      // console.log(this.graph.vertices[neighbours[0]].value.element, this.graph.vertices[neighbours[1]].value.element, this.graph.vertices[neighbours[2]].value.element, this.graph.vertices[neighbours[3]].value.element);
-      
       let nNeighbours = neighbours.length;
       let priorities = Array(nNeighbours);
 
@@ -2523,8 +2518,6 @@ export default class Drawer {
         }
       }
 
-      // console.log(priorities);
-
       priorities.sort(function(a, b) {
         for (var j = 0; j < a[1].length; j++) {
           for (var k = 0; k < a[1][j].length; k++) {
@@ -2539,21 +2532,16 @@ export default class Drawer {
         return 0;
       });
 
-      console.log(priorities);
-
       let order = new Uint8Array(nNeighbours);
       for (var j = 0; j < nNeighbours; j++) {
         order[j] = priorities[j][0];
       }
 
-      // console.log(order);
-
       let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
       let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
       
       vertex.value.chirality = rs;
-      // console.log(order);
-      // console.log(vertex.id, rs);
+      console.log(vertex.id, rs, neighbours, priorities);
     }
   }
 
