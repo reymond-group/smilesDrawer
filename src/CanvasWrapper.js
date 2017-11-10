@@ -287,12 +287,12 @@ export default class CanvasWrapper {
      * @param {Line} line A line.
      * @param {Number} width The wedge width.
      */
-    drawWedge(line, width = 3.0) {
+    drawWedge(line, width = 1.0) {
         if (isNaN(line.from.x) || isNaN(line.from.y) ||
             isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
-
+        console.log(line);
         let ctx = this.ctx;
         let offsetX = this.offsetX;
         let offsetY = this.offsetY;
@@ -319,7 +319,7 @@ export default class CanvasWrapper {
         r.y += offsetY;
 
         ctx.save();
-
+        
         let normals = Vector2.normals(l, r);
 
         normals[0].normalize();
@@ -335,11 +335,11 @@ export default class CanvasWrapper {
             end = l;
         }
 
-        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], 0.75));
-        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], width));
-        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], width));
-        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], 0.75));
-
+        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
+        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
+        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
+        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
+        
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
         ctx.lineTo(u.x, u.y);
@@ -422,10 +422,10 @@ export default class CanvasWrapper {
         sEnd.x += offsetX;
         sEnd.y += offsetY;
 
-        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], 0.75));
-        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], width / 2.0));
-        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], width / 2.0));
-        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], 0.75));
+        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
+        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
+        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
+        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
 
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);

@@ -455,7 +455,7 @@ export default class Vector2 {
      * @returns {Vector2} Returns the product of two vectors.
      */
     static multiplyScalar(vec, scalar) {
-        return new Vector2(vec).multiply(scalar);
+        return new Vector2(vec.x, vec.y).multiplyScalar(scalar);
     }
 
     /**

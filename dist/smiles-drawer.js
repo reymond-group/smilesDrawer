@@ -873,6 +873,16 @@ var Atom = function () {
     }
 
     /**
+     * Checks whether this atom is a chiral center or not.
+     */
+
+  }, {
+    key: 'isChiralCenter',
+    value: function isChiralCenter() {
+      return this.bracket && (this.bracket.chirality === '@' || this.bracket.chirality === '@@');
+    }
+
+    /**
      * Sorts an array of vertices by their respecitve atomic number.
      *
      * @param {Vertex} root The central vertex
@@ -1607,12 +1617,12 @@ var CanvasWrapper = function () {
     }, {
         key: 'drawWedge',
         value: function drawWedge(line) {
-            var width = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3.0;
+            var width = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1.0;
 
             if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
                 return;
             }
-
+            console.log(line);
             var ctx = this.ctx;
             var offsetX = this.offsetX;
             var offsetY = this.offsetY;
@@ -1655,10 +1665,10 @@ var CanvasWrapper = function () {
                 end = l;
             }
 
-            var t = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[0], 0.75));
-            var u = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[0], width));
-            var v = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[1], width));
-            var w = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[1], 0.75));
+            var t = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[0], this.opts.bondThickness));
+            var u = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
+            var v = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
+            var w = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[1], this.opts.bondThickness));
 
             ctx.beginPath();
             ctx.moveTo(t.x, t.y);
@@ -1744,10 +1754,10 @@ var CanvasWrapper = function () {
             sEnd.x += offsetX;
             sEnd.y += offsetY;
 
-            var t = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[0], 0.75));
-            var u = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[0], width / 2.0));
-            var v = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[1], width / 2.0));
-            var w = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[1], 0.75));
+            var t = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[0], this.opts.bondThickness));
+            var u = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
+            var v = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
+            var w = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[1], this.opts.bondThickness));
 
             ctx.beginPath();
             ctx.moveTo(t.x, t.y);
@@ -3749,12 +3759,12 @@ var Drawer = function () {
       } else if (edge.bondType === '.') {
         // TODO: Something... maybe... version 2?
       } else {
-        var isChiralCenterA = vertexA.value.bracket && vertexA.value.bracket.chirality;
-        var isChiralCenterB = vertexB.value.bracket && vertexB.value.bracket.chirality;
+        var isChiralCenterA = vertexA.value.isChiralCenter();
+        var isChiralCenterB = vertexB.value.isChiralCenter();
 
-        if (edge.chiral === 'up') {
+        if (edge.wedge === 'up') {
           this.canvasWrapper.drawWedge(new _Line2.default(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
-        } else if (edge.chiral === 'down') {
+        } else if (edge.wedge === 'down') {
           this.canvasWrapper.drawDashedWedge(new _Line2.default(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
         } else {
           this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
@@ -5040,6 +5050,11 @@ var Drawer = function () {
         var rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
         var rs = _MathHelper2.default.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
 
+        var up = this.graph.getEdge(vertex.id, neighbours[order[1]]);
+        var down = this.graph.getEdge(vertex.id, neighbours[order[3]]);
+        up.wedge = 'up';
+        down.wedge = 'down';
+
         vertex.value.chirality = rs;
         console.log(vertex.id, rs, neighbours, priorities);
       }
@@ -5236,7 +5251,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String} [bondType='-'] The bond type of this edge.
  * @property {Boolean} [isPartOfAromaticRing=false] Whether or not this edge is part of an aromatic ring.
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
- * @property {String} [chiral=''] Chirality information.
+ * @property {String} [wedge=''] Wedge direction. Either '', 'solid' or 'dashed'
  */
 var Edge = function () {
     /**
@@ -5258,7 +5273,7 @@ var Edge = function () {
         this.bondType = '-';
         this.isPartOfAromaticRing = false;
         this.center = false;
-        this.chiral = '';
+        this.wedge = '';
     }
 
     /**
@@ -10573,7 +10588,7 @@ var Vector2 = function () {
     }, {
         key: 'multiplyScalar',
         value: function multiplyScalar(vec, scalar) {
-            return new Vector2(vec).multiply(scalar);
+            return new Vector2(vec.x, vec.y).multiplyScalar(scalar);
         }
 
         /**

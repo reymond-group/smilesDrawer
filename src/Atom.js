@@ -247,6 +247,13 @@ export default class Atom {
   }
 
   /**
+   * Checks whether this atom is a chiral center or not.
+   */
+  isChiralCenter() {
+    return this.bracket && (this.bracket.chirality === '@' || this.bracket.chirality === '@@');
+  }
+
+  /**
    * Sorts an array of vertices by their respecitve atomic number.
    *
    * @param {Vertex} root The central vertex

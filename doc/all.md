@@ -119,6 +119,9 @@
 <dt><a href="#getMaxBonds">getMaxBonds()</a> ⇒ <code>Number</code></dt>
 <dd><p>Get the maximum number of bonds for this atom.</p>
 </dd>
+<dt><a href="#isChiralCenter">isChiralCenter()</a></dt>
+<dd><p>Checks whether this atom is a chiral center or not.</p>
+</dd>
 <dt><a href="#sortByAtomicNumber">sortByAtomicNumber(root, neighbours, vertices, rings)</a> ⇒ <code>Array.&lt;Object&gt;</code></dt>
 <dd><p>Sorts an array of vertices by their respecitve atomic number.</p>
 </dd>
@@ -1152,6 +1155,12 @@ Get the maximum number of bonds for this atom.
 
 **Kind**: global function  
 **Returns**: <code>Number</code> - The maximum number of bonds of this atom.  
+<a name="isChiralCenter"></a>
+
+## isChiralCenter()
+Checks whether this atom is a chiral center or not.
+
+**Kind**: global function  
 <a name="sortByAtomicNumber"></a>
 
 ## sortByAtomicNumber(root, neighbours, vertices, rings) ⇒ <code>Array.&lt;Object&gt;</code>
@@ -1287,7 +1296,7 @@ Draw a wedge on the canvas.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | line | <code>Line</code> |  | A line. |
-| width | <code>Number</code> | <code>3</code> | The wedge width. |
+| width | <code>Number</code> | <code>1</code> | The wedge width. |
 
 <a name="drawDashedWedge"></a>
 

@@ -1319,12 +1319,12 @@ export default class Drawer {
     } else if (edge.bondType === '.') {
       // TODO: Something... maybe... version 2?
     } else {
-      let isChiralCenterA = vertexA.value.bracket && vertexA.value.bracket.chirality;
-      let isChiralCenterB = vertexB.value.bracket && vertexB.value.bracket.chirality;
+      let isChiralCenterA = vertexA.value.isChiralCenter();
+      let isChiralCenterB = vertexB.value.isChiralCenter();
 
-      if (edge.chiral === 'up') {
+      if (edge.wedge === 'up') {
         this.canvasWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
-      } else if (edge.chiral === 'down') {
+      } else if (edge.wedge === 'down') {
         this.canvasWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
       } else {
         this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
@@ -2536,9 +2536,14 @@ export default class Drawer {
       for (var j = 0; j < nNeighbours; j++) {
         order[j] = priorities[j][0];
       }
-
+      
       let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
       let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
+
+      let up = this.graph.getEdge(vertex.id, neighbours[order[1]]);
+      let down = this.graph.getEdge(vertex.id, neighbours[order[3]]);
+      up.wedge = 'up';
+      down.wedge = 'down';
       
       vertex.value.chirality = rs;
       console.log(vertex.id, rs, neighbours, priorities);

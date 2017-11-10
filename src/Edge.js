@@ -10,7 +10,7 @@
  * @property {String} [bondType='-'] The bond type of this edge.
  * @property {Boolean} [isPartOfAromaticRing=false] Whether or not this edge is part of an aromatic ring.
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
- * @property {String} [chiral=''] Chirality information.
+ * @property {String} [wedge=''] Wedge direction. Either '', 'solid' or 'dashed'
  */
 export default class Edge {
     /**
@@ -28,7 +28,7 @@ export default class Edge {
         this.bondType = '-';
         this.isPartOfAromaticRing = false;
         this.center = false;
-        this.chiral = '';
+        this.wedge = '';
     }
 
     /**
