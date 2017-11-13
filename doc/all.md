@@ -104,12 +104,6 @@
 <dt><a href="#haveCommonRingbond">haveCommonRingbond(atomA, atomB)</a> ⇒ <code>Boolean</code></dt>
 <dd><p>Checks whether or not two atoms share a common ringbond id. A ringbond is a break in a ring created when generating the spanning tree of a structure.</p>
 </dd>
-<dt><a href="#getOrder">getOrder(center)</a> ⇒ <code>Number</code></dt>
-<dd><p>Returns the order of this atom given a central atom.</p>
-</dd>
-<dt><a href="#setOrder">setOrder(center, order)</a></dt>
-<dd><p>Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.</p>
-</dd>
 <dt><a href="#neighbouringElementsEqual">neighbouringElementsEqual(arr)</a> ⇒ <code>Boolean</code></dt>
 <dd><p>Check whether or not the neighbouring elements of this atom equal the supplied array.</p>
 </dd>
@@ -118,18 +112,6 @@
 </dd>
 <dt><a href="#getMaxBonds">getMaxBonds()</a> ⇒ <code>Number</code></dt>
 <dd><p>Get the maximum number of bonds for this atom.</p>
-</dd>
-<dt><a href="#isChiralCenter">isChiralCenter()</a></dt>
-<dd><p>Checks whether this atom is a chiral center or not.</p>
-</dd>
-<dt><a href="#sortByAtomicNumber">sortByAtomicNumber(root, neighbours, vertices, rings)</a> ⇒ <code>Array.&lt;Object&gt;</code></dt>
-<dd><p>Sorts an array of vertices by their respecitve atomic number.</p>
-</dd>
-<dt><a href="#hasDuplicateAtomicNumbers">hasDuplicateAtomicNumbers(sortedAtomicNumbers)</a> ⇒ <code>Boolean</code></dt>
-<dd><p>Checks wheter or not two atoms have the same atomic number</p>
-</dd>
-<dt><a href="#getDuplicateAtomicNumbers">getDuplicateAtomicNumbers(sortedAtomicNumbers)</a> ⇒ <code>Array.&lt;Array&gt;</code></dt>
-<dd><p>Returns sets of duplicate atomic numbers.</p>
 </dd>
 <dt><a href="#updateSize">updateSize(width, height)</a></dt>
 <dd><p>Update the width and height of the canvas</p>
@@ -638,6 +620,9 @@ the involved atoms not to be displayed.</p>
 <dt><a href="#clockwise">clockwise(vec)</a> ⇒ <code>Number</code></dt>
 <dd><p>Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to the coordinate system.</p>
 </dd>
+<dt><a href="#relativeClockwise">relativeClockwise(center, vec)</a> ⇒ <code>Number</code></dt>
+<dd><p>Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to an arbitrary third vector.</p>
+</dd>
 <dt><a href="#rotate">rotate(angle)</a> ⇒ <code>Vector2</code></dt>
 <dd><p>Rotates this vector by a given number of radians around the origin of the coordinate system.</p>
 </dd>
@@ -728,10 +713,10 @@ the involved atoms not to be displayed.</p>
 <dt><a href="#setPositionFromVector">setPositionFromVector(v)</a></dt>
 <dd><p>Set the 2D coordinates of the vertex from a Vector2.</p>
 </dd>
-<dt><a href="#addChild">addChild(vertexID)</a></dt>
+<dt><a href="#addChild">addChild(vertexId)</a></dt>
 <dd><p>Add a child vertex id to this vertex.</p>
 </dd>
-<dt><a href="#addAsSecondChild">addAsSecondChild(vertexID)</a></dt>
+<dt><a href="#addRingbondChild">addRingbondChild(vertexId, ringbondIndex)</a></dt>
 <dd><p>Add a child vertex id to this vertex as the second child of the neighbours array,
 except this vertex is the first vertex of the SMILE string, then it is added as the first.
 This is used to get the correct ordering of neighbours for parity calculations.
@@ -1105,30 +1090,6 @@ Checks whether or not two atoms share a common ringbond id. A ringbond is a brea
 | atomA | <code>Atom</code> | An atom. |
 | atomB | <code>Atom</code> | An atom. |
 
-<a name="getOrder"></a>
-
-## getOrder(center) ⇒ <code>Number</code>
-Returns the order of this atom given a central atom.
-
-**Kind**: global function  
-**Returns**: <code>Number</code> - The order of this atom in respect to the center atom.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| center | <code>Number</code> | The id of the central atom in respect to which the order is defined. |
-
-<a name="setOrder"></a>
-
-## setOrder(center, order)
-Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
-
-**Kind**: global function  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| center | <code>Number</code> | The id of the central atom in respect to which the order is defined. |
-| order | <code>Number</code> | The order of this atom. |
-
 <a name="neighbouringElementsEqual"></a>
 
 ## neighbouringElementsEqual(arr) ⇒ <code>Boolean</code>
@@ -1155,55 +1116,6 @@ Get the maximum number of bonds for this atom.
 
 **Kind**: global function  
 **Returns**: <code>Number</code> - The maximum number of bonds of this atom.  
-<a name="isChiralCenter"></a>
-
-## isChiralCenter()
-Checks whether this atom is a chiral center or not.
-
-**Kind**: global function  
-<a name="sortByAtomicNumber"></a>
-
-## sortByAtomicNumber(root, neighbours, vertices, rings) ⇒ <code>Array.&lt;Object&gt;</code>
-Sorts an array of vertices by their respecitve atomic number.
-
-**Kind**: global function  
-**Returns**: <code>Array.&lt;Object&gt;</code> - The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| root | <code>Vertex</code> | The central vertex |
-| neighbours | <code>Array.&lt;Number&gt;</code> | An array of vertex ids. |
-| vertices | <code>Array.&lt;Vertex&gt;</code> | An array containing the vertices associated with the current molecule. |
-| rings | <code>Array.&lt;Ring&gt;</code> | An array containing the rings associated with the current molecule. |
-
-<a name="hasDuplicateAtomicNumbers"></a>
-
-## hasDuplicateAtomicNumbers(sortedAtomicNumbers) ⇒ <code>Boolean</code>
-Checks wheter or not two atoms have the same atomic number
-
-**Kind**: global function  
-**Returns**: <code>Boolean</code> - A boolean indicating whether or not there are duplicate atomic numbers.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortedAtomicNumbers | <code>Array.&lt;Object&gt;</code> | An array of vertex ids with their associated atomic numbers. |
-| sortedAtomicNumbers[].vertexId | <code>Number</code> | A vertex id. |
-| sortedAtomicNumbers[].atomicNumber | <code>Number</code> | The atomic number associated with the vertex id. |
-
-<a name="getDuplicateAtomicNumbers"></a>
-
-## getDuplicateAtomicNumbers(sortedAtomicNumbers) ⇒ <code>Array.&lt;Array&gt;</code>
-Returns sets of duplicate atomic numbers.
-
-**Kind**: global function  
-**Returns**: <code>Array.&lt;Array&gt;</code> - An array of arrays containing the indices of duplicate atomic numbers.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| sortedAtomicNumbers | <code>Array.&lt;Object&gt;</code> | An array of vertex ids with their associated atomic numbers. |
-| sortedAtomicNumbers[].vertexId | <code>Number</code> | A vertex id. |
-| sortedAtomicNumbers[].atomicNumber | <code>Number</code> | The atomic number associated with the vertex id. |
-
 <a name="updateSize"></a>
 
 ## updateSize(width, height)
@@ -3059,6 +2971,19 @@ Checks whether or not this vector is in a clockwise or counter-clockwise rotatio
 | --- | --- | --- |
 | vec | <code>Vector2</code> | Another vector. |
 
+<a name="relativeClockwise"></a>
+
+## relativeClockwise(center, vec) ⇒ <code>Number</code>
+Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to an arbitrary third vector.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to an arbitrary third vector.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| center | <code>Vector2</code> | The central vector. |
+| vec | <code>Vector2</code> | Another vector. |
+
 <a name="rotate"></a>
 
 ## rotate(angle) ⇒ <code>Vector2</code>
@@ -3373,7 +3298,7 @@ Returns the angle between two vectors based on a third vector in between.
 | Param | Type | Description |
 | --- | --- | --- |
 | vecA | <code>Vector2</code> | A vector. |
-| vecB | <code>Vector2</code> | A vector. |
+| vecB | <code>Vector2</code> | A (central) vector. |
 | vecC | <code>Vector2</code> | A vector. |
 
 <a name="scalarProjection"></a>
@@ -3426,25 +3351,26 @@ Set the 2D coordinates of the vertex from a Vector2.
 
 <a name="addChild"></a>
 
-## addChild(vertexID)
+## addChild(vertexId)
 Add a child vertex id to this vertex.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexID | <code>Number</code> | The id of a vertex to be added as a child to this vertex. |
+| vertexId | <code>Number</code> | The id of a vertex to be added as a child to this vertex. |
 
-<a name="addAsSecondChild"></a>
+<a name="addRingbondChild"></a>
 
-## addAsSecondChild(vertexID)
+## addRingbondChild(vertexId, ringbondIndex)
 Add a child vertex id to this vertex as the second child of the neighbours array,except this vertex is the first vertex of the SMILE string, then it is added as the first.This is used to get the correct ordering of neighbours for parity calculations.If a hydrogen is implicitly attached to the chiral center, insert as the third child.
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexID | <code>Number</code> | The id of a vertex to be added as a child to this vertex. |
+| vertexId | <code>Number</code> | The id of a vertex to be added as a child to this vertex. |
+| ringbondIndex | <code>Number</code> | The index of the ringbond. |
 
 <a name="setParentVertexId"></a>
 

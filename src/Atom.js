@@ -31,7 +31,10 @@ import Ring from './Ring'
  * @property {String[]} neighbouringElements An array containing the element symbols of neighbouring atoms.
  * @property {Boolean} isPartOfAromaticRing A boolean indicating whether or not this atom is part of an explicitly defined aromatic ring. Example: c1ccccc1.
  * @property {Number} bondCount The number of bonds in which this atom is participating.
- * @property {String} chirality The chirality of this atom if it is a stereocenter.
+ * @property {String} chirality The chirality of this atom if it is a stereocenter (R or S).
+ * @property {Number} priority The priority of this atom acording to the CIP rules, where 0 is the highest priority.
+ * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
+ * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  */
 export default class Atom {
   /**
@@ -43,26 +46,29 @@ export default class Atom {
   constructor(element, bondType = '-') {
     this.element = element.length === 1 ? element.toUpperCase() : element;
     this.drawExplicit = false;
-    this.ringbonds = [];
-    this.rings = [];
+    this.ringbonds = Array();
+    this.rings = Array();
     this.bondType = bondType;
     this.branchBond = null;
     this.isBridge = false;
     this.isBridgeNode = false;
-    this.originalRings = [];
+    this.originalRings = Array();
     this.bridgedRing = null;
-    this.anchoredRings = [];
+    this.anchoredRings = Array();
     this.bracket = null;
     this.plane = 0;
-    this.order = {};
     this.attachedPseudoElements = {};
     this.hasAttachedPseudoElements = false;
     this.isDrawn = true;
     this.isConnectedToRing = false;
-    this.neighbouringElements = [];
+    this.neighbouringElements = Array();
     this.isPartOfAromaticRing = element !== this.element;
     this.bondCount = 0;
     this.chirality = '';
+    this.isStereoCenter = false;
+    this.priority = 0;
+    this.mainChain = false;
+    this.hydrogenDirection = 'down';
   }
 
   /**
@@ -186,26 +192,6 @@ export default class Atom {
   }
 
   /**
-   * Returns the order of this atom given a central atom.
-   * 
-   * @param {Number} center The id of the central atom in respect to which the order is defined.
-   * @returns {Number} The order of this atom in respect to the center atom.
-   */
-  getOrder(center) {
-    return this.order[center];
-  }
-
-  /**
-   * Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
-   *
-   * @param {Number} center The id of the central atom in respect to which the order is defined.
-   * @param {Number} order The order of this atom.
-   */
-  setOrder(center, order) {
-    this.order[center] = order;
-  }
-
-  /**
    * Check whether or not the neighbouring elements of this atom equal the supplied array.
    * 
    * @param {String[]} arr An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N']
@@ -244,95 +230,6 @@ export default class Atom {
    */
   getMaxBonds() {
     return Atom.maxBonds[this.element];
-  }
-
-  /**
-   * Checks whether this atom is a chiral center or not.
-   */
-  isChiralCenter() {
-    return this.bracket && (this.bracket.chirality === '@' || this.bracket.chirality === '@@');
-  }
-
-  /**
-   * Sorts an array of vertices by their respecitve atomic number.
-   *
-   * @param {Vertex} root The central vertex
-   * @param {Number[]} neighbours An array of vertex ids.
-   * @param {Vertex[]} vertices An array containing the vertices associated with the current molecule.
-   * @param {Ring[]} rings An array containing the rings associated with the current molecule.
-   * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
-   */
-  static sortByAtomicNumber(neighbours, vertices) {
-    let orderedVertices = new Array(neighbours.length);
-
-    for (let i = 0; i < neighbours.length; i++) {
-      let vertex = vertices[neighbours[i]];
-      let val = Atom.atomicNumbers[vertex.value.element];
-
-      orderedVertices[i] = {
-        atomicNumber: val.toString(),
-        vertexId: vertex.id
-      };
-    }
-
-    return ArrayHelper.sortByAtomicNumberDesc(orderedVertices);
-  }
-
-  /**
-   * Checks wheter or not two atoms have the same atomic number
-   *
-   * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
-   * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
-   * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
-   * @returns {Boolean} A boolean indicating whether or not there are duplicate atomic numbers.
-   */
-  static hasDuplicateAtomicNumbers(sortedAtomicNumbers) {
-    let found = {};
-
-    for (let i = 0; i < sortedAtomicNumbers.length; i++) {
-      let v = sortedAtomicNumbers[i];
-
-      if (found[v.atomicNumber] !== undefined) {
-        return true;
-      }
-
-      found[v.atomicNumber] = true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Returns sets of duplicate atomic numbers.
-   *
-   * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
-   * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
-   * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
-   * @returns {Array[]} An array of arrays containing the indices of duplicate atomic numbers.
-   */
-  static getDuplicateAtomicNumbers(sortedAtomicNumbers) {
-    let duplicates = {};
-    let dpl = [];
-
-    for (let i = 0; i < sortedAtomicNumbers.length; i++) {
-      let v = sortedAtomicNumbers[i];
-
-      if (duplicates[v.atomicNumber] === undefined) {
-        duplicates[v.atomicNumber] = [];
-      }
-
-      duplicates[v.atomicNumber].push(i);
-    }
-
-    for (let key in duplicates) {
-      let arr = duplicates[key];
-
-      if (arr.length > 1) {
-        dpl.push(arr);
-      }
-    }
-
-    return dpl;
   }
 
   /**

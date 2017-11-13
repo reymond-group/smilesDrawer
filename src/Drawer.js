@@ -159,7 +159,6 @@ export default class Drawer {
     this.bridgedRing = false;
 
     this.initRings();
-    this.annotateStereochemistry();
 
     if (!this.opts.explicitHydrogens) {
       for (var i = 0; i < this.graph.vertices.length; i++) {
@@ -167,10 +166,6 @@ export default class Drawer {
           this.graph.vertices[i].value.isDrawn = false;
         }
       }
-    }
-
-    if (this.opts.isomeric) {
-      this.annotateStereochemistry();
     }
 
     if (!this.infoOnly) {
@@ -255,6 +250,11 @@ export default class Drawer {
       }
 
       this.resolveSecondaryOverlaps(overlapScore.scores);
+
+      this.annotateStereochemistry();
+      if (this.opts.isomeric) {
+        this.annotateStereochemistry();
+      }
 
       // Set the canvas to the appropriate size
       this.canvasWrapper.scale(this.graph.vertices);
@@ -464,9 +464,9 @@ export default class Drawer {
           let edgeId = this.graph.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
           let targetVertex = this.graph.vertices[targetVertexId];
 
-          vertex.addAsSecondChild(targetVertexId, sourceVertexId, j);
+          vertex.addRingbondChild(targetVertexId, j);
           vertex.value.addNeighbouringElement(targetVertex.value.element);
-          targetVertex.addAsSecondChild(sourceVertexId, sourceVertexId, j);
+          targetVertex.addRingbondChild(sourceVertexId, j);
           targetVertex.value.addNeighbouringElement(vertex.value.element);
           vertex.edges.push(edgeId);
           targetVertex.edges.push(edgeId);
@@ -478,7 +478,7 @@ export default class Drawer {
 
     // Get the rings in the graph (the SSSR)
     let rings = SSSR.getRings(this.graph);
-    
+
     if (rings === null) {
       return;
     }
@@ -627,7 +627,7 @@ export default class Drawer {
       }
 
       for (var j = 0; j < ring.neighbours.length; j++) {
-        let id  = ring.neighbours[j];
+        let id = ring.neighbours[j];
 
         if (ringIds.indexOf(id) === -1) {
           neighbours.add(ring.neighbours[j]);
@@ -1022,9 +1022,9 @@ export default class Drawer {
         }
       }
     }
-    
+
     let sortable = Array();
-    
+
     for (var i = 0; i < this.graph.vertices.length; i++) {
       sortable.push({
         id: i,
@@ -1035,7 +1035,7 @@ export default class Drawer {
     sortable.sort(function (a, b) {
       return b.score - a.score;
     });
-    
+
     return {
       total: total,
       scores: sortable,
@@ -1113,13 +1113,11 @@ export default class Drawer {
    */
   setRingCenter(ring) {
     let ringSize = ring.getSize();
-    let total = new Vector2(0,0);
+    let total = new Vector2(0, 0);
 
     for (var i = 0; i < ringSize; i++) {
       total.add(this.graph.vertices[ring.members[i]].position);
     }
-
-    ring.center = total.divide(ringSize);
   }
 
   /**
@@ -1236,14 +1234,14 @@ export default class Drawer {
         }
 
         line.shorten(this.opts.bondLength - this.opts.shortBondLength);
-        
+
         // The shortened edge
         if (edge.isPartOfAromaticRing) {
           this.canvasWrapper.drawLine(line, true);
         } else {
           this.canvasWrapper.drawLine(line);
         }
-        
+
         // The normal edge
         this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (edge.center) {
@@ -1319,8 +1317,8 @@ export default class Drawer {
     } else if (edge.bondType === '.') {
       // TODO: Something... maybe... version 2?
     } else {
-      let isChiralCenterA = vertexA.value.isChiralCenter();
-      let isChiralCenterB = vertexB.value.isChiralCenter();
+      let isChiralCenterA = vertexA.value.isStereoCenter;
+      let isChiralCenterB = vertexB.value.isStereoCenter;
 
       if (edge.wedge === 'up') {
         this.canvasWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
@@ -1805,13 +1803,13 @@ export default class Drawer {
 
     for (var i = 0; i < overlaps.length; i++) {
       let overlap = overlaps[i];
-    
+
       if (overlap.vertices.length === 2) {
         let a = overlap.vertices[0];
         let b = overlap.vertices[1];
 
         if (!a.value.isDrawn || !b.value.isDrawn) {
-            continue;
+          continue;
         }
 
         let angle = (2 * Math.PI - this.getRing(overlap.rings[0]).getAngle()) / 6.0;
@@ -1820,7 +1818,7 @@ export default class Drawer {
         this.rotateSubtree(b.id, overlap.common.id, -angle, overlap.common.position);
 
         // Decide which way to rotate the vertices depending on the effect it has on the overlap score
-        let overlapScore = this.getOverlapScore();        
+        let overlapScore = this.getOverlapScore();
         let subTreeOverlapA = this.getSubtreeOverlapScore(a.id, overlap.common.id, overlapScore.vertexScores);
         let subTreeOverlapB = this.getSubtreeOverlapScore(b.id, overlap.common.id, overlapScore.vertexScores);
         let total = subTreeOverlapA.value + subTreeOverlapB.value;
@@ -1828,13 +1826,13 @@ export default class Drawer {
         this.rotateSubtree(a.id, overlap.common.id, -2.0 * angle, overlap.common.position);
         this.rotateSubtree(b.id, overlap.common.id, 2.0 * angle, overlap.common.position);
 
-        overlapScore = this.getOverlapScore();        
+        overlapScore = this.getOverlapScore();
         subTreeOverlapA = this.getSubtreeOverlapScore(a.id, overlap.common.id, overlapScore.vertexScores);
         subTreeOverlapB = this.getSubtreeOverlapScore(b.id, overlap.common.id, overlapScore.vertexScores);
-        
+
         if (subTreeOverlapA.value + subTreeOverlapB.value > total) {
-            this.rotateSubtree(a.id, overlap.common.id, 2.0 * angle, overlap.common.position);
-            this.rotateSubtree(b.id, overlap.common.id, -2.0 * angle, overlap.common.position);
+          this.rotateSubtree(a.id, overlap.common.id, 2.0 * angle, overlap.common.position);
+          this.rotateSubtree(b.id, overlap.common.id, -2.0 * angle, overlap.common.position);
         }
       }
     }
@@ -1929,10 +1927,10 @@ export default class Drawer {
       } else if (previousVertex.value.originalRings.length > 1) {
         let vecs = Array()
         let neighbours = previousVertex.neighbours;
-        
+
         for (var i = 0; i < neighbours.length; i++) {
           let neighbour = this.graph.vertices[neighbours[i]];
-          
+
           if (neighbour.positioned && neighbour.value.originalRings.length > 1) {
             vecs.push(Vector2.subtract(neighbour.position, previousVertex.position));
           }
@@ -2005,9 +2003,11 @@ export default class Drawer {
         this.createRing(nextRing, nextCenter, vertex);
       }
     } else {
-      // Draw the non-ring vertices connected to this one        
+      // Draw the non-ring vertices connected to this one  
+      let isStereoCenter = vertex.value.isStereoCenter;      
       let tmpNeighbours = vertex.getNeighbours();
       let neighbours = Array();
+
       // Remove neighbours that are not drawn
       for (var i = 0; i < tmpNeighbours.length; i++) {
         if (this.graph.vertices[tmpNeighbours[i]].value.isDrawn) {
@@ -2015,12 +2015,13 @@ export default class Drawer {
         }
       }
 
+      // Remove the previous vertex (which has already been drawn)
       if (previousVertex) {
         neighbours = ArrayHelper.remove(neighbours, previousVertex.id);
       }
 
       let angle = vertex.getAngle();
-      
+
       if (neighbours.length === 1) {
         let nextVertex = this.graph.vertices[neighbours[0]];
 
@@ -2041,6 +2042,7 @@ export default class Drawer {
           nextVertex.drawExplicit = true;
           nextVertex.globalAngle = angle;
           nextVertex.angle = 0.0;
+
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, -dir);
         } else if (previousVertex && previousVertex.value.rings.length > 0) {
           // If coming out of a ring, always draw away from the center of mass
@@ -2113,6 +2115,10 @@ export default class Drawer {
         if (subTreeDepthA > subTreeDepthB) {
           cis = 1;
           trans = 0;
+
+          let tmp = subTreeDepthA;
+          subTreeDepthA = subTreeDepthB;
+          subTreeDepthB = tmp;
         }
 
         let cisVertex = this.graph.vertices[neighbours[cis]];
@@ -2120,6 +2126,9 @@ export default class Drawer {
 
         // If the origin tree is the shortest, set both vertices to trans
         if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
+          transVertex.value.mainChain = true;
+          cisVertex.value.mainChain = true;
+
           if (vertex.position.clockwise(vertex.previousPosition) === 1) {
             transVertex.angle = MathHelper.toRad(60);
             cisVertex.angle = -MathHelper.toRad(60);
@@ -2139,6 +2148,9 @@ export default class Drawer {
           }
         } else {
           if (vertex.position.clockwise(vertex.previousPosition) === 1) {
+            previousVertex.value.mainChain = true;
+            transVertex.value.mainChain = true;
+
             transVertex.angle = MathHelper.toRad(60);
             cisVertex.angle = -MathHelper.toRad(60);
             transVertex.globalAngle = angle + transVertex.angle;
@@ -2147,6 +2159,9 @@ export default class Drawer {
             this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
             this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
           } else {
+            previousVertex.value.mainChain = true;
+            cisVertex.value.mainChain = true;
+
             transVertex.angle = -MathHelper.toRad(60);
             cisVertex.angle = MathHelper.toRad(60);
             transVertex.globalAngle = angle + transVertex.angle;
@@ -2207,31 +2222,16 @@ export default class Drawer {
             dir = -dir;
           }
 
+          l.angle = MathHelper.toRad(30) * dir;
+          r.angle = MathHelper.toRad(90) * dir;
+
           s.globalAngle = angle + s.angle;
+          l.globalAngle = angle + l.angle;
+          r.globalAngle = angle + r.angle;
 
           this.createNextBond(s, vertex, s.globalAngle, -dir);
-
-          // If it's chiral, the order changes - for anticlockwise, switch the draw order around
-          // to keep the drawing the same
-          if (vertex.value.bracket && vertex.value.bracket.chirality === '@@') {
-            r.angle = MathHelper.toRad(30) * dir;
-            l.angle = MathHelper.toRad(90) * dir;
-
-            r.globalAngle = angle + r.angle;
-            l.globalAngle = angle + l.angle;
-
-            this.createNextBond(r, vertex, r.globalAngle);
-            this.createNextBond(l, vertex, l.globalAngle);
-          } else {
-            l.angle = MathHelper.toRad(30) * dir;
-            r.angle = MathHelper.toRad(90) * dir;
-
-            l.globalAngle = angle + l.angle;
-            r.globalAngle = angle + r.angle;
-
-            this.createNextBond(l, vertex, l.globalAngle);
-            this.createNextBond(r, vertex, r.globalAngle);
-          }
+          this.createNextBond(l, vertex, l.globalAngle);
+          this.createNextBond(r, vertex, r.globalAngle);
         } else {
           s.angle = 0.0;
           l.angle = MathHelper.toRad(90);
@@ -2462,8 +2462,8 @@ export default class Drawer {
     // For each stereo-center
     for (var i = 0; i < this.graph.vertices.length; i++) {
       let vertex = this.graph.vertices[i];
-      
-      if (!vertex.value.bracket || !vertex.value.bracket.chirality) {
+
+      if (!vertex.value.isStereoCenter) {
         continue;
       }
 
@@ -2480,10 +2480,10 @@ export default class Drawer {
 
         // Sort each level according to atomic number
         for (var k = 0; k < priority.length; k++) {
-          priority[k].sort(function(a, b){ return b - a });
+          priority[k].sort(function (a, b) { return b - a });
         }
 
-        priorities[j] = [ j, priority ];
+        priorities[j] = [j, priority];
       }
 
       let maxLevels = 0;
@@ -2518,7 +2518,7 @@ export default class Drawer {
         }
       }
 
-      priorities.sort(function(a, b) {
+      priorities.sort(function (a, b) {
         for (var j = 0; j < a[1].length; j++) {
           for (var k = 0; k < a[1][j].length; k++) {
             if (a[1][j][k] > b[1][j][k]) {
@@ -2535,16 +2535,23 @@ export default class Drawer {
       let order = new Uint8Array(nNeighbours);
       for (var j = 0; j < nNeighbours; j++) {
         order[j] = priorities[j][0];
+        vertex.value.priority = j;
       }
-      
+
+      // Check the angles between elements 0 and 1, and 0 and 2 to determine whether they are
+      // drawn cw or ccw
+      let posA = this.graph.vertices[neighbours[order[0]]].position;
+      let posB = this.graph.vertices[neighbours[order[1]]].position;
+      let posC = this.graph.vertices[neighbours[order[2]]].position;
+
+      let cwA = posA.relativeClockwise(posB, vertex.position);
+      let cwB = posA.relativeClockwise(posC, vertex.position);
+
+      console.log(cwA, cwB);
+
       let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
       let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
 
-      let up = this.graph.getEdge(vertex.id, neighbours[order[1]]);
-      let down = this.graph.getEdge(vertex.id, neighbours[order[3]]);
-      up.wedge = 'up';
-      down.wedge = 'down';
-      
       vertex.value.chirality = rs;
       console.log(vertex.id, rs, neighbours, priorities);
     }
@@ -2568,7 +2575,7 @@ export default class Drawer {
     if (priority.length <= depth) {
       priority.push(Array());
     }
-    
+
     for (var i = 0; i < this.graph.getEdge(vertexId, previousVertexId).weight; i++) {
       priority[depth].push(atomicNumber);
     }

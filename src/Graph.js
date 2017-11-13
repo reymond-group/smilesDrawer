@@ -49,7 +49,6 @@ export default class Graph {
     atom.branchBond = node.branchBond;
     atom.ringbonds = node.ringbonds;
     atom.bracket = node.atom.element ? node.atom : null;
-    atom.setOrder(parentVertexId, order);
 
     let vertex = new Vertex(atom);
     let parentVertex = this.vertices[parentVertexId];
@@ -89,6 +88,7 @@ export default class Graph {
 
     let stereoHydrogens = 0;
     if (atom.bracket && atom.bracket.chirality) {
+      atom.isStereoCenter = true;
       stereoHydrogens = atom.bracket.hcount;
       for (var i = 0; i < stereoHydrogens; i++) {
         this._init({

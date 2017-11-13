@@ -171,6 +171,27 @@ export default class Vector2 {
     }
 
     /**
+     * Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to an arbitrary third vector.
+     *
+     * @param {Vector2} center The central vector.
+     * @param {Vector2} vec Another vector.
+     * @returns {Number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to an arbitrary third vector.
+     */
+    relativeClockwise(center, vec) {
+        let a = (this.y - center.y) * (vec.x - center.x);
+        let b = (this.x - center.x) * (vec.y - center.y);
+        
+        if (a > b) {
+            return -1;
+        }
+        else if (a === b) {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    /**
      * Rotates this vector by a given number of radians around the origin of the coordinate system.
      *
      * @param {Number} angle The angle in radians to rotate the vector.
@@ -559,7 +580,7 @@ export default class Vector2 {
      *
      * @static
      * @param {Vector2} vecA A vector.
-     * @param {Vector2} vecB A vector.
+     * @param {Vector2} vecB A (central) vector.
      * @param {Vector2} vecC A vector.
      * @returns {Number} The angle in radians.
      */

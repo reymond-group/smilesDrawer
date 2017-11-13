@@ -77,7 +77,7 @@ export default class Vertex {
 
   /**
    * Add a child vertex id to this vertex.
-   * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
+   * @param {Number} vertexId The id of a vertex to be added as a child to this vertex.
    */
   addChild(vertexId) {
     this.children.push(vertexId);
@@ -92,9 +92,10 @@ export default class Vertex {
    * except this vertex is the first vertex of the SMILE string, then it is added as the first.
    * This is used to get the correct ordering of neighbours for parity calculations.
    * If a hydrogen is implicitly attached to the chiral center, insert as the third child.
-   * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
+   * @param {Number} vertexId The id of a vertex to be added as a child to this vertex.
+   * @param {Number} ringbondIndex The index of the ringbond.
    */
-  addAsSecondChild(vertexId, otherVertexId, ringbondIndex) {
+  addRingbondChild(vertexId, ringbondIndex) {
     this.children.push(vertexId);
 
     if (this.value.bracket) {

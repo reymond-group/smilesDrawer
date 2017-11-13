@@ -292,7 +292,7 @@ export default class CanvasWrapper {
             isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
-        console.log(line);
+        
         let ctx = this.ctx;
         let offsetX = this.offsetX;
         let offsetY = this.offsetY;

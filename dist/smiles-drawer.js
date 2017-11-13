@@ -608,7 +608,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String[]} neighbouringElements An array containing the element symbols of neighbouring atoms.
  * @property {Boolean} isPartOfAromaticRing A boolean indicating whether or not this atom is part of an explicitly defined aromatic ring. Example: c1ccccc1.
  * @property {Number} bondCount The number of bonds in which this atom is participating.
- * @property {String} chirality The chirality of this atom if it is a stereocenter.
+ * @property {String} chirality The chirality of this atom if it is a stereocenter (R or S).
+ * @property {Number} priority The priority of this atom acording to the CIP rules, where 0 is the highest priority.
+ * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
+ * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  */
 var Atom = function () {
   /**
@@ -624,26 +627,29 @@ var Atom = function () {
 
     this.element = element.length === 1 ? element.toUpperCase() : element;
     this.drawExplicit = false;
-    this.ringbonds = [];
-    this.rings = [];
+    this.ringbonds = Array();
+    this.rings = Array();
     this.bondType = bondType;
     this.branchBond = null;
     this.isBridge = false;
     this.isBridgeNode = false;
-    this.originalRings = [];
+    this.originalRings = Array();
     this.bridgedRing = null;
-    this.anchoredRings = [];
+    this.anchoredRings = Array();
     this.bracket = null;
     this.plane = 0;
-    this.order = {};
     this.attachedPseudoElements = {};
     this.hasAttachedPseudoElements = false;
     this.isDrawn = true;
     this.isConnectedToRing = false;
-    this.neighbouringElements = [];
+    this.neighbouringElements = Array();
     this.isPartOfAromaticRing = element !== this.element;
     this.bondCount = 0;
     this.chirality = '';
+    this.isStereoCenter = false;
+    this.priority = 0;
+    this.mainChain = false;
+    this.hydrogenDirection = 'down';
   }
 
   /**
@@ -797,32 +803,6 @@ var Atom = function () {
     }
 
     /**
-     * Returns the order of this atom given a central atom.
-     * 
-     * @param {Number} center The id of the central atom in respect to which the order is defined.
-     * @returns {Number} The order of this atom in respect to the center atom.
-     */
-
-  }, {
-    key: 'getOrder',
-    value: function getOrder(center) {
-      return this.order[center];
-    }
-
-    /**
-     * Sets the order of this atom given a center. This is required since two atoms can have an order in respect to two different centers when connected by ringbonds.
-     *
-     * @param {Number} center The id of the central atom in respect to which the order is defined.
-     * @param {Number} order The order of this atom.
-     */
-
-  }, {
-    key: 'setOrder',
-    value: function setOrder(center, order) {
-      this.order[center] = order;
-    }
-
-    /**
      * Check whether or not the neighbouring elements of this atom equal the supplied array.
      * 
      * @param {String[]} arr An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N']
@@ -873,111 +853,10 @@ var Atom = function () {
     }
 
     /**
-     * Checks whether this atom is a chiral center or not.
-     */
-
-  }, {
-    key: 'isChiralCenter',
-    value: function isChiralCenter() {
-      return this.bracket && (this.bracket.chirality === '@' || this.bracket.chirality === '@@');
-    }
-
-    /**
-     * Sorts an array of vertices by their respecitve atomic number.
-     *
-     * @param {Vertex} root The central vertex
-     * @param {Number[]} neighbours An array of vertex ids.
-     * @param {Vertex[]} vertices An array containing the vertices associated with the current molecule.
-     * @param {Ring[]} rings An array containing the rings associated with the current molecule.
-     * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
-     */
-
-  }], [{
-    key: 'sortByAtomicNumber',
-    value: function sortByAtomicNumber(neighbours, vertices) {
-      var orderedVertices = new Array(neighbours.length);
-
-      for (var i = 0; i < neighbours.length; i++) {
-        var vertex = vertices[neighbours[i]];
-        var val = Atom.atomicNumbers[vertex.value.element];
-
-        orderedVertices[i] = {
-          atomicNumber: val.toString(),
-          vertexId: vertex.id
-        };
-      }
-
-      return _ArrayHelper2.default.sortByAtomicNumberDesc(orderedVertices);
-    }
-
-    /**
-     * Checks wheter or not two atoms have the same atomic number
-     *
-     * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
-     * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
-     * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
-     * @returns {Boolean} A boolean indicating whether or not there are duplicate atomic numbers.
-     */
-
-  }, {
-    key: 'hasDuplicateAtomicNumbers',
-    value: function hasDuplicateAtomicNumbers(sortedAtomicNumbers) {
-      var found = {};
-
-      for (var i = 0; i < sortedAtomicNumbers.length; i++) {
-        var v = sortedAtomicNumbers[i];
-
-        if (found[v.atomicNumber] !== undefined) {
-          return true;
-        }
-
-        found[v.atomicNumber] = true;
-      }
-
-      return false;
-    }
-
-    /**
-     * Returns sets of duplicate atomic numbers.
-     *
-     * @param {Object[]} sortedAtomicNumbers An array of vertex ids with their associated atomic numbers.
-     * @param {Number} sortedAtomicNumbers[].vertexId A vertex id.
-     * @param {Number} sortedAtomicNumbers[].atomicNumber The atomic number associated with the vertex id.
-     * @returns {Array[]} An array of arrays containing the indices of duplicate atomic numbers.
-     */
-
-  }, {
-    key: 'getDuplicateAtomicNumbers',
-    value: function getDuplicateAtomicNumbers(sortedAtomicNumbers) {
-      var duplicates = {};
-      var dpl = [];
-
-      for (var i = 0; i < sortedAtomicNumbers.length; i++) {
-        var v = sortedAtomicNumbers[i];
-
-        if (duplicates[v.atomicNumber] === undefined) {
-          duplicates[v.atomicNumber] = [];
-        }
-
-        duplicates[v.atomicNumber].push(i);
-      }
-
-      for (var key in duplicates) {
-        var arr = duplicates[key];
-
-        if (arr.length > 1) {
-          dpl.push(arr);
-        }
-      }
-
-      return dpl;
-    }
-
-    /**
      * A map mapping element symbols to their maximum bonds.
      */
 
-  }, {
+  }], [{
     key: 'maxBonds',
     get: function get() {
       return {
@@ -1622,7 +1501,7 @@ var CanvasWrapper = function () {
             if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
                 return;
             }
-            console.log(line);
+
             var ctx = this.ctx;
             var offsetX = this.offsetX;
             var offsetY = this.offsetY;
@@ -2422,7 +2301,6 @@ var Drawer = function () {
       this.bridgedRing = false;
 
       this.initRings();
-      this.annotateStereochemistry();
 
       if (!this.opts.explicitHydrogens) {
         for (var i = 0; i < this.graph.vertices.length; i++) {
@@ -2430,10 +2308,6 @@ var Drawer = function () {
             this.graph.vertices[i].value.isDrawn = false;
           }
         }
-      }
-
-      if (this.opts.isomeric) {
-        this.annotateStereochemistry();
       }
 
       if (!this.infoOnly) {
@@ -2518,6 +2392,11 @@ var Drawer = function () {
         }
 
         this.resolveSecondaryOverlaps(overlapScore.scores);
+
+        this.annotateStereochemistry();
+        if (this.opts.isomeric) {
+          this.annotateStereochemistry();
+        }
 
         // Set the canvas to the appropriate size
         this.canvasWrapper.scale(this.graph.vertices);
@@ -2760,9 +2639,9 @@ var Drawer = function () {
             var edgeId = this.graph.addEdge(new _Edge2.default(sourceVertexId, targetVertexId, 1));
             var targetVertex = this.graph.vertices[targetVertexId];
 
-            vertex.addAsSecondChild(targetVertexId, sourceVertexId, j);
+            vertex.addRingbondChild(targetVertexId, j);
             vertex.value.addNeighbouringElement(targetVertex.value.element);
-            targetVertex.addAsSecondChild(sourceVertexId, sourceVertexId, j);
+            targetVertex.addRingbondChild(sourceVertexId, j);
             targetVertex.value.addNeighbouringElement(vertex.value.element);
             vertex.edges.push(edgeId);
             targetVertex.edges.push(edgeId);
@@ -3552,8 +3431,6 @@ var Drawer = function () {
       for (var i = 0; i < ringSize; i++) {
         total.add(this.graph.vertices[ring.members[i]].position);
       }
-
-      ring.center = total.divide(ringSize);
     }
 
     /**
@@ -3759,8 +3636,8 @@ var Drawer = function () {
       } else if (edge.bondType === '.') {
         // TODO: Something... maybe... version 2?
       } else {
-        var isChiralCenterA = vertexA.value.isChiralCenter();
-        var isChiralCenterB = vertexB.value.isChiralCenter();
+        var isChiralCenterA = vertexA.value.isStereoCenter;
+        var isChiralCenterB = vertexB.value.isStereoCenter;
 
         if (edge.wedge === 'up') {
           this.canvasWrapper.drawWedge(new _Line2.default(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
@@ -4490,9 +4367,11 @@ var Drawer = function () {
           this.createRing(_nextRing, _nextCenter2, vertex);
         }
       } else {
-        // Draw the non-ring vertices connected to this one        
+        // Draw the non-ring vertices connected to this one  
+        var isStereoCenter = vertex.value.isStereoCenter;
         var tmpNeighbours = vertex.getNeighbours();
         var _neighbours2 = Array();
+
         // Remove neighbours that are not drawn
         for (var i = 0; i < tmpNeighbours.length; i++) {
           if (this.graph.vertices[tmpNeighbours[i]].value.isDrawn) {
@@ -4500,6 +4379,7 @@ var Drawer = function () {
           }
         }
 
+        // Remove the previous vertex (which has already been drawn)
         if (previousVertex) {
           _neighbours2 = _ArrayHelper2.default.remove(_neighbours2, previousVertex.id);
         }
@@ -4525,6 +4405,7 @@ var Drawer = function () {
             nextVertex.drawExplicit = true;
             nextVertex.globalAngle = angle;
             nextVertex.angle = 0.0;
+
             this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, -dir);
           } else if (previousVertex && previousVertex.value.rings.length > 0) {
             // If coming out of a ring, always draw away from the center of mass
@@ -4597,6 +4478,10 @@ var Drawer = function () {
           if (subTreeDepthA > subTreeDepthB) {
             cis = 1;
             trans = 0;
+
+            var tmp = subTreeDepthA;
+            subTreeDepthA = subTreeDepthB;
+            subTreeDepthB = tmp;
           }
 
           var cisVertex = this.graph.vertices[_neighbours2[cis]];
@@ -4604,6 +4489,9 @@ var Drawer = function () {
 
           // If the origin tree is the shortest, set both vertices to trans
           if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
+            transVertex.value.mainChain = true;
+            cisVertex.value.mainChain = true;
+
             if (vertex.position.clockwise(vertex.previousPosition) === 1) {
               transVertex.angle = _MathHelper2.default.toRad(60);
               cisVertex.angle = -_MathHelper2.default.toRad(60);
@@ -4623,6 +4511,9 @@ var Drawer = function () {
             }
           } else {
             if (vertex.position.clockwise(vertex.previousPosition) === 1) {
+              previousVertex.value.mainChain = true;
+              transVertex.value.mainChain = true;
+
               transVertex.angle = _MathHelper2.default.toRad(60);
               cisVertex.angle = -_MathHelper2.default.toRad(60);
               transVertex.globalAngle = angle + transVertex.angle;
@@ -4631,6 +4522,9 @@ var Drawer = function () {
               this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
               this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
             } else {
+              previousVertex.value.mainChain = true;
+              cisVertex.value.mainChain = true;
+
               transVertex.angle = -_MathHelper2.default.toRad(60);
               cisVertex.angle = _MathHelper2.default.toRad(60);
               transVertex.globalAngle = angle + transVertex.angle;
@@ -4689,31 +4583,16 @@ var Drawer = function () {
               dir = -dir;
             }
 
+            l.angle = _MathHelper2.default.toRad(30) * dir;
+            _r3.angle = _MathHelper2.default.toRad(90) * dir;
+
             s.globalAngle = angle + s.angle;
+            l.globalAngle = angle + l.angle;
+            _r3.globalAngle = angle + _r3.angle;
 
             this.createNextBond(s, vertex, s.globalAngle, -dir);
-
-            // If it's chiral, the order changes - for anticlockwise, switch the draw order around
-            // to keep the drawing the same
-            if (vertex.value.bracket && vertex.value.bracket.chirality === '@@') {
-              _r3.angle = _MathHelper2.default.toRad(30) * dir;
-              l.angle = _MathHelper2.default.toRad(90) * dir;
-
-              _r3.globalAngle = angle + _r3.angle;
-              l.globalAngle = angle + l.angle;
-
-              this.createNextBond(_r3, vertex, _r3.globalAngle);
-              this.createNextBond(l, vertex, l.globalAngle);
-            } else {
-              l.angle = _MathHelper2.default.toRad(30) * dir;
-              _r3.angle = _MathHelper2.default.toRad(90) * dir;
-
-              l.globalAngle = angle + l.angle;
-              _r3.globalAngle = angle + _r3.angle;
-
-              this.createNextBond(l, vertex, l.globalAngle);
-              this.createNextBond(_r3, vertex, _r3.globalAngle);
-            }
+            this.createNextBond(l, vertex, l.globalAngle);
+            this.createNextBond(_r3, vertex, _r3.globalAngle);
           } else {
             s.angle = 0.0;
             l.angle = _MathHelper2.default.toRad(90);
@@ -4971,7 +4850,7 @@ var Drawer = function () {
       for (var i = 0; i < this.graph.vertices.length; i++) {
         var vertex = this.graph.vertices[i];
 
-        if (!vertex.value.bracket || !vertex.value.bracket.chirality) {
+        if (!vertex.value.isStereoCenter) {
           continue;
         }
 
@@ -5045,15 +4924,22 @@ var Drawer = function () {
         var order = new Uint8Array(nNeighbours);
         for (var j = 0; j < nNeighbours; j++) {
           order[j] = priorities[j][0];
+          vertex.value.priority = j;
         }
+
+        // Check the angles between elements 0 and 1, and 0 and 2 to determine whether they are
+        // drawn cw or ccw
+        var posA = this.graph.vertices[neighbours[order[0]]].position;
+        var posB = this.graph.vertices[neighbours[order[1]]].position;
+        var posC = this.graph.vertices[neighbours[order[2]]].position;
+
+        var cwA = posA.relativeClockwise(posB, vertex.position);
+        var cwB = posA.relativeClockwise(posC, vertex.position);
+
+        console.log(cwA, cwB);
 
         var rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
         var rs = _MathHelper2.default.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
-
-        var up = this.graph.getEdge(vertex.id, neighbours[order[1]]);
-        var down = this.graph.getEdge(vertex.id, neighbours[order[3]]);
-        up.wedge = 'up';
-        down.wedge = 'down';
 
         vertex.value.chirality = rs;
         console.log(vertex.id, rs, neighbours, priorities);
@@ -5409,7 +5295,6 @@ var Graph = function () {
       atom.branchBond = node.branchBond;
       atom.ringbonds = node.ringbonds;
       atom.bracket = node.atom.element ? node.atom : null;
-      atom.setOrder(parentVertexId, order);
 
       var vertex = new _Vertex2.default(atom);
       var parentVertex = this.vertices[parentVertexId];
@@ -5449,6 +5334,7 @@ var Graph = function () {
 
       var stereoHydrogens = 0;
       if (atom.bracket && atom.bracket.chirality) {
+        atom.isStereoCenter = true;
         stereoHydrogens = atom.bracket.hcount;
         for (var i = 0; i < stereoHydrogens; i++) {
           this._init({
@@ -10251,6 +10137,29 @@ var Vector2 = function () {
         }
 
         /**
+         * Checks whether or not this vector is in a clockwise or counter-clockwise rotational direction compared to another vector in relation to an arbitrary third vector.
+         *
+         * @param {Vector2} center The central vector.
+         * @param {Vector2} vec Another vector.
+         * @returns {Number} Returns -1, 0 or 1 if the vector supplied as an argument is clockwise, neutral or counter-clockwise respectively to this vector in relation to an arbitrary third vector.
+         */
+
+    }, {
+        key: 'relativeClockwise',
+        value: function relativeClockwise(center, vec) {
+            var a = (this.y - center.y) * (vec.x - center.x);
+            var b = (this.x - center.x) * (vec.y - center.y);
+
+            if (a > b) {
+                return -1;
+            } else if (a === b) {
+                return 0;
+            }
+
+            return 1;
+        }
+
+        /**
          * Rotates this vector by a given number of radians around the origin of the coordinate system.
          *
          * @param {Number} angle The angle in radians to rotate the vector.
@@ -10707,7 +10616,7 @@ var Vector2 = function () {
          *
          * @static
          * @param {Vector2} vecA A vector.
-         * @param {Vector2} vecB A vector.
+         * @param {Vector2} vecB A (central) vector.
          * @param {Vector2} vecC A vector.
          * @returns {Number} The angle in radians.
          */
@@ -10882,7 +10791,7 @@ var Vertex = function () {
 
     /**
      * Add a child vertex id to this vertex.
-     * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
+     * @param {Number} vertexId The id of a vertex to be added as a child to this vertex.
      */
 
   }, {
@@ -10900,12 +10809,13 @@ var Vertex = function () {
      * except this vertex is the first vertex of the SMILE string, then it is added as the first.
      * This is used to get the correct ordering of neighbours for parity calculations.
      * If a hydrogen is implicitly attached to the chiral center, insert as the third child.
-     * @param {Number} vertexID The id of a vertex to be added as a child to this vertex.
+     * @param {Number} vertexId The id of a vertex to be added as a child to this vertex.
+     * @param {Number} ringbondIndex The index of the ringbond.
      */
 
   }, {
-    key: 'addAsSecondChild',
-    value: function addAsSecondChild(vertexId, otherVertexId, ringbondIndex) {
+    key: 'addRingbondChild',
+    value: function addRingbondChild(vertexId, ringbondIndex) {
       this.children.push(vertexId);
 
       if (this.value.bracket) {
