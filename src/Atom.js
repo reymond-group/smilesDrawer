@@ -35,6 +35,7 @@ import Ring from './Ring'
  * @property {Number} priority The priority of this atom acording to the CIP rules, where 0 is the highest priority.
  * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
  * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
+ * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
  */
 export default class Atom {
   /**
@@ -69,6 +70,7 @@ export default class Atom {
     this.priority = 0;
     this.mainChain = false;
     this.hydrogenDirection = 'down';
+    this.subtreeDepth = 1;
   }
 
   /**
@@ -126,6 +128,15 @@ export default class Atom {
    */
   getAttachedPseudoElementsCount() {
     return Object.keys(this.attachedPseudoElements).length;
+  }
+
+  /**
+   * Returns whether this atom is a heteroatom (not C and not H).
+   *
+   * @returns {Boolean} A boolean indicating whether this atom is a heteroatom.
+   */
+  isHeteroAtom() {
+    return this.element !== 'C' && this.element !== 'H';
   }
 
   /**

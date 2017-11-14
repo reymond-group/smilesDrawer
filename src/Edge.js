@@ -10,7 +10,7 @@
  * @property {String} [bondType='-'] The bond type of this edge.
  * @property {Boolean} [isPartOfAromaticRing=false] Whether or not this edge is part of an aromatic ring.
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
- * @property {String} [wedge=''] Wedge direction. Either '', 'solid' or 'dashed'
+ * @property {String} [wedge=''] Wedge direction. Either '', 'up' or 'down'
  */
 export default class Edge {
     /**

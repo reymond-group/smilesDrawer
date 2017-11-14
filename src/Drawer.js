@@ -160,10 +160,19 @@ export default class Drawer {
 
     this.initRings();
 
+    // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
     if (!this.opts.explicitHydrogens) {
       for (var i = 0; i < this.graph.vertices.length; i++) {
-        if (this.graph.vertices[i].value.element === 'H') {
-          this.graph.vertices[i].value.isDrawn = false;
+        let vertex = this.graph.vertices[i];
+
+        if (vertex.value.element !== 'H') {
+          continue;
+        }
+
+        // Hydrogens should have only one neighbour, so just take the first
+        let neighbour = this.graph.vertices[vertex.neighbours[0]];
+        if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2) {
+          vertex.value.isDrawn = false;
         }
       }
     }
@@ -1925,19 +1934,19 @@ export default class Drawer {
         vertex.previousPosition = previousVertex.position;
         vertex.positioned = true;
       } else if (previousVertex.value.originalRings.length > 1) {
-        let vecs = Array()
         let neighbours = previousVertex.neighbours;
+        let added = new Vector2(0, 0);
 
         for (var i = 0; i < neighbours.length; i++) {
           let neighbour = this.graph.vertices[neighbours[i]];
 
-          if (neighbour.positioned && neighbour.value.originalRings.length > 1) {
-            vecs.push(Vector2.subtract(neighbour.position, previousVertex.position));
+          if (neighbour.positioned) {
+            added.add(Vector2.subtract(neighbour.position, previousVertex.position));
           }
         }
 
-        let avg = Vector2.averageDirection(vecs);
-        avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+        added.normalize();
+        added.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
 
         // Invert if too close to another of the averaged vertices (resolve situations like: CC1CC2NCC3(N)CC1(C)C23CC#C)
         for (var i = 0; i < neighbours.length; i++) {
@@ -1947,14 +1956,14 @@ export default class Drawer {
             continue;
           }
 
-          if (Vector2.threePointangle(avg, previousVertex.position, neighbour.position) > 3.1) {
-            avg.rotateAround(Math.PI, previousVertex.position);
+          if (Vector2.threePointangle(added, previousVertex.position, neighbour.position) > 3.1) {
+            added.rotateAround(Math.PI, previousVertex.position);
             break;
           }
         }
 
         vertex.previousPosition = previousVertex.position;
-        vertex.setPositionFromVector(avg);
+        vertex.setPositionFromVector(added);
         vertex.positioned = true;
       } else {
         // If the previous vertex was not part of a ring, draw a bond based
@@ -2007,13 +2016,13 @@ export default class Drawer {
       let isStereoCenter = vertex.value.isStereoCenter;      
       let tmpNeighbours = vertex.getNeighbours();
       let neighbours = Array();
-
+      
       // Remove neighbours that are not drawn
       for (var i = 0; i < tmpNeighbours.length; i++) {
         if (this.graph.vertices[tmpNeighbours[i]].value.isDrawn) {
           neighbours.push(tmpNeighbours[i]);
         }
-      }
+      } 
 
       // Remove the previous vertex (which has already been drawn)
       if (previousVertex) {
@@ -2105,9 +2114,18 @@ export default class Drawer {
         let subTreeDepthA = this.graph.getTreeDepth(neighbours[0], vertex.id);
         let subTreeDepthB = this.graph.getTreeDepth(neighbours[1], vertex.id);
 
+        let l = this.graph.vertices[neighbours[0]];
+        let r = this.graph.vertices[neighbours[1]];
+
+        l.value.subtreeDepth = subTreeDepthA;
+        r.value.subtreeDepth = subTreeDepthB;
+
         // Also get the subtree for the previous direction (this is important when
         // the previous vertex is the shortest path)
         let subTreeDepthC = this.graph.getTreeDepth(previousVertex ? previousVertex.id : null, vertex.id);
+        if (previousVertex) {
+          previousVertex.value.subtreeDepth = subTreeDepthC;
+        }
 
         let cis = 0;
         let trans = 1;
@@ -2180,6 +2198,10 @@ export default class Drawer {
         let s = this.graph.vertices[neighbours[0]];
         let l = this.graph.vertices[neighbours[1]];
         let r = this.graph.vertices[neighbours[2]];
+
+        s.value.subtreeDepth = d1;
+        l.value.subtreeDepth = d2;
+        r.value.subtreeDepth = d3;
 
         if (d2 > d1 && d2 > d3) {
           s = this.graph.vertices[neighbours[1]];
@@ -2256,6 +2278,11 @@ export default class Drawer {
         let x = this.graph.vertices[neighbours[1]];
         let y = this.graph.vertices[neighbours[2]];
         let z = this.graph.vertices[neighbours[3]];
+
+        w.value.subtreeDepth = d1;
+        x.value.subtreeDepth = d2;
+        y.value.subtreeDepth = d3;
+        z.value.subtreeDepth = d4;
 
         if (d2 > d1 && d2 > d3 && d2 > d4) {
           w = this.graph.vertices[neighbours[1]];
@@ -2547,13 +2574,63 @@ export default class Drawer {
       let cwA = posA.relativeClockwise(posB, vertex.position);
       let cwB = posA.relativeClockwise(posC, vertex.position);
 
-      console.log(cwA, cwB);
+      // If the second priority is clockwise from the first, the ligands are drawn clockwise, since
+      // The hydrogen can be drawn on either side
+      let isCw = cwA === -1;
 
       let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
       let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
+      
+      // Flip the hydrogen direction when the drawing doesn't match the chirality.
+      let wedgeA = 'down';
+      let wedgeB = 'up';
+      if (isCw && rs !== 'R' || !isCw && rs !== 'S') {
+        vertex.value.hydrogenDirection = 'up';
+        wedgeA = 'up';
+        wedgeB = 'down';
+      }
+
+      this.graph.getEdge(vertex.id, neighbours[order[order.length - 1]]).wedge = wedgeA;
+
+      // Get the shortest subtree to flip up / down. Ignore lowest priority
+      // The rules are following:
+      // 1. Do not draw wedge between two stereocenters
+      // 2. Heteroatoms
+      // 3. Draw outside ring
+      // 4. Shortest subtree
+
+      let wedgeOrder = new Array(neighbours.length - 1);
+      let showHydrogen = vertex.value.rings.length > 1;
+
+      for (var j = 0; j < order.length - 1; j++) {
+        wedgeOrder[j] = new Uint32Array(2);
+        let neighbour = this.graph.vertices[neighbours[order[j]]];
+
+        wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 100000;
+        wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 10000 : 0;
+        wedgeOrder[j][0] += neighbour.value.rings.length > 0 ? 0 : 1000;
+        wedgeOrder[j][0] += neighbour.value.getAtomicNumber();
+        wedgeOrder[j][1] = neighbours[order[j]];
+      }
+
+      wedgeOrder.sort(function (a, b) {
+        if (a[0] > b[0]) {
+          return -1;
+        } else if (a[0] < b[0]) {
+          return 1;
+        }
+        return 0;
+      });
+
+      // console.log(wedgeOrder);
+
+      // If all neighbours are in a ring, do not draw wedge, the hydrogen will be drawn.
+      if (!showHydrogen) {
+        this.graph.getEdge(vertex.id, wedgeOrder[0][1]).wedge = wedgeB;
+      }
 
       vertex.value.chirality = rs;
-      console.log(vertex.id, rs, neighbours, priorities);
+      // console.log(vertex.id, rs, neighbours, priorities);
     }
   }
 

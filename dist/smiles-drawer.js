@@ -612,6 +612,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Number} priority The priority of this atom acording to the CIP rules, where 0 is the highest priority.
  * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
  * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
+ * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
  */
 var Atom = function () {
   /**
@@ -650,6 +651,7 @@ var Atom = function () {
     this.priority = 0;
     this.mainChain = false;
     this.hydrogenDirection = 'down';
+    this.subtreeDepth = 1;
   }
 
   /**
@@ -722,6 +724,18 @@ var Atom = function () {
     key: 'getAttachedPseudoElementsCount',
     value: function getAttachedPseudoElementsCount() {
       return Object.keys(this.attachedPseudoElements).length;
+    }
+
+    /**
+     * Returns whether this atom is a heteroatom (not C and not H).
+     *
+     * @returns {Boolean} A boolean indicating whether this atom is a heteroatom.
+     */
+
+  }, {
+    key: 'isHeteroAtom',
+    value: function isHeteroAtom() {
+      return this.element !== 'C' && this.element !== 'H';
     }
 
     /**
@@ -2302,10 +2316,19 @@ var Drawer = function () {
 
       this.initRings();
 
+      // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
       if (!this.opts.explicitHydrogens) {
         for (var i = 0; i < this.graph.vertices.length; i++) {
-          if (this.graph.vertices[i].value.element === 'H') {
-            this.graph.vertices[i].value.isDrawn = false;
+          var vertex = this.graph.vertices[i];
+
+          if (vertex.value.element !== 'H') {
+            continue;
+          }
+
+          // Hydrogens should have only one neighbour, so just take the first
+          var neighbour = this.graph.vertices[vertex.neighbours[0]];
+          if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2) {
+            vertex.value.isDrawn = false;
           }
         }
       }
@@ -2347,16 +2370,16 @@ var Drawer = function () {
               var neighbours = vertexB.getNeighbours(a);
 
               if (neighbours.length === 1) {
-                var neighbour = this.graph.vertices[neighbours[0]];
-                var angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
+                var _neighbour = this.graph.vertices[neighbours[0]];
+                var angle = _neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
 
-                this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
+                this.rotateSubtree(_neighbour.id, vertexB.id, angle, vertexB.position);
 
                 // If the new overlap is bigger, undo change
                 var newTotalOverlapScore = this.getOverlapScore().total;
 
                 if (newTotalOverlapScore > this.totalOverlapScore) {
-                  this.rotateSubtree(neighbour.id, vertexB.id, -angle, vertexB.position);
+                  this.rotateSubtree(_neighbour.id, vertexB.id, -angle, vertexB.position);
                 } else {
                   this.totalOverlapScore = newTotalOverlapScore;
                 }
@@ -4290,36 +4313,36 @@ var Drawer = function () {
           vertex.previousPosition = previousVertex.position;
           vertex.positioned = true;
         } else if (previousVertex.value.originalRings.length > 1) {
-          var _vecs = Array();
           var _neighbours = previousVertex.neighbours;
+          var added = new _Vector2.default(0, 0);
 
-          for (var i = 0; i < _neighbours.length; i++) {
-            var _neighbour = this.graph.vertices[_neighbours[i]];
-
-            if (_neighbour.positioned && _neighbour.value.originalRings.length > 1) {
-              _vecs.push(_Vector2.default.subtract(_neighbour.position, previousVertex.position));
-            }
-          }
-
-          var _avg = _Vector2.default.averageDirection(_vecs);
-          _avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
-
-          // Invert if too close to another of the averaged vertices (resolve situations like: CC1CC2NCC3(N)CC1(C)C23CC#C)
           for (var i = 0; i < _neighbours.length; i++) {
             var _neighbour2 = this.graph.vertices[_neighbours[i]];
 
-            if (!_neighbour2.positioned) {
+            if (_neighbour2.positioned) {
+              added.add(_Vector2.default.subtract(_neighbour2.position, previousVertex.position));
+            }
+          }
+
+          added.normalize();
+          added.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+
+          // Invert if too close to another of the averaged vertices (resolve situations like: CC1CC2NCC3(N)CC1(C)C23CC#C)
+          for (var i = 0; i < _neighbours.length; i++) {
+            var _neighbour3 = this.graph.vertices[_neighbours[i]];
+
+            if (!_neighbour3.positioned) {
               continue;
             }
 
-            if (_Vector2.default.threePointangle(_avg, previousVertex.position, _neighbour2.position) > 3.1) {
-              _avg.rotateAround(Math.PI, previousVertex.position);
+            if (_Vector2.default.threePointangle(added, previousVertex.position, _neighbour3.position) > 3.1) {
+              added.rotateAround(Math.PI, previousVertex.position);
               break;
             }
           }
 
           vertex.previousPosition = previousVertex.position;
-          vertex.setPositionFromVector(_avg);
+          vertex.setPositionFromVector(added);
           vertex.positioned = true;
         } else {
           // If the previous vertex was not part of a ring, draw a bond based
@@ -4468,9 +4491,18 @@ var Drawer = function () {
           var subTreeDepthA = this.graph.getTreeDepth(_neighbours2[0], vertex.id);
           var subTreeDepthB = this.graph.getTreeDepth(_neighbours2[1], vertex.id);
 
+          var l = this.graph.vertices[_neighbours2[0]];
+          var _r3 = this.graph.vertices[_neighbours2[1]];
+
+          l.value.subtreeDepth = subTreeDepthA;
+          _r3.value.subtreeDepth = subTreeDepthB;
+
           // Also get the subtree for the previous direction (this is important when
           // the previous vertex is the shortest path)
           var subTreeDepthC = this.graph.getTreeDepth(previousVertex ? previousVertex.id : null, vertex.id);
+          if (previousVertex) {
+            previousVertex.value.subtreeDepth = subTreeDepthC;
+          }
 
           var cis = 0;
           var trans = 1;
@@ -4541,20 +4573,24 @@ var Drawer = function () {
           var d3 = this.graph.getTreeDepth(_neighbours2[2], vertex.id);
 
           var s = this.graph.vertices[_neighbours2[0]];
-          var l = this.graph.vertices[_neighbours2[1]];
-          var _r3 = this.graph.vertices[_neighbours2[2]];
+          var _l = this.graph.vertices[_neighbours2[1]];
+          var _r4 = this.graph.vertices[_neighbours2[2]];
+
+          s.value.subtreeDepth = d1;
+          _l.value.subtreeDepth = d2;
+          _r4.value.subtreeDepth = d3;
 
           if (d2 > d1 && d2 > d3) {
             s = this.graph.vertices[_neighbours2[1]];
-            l = this.graph.vertices[_neighbours2[0]];
-            _r3 = this.graph.vertices[_neighbours2[2]];
+            _l = this.graph.vertices[_neighbours2[0]];
+            _r4 = this.graph.vertices[_neighbours2[2]];
           } else if (d3 > d1 && d3 > d2) {
             s = this.graph.vertices[_neighbours2[2]];
-            l = this.graph.vertices[_neighbours2[0]];
-            _r3 = this.graph.vertices[_neighbours2[1]];
+            _l = this.graph.vertices[_neighbours2[0]];
+            _r4 = this.graph.vertices[_neighbours2[1]];
           }
 
-          if (this.graph.getTreeDepth(l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r3.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
+          if (this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
 
             if (!dir) {
               var _proposedAngleA2 = _MathHelper2.default.toRad(60);
@@ -4583,28 +4619,28 @@ var Drawer = function () {
               dir = -dir;
             }
 
-            l.angle = _MathHelper2.default.toRad(30) * dir;
-            _r3.angle = _MathHelper2.default.toRad(90) * dir;
+            _l.angle = _MathHelper2.default.toRad(30) * dir;
+            _r4.angle = _MathHelper2.default.toRad(90) * dir;
 
             s.globalAngle = angle + s.angle;
-            l.globalAngle = angle + l.angle;
-            _r3.globalAngle = angle + _r3.angle;
+            _l.globalAngle = angle + _l.angle;
+            _r4.globalAngle = angle + _r4.angle;
 
             this.createNextBond(s, vertex, s.globalAngle, -dir);
-            this.createNextBond(l, vertex, l.globalAngle);
-            this.createNextBond(_r3, vertex, _r3.globalAngle);
+            this.createNextBond(_l, vertex, _l.globalAngle);
+            this.createNextBond(_r4, vertex, _r4.globalAngle);
           } else {
             s.angle = 0.0;
-            l.angle = _MathHelper2.default.toRad(90);
-            _r3.angle = -_MathHelper2.default.toRad(90);
+            _l.angle = _MathHelper2.default.toRad(90);
+            _r4.angle = -_MathHelper2.default.toRad(90);
 
             s.globalAngle = angle + s.angle;
-            l.globalAngle = angle + l.angle;
-            _r3.globalAngle = angle + _r3.angle;
+            _l.globalAngle = angle + _l.angle;
+            _r4.globalAngle = angle + _r4.angle;
 
             this.createNextBond(s, vertex, s.globalAngle);
-            this.createNextBond(l, vertex, l.globalAngle);
-            this.createNextBond(_r3, vertex, _r3.globalAngle);
+            this.createNextBond(_l, vertex, _l.globalAngle);
+            this.createNextBond(_r4, vertex, _r4.globalAngle);
           }
         } else if (_neighbours2.length === 4) {
           // The vertex with the longest sub-tree should always go to the reflected opposide direction
@@ -4617,6 +4653,11 @@ var Drawer = function () {
           var x = this.graph.vertices[_neighbours2[1]];
           var y = this.graph.vertices[_neighbours2[2]];
           var z = this.graph.vertices[_neighbours2[3]];
+
+          w.value.subtreeDepth = _d;
+          x.value.subtreeDepth = _d2;
+          y.value.subtreeDepth = _d3;
+          z.value.subtreeDepth = d4;
 
           if (_d2 > _d && _d2 > _d3 && _d2 > d4) {
             w = this.graph.vertices[_neighbours2[1]];
@@ -4936,13 +4977,63 @@ var Drawer = function () {
         var cwA = posA.relativeClockwise(posB, vertex.position);
         var cwB = posA.relativeClockwise(posC, vertex.position);
 
-        console.log(cwA, cwB);
+        // If the second priority is clockwise from the first, the ligands are drawn clockwise, since
+        // The hydrogen can be drawn on either side
+        var isCw = cwA === -1;
 
         var rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
         var rs = _MathHelper2.default.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
 
+        // Flip the hydrogen direction when the drawing doesn't match the chirality.
+        var wedgeA = 'down';
+        var wedgeB = 'up';
+        if (isCw && rs !== 'R' || !isCw && rs !== 'S') {
+          vertex.value.hydrogenDirection = 'up';
+          wedgeA = 'up';
+          wedgeB = 'down';
+        }
+
+        this.graph.getEdge(vertex.id, neighbours[order[order.length - 1]]).wedge = wedgeA;
+
+        // Get the shortest subtree to flip up / down. Ignore lowest priority
+        // The rules are following:
+        // 1. Do not draw wedge between two stereocenters
+        // 2. Draw outside ring
+        // 3. Heteroatoms
+        // 4. Shortest subtree
+
+        var wedgeOrder = new Array(neighbours.length - 1);
+        var showHydrogen = vertex.value.rings.length > 1;
+
+        for (var j = 0; j < order.length - 1; j++) {
+          wedgeOrder[j] = new Uint32Array(2);
+          var neighbour = this.graph.vertices[neighbours[order[j]]];
+
+          wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 100000;
+          wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 10000 : 0;
+          wedgeOrder[j][0] += neighbour.value.rings.length > 0 ? 0 : 1000;
+          wedgeOrder[j][0] += neighbour.value.getAtomicNumber();
+          wedgeOrder[j][1] = neighbours[order[j]];
+        }
+
+        wedgeOrder.sort(function (a, b) {
+          if (a[0] > b[0]) {
+            return -1;
+          } else if (a[0] < b[0]) {
+            return 1;
+          }
+          return 0;
+        });
+
+        // console.log(wedgeOrder);
+
+        // If all neighbours are in a ring, do not draw wedge, the hydrogen will be drawn.
+        if (!showHydrogen) {
+          this.graph.getEdge(vertex.id, wedgeOrder[0][1]).wedge = wedgeB;
+        }
+
         vertex.value.chirality = rs;
-        console.log(vertex.id, rs, neighbours, priorities);
+        // console.log(vertex.id, rs, neighbours, priorities);
       }
     }
 
@@ -5048,29 +5139,29 @@ var Drawer = function () {
         var previous = null;
 
         for (var j = 0; j < neighbours.length; j++) {
-          var _neighbour3 = neighbours[j];
+          var _neighbour4 = neighbours[j];
 
-          if (_neighbour3.getNeighbourCount() > 1) {
-            previous = _neighbour3;
+          if (_neighbour4.getNeighbourCount() > 1) {
+            previous = _neighbour4;
           }
         }
 
         for (var j = 0; j < neighbours.length; j++) {
-          var _neighbour4 = neighbours[j];
+          var _neighbour5 = neighbours[j];
 
-          if (_neighbour4.getNeighbourCount() > 1) {
+          if (_neighbour5.getNeighbourCount() > 1) {
             continue;
           }
 
-          _neighbour4.value.isDrawn = false;
+          _neighbour5.value.isDrawn = false;
 
-          var hydrogens = _Atom2.default.maxBonds[_neighbour4.value.element] - this.getBondCount(_neighbour4);
+          var hydrogens = _Atom2.default.maxBonds[_neighbour5.value.element] - this.getBondCount(_neighbour5);
 
-          if (_neighbour4.value.bracket) {
-            hydrogens = _neighbour4.value.bracket.hcount;
+          if (_neighbour5.value.bracket) {
+            hydrogens = _neighbour5.value.bracket.hcount;
           }
 
-          vertex.value.attachPseudoElement(_neighbour4.value.element, previous ? previous.value.element : null, hydrogens);
+          vertex.value.attachPseudoElement(_neighbour5.value.element, previous ? previous.value.element : null, hydrogens);
         }
       }
 
@@ -5092,16 +5183,16 @@ var Drawer = function () {
         }
 
         for (var j = 0; j < _neighbours3.length; j++) {
-          var _neighbour5 = _neighbours3[j].value;
+          var _neighbour6 = _neighbours3[j].value;
 
-          if (!_neighbour5.hasAttachedPseudoElements || _neighbour5.getAttachedPseudoElementsCount() !== 2) {
+          if (!_neighbour6.hasAttachedPseudoElements || _neighbour6.getAttachedPseudoElementsCount() !== 2) {
             continue;
           }
 
-          var pseudoElements = _neighbour5.getAttachedPseudoElements();
+          var pseudoElements = _neighbour6.getAttachedPseudoElements();
 
           if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
-            _neighbour5.isDrawn = false;
+            _neighbour6.isDrawn = false;
             _vertex4.value.attachPseudoElement('Ac', '', 0);
           }
         }
@@ -5137,7 +5228,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String} [bondType='-'] The bond type of this edge.
  * @property {Boolean} [isPartOfAromaticRing=false] Whether or not this edge is part of an aromatic ring.
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
- * @property {String} [wedge=''] Wedge direction. Either '', 'solid' or 'dashed'
+ * @property {String} [wedge=''] Wedge direction. Either '', 'up' or 'down'
  */
 var Edge = function () {
     /**
@@ -10848,8 +10939,6 @@ var Vertex = function () {
             index = 2;
           }
         }
-
-        console.log(index);
 
         this.neighbours.splice(index, 0, vertexId);
       } else {

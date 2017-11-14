@@ -128,8 +128,6 @@ export default class Vertex {
           index = 2;
         }
       }
-
-      console.log(index);
       
       this.neighbours.splice(index, 0, vertexId);
     } else {

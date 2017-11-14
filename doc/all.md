@@ -89,6 +89,9 @@
 <dt><a href="#getAttachedPseudoElementsCount">getAttachedPseudoElementsCount()</a> ⇒ <code>Number</code></dt>
 <dd><p>Returns the number of attached pseudo elements.</p>
 </dd>
+<dt><a href="#isHeteroAtom">isHeteroAtom()</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Returns whether this atom is a heteroatom (not C and not H).</p>
+</dd>
 <dt><a href="#addAnchoredRing">addAnchoredRing(ringId)</a></dt>
 <dd><p>Defines this atom as the anchor for a ring. When doing repositionings of the vertices and the vertex associated with this atom is moved, the center of this ring is moved as well.</p>
 </dd>
@@ -1047,6 +1050,13 @@ Returns the number of attached pseudo elements.
 
 **Kind**: global function  
 **Returns**: <code>Number</code> - The number of attached pseudo elements.  
+<a name="isHeteroAtom"></a>
+
+## isHeteroAtom() ⇒ <code>Boolean</code>
+Returns whether this atom is a heteroatom (not C and not H).
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether this atom is a heteroatom.  
 <a name="addAnchoredRing"></a>
 
 ## addAnchoredRing(ringId)
