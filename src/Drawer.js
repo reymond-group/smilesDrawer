@@ -2533,9 +2533,10 @@ export default class Drawer {
           priorities[j][1].push([]);
         }
 
-        // Break ties by the position in the smiles string as per specification
+        // Break ties by the position in the SMILES string as per specification
         priorities[j][1].push([neighbours[j]]);
 
+        // Make all same length. Fill with zeroes.
         for (var k = 0; k < priorities[j][1].length; k++) {
           let diff = maxEntries - priorities[j][1][k].length;
 
@@ -2567,6 +2568,7 @@ export default class Drawer {
 
       // Check the angles between elements 0 and 1, and 0 and 2 to determine whether they are
       // drawn cw or ccw
+      // TODO: OC(Cl)=[C@]=C(C)F currently fails here, however this is, IMHO, not a valid SMILES.
       let posA = this.graph.vertices[neighbours[order[0]]].position;
       let posB = this.graph.vertices[neighbours[order[1]]].position;
       let posC = this.graph.vertices[neighbours[order[2]]].position;
@@ -2630,7 +2632,7 @@ export default class Drawer {
       }
 
       vertex.value.chirality = rs;
-      // console.log(vertex.id, rs, neighbours, priorities);
+      console.log(vertex.id, rs, neighbours, priorities);
     }
   }
 
@@ -2644,7 +2646,7 @@ export default class Drawer {
    * @param {Number} maxDepth The maximum depth.
    * @param {Number} depth The current depth.
    */
-  visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth) {
+  visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth, parentAtomicNumber = 0) {
     visited[vertexId] = 1;
     let vertex = this.graph.vertices[vertexId];
     let atomicNumber = vertex.value.getAtomicNumber();
@@ -2654,14 +2656,14 @@ export default class Drawer {
     }
 
     for (var i = 0; i < this.graph.getEdge(vertexId, previousVertexId).weight; i++) {
-      priority[depth].push(atomicNumber);
+      priority[depth].push(parentAtomicNumber * 1000 + atomicNumber);
     }
 
     let neighbours = this.graph.vertices[vertexId].neighbours;
 
     for (var i = 0; i < neighbours.length; i++) {
       if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
-        this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1);
+        this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1, atomicNumber);
       }
     }
 
@@ -2678,7 +2680,7 @@ export default class Drawer {
           priority.push(Array());
         }
 
-        priority[depth + 1].push(1);
+        priority[depth + 1].push(atomicNumber * 1000 + 1);
       }
     }
   }

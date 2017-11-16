@@ -1628,7 +1628,7 @@ var CanvasWrapper = function () {
                 start = r;
                 end = l;
 
-                shortLine.shortenRight(3.0);
+                shortLine.shortenRight(1.0);
 
                 sStart = shortLine.getRightVector().clone();
                 sEnd = shortLine.getLeftVector().clone();
@@ -1636,7 +1636,7 @@ var CanvasWrapper = function () {
                 start = l;
                 end = r;
 
-                shortLine.shortenLeft(3.0);
+                shortLine.shortenLeft(1.0);
 
                 sStart = shortLine.getLeftVector().clone();
                 sEnd = shortLine.getRightVector().clone();
@@ -1673,7 +1673,7 @@ var CanvasWrapper = function () {
             ctx.lineTo(sEnd.x, sEnd.y);
             ctx.lineCap = 'butt';
             ctx.lineWidth = width;
-            ctx.setLineDash([1, 1]);
+            ctx.setLineDash([0.75, 0.75]);
             ctx.strokeStyle = this.getColor('BACKGROUND');
             ctx.stroke();
             ctx.globalCompositeOperation = 'source-over';
@@ -4936,9 +4936,10 @@ var Drawer = function () {
             priorities[j][1].push([]);
           }
 
-          // Break ties by the position in the smiles string as per specification
+          // Break ties by the position in the SMILES string as per specification
           priorities[j][1].push([neighbours[j]]);
 
+          // Make all same length. Fill with zeroes.
           for (var k = 0; k < priorities[j][1].length; k++) {
             var _diff = maxEntries - priorities[j][1][k].length;
 
@@ -4970,6 +4971,7 @@ var Drawer = function () {
 
         // Check the angles between elements 0 and 1, and 0 and 2 to determine whether they are
         // drawn cw or ccw
+        // TODO: OC(Cl)=[C@]=C(C)F currently fails here, however this is, IMHO, not a valid SMILES.
         var posA = this.graph.vertices[neighbours[order[0]]].position;
         var posB = this.graph.vertices[neighbours[order[1]]].position;
         var posC = this.graph.vertices[neighbours[order[2]]].position;
@@ -4998,8 +5000,8 @@ var Drawer = function () {
         // Get the shortest subtree to flip up / down. Ignore lowest priority
         // The rules are following:
         // 1. Do not draw wedge between two stereocenters
-        // 2. Draw outside ring
-        // 3. Heteroatoms
+        // 2. Heteroatoms
+        // 3. Draw outside ring
         // 4. Shortest subtree
 
         var wedgeOrder = new Array(neighbours.length - 1);
@@ -5033,7 +5035,7 @@ var Drawer = function () {
         }
 
         vertex.value.chirality = rs;
-        // console.log(vertex.id, rs, neighbours, priorities);
+        console.log(vertex.id, rs, neighbours, priorities);
       }
     }
 
@@ -5051,6 +5053,8 @@ var Drawer = function () {
   }, {
     key: 'visitStereochemistry',
     value: function visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth) {
+      var parentAtomicNumber = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
+
       visited[vertexId] = 1;
       var vertex = this.graph.vertices[vertexId];
       var atomicNumber = vertex.value.getAtomicNumber();
@@ -5060,14 +5064,14 @@ var Drawer = function () {
       }
 
       for (var i = 0; i < this.graph.getEdge(vertexId, previousVertexId).weight; i++) {
-        priority[depth].push(atomicNumber);
+        priority[depth].push(parentAtomicNumber * 1000 + atomicNumber);
       }
 
       var neighbours = this.graph.vertices[vertexId].neighbours;
 
       for (var i = 0; i < neighbours.length; i++) {
         if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
-          this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1);
+          this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1, atomicNumber);
         }
       }
 
@@ -5084,7 +5088,7 @@ var Drawer = function () {
             priority.push(Array());
           }
 
-          priority[depth + 1].push(1);
+          priority[depth + 1].push(atomicNumber * 1000 + 1);
         }
       }
     }

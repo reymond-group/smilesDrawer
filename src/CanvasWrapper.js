@@ -403,7 +403,7 @@ export default class CanvasWrapper {
             start = r;
             end = l;
 
-            shortLine.shortenRight(3.0);
+            shortLine.shortenRight(.0);
 
             sStart = shortLine.getRightVector().clone();
             sEnd = shortLine.getLeftVector().clone();
@@ -411,7 +411,7 @@ export default class CanvasWrapper {
             start = l;
             end = r;
 
-            shortLine.shortenLeft(3.0);
+            shortLine.shortenLeft(1.0);
 
             sStart = shortLine.getLeftVector().clone();
             sEnd = shortLine.getRightVector().clone();
@@ -450,7 +450,7 @@ export default class CanvasWrapper {
         ctx.lineTo(sEnd.x, sEnd.y);
         ctx.lineCap = 'butt';
         ctx.lineWidth = width;
-        ctx.setLineDash([1, 1]);
+        ctx.setLineDash([0.75, 0.75]);
         ctx.strokeStyle = this.getColor('BACKGROUND');
         ctx.stroke();
         ctx.globalCompositeOperation = 'source-over';
