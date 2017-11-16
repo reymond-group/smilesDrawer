@@ -1393,7 +1393,7 @@ export default class Drawer {
         let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
         this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
       } else {
-        this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
+        // this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
       }
     }
 
