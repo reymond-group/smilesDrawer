@@ -80,7 +80,7 @@
 <dt><a href="#addNeighbouringElement">addNeighbouringElement(element)</a></dt>
 <dd><p>Adds a neighbouring element to this atom.</p>
 </dd>
-<dt><a href="#attachPseudoElement">attachPseudoElement(element, previousElement, [hydrogenCount])</a></dt>
+<dt><a href="#attachPseudoElement">attachPseudoElement(element, previousElement, [hydrogenCount], [charge])</a></dt>
 <dd><p>Attaches a pseudo element (e.g. Ac) to the atom.</p>
 </dd>
 <dt><a href="#getAttachedPseudoElements">getAttachedPseudoElements()</a> ⇒ <code>Object</code></dt>
@@ -154,6 +154,9 @@
 </dd>
 <dt><a href="#drawText">drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)</a></dt>
 <dd><p>Draw a text to the canvas.</p>
+</dd>
+<dt><a href="#getChargeText">getChargeText(charge)</a> ⇒ <code>String</code></dt>
+<dd><p>Translate the integer indicating the charge to the appropriate text.</p>
 </dd>
 <dt><a href="#drawDebugPoint">drawDebugPoint(x, y, [debugText], [color])</a></dt>
 <dd><p>Draws a dubug dot at a given coordinate and adds text.</p>
@@ -1025,7 +1028,7 @@ Adds a neighbouring element to this atom.
 
 <a name="attachPseudoElement"></a>
 
-## attachPseudoElement(element, previousElement, [hydrogenCount])
+## attachPseudoElement(element, previousElement, [hydrogenCount], [charge])
 Attaches a pseudo element (e.g. Ac) to the atom.
 
 **Kind**: global function  
@@ -1035,6 +1038,7 @@ Attaches a pseudo element (e.g. Ac) to the atom.
 | element | <code>String</code> |  | The element identifier (e.g. Br, C, ...). |
 | previousElement | <code>String</code> |  | The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated). |
 | [hydrogenCount] | <code>Number</code> | <code>0</code> | The number of hydrogens for the element. |
+| [charge] | <code>Number</code> | <code>0</code> | The charge for the element. |
 
 <a name="getAttachedPseudoElements"></a>
 
@@ -1292,6 +1296,18 @@ Draw a text to the canvas.
 | attachedPseudoElement[].element | <code>String</code> | The element symbol. |
 | attachedPseudoElement[].count | <code>Number</code> | The number of occurences that match the key. |
 | attachedPseudoElement[].hyrogenCount | <code>Number</code> | The number of hydrogens attached to each atom matching the key. |
+
+<a name="getChargeText"></a>
+
+## getChargeText(charge) ⇒ <code>String</code>
+Translate the integer indicating the charge to the appropriate text.
+
+**Kind**: global function  
+**Returns**: <code>String</code> - A string representing a charge.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| charge | <code>Number</code> | The integer indicating the charge. |
 
 <a name="drawDebugPoint"></a>
 

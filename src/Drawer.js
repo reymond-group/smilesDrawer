@@ -171,7 +171,9 @@ export default class Drawer {
 
         // Hydrogens should have only one neighbour, so just take the first
         let neighbour = this.graph.vertices[vertex.neighbours[0]];
-        if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2) {
+
+        if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing ||
+            neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
           vertex.value.isDrawn = false;
         }
       }
@@ -1216,7 +1218,7 @@ export default class Drawer {
 
     sides[0].multiplyScalar(10).add(a);
     sides[1].multiplyScalar(10).add(a);
-
+    
     if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' ||
       (edge.isPartOfAromaticRing && this.bridgedRing)) {
       // Always draw double bonds inside the ring
@@ -1649,7 +1651,7 @@ export default class Drawer {
     for (var i = 0; i < ring.members.length; i++) {
       let ringMember = this.graph.vertices[ring.members[i]];
       let ringMemberNeighbours = ringMember.neighbours;
-
+      
       // If there are multiple, the ovlerap will be resolved in the appropriate step
       for (var j = 0; j < ringMemberNeighbours.length; j++) {
         let v = this.graph.vertices[ringMemberNeighbours[j]];
@@ -2609,9 +2611,10 @@ export default class Drawer {
         let neighbour = this.graph.vertices[neighbours[order[j]]];
 
         wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 100000;
-        wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 10000 : 0;
-        wedgeOrder[j][0] += neighbour.value.rings.length > 0 ? 0 : 1000;
-        wedgeOrder[j][0] += neighbour.value.getAtomicNumber();
+        wedgeOrder[j][0] += neighbour.value.rings.length > 0 ? 0 : 10000;
+        wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 1000 : 0;
+        // wedgeOrder[j][0] += neighbour.value.getAtomicNumber();
+        wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
         wedgeOrder[j][1] = neighbours[order[j]];
       }
 
@@ -2750,12 +2753,14 @@ export default class Drawer {
         neighbour.value.isDrawn = false;
 
         let hydrogens = Atom.maxBonds[neighbour.value.element] - this.getBondCount(neighbour);
+        let charge = '';
 
         if (neighbour.value.bracket) {
           hydrogens = neighbour.value.bracket.hcount;
+          charge = neighbour.value.bracket.charge || 0;
         }
 
-        vertex.value.attachPseudoElement(neighbour.value.element, previous ? previous.value.element : null, hydrogens);
+        vertex.value.attachPseudoElement(neighbour.value.element, previous ? previous.value.element : null, hydrogens, charge);
       }
     }
 

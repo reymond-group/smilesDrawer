@@ -87,9 +87,10 @@ export default class Atom {
    * @param {String} element The element identifier (e.g. Br, C, ...).
    * @param {String} previousElement The element that is part of the main chain (not the terminals that are converted to the pseudo element or concatinated).
    * @param {Number} [hydrogenCount=0] The number of hydrogens for the element.
+   * @param {Number} [charge=0] The charge for the element.
    */
-  attachPseudoElement(element, previousElement, hydrogenCount = 0) {
-    let key = hydrogenCount + element;
+  attachPseudoElement(element, previousElement, hydrogenCount = 0, charge = 0) {
+    let key = hydrogenCount + element + charge;
 
     if (this.attachedPseudoElements[key]) {
       this.attachedPseudoElements[key].count += 1;
@@ -98,7 +99,8 @@ export default class Atom {
         element: element,
         count: 1,
         hydrogenCount: hydrogenCount,
-        previousElement: previousElement
+        previousElement: previousElement,
+        charge: charge
       };
     }
 

@@ -46,7 +46,7 @@ export default class CanvasWrapper {
         this.fontSmall = this.opts.fontSizeSmall + 'pt Helvetica, Arial, sans-serif';
 
         this.updateSize(this.opts.width, this.opts.height);
-        
+
         this.ctx.font = this.fontLarge;
         this.hydrogenWidth = this.ctx.measureText('H').width;
         this.halfHydrogenWidth = this.hydrogenWidth / 2.0;
@@ -63,12 +63,12 @@ export default class CanvasWrapper {
      */
     updateSize(width, height) {
         this.devicePixelRatio = window.devicePixelRatio || 1;
-        this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio ||  this.ctx.mozBackingStorePixelRatio || 
-                                 this.ctx.msBackingStorePixelRatio ||  this.ctx.oBackingStorePixelRatio || 
-                                 this.ctx.backingStorePixelRatio || 1;
+        this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio || this.ctx.mozBackingStorePixelRatio ||
+            this.ctx.msBackingStorePixelRatio || this.ctx.oBackingStorePixelRatio ||
+            this.ctx.backingStorePixelRatio || 1;
         this.ratio = this.devicePixelRatio / this.backingStoreRatio;
 
-        if (this.ratio !== 1) {      
+        if (this.ratio !== 1) {
             this.canvas.width = width * this.ratio;
             this.canvas.height = height * this.ratio;
             this.canvas.style.width = width + 'px';
@@ -292,7 +292,7 @@ export default class CanvasWrapper {
             isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
-        
+
         let ctx = this.ctx;
         let offsetX = this.offsetX;
         let offsetY = this.offsetY;
@@ -319,7 +319,7 @@ export default class CanvasWrapper {
         r.y += offsetY;
 
         ctx.save();
-        
+
         let normals = Vector2.normals(l, r);
 
         normals[0].normalize();
@@ -339,7 +339,7 @@ export default class CanvasWrapper {
         let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
         let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
         let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
-        
+
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
         ctx.lineTo(u.x, u.y);
@@ -347,11 +347,11 @@ export default class CanvasWrapper {
         ctx.lineTo(w.x, w.y);
 
         let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
-        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || 
-                this.getColor('C'));
-        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || 
-                this.getColor('C'));
-    
+        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
+            this.getColor('C'));
+        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
+            this.getColor('C'));
+
         ctx.fillStyle = gradient;
 
         ctx.fill();
@@ -550,17 +550,11 @@ export default class CanvasWrapper {
         let pseudoElementHandled = false;
 
         // Charge
-        let chargeText = '+'
+        let chargeText = ''
         let chargeWidth = 0;
 
         if (charge) {
-            if (charge === 2) {
-                chargeText = '2+';
-            } else if (charge === -1) {
-                chargeText = '-';
-            } else if (charge === -2) {
-                chargeText = '2-';
-            }
+            chargeText = this.getChargeText(charge);
 
             ctx.font = this.fontSmall;
             chargeWidth = ctx.measureText(chargeText).width;
@@ -689,10 +683,11 @@ export default class CanvasWrapper {
 
             let openParenthesisWidth = 0;
             let closeParenthesisWidth = 0;
-            
+
             let element = attachedPseudoElement[key].element;
             let elementCount = attachedPseudoElement[key].count;
             let hydrogenCount = attachedPseudoElement[key].hydrogenCount;
+            let elementCharge = attachedPseudoElement[key].charge;
 
             ctx.font = this.fontLarge;
 
@@ -704,6 +699,9 @@ export default class CanvasWrapper {
             let elementWidth = ctx.measureText(element).width;
             let elementCountWidth = 0;
 
+            let elementChargeText = '';
+            let elementChargeWidth = 0;
+
             hydrogenWidth = 0;
 
             if (hydrogenCount > 0) {
@@ -714,6 +712,11 @@ export default class CanvasWrapper {
 
             if (elementCount > 1) {
                 elementCountWidth = ctx.measureText(elementCount).width;
+            }
+
+            if (elementCharge !== 0) {
+                elementChargeText = this.getChargeText(elementCharge);
+                elementChargeWidth = ctx.measureText(elementChargeText).width;
             }
 
             hydrogenCountWidth = 0;
@@ -755,7 +758,7 @@ export default class CanvasWrapper {
                 if (direction === 'left') {
                     cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
                     ctx.fillText('H', hx + cursorPosLeft, hy)
-                    
+
                     if (hydrogenCount > 1) {
                         ctx.font = this.fontSmall;
                         ctx.fillText(hydrogenCount, hx + cursorPosLeft + hydrogenWidth, hy + this.opts.fifthFontSizeSmall);
@@ -783,22 +786,52 @@ export default class CanvasWrapper {
                     cursorPos += closeParenthesisWidth;
                 }
             }
-            
+
             ctx.font = this.fontSmall;
 
             if (elementCount > 1) {
                 if (direction === 'left') {
-                    ctx.fillText(elementCount, hx + cursorPosLeft + 
-                                 openParenthesisWidth + closeParenthesisWidth + hydrogenWidth + 
-                                 hydrogenCountWidth + elementWidth, hy + this.opts.fifthFontSizeSmall);
+                    ctx.fillText(elementCount, hx + cursorPosLeft +
+                        openParenthesisWidth + closeParenthesisWidth + hydrogenWidth +
+                        hydrogenCountWidth + elementWidth, hy + this.opts.fifthFontSizeSmall);
                 } else {
                     ctx.fillText(elementCount, hx + cursorPos, hy + this.opts.fifthFontSizeSmall);
                     cursorPos += elementCountWidth;
                 }
             }
+
+            if (elementCharge !== 0) {
+                if (direction === 'left') {
+                    ctx.fillText(elementChargeText, hx + cursorPosLeft +
+                        openParenthesisWidth + closeParenthesisWidth + hydrogenWidth +
+                        hydrogenCountWidth + elementWidth, y - this.opts.fifthFontSizeSmall + offsetY);
+                } else {
+                    ctx.fillText(elementChargeText, hx + cursorPos, y - this.opts.fifthFontSizeSmall + offsetY);
+                    cursorPos += elementChargeWidth;
+                }
+            }
         }
 
         ctx.restore();
+    }
+
+    /**
+     * Translate the integer indicating the charge to the appropriate text.
+     * @param {Number} charge The integer indicating the charge.
+     * @returns {String} A string representing a charge.
+     */
+    getChargeText(charge) {
+        if (charge === 1) {
+            return '+'
+        } else if (charge === 2) {
+            return '2+';
+        } else if (charge === -1) {
+            return '-';
+        } else if (charge === -2) {
+            return '2-';
+        } else {
+            return '';
+        }
     }
 
     /**
@@ -826,8 +859,8 @@ export default class CanvasWrapper {
         ctx.strokeStyle = this.getColor('C');
         ctx.lineWidth = this.opts.bondThickness;
         ctx.beginPath();
-        ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, 
-                radius - this.opts.bondSpacing, 0, Math.PI * 2, true); 
+        ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY,
+            radius - this.opts.bondSpacing, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.stroke();
         ctx.restore();
