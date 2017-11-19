@@ -170,7 +170,9 @@ export default class Drawer {
         }
 
         // Hydrogens should have only one neighbour, so just take the first
+        // Also set hasHydrogen true on connected atom
         let neighbour = this.graph.vertices[vertex.neighbours[0]];
+        neighbour.value.hasHydrogen = true;
 
         if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing ||
             neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
@@ -2594,7 +2596,9 @@ export default class Drawer {
         wedgeB = 'down';
       }
 
-      this.graph.getEdge(vertex.id, neighbours[order[order.length - 1]]).wedge = wedgeA;
+      if (vertex.value.hasHydrogen) {
+        this.graph.getEdge(vertex.id, neighbours[order[order.length - 1]]).wedge = wedgeA;
+      }
 
       // Get the shortest subtree to flip up / down. Ignore lowest priority
       // The rules are following:
@@ -2604,18 +2608,21 @@ export default class Drawer {
       // 4. Shortest subtree
 
       let wedgeOrder = new Array(neighbours.length - 1);
-      let showHydrogen = vertex.value.rings.length > 1;
+      let showHydrogen = vertex.value.rings.length > 1 && vertex.value.hasHydrogen;
+      let offset = vertex.value.hasHydrogen ? 1 : 0;
 
-      for (var j = 0; j < order.length - 1; j++) {
+      for (var j = 0; j < order.length - offset; j++) {
         wedgeOrder[j] = new Uint32Array(2);
         let neighbour = this.graph.vertices[neighbours[order[j]]];
-
+        
         wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 100000;
         wedgeOrder[j][0] += neighbour.value.rings.length > 0 ? 0 : 10000;
         wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 1000 : 0;
         // wedgeOrder[j][0] += neighbour.value.getAtomicNumber();
         wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
         wedgeOrder[j][1] = neighbours[order[j]];
+        
+        // if (vertex.id === 32) console.log(wedgeOrder[j][0], neighbour.id, neighbour);
       }
 
       wedgeOrder.sort(function (a, b) {
@@ -2635,7 +2642,7 @@ export default class Drawer {
       }
 
       vertex.value.chirality = rs;
-      console.log(vertex.id, rs, neighbours, priorities);
+      // console.log(vertex.id, rs, neighbours, priorities);
     }
   }
 

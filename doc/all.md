@@ -140,7 +140,7 @@
 <dt><a href="#drawWedge">drawWedge(line, width)</a></dt>
 <dd><p>Draw a wedge on the canvas.</p>
 </dd>
-<dt><a href="#drawDashedWedge">drawDashedWedge(line, width)</a></dt>
+<dt><a href="#drawDashedWedge">drawDashedWedge(line)</a></dt>
 <dd><p>Draw a dashed wedge on the canvas.</p>
 </dd>
 <dt><a href="#drawDebugText">drawDebugText(x, y, text)</a></dt>
@@ -1226,15 +1226,14 @@ Draw a wedge on the canvas.
 
 <a name="drawDashedWedge"></a>
 
-## drawDashedWedge(line, width)
+## drawDashedWedge(line)
 Draw a dashed wedge on the canvas.
 
 **Kind**: global function  
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| line | <code>Line</code> |  | A line. |
-| width | <code>Number</code> | <code>6</code> | The wedge width. |
+| Param | Type | Description |
+| --- | --- | --- |
+| line | <code>Line</code> | A line. |
 
 <a name="drawDebugText"></a>
 

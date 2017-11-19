@@ -71,6 +71,7 @@ export default class Atom {
     this.mainChain = false;
     this.hydrogenDirection = 'down';
     this.subtreeDepth = 1;
+    this.hasHydrogen = false;
   }
 
   /**

@@ -652,6 +652,7 @@ var Atom = function () {
     this.mainChain = false;
     this.hydrogenDirection = 'down';
     this.subtreeDepth = 1;
+    this.hasHydrogen = false;
   }
 
   /**
@@ -1586,14 +1587,11 @@ var CanvasWrapper = function () {
          * Draw a dashed wedge on the canvas.
          *
          * @param {Line} line A line.
-         * @param {Number} width The wedge width.
          */
 
     }, {
         key: 'drawDashedWedge',
         value: function drawDashedWedge(line) {
-            var width = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 6.0;
-
             if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
                 return;
             }
@@ -1631,7 +1629,7 @@ var CanvasWrapper = function () {
                 start = r;
                 end = l;
 
-                shortLine.shortenRight(.0);
+                shortLine.shortenRight(1.0);
 
                 sStart = shortLine.getRightVector().clone();
                 sEnd = shortLine.getLeftVector().clone();
@@ -1650,37 +1648,58 @@ var CanvasWrapper = function () {
             sEnd.x += offsetX;
             sEnd.y += offsetY;
 
-            var t = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[0], this.opts.bondThickness));
-            var u = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
-            var v = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
-            var w = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[1], this.opts.bondThickness));
-
+            var dir = _Vector2.default.subtract(end, start).normalize();
+            ctx.strokeStyle = this.getColor('C');
+            ctx.lineCap = 'round';
+            ctx.lineWidth = this.opts.bondThickness;
             ctx.beginPath();
+            var length = line.getLength();
+            var step = 1.25 / length;
+
+            for (var t = 0.0; t < 1.0; t += step) {
+                var to = _Vector2.default.multiplyScalar(dir, t * length);
+                var startDash = _Vector2.default.add(start, to);
+                var width = 1.5 * t;
+                var dashOffset = _Vector2.default.multiplyScalar(normals[0], width);
+                startDash.subtract(dashOffset);
+                ctx.moveTo(startDash.x, startDash.y);
+                startDash.add(_Vector2.default.multiplyScalar(dashOffset, 2.0));
+                ctx.lineTo(startDash.x, startDash.y);
+            }
+
+            ctx.stroke();
+            ctx.restore();
+
+            /*
+              let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
+            let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
+            let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
+            let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
+              ctx.beginPath();
             ctx.moveTo(t.x, t.y);
             ctx.lineTo(u.x, u.y);
             ctx.lineTo(v.x, v.y);
             ctx.lineTo(w.x, w.y);
-
-            var gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
-            gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || this.getColor('C'));
-            gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
-
-            ctx.fillStyle = gradient;
-
-            ctx.fill();
-
-            // Now dash it
+              let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
+            gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
+                this.getColor('C'));
+            gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
+                this.getColor('C'));
+              ctx.fillStyle = gradient;
+              ctx.fill();
+              // Now dash it
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
             ctx.moveTo(sStart.x, sStart.y);
             ctx.lineTo(sEnd.x, sEnd.y);
             ctx.lineCap = 'butt';
-            ctx.lineWidth = width;
+            ctx.lineWidth = 2;
             ctx.setLineDash([0.75, 0.75]);
             ctx.strokeStyle = this.getColor('BACKGROUND');
             ctx.stroke();
             ctx.globalCompositeOperation = 'source-over';
             ctx.restore();
+            */
         }
 
         /**
@@ -2363,7 +2382,9 @@ var Drawer = function () {
           }
 
           // Hydrogens should have only one neighbour, so just take the first
+          // Also set hasHydrogen true on connected atom
           var neighbour = this.graph.vertices[vertex.neighbours[0]];
+          neighbour.value.hasHydrogen = true;
 
           if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing || neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
             vertex.value.isDrawn = false;
@@ -5033,7 +5054,9 @@ var Drawer = function () {
           wedgeB = 'down';
         }
 
-        this.graph.getEdge(vertex.id, neighbours[order[order.length - 1]]).wedge = wedgeA;
+        if (vertex.value.hasHydrogen) {
+          this.graph.getEdge(vertex.id, neighbours[order[order.length - 1]]).wedge = wedgeA;
+        }
 
         // Get the shortest subtree to flip up / down. Ignore lowest priority
         // The rules are following:
@@ -5043,9 +5066,10 @@ var Drawer = function () {
         // 4. Shortest subtree
 
         var wedgeOrder = new Array(neighbours.length - 1);
-        var showHydrogen = vertex.value.rings.length > 1;
+        var showHydrogen = vertex.value.rings.length > 1 && vertex.value.hasHydrogen;
+        var offset = vertex.value.hasHydrogen ? 1 : 0;
 
-        for (var j = 0; j < order.length - 1; j++) {
+        for (var j = 0; j < order.length - offset; j++) {
           wedgeOrder[j] = new Uint32Array(2);
           var neighbour = this.graph.vertices[neighbours[order[j]]];
 
@@ -5055,6 +5079,8 @@ var Drawer = function () {
           // wedgeOrder[j][0] += neighbour.value.getAtomicNumber();
           wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
           wedgeOrder[j][1] = neighbours[order[j]];
+
+          // if (vertex.id === 32) console.log(wedgeOrder[j][0], neighbour.id, neighbour);
         }
 
         wedgeOrder.sort(function (a, b) {
@@ -5074,7 +5100,7 @@ var Drawer = function () {
         }
 
         vertex.value.chirality = rs;
-        console.log(vertex.id, rs, neighbours, priorities);
+        // console.log(vertex.id, rs, neighbours, priorities);
       }
     }
 

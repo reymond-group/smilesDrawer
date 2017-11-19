@@ -362,9 +362,8 @@ export default class CanvasWrapper {
      * Draw a dashed wedge on the canvas.
      *
      * @param {Line} line A line.
-     * @param {Number} width The wedge width.
      */
-    drawDashedWedge(line, width = 6.0) {
+    drawDashedWedge(line) {
         if (isNaN(line.from.x) || isNaN(line.from.y) ||
             isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
@@ -390,6 +389,7 @@ export default class CanvasWrapper {
         normals[0].normalize();
         normals[1].normalize();
 
+
         let isRightChiralCenter = line.getRightChiral();
 
         let start;
@@ -403,7 +403,7 @@ export default class CanvasWrapper {
             start = r;
             end = l;
 
-            shortLine.shortenRight(.0);
+            shortLine.shortenRight(1.0);
 
             sStart = shortLine.getRightVector().clone();
             sEnd = shortLine.getLeftVector().clone();
@@ -421,6 +421,30 @@ export default class CanvasWrapper {
         sStart.y += offsetY;
         sEnd.x += offsetX;
         sEnd.y += offsetY;
+
+        let dir = Vector2.subtract(end, start).normalize();
+        ctx.strokeStyle = this.getColor('C');
+        ctx.lineCap = 'round';
+        ctx.lineWidth = this.opts.bondThickness;
+        ctx.beginPath();
+        let length = line.getLength();
+        let step = 1.25 / length;
+
+        for (var t = 0.0; t < 1.0; t += step) {
+          let to = Vector2.multiplyScalar(dir, t * length);
+          let startDash = Vector2.add(start, to);
+          let width = 1.5 * t;
+          let dashOffset = Vector2.multiplyScalar(normals[0], width);
+          startDash.subtract(dashOffset);
+          ctx.moveTo(startDash.x, startDash.y);
+          startDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
+          ctx.lineTo(startDash.x, startDash.y);
+        }
+
+        ctx.stroke();
+        ctx.restore();
+
+        /*
 
         let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
         let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
@@ -449,12 +473,13 @@ export default class CanvasWrapper {
         ctx.moveTo(sStart.x, sStart.y);
         ctx.lineTo(sEnd.x, sEnd.y);
         ctx.lineCap = 'butt';
-        ctx.lineWidth = width;
+        ctx.lineWidth = 2;
         ctx.setLineDash([0.75, 0.75]);
         ctx.strokeStyle = this.getColor('BACKGROUND');
         ctx.stroke();
         ctx.globalCompositeOperation = 'source-over';
         ctx.restore();
+        */
     }
 
     /**
