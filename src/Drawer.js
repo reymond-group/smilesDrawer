@@ -2039,9 +2039,9 @@ export default class Drawer {
         let nextVertex = this.graph.vertices[neighbours[0]];
 
         // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
-        // or if there are successive double bonds
+        // or if there are successive double bonds. Added a ring check because if there is an aromatic ring the ring bond inside the ring counts as a double bond and leads to =-= being straight.
         if ((vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) ||
-          vertex.value.bondType === '=' && previousVertex && previousVertex.value.bondType === '=') {
+          vertex.value.bondType === '=' && previousVertex && previousVertex.value.rings.length === 0 && previousVertex.value.bondType === '=') {
           vertex.value.drawExplicit = false;
 
           if (previousVertex) {
@@ -2150,7 +2150,7 @@ export default class Drawer {
         if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
           transVertex.value.mainChain = true;
           cisVertex.value.mainChain = true;
-
+          
           if (vertex.position.clockwise(vertex.previousPosition) === 1) {
             transVertex.angle = MathHelper.toRad(60);
             cisVertex.angle = -MathHelper.toRad(60);
@@ -2164,7 +2164,7 @@ export default class Drawer {
             cisVertex.angle = MathHelper.toRad(60);
             transVertex.globalAngle = angle + transVertex.angle;
             cisVertex.globalAngle = angle + cisVertex.angle;
-
+            
             this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
             this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
           }
