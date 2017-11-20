@@ -1308,6 +1308,10 @@ var CanvasWrapper = function () {
             var minY = Number.MAX_VALUE;
 
             for (var i = 0; i < vertices.length; i++) {
+                if (!vertices[i].value.isDrawn) {
+                    continue;
+                }
+
                 var p = vertices[i].position;
 
                 if (maxX < p.x) maxX = p.x;
@@ -1837,7 +1841,7 @@ var CanvasWrapper = function () {
             dim.height = parseInt(this.fontLarge, 10);
 
             var r = dim.width > this.opts.fontSizeLarge ? dim.width : this.opts.fontSizeLarge;
-            r /= 1.25;
+            r /= 1.5;
 
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
@@ -3513,6 +3517,8 @@ var Drawer = function () {
       for (var i = 0; i < ringSize; i++) {
         total.add(this.graph.vertices[ring.members[i]].position);
       }
+
+      ring.center = total.divide(ringSize);
     }
 
     /**
@@ -3825,15 +3831,15 @@ var Drawer = function () {
         }
       }
 
-      if (this.rings.length > 0 && startVertex === null) {
-        startVertex = this.graph.vertices[this.rings[0].members[0]];
-      }
+      // if (this.rings.length > 0 && startVertex === null) {
+      //   startVertex = this.graph.vertices[this.rings[0].members[0]];
+      // }
 
       if (startVertex === null) {
         startVertex = this.graph.vertices[0];
       }
 
-      this.createNextBond(startVertex);
+      this.createNextBond(startVertex, null, 0.0, 1);
     }
 
     /**
@@ -4069,7 +4075,7 @@ var Drawer = function () {
           }
 
           v.value.isConnectedToRing = true;
-          this.createNextBond(v, ringMember);
+          this.createNextBond(v, ringMember, 0.0, 1);
         }
       }
 
@@ -4077,7 +4083,7 @@ var Drawer = function () {
         var u = this.graph.vertices[positioned[i][1]]; // this is the ring vertex
         var _v2 = this.graph.vertices[positioned[i][0]]; // this is the vertex attached to the ring vertex
         _v2.previousPosition = u.position;
-        this.createNextBond(_v2, u, 0, 0, true);
+        this.createNextBond(_v2, u, 0.0, 1, true);
       }
     }
 
@@ -4318,7 +4324,7 @@ var Drawer = function () {
      * @param {Vertex} vertex A vertex.
      * @param {Vertex} [previousVertex=null] The previous vertex which has been positioned.
      * @param {Number} [previousAngle=0.0] The global angle of the previous vertex.
-     * @param {Number} [dir=1] Either 1 or -1 to break ties (if no angle can be elucidated).
+     * @param {Number} [dir=null] Either 1 or -1 to break ties (if no angle can be elucidated).
      * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
      */
 
@@ -4327,7 +4333,7 @@ var Drawer = function () {
     value: function createNextBond(vertex) {
       var previousVertex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var previousAngle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.0;
-      var dir = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+      var dir = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
       var skipPositioning = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
       if (vertex.positioned && !skipPositioning) {
@@ -4473,7 +4479,8 @@ var Drawer = function () {
 
           // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
           // or if there are successive double bonds. Added a ring check because if there is an aromatic ring the ring bond inside the ring counts as a double bond and leads to =-= being straight.
-          if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#' || vertex.value.bondType === '=' && previousVertex && previousVertex.value.rings.length === 0 && previousVertex.value.bondType === '=') {
+          if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#' || vertex.value.bondType === '=' && previousVertex && previousVertex.value.rings.length === 0 && previousVertex.value.bondType === '=' && vertex.value.branchBond !== '-') {
+
             vertex.value.drawExplicit = false;
 
             if (previousVertex) {
@@ -4516,7 +4523,7 @@ var Drawer = function () {
             nextVertex.globalAngle = angle + nextVertex.angle;
             this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
           } else {
-            if (!dir) {
+            if (dir === null) {
               var _proposedAngleA = _MathHelper2.default.toRad(60);
               var _proposedAngleB = -_proposedAngleA;
 
@@ -4566,14 +4573,35 @@ var Drawer = function () {
           var cis = 0;
           var trans = 1;
 
-          if (subTreeDepthA > subTreeDepthB) {
+          // Carbons go always cis
+          if (_r3.value.element === 'C' && l.value.element !== 'C') {
+            cis = 0;
+            trans = 1;
+          } else if (_r3.value.element !== 'C' && l.value.element === 'C') {
             cis = 1;
             trans = 0;
-
-            var tmp = subTreeDepthA;
-            subTreeDepthA = subTreeDepthB;
-            subTreeDepthB = tmp;
+          } else if (subTreeDepthA > subTreeDepthB) {
+            cis = 1;
+            trans = 0;
           }
+
+          // if (subTreeDepthA > subTreeDepthB) {
+          //   cis = 1;
+          //   trans = 0;
+
+          //   let tmp = subTreeDepthA;
+          //   subTreeDepthA = subTreeDepthB;
+          //   subTreeDepthB = tmp;
+          // } else if (subTreeDepthA === subTreeDepthB) {
+          //   // If the depths are the same, prefere carbon to go cis
+          //   if (r.value.element === 'C') {
+          //     cis = dir === 1 ? 0 : 1;
+          //     trans = dir === 1 ? 1 : 0;
+          //   } else if (l.value.element === 'C') {
+          //     cis = dir === 1 ? 1 : 0;
+          //     trans = dir === 1 ? 0 : 1;
+          //   }
+          // }
 
           var cisVertex = this.graph.vertices[_neighbours2[cis]];
           var transVertex = this.graph.vertices[_neighbours2[trans]];
@@ -4598,14 +4626,12 @@ var Drawer = function () {
               cisVertex.globalAngle = angle + cisVertex.angle;
 
               this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
-              this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
+              this.createNextBond(transVertex, vertex, transVertex.globalAngle, dir);
             }
           } else {
-            console.log(vertex.id, cisVertex.id, transVertex.id);
             if (vertex.position.clockwise(vertex.previousPosition) === 1) {
               previousVertex.value.mainChain = true;
               transVertex.value.mainChain = true;
-
               transVertex.angle = _MathHelper2.default.toRad(60);
               cisVertex.angle = -_MathHelper2.default.toRad(60);
               transVertex.globalAngle = angle + transVertex.angle;
@@ -4687,8 +4713,8 @@ var Drawer = function () {
             _r4.globalAngle = angle + _r4.angle;
 
             this.createNextBond(s, vertex, s.globalAngle, -dir);
-            this.createNextBond(_l, vertex, _l.globalAngle);
-            this.createNextBond(_r4, vertex, _r4.globalAngle);
+            this.createNextBond(_l, vertex, _l.globalAngle, 1);
+            this.createNextBond(_r4, vertex, _r4.globalAngle, 1);
           } else {
             s.angle = 0.0;
             _l.angle = _MathHelper2.default.toRad(90);
@@ -4698,9 +4724,9 @@ var Drawer = function () {
             _l.globalAngle = angle + _l.angle;
             _r4.globalAngle = angle + _r4.angle;
 
-            this.createNextBond(s, vertex, s.globalAngle);
-            this.createNextBond(_l, vertex, _l.globalAngle);
-            this.createNextBond(_r4, vertex, _r4.globalAngle);
+            this.createNextBond(s, vertex, s.globalAngle, 1);
+            this.createNextBond(_l, vertex, _l.globalAngle, 1);
+            this.createNextBond(_r4, vertex, _r4.globalAngle, 1);
           }
         } else if (_neighbours2.length === 4) {
           // The vertex with the longest sub-tree should always go to the reflected opposide direction
@@ -4746,10 +4772,10 @@ var Drawer = function () {
           y.globalAngle = angle + y.angle;
           z.globalAngle = angle + z.angle;
 
-          this.createNextBond(w, vertex, w.globalAngle);
-          this.createNextBond(x, vertex, x.globalAngle);
-          this.createNextBond(y, vertex, y.globalAngle);
-          this.createNextBond(z, vertex, z.globalAngle);
+          this.createNextBond(w, vertex, w.globalAngle, 1);
+          this.createNextBond(x, vertex, x.globalAngle, 1);
+          this.createNextBond(y, vertex, y.globalAngle, 1);
+          this.createNextBond(z, vertex, z.globalAngle, 1);
         }
       }
     }
@@ -5073,10 +5099,10 @@ var Drawer = function () {
         for (var j = 0; j < order.length - offset; j++) {
           wedgeOrder[j] = new Uint32Array(2);
           var neighbour = this.graph.vertices[neighbours[order[j]]];
-
           wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 100000;
           wedgeOrder[j][0] += neighbour.value.rings.length > 0 ? 0 : 10000;
           wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 1000 : 0;
+          wedgeOrder[j][0] -= neighbour.value.subtreeDepth === 0 ? 1000 : 0;
           // wedgeOrder[j][0] += neighbour.value.getAtomicNumber();
           wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
           wedgeOrder[j][1] = neighbours[order[j]];

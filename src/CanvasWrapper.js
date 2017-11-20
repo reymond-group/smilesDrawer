@@ -102,6 +102,10 @@ export default class CanvasWrapper {
         let minY = Number.MAX_VALUE;
 
         for (var i = 0; i < vertices.length; i++) {
+            if (!vertices[i].value.isDrawn) {
+                continue;
+            }
+
             let p = vertices[i].position;
 
             if (maxX < p.x) maxX = p.x;
@@ -431,14 +435,14 @@ export default class CanvasWrapper {
         let step = 1.25 / length;
 
         for (var t = 0.0; t < 1.0; t += step) {
-          let to = Vector2.multiplyScalar(dir, t * length);
-          let startDash = Vector2.add(start, to);
-          let width = 1.5 * t;
-          let dashOffset = Vector2.multiplyScalar(normals[0], width);
-          startDash.subtract(dashOffset);
-          ctx.moveTo(startDash.x, startDash.y);
-          startDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
-          ctx.lineTo(startDash.x, startDash.y);
+            let to = Vector2.multiplyScalar(dir, t * length);
+            let startDash = Vector2.add(start, to);
+            let width = 1.5 * t;
+            let dashOffset = Vector2.multiplyScalar(normals[0], width);
+            startDash.subtract(dashOffset);
+            ctx.moveTo(startDash.x, startDash.y);
+            startDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
+            ctx.lineTo(startDash.x, startDash.y);
         }
 
         ctx.stroke();
@@ -603,7 +607,7 @@ export default class CanvasWrapper {
         dim.height = parseInt(this.fontLarge, 10);
 
         let r = (dim.width > this.opts.fontSizeLarge) ? dim.width : this.opts.fontSizeLarge;
-        r /= 1.25;
+        r /= 1.5;
 
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
