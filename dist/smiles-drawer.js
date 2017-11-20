@@ -6298,8 +6298,8 @@ var Graph = function () {
       // Setting parameters
       var threshold = 0.1;
       var innerThreshold = 0.1;
-      var maxIteration = 1000;
-      var maxInnerIteration = 50;
+      var maxIteration = 10000;
+      var maxInnerIteration = 500;
       var maxEnergy = 1e9;
 
       // Setting up variables for the while loops

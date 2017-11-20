@@ -785,8 +785,8 @@ export default class Graph {
     // Setting parameters
     let threshold = 0.1;
     let innerThreshold = 0.1;
-    let maxIteration = 1000;
-    let maxInnerIteration = 50;
+    let maxIteration = 10000;
+    let maxInnerIteration = 500;
     let maxEnergy = 1e9;
 
     // Setting up variables for the while loops
