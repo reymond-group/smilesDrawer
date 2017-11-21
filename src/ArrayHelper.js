@@ -29,6 +29,32 @@ export default class ArrayHelper {
     }
 
     /**
+     * Returns a boolean indicating whether or not the two arrays contain the same elements.
+     * Only supports 1d, non-nested arrays.
+     *
+     * @static
+     * @param {Array} arrA An array.
+     * @param {Array} arrB An array.
+     * @returns {Boolean} A boolean indicating whether or not the two arrays contain the same elements.
+     */
+    static equals(arrA, arrB) {
+        if (arrA.length !== arrB.length) {
+            return false;
+        }
+
+        let tmpA = arrA.slice().sort();
+        let tmpB = arrB.slice().sort();
+
+        for (var i = 0; i < tmpA.length; i++) {
+            if (tmpA[i] !== tmpB[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Returns a string representation of an array. If the array contains objects with an id property, the id property is printed for each of the elements.
      *
      * @static

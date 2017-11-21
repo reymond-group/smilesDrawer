@@ -8,5 +8,6 @@ let force = [
     'NC1=CC=C2C(=O)NC(=O)C3=CC=CC1=C23',
     'CC1=C(C2=CC3=NC(=CC4=C(C(=C([N-]4)C=C5C(=C(C(=N5)C=C1[N-]2)C)CCC(=O)O)CCC(=O)O)C)C(=C3C)C=C)C=C',
     '[H][C@@]12CC3=CC=C(OC4=C5C(CC[N+](C)(C)[C@]5([H])CC5=CC(OC6=C(OC)C=C(CCN1C)C2=C6)=C(O)C=C5)=CC(OC)=C4O)C=C3',
-    '[H][C@@]1(C[C@@H](C)[C@]2([H])CC(=O)[C@H](C)C=C(C)[C@@H](O)[C@@H](OC)C(=O)[C@H](C)C[C@H](C)C=CC=CC=C(C)[C@H](C[C@]3([H])CC[C@@H](C)[C@@](O)(O3)C(=O)C(=O)N3CCCC[C@@]3([H])C(=O)O2)OC)CC[C@@H](OCCO)[C@@H](C1)OC'
+    '[H][C@@]1(C[C@@H](C)[C@]2([H])CC(=O)[C@H](C)C=C(C)[C@@H](O)[C@@H](OC)C(=O)[C@H](C)C[C@H](C)C=CC=CC=C(C)[C@H](C[C@]3([H])CC[C@@H](C)[C@@](O)(O3)C(=O)C(=O)N3CCCC[C@@]3([H])C(=O)O2)OC)CC[C@@H](OCCO)[C@@H](C1)OC',
+    '[H][C@]12[C@H](OC(=O)C3=CC=CC=C3)[C@]3(O)C[C@H](OC(=O)[C@H](O)[C@@H](NC(=O)C4=CC=CC=C4)C4=CC=CC=C4)C(C)=C([C@@H](OC(C)=O)C(=O)[C@]1(C)[C@@H](O)C[C@H]1OC[C@@]21OC(C)=O)C3(C)C'
 ]

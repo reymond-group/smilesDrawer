@@ -1434,9 +1434,9 @@ export default class Drawer {
       }
     }
 
-    // if (this.rings.length > 0 && startVertex === null) {
-    //   startVertex = this.graph.vertices[this.rings[0].members[0]];
-    // }
+    if (this.rings.length > 0 && startVertex === null) {
+      startVertex = this.graph.vertices[this.rings[0].members[0]];
+    }
 
     if (startVertex === null) {
       startVertex = this.graph.vertices[0];
@@ -1563,6 +1563,7 @@ export default class Drawer {
         a += angle;
 
         if (!ring.isBridged || ring.rings.length < 3) {
+          vertex.angle = a;
           vertex.positioned = true;
         }
       }, startVertexId, (previousVertex) ? previousVertex.id : null);
@@ -1669,11 +1670,18 @@ export default class Drawer {
       }
     }
 
+    // Vertices that are directly connected to a bridged ring.
     for (var i = 0; i < positioned.length; i++) {
       let u = this.graph.vertices[positioned[i][1]]; // this is the ring vertex
       let v = this.graph.vertices[positioned[i][0]]; // this is the vertex attached to the ring vertex
       v.previousPosition = u.position;
-      this.createNextBond(v, u, 0.0, 1, true);
+
+      if (u.value.originalRings.length === 2) {
+        v.positioned = false;
+        this.createNextBond(v, u, 1.0, 1);
+      } else {
+        this.createNextBond(v, u, 1.0, 1, true);
+      }
     }
   }
 
@@ -1926,7 +1934,6 @@ export default class Drawer {
       } else if (previousVertex.value.originalRings.length === 1) {
         let vecs = Array()
         let neighbours = previousVertex.neighbours;
-
         for (var i = 0; i < neighbours.length; i++) {
           let neighbour = this.graph.vertices[neighbours[i]];
 
@@ -1934,42 +1941,30 @@ export default class Drawer {
             vecs.push(Vector2.subtract(neighbour.position, previousVertex.position));
           }
         }
-
+        
         let avg = Vector2.averageDirection(vecs);
         vertex.setPositionFromVector(avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
         vertex.previousPosition = previousVertex.position;
         vertex.positioned = true;
       } else if (previousVertex.value.originalRings.length > 1) {
         let neighbours = previousVertex.neighbours;
-        let added = new Vector2(0, 0);
+        
+        // For steroids and other joined but not bridged rings
+        let joinedVertex = null;
 
         for (var i = 0; i < neighbours.length; i++) {
           let neighbour = this.graph.vertices[neighbours[i]];
-
-          if (neighbour.positioned) {
-            added.add(Vector2.subtract(neighbour.position, previousVertex.position));
-          }
-        }
-
-        added.normalize();
-        added.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
-
-        // Invert if too close to another of the averaged vertices (resolve situations like: CC1CC2NCC3(N)CC1(C)C23CC#C)
-        for (var i = 0; i < neighbours.length; i++) {
-          let neighbour = this.graph.vertices[neighbours[i]];
-
-          if (!neighbour.positioned) {
-            continue;
-          }
-
-          if (Vector2.threePointangle(added, previousVertex.position, neighbour.position) > 3.1) {
-            added.rotateAround(Math.PI, previousVertex.position);
+          if (ArrayHelper.containsAll(neighbour.value.originalRings, previousVertex.value.originalRings)) {
+            joinedVertex = neighbour;
             break;
           }
         }
 
+        // Stil a problem with e.g. adamantanes. COC1=C(C=C(C=C1)C1=CC2=C(C=C1)C=C(C=C2)C(O)=O)C12CC3CC(CC(C3)C1)C2
+        let pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);
+
         vertex.previousPosition = previousVertex.position;
-        vertex.setPositionFromVector(added);
+        vertex.setPositionFromVector(pos);
         vertex.positioned = true;
       } else {
         // If the previous vertex was not part of a ring, draw a bond based
@@ -2113,11 +2108,15 @@ export default class Drawer {
             nextVertex.angle = MathHelper.toRad(60) * dir;
             dir = -dir;
           }
-
+          
           nextVertex.globalAngle = angle + nextVertex.angle;
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
         }
       } else if (neighbours.length === 2) {
+        // If the previous vertex comes out of a ring, it doesn't have an angle set
+        if (vertex.angle === null) {
+          vertex.angle = MathHelper.toRad(-60);
+        }
         // Check for the longer subtree - always go with cis for the longer subtree
         let subTreeDepthA = this.graph.getTreeDepth(neighbours[0], vertex.id);
         let subTreeDepthB = this.graph.getTreeDepth(neighbours[1], vertex.id);
@@ -2139,34 +2138,16 @@ export default class Drawer {
         let trans = 1;
 
         // Carbons go always cis
-        if (r.value.element === 'C' && l.value.element !== 'C') {
-          cis = 0;
-          trans = 1;
-        } else if (r.value.element !== 'C' && l.value.element === 'C') {
+        if (r.value.element === 'C' && l.value.element !== 'C' && subTreeDepthB > 1 && subTreeDepthA < 5) {
           cis = 1;
           trans = 0;
-        } else if (subTreeDepthA > subTreeDepthB) {
+        } else if (r.value.element !== 'C' && l.value.element === 'C' && subTreeDepthA > 1 && subTreeDepthB < 5) {
+          cis = 0;
+          trans = 1;
+        } else if (subTreeDepthB > subTreeDepthA) {
           cis = 1;
           trans = 0;
         }
-
-        // if (subTreeDepthA > subTreeDepthB) {
-        //   cis = 1;
-        //   trans = 0;
-
-        //   let tmp = subTreeDepthA;
-        //   subTreeDepthA = subTreeDepthB;
-        //   subTreeDepthB = tmp;
-        // } else if (subTreeDepthA === subTreeDepthB) {
-        //   // If the depths are the same, prefere carbon to go cis
-        //   if (r.value.element === 'C') {
-        //     cis = dir === 1 ? 0 : 1;
-        //     trans = dir === 1 ? 1 : 0;
-        //   } else if (l.value.element === 'C') {
-        //     cis = dir === 1 ? 1 : 0;
-        //     trans = dir === 1 ? 0 : 1;
-        //   }
-        // }
 
         let cisVertex = this.graph.vertices[neighbours[cis]];
         let transVertex = this.graph.vertices[neighbours[trans]];
@@ -2177,45 +2158,32 @@ export default class Drawer {
           cisVertex.value.mainChain = true;
 
           if (vertex.position.clockwise(vertex.previousPosition) === 1) {
-            transVertex.angle = MathHelper.toRad(60);
-            cisVertex.angle = -MathHelper.toRad(60);
+            transVertex.angle = -vertex.angle;
+            cisVertex.angle = vertex.angle;
             transVertex.globalAngle = angle + transVertex.angle;
             cisVertex.globalAngle = angle + cisVertex.angle;
 
-            this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
-            this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
-          } else {
-            transVertex.angle = -MathHelper.toRad(60);
-            cisVertex.angle = MathHelper.toRad(60);
-            transVertex.globalAngle = angle + transVertex.angle;
-            cisVertex.globalAngle = angle + cisVertex.angle;
-
-            this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
             this.createNextBond(transVertex, vertex, transVertex.globalAngle, dir);
+            this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
+          } else {
+            transVertex.angle = vertex.angle;
+            cisVertex.angle = -vertex.angle;
+            transVertex.globalAngle = angle + transVertex.angle;
+            cisVertex.globalAngle = angle + cisVertex.angle;
+
+            this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
+            this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
           }
         } else {
-          if (vertex.position.clockwise(vertex.previousPosition) === 1) {
-            previousVertex.value.mainChain = true;
-            transVertex.value.mainChain = true;
-            transVertex.angle = MathHelper.toRad(60);
-            cisVertex.angle = -MathHelper.toRad(60);
-            transVertex.globalAngle = angle + transVertex.angle;
-            cisVertex.globalAngle = angle + cisVertex.angle;
+          previousVertex.value.mainChain = true;
+          transVertex.value.mainChain = true;
+          transVertex.angle = vertex.angle;
+          cisVertex.angle = -vertex.angle;
+          transVertex.globalAngle = angle + transVertex.angle;
+          cisVertex.globalAngle = angle + cisVertex.angle;
 
-            this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
-            this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
-          } else {
-            previousVertex.value.mainChain = true;
-            cisVertex.value.mainChain = true;
-
-            transVertex.angle = -MathHelper.toRad(60);
-            cisVertex.angle = MathHelper.toRad(60);
-            transVertex.globalAngle = angle + transVertex.angle;
-            cisVertex.globalAngle = angle + cisVertex.angle;
-
-            this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
-            this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
-          }
+          this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
+          this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
         }
       } else if (neighbours.length === 3) {
         // The vertex with the longest sub-tree should always go straight
@@ -2268,7 +2236,7 @@ export default class Drawer {
               dir = 1;
             }
           } else {
-            s.angle = MathHelper.toRad(60) * dir;
+            s.angle = -vertex.angle; // * dir;
             dir = -dir;
           }
 
@@ -2279,7 +2247,7 @@ export default class Drawer {
           l.globalAngle = angle + l.angle;
           r.globalAngle = angle + r.angle;
 
-          this.createNextBond(s, vertex, s.globalAngle, -dir);
+          this.createNextBond(s, vertex, s.globalAngle, dir);
           this.createNextBond(l, vertex, l.globalAngle, 1);
           this.createNextBond(r, vertex, r.globalAngle, 1);
         } else {
@@ -2328,7 +2296,7 @@ export default class Drawer {
           y = this.graph.vertices[neighbours[1]];
           z = this.graph.vertices[neighbours[2]];
         }
-
+        
         w.angle = -MathHelper.toRad(36);
         x.angle = MathHelper.toRad(36);
         y.angle = -MathHelper.toRad(108);
@@ -2639,10 +2607,11 @@ export default class Drawer {
         wedgeOrder[j] = new Uint32Array(2);
         let neighbour = this.graph.vertices[neighbours[order[j]]];
         wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 100000;
-        wedgeOrder[j][0] += neighbour.value.rings.length > 0 ? 0 : 10000;
+        // wedgeOrder[j][0] += neighbour.value.rings.length > 0 ? 0 : 10000;
+        // Only add if in same ring, unlike above
+        wedgeOrder[j][0] += this.areVerticesInSameRing(neighbour, vertex) ? 0 : 10000;
         wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 1000 : 0;
         wedgeOrder[j][0] -= neighbour.value.subtreeDepth === 0 ? 1000 : 0;
-        // wedgeOrder[j][0] += neighbour.value.getAtomicNumber();
         wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
         wedgeOrder[j][1] = neighbours[order[j]];
 

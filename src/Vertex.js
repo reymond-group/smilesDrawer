@@ -43,7 +43,7 @@ export default class Vertex {
     this.spanningTreeChildren = Array();
     this.edges = Array();
     this.positioned = false;
-    this.angle = 0.0;
+    this.angle = null;
     this.globalAngle = 0.0;
     this.dir = 1.0;
     this.neighbourCount = 0;

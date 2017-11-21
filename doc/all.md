@@ -32,6 +32,10 @@
 <dt><a href="#clone">clone(arr)</a> ⇒ <code>*</code></dt>
 <dd><p>Clone an array or an object. If an object is passed, a shallow clone will be created.</p>
 </dd>
+<dt><a href="#equals">equals(arrA, arrB)</a> ⇒ <code>Boolean</code></dt>
+<dd><p>Returns a boolean indicating whether or not the two arrays contain the same elements.
+Only supports 1d, non-nested arrays.</p>
+</dd>
 <dt><a href="#print">print(arr)</a> ⇒ <code>String</code></dt>
 <dd><p>Returns a string representation of an array. If the array contains objects with an id property, the id property is printed for each of the elements.</p>
 </dd>
@@ -817,6 +821,19 @@ Clone an array or an object. If an object is passed, a shallow clone will be cre
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>\*</code> | The array or object to be cloned. |
+
+<a name="equals"></a>
+
+## equals(arrA, arrB) ⇒ <code>Boolean</code>
+Returns a boolean indicating whether or not the two arrays contain the same elements.Only supports 1d, non-nested arrays.
+
+**Kind**: global function  
+**Returns**: <code>Boolean</code> - A boolean indicating whether or not the two arrays contain the same elements.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| arrA | <code>Array</code> | An array. |
+| arrB | <code>Array</code> | An array. |
 
 <a name="print"></a>
 

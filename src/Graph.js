@@ -603,6 +603,7 @@ export default class Graph {
     let arrPositionX = new Float32Array(length);
     let arrPositionY = new Float32Array(length);
     let arrPositioned = Array(length);
+
     i = length;
     while (i--) {
       let vertex = this.vertices[vertexIds[i]];
@@ -635,7 +636,7 @@ export default class Graph {
       matStrength[i] = Array(length);
       var j = length;
       while (j--) {
-        matStrength[i][j] = edgeStrength * Math.pow(matDist[i][j], -2);
+        matStrength[i][j] = edgeStrength * Math.pow(matDist[i][j], -2.0);
       }
     }
 
@@ -723,6 +724,7 @@ export default class Graph {
         let k = arrK[i];
         let m = (ux - vx) * (ux - vx);
         let denom = 1.0 / Math.pow(m + (uy - vy) * (uy - vy), 1.5);
+        
         dxx += k * (1 - l * (uy - vy) * (uy - vy) * denom);
         dyy += k * (1 - l * m * denom);
         dxy += k * (l * (ux - vx) * (uy - vy) * denom);
@@ -785,8 +787,8 @@ export default class Graph {
     // Setting parameters
     let threshold = 0.1;
     let innerThreshold = 0.1;
-    let maxIteration = 10000;
-    let maxInnerIteration = 500;
+    let maxIteration = 1000;
+    let maxInnerIteration = 50;
     let maxEnergy = 1e9;
 
     // Setting up variables for the while loops
