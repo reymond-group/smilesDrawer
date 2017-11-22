@@ -4387,11 +4387,11 @@ var Drawer = function () {
           // and rotate it by 90°
 
           var dummy = new _Vector2.default(this.opts.bondLength, 0);
-          dummy.rotate(_MathHelper2.default.toRad(-120));
+          dummy.rotate(_MathHelper2.default.toRad(-60));
 
           vertex.previousPosition = dummy;
           vertex.setPosition(this.opts.bondLength, 0);
-          vertex.angle = _MathHelper2.default.toRad(-120);
+          vertex.angle = _MathHelper2.default.toRad(-60);
           vertex.globalAngle = vertex.angle;
 
           // Do not position the vertex if it belongs to a bridged ring that is positioned using a layout algorithm.
@@ -4547,32 +4547,34 @@ var Drawer = function () {
             nextVertex.globalAngle = angle + nextVertex.angle;
             this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
           } else {
-            if (dir === null) {
-              var _proposedAngleA = _MathHelper2.default.toRad(60);
-              var _proposedAngleB = -_proposedAngleA;
+            // if (dir === null) {
+            //   let proposedAngleA = MathHelper.toRad(60);
+            //   let proposedAngleB = -proposedAngleA;
 
-              var _proposedVectorA = new _Vector2.default(this.opts.bondLength, 0);
-              var _proposedVectorB = new _Vector2.default(this.opts.bondLength, 0);
+            //   let proposedVectorA = new Vector2(this.opts.bondLength, 0);
+            //   let proposedVectorB = new Vector2(this.opts.bondLength, 0);
 
-              _proposedVectorA.rotate(_proposedAngleA).add(vertex.position);
-              _proposedVectorB.rotate(_proposedAngleB).add(vertex.position);
+            //   proposedVectorA.rotate(proposedAngleA).add(vertex.position);
+            //   proposedVectorB.rotate(proposedAngleB).add(vertex.position);
 
-              var _centerOfMass = this.getCurrentCenterOfMass();
-              var _distanceA = _proposedVectorA.distanceSq(_centerOfMass);
-              var _distanceB = _proposedVectorB.distanceSq(_centerOfMass);
+            //   let centerOfMass = this.getCurrentCenterOfMass();
+            //   let distanceA = proposedVectorA.distanceSq(centerOfMass);
+            //   let distanceB = proposedVectorB.distanceSq(centerOfMass);
 
-              nextVertex.angle = _distanceA < _distanceB ? _proposedAngleB : _proposedAngleA;
+            //   nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
 
-              if (nextVertex.angle > 0) {
-                dir = -1;
-              } else {
-                dir = 1;
-              }
-            } else {
-              nextVertex.angle = _MathHelper2.default.toRad(60) * dir;
-              dir = -dir;
-            }
+            //   if (nextVertex.angle > 0) {
+            //     dir = -1;
+            //   } else {
+            //     dir = 1;
+            //   }
+            // } else {
+            //   console.log(vertex.id, nextVertex.id);
+            //   nextVertex.angle = previousVertex.angle; // MathHelper.toRad(60) * dir;
+            //   dir = -dir;
+            // }
 
+            nextVertex.angle = -vertex.angle;
             nextVertex.globalAngle = angle + nextVertex.angle;
             this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
           }
@@ -4676,21 +4678,21 @@ var Drawer = function () {
           if (this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
 
             if (!dir) {
-              var _proposedAngleA2 = _MathHelper2.default.toRad(60);
-              var _proposedAngleB2 = -_proposedAngleA2;
+              var _proposedAngleA = _MathHelper2.default.toRad(60);
+              var _proposedAngleB = -_proposedAngleA;
 
-              var _proposedVectorA2 = new _Vector2.default(this.opts.bondLength, 0);
-              var _proposedVectorB2 = new _Vector2.default(this.opts.bondLength, 0);
+              var _proposedVectorA = new _Vector2.default(this.opts.bondLength, 0);
+              var _proposedVectorB = new _Vector2.default(this.opts.bondLength, 0);
 
-              _proposedVectorA2.rotate(_proposedAngleA2).add(vertex.position);
-              _proposedVectorB2.rotate(_proposedAngleB2).add(vertex.position);
+              _proposedVectorA.rotate(_proposedAngleA).add(vertex.position);
+              _proposedVectorB.rotate(_proposedAngleB).add(vertex.position);
 
               // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
-              var _centerOfMass2 = this.getCurrentCenterOfMass();
-              var _distanceA2 = _proposedVectorA2.distanceSq(_centerOfMass2);
-              var _distanceB2 = _proposedVectorB2.distanceSq(_centerOfMass2);
+              var _centerOfMass = this.getCurrentCenterOfMass();
+              var _distanceA = _proposedVectorA.distanceSq(_centerOfMass);
+              var _distanceB = _proposedVectorB.distanceSq(_centerOfMass);
 
-              s.angle = _distanceA2 < _distanceB2 ? _proposedAngleB2 : _proposedAngleA2;
+              s.angle = _distanceA < _distanceB ? _proposedAngleB : _proposedAngleA;
 
               if (s.angle > 0) {
                 dir = -1;
@@ -6296,9 +6298,9 @@ var Graph = function () {
       };
 
       // Setting parameters
-      var threshold = 0.1;
+      var threshold = 0.01;
       var innerThreshold = 0.1;
-      var maxIteration = 1000;
+      var maxIteration = 4000;
       var maxInnerIteration = 50;
       var maxEnergy = 1e9;
 

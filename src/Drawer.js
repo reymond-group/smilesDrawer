@@ -1920,11 +1920,11 @@ export default class Drawer {
         // and rotate it by 90°
 
         let dummy = new Vector2(this.opts.bondLength, 0);
-        dummy.rotate(MathHelper.toRad(-120));
+        dummy.rotate(MathHelper.toRad(-60));
 
         vertex.previousPosition = dummy;
         vertex.setPosition(this.opts.bondLength, 0);
-        vertex.angle = MathHelper.toRad(-120);
+        vertex.angle = MathHelper.toRad(-60);
         vertex.globalAngle = vertex.angle;
 
         // Do not position the vertex if it belongs to a bridged ring that is positioned using a layout algorithm.
@@ -2083,32 +2083,34 @@ export default class Drawer {
           nextVertex.globalAngle = angle + nextVertex.angle;
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
         } else {
-          if (dir === null) {
-            let proposedAngleA = MathHelper.toRad(60);
-            let proposedAngleB = -proposedAngleA;
+          // if (dir === null) {
+          //   let proposedAngleA = MathHelper.toRad(60);
+          //   let proposedAngleB = -proposedAngleA;
 
-            let proposedVectorA = new Vector2(this.opts.bondLength, 0);
-            let proposedVectorB = new Vector2(this.opts.bondLength, 0);
+          //   let proposedVectorA = new Vector2(this.opts.bondLength, 0);
+          //   let proposedVectorB = new Vector2(this.opts.bondLength, 0);
 
-            proposedVectorA.rotate(proposedAngleA).add(vertex.position);
-            proposedVectorB.rotate(proposedAngleB).add(vertex.position);
+          //   proposedVectorA.rotate(proposedAngleA).add(vertex.position);
+          //   proposedVectorB.rotate(proposedAngleB).add(vertex.position);
 
-            let centerOfMass = this.getCurrentCenterOfMass();
-            let distanceA = proposedVectorA.distanceSq(centerOfMass);
-            let distanceB = proposedVectorB.distanceSq(centerOfMass);
+          //   let centerOfMass = this.getCurrentCenterOfMass();
+          //   let distanceA = proposedVectorA.distanceSq(centerOfMass);
+          //   let distanceB = proposedVectorB.distanceSq(centerOfMass);
 
-            nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
+          //   nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
 
-            if (nextVertex.angle > 0) {
-              dir = -1;
-            } else {
-              dir = 1;
-            }
-          } else {
-            nextVertex.angle = MathHelper.toRad(60) * dir;
-            dir = -dir;
-          }
+          //   if (nextVertex.angle > 0) {
+          //     dir = -1;
+          //   } else {
+          //     dir = 1;
+          //   }
+          // } else {
+          //   console.log(vertex.id, nextVertex.id);
+          //   nextVertex.angle = previousVertex.angle; // MathHelper.toRad(60) * dir;
+          //   dir = -dir;
+          // }
           
+          nextVertex.angle = -vertex.angle;
           nextVertex.globalAngle = angle + nextVertex.angle;
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
         }

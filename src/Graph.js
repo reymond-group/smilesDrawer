@@ -785,9 +785,9 @@ export default class Graph {
     }
 
     // Setting parameters
-    let threshold = 0.1;
+    let threshold = 0.01;
     let innerThreshold = 0.1;
-    let maxIteration = 1000;
+    let maxIteration = 4000;
     let maxInnerIteration = 50;
     let maxEnergy = 1e9;
 
