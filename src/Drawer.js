@@ -50,8 +50,8 @@ export default class Drawer {
       terminalCarbons: false,
       explicitHydrogens: false, // TODO: Add to doc
       compactDrawing: true,
-      fontSizeLarge: 6,
-      fontSizeSmall: 4,
+      fontSizeLarge: 5,
+      fontSizeSmall: 3,
       themes: {
         dark: {
           C: '#fff',
@@ -212,7 +212,7 @@ export default class Drawer {
 
           let subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
 
-          if (subTreeOverlap.value > 1.0) {
+          if (subTreeOverlap.value > 0.2) {
             let vertexA = this.graph.vertices[a];
             let vertexB = this.graph.vertices[b];
             let neighbours = vertexB.getNeighbours(a);
@@ -1948,7 +1948,7 @@ export default class Drawer {
             }
           }
         }
-        
+
         if (joinedVertex === null) {
           for (var i = 0; i < neighbours.length; i++) {
             let v = this.graph.vertices[neighbours[i]];
@@ -2144,7 +2144,6 @@ export default class Drawer {
         if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
           transVertex.value.mainChain = true;
           cisVertex.value.mainChain = true;
-
           if (vertex.position.clockwise(vertex.previousPosition) === 1) {
             transVertex.angle = -vertex.angle;
             cisVertex.angle = vertex.angle;

@@ -2286,8 +2286,8 @@ var Drawer = function () {
       terminalCarbons: false,
       explicitHydrogens: false, // TODO: Add to doc
       compactDrawing: true,
-      fontSizeLarge: 6,
-      fontSizeSmall: 4,
+      fontSizeLarge: 5,
+      fontSizeSmall: 3,
       themes: {
         dark: {
           C: '#fff',
@@ -2456,7 +2456,7 @@ var Drawer = function () {
 
             var subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
 
-            if (subTreeOverlap.value > 1.0) {
+            if (subTreeOverlap.value > 0.2) {
               var vertexA = this.graph.vertices[a];
               var vertexB = this.graph.vertices[b];
               var neighbours = vertexB.getNeighbours(a);
@@ -4416,8 +4416,6 @@ var Drawer = function () {
             }
           }
 
-          if (joinedVertex === null) console.log(vertex.id, previousVertex.id, previousVertex.value.rings);
-
           if (joinedVertex === null) {
             for (var i = 0; i < neighbours.length; i++) {
               var v = this.graph.vertices[neighbours[i]];
@@ -4610,7 +4608,6 @@ var Drawer = function () {
           if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
             transVertex.value.mainChain = true;
             cisVertex.value.mainChain = true;
-
             if (vertex.position.clockwise(vertex.previousPosition) === 1) {
               transVertex.angle = -vertex.angle;
               cisVertex.angle = vertex.angle;
