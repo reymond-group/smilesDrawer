@@ -1935,7 +1935,6 @@ export default class Drawer {
           vertex.positioned = true;
         }
       } else if (previousVertex.value.originalRings.length === 1) {
-        console.log(vertex.id, vertex);
         let vecs = Array()
         let neighbours = previousVertex.neighbours;
         for (var i = 0; i < neighbours.length; i++) {
@@ -1956,22 +1955,34 @@ export default class Drawer {
         // For steroids and other joined but not bridged rings
         let joinedVertex = null;
 
-        for (var i = 0; i < neighbours.length; i++) {
-          let neighbour = this.graph.vertices[neighbours[i]];
-          if (ArrayHelper.containsAll(neighbour.value.originalRings, previousVertex.value.originalRings)) {
-            joinedVertex = neighbour;
-            break;
+        if (previousVertex.value.originalRings.length === 2) {
+          for (var i = 0; i < neighbours.length; i++) {
+            let neighbour = this.graph.vertices[neighbours[i]];
+            if (ArrayHelper.containsAll(neighbour.value.originalRings, previousVertex.value.originalRings)) {
+              joinedVertex = neighbour;
+              break;
+            }
           }
         }
 
+        let pos = new Vector2(0.0, 0.0);
+
         if (joinedVertex === null) {
-          if (neighbours.length === 3) {
-            
+          for (var i = 0; i < neighbours.length; i++) {
+            let v = this.graph.vertices[neighbours[i]];
+            if (v.positioned && v.value.originalRings.length > 0) {
+              console.log(vertex.id, v.id, v.value.originalRings);
+              pos.add(Vector2.subtract(v.position, previousVertex.position));
+            }
           }
+
+          pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+          console.log(vertex.id, pos);
+        } else {
+          pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);          
         }
 
         // Stil a problem with e.g. adamantanes. COC1=C(C=C(C=C1)C1=CC2=C(C=C1)C=C(C=C2)C(O)=O)C12CC3CC(CC(C3)C1)C2
-        let pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);
 
         vertex.previousPosition = previousVertex.position;
         vertex.setPositionFromVector(pos);
