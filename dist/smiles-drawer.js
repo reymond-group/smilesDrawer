@@ -17,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 //@ts-check
 window.SmilesDrawer = {
-  Version: '1.0.0'
+    Version: '1.0.0'
 };
 
 window.SmilesDrawer.Drawer = _Drawer2.default;
@@ -31,7 +31,7 @@ window.SmilesDrawer.Parser = _Parser2.default;
 * @returns {String} The clean SMILES string.
 */
 window.SmilesDrawer.clean = function (smiles) {
-  return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
+    return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
 };
 
 /**
@@ -44,28 +44,28 @@ window.SmilesDrawer.clean = function (smiles) {
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
 window.SmilesDrawer.apply = function (options) {
-  var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
-  var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
-  var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
+    var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
+    var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-  var smilesDrawer = new _Drawer2.default(options);
-  var elements = document.querySelectorAll(selector);
+    var smilesDrawer = new _Drawer2.default(options);
+    var elements = document.querySelectorAll(selector);
 
-  var _loop = function _loop() {
-    var element = elements[i];
+    var _loop = function _loop() {
+        var element = elements[i];
 
-    SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
-      smilesDrawer.draw(tree, element, themeName, false);
-    }, function (err) {
-      if (onError) {
-        onError(err);
-      }
-    });
-  };
+        SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
+            smilesDrawer.draw(tree, element, themeName, false);
+        }, function (err) {
+            if (onError) {
+                onError(err);
+            }
+        });
+    };
 
-  for (var i = 0; i < elements.length; i++) {
-    _loop();
-  }
+    for (var i = 0; i < elements.length; i++) {
+        _loop();
+    }
 };
 
 /**
@@ -77,57 +77,57 @@ window.SmilesDrawer.apply = function (options) {
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
 window.SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
-  try {
-    if (successCallback) {
-      successCallback(_Parser2.default.parse(smiles));
+    try {
+        if (successCallback) {
+            successCallback(_Parser2.default.parse(smiles));
+        }
+    } catch (err) {
+        if (errorCallback) {
+            errorCallback(err);
+        }
     }
-  } catch (err) {
-    if (errorCallback) {
-      errorCallback(err);
-    }
-  }
 };
 
 // There be dragons (polyfills)
 
 if (!Array.prototype.fill) {
-  Object.defineProperty(Array.prototype, 'fill', {
-    value: function value(_value) {
+    Object.defineProperty(Array.prototype, 'fill', {
+        value: function value(_value) {
 
-      // Steps 1-2.
-      if (this == null) {
-        throw new TypeError('this is null or not defined');
-      }
+            // Steps 1-2.
+            if (this == null) {
+                throw new TypeError('this is null or not defined');
+            }
 
-      var O = Object(this);
+            var O = Object(this);
 
-      // Steps 3-5.
-      var len = O.length >>> 0;
+            // Steps 3-5.
+            var len = O.length >>> 0;
 
-      // Steps 6-7.
-      var start = arguments[1];
-      var relativeStart = start >> 0;
+            // Steps 6-7.
+            var start = arguments[1];
+            var relativeStart = start >> 0;
 
-      // Step 8.
-      var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
+            // Step 8.
+            var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
 
-      // Steps 9-10.
-      var end = arguments[2];
-      var relativeEnd = end === undefined ? len : end >> 0;
+            // Steps 9-10.
+            var end = arguments[2];
+            var relativeEnd = end === undefined ? len : end >> 0;
 
-      // Step 11.
-      var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
+            // Step 11.
+            var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
 
-      // Step 12.
-      while (k < final) {
-        O[k] = _value;
-        k++;
-      }
+            // Step 12.
+            while (k < final) {
+                O[k] = _value;
+                k++;
+            }
 
-      // Step 13.
-      return O;
-    }
-  });
+            // Step 13.
+            return O;
+        }
+    });
 }
 
 },{"./src/Drawer":5,"./src/Parser":10}],2:[function(require,module,exports){
@@ -1704,23 +1704,23 @@ var CanvasWrapper = function () {
             ctx.restore();
 
             /*
-             let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
+              let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
             let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
             let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
             let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
-             ctx.beginPath();
+              ctx.beginPath();
             ctx.moveTo(t.x, t.y);
             ctx.lineTo(u.x, u.y);
             ctx.lineTo(v.x, v.y);
             ctx.lineTo(w.x, w.y);
-             let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
+              let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
             gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
                 this.getColor('C'));
             gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
                 this.getColor('C'));
-             ctx.fillStyle = gradient;
-             ctx.fill();
-             // Now dash it
+              ctx.fillStyle = gradient;
+              ctx.fill();
+              // Now dash it
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
             ctx.moveTo(sStart.x, sStart.y);
@@ -4401,55 +4401,36 @@ var Drawer = function () {
           if (vertex.value.bridgedRing === null) {
             vertex.positioned = true;
           }
-        } else if (previousVertex.value.originalRings.length === 1) {
-          var vecs = Array();
+        } else if (previousVertex.value.rings.length > 0) {
           var neighbours = previousVertex.neighbours;
-          for (var i = 0; i < neighbours.length; i++) {
-            var neighbour = this.graph.vertices[neighbours[i]];
-
-            if (neighbour.positioned && neighbour.value.originalRings.length > 0) {
-              vecs.push(_Vector2.default.subtract(neighbour.position, previousVertex.position));
-            }
-          }
-
-          var avg = _Vector2.default.averageDirection(vecs);
-          vertex.setPositionFromVector(avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
-          vertex.previousPosition = previousVertex.position;
-          vertex.positioned = true;
-        } else if (previousVertex.value.originalRings.length > 1) {
-          var _neighbours = previousVertex.neighbours;
-
-          // For steroids and other joined but not bridged rings
           var joinedVertex = null;
+          var pos = new _Vector2.default(0.0, 0.0);
 
-          if (previousVertex.value.originalRings.length === 2) {
-            for (var i = 0; i < _neighbours.length; i++) {
-              var _neighbour2 = this.graph.vertices[_neighbours[i]];
-              if (_ArrayHelper2.default.containsAll(_neighbour2.value.originalRings, previousVertex.value.originalRings)) {
-                joinedVertex = _neighbour2;
+          if (previousVertex.value.bridgedRing === null && previousVertex.value.rings.length > 1) {
+            for (var i = 0; i < neighbours.length; i++) {
+              var neighbour = this.graph.vertices[neighbours[i]];
+              if (_ArrayHelper2.default.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
+                joinedVertex = neighbour;
                 break;
               }
             }
           }
 
-          var pos = new _Vector2.default(0.0, 0.0);
+          if (joinedVertex === null) console.log(vertex.id, previousVertex.id, previousVertex.value.rings);
 
           if (joinedVertex === null) {
-            for (var i = 0; i < _neighbours.length; i++) {
-              var v = this.graph.vertices[_neighbours[i]];
-              if (v.positioned && v.value.originalRings.length > 0) {
-                console.log(vertex.id, v.id, v.value.originalRings);
+            for (var i = 0; i < neighbours.length; i++) {
+              var v = this.graph.vertices[neighbours[i]];
+
+              if (v.positioned && this.areVerticesInSameRing(v, previousVertex)) {
                 pos.add(_Vector2.default.subtract(v.position, previousVertex.position));
               }
             }
 
             pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
-            console.log(vertex.id, pos);
           } else {
             pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);
           }
-
-          // Stil a problem with e.g. adamantanes. COC1=C(C=C(C=C1)C1=CC2=C(C=C1)C=C(C=C2)C(O)=O)C12CC3CC(CC(C3)C1)C2
 
           vertex.previousPosition = previousVertex.position;
           vertex.setPositionFromVector(pos);
@@ -4503,24 +4484,24 @@ var Drawer = function () {
         // Draw the non-ring vertices connected to this one  
         var isStereoCenter = vertex.value.isStereoCenter;
         var tmpNeighbours = vertex.getNeighbours();
-        var _neighbours2 = Array();
+        var _neighbours = Array();
 
         // Remove neighbours that are not drawn
         for (var i = 0; i < tmpNeighbours.length; i++) {
           if (this.graph.vertices[tmpNeighbours[i]].value.isDrawn) {
-            _neighbours2.push(tmpNeighbours[i]);
+            _neighbours.push(tmpNeighbours[i]);
           }
         }
 
         // Remove the previous vertex (which has already been drawn)
         if (previousVertex) {
-          _neighbours2 = _ArrayHelper2.default.remove(_neighbours2, previousVertex.id);
+          _neighbours = _ArrayHelper2.default.remove(_neighbours, previousVertex.id);
         }
 
         var angle = vertex.getAngle();
 
-        if (_neighbours2.length === 1) {
-          var nextVertex = this.graph.vertices[_neighbours2[0]];
+        if (_neighbours.length === 1) {
+          var nextVertex = this.graph.vertices[_neighbours[0]];
 
           // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
           // or if there are successive double bonds. Added a ring check because if there is an aromatic ring the ring bond inside the ring counts as a double bond and leads to =-= being straight.
@@ -4568,48 +4549,34 @@ var Drawer = function () {
             nextVertex.globalAngle = angle + nextVertex.angle;
             this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
           } else {
-            // if (dir === null) {
-            //   let proposedAngleA = MathHelper.toRad(60);
-            //   let proposedAngleB = -proposedAngleA;
+            // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
+            var a = vertex.angle;
 
-            //   let proposedVectorA = new Vector2(this.opts.bondLength, 0);
-            //   let proposedVectorB = new Vector2(this.opts.bondLength, 0);
+            if (previousVertex && previousVertex.neighbours.length > 3) {
+              if (a > 0) {
+                a = Math.min(1.0472, a);
+              } else if (a < 0) {
+                a = Math.max(-1.0472, a);
+              } else {
+                a = 1.0472;
+              }
+            }
 
-            //   proposedVectorA.rotate(proposedAngleA).add(vertex.position);
-            //   proposedVectorB.rotate(proposedAngleB).add(vertex.position);
-
-            //   let centerOfMass = this.getCurrentCenterOfMass();
-            //   let distanceA = proposedVectorA.distanceSq(centerOfMass);
-            //   let distanceB = proposedVectorB.distanceSq(centerOfMass);
-
-            //   nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
-
-            //   if (nextVertex.angle > 0) {
-            //     dir = -1;
-            //   } else {
-            //     dir = 1;
-            //   }
-            // } else {
-            //   console.log(vertex.id, nextVertex.id);
-            //   nextVertex.angle = previousVertex.angle; // MathHelper.toRad(60) * dir;
-            //   dir = -dir;
-            // }
-
-            nextVertex.angle = -vertex.angle;
+            nextVertex.angle = -a;
             nextVertex.globalAngle = angle + nextVertex.angle;
             this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
           }
-        } else if (_neighbours2.length === 2) {
+        } else if (_neighbours.length === 2) {
           // If the previous vertex comes out of a ring, it doesn't have an angle set
           if (vertex.angle === null) {
             vertex.angle = _MathHelper2.default.toRad(-60);
           }
           // Check for the longer subtree - always go with cis for the longer subtree
-          var subTreeDepthA = this.graph.getTreeDepth(_neighbours2[0], vertex.id);
-          var subTreeDepthB = this.graph.getTreeDepth(_neighbours2[1], vertex.id);
+          var subTreeDepthA = this.graph.getTreeDepth(_neighbours[0], vertex.id);
+          var subTreeDepthB = this.graph.getTreeDepth(_neighbours[1], vertex.id);
 
-          var l = this.graph.vertices[_neighbours2[0]];
-          var _r3 = this.graph.vertices[_neighbours2[1]];
+          var l = this.graph.vertices[_neighbours[0]];
+          var _r3 = this.graph.vertices[_neighbours[1]];
 
           l.value.subtreeDepth = subTreeDepthA;
           _r3.value.subtreeDepth = subTreeDepthB;
@@ -4636,8 +4603,8 @@ var Drawer = function () {
             trans = 0;
           }
 
-          var cisVertex = this.graph.vertices[_neighbours2[cis]];
-          var transVertex = this.graph.vertices[_neighbours2[trans]];
+          var cisVertex = this.graph.vertices[_neighbours[cis]];
+          var transVertex = this.graph.vertices[_neighbours[trans]];
 
           // If the origin tree is the shortest, set both vertices to trans
           if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
@@ -4672,28 +4639,28 @@ var Drawer = function () {
             this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
             this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
           }
-        } else if (_neighbours2.length === 3) {
+        } else if (_neighbours.length === 3) {
           // The vertex with the longest sub-tree should always go straight
-          var d1 = this.graph.getTreeDepth(_neighbours2[0], vertex.id);
-          var d2 = this.graph.getTreeDepth(_neighbours2[1], vertex.id);
-          var d3 = this.graph.getTreeDepth(_neighbours2[2], vertex.id);
+          var d1 = this.graph.getTreeDepth(_neighbours[0], vertex.id);
+          var d2 = this.graph.getTreeDepth(_neighbours[1], vertex.id);
+          var d3 = this.graph.getTreeDepth(_neighbours[2], vertex.id);
 
-          var s = this.graph.vertices[_neighbours2[0]];
-          var _l = this.graph.vertices[_neighbours2[1]];
-          var _r4 = this.graph.vertices[_neighbours2[2]];
+          var s = this.graph.vertices[_neighbours[0]];
+          var _l = this.graph.vertices[_neighbours[1]];
+          var _r4 = this.graph.vertices[_neighbours[2]];
 
           s.value.subtreeDepth = d1;
           _l.value.subtreeDepth = d2;
           _r4.value.subtreeDepth = d3;
 
           if (d2 > d1 && d2 > d3) {
-            s = this.graph.vertices[_neighbours2[1]];
-            _l = this.graph.vertices[_neighbours2[0]];
-            _r4 = this.graph.vertices[_neighbours2[2]];
+            s = this.graph.vertices[_neighbours[1]];
+            _l = this.graph.vertices[_neighbours[0]];
+            _r4 = this.graph.vertices[_neighbours[2]];
           } else if (d3 > d1 && d3 > d2) {
-            s = this.graph.vertices[_neighbours2[2]];
-            _l = this.graph.vertices[_neighbours2[0]];
-            _r4 = this.graph.vertices[_neighbours2[1]];
+            s = this.graph.vertices[_neighbours[2]];
+            _l = this.graph.vertices[_neighbours[0]];
+            _r4 = this.graph.vertices[_neighbours[1]];
           }
 
           if (this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
@@ -4748,17 +4715,17 @@ var Drawer = function () {
             this.createNextBond(_l, vertex, _l.globalAngle, 1);
             this.createNextBond(_r4, vertex, _r4.globalAngle, 1);
           }
-        } else if (_neighbours2.length === 4) {
+        } else if (_neighbours.length === 4) {
           // The vertex with the longest sub-tree should always go to the reflected opposide direction
-          var _d = this.graph.getTreeDepth(_neighbours2[0], vertex.id);
-          var _d2 = this.graph.getTreeDepth(_neighbours2[1], vertex.id);
-          var _d3 = this.graph.getTreeDepth(_neighbours2[2], vertex.id);
-          var d4 = this.graph.getTreeDepth(_neighbours2[3], vertex.id);
+          var _d = this.graph.getTreeDepth(_neighbours[0], vertex.id);
+          var _d2 = this.graph.getTreeDepth(_neighbours[1], vertex.id);
+          var _d3 = this.graph.getTreeDepth(_neighbours[2], vertex.id);
+          var d4 = this.graph.getTreeDepth(_neighbours[3], vertex.id);
 
-          var w = this.graph.vertices[_neighbours2[0]];
-          var x = this.graph.vertices[_neighbours2[1]];
-          var y = this.graph.vertices[_neighbours2[2]];
-          var z = this.graph.vertices[_neighbours2[3]];
+          var w = this.graph.vertices[_neighbours[0]];
+          var x = this.graph.vertices[_neighbours[1]];
+          var y = this.graph.vertices[_neighbours[2]];
+          var z = this.graph.vertices[_neighbours[3]];
 
           w.value.subtreeDepth = _d;
           x.value.subtreeDepth = _d2;
@@ -4766,20 +4733,20 @@ var Drawer = function () {
           z.value.subtreeDepth = d4;
 
           if (_d2 > _d && _d2 > _d3 && _d2 > d4) {
-            w = this.graph.vertices[_neighbours2[1]];
-            x = this.graph.vertices[_neighbours2[0]];
-            y = this.graph.vertices[_neighbours2[2]];
-            z = this.graph.vertices[_neighbours2[3]];
+            w = this.graph.vertices[_neighbours[1]];
+            x = this.graph.vertices[_neighbours[0]];
+            y = this.graph.vertices[_neighbours[2]];
+            z = this.graph.vertices[_neighbours[3]];
           } else if (_d3 > _d && _d3 > _d2 && _d3 > d4) {
-            w = this.graph.vertices[_neighbours2[2]];
-            x = this.graph.vertices[_neighbours2[0]];
-            y = this.graph.vertices[_neighbours2[1]];
-            z = this.graph.vertices[_neighbours2[3]];
+            w = this.graph.vertices[_neighbours[2]];
+            x = this.graph.vertices[_neighbours[0]];
+            y = this.graph.vertices[_neighbours[1]];
+            z = this.graph.vertices[_neighbours[3]];
           } else if (d4 > _d && d4 > _d2 && d4 > _d3) {
-            w = this.graph.vertices[_neighbours2[3]];
-            x = this.graph.vertices[_neighbours2[0]];
-            y = this.graph.vertices[_neighbours2[1]];
-            z = this.graph.vertices[_neighbours2[2]];
+            w = this.graph.vertices[_neighbours[3]];
+            x = this.graph.vertices[_neighbours[0]];
+            y = this.graph.vertices[_neighbours[1]];
+            z = this.graph.vertices[_neighbours[2]];
           }
 
           w.angle = -_MathHelper2.default.toRad(36);
@@ -5256,31 +5223,31 @@ var Drawer = function () {
         var previous = null;
 
         for (var j = 0; j < neighbours.length; j++) {
-          var _neighbour3 = neighbours[j];
+          var _neighbour2 = neighbours[j];
 
-          if (_neighbour3.getNeighbourCount() > 1) {
-            previous = _neighbour3;
+          if (_neighbour2.getNeighbourCount() > 1) {
+            previous = _neighbour2;
           }
         }
 
         for (var j = 0; j < neighbours.length; j++) {
-          var _neighbour4 = neighbours[j];
+          var _neighbour3 = neighbours[j];
 
-          if (_neighbour4.getNeighbourCount() > 1) {
+          if (_neighbour3.getNeighbourCount() > 1) {
             continue;
           }
 
-          _neighbour4.value.isDrawn = false;
+          _neighbour3.value.isDrawn = false;
 
-          var hydrogens = _Atom2.default.maxBonds[_neighbour4.value.element] - this.getBondCount(_neighbour4);
+          var hydrogens = _Atom2.default.maxBonds[_neighbour3.value.element] - this.getBondCount(_neighbour3);
           var charge = '';
 
-          if (_neighbour4.value.bracket) {
-            hydrogens = _neighbour4.value.bracket.hcount;
-            charge = _neighbour4.value.bracket.charge || 0;
+          if (_neighbour3.value.bracket) {
+            hydrogens = _neighbour3.value.bracket.hcount;
+            charge = _neighbour3.value.bracket.charge || 0;
           }
 
-          vertex.value.attachPseudoElement(_neighbour4.value.element, previous ? previous.value.element : null, hydrogens, charge);
+          vertex.value.attachPseudoElement(_neighbour3.value.element, previous ? previous.value.element : null, hydrogens, charge);
         }
       }
 
@@ -5295,23 +5262,23 @@ var Drawer = function () {
         }
 
         var _neighbourIds = _vertex4.neighbours;
-        var _neighbours3 = Array(_neighbourIds.length);
+        var _neighbours2 = Array(_neighbourIds.length);
 
         for (var j = 0; j < _neighbourIds.length; j++) {
-          _neighbours3[j] = this.graph.vertices[_neighbourIds[j]];
+          _neighbours2[j] = this.graph.vertices[_neighbourIds[j]];
         }
 
-        for (var j = 0; j < _neighbours3.length; j++) {
-          var _neighbour5 = _neighbours3[j].value;
+        for (var j = 0; j < _neighbours2.length; j++) {
+          var _neighbour4 = _neighbours2[j].value;
 
-          if (!_neighbour5.hasAttachedPseudoElements || _neighbour5.getAttachedPseudoElementsCount() !== 2) {
+          if (!_neighbour4.hasAttachedPseudoElements || _neighbour4.getAttachedPseudoElementsCount() !== 2) {
             continue;
           }
 
-          var pseudoElements = _neighbour5.getAttachedPseudoElements();
+          var pseudoElements = _neighbour4.getAttachedPseudoElements();
 
           if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
-            _neighbour5.isDrawn = false;
+            _neighbour4.isDrawn = false;
             _vertex4.value.attachPseudoElement('Ac', '', 0);
           }
         }
@@ -5328,7 +5295,7 @@ exports.default = Drawer;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5350,62 +5317,62 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String} [wedge=''] Wedge direction. Either '', 'up' or 'down'
  */
 var Edge = function () {
-  /**
-   * The constructor for the class Edge.
-   *
-   * @param {Number} sourceId A vertex id.
-   * @param {Number} targetId A vertex id.
-   * @param {Number} [weight=1] The weight of the edge.
-   */
-  function Edge(sourceId, targetId) {
-    var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+    /**
+     * The constructor for the class Edge.
+     *
+     * @param {Number} sourceId A vertex id.
+     * @param {Number} targetId A vertex id.
+     * @param {Number} [weight=1] The weight of the edge.
+     */
+    function Edge(sourceId, targetId) {
+        var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-    _classCallCheck(this, Edge);
+        _classCallCheck(this, Edge);
 
-    this.id = null;
-    this.sourceId = sourceId;
-    this.targetId = targetId;
-    this.weight = weight;
-    this.bondType = '-';
-    this.isPartOfAromaticRing = false;
-    this.center = false;
-    this.wedge = '';
-  }
-
-  /**
-   * Set the bond type of this edge. This also sets the edge weight.
-   * @param {String} bondType 
-   */
-
-
-  _createClass(Edge, [{
-    key: 'setBondType',
-    value: function setBondType(bondType) {
-      this.bondType = bondType;
-      this.weight = Edge.bonds[bondType];
+        this.id = null;
+        this.sourceId = sourceId;
+        this.targetId = targetId;
+        this.weight = weight;
+        this.bondType = '-';
+        this.isPartOfAromaticRing = false;
+        this.center = false;
+        this.wedge = '';
     }
 
     /**
-     * An object mapping the bond type to the number of bonds.
-     *
-     * @returns {Object} The object containing the map.
+     * Set the bond type of this edge. This also sets the edge weight.
+     * @param {String} bondType 
      */
 
-  }], [{
-    key: 'bonds',
-    get: function get() {
-      return {
-        '-': 1,
-        '/': 1,
-        '\\': 1,
-        '=': 2,
-        '#': 3,
-        '$': 4
-      };
-    }
-  }]);
 
-  return Edge;
+    _createClass(Edge, [{
+        key: 'setBondType',
+        value: function setBondType(bondType) {
+            this.bondType = bondType;
+            this.weight = Edge.bonds[bondType];
+        }
+
+        /**
+         * An object mapping the bond type to the number of bonds.
+         *
+         * @returns {Object} The object containing the map.
+         */
+
+    }], [{
+        key: 'bonds',
+        get: function get() {
+            return {
+                '-': 1,
+                '/': 1,
+                '\\': 1,
+                '=': 2,
+                '#': 3,
+                '$': 4
+            };
+        }
+    }]);
+
+    return Edge;
 }();
 
 exports.default = Edge;

@@ -1934,56 +1934,35 @@ export default class Drawer {
         if (vertex.value.bridgedRing === null) {
           vertex.positioned = true;
         }
-      } else if (previousVertex.value.originalRings.length === 1) {
-        let vecs = Array()
+      } else if (previousVertex.value.rings.length > 0) {
         let neighbours = previousVertex.neighbours;
-        for (var i = 0; i < neighbours.length; i++) {
-          let neighbour = this.graph.vertices[neighbours[i]];
-
-          if (neighbour.positioned && neighbour.value.originalRings.length > 0) {
-            vecs.push(Vector2.subtract(neighbour.position, previousVertex.position));
-          }
-        }
-        
-        let avg = Vector2.averageDirection(vecs);
-        vertex.setPositionFromVector(avg.invert().multiplyScalar(this.opts.bondLength).add(previousVertex.position));
-        vertex.previousPosition = previousVertex.position;
-        vertex.positioned = true;
-      } else if (previousVertex.value.originalRings.length > 1) {
-        let neighbours = previousVertex.neighbours;
-        
-        // For steroids and other joined but not bridged rings
         let joinedVertex = null;
+        let pos = new Vector2(0.0, 0.0);
 
-        if (previousVertex.value.originalRings.length === 2) {
+        if (previousVertex.value.bridgedRing === null && previousVertex.value.rings.length > 1) {
           for (var i = 0; i < neighbours.length; i++) {
             let neighbour = this.graph.vertices[neighbours[i]];
-            if (ArrayHelper.containsAll(neighbour.value.originalRings, previousVertex.value.originalRings)) {
+            if (ArrayHelper.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
               joinedVertex = neighbour;
               break;
             }
           }
         }
-
-        let pos = new Vector2(0.0, 0.0);
-
+        
         if (joinedVertex === null) {
           for (var i = 0; i < neighbours.length; i++) {
             let v = this.graph.vertices[neighbours[i]];
-            if (v.positioned && v.value.originalRings.length > 0) {
-              console.log(vertex.id, v.id, v.value.originalRings);
+
+            if (v.positioned && this.areVerticesInSameRing(v, previousVertex)) {
               pos.add(Vector2.subtract(v.position, previousVertex.position));
             }
           }
 
           pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
-          console.log(vertex.id, pos);
         } else {
           pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);          
         }
-
-        // Stil a problem with e.g. adamantanes. COC1=C(C=C(C=C1)C1=CC2=C(C=C1)C=C(C=C2)C(O)=O)C12CC3CC(CC(C3)C1)C2
-
+        
         vertex.previousPosition = previousVertex.position;
         vertex.setPositionFromVector(pos);
         vertex.positioned = true;
@@ -2104,34 +2083,20 @@ export default class Drawer {
           nextVertex.globalAngle = angle + nextVertex.angle;
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
         } else {
-          // if (dir === null) {
-          //   let proposedAngleA = MathHelper.toRad(60);
-          //   let proposedAngleB = -proposedAngleA;
-
-          //   let proposedVectorA = new Vector2(this.opts.bondLength, 0);
-          //   let proposedVectorB = new Vector2(this.opts.bondLength, 0);
-
-          //   proposedVectorA.rotate(proposedAngleA).add(vertex.position);
-          //   proposedVectorB.rotate(proposedAngleB).add(vertex.position);
-
-          //   let centerOfMass = this.getCurrentCenterOfMass();
-          //   let distanceA = proposedVectorA.distanceSq(centerOfMass);
-          //   let distanceB = proposedVectorB.distanceSq(centerOfMass);
-
-          //   nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
-
-          //   if (nextVertex.angle > 0) {
-          //     dir = -1;
-          //   } else {
-          //     dir = 1;
-          //   }
-          // } else {
-          //   console.log(vertex.id, nextVertex.id);
-          //   nextVertex.angle = previousVertex.angle; // MathHelper.toRad(60) * dir;
-          //   dir = -dir;
-          // }
+          // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
+          let a = vertex.angle;
           
-          nextVertex.angle = -vertex.angle;
+          if (previousVertex && previousVertex.neighbours.length > 3) {
+            if (a > 0) {
+              a = Math.min(1.0472, a);
+            } else if (a < 0) {
+              a = Math.max(-1.0472, a);
+            } else {
+              a = 1.0472;
+            }
+          } 
+
+          nextVertex.angle = -a;
           nextVertex.globalAngle = angle + nextVertex.angle;
           this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
         }
