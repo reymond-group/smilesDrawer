@@ -4115,12 +4115,15 @@ var Drawer = function () {
         var _v2 = this.graph.vertices[positioned[i][0]]; // this is the vertex attached to the ring vertex
         _v2.previousPosition = u.position;
 
-        if (u.value.originalRings.length === 2) {
-          _v2.positioned = false;
-          this.createNextBond(_v2, u, 1.0, 1);
-        } else {
-          this.createNextBond(_v2, u, 1.0, 1, true);
-        }
+        // Ignore the positioning of ring attachments for now
+        _v2.positioned = false;
+        this.createNextBond(_v2, u, 1.0, 1);
+        // if (u.value.originalRings.length === 2) {
+        //   v.positioned = false;
+        //   this.createNextBond(v, u, 1.0, 1);
+        // } else {
+        //   this.createNextBond(v, u, 1.0, 1, true);
+        // }
       }
     }
 
@@ -4399,6 +4402,7 @@ var Drawer = function () {
             vertex.positioned = true;
           }
         } else if (previousVertex.value.originalRings.length === 1) {
+          console.log(vertex.id, vertex);
           var vecs = Array();
           var neighbours = previousVertex.neighbours;
           for (var i = 0; i < neighbours.length; i++) {
