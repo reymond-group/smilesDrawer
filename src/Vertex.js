@@ -17,7 +17,6 @@ import Atom from './Atom'
  * @property {Number[]} edges The ids of edges associated with this vertex.
  * @property {Boolean} positioned A boolean indicating whether or not this vertex has been positioned.
  * @property {Number} angle The angle of this vertex.
- * @property {Number} globalAngle The global angle of this vertex.
  * @property {Number} dir The direction of this vertex.
  * @property {Number} neighbourCount The number of neighbouring vertices.
  * @property {Number[]} neighbours The vertex ids of neighbouring vertices.
@@ -44,7 +43,6 @@ export default class Vertex {
     this.edges = Array();
     this.positioned = false;
     this.angle = null;
-    this.globalAngle = 0.0;
     this.dir = 1.0;
     this.neighbourCount = 0;
     this.neighbours = Array();

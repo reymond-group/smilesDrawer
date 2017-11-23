@@ -54,7 +54,7 @@ export default class Graph {
     let parentVertex = this.vertices[parentVertexId];
 
     this.addVertex(vertex);
-
+ 
     // Add the id of this node to the parent as child
     if (parentVertexId !== null) {
       vertex.setParentVertexId(parentVertexId);
@@ -74,7 +74,7 @@ export default class Graph {
       } else {
         edge.setBondType(parentVertex.value.bondType || '-');
       }
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
       let edgeId = this.addEdge(edge);
       vertex.edges.push(edgeId);
       parentVertex.edges.push(edgeId);

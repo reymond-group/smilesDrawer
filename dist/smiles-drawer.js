@@ -4395,7 +4395,6 @@ var Drawer = function () {
           vertex.previousPosition = dummy;
           vertex.setPosition(this.opts.bondLength, 0);
           vertex.angle = _MathHelper2.default.toRad(-60);
-          vertex.globalAngle = vertex.angle;
 
           // Do not position the vertex if it belongs to a bridged ring that is positioned using a layout algorithm.
           if (vertex.value.bridgedRing === null) {
@@ -4437,10 +4436,10 @@ var Drawer = function () {
           // If the previous vertex was not part of a ring, draw a bond based
           // on the global angle of the previous bond
           var _v3 = new _Vector2.default(this.opts.bondLength, 0);
+
           _v3.rotate(previousAngle);
           _v3.add(previousVertex.position);
 
-          vertex.globalAngle = previousAngle;
           vertex.setPositionFromVector(_v3);
           vertex.previousPosition = previousVertex.position;
           vertex.positioned = true;
@@ -4516,10 +4515,9 @@ var Drawer = function () {
             straightEdge2.center = true;
 
             nextVertex.drawExplicit = true;
-            nextVertex.globalAngle = angle;
             nextVertex.angle = 0.0;
 
-            this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, -dir);
+            this.createNextBond(nextVertex, vertex, 0.0, -dir);
           } else if (previousVertex && previousVertex.value.rings.length > 0) {
             // If coming out of a ring, always draw away from the center of mass
             var proposedAngleA = _MathHelper2.default.toRad(60);
@@ -4544,8 +4542,7 @@ var Drawer = function () {
               dir = 1;
             }
 
-            nextVertex.globalAngle = angle + nextVertex.angle;
-            this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
+            this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
           } else {
             // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
             var a = vertex.angle;
@@ -4561,8 +4558,7 @@ var Drawer = function () {
             }
 
             nextVertex.angle = -a;
-            nextVertex.globalAngle = angle + nextVertex.angle;
-            this.createNextBond(nextVertex, vertex, nextVertex.globalAngle, dir);
+            this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
           }
         } else if (_neighbours.length === 2) {
           // If the previous vertex comes out of a ring, it doesn't have an angle set
@@ -4611,30 +4607,24 @@ var Drawer = function () {
             if (vertex.position.clockwise(vertex.previousPosition) === 1) {
               transVertex.angle = -vertex.angle;
               cisVertex.angle = vertex.angle;
-              transVertex.globalAngle = angle + transVertex.angle;
-              cisVertex.globalAngle = angle + cisVertex.angle;
 
-              this.createNextBond(transVertex, vertex, transVertex.globalAngle, dir);
-              this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
+              this.createNextBond(transVertex, vertex, angle + transVertex.angle, dir);
+              this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, -dir);
             } else {
               transVertex.angle = vertex.angle;
               cisVertex.angle = -vertex.angle;
-              transVertex.globalAngle = angle + transVertex.angle;
-              cisVertex.globalAngle = angle + cisVertex.angle;
 
-              this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, dir);
-              this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
+              this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, dir);
+              this.createNextBond(transVertex, vertex, angle + transVertex.angle, -dir);
             }
           } else {
             previousVertex.value.mainChain = true;
             transVertex.value.mainChain = true;
             transVertex.angle = vertex.angle;
             cisVertex.angle = -vertex.angle;
-            transVertex.globalAngle = angle + transVertex.angle;
-            cisVertex.globalAngle = angle + cisVertex.angle;
 
-            this.createNextBond(transVertex, vertex, transVertex.globalAngle, -dir);
-            this.createNextBond(cisVertex, vertex, cisVertex.globalAngle, -dir);
+            this.createNextBond(transVertex, vertex, angle + transVertex.angle, -dir);
+            this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, -dir);
           }
         } else if (_neighbours.length === 3) {
           // The vertex with the longest sub-tree should always go straight
@@ -4692,25 +4682,17 @@ var Drawer = function () {
             _l.angle = _MathHelper2.default.toRad(30) * dir;
             _r4.angle = _MathHelper2.default.toRad(90) * dir;
 
-            s.globalAngle = angle + s.angle;
-            _l.globalAngle = angle + _l.angle;
-            _r4.globalAngle = angle + _r4.angle;
-
-            this.createNextBond(s, vertex, s.globalAngle, dir);
-            this.createNextBond(_l, vertex, _l.globalAngle, 1);
-            this.createNextBond(_r4, vertex, _r4.globalAngle, 1);
+            this.createNextBond(s, vertex, angle + s.angle, 1);
+            this.createNextBond(_l, vertex, angle + _l.angle, 1);
+            this.createNextBond(_r4, vertex, angle + _r4.angle, 1);
           } else {
             s.angle = 0.0;
             _l.angle = _MathHelper2.default.toRad(90);
             _r4.angle = -_MathHelper2.default.toRad(90);
 
-            s.globalAngle = angle + s.angle;
-            _l.globalAngle = angle + _l.angle;
-            _r4.globalAngle = angle + _r4.angle;
-
-            this.createNextBond(s, vertex, s.globalAngle, 1);
-            this.createNextBond(_l, vertex, _l.globalAngle, 1);
-            this.createNextBond(_r4, vertex, _r4.globalAngle, 1);
+            this.createNextBond(s, vertex, angle + s.angle, 1);
+            this.createNextBond(_l, vertex, angle + _l.angle, 1);
+            this.createNextBond(_r4, vertex, angle + _r4.angle, 1);
           }
         } else if (_neighbours.length === 4) {
           // The vertex with the longest sub-tree should always go to the reflected opposide direction
@@ -4751,15 +4733,10 @@ var Drawer = function () {
           y.angle = -_MathHelper2.default.toRad(108);
           z.angle = _MathHelper2.default.toRad(108);
 
-          w.globalAngle = angle + w.angle;
-          x.globalAngle = angle + x.angle;
-          y.globalAngle = angle + y.angle;
-          z.globalAngle = angle + z.angle;
-
-          this.createNextBond(w, vertex, w.globalAngle, 1);
-          this.createNextBond(x, vertex, x.globalAngle, 1);
-          this.createNextBond(y, vertex, y.globalAngle, 1);
-          this.createNextBond(z, vertex, z.globalAngle, 1);
+          this.createNextBond(w, vertex, angle + w.angle, 1);
+          this.createNextBond(x, vertex, angle + x.angle, 1);
+          this.createNextBond(y, vertex, angle + y.angle, 1);
+          this.createNextBond(z, vertex, angle + z.angle, 1);
         }
       }
     }
@@ -5091,8 +5068,6 @@ var Drawer = function () {
           wedgeOrder[j][0] -= neighbour.value.subtreeDepth === 0 ? 1000 : 0;
           wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
           wedgeOrder[j][1] = neighbours[order[j]];
-
-          // if (vertex.id === 32) console.log(wedgeOrder[j][0], neighbour.id, neighbour);
         }
 
         wedgeOrder.sort(function (a, b) {
@@ -5104,15 +5079,12 @@ var Drawer = function () {
           return 0;
         });
 
-        // console.log(wedgeOrder);
-
         // If all neighbours are in a ring, do not draw wedge, the hydrogen will be drawn.
         if (!showHydrogen) {
           this.graph.getEdge(vertex.id, wedgeOrder[0][1]).wedge = wedgeB;
         }
 
         vertex.value.chirality = rs;
-        // console.log(vertex.id, rs, neighbours, priorities);
       }
     }
 
