@@ -1857,7 +1857,7 @@ Positiones the next vertex thus creating a bond.
 | --- | --- | --- | --- |
 | vertex | <code>Vertex</code> |  | A vertex. |
 | [previousVertex] | <code>Vertex</code> | <code></code> | The previous vertex which has been positioned. |
-| [previousAngle] | <code>Number</code> | <code>0.0</code> | The global angle of the previous vertex. |
+| [previousAngle] | <code>Number</code> | <code>0.0</code> | The (global) angle of the vertex. |
 | [dir] | <code>Number</code> | <code></code> | Either 1 or -1 to break ties (if no angle can be elucidated). |
 | [skipPositioning] | <code>Boolean</code> | <code>false</code> | Whether or not to skip positioning and just check the neighbours. |
 

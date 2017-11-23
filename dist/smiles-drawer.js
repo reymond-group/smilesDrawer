@@ -4363,7 +4363,7 @@ var Drawer = function () {
      *
      * @param {Vertex} vertex A vertex.
      * @param {Vertex} [previousVertex=null] The previous vertex which has been positioned.
-     * @param {Number} [previousAngle=0.0] The global angle of the previous vertex.
+     * @param {Number} [previousAngle=0.0] The (global) angle of the vertex.
      * @param {Number} [dir=null] Either 1 or -1 to break ties (if no angle can be elucidated).
      * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
      */
@@ -4503,7 +4503,6 @@ var Drawer = function () {
           // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
           // or if there are successive double bonds. Added a ring check because if there is an aromatic ring the ring bond inside the ring counts as a double bond and leads to =-= being straight.
           if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#' || vertex.value.bondType === '=' && previousVertex && previousVertex.value.rings.length === 0 && previousVertex.value.bondType === '=' && vertex.value.branchBond !== '-') {
-
             vertex.value.drawExplicit = false;
 
             if (previousVertex) {
@@ -4514,10 +4513,13 @@ var Drawer = function () {
             var straightEdge2 = this.graph.getEdge(vertex.id, nextVertex.id);
             straightEdge2.center = true;
 
-            nextVertex.drawExplicit = true;
-            nextVertex.angle = 0.0;
+            if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#') {
+              nextVertex.angle = 0;
+            }
 
-            this.createNextBond(nextVertex, vertex, 0.0, -dir);
+            nextVertex.drawExplicit = true;
+
+            this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, -dir);
           } else if (previousVertex && previousVertex.value.rings.length > 0) {
             // If coming out of a ring, always draw away from the center of mass
             var proposedAngleA = _MathHelper2.default.toRad(60);
@@ -4544,9 +4546,9 @@ var Drawer = function () {
 
             this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
           } else {
-            // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
             var a = vertex.angle;
-
+            console.log(vertex.id, a);
+            // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
             if (previousVertex && previousVertex.neighbours.length > 3) {
               if (a > 0) {
                 a = Math.min(1.0472, a);
@@ -4555,9 +4557,12 @@ var Drawer = function () {
               } else {
                 a = 1.0472;
               }
+            } else if (!a) {
+              a = 1.0472;
             }
 
             nextVertex.angle = -a;
+            console.log(vertex.id, nextVertex.id, angle, nextVertex.angle);
             this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
           }
         } else if (_neighbours.length === 2) {
@@ -10867,7 +10872,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Number[]} edges The ids of edges associated with this vertex.
  * @property {Boolean} positioned A boolean indicating whether or not this vertex has been positioned.
  * @property {Number} angle The angle of this vertex.
- * @property {Number} globalAngle The global angle of this vertex.
  * @property {Number} dir The direction of this vertex.
  * @property {Number} neighbourCount The number of neighbouring vertices.
  * @property {Number[]} neighbours The vertex ids of neighbouring vertices.
@@ -10899,7 +10903,6 @@ var Vertex = function () {
     this.edges = Array();
     this.positioned = false;
     this.angle = null;
-    this.globalAngle = 0.0;
     this.dir = 1.0;
     this.neighbourCount = 0;
     this.neighbours = Array();

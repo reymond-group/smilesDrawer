@@ -2039,7 +2039,6 @@ export default class Drawer {
         if ((vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) ||
           vertex.value.bondType === '=' && previousVertex && previousVertex.value.rings.length === 0 &&
           previousVertex.value.bondType === '=' && vertex.value.branchBond !== '-') {
-
           vertex.value.drawExplicit = false;
 
           if (previousVertex) {
@@ -2050,10 +2049,13 @@ export default class Drawer {
           let straightEdge2 = this.graph.getEdge(vertex.id, nextVertex.id);
           straightEdge2.center = true;
 
-          nextVertex.drawExplicit = true;
-          nextVertex.angle = 0.0;
+          if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#') {
+            nextVertex.angle = 0;
+          }
 
-          this.createNextBond(nextVertex, vertex, 0.0, -dir);
+          nextVertex.drawExplicit = true;
+
+          this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, -dir);
         } else if (previousVertex && previousVertex.value.rings.length > 0) {
           // If coming out of a ring, always draw away from the center of mass
           let proposedAngleA = MathHelper.toRad(60);
@@ -2080,9 +2082,11 @@ export default class Drawer {
 
           this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
         } else {
-          // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
           let a = vertex.angle;
-          
+
+          // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
+          // TODO: If a is null or zero, it should be checked whether or not this one should go cis or trans, that is,
+          //       it should go into the oposite direction of the last non-null or 0 previous vertex / angle.
           if (previousVertex && previousVertex.neighbours.length > 3) {
             if (a > 0) {
               a = Math.min(1.0472, a);
@@ -2091,9 +2095,11 @@ export default class Drawer {
             } else {
               a = 1.0472;
             }
+          } else if (!a) {
+            a = 1.0472;
           }
-
-          nextVertex.angle = -a;
+          
+          console.log(vertex.id, nextVertex.id, angle, nextVertex.angle);
           this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
         }
       } else if (neighbours.length === 2) {
