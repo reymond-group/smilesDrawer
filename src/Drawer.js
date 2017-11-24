@@ -2185,7 +2185,10 @@ export default class Drawer {
           r = this.graph.vertices[neighbours[1]];
         }
 
-        if (previousVertex.value.rings.length < 1 &&
+        if (previousVertex.value.rings.length < 1 && 
+            s.value.rings.length < 1 && 
+            l.value.rings.length < 1 && 
+            r.value.rings.length < 1 &&
             this.graph.getTreeDepth(l.id, vertex.id) === 1 &&
             this.graph.getTreeDepth(r.id, vertex.id) === 1 &&
             this.graph.getTreeDepth(s.id, vertex.id) > 1) {

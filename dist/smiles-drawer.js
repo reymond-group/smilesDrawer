@@ -4649,7 +4649,7 @@ var Drawer = function () {
             _r4 = this.graph.vertices[_neighbours[1]];
           }
 
-          if (previousVertex.value.rings.length < 1 && this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
+          if (previousVertex.value.rings.length < 1 && s.value.rings.length < 1 && _l.value.rings.length < 1 && _r4.value.rings.length < 1 && this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
 
             s.angle = -vertex.angle;
             if (vertex.angle >= 0) {
