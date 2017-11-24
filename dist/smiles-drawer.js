@@ -3868,7 +3868,7 @@ var Drawer = function () {
         startVertex = this.graph.vertices[0];
       }
 
-      this.createNextBond(startVertex, null, 0.0, 1);
+      this.createNextBond(startVertex, null, 0.0);
     }
 
     /**
@@ -4105,7 +4105,7 @@ var Drawer = function () {
           }
 
           v.value.isConnectedToRing = true;
-          this.createNextBond(v, ringMember, 0.0, 1);
+          this.createNextBond(v, ringMember, 0.0);
         }
       }
 
@@ -4117,7 +4117,7 @@ var Drawer = function () {
 
         // Ignore the positioning of ring attachments for now
         _v2.positioned = false;
-        this.createNextBond(_v2, u, 1.0, 1);
+        this.createNextBond(_v2, u, 1.0);
         // if (u.value.originalRings.length === 2) {
         //   v.positioned = false;
         //   this.createNextBond(v, u, 1.0, 1);
@@ -4363,8 +4363,8 @@ var Drawer = function () {
      *
      * @param {Vertex} vertex A vertex.
      * @param {Vertex} [previousVertex=null] The previous vertex which has been positioned.
-     * @param {Number} [previousAngle=0.0] The (global) angle of the vertex.
-     * @param {Number} [dir=null] Either 1 or -1 to break ties (if no angle can be elucidated).
+     * @param {Number} [angle=0.0] The (global) angle of the vertex.
+     * @param {Boolean} [originShortest=false] Whether the origin is the shortest subtree in the branch.
      * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
      */
 
@@ -4372,8 +4372,8 @@ var Drawer = function () {
     key: 'createNextBond',
     value: function createNextBond(vertex) {
       var previousVertex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      var previousAngle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.0;
-      var dir = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      var angle = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.0;
+      var originShortest = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
       var skipPositioning = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
       if (vertex.positioned && !skipPositioning) {
@@ -4437,7 +4437,7 @@ var Drawer = function () {
           // on the global angle of the previous bond
           var _v3 = new _Vector2.default(this.opts.bondLength, 0);
 
-          _v3.rotate(previousAngle);
+          _v3.rotate(angle);
           _v3.add(previousVertex.position);
 
           vertex.setPositionFromVector(_v3);
@@ -4495,7 +4495,7 @@ var Drawer = function () {
           _neighbours = _ArrayHelper2.default.remove(_neighbours, previousVertex.id);
         }
 
-        var angle = vertex.getAngle();
+        var previousAngle = vertex.getAngle();
 
         if (_neighbours.length === 1) {
           var nextVertex = this.graph.vertices[_neighbours[0]];
@@ -4514,12 +4514,12 @@ var Drawer = function () {
             straightEdge2.center = true;
 
             if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#') {
-              nextVertex.angle = 0;
+              nextVertex.angle = 0.0;
             }
 
             nextVertex.drawExplicit = true;
 
-            this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, -dir);
+            this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
           } else if (previousVertex && previousVertex.value.rings.length > 0) {
             // If coming out of a ring, always draw away from the center of mass
             var proposedAngleA = _MathHelper2.default.toRad(60);
@@ -4538,17 +4538,12 @@ var Drawer = function () {
 
             nextVertex.angle = distanceA < distanceB ? proposedAngleB : proposedAngleA;
 
-            if (nextVertex.angle > 0) {
-              dir = -1;
-            } else {
-              dir = 1;
-            }
-
-            this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
+            this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
           } else {
             var a = vertex.angle;
-            console.log(vertex.id, a);
             // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
+            // TODO: If a is null or zero, it should be checked whether or not this one should go cis or trans, that is,
+            //       it should go into the oposite direction of the last non-null or 0 previous vertex / angle.
             if (previousVertex && previousVertex.neighbours.length > 3) {
               if (a > 0) {
                 a = Math.min(1.0472, a);
@@ -4561,15 +4556,21 @@ var Drawer = function () {
               a = 1.0472;
             }
 
-            nextVertex.angle = -a;
-            console.log(vertex.id, nextVertex.id, angle, nextVertex.angle);
-            this.createNextBond(nextVertex, vertex, angle + nextVertex.angle, dir);
+            if (originShortest) {
+              nextVertex.angle = a;
+            } else {
+              nextVertex.angle = -a;
+            }
+            this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
           }
         } else if (_neighbours.length === 2) {
           // If the previous vertex comes out of a ring, it doesn't have an angle set
-          if (vertex.angle === null) {
-            vertex.angle = _MathHelper2.default.toRad(-60);
+          var _a = vertex.angle;
+
+          if (!_a) {
+            _a = 1.0472;
           }
+
           // Check for the longer subtree - always go with cis for the longer subtree
           var subTreeDepthA = this.graph.getTreeDepth(_neighbours[0], vertex.id);
           var subTreeDepthB = this.graph.getTreeDepth(_neighbours[1], vertex.id);
@@ -4605,31 +4606,24 @@ var Drawer = function () {
           var cisVertex = this.graph.vertices[_neighbours[cis]];
           var transVertex = this.graph.vertices[_neighbours[trans]];
 
-          // If the origin tree is the shortest, set both vertices to trans
+          // If the origin tree is the shortest, make them the main chain
           if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
             transVertex.value.mainChain = true;
             cisVertex.value.mainChain = true;
-            if (vertex.position.clockwise(vertex.previousPosition) === 1) {
-              transVertex.angle = -vertex.angle;
-              cisVertex.angle = vertex.angle;
 
-              this.createNextBond(transVertex, vertex, angle + transVertex.angle, dir);
-              this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, -dir);
-            } else {
-              transVertex.angle = vertex.angle;
-              cisVertex.angle = -vertex.angle;
+            transVertex.angle = _a;
+            cisVertex.angle = -_a;
 
-              this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, dir);
-              this.createNextBond(transVertex, vertex, angle + transVertex.angle, -dir);
-            }
+            this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle, true);
+            this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle, true);
           } else {
             previousVertex.value.mainChain = true;
             transVertex.value.mainChain = true;
-            transVertex.angle = vertex.angle;
-            cisVertex.angle = -vertex.angle;
+            transVertex.angle = _a;
+            cisVertex.angle = -_a;
 
-            this.createNextBond(transVertex, vertex, angle + transVertex.angle, -dir);
-            this.createNextBond(cisVertex, vertex, angle + cisVertex.angle, -dir);
+            this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle);
+            this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle);
           }
         } else if (_neighbours.length === 3) {
           // The vertex with the longest sub-tree should always go straight
@@ -4655,49 +4649,28 @@ var Drawer = function () {
             _r4 = this.graph.vertices[_neighbours[1]];
           }
 
-          if (this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
+          if (previousVertex.value.rings.length < 1 && this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
 
-            if (!dir) {
-              var _proposedAngleA = _MathHelper2.default.toRad(60);
-              var _proposedAngleB = -_proposedAngleA;
-
-              var _proposedVectorA = new _Vector2.default(this.opts.bondLength, 0);
-              var _proposedVectorB = new _Vector2.default(this.opts.bondLength, 0);
-
-              _proposedVectorA.rotate(_proposedAngleA).add(vertex.position);
-              _proposedVectorB.rotate(_proposedAngleB).add(vertex.position);
-
-              // let centerOfMass = this.getCurrentCenterOfMassInNeigbourhood(vertex.position, 100);
-              var _centerOfMass = this.getCurrentCenterOfMass();
-              var _distanceA = _proposedVectorA.distanceSq(_centerOfMass);
-              var _distanceB = _proposedVectorB.distanceSq(_centerOfMass);
-
-              s.angle = _distanceA < _distanceB ? _proposedAngleB : _proposedAngleA;
-
-              if (s.angle > 0) {
-                dir = -1;
-              } else {
-                dir = 1;
-              }
+            s.angle = -vertex.angle;
+            if (vertex.angle >= 0) {
+              _l.angle = _MathHelper2.default.toRad(30);
+              _r4.angle = _MathHelper2.default.toRad(90);
             } else {
-              s.angle = -vertex.angle; // * dir;
-              dir = -dir;
+              _l.angle = -_MathHelper2.default.toRad(30);
+              _r4.angle = -_MathHelper2.default.toRad(90);
             }
 
-            _l.angle = _MathHelper2.default.toRad(30) * dir;
-            _r4.angle = _MathHelper2.default.toRad(90) * dir;
-
-            this.createNextBond(s, vertex, angle + s.angle, 1);
-            this.createNextBond(_l, vertex, angle + _l.angle, 1);
-            this.createNextBond(_r4, vertex, angle + _r4.angle, 1);
+            this.createNextBond(s, vertex, previousAngle + s.angle);
+            this.createNextBond(_l, vertex, previousAngle + _l.angle);
+            this.createNextBond(_r4, vertex, previousAngle + _r4.angle);
           } else {
             s.angle = 0.0;
             _l.angle = _MathHelper2.default.toRad(90);
             _r4.angle = -_MathHelper2.default.toRad(90);
 
-            this.createNextBond(s, vertex, angle + s.angle, 1);
-            this.createNextBond(_l, vertex, angle + _l.angle, 1);
-            this.createNextBond(_r4, vertex, angle + _r4.angle, 1);
+            this.createNextBond(s, vertex, previousAngle + s.angle);
+            this.createNextBond(_l, vertex, previousAngle + _l.angle);
+            this.createNextBond(_r4, vertex, previousAngle + _r4.angle);
           }
         } else if (_neighbours.length === 4) {
           // The vertex with the longest sub-tree should always go to the reflected opposide direction
@@ -4738,10 +4711,10 @@ var Drawer = function () {
           y.angle = -_MathHelper2.default.toRad(108);
           z.angle = _MathHelper2.default.toRad(108);
 
-          this.createNextBond(w, vertex, angle + w.angle, 1);
-          this.createNextBond(x, vertex, angle + x.angle, 1);
-          this.createNextBond(y, vertex, angle + y.angle, 1);
-          this.createNextBond(z, vertex, angle + z.angle, 1);
+          this.createNextBond(w, vertex, previousAngle + w.angle);
+          this.createNextBond(x, vertex, previousAngle + x.angle);
+          this.createNextBond(y, vertex, previousAngle + y.angle);
+          this.createNextBond(z, vertex, previousAngle + z.angle);
         }
       }
     }

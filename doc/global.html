@@ -3033,7 +3033,7 @@ If a hydrogen is implicitly attached to the chiral center, insert as the third c
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2451">line 2451</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2425">line 2425</a>
     </li></ul></dd>
     
 
@@ -6791,7 +6791,7 @@ If a hydrogen is implicitly attached to the chiral center, insert as the third c
 
     
 
-    <h4 class="name" id="createNextBond"><span class="type-signature"></span>createNextBond<span class="signature">(vertex, previousVertex<span class="signature-attributes">opt</span>, previousAngle<span class="signature-attributes">opt</span>, dir<span class="signature-attributes">opt</span>, skipPositioning<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="createNextBond"><span class="type-signature"></span>createNextBond<span class="signature">(vertex, previousVertex<span class="signature-attributes">opt</span>, angle<span class="signature-attributes">opt</span>, originShortest<span class="signature-attributes">opt</span>, skipPositioning<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -6959,7 +6959,7 @@ If a hydrogen is implicitly attached to the chiral center, insert as the third c
 
         <tr>
             
-                <td class="name"><code>previousAngle</code></td>
+                <td class="name"><code>angle</code></td>
             
 
             <td class="type">
@@ -6998,13 +6998,13 @@ If a hydrogen is implicitly attached to the chiral center, insert as the third c
 
         <tr>
             
-                <td class="name"><code>dir</code></td>
+                <td class="name"><code>originShortest</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -7025,12 +7025,12 @@ If a hydrogen is implicitly attached to the chiral center, insert as the third c
             
                 <td class="default">
                 
-                    <code>null</code>
+                    <code>false</code>
                 
                 </td>
             
 
-            <td class="description last"><p>Either 1 or -1 to break ties (if no angle can be elucidated).</p></td>
+            <td class="description last"><p>Whether the origin is the shortest subtree in the branch.</p></td>
         </tr>
 
     
@@ -13714,7 +13714,7 @@ Only supports 1d, non-nested arrays.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2415">line 2415</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2389">line 2389</a>
     </li></ul></dd>
     
 
@@ -14701,7 +14701,7 @@ Only supports 1d, non-nested arrays.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2293">line 2293</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2267">line 2267</a>
     </li></ul></dd>
     
 
@@ -16782,7 +16782,7 @@ Only supports 1d, non-nested arrays.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2399">line 2399</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2373">line 2373</a>
     </li></ul></dd>
     
 
@@ -18675,7 +18675,7 @@ Only supports 1d, non-nested arrays.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2431">line 2431</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2405">line 2405</a>
     </li></ul></dd>
     
 
@@ -24492,7 +24492,7 @@ Only supports 1d, non-nested arrays.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2659">line 2659</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2633">line 2633</a>
     </li></ul></dd>
     
 
@@ -25634,7 +25634,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2338">line 2338</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2312">line 2312</a>
     </li></ul></dd>
     
 
@@ -25789,7 +25789,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2351">line 2351</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2325">line 2325</a>
     </li></ul></dd>
     
 
@@ -26360,7 +26360,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2313">line 2313</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2287">line 2287</a>
     </li></ul></dd>
     
 
@@ -26515,7 +26515,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2381">line 2381</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2355">line 2355</a>
     </li></ul></dd>
     
 
@@ -38336,7 +38336,7 @@ the involved atoms not to be displayed.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2616">line 2616</a>
+        <a href="Drawer.js.html">Drawer.js</a>, <a href="Drawer.js.html#line2590">line 2590</a>
     </li></ul></dd>
     
 
@@ -38762,7 +38762,7 @@ the involved atoms not to be displayed.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 23 2017 21:38:52 GMT+0100 (W. Europe Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 24 2017 15:14:19 GMT+0100 (W. Europe Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
