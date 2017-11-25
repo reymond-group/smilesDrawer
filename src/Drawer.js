@@ -32,6 +32,7 @@ export default class Drawer {
    */
   constructor(options) {
     this.graph = null;
+    this.doubleBondConfig = null;
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
     this.canvasWrapper = null;
@@ -1679,12 +1680,6 @@ export default class Drawer {
       // Ignore the positioning of ring attachments for now
       v.positioned = false;
       this.createNextBond(v, u, 1.0);
-      // if (u.value.originalRings.length === 2) {
-      //   v.positioned = false;
-      //   this.createNextBond(v, u, 1.0, 1);
-      // } else {
-      //   this.createNextBond(v, u, 1.0, 1, true);
-      // }
     }
   }
 

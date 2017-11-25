@@ -54,7 +54,7 @@ export default class Graph {
     let parentVertex = this.vertices[parentVertexId];
 
     this.addVertex(vertex);
- 
+
     // Add the id of this node to the parent as child
     if (parentVertexId !== null) {
       vertex.setParentVertexId(parentVertexId);
@@ -68,13 +68,16 @@ export default class Graph {
 
       // Add edge between this node and its parent
       let edge = new Edge(parentVertexId, vertex.id, 1);
+      let vertexId = null;
 
       if (isBranch) {
         edge.setBondType(vertex.value.branchBond || '-');
+        vertexId = vertex.id;
       } else {
         edge.setBondType(parentVertex.value.bondType || '-');
+        vertexId = parentVertex.id;
       }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+
       let edgeId = this.addEdge(edge);
       vertex.edges.push(edgeId);
       parentVertex.edges.push(edgeId);
