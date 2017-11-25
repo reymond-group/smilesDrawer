@@ -32,6 +32,7 @@ export default class Drawer {
    */
   constructor(options) {
     this.graph = null;
+    this.doubleBondConfigAngle = null;
     this.doubleBondConfig = null;
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
@@ -50,6 +51,7 @@ export default class Drawer {
       debug: false,
       terminalCarbons: false,
       explicitHydrogens: false, // TODO: Add to doc
+      overlapSensitivity: 0.42, // TODO: Add to doc
       compactDrawing: true,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
@@ -159,6 +161,10 @@ export default class Drawer {
 
     this.bridgedRing = false;
 
+    // Reset those, in case the previous drawn SMILES had a dangling \ or /
+    this.doubleBondConfigAngle = null;
+    this.doubleBondConfig = null;
+
     this.initRings();
 
     // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
@@ -197,7 +203,6 @@ export default class Drawer {
 
       for (var i = 0; i < this.graph.edges.length; i++) {
         let edge = this.graph.edges[i];
-
         if (this.isEdgeRotatable(edge)) {
           let subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
           let subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
@@ -212,8 +217,8 @@ export default class Drawer {
           }
 
           let subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
-
-          if (subTreeOverlap.value > 0.2) {
+          
+          if (subTreeOverlap.value > this.opts.overlapSensitivity) {
             let vertexA = this.graph.vertices[a];
             let vertexB = this.graph.vertices[b];
             let neighbours = vertexB.getNeighbours(a);
@@ -1719,10 +1724,14 @@ export default class Drawer {
     let that = this;
     let score = 0;
     let center = new Vector2(0, 0);
+    let count = 0;
 
     this.graph.traverseTree(vertexId, parentVertexId, function (vertex) {
       let s = vertexOverlapScores[vertex.id];
-      score += s;
+      if (s > that.opts.overlapSensitivity) {
+        score += s;
+        count++;
+      }
 
       let position = that.graph.vertices[vertex.id].position.clone();
       position.multiplyScalar(s)
@@ -1732,7 +1741,7 @@ export default class Drawer {
     center.divide(score);
 
     return {
-      value: score,
+      value: score / count,
       center: center
     };
   }
@@ -1868,7 +1877,7 @@ export default class Drawer {
    */
   resolveSecondaryOverlaps(scores) {
     for (var i = 0; i < scores.length; i++) {
-      if (scores[i].score > this.opts.bondLength / (4.0 * this.opts.bondLength)) {
+      if (scores[i].score > this.opts.overlapSensitivity) {
         let vertex = this.graph.vertices[scores[i].id];
 
         if (vertex.isTerminal()) {
@@ -1906,6 +1915,28 @@ export default class Drawer {
   createNextBond(vertex, previousVertex = null, angle = 0.0, originShortest = false, skipPositioning = false) {
     if (vertex.positioned && !skipPositioning) {
       return;
+    }
+
+    // Keeping track of configurations around double bonds
+    if (previousVertex) {
+      let edge = this.graph.getEdge(vertex.id, previousVertex.id);
+
+      if (edge.bondType === '/' || edge.bondType === '\\') {
+        if (this.doubleBondConfigAngle === null) {
+          this.doubleBondConfigAngle = angle;
+          this.doubleBondConfig = edge.bondType;
+        } else {
+          if (edge.bondType === this.doubleBondConfig) {
+            angle = this.doubleBondConfigAngle;
+          } else {
+            angle = this.doubleBondConfigAngle - 2 * vertex.angle;
+            vertex.angle = -vertex.angle;
+          }
+
+          this.doubleBondConfigAngle = null;
+          this.doubleBondConfig = null;
+        }
+      } 
     }
 
     // If the current node is the member of one ring, then point straight away
@@ -2180,7 +2211,10 @@ export default class Drawer {
           r = this.graph.vertices[neighbours[1]];
         }
 
-        if (previousVertex.value.rings.length < 1 && 
+        // Create a cross if more than one subtree is of length > 1
+        // or the vertex is connected to a ring
+        if (previousVertex && 
+            previousVertex.value.rings.length < 1 && 
             s.value.rings.length < 1 && 
             l.value.rings.length < 1 && 
             r.value.rings.length < 1 &&
@@ -2641,6 +2675,11 @@ export default class Drawer {
       // Ignore atoms that have less than 3 neighbours, except if
       // the vertex is connected to a ring and has two neighbours
       if (vertex.getNeighbourCount() < 3 || vertex.value.rings.length > 0) {
+        continue;
+      }
+    
+      // Ignore phosphates (especially for triphosphates)
+      if (vertex.value.element === 'P') {
         continue;
       }
 

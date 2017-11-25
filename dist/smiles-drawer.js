@@ -17,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 //@ts-check
 window.SmilesDrawer = {
-  Version: '1.0.0'
+    Version: '1.0.0'
 };
 
 window.SmilesDrawer.Drawer = _Drawer2.default;
@@ -31,7 +31,7 @@ window.SmilesDrawer.Parser = _Parser2.default;
 * @returns {String} The clean SMILES string.
 */
 window.SmilesDrawer.clean = function (smiles) {
-  return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
+    return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
 };
 
 /**
@@ -44,28 +44,28 @@ window.SmilesDrawer.clean = function (smiles) {
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
 window.SmilesDrawer.apply = function (options) {
-  var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
-  var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
-  var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
+    var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
+    var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-  var smilesDrawer = new _Drawer2.default(options);
-  var elements = document.querySelectorAll(selector);
+    var smilesDrawer = new _Drawer2.default(options);
+    var elements = document.querySelectorAll(selector);
 
-  var _loop = function _loop() {
-    var element = elements[i];
+    var _loop = function _loop() {
+        var element = elements[i];
 
-    SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
-      smilesDrawer.draw(tree, element, themeName, false);
-    }, function (err) {
-      if (onError) {
-        onError(err);
-      }
-    });
-  };
+        SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
+            smilesDrawer.draw(tree, element, themeName, false);
+        }, function (err) {
+            if (onError) {
+                onError(err);
+            }
+        });
+    };
 
-  for (var i = 0; i < elements.length; i++) {
-    _loop();
-  }
+    for (var i = 0; i < elements.length; i++) {
+        _loop();
+    }
 };
 
 /**
@@ -77,57 +77,57 @@ window.SmilesDrawer.apply = function (options) {
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
 window.SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
-  try {
-    if (successCallback) {
-      successCallback(_Parser2.default.parse(smiles));
+    try {
+        if (successCallback) {
+            successCallback(_Parser2.default.parse(smiles));
+        }
+    } catch (err) {
+        if (errorCallback) {
+            errorCallback(err);
+        }
     }
-  } catch (err) {
-    if (errorCallback) {
-      errorCallback(err);
-    }
-  }
 };
 
 // There be dragons (polyfills)
 
 if (!Array.prototype.fill) {
-  Object.defineProperty(Array.prototype, 'fill', {
-    value: function value(_value) {
+    Object.defineProperty(Array.prototype, 'fill', {
+        value: function value(_value) {
 
-      // Steps 1-2.
-      if (this == null) {
-        throw new TypeError('this is null or not defined');
-      }
+            // Steps 1-2.
+            if (this == null) {
+                throw new TypeError('this is null or not defined');
+            }
 
-      var O = Object(this);
+            var O = Object(this);
 
-      // Steps 3-5.
-      var len = O.length >>> 0;
+            // Steps 3-5.
+            var len = O.length >>> 0;
 
-      // Steps 6-7.
-      var start = arguments[1];
-      var relativeStart = start >> 0;
+            // Steps 6-7.
+            var start = arguments[1];
+            var relativeStart = start >> 0;
 
-      // Step 8.
-      var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
+            // Step 8.
+            var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
 
-      // Steps 9-10.
-      var end = arguments[2];
-      var relativeEnd = end === undefined ? len : end >> 0;
+            // Steps 9-10.
+            var end = arguments[2];
+            var relativeEnd = end === undefined ? len : end >> 0;
 
-      // Step 11.
-      var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
+            // Step 11.
+            var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
 
-      // Step 12.
-      while (k < final) {
-        O[k] = _value;
-        k++;
-      }
+            // Step 12.
+            while (k < final) {
+                O[k] = _value;
+                k++;
+            }
 
-      // Step 13.
-      return O;
-    }
-  });
+            // Step 13.
+            return O;
+        }
+    });
 }
 
 },{"./src/Drawer":5,"./src/Parser":10}],2:[function(require,module,exports){
@@ -1704,23 +1704,23 @@ var CanvasWrapper = function () {
             ctx.restore();
 
             /*
-             let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
+              let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
             let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
             let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
             let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
-             ctx.beginPath();
+              ctx.beginPath();
             ctx.moveTo(t.x, t.y);
             ctx.lineTo(u.x, u.y);
             ctx.lineTo(v.x, v.y);
             ctx.lineTo(w.x, w.y);
-             let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
+              let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
             gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
                 this.getColor('C'));
             gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
                 this.getColor('C'));
-             ctx.fillStyle = gradient;
-             ctx.fill();
-             // Now dash it
+              ctx.fillStyle = gradient;
+              ctx.fill();
+              // Now dash it
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
             ctx.moveTo(sStart.x, sStart.y);
@@ -2268,6 +2268,8 @@ var Drawer = function () {
     _classCallCheck(this, Drawer);
 
     this.graph = null;
+    this.doubleBondConfigAngle = null;
+    this.doubleBondConfig = null;
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
     this.canvasWrapper = null;
@@ -2285,6 +2287,7 @@ var Drawer = function () {
       debug: false,
       terminalCarbons: false,
       explicitHydrogens: false, // TODO: Add to doc
+      overlapSensitivity: 0.42, // TODO: Add to doc
       compactDrawing: true,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
@@ -2403,6 +2406,10 @@ var Drawer = function () {
 
       this.bridgedRing = false;
 
+      // Reset those, in case the previous drawn SMILES had a dangling \ or /
+      this.doubleBondConfigAngle = null;
+      this.doubleBondConfig = null;
+
       this.initRings();
 
       // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
@@ -2440,7 +2447,6 @@ var Drawer = function () {
 
         for (var i = 0; i < this.graph.edges.length; i++) {
           var edge = this.graph.edges[i];
-
           if (this.isEdgeRotatable(edge)) {
             var subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
             var subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
@@ -2456,7 +2462,7 @@ var Drawer = function () {
 
             var subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
 
-            if (subTreeOverlap.value > 0.2) {
+            if (subTreeOverlap.value > this.opts.overlapSensitivity) {
               var vertexA = this.graph.vertices[a];
               var vertexB = this.graph.vertices[b];
               var neighbours = vertexB.getNeighbours(a);
@@ -4118,12 +4124,6 @@ var Drawer = function () {
         // Ignore the positioning of ring attachments for now
         _v2.positioned = false;
         this.createNextBond(_v2, u, 1.0);
-        // if (u.value.originalRings.length === 2) {
-        //   v.positioned = false;
-        //   this.createNextBond(v, u, 1.0, 1);
-        // } else {
-        //   this.createNextBond(v, u, 1.0, 1, true);
-        // }
       }
     }
 
@@ -4169,10 +4169,14 @@ var Drawer = function () {
       var that = this;
       var score = 0;
       var center = new _Vector2.default(0, 0);
+      var count = 0;
 
       this.graph.traverseTree(vertexId, parentVertexId, function (vertex) {
         var s = vertexOverlapScores[vertex.id];
-        score += s;
+        if (s > that.opts.overlapSensitivity) {
+          score += s;
+          count++;
+        }
 
         var position = that.graph.vertices[vertex.id].position.clone();
         position.multiplyScalar(s);
@@ -4182,7 +4186,7 @@ var Drawer = function () {
       center.divide(score);
 
       return {
-        value: score,
+        value: score / count,
         center: center
       };
     }
@@ -4332,7 +4336,7 @@ var Drawer = function () {
     key: 'resolveSecondaryOverlaps',
     value: function resolveSecondaryOverlaps(scores) {
       for (var i = 0; i < scores.length; i++) {
-        if (scores[i].score > this.opts.bondLength / (4.0 * this.opts.bondLength)) {
+        if (scores[i].score > this.opts.overlapSensitivity) {
           var vertex = this.graph.vertices[scores[i].id];
 
           if (vertex.isTerminal()) {
@@ -4378,6 +4382,28 @@ var Drawer = function () {
 
       if (vertex.positioned && !skipPositioning) {
         return;
+      }
+
+      // Keeping track of configurations around double bonds
+      if (previousVertex) {
+        var edge = this.graph.getEdge(vertex.id, previousVertex.id);
+
+        if (edge.bondType === '/' || edge.bondType === '\\') {
+          if (this.doubleBondConfigAngle === null) {
+            this.doubleBondConfigAngle = angle;
+            this.doubleBondConfig = edge.bondType;
+          } else {
+            if (edge.bondType === this.doubleBondConfig) {
+              angle = this.doubleBondConfigAngle;
+            } else {
+              angle = this.doubleBondConfigAngle - 2 * vertex.angle;
+              vertex.angle = -vertex.angle;
+            }
+
+            this.doubleBondConfigAngle = null;
+            this.doubleBondConfig = null;
+          }
+        }
       }
 
       // If the current node is the member of one ring, then point straight away
@@ -4649,7 +4675,9 @@ var Drawer = function () {
             _r4 = this.graph.vertices[_neighbours[1]];
           }
 
-          if (previousVertex.value.rings.length < 1 && s.value.rings.length < 1 && _l.value.rings.length < 1 && _r4.value.rings.length < 1 && this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
+          // Create a cross if more than one subtree is of length > 1
+          // or the vertex is connected to a ring
+          if (previousVertex && previousVertex.value.rings.length < 1 && s.value.rings.length < 1 && _l.value.rings.length < 1 && _r4.value.rings.length < 1 && this.graph.getTreeDepth(_l.id, vertex.id) === 1 && this.graph.getTreeDepth(_r4.id, vertex.id) === 1 && this.graph.getTreeDepth(s.id, vertex.id) > 1) {
 
             s.angle = -vertex.angle;
             if (vertex.angle >= 0) {
@@ -5143,6 +5171,11 @@ var Drawer = function () {
           continue;
         }
 
+        // Ignore phosphates (especially for triphosphates)
+        if (vertex.value.element === 'P') {
+          continue;
+        }
+
         // Continue if there are less than two heteroatoms
         // or if a neighbour has more than 1 neighbour
         var heteroAtomCount = 0;
@@ -5242,7 +5275,7 @@ exports.default = Drawer;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5264,62 +5297,62 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String} [wedge=''] Wedge direction. Either '', 'up' or 'down'
  */
 var Edge = function () {
-  /**
-   * The constructor for the class Edge.
-   *
-   * @param {Number} sourceId A vertex id.
-   * @param {Number} targetId A vertex id.
-   * @param {Number} [weight=1] The weight of the edge.
-   */
-  function Edge(sourceId, targetId) {
-    var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+    /**
+     * The constructor for the class Edge.
+     *
+     * @param {Number} sourceId A vertex id.
+     * @param {Number} targetId A vertex id.
+     * @param {Number} [weight=1] The weight of the edge.
+     */
+    function Edge(sourceId, targetId) {
+        var weight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
-    _classCallCheck(this, Edge);
+        _classCallCheck(this, Edge);
 
-    this.id = null;
-    this.sourceId = sourceId;
-    this.targetId = targetId;
-    this.weight = weight;
-    this.bondType = '-';
-    this.isPartOfAromaticRing = false;
-    this.center = false;
-    this.wedge = '';
-  }
-
-  /**
-   * Set the bond type of this edge. This also sets the edge weight.
-   * @param {String} bondType 
-   */
-
-
-  _createClass(Edge, [{
-    key: 'setBondType',
-    value: function setBondType(bondType) {
-      this.bondType = bondType;
-      this.weight = Edge.bonds[bondType];
+        this.id = null;
+        this.sourceId = sourceId;
+        this.targetId = targetId;
+        this.weight = weight;
+        this.bondType = '-';
+        this.isPartOfAromaticRing = false;
+        this.center = false;
+        this.wedge = '';
     }
 
     /**
-     * An object mapping the bond type to the number of bonds.
-     *
-     * @returns {Object} The object containing the map.
+     * Set the bond type of this edge. This also sets the edge weight.
+     * @param {String} bondType 
      */
 
-  }], [{
-    key: 'bonds',
-    get: function get() {
-      return {
-        '-': 1,
-        '/': 1,
-        '\\': 1,
-        '=': 2,
-        '#': 3,
-        '$': 4
-      };
-    }
-  }]);
 
-  return Edge;
+    _createClass(Edge, [{
+        key: 'setBondType',
+        value: function setBondType(bondType) {
+            this.bondType = bondType;
+            this.weight = Edge.bonds[bondType];
+        }
+
+        /**
+         * An object mapping the bond type to the number of bonds.
+         *
+         * @returns {Object} The object containing the map.
+         */
+
+    }], [{
+        key: 'bonds',
+        get: function get() {
+            return {
+                '-': 1,
+                '/': 1,
+                '\\': 1,
+                '=': 2,
+                '#': 3,
+                '$': 4
+            };
+        }
+    }]);
+
+    return Edge;
 }();
 
 exports.default = Edge;
@@ -5393,7 +5426,6 @@ var Graph = function () {
 
     // Used for the bridge detection algorithm
     this._time = 0;
-    this._doubleBondStereo = null;
     this._init(parseTree);
     this._initInfos();
   }
@@ -5452,25 +5484,6 @@ var Graph = function () {
         var edgeId = this.addEdge(edge);
         vertex.edges.push(edgeId);
         parentVertex.edges.push(edgeId);
-
-        if (edge.bondType === '/' || edge.bondType === '\\') {
-          if (this._doubleBondStereo === null) {
-            if (isBranch) {
-              console.log(vertex.id);
-              this._doubleBondStereo = vertex.id;
-            } else {
-              console.log(vertex.id - 1);
-              this._doubleBondStereo = vertex.id - 1;
-            }
-          } else {
-            if (isBranch) {
-              console.log(vertex.id + 1);
-            } else {
-              console.log(vertex.id);
-            }
-            this._doubleBondStereo = null;
-          }
-        }
       }
 
       var offset = node.ringbondCount + 1;
