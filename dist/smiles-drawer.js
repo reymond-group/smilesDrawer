@@ -2268,7 +2268,7 @@ var Drawer = function () {
     _classCallCheck(this, Drawer);
 
     this.graph = null;
-    this.doubleBondConfigAngle = null;
+    this.doubleBondConfigCount = 0;
     this.doubleBondConfig = null;
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
@@ -2407,7 +2407,7 @@ var Drawer = function () {
       this.bridgedRing = false;
 
       // Reset those, in case the previous drawn SMILES had a dangling \ or /
-      this.doubleBondConfigAngle = null;
+      this.doubleBondConfigCount = null;
       this.doubleBondConfig = null;
 
       this.initRings();
@@ -4363,6 +4363,27 @@ var Drawer = function () {
     }
 
     /**
+     * Get the last non-null or 0 angle vertex.
+     * @param {Number} vertexId A vertex id.
+     * @returns {Vertex} The last vertex with an angle that was not 0 or null.
+     */
+
+  }, {
+    key: 'getLastVertexWithAngle',
+    value: function getLastVertexWithAngle(vertexId) {
+      var angle = 0;
+      var vertex = null;
+
+      while (!angle && vertexId) {
+        vertex = this.graph.vertices[vertexId];
+        angle = vertex.angle;
+        vertexId = vertex.parentVertexId;
+      }
+
+      return vertex;
+    }
+
+    /**
      * Positiones the next vertex thus creating a bond.
      *
      * @param {Vertex} vertex A vertex.
@@ -4384,24 +4405,26 @@ var Drawer = function () {
         return;
       }
 
+      // If the double bond config was set on this vertex, do not check later
+      var doubleBondConfigSet = false;
+
       // Keeping track of configurations around double bonds
       if (previousVertex) {
         var edge = this.graph.getEdge(vertex.id, previousVertex.id);
 
-        if (edge.bondType === '/' || edge.bondType === '\\') {
-          if (this.doubleBondConfigAngle === null) {
-            this.doubleBondConfigAngle = angle;
+        if ((edge.bondType === '/' || edge.bondType === '\\') && ++this.doubleBondConfigCount % 2 === 1) {
+          if (this.doubleBondConfig === null) {
             this.doubleBondConfig = edge.bondType;
-          } else {
-            if (edge.bondType === this.doubleBondConfig) {
-              angle = this.doubleBondConfigAngle;
-            } else {
-              angle = this.doubleBondConfigAngle - 2 * vertex.angle;
-              vertex.angle = -vertex.angle;
-            }
+            doubleBondConfigSet = true;
 
-            this.doubleBondConfigAngle = null;
-            this.doubleBondConfig = null;
+            // Switch if the bond is a branch bond and previous vertex is the first
+            if (previousVertex.parentVertexId === null && vertex.value.branchBond) {
+              if (this.doubleBondConfig === '/') {
+                this.doubleBondConfig = '\\';
+              } else if (this.doubleBondConfig === '\\') {
+                this.doubleBondConfig = '/';
+              }
+            }
           }
         }
       }
@@ -4567,7 +4590,7 @@ var Drawer = function () {
             this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
           } else {
             var a = vertex.angle;
-            // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
+            // Take the min and max if the previous angle was in a 4-neighbourhood (90° angles)
             // TODO: If a is null or zero, it should be checked whether or not this one should go cis or trans, that is,
             //       it should go into the oposite direction of the last non-null or 0 previous vertex / angle.
             if (previousVertex && previousVertex.neighbours.length > 3) {
@@ -4579,7 +4602,33 @@ var Drawer = function () {
                 a = 1.0472;
               }
             } else if (!a) {
-              a = 1.0472;
+              var _v4 = this.getLastVertexWithAngle(vertex.id);
+              a = _v4.angle;
+
+              if (!a) {
+                a = 1.0472;
+              }
+            }
+
+            // Handle configuration around double bonds
+            if (previousVertex && !doubleBondConfigSet) {
+              var bondType = this.graph.getEdge(vertex.id, nextVertex.id).bondType;
+
+              if (bondType === '/') {
+                if (this.doubleBondConfig === '/') {
+                  // Nothing to do since it will be trans per default
+                } else if (this.doubleBondConfig === '\\') {
+                  a = -a;
+                }
+                this.doubleBondConfig = null;
+              } else if (bondType === '\\') {
+                if (this.doubleBondConfig === '/') {
+                  a = -a;
+                } else if (this.doubleBondConfig === '\\') {
+                  // Nothing to do since it will be trans per default
+                }
+                this.doubleBondConfig = null;
+              }
             }
 
             if (originShortest) {
@@ -4587,6 +4636,7 @@ var Drawer = function () {
             } else {
               nextVertex.angle = -a;
             }
+
             this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
           }
         } else if (_neighbours.length === 2) {
@@ -4632,6 +4682,9 @@ var Drawer = function () {
           var cisVertex = this.graph.vertices[_neighbours[cis]];
           var transVertex = this.graph.vertices[_neighbours[trans]];
 
+          var edgeCis = this.graph.getEdge(vertex.id, cisVertex.id);
+          var edgeTrans = this.graph.getEdge(vertex.id, transVertex.id);
+
           // If the origin tree is the shortest, make them the main chain
           if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
             transVertex.value.mainChain = true;
@@ -4640,6 +4693,18 @@ var Drawer = function () {
             transVertex.angle = _a;
             cisVertex.angle = -_a;
 
+            if (this.doubleBondConfig === '\\') {
+              if (transVertex.value.branchBond === '\\') {
+                transVertex.angle = -_a;
+                cisVertex.angle = _a;
+              }
+            } else if (this.doubleBondConfig === '/') {
+              if (transVertex.value.branchBond === '/') {
+                transVertex.angle = -_a;
+                cisVertex.angle = _a;
+              }
+            }
+
             this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle, true);
             this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle, true);
           } else {
@@ -4647,6 +4712,18 @@ var Drawer = function () {
             transVertex.value.mainChain = true;
             transVertex.angle = _a;
             cisVertex.angle = -_a;
+
+            if (this.doubleBondConfig === '\\') {
+              if (transVertex.value.branchBond === '\\') {
+                transVertex.angle = -_a;
+                cisVertex.angle = _a;
+              }
+            } else if (this.doubleBondConfig === '/') {
+              if (transVertex.value.branchBond === '/') {
+                transVertex.angle = -_a;
+                cisVertex.angle = _a;
+              }
+            }
 
             this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle);
             this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle);

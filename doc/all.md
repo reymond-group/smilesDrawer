@@ -309,6 +309,9 @@ Only supports 1d, non-nested arrays.</p>
 <dt><a href="#resolveSecondaryOverlaps">resolveSecondaryOverlaps(scores)</a></dt>
 <dd><p>Resolve secondary overlaps. Those overlaps are due to the structure turning back on itself.</p>
 </dd>
+<dt><a href="#getLastVertexWithAngle">getLastVertexWithAngle(vertexId)</a> ⇒ <code>Vertex</code></dt>
+<dd><p>Get the last non-null or 0 angle vertex.</p>
+</dd>
 <dt><a href="#createNextBond">createNextBond(vertex, [previousVertex], [angle], [originShortest], [skipPositioning])</a></dt>
 <dd><p>Positiones the next vertex thus creating a bond.</p>
 </dd>
@@ -1845,6 +1848,18 @@ Resolve secondary overlaps. Those overlaps are due to the structure turning back
 | scores | <code>Array.&lt;Object&gt;</code> | An array of objects sorted descending by score. |
 | scores[].id | <code>Number</code> | A vertex id. |
 | scores[].score | <code>Number</code> | The overlap score associated with the vertex id. |
+
+<a name="getLastVertexWithAngle"></a>
+
+## getLastVertexWithAngle(vertexId) ⇒ <code>Vertex</code>
+Get the last non-null or 0 angle vertex.
+
+**Kind**: global function  
+**Returns**: <code>Vertex</code> - The last vertex with an angle that was not 0 or null.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vertexId | <code>Number</code> | A vertex id. |
 
 <a name="createNextBond"></a>
 

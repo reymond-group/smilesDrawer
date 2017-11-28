@@ -32,7 +32,7 @@ export default class Drawer {
    */
   constructor(options) {
     this.graph = null;
-    this.doubleBondConfigAngle = null;
+    this.doubleBondConfigCount = 0;
     this.doubleBondConfig = null;
     this.ringIdCounter = 0;
     this.ringConnectionIdCounter = 0;
@@ -162,7 +162,7 @@ export default class Drawer {
     this.bridgedRing = false;
 
     // Reset those, in case the previous drawn SMILES had a dangling \ or /
-    this.doubleBondConfigAngle = null;
+    this.doubleBondConfigCount = null;
     this.doubleBondConfig = null;
 
     this.initRings();
@@ -217,7 +217,7 @@ export default class Drawer {
           }
 
           let subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
-          
+
           if (subTreeOverlap.value > this.opts.overlapSensitivity) {
             let vertexA = this.graph.vertices[a];
             let vertexB = this.graph.vertices[b];
@@ -1904,6 +1904,24 @@ export default class Drawer {
   }
 
   /**
+   * Get the last non-null or 0 angle vertex.
+   * @param {Number} vertexId A vertex id.
+   * @returns {Vertex} The last vertex with an angle that was not 0 or null.
+   */
+  getLastVertexWithAngle(vertexId) {
+    let angle = 0;
+    let vertex = null;
+
+    while (!angle && vertexId) {
+      vertex = this.graph.vertices[vertexId];
+      angle = vertex.angle;
+      vertexId = vertex.parentVertexId;
+    }
+
+    return vertex;
+  }
+
+  /**
    * Positiones the next vertex thus creating a bond.
    *
    * @param {Vertex} vertex A vertex.
@@ -1917,26 +1935,29 @@ export default class Drawer {
       return;
     }
 
+    // If the double bond config was set on this vertex, do not check later
+    let doubleBondConfigSet = false;
+
     // Keeping track of configurations around double bonds
     if (previousVertex) {
       let edge = this.graph.getEdge(vertex.id, previousVertex.id);
 
-      if (edge.bondType === '/' || edge.bondType === '\\') {
-        if (this.doubleBondConfigAngle === null) {
-          this.doubleBondConfigAngle = angle;
+      if ((edge.bondType === '/' || edge.bondType === '\\') && ++this.doubleBondConfigCount % 2 === 1) {
+        if (this.doubleBondConfig === null) {
           this.doubleBondConfig = edge.bondType;
-        } else {
-          if (edge.bondType === this.doubleBondConfig) {
-            angle = this.doubleBondConfigAngle;
-          } else {
-            angle = this.doubleBondConfigAngle - 2 * vertex.angle;
-            vertex.angle = -vertex.angle;
-          }
+          doubleBondConfigSet = true;
 
-          this.doubleBondConfigAngle = null;
-          this.doubleBondConfig = null;
+          // Switch if the bond is a branch bond and previous vertex is the first
+          // TODO: Why is it different with the first vertex?
+          if (previousVertex.parentVertexId === null && vertex.value.branchBond) {
+            if (this.doubleBondConfig === '/') {
+              this.doubleBondConfig = '\\';
+            } else if (this.doubleBondConfig === '\\') {
+              this.doubleBondConfig = '/';
+            }
+          }
         }
-      } 
+      }
     }
 
     // If the current node is the member of one ring, then point straight away
@@ -1985,9 +2006,9 @@ export default class Drawer {
 
           pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
         } else {
-          pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);          
+          pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);
         }
-        
+
         vertex.previousPosition = previousVertex.position;
         vertex.setPositionFromVector(pos);
         vertex.positioned = true;
@@ -2103,7 +2124,7 @@ export default class Drawer {
           this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
         } else {
           let a = vertex.angle;
-          // Take the min an max if the previous angle was in a 4-neighbourhood (90° angles)
+          // Take the min and max if the previous angle was in a 4-neighbourhood (90° angles)
           // TODO: If a is null or zero, it should be checked whether or not this one should go cis or trans, that is,
           //       it should go into the oposite direction of the last non-null or 0 previous vertex / angle.
           if (previousVertex && previousVertex.neighbours.length > 3) {
@@ -2115,7 +2136,33 @@ export default class Drawer {
               a = 1.0472;
             }
           } else if (!a) {
-            a = 1.0472;
+            let v = this.getLastVertexWithAngle(vertex.id);
+            a = v.angle;
+
+            if (!a) {
+              a = 1.0472;
+            }
+          }
+
+          // Handle configuration around double bonds
+          if (previousVertex && !doubleBondConfigSet) {
+            let bondType = this.graph.getEdge(vertex.id, nextVertex.id).bondType;
+
+            if (bondType === '/') {
+              if (this.doubleBondConfig === '/') {
+                // Nothing to do since it will be trans per default
+              } else if (this.doubleBondConfig === '\\') {
+                a = -a;
+              }
+              this.doubleBondConfig = null;
+            } else if (bondType === '\\') {
+              if (this.doubleBondConfig === '/') {
+                a = -a;
+              } else if (this.doubleBondConfig === '\\') {
+                // Nothing to do since it will be trans per default
+              }
+              this.doubleBondConfig = null;
+            }
           }
 
           if (originShortest) {
@@ -2123,6 +2170,7 @@ export default class Drawer {
           } else {
             nextVertex.angle = -a;
           }
+
           this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
         }
       } else if (neighbours.length === 2) {
@@ -2168,6 +2216,9 @@ export default class Drawer {
         let cisVertex = this.graph.vertices[neighbours[cis]];
         let transVertex = this.graph.vertices[neighbours[trans]];
 
+        let edgeCis = this.graph.getEdge(vertex.id, cisVertex.id);
+        let edgeTrans = this.graph.getEdge(vertex.id, transVertex.id);
+
         // If the origin tree is the shortest, make them the main chain
         if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
           transVertex.value.mainChain = true;
@@ -2176,6 +2227,18 @@ export default class Drawer {
           transVertex.angle = a;
           cisVertex.angle = -a;
 
+          if (this.doubleBondConfig === '\\') {
+            if (transVertex.value.branchBond === '\\') {
+              transVertex.angle = -a;
+              cisVertex.angle = a;
+            }
+          } else if (this.doubleBondConfig === '/') {
+            if (transVertex.value.branchBond === '/') {
+              transVertex.angle = -a;
+              cisVertex.angle = a;
+            }
+          }
+
           this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle, true);
           this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle, true);
         } else {
@@ -2183,6 +2246,18 @@ export default class Drawer {
           transVertex.value.mainChain = true;
           transVertex.angle = a;
           cisVertex.angle = -a;
+
+          if (this.doubleBondConfig === '\\') {
+            if (transVertex.value.branchBond === '\\') {
+              transVertex.angle = -a;
+              cisVertex.angle = a;
+            }
+          } else if (this.doubleBondConfig === '/') {
+            if (transVertex.value.branchBond === '/') {
+              transVertex.angle = -a;
+              cisVertex.angle = a;
+            }
+          }
 
           this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle);
           this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle);
@@ -2213,15 +2288,15 @@ export default class Drawer {
 
         // Create a cross if more than one subtree is of length > 1
         // or the vertex is connected to a ring
-        if (previousVertex && 
-            previousVertex.value.rings.length < 1 && 
-            s.value.rings.length < 1 && 
-            l.value.rings.length < 1 && 
-            r.value.rings.length < 1 &&
-            this.graph.getTreeDepth(l.id, vertex.id) === 1 &&
-            this.graph.getTreeDepth(r.id, vertex.id) === 1 &&
-            this.graph.getTreeDepth(s.id, vertex.id) > 1) {
-          
+        if (previousVertex &&
+          previousVertex.value.rings.length < 1 &&
+          s.value.rings.length < 1 &&
+          l.value.rings.length < 1 &&
+          r.value.rings.length < 1 &&
+          this.graph.getTreeDepth(l.id, vertex.id) === 1 &&
+          this.graph.getTreeDepth(r.id, vertex.id) === 1 &&
+          this.graph.getTreeDepth(s.id, vertex.id) > 1) {
+
           s.angle = -vertex.angle;
           if (vertex.angle >= 0) {
             l.angle = MathHelper.toRad(30);
@@ -2276,7 +2351,7 @@ export default class Drawer {
           y = this.graph.vertices[neighbours[1]];
           z = this.graph.vertices[neighbours[2]];
         }
-        
+
         w.angle = -MathHelper.toRad(36);
         x.angle = MathHelper.toRad(36);
         y.angle = -MathHelper.toRad(108);
@@ -2478,7 +2553,9 @@ export default class Drawer {
 
         // Sort each level according to atomic number
         for (var k = 0; k < priority.length; k++) {
-          priority[k].sort(function (a, b) { return b - a });
+          priority[k].sort(function (a, b) {
+            return b - a
+          });
         }
 
         priorities[j] = [j, priority];
@@ -2677,7 +2754,7 @@ export default class Drawer {
       if (vertex.getNeighbourCount() < 3 || vertex.value.rings.length > 0) {
         continue;
       }
-    
+
       // Ignore phosphates (especially for triphosphates)
       if (vertex.value.element === 'P') {
         continue;
