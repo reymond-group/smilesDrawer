@@ -2467,32 +2467,32 @@ var Drawer = function () {
             var subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
 
             // Only rotate the shorter subtree
-            var a = edge.targetId;
-            var b = edge.sourceId;
+            var _a = edge.targetId;
+            var _b = edge.sourceId;
 
             if (subTreeDepthA > subTreeDepthB) {
-              a = edge.sourceId;
-              b = edge.targetId;
+              _a = edge.sourceId;
+              _b = edge.targetId;
             }
 
-            var subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
+            var subTreeOverlap = this.getSubtreeOverlapScore(_b, _a, overlapScore.vertexScores);
 
             if (subTreeOverlap.value > this.opts.overlapSensitivity) {
-              var vertexA = this.graph.vertices[a];
-              var vertexB = this.graph.vertices[b];
-              var neighbours = vertexB.getNeighbours(a);
+              var vertexA = this.graph.vertices[_a];
+              var vertexB = this.graph.vertices[_b];
+              var neighbours = vertexB.getNeighbours(_a);
 
               if (neighbours.length === 1) {
                 var _neighbour = this.graph.vertices[neighbours[0]];
-                var angle = _neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
+                var _angle = _neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
 
-                this.rotateSubtree(_neighbour.id, vertexB.id, angle, vertexB.position);
+                this.rotateSubtree(_neighbour.id, vertexB.id, _angle, vertexB.position);
 
                 // If the new overlap is bigger, undo change
                 var newTotalOverlapScore = this.getOverlapScore().total;
 
                 if (newTotalOverlapScore > this.totalOverlapScore) {
-                  this.rotateSubtree(_neighbour.id, vertexB.id, -angle, vertexB.position);
+                  this.rotateSubtree(_neighbour.id, vertexB.id, -_angle, vertexB.position);
                 } else {
                   this.totalOverlapScore = newTotalOverlapScore;
                 }
@@ -2534,19 +2534,69 @@ var Drawer = function () {
           this.annotateStereochemistry();
         }
 
-        // Rotate the vertices to make the molecule align horizontally
-        // Find the longest distance
-        for (var i = 0; i < this.graph.vertices.length; i++) {
-          for (var j = i + 1; j < this.graph.vertices.length; j++) {}
-        }
-
-        // Set the canvas to the appropriate size
-        this.canvasWrapper.scale(this.graph.vertices);
-
         // Initialize pseudo elements or shortcuts
         if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
           this.initPseudoElements();
         }
+
+        // Rotate the vertices to make the molecule align horizontally
+        // Find the longest distance
+        var a = 0;
+        var b = 0;
+        var maxDist = 0;
+        for (var i = 0; i < this.graph.vertices.length; i++) {
+          var _vertexA = this.graph.vertices[i];
+
+          if (!_vertexA.value.isDrawn) {
+            continue;
+          }
+
+          for (var j = i + 1; j < this.graph.vertices.length; j++) {
+            var _vertexB = this.graph.vertices[j];
+
+            if (!_vertexB.value.isDrawn) {
+              continue;
+            }
+
+            var dist = _vertexA.position.distanceSq(_vertexB.position);
+
+            if (dist > maxDist) {
+              maxDist = dist;
+              a = i;
+              b = j;
+            }
+          }
+        }
+
+        var angle = -_Vector2.default.subtract(this.graph.vertices[a].position, this.graph.vertices[b].position).angle();
+
+        if (!isNaN(angle)) {
+          // Round to 30 degrees
+          var remainder = angle % 0.523599;
+
+          // Round either up or down in 30 degree steps
+          if (remainder < 0.2617995) {
+            angle = angle - remainder;
+          } else {
+            angle += 0.523599 - remainder;
+          }
+
+          // Finally, rotate everything
+          for (var i = 0; i < this.graph.vertices.length; i++) {
+            if (i === b) {
+              continue;
+            }
+
+            this.graph.vertices[i].position.rotateAround(angle, this.graph.vertices[b].position);
+          }
+
+          for (var i = 0; i < this.rings.length; i++) {
+            this.rings[i].center.rotateAround(angle, this.graph.vertices[b].position);
+          }
+        }
+
+        // Set the canvas to the appropriate size
+        this.canvasWrapper.scale(this.graph.vertices);
 
         // Do the actual drawing
         this.drawEdges(this.opts.debug);
@@ -4095,10 +4145,10 @@ var Drawer = function () {
           ring.isSpiro = true;
           neighbour.isSpiro = true;
 
-          var _vertexA = this.graph.vertices[vertices[0]];
+          var _vertexA2 = this.graph.vertices[vertices[0]];
 
           // Get the vector pointing from the shared vertex to the new centpositioner
-          var _nextCenter = _Vector2.default.subtract(center, _vertexA.position);
+          var _nextCenter = _Vector2.default.subtract(center, _vertexA2.position);
 
           _nextCenter.invert();
           _nextCenter.normalize();
@@ -4107,10 +4157,10 @@ var Drawer = function () {
           var _r = _MathHelper2.default.polyCircumradius(this.opts.bondLength, neighbour.getSize());
 
           _nextCenter.multiplyScalar(_r);
-          _nextCenter.add(_vertexA.position);
+          _nextCenter.add(_vertexA2.position);
 
           if (!neighbour.positioned) {
-            this.createRing(neighbour, _nextCenter, _vertexA);
+            this.createRing(neighbour, _nextCenter, _vertexA2);
           }
         }
       }
@@ -4649,10 +4699,10 @@ var Drawer = function () {
           }
         } else if (_neighbours.length === 2) {
           // If the previous vertex comes out of a ring, it doesn't have an angle set
-          var _a = vertex.angle;
+          var _a2 = vertex.angle;
 
-          if (!_a) {
-            _a = 1.0472;
+          if (!_a2) {
+            _a2 = 1.0472;
           }
 
           // Check for the longer subtree - always go with cis for the longer subtree
@@ -4699,18 +4749,18 @@ var Drawer = function () {
             _originShortest = true;
           }
 
-          transVertex.angle = _a;
-          cisVertex.angle = -_a;
+          transVertex.angle = _a2;
+          cisVertex.angle = -_a2;
 
           if (this.doubleBondConfig === '\\') {
             if (transVertex.value.branchBond === '\\') {
-              transVertex.angle = -_a;
-              cisVertex.angle = _a;
+              transVertex.angle = -_a2;
+              cisVertex.angle = _a2;
             }
           } else if (this.doubleBondConfig === '/') {
             if (transVertex.value.branchBond === '/') {
-              transVertex.angle = -_a;
-              cisVertex.angle = _a;
+              transVertex.angle = -_a2;
+              cisVertex.angle = _a2;
             }
           }
 

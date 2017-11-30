@@ -275,21 +275,69 @@ export default class Drawer {
         this.annotateStereochemistry();
       }
 
-      // Rotate the vertices to make the molecule align horizontally
-      // Find the longest distance
-      for (var i = 0; i < this.graph.vertices.length; i++) {
-        for (var j = i + 1; j < this.graph.vertices.length; j++) {
-
-        }
-      }
-
-      // Set the canvas to the appropriate size
-      this.canvasWrapper.scale(this.graph.vertices);
-
       // Initialize pseudo elements or shortcuts
       if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
         this.initPseudoElements();
       }
+
+      // Rotate the vertices to make the molecule align horizontally
+      // Find the longest distance
+      let a = 0;
+      let b = 0;
+      let maxDist = 0;
+      for (var i = 0; i < this.graph.vertices.length; i++) {
+        let vertexA = this.graph.vertices[i];
+
+        if (!vertexA.value.isDrawn) {
+          continue;
+        }
+
+        for (var j = i + 1; j < this.graph.vertices.length; j++) {
+          let vertexB = this.graph.vertices[j];
+
+          if (!vertexB.value.isDrawn) {
+            continue;
+          }
+          
+          let dist = vertexA.position.distanceSq(vertexB.position);
+
+          if (dist > maxDist) {
+            maxDist = dist;
+            a = i;
+            b = j;
+          }
+        }
+      }
+
+      let angle = -Vector2.subtract(this.graph.vertices[a].position, this.graph.vertices[b].position).angle();
+
+      if (!isNaN(angle)) {
+        // Round to 30 degrees
+        let remainder = angle % 0.523599;
+
+        // Round either up or down in 30 degree steps
+        if (remainder < 0.2617995) {
+          angle = angle - remainder;
+        } else {
+          angle += 0.523599 - remainder;
+        }
+
+        // Finally, rotate everything
+        for (var i = 0; i < this.graph.vertices.length; i++) {
+          if (i === b) {
+            continue;
+          }
+          
+          this.graph.vertices[i].position.rotateAround(angle, this.graph.vertices[b].position);
+        }
+
+        for (var i = 0; i < this.rings.length; i++) {
+          this.rings[i].center.rotateAround(angle, this.graph.vertices[b].position);
+        }
+      }
+
+      // Set the canvas to the appropriate size
+      this.canvasWrapper.scale(this.graph.vertices); 
 
       // Do the actual drawing
       this.drawEdges(this.opts.debug);
