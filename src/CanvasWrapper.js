@@ -561,10 +561,10 @@ export default class CanvasWrapper {
      * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
      * @param {Number} charge The charge of the atom.
      * @param {Number} isotope The isotope number.
-     * @param {Object[]} attachedPseudoElements A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
-     * @param {String} attachedPseudoElement[].element The element symbol.
-     * @param {Number} attachedPseudoElement[].count The number of occurences that match the key.
-     * @param {Number} attachedPseudoElement[].hyrogenCount The number of hydrogens attached to each atom matching the key.
+     * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
+     * @param {String} attachedPseudoElement.element The element symbol.
+     * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
+     * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
      */
     drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
         let ctx = this.ctx;
@@ -597,6 +597,16 @@ export default class CanvasWrapper {
             ctx.font = this.fontSmall;
             isotopeWidth = ctx.measureText(isotopeText).width;
         }
+
+
+        // TODO: Better handle exceptions
+        // Exception for nitro (draw nitro as NO2 instead of N+O-O)
+        if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') && 
+            attachedPseudoElement.hasOwnProperty('0O-1')) {
+            attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
+            charge = 0;
+        }
+
 
         ctx.font = this.fontLarge;
         ctx.fillStyle = this.getColor('BACKGROUND');

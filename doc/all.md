@@ -156,7 +156,7 @@ Only supports 1d, non-nested arrays.</p>
 <dt><a href="#drawPoint">drawPoint(x, y, elementName)</a></dt>
 <dd><p>Draw a point to the canvas.</p>
 </dd>
-<dt><a href="#drawText">drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)</a></dt>
+<dt><a href="#drawText">drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement)</a></dt>
 <dd><p>Draw a text to the canvas.</p>
 </dd>
 <dt><a href="#getChargeText">getChargeText(charge)</a> ⇒ <code>String</code></dt>
@@ -414,7 +414,7 @@ the involved atoms not to be displayed.</p>
 <dt><a href="#traverseTree">traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst], [depth], [visited])</a></dt>
 <dd><p>Traverse a sub-tree in the graph.</p>
 </dd>
-<dt><a href="#kkLayout">kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)</a></dt>
+<dt><a href="#kkLayout">kkLayout(vertexIds, center, startVertexId, ring)</a></dt>
 <dd><p>Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. <a href="https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf">https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf</a></p>
 </dd>
 <dt><a href="#_bridgeDfs">_bridgeDfs()</a></dt>
@@ -1296,7 +1296,7 @@ Draw a point to the canvas.
 
 <a name="drawText"></a>
 
-## drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElements)
+## drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement)
 Draw a text to the canvas.
 
 **Kind**: global function  
@@ -1311,10 +1311,10 @@ Draw a text to the canvas.
 | isTerminal | <code>Boolean</code> | A boolean indicating whether or not the vertex is terminal. |
 | charge | <code>Number</code> | The charge of the atom. |
 | isotope | <code>Number</code> | The isotope number. |
-| attachedPseudoElements | <code>Array.&lt;Object&gt;</code> | A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count. |
-| attachedPseudoElement[].element | <code>String</code> | The element symbol. |
-| attachedPseudoElement[].count | <code>Number</code> | The number of occurences that match the key. |
-| attachedPseudoElement[].hyrogenCount | <code>Number</code> | The number of hydrogens attached to each atom matching the key. |
+| attachedPseudoElement | <code>Object</code> | A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count. |
+| attachedPseudoElement.element | <code>String</code> | The element symbol. |
+| attachedPseudoElement.count | <code>Number</code> | The number of occurences that match the key. |
+| attachedPseudoElement.hyrogenCount | <code>Number</code> | The number of hydrogens attached to each atom matching the key. |
 
 <a name="getChargeText"></a>
 
@@ -2225,7 +2225,7 @@ Traverse a sub-tree in the graph.
 
 <a name="kkLayout"></a>
 
-## kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring)
+## kkLayout(vertexIds, center, startVertexId, ring)
 Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
 
 **Kind**: global function  
@@ -2233,7 +2233,6 @@ Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general 
 | Param | Type | Description |
 | --- | --- | --- |
 | vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing vertexIds to be placed using the force based layout. |
-| outAdditionallyPositioned | <code>Array.&lt;Array&gt;</code> | Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ]. |
 | center | <code>Vector2</code> | The center of the layout. |
 | startVertexId | <code>Number</code> | A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex. |
 | ring | <code>Ring</code> | The bridged ring associated with this force-based layout. |
@@ -2808,8 +2807,8 @@ Searches the candidates for the smallest set of smallest rings.
 | adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
 | pe | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths. |
 | pe_prime | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
-| arrBondCount | <code>Array.&lt;Number&gt;</code> | A matrix containing the bond count of each vertex. |
-| arrRingCount | <code>Array.&lt;Number&gt;</code> | A matrix containing the number of rings associated with each vertex. |
+| arrBondCount | <code>Uint16Array</code> | A matrix containing the bond count of each vertex. |
+| arrRingCount | <code>Uint16Array</code> | A matrix containing the number of rings associated with each vertex. |
 | nsssr | <code>Number</code> | The theoretical number of rings in the graph. |
 
 <a name="getEdgeCount"></a>
@@ -2875,8 +2874,8 @@ Checks whether or not a given path already exists in an array of paths.
 | pathSet | <code>Set.&lt;Number&gt;</code> | A set representing a path. |
 | bonds | <code>Array.&lt;Array&gt;</code> | The bonds associated with the current path. |
 | allBonds | <code>Array.&lt;Array&gt;</code> | All bonds currently associated with rings in the SSSR set. |
-| arrBondCount | <code>Array.&lt;Number&gt;</code> | A matrix containing the bond count of each vertex. |
-| arrRingCount | <code>Array.&lt;Number&gt;</code> | A matrix containing the number of rings associated with each vertex. |
+| arrBondCount | <code>Uint16Array</code> | A matrix containing the bond count of each vertex. |
+| arrRingCount | <code>Uint16Array</code> | A matrix containing the number of rings associated with each vertex. |
 
 <a name="areSetsEqual"></a>
 

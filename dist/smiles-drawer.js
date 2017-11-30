@@ -711,6 +711,14 @@ var Atom = function () {
       var hydrogenCount = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
       var charge = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
+      if (hydrogenCount === null) {
+        hydrogenCount = 0;
+      }
+
+      if (charge === null) {
+        charge = 0;
+      }
+
       var key = hydrogenCount + element + charge;
 
       if (this.attachedPseudoElements[key]) {
@@ -1819,10 +1827,10 @@ var CanvasWrapper = function () {
          * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
          * @param {Number} charge The charge of the atom.
          * @param {Number} isotope The isotope number.
-         * @param {Object[]} attachedPseudoElements A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
-         * @param {String} attachedPseudoElement[].element The element symbol.
-         * @param {Number} attachedPseudoElement[].count The number of occurences that match the key.
-         * @param {Number} attachedPseudoElement[].hyrogenCount The number of hydrogens attached to each atom matching the key.
+         * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
+         * @param {String} attachedPseudoElement.element The element symbol.
+         * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
+         * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
          */
 
     }, {
@@ -1859,6 +1867,13 @@ var CanvasWrapper = function () {
                 isotopeText = isotope.toString();
                 ctx.font = this.fontSmall;
                 isotopeWidth = ctx.measureText(isotopeText).width;
+            }
+
+            // TODO: Better handle exceptions
+            // Exception for nitro (draw nitro as NO2 instead of N+O-O)
+            if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') && attachedPseudoElement.hasOwnProperty('0O-1')) {
+                attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } };
+                charge = 0;
             }
 
             ctx.font = this.fontLarge;
@@ -2517,6 +2532,12 @@ var Drawer = function () {
         this.annotateStereochemistry();
         if (this.opts.isomeric) {
           this.annotateStereochemistry();
+        }
+
+        // Rotate the vertices to make the molecule align horizontally
+        // Find the longest distance
+        for (var i = 0; i < this.graph.vertices.length; i++) {
+          for (var j = i + 1; j < this.graph.vertices.length; j++) {}
         }
 
         // Set the canvas to the appropriate size
@@ -3980,13 +4001,10 @@ var Drawer = function () {
         startVertexId = ring.members[0];
       }
 
-      // For bridged rings, vertices directly connected to the ring are also positioned.
-      var positioned = Array();
-
       // If the ring is bridged, then draw the vertices inside the ring
       // using a force based approach
       if (ring.isBridged) {
-        this.graph.kkLayout(ring.members.slice(), positioned, center, startVertex.id, ring, this.opts.bondLength);
+        this.graph.kkLayout(ring.members.slice(), center, startVertex.id, ring, this.opts.bondLength);
         ring.positioned = true;
 
         // Update the center of the bridged ring
@@ -4113,17 +4131,6 @@ var Drawer = function () {
           v.value.isConnectedToRing = true;
           this.createNextBond(v, ringMember, 0.0);
         }
-      }
-
-      // Vertices that are directly connected to a bridged ring.
-      for (var i = 0; i < positioned.length; i++) {
-        var u = this.graph.vertices[positioned[i][1]]; // this is the ring vertex
-        var _v2 = this.graph.vertices[positioned[i][0]]; // this is the vertex attached to the ring vertex
-        _v2.previousPosition = u.position;
-
-        // Ignore the positioning of ring attachments for now
-        _v2.positioned = false;
-        this.createNextBond(_v2, u, 1.0);
       }
     }
 
@@ -4418,6 +4425,7 @@ var Drawer = function () {
             doubleBondConfigSet = true;
 
             // Switch if the bond is a branch bond and previous vertex is the first
+            // TODO: Why is it different with the first vertex?
             if (previousVertex.parentVertexId === null && vertex.value.branchBond) {
               if (this.doubleBondConfig === '/') {
                 this.doubleBondConfig = '\\';
@@ -4484,12 +4492,12 @@ var Drawer = function () {
         } else {
           // If the previous vertex was not part of a ring, draw a bond based
           // on the global angle of the previous bond
-          var _v3 = new _Vector2.default(this.opts.bondLength, 0);
+          var _v2 = new _Vector2.default(this.opts.bondLength, 0);
 
-          _v3.rotate(angle);
-          _v3.add(previousVertex.position);
+          _v2.rotate(angle);
+          _v2.add(previousVertex.position);
 
-          vertex.setPositionFromVector(_v3);
+          vertex.setPositionFromVector(_v2);
           vertex.previousPosition = previousVertex.position;
           vertex.positioned = true;
         }
@@ -4602,8 +4610,8 @@ var Drawer = function () {
                 a = 1.0472;
               }
             } else if (!a) {
-              var _v4 = this.getLastVertexWithAngle(vertex.id);
-              a = _v4.angle;
+              var _v3 = this.getLastVertexWithAngle(vertex.id);
+              a = _v3.angle;
 
               if (!a) {
                 a = 1.0472;
@@ -4686,48 +4694,28 @@ var Drawer = function () {
           var edgeTrans = this.graph.getEdge(vertex.id, transVertex.id);
 
           // If the origin tree is the shortest, make them the main chain
+          var _originShortest = false;
           if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
-            transVertex.value.mainChain = true;
-            cisVertex.value.mainChain = true;
-
-            transVertex.angle = _a;
-            cisVertex.angle = -_a;
-
-            if (this.doubleBondConfig === '\\') {
-              if (transVertex.value.branchBond === '\\') {
-                transVertex.angle = -_a;
-                cisVertex.angle = _a;
-              }
-            } else if (this.doubleBondConfig === '/') {
-              if (transVertex.value.branchBond === '/') {
-                transVertex.angle = -_a;
-                cisVertex.angle = _a;
-              }
-            }
-
-            this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle, true);
-            this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle, true);
-          } else {
-            previousVertex.value.mainChain = true;
-            transVertex.value.mainChain = true;
-            transVertex.angle = _a;
-            cisVertex.angle = -_a;
-
-            if (this.doubleBondConfig === '\\') {
-              if (transVertex.value.branchBond === '\\') {
-                transVertex.angle = -_a;
-                cisVertex.angle = _a;
-              }
-            } else if (this.doubleBondConfig === '/') {
-              if (transVertex.value.branchBond === '/') {
-                transVertex.angle = -_a;
-                cisVertex.angle = _a;
-              }
-            }
-
-            this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle);
-            this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle);
+            _originShortest = true;
           }
+
+          transVertex.angle = _a;
+          cisVertex.angle = -_a;
+
+          if (this.doubleBondConfig === '\\') {
+            if (transVertex.value.branchBond === '\\') {
+              transVertex.angle = -_a;
+              cisVertex.angle = _a;
+            }
+          } else if (this.doubleBondConfig === '/') {
+            if (transVertex.value.branchBond === '/') {
+              transVertex.angle = -_a;
+              cisVertex.angle = _a;
+            }
+          }
+
+          this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle, _originShortest);
+          this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle, _originShortest);
         } else if (_neighbours.length === 3) {
           // The vertex with the longest sub-tree should always go straight
           var d1 = this.graph.getTreeDepth(_neighbours[0], vertex.id);
@@ -5248,8 +5236,15 @@ var Drawer = function () {
           continue;
         }
 
+        // TODO: This exceptions should be handled more elegantly (via config file?)
+
         // Ignore phosphates (especially for triphosphates)
         if (vertex.value.element === 'P') {
+          continue;
+        }
+
+        // Ignore also guanidine
+        if (vertex.value.element === 'C' && neighbours.length === 3 && neighbours[0].value.element === 'N' && neighbours[1].value.element === 'N' && neighbours[2].value.element === 'N') {
           continue;
         }
 
@@ -6118,7 +6113,6 @@ var Graph = function () {
      * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
      * 
      * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
-     * @param {Array[]} outAdditionallyPositioned Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ].
      * @param {Vector2} center The center of the layout.
      * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
      * @param {Ring} ring The bridged ring associated with this force-based layout.
@@ -6126,7 +6120,7 @@ var Graph = function () {
 
   }, {
     key: 'kkLayout',
-    value: function kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring, bondLength) {
+    value: function kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
       var edgeStrength = bondLength;
 
       // Add vertices that are directly connected to the ring
@@ -6134,13 +6128,6 @@ var Graph = function () {
       while (i--) {
         var vertex = this.vertices[vertexIds[i]];
         var j = vertex.neighbours.length;
-        while (j--) {
-          var neighbour = this.vertices[vertex.neighbours[j]];
-          if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
-            vertexIds.push(neighbour.id);
-            outAdditionallyPositioned.push([neighbour.id, vertex.id]);
-          }
-        }
       }
 
       var matDist = this.getSubgraphDistanceMatrix(vertexIds);
@@ -6346,9 +6333,9 @@ var Graph = function () {
       };
 
       // Setting parameters
-      var threshold = 0.01;
+      var threshold = 0.1;
       var innerThreshold = 0.1;
-      var maxIteration = 4000;
+      var maxIteration = 2000;
       var maxInnerIteration = 50;
       var maxEnergy = 1e9;
 
@@ -9441,14 +9428,14 @@ var SSSR = function () {
             }
 
             var connectedComponents = _Graph2.default.getConnectedComponents(adjacencyMatrix);
-            var rings = new Array();
+            var rings = Array();
 
             for (var i = 0; i < connectedComponents.length; i++) {
                 var connectedComponent = connectedComponents[i];
                 var ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix([].concat(_toConsumableArray(connectedComponent)));
 
-                var arrBondCount = Array(ccAdjacencyMatrix.length);
-                var arrRingCount = Array(ccAdjacencyMatrix.length);
+                var arrBondCount = new Uint16Array(ccAdjacencyMatrix.length);
+                var arrRingCount = new Uint16Array(ccAdjacencyMatrix.length);
 
                 for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
                     arrRingCount[j] = 0;
@@ -9459,9 +9446,20 @@ var SSSR = function () {
                     }
                 }
 
-                // Get the edge list and the theoretical number of rings in SSSR
-                var nEdges = SSSR.getEdgeList(ccAdjacencyMatrix).length;
+                // Get the edge number and the theoretical number of rings in SSSR
+                var nEdges = 0;
+
+                for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
+                    for (var k = j + 1; k < ccAdjacencyMatrix.length; k++) {
+                        nEdges += ccAdjacencyMatrix[j][k];
+                    }
+                }
+
                 var nSssr = nEdges - ccAdjacencyMatrix.length + 1;
+
+                // console.log(nEdges, ccAdjacencyMatrix.length, nSssr);
+                // console.log(SSSR.getEdgeList(ccAdjacencyMatrix));
+                // console.log(ccAdjacencyMatrix);
 
                 // If all vertices have 3 incident edges, calculate with different formula (see Euler)
                 var allThree = true;
@@ -9475,6 +9473,12 @@ var SSSR = function () {
                     nSssr = 2.0 + nEdges - ccAdjacencyMatrix.length;
                 }
 
+                // All vertices are part of one ring if theres only one ring.
+                if (nSssr === 1) {
+                    rings.push([].concat(_toConsumableArray(connectedComponent)));
+                    continue;
+                }
+
                 var _SSSR$getPathIncluded = SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix),
                     d = _SSSR$getPathIncluded.d,
                     pe = _SSSR$getPathIncluded.pe,
@@ -9483,8 +9487,8 @@ var SSSR = function () {
                 var c = SSSR.getRingCandidates(d, pe, pe_prime);
                 var sssr = SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
 
-                for (var _i = 0; _i < sssr.length; _i++) {
-                    var ring = new Array(sssr[_i].size);
+                for (var j = 0; j < sssr.length; j++) {
+                    var ring = Array(sssr[j].size);
                     var index = 0;
 
                     var _iteratorNormalCompletion = true;
@@ -9492,7 +9496,7 @@ var SSSR = function () {
                     var _iteratorError = undefined;
 
                     try {
-                        for (var _iterator = sssr[_i][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        for (var _iterator = sssr[j][Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                             var val = _step.value;
 
                             // Get the original id of the vertex back
@@ -9750,8 +9754,8 @@ var SSSR = function () {
          * @param {Array[]} adjacencyMatrix An adjacency matrix.
          * @param {Array[]} pe A matrix containing the shortest paths.
          * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
-         * @param {Number[]} arrBondCount A matrix containing the bond count of each vertex.
-         * @param {Number[]} arrRingCount A matrix containing the number of rings associated with each vertex.
+         * @param {Uint16Array} arrBondCount A matrix containing the bond count of each vertex.
+         * @param {Uint16Array} arrRingCount A matrix containing the number of rings associated with each vertex.
          * @param {Number} nsssr The theoretical number of rings in the graph.
          * @returns {Set[]} The smallest set of smallest rings.
          */
@@ -9955,8 +9959,8 @@ var SSSR = function () {
          * @param {Set<Number>} pathSet A set representing a path.
          * @param {Array[]} bonds The bonds associated with the current path.
          * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
-         * @param {Number[]} arrBondCount A matrix containing the bond count of each vertex.
-         * @param {Number[]} arrRingCount A matrix containing the number of rings associated with each vertex.
+         * @param {Uint16Array} arrBondCount A matrix containing the bond count of each vertex.
+         * @param {Uint16Array} arrRingCount A matrix containing the number of rings associated with each vertex.
          * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
          */
 

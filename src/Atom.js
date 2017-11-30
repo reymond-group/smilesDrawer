@@ -91,6 +91,14 @@ export default class Atom {
    * @param {Number} [charge=0] The charge for the element.
    */
   attachPseudoElement(element, previousElement, hydrogenCount = 0, charge = 0) {
+    if (hydrogenCount === null) {
+      hydrogenCount = 0;
+    }
+
+    if (charge === null) {
+      charge = 0;
+    }
+
     let key = hydrogenCount + element + charge;
 
     if (this.attachedPseudoElements[key]) {

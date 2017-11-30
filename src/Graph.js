@@ -574,12 +574,11 @@ export default class Graph {
    * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
    * 
    * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
-   * @param {Array[]} outAdditionallyPositioned Vertices connected to the bridged ring which were also positioned. Include the ring vertex id they are attached to in the form: [ [ vertexId, ringVertexId ] ].
    * @param {Vector2} center The center of the layout.
    * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
    * @param {Ring} ring The bridged ring associated with this force-based layout.
    */
-  kkLayout(vertexIds, outAdditionallyPositioned, center, startVertexId, ring, bondLength) {
+  kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
     let edgeStrength = bondLength;
 
     // Add vertices that are directly connected to the ring
@@ -587,13 +586,6 @@ export default class Graph {
     while (i--) {
       let vertex = this.vertices[vertexIds[i]];
       var j = vertex.neighbours.length;
-      while (j--) {
-        let neighbour = this.vertices[vertex.neighbours[j]];
-        if (neighbour.value.rings.length === 0 && vertexIds.indexOf(neighbour.id) === -1) {
-          vertexIds.push(neighbour.id);
-          outAdditionallyPositioned.push([neighbour.id, vertex.id]);
-        }
-      }
     }
 
     let matDist = this.getSubgraphDistanceMatrix(vertexIds);
@@ -788,9 +780,9 @@ export default class Graph {
     }
 
     // Setting parameters
-    let threshold = 0.01;
+    let threshold = 0.1;
     let innerThreshold = 0.1;
-    let maxIteration = 4000;
+    let maxIteration = 2000;
     let maxInnerIteration = 50;
     let maxEnergy = 1e9;
 

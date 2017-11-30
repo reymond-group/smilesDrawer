@@ -314,6 +314,14 @@ export default class Drawer {
         this.annotateStereochemistry();
       }
 
+      // Rotate the vertices to make the molecule align horizontally
+      // Find the longest distance
+      for (var i = 0; i &lt; this.graph.vertices.length; i++) {
+        for (var j = i + 1; j &lt; this.graph.vertices.length; j++) {
+
+        }
+      }
+
       // Set the canvas to the appropriate size
       this.canvasWrapper.scale(this.graph.vertices);
 
@@ -1580,13 +1588,10 @@ export default class Drawer {
       startVertexId = ring.members[0];
     }
 
-    // For bridged rings, vertices directly connected to the ring are also positioned.
-    let positioned = Array();
-
     // If the ring is bridged, then draw the vertices inside the ring
     // using a force based approach
     if (ring.isBridged) {
-      this.graph.kkLayout(ring.members.slice(), positioned, center, startVertex.id, ring, this.opts.bondLength);
+      this.graph.kkLayout(ring.members.slice(), center, startVertex.id, ring, this.opts.bondLength);
       ring.positioned = true;
 
       // Update the center of the bridged ring
@@ -1713,17 +1718,6 @@ export default class Drawer {
         v.value.isConnectedToRing = true;
         this.createNextBond(v, ringMember, 0.0);
       }
-    }
-
-    // Vertices that are directly connected to a bridged ring.
-    for (var i = 0; i &lt; positioned.length; i++) {
-      let u = this.graph.vertices[positioned[i][1]]; // this is the ring vertex
-      let v = this.graph.vertices[positioned[i][0]]; // this is the vertex attached to the ring vertex
-      v.previousPosition = u.position;
-
-      // Ignore the positioning of ring attachments for now
-      v.positioned = false;
-      this.createNextBond(v, u, 1.0);
     }
   }
 
@@ -1987,6 +1981,7 @@ export default class Drawer {
           doubleBondConfigSet = true;
 
           // Switch if the bond is a branch bond and previous vertex is the first
+          // TODO: Why is it different with the first vertex?
           if (previousVertex.parentVertexId === null &amp;&amp; vertex.value.branchBond) {
             if (this.doubleBondConfig === '/') {
               this.doubleBondConfig = '\\';
@@ -2258,48 +2253,28 @@ export default class Drawer {
         let edgeTrans = this.graph.getEdge(vertex.id, transVertex.id);
 
         // If the origin tree is the shortest, make them the main chain
+        let originShortest = false;
         if (subTreeDepthC &lt; subTreeDepthA &amp;&amp; subTreeDepthC &lt; subTreeDepthB) {
-          transVertex.value.mainChain = true;
-          cisVertex.value.mainChain = true;
-
-          transVertex.angle = a;
-          cisVertex.angle = -a;
-
-          if (this.doubleBondConfig === '\\') {
-            if (transVertex.value.branchBond === '\\') {
-              transVertex.angle = -a;
-              cisVertex.angle = a;
-            }
-          } else if (this.doubleBondConfig === '/') {
-            if (transVertex.value.branchBond === '/') {
-              transVertex.angle = -a;
-              cisVertex.angle = a;
-            }
-          }
-
-          this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle, true);
-          this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle, true);
-        } else {
-          previousVertex.value.mainChain = true;
-          transVertex.value.mainChain = true;
-          transVertex.angle = a;
-          cisVertex.angle = -a;
-
-          if (this.doubleBondConfig === '\\') {
-            if (transVertex.value.branchBond === '\\') {
-              transVertex.angle = -a;
-              cisVertex.angle = a;
-            }
-          } else if (this.doubleBondConfig === '/') {
-            if (transVertex.value.branchBond === '/') {
-              transVertex.angle = -a;
-              cisVertex.angle = a;
-            }
-          }
-
-          this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle);
-          this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle);
+          originShortest = true;
         }
+
+        transVertex.angle = a;
+        cisVertex.angle = -a;
+
+        if (this.doubleBondConfig === '\\') {
+          if (transVertex.value.branchBond === '\\') {
+            transVertex.angle = -a;
+            cisVertex.angle = a;
+          }
+        } else if (this.doubleBondConfig === '/') {
+          if (transVertex.value.branchBond === '/') {
+            transVertex.angle = -a;
+            cisVertex.angle = a;
+          }
+        }
+
+        this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle, originShortest);
+        this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle, originShortest);
       } else if (neighbours.length === 3) {
         // The vertex with the longest sub-tree should always go straight
         let d1 = this.graph.getTreeDepth(neighbours[0], vertex.id);
@@ -2793,8 +2768,16 @@ export default class Drawer {
         continue;
       }
 
+      // TODO: This exceptions should be handled more elegantly (via config file?)
+
       // Ignore phosphates (especially for triphosphates)
       if (vertex.value.element === 'P') {
+        continue;
+      }
+
+      // Ignore also guanidine
+      if (vertex.value.element === 'C' &amp;&amp; neighbours.length === 3 &amp;&amp;
+          neighbours[0].value.element === 'N' &amp;&amp; neighbours[1].value.element === 'N' &amp;&amp; neighbours[2].value.element === 'N') {
         continue;
       }
 
@@ -2899,7 +2882,7 @@ export default class Drawer {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Nov 28 2017 16:55:44 GMT+0100 (W. Europe Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 30 2017 15:24:49 GMT+0100 (W. Europe Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

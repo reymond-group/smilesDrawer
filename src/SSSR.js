@@ -16,27 +16,38 @@ export default class SSSR {
         }
 
         let connectedComponents = Graph.getConnectedComponents(adjacencyMatrix);
-        let rings = new Array();
+        let rings = Array();
 
         for (var i = 0; i < connectedComponents.length; i++) {
             let connectedComponent = connectedComponents[i];
             let ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix([...connectedComponent]);
 
-            let arrBondCount = Array(ccAdjacencyMatrix.length);
-            let arrRingCount = Array(ccAdjacencyMatrix.length);
-            
+            let arrBondCount = new Uint16Array(ccAdjacencyMatrix.length);
+            let arrRingCount = new Uint16Array(ccAdjacencyMatrix.length);
+
             for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
                 arrRingCount[j] = 0;
                 arrBondCount[j] = 0;
-    
+
                 for (var k = 0; k < ccAdjacencyMatrix[j].length; k++) {
                     arrBondCount[j] += ccAdjacencyMatrix[j][k];
                 }
             }
 
-            // Get the edge list and the theoretical number of rings in SSSR
-            let nEdges = SSSR.getEdgeList(ccAdjacencyMatrix).length;
+            // Get the edge number and the theoretical number of rings in SSSR
+            let nEdges = 0;
+
+            for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
+                for (var k = j + 1; k < ccAdjacencyMatrix.length; k++) {
+                    nEdges += ccAdjacencyMatrix[j][k];
+                }
+            }
+
             let nSssr = nEdges - ccAdjacencyMatrix.length + 1;
+
+            // console.log(nEdges, ccAdjacencyMatrix.length, nSssr);
+            // console.log(SSSR.getEdgeList(ccAdjacencyMatrix));
+            // console.log(ccAdjacencyMatrix);
 
             // If all vertices have 3 incident edges, calculate with different formula (see Euler)
             let allThree = true;
@@ -50,15 +61,21 @@ export default class SSSR {
                 nSssr = 2.0 + nEdges - ccAdjacencyMatrix.length;
             }
 
-            let {d, pe, pe_prime} = SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
+            // All vertices are part of one ring if theres only one ring.
+            if (nSssr === 1) {
+                rings.push([...connectedComponent]);
+                continue;
+            }
+
+            let { d, pe, pe_prime } = SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
             let c = SSSR.getRingCandidates(d, pe, pe_prime);
             let sssr = SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
-            
-            for (let i = 0; i < sssr.length; i++) {
-                let ring = new Array(sssr[i].size);
+
+            for (var j = 0; j < sssr.length; j++) {
+                let ring = Array(sssr[j].size);
                 let index = 0;
-    
-                for (let val of sssr[i]) {
+
+                for (let val of sssr[j]) {
                     // Get the original id of the vertex back
                     ring[index++] = connectedComponent[val];
                 }
@@ -66,7 +83,7 @@ export default class SSSR {
                 rings.push(ring);
             }
         }
-        
+
         return rings;
     }
 
@@ -110,7 +127,7 @@ export default class SSSR {
             d[i] = Array(length);
             pe[i] = Array(length);
             pe_prime[i] = Array(length);
-            
+
             var j = length;
             while (j--) {
                 d[i][j] = (i === j || adjacencyMatrix[i][j] === 1) ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
@@ -156,7 +173,7 @@ export default class SSSR {
                         }
 
                         d[i][j] = newPathLength;
-                        
+
                         pe[i][j] = [[]];
 
                         l = pe[i][k][0].length;
@@ -204,7 +221,7 @@ export default class SSSR {
                         var l;
                         if (pe_prime[i][j].length) {
                             let tmp = Array();
-                            
+
                             l = pe[i][k][0].length;
                             while (l--) {
                                 tmp.push(pe[i][k][0][l]);
@@ -238,8 +255,8 @@ export default class SSSR {
 
         return {
             d: d,
-            pe: pe, 
-            pe_prime: pe_prime 
+            pe: pe,
+            pe_prime: pe_prime
         };
     }
 
@@ -267,7 +284,7 @@ export default class SSSR {
                     } else {
                         c = 2 * d[i][j];
                     }
-                    
+
                     if (c !== Infinity) {
                         candidates.push([c, pe[i][j], pe_prime[i][j]]);
                     }
@@ -276,7 +293,7 @@ export default class SSSR {
         }
 
         // Candidates have to be sorted by c
-        candidates.sort(function(a, b) {
+        candidates.sort(function (a, b) {
             return a[0] - b[0];
         });
 
@@ -291,8 +308,8 @@ export default class SSSR {
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @param {Array[]} pe A matrix containing the shortest paths.
      * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
-     * @param {Number[]} arrBondCount A matrix containing the bond count of each vertex.
-     * @param {Number[]} arrRingCount A matrix containing the number of rings associated with each vertex.
+     * @param {Uint16Array} arrBondCount A matrix containing the bond count of each vertex.
+     * @param {Uint16Array} arrRingCount A matrix containing the number of rings associated with each vertex.
      * @param {Number} nsssr The theoretical number of rings in the graph.
      * @returns {Set[]} The smallest set of smallest rings.
      */
@@ -312,7 +329,7 @@ export default class SSSR {
                     }
 
                     let atoms = SSSR.bondsToAtoms(bonds);
-                    
+
                     if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds, arrBondCount, arrRingCount)) {
                         cSssr.push(atoms);
                         allBonds = allBonds.concat(bonds);
@@ -333,7 +350,7 @@ export default class SSSR {
                     }
 
                     let atoms = SSSR.bondsToAtoms(bonds);
-                    
+
                     if (SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds, arrBondCount, arrRingCount)) {
                         cSssr.push(atoms);
                         allBonds = allBonds.concat(bonds);
@@ -365,7 +382,7 @@ export default class SSSR {
             while (j--) {
                 if (adjacencyMatrix[i][j] === 1) {
                     edgeCount++;
-                } 
+                }
             }
         }
 
@@ -387,7 +404,7 @@ export default class SSSR {
             var j = length;
             while (j--) {
                 if (adjacencyMatrix[i][j] === 1) {
-                    edgeList.push([i,j]);
+                    edgeList.push([i, j]);
                 }
             }
         }
@@ -412,13 +429,13 @@ export default class SSSR {
         return atoms;
     }
 
-     /**
-     * Returns the number of bonds within a set of atoms.
-     * 
-     * @param {Set<Number>} atoms An array of atom ids.
-     * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Number} The number of bonds in a set of atoms.
-     */
+    /**
+    * Returns the number of bonds within a set of atoms.
+    * 
+    * @param {Set<Number>} atoms An array of atom ids.
+    * @param {Array[]} adjacencyMatrix An adjacency matrix.
+    * @returns {Number} The number of bonds in a set of atoms.
+    */
     static getBondCount(atoms, adjacencyMatrix) {
         let count = 0;
         for (let u of atoms) {
@@ -440,8 +457,8 @@ export default class SSSR {
      * @param {Set<Number>} pathSet A set representing a path.
      * @param {Array[]} bonds The bonds associated with the current path.
      * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
-     * @param {Number[]} arrBondCount A matrix containing the bond count of each vertex.
-     * @param {Number[]} arrRingCount A matrix containing the number of rings associated with each vertex.
+     * @param {Uint16Array} arrBondCount A matrix containing the bond count of each vertex.
+     * @param {Uint16Array} arrRingCount A matrix containing the number of rings associated with each vertex.
      * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
      */
     static pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) {
@@ -454,7 +471,7 @@ export default class SSSR {
             if (pathSets[i].size !== pathSet.size) {
                 continue;
             }
-            
+
             if (SSSR.areSetsEqual(pathSets[i], pathSet)) {
                 return true;
             }
@@ -483,12 +500,12 @@ export default class SSSR {
         // check if there's one vertex with ringCount < bondCount
         let specialCase = false;
         if (allContained) {
-          for (let element of pathSet) {
-              if (arrRingCount[element] < arrBondCount[element]) {
-                  specialCase = true;
-                  break;
-              }
-          }
+            for (let element of pathSet) {
+                if (arrRingCount[element] < arrBondCount[element]) {
+                    specialCase = true;
+                    break;
+                }
+            }
         }
 
         if (allContained && !specialCase) {
@@ -514,7 +531,7 @@ export default class SSSR {
         if (setA.size !== setB.size) {
             return false;
         }
-        
+
         for (let element of setA) {
             if (!setB.has(element)) {
                 return false;
@@ -537,7 +554,7 @@ export default class SSSR {
                 return false;
             }
         }
-        
+
         return true;
     }
 }
