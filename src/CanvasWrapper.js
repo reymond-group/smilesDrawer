@@ -50,6 +50,7 @@ export default class CanvasWrapper {
         this.ctx.font = this.fontLarge;
         this.hydrogenWidth = this.ctx.measureText('H').width;
         this.halfHydrogenWidth = this.hydrogenWidth / 2.0;
+        this.halfBondThickness = this.opts.bondThickness / 2.0;
 
         // TODO: Find out why clear was here.
         // this.clear();
@@ -241,7 +242,7 @@ export default class CanvasWrapper {
             ctx.moveTo(l.x, l.y);
             ctx.lineTo(r.x, r.y);
             ctx.lineCap = 'round';
-            ctx.lineWidth = this.opts.bondThickness * 2.5;
+            ctx.lineWidth = this.opts.bondThickness + 1.2;
             ctx.strokeStyle = this.getColor('BACKGROUND');
             ctx.stroke();
             ctx.globalCompositeOperation = 'source-over';
@@ -339,10 +340,10 @@ export default class CanvasWrapper {
             end = l;
         }
 
-        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
-        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
-        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
-        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
+        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness));
+        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 1.5 + this.halfBondThickness));
+        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 1.5 + this.halfBondThickness));
+        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
 
         ctx.beginPath();
         ctx.moveTo(t.x, t.y);
@@ -432,13 +433,22 @@ export default class CanvasWrapper {
         ctx.lineWidth = this.opts.bondThickness;
         ctx.beginPath();
         let length = line.getLength();
-        let step = 1.25 / length;
+        let step = 1.25 / (length / (this.opts.bondThickness * 1.5));
 
+        let changed = false;
         for (var t = 0.0; t < 1.0; t += step) {
             let to = Vector2.multiplyScalar(dir, t * length);
             let startDash = Vector2.add(start, to);
             let width = 1.5 * t;
             let dashOffset = Vector2.multiplyScalar(normals[0], width);
+
+            if (!changed && t > 0.5) {
+              ctx.stroke();
+              ctx.beginPath();
+              ctx.strokeStyle = this.getColor(line.getRightElement()) || this.getColor('C');
+              changed = true;
+            }
+            
             startDash.subtract(dashOffset);
             ctx.moveTo(startDash.x, startDash.y);
             startDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
@@ -447,43 +457,6 @@ export default class CanvasWrapper {
 
         ctx.stroke();
         ctx.restore();
-
-        /*
-
-        let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
-        let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
-        let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
-        let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
-
-        ctx.beginPath();
-        ctx.moveTo(t.x, t.y);
-        ctx.lineTo(u.x, u.y);
-        ctx.lineTo(v.x, v.y);
-        ctx.lineTo(w.x, w.y);
-
-        let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
-        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
-            this.getColor('C'));
-        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
-            this.getColor('C'));
-
-        ctx.fillStyle = gradient;
-
-        ctx.fill();
-
-        // Now dash it
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.moveTo(sStart.x, sStart.y);
-        ctx.lineTo(sEnd.x, sEnd.y);
-        ctx.lineCap = 'butt';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([0.75, 0.75]);
-        ctx.strokeStyle = this.getColor('BACKGROUND');
-        ctx.stroke();
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.restore();
-        */
     }
 
     /**
