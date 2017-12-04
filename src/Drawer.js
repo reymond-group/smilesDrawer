@@ -47,7 +47,7 @@ export default class Drawer {
       shortBondLength: 0.85 * 14.4,
       bondSpacing: 0.18 * 14.4,
       atomVisualization: 'default',
-      isomeric: false,
+      isomeric: true,
       debug: false,
       terminalCarbons: false,
       explicitHydrogens: false, // TODO: Add to doc
@@ -250,7 +250,6 @@ export default class Drawer {
 
       this.resolveSecondaryOverlaps(overlapScore.scores);
 
-      this.annotateStereochemistry();
       if (this.opts.isomeric) {
         this.annotateStereochemistry();
       }

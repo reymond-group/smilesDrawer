@@ -26,20 +26,20 @@
             let str = 'parsetime,rendertime,overlap,rings,hac,bridged,smiles\n';
             
             let failed = '';
-            for (let i = 0; i < schembl.length; i++) {                
+            for (let i = 0; i < drugbank.length; i++) {                
                 let td = null;
                 let t2 = null;
                 let td2 = null;
                 let t = performance.now();
                 
-                SmilesDrawer.parse(schembl[i], function(tree) {
+                SmilesDrawer.parse(drugbank[i], function(tree) {
                     td = performance.now() - t;
                     t2 = performance.now();
                     smilesDrawer.draw(tree, 'example-canvas', 'light', false);
                     td2 = performance.now() - t2;
                 }, function(err) {
                     nErrors++;
-                    failed += schembl[i] + '\n';
+                    failed += drugbank[i] + '\n';
                 });
 
                 if (td2 === null) {
@@ -54,7 +54,7 @@
                        smilesDrawer.getTotalOverlapScore() + ',' +
                        smilesDrawer.getRingCount() + ',' + 
                        smilesDrawer.getHeavyAtomCount() + ',' +
-                       smilesDrawer.hasBridgedRing() + ',' + schembl[i] + '\n';
+                       smilesDrawer.hasBridgedRing() + ',' + drugbank[i] + '\n';
             }
 
             console.log(str);

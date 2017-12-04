@@ -1285,6 +1285,7 @@ var CanvasWrapper = function () {
         this.ctx.font = this.fontLarge;
         this.hydrogenWidth = this.ctx.measureText('H').width;
         this.halfHydrogenWidth = this.hydrogenWidth / 2.0;
+        this.halfBondThickness = this.opts.bondThickness / 2.0;
 
         // TODO: Find out why clear was here.
         // this.clear();
@@ -1503,7 +1504,7 @@ var CanvasWrapper = function () {
                 ctx.moveTo(l.x, l.y);
                 ctx.lineTo(r.x, r.y);
                 ctx.lineCap = 'round';
-                ctx.lineWidth = this.opts.bondThickness * 2.5;
+                ctx.lineWidth = this.opts.bondThickness + 1.2;
                 ctx.strokeStyle = this.getColor('BACKGROUND');
                 ctx.stroke();
                 ctx.globalCompositeOperation = 'source-over';
@@ -1603,10 +1604,10 @@ var CanvasWrapper = function () {
                 end = l;
             }
 
-            var t = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[0], this.opts.bondThickness));
-            var u = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
-            var v = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
-            var w = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[1], this.opts.bondThickness));
+            var t = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[0], this.halfBondThickness));
+            var u = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[0], 1.5 + this.halfBondThickness));
+            var v = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[1], 1.5 + this.halfBondThickness));
+            var w = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[1], this.halfBondThickness));
 
             ctx.beginPath();
             ctx.moveTo(t.x, t.y);
@@ -1695,13 +1696,22 @@ var CanvasWrapper = function () {
             ctx.lineWidth = this.opts.bondThickness;
             ctx.beginPath();
             var length = line.getLength();
-            var step = 1.25 / length;
+            var step = 1.25 / (length / (this.opts.bondThickness * 1.5));
 
+            var changed = false;
             for (var t = 0.0; t < 1.0; t += step) {
                 var to = _Vector2.default.multiplyScalar(dir, t * length);
                 var startDash = _Vector2.default.add(start, to);
                 var width = 1.5 * t;
                 var dashOffset = _Vector2.default.multiplyScalar(normals[0], width);
+
+                if (!changed && t > 0.5) {
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.strokeStyle = this.getColor(line.getRightElement()) || this.getColor('C');
+                    changed = true;
+                }
+
                 startDash.subtract(dashOffset);
                 ctx.moveTo(startDash.x, startDash.y);
                 startDash.add(_Vector2.default.multiplyScalar(dashOffset, 2.0));
@@ -1710,37 +1720,6 @@ var CanvasWrapper = function () {
 
             ctx.stroke();
             ctx.restore();
-
-            /*
-              let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.opts.bondThickness));
-            let u = Vector2.add(end, Vector2.multiplyScalar(normals[0], this.opts.bondThickness * 2.5));
-            let v = Vector2.add(end, Vector2.multiplyScalar(normals[1], this.opts.bondThickness * 2.5));
-            let w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.opts.bondThickness));
-              ctx.beginPath();
-            ctx.moveTo(t.x, t.y);
-            ctx.lineTo(u.x, u.y);
-            ctx.lineTo(v.x, v.y);
-            ctx.lineTo(w.x, w.y);
-              let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
-            gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
-                this.getColor('C'));
-            gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
-                this.getColor('C'));
-              ctx.fillStyle = gradient;
-              ctx.fill();
-              // Now dash it
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath();
-            ctx.moveTo(sStart.x, sStart.y);
-            ctx.lineTo(sEnd.x, sEnd.y);
-            ctx.lineCap = 'butt';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([0.75, 0.75]);
-            ctx.strokeStyle = this.getColor('BACKGROUND');
-            ctx.stroke();
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.restore();
-            */
         }
 
         /**
@@ -2298,7 +2277,7 @@ var Drawer = function () {
       shortBondLength: 0.85 * 14.4,
       bondSpacing: 0.18 * 14.4,
       atomVisualization: 'default',
-      isomeric: false,
+      isomeric: true,
       debug: false,
       terminalCarbons: false,
       explicitHydrogens: false, // TODO: Add to doc
@@ -2529,7 +2508,6 @@ var Drawer = function () {
 
         this.resolveSecondaryOverlaps(overlapScore.scores);
 
-        this.annotateStereochemistry();
         if (this.opts.isomeric) {
           this.annotateStereochemistry();
         }
