@@ -2405,26 +2405,7 @@ var Drawer = function () {
       this.doubleBondConfig = null;
 
       this.initRings();
-
-      // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
-      if (!this.opts.explicitHydrogens) {
-        for (var i = 0; i < this.graph.vertices.length; i++) {
-          var vertex = this.graph.vertices[i];
-
-          if (vertex.value.element !== 'H') {
-            continue;
-          }
-
-          // Hydrogens should have only one neighbour, so just take the first
-          // Also set hasHydrogen true on connected atom
-          var neighbour = this.graph.vertices[vertex.neighbours[0]];
-          neighbour.value.hasHydrogen = true;
-
-          if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing || neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
-            vertex.value.isDrawn = false;
-          }
-        }
-      }
+      this.initHydrogens();
 
       if (!this.infoOnly) {
         this.position();
@@ -2446,32 +2427,32 @@ var Drawer = function () {
             var subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
 
             // Only rotate the shorter subtree
-            var _a = edge.targetId;
-            var _b = edge.sourceId;
+            var a = edge.targetId;
+            var b = edge.sourceId;
 
             if (subTreeDepthA > subTreeDepthB) {
-              _a = edge.sourceId;
-              _b = edge.targetId;
+              a = edge.sourceId;
+              b = edge.targetId;
             }
 
-            var subTreeOverlap = this.getSubtreeOverlapScore(_b, _a, overlapScore.vertexScores);
+            var subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
 
             if (subTreeOverlap.value > this.opts.overlapSensitivity) {
-              var vertexA = this.graph.vertices[_a];
-              var vertexB = this.graph.vertices[_b];
-              var neighbours = vertexB.getNeighbours(_a);
+              var vertexA = this.graph.vertices[a];
+              var vertexB = this.graph.vertices[b];
+              var neighbours = vertexB.getNeighbours(a);
 
               if (neighbours.length === 1) {
-                var _neighbour = this.graph.vertices[neighbours[0]];
-                var _angle = _neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
+                var neighbour = this.graph.vertices[neighbours[0]];
+                var angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
 
-                this.rotateSubtree(_neighbour.id, vertexB.id, _angle, vertexB.position);
+                this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
 
                 // If the new overlap is bigger, undo change
                 var newTotalOverlapScore = this.getOverlapScore().total;
 
                 if (newTotalOverlapScore > this.totalOverlapScore) {
-                  this.rotateSubtree(_neighbour.id, vertexB.id, -_angle, vertexB.position);
+                  this.rotateSubtree(neighbour.id, vertexB.id, -angle, vertexB.position);
                 } else {
                   this.totalOverlapScore = newTotalOverlapScore;
                 }
@@ -2517,61 +2498,7 @@ var Drawer = function () {
           this.initPseudoElements();
         }
 
-        // Rotate the vertices to make the molecule align horizontally
-        // Find the longest distance
-        var a = 0;
-        var b = 0;
-        var maxDist = 0;
-        for (var i = 0; i < this.graph.vertices.length; i++) {
-          var _vertexA = this.graph.vertices[i];
-
-          if (!_vertexA.value.isDrawn) {
-            continue;
-          }
-
-          for (var j = i + 1; j < this.graph.vertices.length; j++) {
-            var _vertexB = this.graph.vertices[j];
-
-            if (!_vertexB.value.isDrawn) {
-              continue;
-            }
-
-            var dist = _vertexA.position.distanceSq(_vertexB.position);
-
-            if (dist > maxDist) {
-              maxDist = dist;
-              a = i;
-              b = j;
-            }
-          }
-        }
-
-        var angle = -_Vector2.default.subtract(this.graph.vertices[a].position, this.graph.vertices[b].position).angle();
-
-        if (!isNaN(angle)) {
-          // Round to 30 degrees
-          var remainder = angle % 0.523599;
-
-          // Round either up or down in 30 degree steps
-          if (remainder < 0.2617995) {
-            angle = angle - remainder;
-          } else {
-            angle += 0.523599 - remainder;
-          }
-
-          // Finally, rotate everything
-          for (var i = 0; i < this.graph.vertices.length; i++) {
-            if (i === b) {
-              continue;
-            }
-
-            this.graph.vertices[i].position.rotateAround(angle, this.graph.vertices[b].position);
-          }
-
-          for (var i = 0; i < this.rings.length; i++) {
-            this.rings[i].center.rotateAround(angle, this.graph.vertices[b].position);
-          }
-        }
+        this.rotateDrawing();
 
         // Set the canvas to the appropriate size
         this.canvasWrapper.scale(this.graph.vertices);
@@ -2684,6 +2611,70 @@ var Drawer = function () {
       }
 
       return result;
+    }
+
+    /**
+     * Rotates the drawing to make the widest dimension horizontal.
+     */
+
+  }, {
+    key: 'rotateDrawing',
+    value: function rotateDrawing() {
+      // Rotate the vertices to make the molecule align horizontally
+      // Find the longest distance
+      var a = 0;
+      var b = 0;
+      var maxDist = 0;
+      for (var i = 0; i < this.graph.vertices.length; i++) {
+        var vertexA = this.graph.vertices[i];
+
+        if (!vertexA.value.isDrawn) {
+          continue;
+        }
+
+        for (var j = i + 1; j < this.graph.vertices.length; j++) {
+          var vertexB = this.graph.vertices[j];
+
+          if (!vertexB.value.isDrawn) {
+            continue;
+          }
+
+          var dist = vertexA.position.distanceSq(vertexB.position);
+
+          if (dist > maxDist) {
+            maxDist = dist;
+            a = i;
+            b = j;
+          }
+        }
+      }
+
+      var angle = -_Vector2.default.subtract(this.graph.vertices[a].position, this.graph.vertices[b].position).angle();
+
+      if (!isNaN(angle)) {
+        // Round to 30 degrees
+        var remainder = angle % 0.523599;
+
+        // Round either up or down in 30 degree steps
+        if (remainder < 0.2617995) {
+          angle = angle - remainder;
+        } else {
+          angle += 0.523599 - remainder;
+        }
+
+        // Finally, rotate everything
+        for (var i = 0; i < this.graph.vertices.length; i++) {
+          if (i === b) {
+            continue;
+          }
+
+          this.graph.vertices[i].position.rotateAround(angle, this.graph.vertices[b].position);
+        }
+
+        for (var i = 0; i < this.rings.length; i++) {
+          this.rings[i].center.rotateAround(angle, this.graph.vertices[b].position);
+        }
+      }
     }
 
     /**
@@ -2898,6 +2889,29 @@ var Drawer = function () {
         // Remove the rings
         for (var i = 0; i < involvedRings.length; i++) {
           this.removeRing(involvedRings[i]);
+        }
+      }
+    }
+  }, {
+    key: 'initHydrogens',
+    value: function initHydrogens() {
+      // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
+      if (!this.opts.explicitHydrogens) {
+        for (var i = 0; i < this.graph.vertices.length; i++) {
+          var vertex = this.graph.vertices[i];
+
+          if (vertex.value.element !== 'H') {
+            continue;
+          }
+
+          // Hydrogens should have only one neighbour, so just take the first
+          // Also set hasHydrogen true on connected atom
+          var neighbour = this.graph.vertices[vertex.neighbours[0]];
+          neighbour.value.hasHydrogen = true;
+
+          if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing || neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
+            vertex.value.isDrawn = false;
+          }
         }
       }
     }
@@ -3858,7 +3872,8 @@ var Drawer = function () {
           this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) {
           if (this.opts.atomVisualization === 'default') {
-            this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+            //this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
+            // element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
           } else if (this.opts.atomVisualization === 'balls') {
             this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
           }
@@ -4123,10 +4138,10 @@ var Drawer = function () {
           ring.isSpiro = true;
           neighbour.isSpiro = true;
 
-          var _vertexA2 = this.graph.vertices[vertices[0]];
+          var _vertexA = this.graph.vertices[vertices[0]];
 
           // Get the vector pointing from the shared vertex to the new centpositioner
-          var _nextCenter = _Vector2.default.subtract(center, _vertexA2.position);
+          var _nextCenter = _Vector2.default.subtract(center, _vertexA.position);
 
           _nextCenter.invert();
           _nextCenter.normalize();
@@ -4135,10 +4150,10 @@ var Drawer = function () {
           var _r = _MathHelper2.default.polyCircumradius(this.opts.bondLength, neighbour.getSize());
 
           _nextCenter.multiplyScalar(_r);
-          _nextCenter.add(_vertexA2.position);
+          _nextCenter.add(_vertexA.position);
 
           if (!neighbour.positioned) {
-            this.createRing(neighbour, _nextCenter, _vertexA2);
+            this.createRing(neighbour, _nextCenter, _vertexA);
           }
         }
       }
@@ -4677,10 +4692,10 @@ var Drawer = function () {
           }
         } else if (_neighbours.length === 2) {
           // If the previous vertex comes out of a ring, it doesn't have an angle set
-          var _a2 = vertex.angle;
+          var _a = vertex.angle;
 
-          if (!_a2) {
-            _a2 = 1.0472;
+          if (!_a) {
+            _a = 1.0472;
           }
 
           // Check for the longer subtree - always go with cis for the longer subtree
@@ -4727,18 +4742,18 @@ var Drawer = function () {
             _originShortest = true;
           }
 
-          transVertex.angle = _a2;
-          cisVertex.angle = -_a2;
+          transVertex.angle = _a;
+          cisVertex.angle = -_a;
 
           if (this.doubleBondConfig === '\\') {
             if (transVertex.value.branchBond === '\\') {
-              transVertex.angle = -_a2;
-              cisVertex.angle = _a2;
+              transVertex.angle = -_a;
+              cisVertex.angle = _a;
             }
           } else if (this.doubleBondConfig === '/') {
             if (transVertex.value.branchBond === '/') {
-              transVertex.angle = -_a2;
-              cisVertex.angle = _a2;
+              transVertex.angle = -_a;
+              cisVertex.angle = _a;
             }
           }
 
@@ -5303,31 +5318,31 @@ var Drawer = function () {
         var previous = null;
 
         for (var j = 0; j < neighbours.length; j++) {
-          var _neighbour2 = neighbours[j];
+          var _neighbour = neighbours[j];
 
-          if (_neighbour2.getNeighbourCount() > 1) {
-            previous = _neighbour2;
+          if (_neighbour.getNeighbourCount() > 1) {
+            previous = _neighbour;
           }
         }
 
         for (var j = 0; j < neighbours.length; j++) {
-          var _neighbour3 = neighbours[j];
+          var _neighbour2 = neighbours[j];
 
-          if (_neighbour3.getNeighbourCount() > 1) {
+          if (_neighbour2.getNeighbourCount() > 1) {
             continue;
           }
 
-          _neighbour3.value.isDrawn = false;
+          _neighbour2.value.isDrawn = false;
 
-          var hydrogens = _Atom2.default.maxBonds[_neighbour3.value.element] - this.getBondCount(_neighbour3);
+          var hydrogens = _Atom2.default.maxBonds[_neighbour2.value.element] - this.getBondCount(_neighbour2);
           var charge = '';
 
-          if (_neighbour3.value.bracket) {
-            hydrogens = _neighbour3.value.bracket.hcount;
-            charge = _neighbour3.value.bracket.charge || 0;
+          if (_neighbour2.value.bracket) {
+            hydrogens = _neighbour2.value.bracket.hcount;
+            charge = _neighbour2.value.bracket.charge || 0;
           }
 
-          vertex.value.attachPseudoElement(_neighbour3.value.element, previous ? previous.value.element : null, hydrogens, charge);
+          vertex.value.attachPseudoElement(_neighbour2.value.element, previous ? previous.value.element : null, hydrogens, charge);
         }
       }
 
@@ -5349,16 +5364,16 @@ var Drawer = function () {
         }
 
         for (var j = 0; j < _neighbours2.length; j++) {
-          var _neighbour4 = _neighbours2[j].value;
+          var _neighbour3 = _neighbours2[j].value;
 
-          if (!_neighbour4.hasAttachedPseudoElements || _neighbour4.getAttachedPseudoElementsCount() !== 2) {
+          if (!_neighbour3.hasAttachedPseudoElements || _neighbour3.getAttachedPseudoElementsCount() !== 2) {
             continue;
           }
 
-          var pseudoElements = _neighbour4.getAttachedPseudoElements();
+          var pseudoElements = _neighbour3.getAttachedPseudoElements();
 
           if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
-            _neighbour4.isDrawn = false;
+            _neighbour3.isDrawn = false;
             _vertex4.value.attachPseudoElement('Ac', '', 0);
           }
         }

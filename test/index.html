@@ -23,7 +23,7 @@
             let nSuccesses = 0;
             let totalSpeed = 0;
             let totalOverlap = 0;
-            let str = 'parsetime,rendertime,overlap,rings,hac,bridged,smiles\n';
+            let str = 'depictor,set,parsetime,rendertime,overlap,rings,hac,bridged,smiles\n';
             
             let failed = '';
             for (let i = 0; i < drugbank.length; i++) {                
@@ -49,7 +49,7 @@
                 totalSpeed += td + td2;
                 totalOverlap += smilesDrawer.getTotalOverlapScore();
                 nSuccesses++;
-                str += td + ',' + 
+                str += 'SmilesDrawer,' + 'drugbank,' + td + ',' + 
                        td2 + ',' + 
                        smilesDrawer.getTotalOverlapScore() + ',' +
                        smilesDrawer.getRingCount() + ',' + 
@@ -62,7 +62,7 @@
             
             console.log('Failed count: ' + nErrors);
             console.log('Success count: ' + nSuccesses);
-            console.log('Success rate: ' + (nSuccesses / drugbank.length));
+            console.log('Success rate: ' + (nSuccesses / schembl.length));
             console.log('Avg speed: ' + totalSpeed / nSuccesses);
             console.log('Avg overlap: ' + totalOverlap / nSuccesses);
         </script>

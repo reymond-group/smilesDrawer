@@ -192,6 +192,9 @@ Only supports 1d, non-nested arrays.</p>
 <dt><a href="#printRingInfo">printRingInfo()</a> ⇒ <code>String</code></dt>
 <dd><p>Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings)</p>
 </dd>
+<dt><a href="#rotateDrawing">rotateDrawing()</a></dt>
+<dd><p>Rotates the drawing to make the widest dimension horizontal.</p>
+</dd>
 <dt><a href="#getTotalOverlapScore">getTotalOverlapScore()</a> ⇒ <code>Number</code></dt>
 <dd><p>Returns the total overlap score of the current molecule.</p>
 </dd>
@@ -1419,6 +1422,12 @@ Returns a string containing a semicolon and new-line separated list of ring prop
 
 **Kind**: global function  
 **Returns**: <code>String</code> - A string as described in the method description.  
+<a name="rotateDrawing"></a>
+
+## rotateDrawing()
+Rotates the drawing to make the widest dimension horizontal.
+
+**Kind**: global function  
 <a name="getTotalOverlapScore"></a>
 
 ## getTotalOverlapScore() ⇒ <code>Number</code>
