@@ -166,27 +166,7 @@ export default class Drawer {
     this.doubleBondConfig = null;
 
     this.initRings();
-
-    // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
-    if (!this.opts.explicitHydrogens) {
-      for (var i = 0; i < this.graph.vertices.length; i++) {
-        let vertex = this.graph.vertices[i];
-
-        if (vertex.value.element !== 'H') {
-          continue;
-        }
-
-        // Hydrogens should have only one neighbour, so just take the first
-        // Also set hasHydrogen true on connected atom
-        let neighbour = this.graph.vertices[vertex.neighbours[0]];
-        neighbour.value.hasHydrogen = true;
-
-        if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing ||
-          neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
-          vertex.value.isDrawn = false;
-        }
-      }
-    }
+    this.initHydrogens();
 
     if (!this.infoOnly) {
       this.position();
@@ -280,64 +260,10 @@ export default class Drawer {
         this.initPseudoElements();
       }
 
-      // Rotate the vertices to make the molecule align horizontally
-      // Find the longest distance
-      let a = 0;
-      let b = 0;
-      let maxDist = 0;
-      for (var i = 0; i < this.graph.vertices.length; i++) {
-        let vertexA = this.graph.vertices[i];
-
-        if (!vertexA.value.isDrawn) {
-          continue;
-        }
-
-        for (var j = i + 1; j < this.graph.vertices.length; j++) {
-          let vertexB = this.graph.vertices[j];
-
-          if (!vertexB.value.isDrawn) {
-            continue;
-          }
-          
-          let dist = vertexA.position.distanceSq(vertexB.position);
-
-          if (dist > maxDist) {
-            maxDist = dist;
-            a = i;
-            b = j;
-          }
-        }
-      }
-
-      let angle = -Vector2.subtract(this.graph.vertices[a].position, this.graph.vertices[b].position).angle();
-
-      if (!isNaN(angle)) {
-        // Round to 30 degrees
-        let remainder = angle % 0.523599;
-
-        // Round either up or down in 30 degree steps
-        if (remainder < 0.2617995) {
-          angle = angle - remainder;
-        } else {
-          angle += 0.523599 - remainder;
-        }
-
-        // Finally, rotate everything
-        for (var i = 0; i < this.graph.vertices.length; i++) {
-          if (i === b) {
-            continue;
-          }
-          
-          this.graph.vertices[i].position.rotateAround(angle, this.graph.vertices[b].position);
-        }
-
-        for (var i = 0; i < this.rings.length; i++) {
-          this.rings[i].center.rotateAround(angle, this.graph.vertices[b].position);
-        }
-      }
+      this.rotateDrawing();
 
       // Set the canvas to the appropriate size
-      this.canvasWrapper.scale(this.graph.vertices); 
+      this.canvasWrapper.scale(this.graph.vertices);
 
       // Do the actual drawing
       this.drawEdges(this.opts.debug);
@@ -432,6 +358,67 @@ export default class Drawer {
     }
 
     return result;
+  }
+
+  /**
+   * Rotates the drawing to make the widest dimension horizontal.
+   */
+  rotateDrawing() {
+    // Rotate the vertices to make the molecule align horizontally
+    // Find the longest distance
+    let a = 0;
+    let b = 0;
+    let maxDist = 0;
+    for (var i = 0; i < this.graph.vertices.length; i++) {
+      let vertexA = this.graph.vertices[i];
+
+      if (!vertexA.value.isDrawn) {
+        continue;
+      }
+
+      for (var j = i + 1; j < this.graph.vertices.length; j++) {
+        let vertexB = this.graph.vertices[j];
+
+        if (!vertexB.value.isDrawn) {
+          continue;
+        }
+
+        let dist = vertexA.position.distanceSq(vertexB.position);
+
+        if (dist > maxDist) {
+          maxDist = dist;
+          a = i;
+          b = j;
+        }
+      }
+    }
+
+    let angle = -Vector2.subtract(this.graph.vertices[a].position, this.graph.vertices[b].position).angle();
+
+    if (!isNaN(angle)) {
+      // Round to 30 degrees
+      let remainder = angle % 0.523599;
+
+      // Round either up or down in 30 degree steps
+      if (remainder < 0.2617995) {
+        angle = angle - remainder;
+      } else {
+        angle += 0.523599 - remainder;
+      }
+
+      // Finally, rotate everything
+      for (var i = 0; i < this.graph.vertices.length; i++) {
+        if (i === b) {
+          continue;
+        }
+
+        this.graph.vertices[i].position.rotateAround(angle, this.graph.vertices[b].position);
+      }
+
+      for (var i = 0; i < this.rings.length; i++) {
+        this.rings[i].center.rotateAround(angle, this.graph.vertices[b].position);
+      }
+    }
   }
 
   /**
@@ -629,6 +616,29 @@ export default class Drawer {
       // Remove the rings
       for (var i = 0; i < involvedRings.length; i++) {
         this.removeRing(involvedRings[i]);
+      }
+    }
+  }
+
+  initHydrogens() {
+    // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
+    if (!this.opts.explicitHydrogens) {
+      for (var i = 0; i < this.graph.vertices.length; i++) {
+        let vertex = this.graph.vertices[i];
+
+        if (vertex.value.element !== 'H') {
+          continue;
+        }
+
+        // Hydrogens should have only one neighbour, so just take the first
+        // Also set hasHydrogen true on connected atom
+        let neighbour = this.graph.vertices[vertex.neighbours[0]];
+        neighbour.value.hasHydrogen = true;
+
+        if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing ||
+          neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
+          vertex.value.isDrawn = false;
+        }
       }
     }
   }
@@ -2786,7 +2796,7 @@ export default class Drawer {
 
       // Ignore also guanidine
       if (vertex.value.element === 'C' && neighbours.length === 3 &&
-          neighbours[0].value.element === 'N' && neighbours[1].value.element === 'N' && neighbours[2].value.element === 'N') {
+        neighbours[0].value.element === 'N' && neighbours[1].value.element === 'N' && neighbours[2].value.element === 'N') {
         continue;
       }
 
