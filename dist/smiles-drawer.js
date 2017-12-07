@@ -3872,8 +3872,7 @@ var Drawer = function () {
           this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) {
           if (this.opts.atomVisualization === 'default') {
-            //this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
-            // element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+            this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
           } else if (this.opts.atomVisualization === 'balls') {
             this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
           }

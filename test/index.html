@@ -14,6 +14,8 @@
         <script src="drugbank.js"></script>
         <script src="schembl.js"></script>
         <script src="gdb17.js"></script>
+        <script src="chembl.js"></script>
+        <script src="fdb.js"></script>
         <script>
             let options = { compactDrawing: true };
             
@@ -26,20 +28,20 @@
             let str = 'depictor,set,parsetime,rendertime,overlap,rings,hac,bridged,smiles\n';
             
             let failed = '';
-            for (let i = 0; i < drugbank.length; i++) {                
+            for (let i = 0; i < fdb.length; i++) {                
                 let td = null;
                 let t2 = null;
                 let td2 = null;
                 let t = performance.now();
                 
-                SmilesDrawer.parse(drugbank[i], function(tree) {
+                SmilesDrawer.parse(fdb[i], function(tree) {
                     td = performance.now() - t;
                     t2 = performance.now();
                     smilesDrawer.draw(tree, 'example-canvas', 'light', false);
                     td2 = performance.now() - t2;
                 }, function(err) {
                     nErrors++;
-                    failed += drugbank[i] + '\n';
+                    failed += fdb[i] + '\n';
                 });
 
                 if (td2 === null) {
@@ -49,12 +51,12 @@
                 totalSpeed += td + td2;
                 totalOverlap += smilesDrawer.getTotalOverlapScore();
                 nSuccesses++;
-                str += 'SmilesDrawer,' + 'drugbank,' + td + ',' + 
+                str += 'SmilesDrawer,' + 'fdb,' + td + ',' + 
                        td2 + ',' + 
                        smilesDrawer.getTotalOverlapScore() + ',' +
                        smilesDrawer.getRingCount() + ',' + 
                        smilesDrawer.getHeavyAtomCount() + ',' +
-                       smilesDrawer.hasBridgedRing() + ',' + drugbank[i] + '\n';
+                       smilesDrawer.hasBridgedRing() + ',' + fdb[i] + '\n';
             }
 
             console.log(str);
@@ -62,7 +64,7 @@
             
             console.log('Failed count: ' + nErrors);
             console.log('Success count: ' + nSuccesses);
-            console.log('Success rate: ' + (nSuccesses / schembl.length));
+            console.log('Success rate: ' + (nSuccesses / fdb.length));
             console.log('Avg speed: ' + totalSpeed / nSuccesses);
             console.log('Avg overlap: ' + totalOverlap / nSuccesses);
         </script>
