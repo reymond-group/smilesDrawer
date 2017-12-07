@@ -2282,6 +2282,7 @@ var Drawer = function () {
       terminalCarbons: false,
       explicitHydrogens: false, // TODO: Add to doc
       overlapSensitivity: 0.42, // TODO: Add to doc
+      overlapResolutionIterations: 1, // TODO: Add to doc
       compactDrawing: true,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
@@ -2420,69 +2421,79 @@ var Drawer = function () {
 
         this.totalOverlapScore = this.getOverlapScore().total;
 
-        for (var i = 0; i < this.graph.edges.length; i++) {
-          var edge = this.graph.edges[i];
-          if (this.isEdgeRotatable(edge)) {
-            var subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
-            var subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
+        for (var o = 0; o < this.opts.overlapResolutionIterations; o++) {
+          for (var i = 0; i < this.graph.edges.length; i++) {
+            var edge = this.graph.edges[i];
+            if (this.isEdgeRotatable(edge)) {
+              var subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
+              var subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
 
-            // Only rotate the shorter subtree
-            var a = edge.targetId;
-            var b = edge.sourceId;
+              // Only rotate the shorter subtree
+              var a = edge.targetId;
+              var b = edge.sourceId;
 
-            if (subTreeDepthA > subTreeDepthB) {
-              a = edge.sourceId;
-              b = edge.targetId;
-            }
-
-            var subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
-
-            if (subTreeOverlap.value > this.opts.overlapSensitivity) {
-              var vertexA = this.graph.vertices[a];
-              var vertexB = this.graph.vertices[b];
-              var neighbours = vertexB.getNeighbours(a);
-
-              if (neighbours.length === 1) {
-                var neighbour = this.graph.vertices[neighbours[0]];
-                var angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
-
-                this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
-
-                // If the new overlap is bigger, undo change
-                var newTotalOverlapScore = this.getOverlapScore().total;
-
-                if (newTotalOverlapScore > this.totalOverlapScore) {
-                  this.rotateSubtree(neighbour.id, vertexB.id, -angle, vertexB.position);
-                } else {
-                  this.totalOverlapScore = newTotalOverlapScore;
-                }
-              } else if (neighbours.length == 2) {
-                // Switch places / sides
-                // If vertex a is in a ring, do nothing
-                if (vertexB.value.rings.length + vertexA.value.rings.length > 0) {
-                  continue;
-                }
-
-                var neighbourA = this.graph.vertices[neighbours[0]];
-                var neighbourB = this.graph.vertices[neighbours[1]];
-
-                var angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
-                var angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
-
-                this.rotateSubtree(neighbourA.id, vertexB.id, angleA, vertexB.position);
-                this.rotateSubtree(neighbourB.id, vertexB.id, angleB, vertexB.position);
-
-                var _newTotalOverlapScore = this.getOverlapScore().total;
-
-                if (_newTotalOverlapScore > this.totalOverlapScore) {
-                  this.rotateSubtree(neighbourA.id, vertexB.id, -angleA, vertexB.position);
-                  this.rotateSubtree(neighbourB.id, vertexB.id, -angleB, vertexB.position);
-                } else {
-                  this.totalOverlapScore = _newTotalOverlapScore;
-                }
+              if (subTreeDepthA > subTreeDepthB) {
+                a = edge.sourceId;
+                b = edge.targetId;
               }
 
-              overlapScore = this.getOverlapScore();
+              var subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
+              if (subTreeOverlap.value > this.opts.overlapSensitivity) {
+                var vertexA = this.graph.vertices[a];
+                var vertexB = this.graph.vertices[b];
+                var neighboursB = vertexB.getNeighbours(a);
+
+                if (neighboursB.length === 1) {
+                  var neighbour = this.graph.vertices[neighboursB[0]];
+                  var angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
+
+                  this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
+                  // If the new overlap is bigger, undo change
+                  var newTotalOverlapScore = this.getOverlapScore().total;
+
+                  if (newTotalOverlapScore > this.totalOverlapScore) {
+                    this.rotateSubtree(neighbour.id, vertexB.id, -angle, vertexB.position);
+                  } else {
+                    this.totalOverlapScore = newTotalOverlapScore;
+                  }
+                } else if (neighboursB.length === 2) {
+                  // Switch places / sides
+                  // If vertex a is in a ring, do nothing
+                  if (vertexB.value.rings.length !== 0 && vertexA.value.rings.length !== 0) {
+                    continue;
+                  }
+
+                  var neighbourA = this.graph.vertices[neighboursB[0]];
+                  var neighbourB = this.graph.vertices[neighboursB[1]];
+
+                  if (neighbourA.value.rings.length === 1 && neighbourB.value.rings.length === 1) {
+                    // Both neighbours in same ring. TODO: does this create problems with wedges? (up = down and vice versa?)
+                    if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
+                      continue;
+                    }
+                    // TODO: Rotate circle
+                  } else if (neighbourA.value.rings.length !== 0 || neighbourB.value.rings.length !== 0) {
+                    continue;
+                  } else {
+                    var angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
+                    var angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
+
+                    this.rotateSubtree(neighbourA.id, vertexB.id, angleA, vertexB.position);
+                    this.rotateSubtree(neighbourB.id, vertexB.id, angleB, vertexB.position);
+
+                    var _newTotalOverlapScore = this.getOverlapScore().total;
+
+                    if (_newTotalOverlapScore > this.totalOverlapScore) {
+                      this.rotateSubtree(neighbourA.id, vertexB.id, -angleA, vertexB.position);
+                      this.rotateSubtree(neighbourB.id, vertexB.id, -angleB, vertexB.position);
+                    } else {
+                      this.totalOverlapScore = _newTotalOverlapScore;
+                    }
+                  }
+                }
+
+                overlapScore = this.getOverlapScore();
+              }
             }
           }
         }
@@ -4221,6 +4232,10 @@ var Drawer = function () {
       var count = 0;
 
       this.graph.traverseTree(vertexId, parentVertexId, function (vertex) {
+        if (!vertex.value.isDrawn) {
+          return;
+        }
+
         var s = vertexOverlapScores[vertex.id];
         if (s > that.opts.overlapSensitivity) {
           score += s;
@@ -4939,9 +4954,13 @@ var Drawer = function () {
         return false;
       }
 
-      // Do not rotate edges that have a further single bond to each side
+      // Do not rotate edges that have a further single bond to each side - do that!
       // If the bond is terminal, it doesn't make sense to rotate it
-      if (vertexA.getNeighbourCount() + vertexB.getNeighbourCount() < 5) {
+      // if (vertexA.getNeighbourCount() + vertexB.getNeighbourCount() < 5) {
+      //   return false;
+      // }
+
+      if (vertexA.isTerminal() || vertexB.isTerminal()) {
         return false;
       }
 

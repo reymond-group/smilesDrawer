@@ -28,20 +28,20 @@
             let str = 'depictor,set,parsetime,rendertime,overlap,rings,hac,bridged,smiles\n';
             
             let failed = '';
-            for (let i = 0; i < fdb.length; i++) {                
+            for (let i = 0; i < drugbank.length; i++) {                
                 let td = null;
                 let t2 = null;
                 let td2 = null;
                 let t = performance.now();
                 
-                SmilesDrawer.parse(fdb[i], function(tree) {
+                SmilesDrawer.parse(drugbank[i], function(tree) {
                     td = performance.now() - t;
                     t2 = performance.now();
                     smilesDrawer.draw(tree, 'example-canvas', 'light', false);
                     td2 = performance.now() - t2;
                 }, function(err) {
                     nErrors++;
-                    failed += fdb[i] + '\n';
+                    failed += drugbank[i] + '\n';
                 });
 
                 if (td2 === null) {
@@ -51,12 +51,12 @@
                 totalSpeed += td + td2;
                 totalOverlap += smilesDrawer.getTotalOverlapScore();
                 nSuccesses++;
-                str += 'SmilesDrawer,' + 'fdb,' + td + ',' + 
+                str += 'SmilesDrawer,' + 'drugbank,' + td + ',' + 
                        td2 + ',' + 
                        smilesDrawer.getTotalOverlapScore() + ',' +
                        smilesDrawer.getRingCount() + ',' + 
                        smilesDrawer.getHeavyAtomCount() + ',' +
-                       smilesDrawer.hasBridgedRing() + ',' + fdb[i] + '\n';
+                       smilesDrawer.hasBridgedRing() + ',' + drugbank[i] + '\n';
             }
 
             console.log(str);
