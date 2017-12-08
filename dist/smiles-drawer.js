@@ -5213,13 +5213,35 @@ var Drawer = function () {
 
         // If all neighbours are in a ring, do not draw wedge, the hydrogen will be drawn.
         if (!showHydrogen) {
-          console.log(vertex.id, order, wedgeOrder, priorities);
+          console.log(vertex.id);
+          console.log(neighbours);
+          console.log(priorities);
+          console.log(order);
+          console.log(wedgeOrder);
+          console.log(rs);
+          if (vertex.value.hasHydrogen) console.log('H goes ' + wedgeA);
+          console.log('...');
           var wedgeId = wedgeOrder[0][1];
 
           if (vertex.value.hasHydrogen) {
-            var wedge = wedgeA;
+            // let wedge = wedgeA;          
 
-            for (var j = order.length - 2; j >= 0; j--) {
+            // for (var j = order.length - 2; j >= 0; j--) {
+            //   if (wedge === wedgeA) {
+            //     wedge = wedgeB;
+            //   } else {
+            //     wedge = wedgeA;
+            //   }
+            //   if (neighbours[order[j]] === wedgeId) {
+            //     break;
+            //   }
+            // }
+
+            this.graph.getEdge(vertex.id, wedgeId).wedge = wedgeB;
+          } else {
+            var wedge = wedgeB;
+
+            for (var j = order.length - 1; j >= 0; j--) {
               if (wedge === wedgeA) {
                 wedge = wedgeB;
               } else {
@@ -5231,21 +5253,6 @@ var Drawer = function () {
             }
 
             this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
-          } else {
-            var _wedge = wedgeB;
-
-            for (var j = order.length - 1; j >= 0; j--) {
-              if (_wedge === wedgeA) {
-                _wedge = wedgeB;
-              } else {
-                _wedge = wedgeA;
-              }
-              if (neighbours[order[j]] === wedgeId) {
-                break;
-              }
-            }
-
-            this.graph.getEdge(vertex.id, wedgeId).wedge = _wedge;
           }
         }
 
