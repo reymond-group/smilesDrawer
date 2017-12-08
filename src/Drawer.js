@@ -43,8 +43,8 @@ export default class Drawer {
       width: 500,
       height: 500,
       bondThickness: 0.6, // TODO: Add to doc
-      bondLength: 14.4,
-      shortBondLength: 0.85 * 14.4,
+      bondLength: 15,
+      shortBondLength: 0.85 * 15,
       bondSpacing: 0.18 * 14.4,
       atomVisualization: 'default',
       isomeric: true,
@@ -2717,6 +2717,7 @@ export default class Drawer {
         wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
         wedgeOrder[j][1] = neighbours[order[j]];
       }
+      
 
       wedgeOrder.sort(function (a, b) {
         if (a[0] > b[0]) {
@@ -2729,7 +2730,40 @@ export default class Drawer {
 
       // If all neighbours are in a ring, do not draw wedge, the hydrogen will be drawn.
       if (!showHydrogen) {
-        this.graph.getEdge(vertex.id, wedgeOrder[0][1]).wedge = wedgeB;
+        console.log(vertex.id, order, wedgeOrder, priorities);
+        let wedgeId = wedgeOrder[0][1];
+
+        if (vertex.value.hasHydrogen) {
+          let wedge = wedgeA;          
+
+          for (var j = order.length - 2; j >= 0; j--) {
+            if (wedge === wedgeA) {
+              wedge = wedgeB;
+            } else {
+              wedge = wedgeA;
+            }
+            if (neighbours[order[j]] === wedgeId) {
+              break;
+            }
+          }
+
+          this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;          
+        } else {
+          let wedge = wedgeB;          
+
+          for (var j = order.length - 1; j >= 0; j--) {
+            if (wedge === wedgeA) {
+              wedge = wedgeB;
+            } else {
+              wedge = wedgeA;
+            }
+            if (neighbours[order[j]] === wedgeId) {
+              break;
+            }
+          }
+
+          this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
+        }
       }
 
       vertex.value.chirality = rs;

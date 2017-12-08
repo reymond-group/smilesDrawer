@@ -1696,7 +1696,7 @@ var CanvasWrapper = function () {
             ctx.lineWidth = this.opts.bondThickness;
             ctx.beginPath();
             var length = line.getLength();
-            var step = 1.25 / (length / (this.opts.bondThickness * 1.5));
+            var step = 1.25 / (length / (this.opts.bondThickness * 3.0));
 
             var changed = false;
             for (var t = 0.0; t < 1.0; t += step) {
@@ -2273,8 +2273,8 @@ var Drawer = function () {
       width: 500,
       height: 500,
       bondThickness: 0.6, // TODO: Add to doc
-      bondLength: 14.4,
-      shortBondLength: 0.85 * 14.4,
+      bondLength: 15,
+      shortBondLength: 0.85 * 15,
       bondSpacing: 0.18 * 14.4,
       atomVisualization: 'default',
       isomeric: true,
@@ -5213,7 +5213,40 @@ var Drawer = function () {
 
         // If all neighbours are in a ring, do not draw wedge, the hydrogen will be drawn.
         if (!showHydrogen) {
-          this.graph.getEdge(vertex.id, wedgeOrder[0][1]).wedge = wedgeB;
+          console.log(vertex.id, order, wedgeOrder, priorities);
+          var wedgeId = wedgeOrder[0][1];
+
+          if (vertex.value.hasHydrogen) {
+            var wedge = wedgeA;
+
+            for (var j = order.length - 2; j >= 0; j--) {
+              if (wedge === wedgeA) {
+                wedge = wedgeB;
+              } else {
+                wedge = wedgeA;
+              }
+              if (neighbours[order[j]] === wedgeId) {
+                break;
+              }
+            }
+
+            this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
+          } else {
+            var _wedge = wedgeB;
+
+            for (var j = order.length - 1; j >= 0; j--) {
+              if (_wedge === wedgeA) {
+                _wedge = wedgeB;
+              } else {
+                _wedge = wedgeA;
+              }
+              if (neighbours[order[j]] === wedgeId) {
+                break;
+              }
+            }
+
+            this.graph.getEdge(vertex.id, wedgeId).wedge = _wedge;
+          }
         }
 
         vertex.value.chirality = rs;

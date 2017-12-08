@@ -433,7 +433,7 @@ export default class CanvasWrapper {
         ctx.lineWidth = this.opts.bondThickness;
         ctx.beginPath();
         let length = line.getLength();
-        let step = 1.25 / (length / (this.opts.bondThickness * 1.5));
+        let step = 1.25 / (length / (this.opts.bondThickness * 3.0));
 
         let changed = false;
         for (var t = 0.0; t < 1.0; t += step) {
