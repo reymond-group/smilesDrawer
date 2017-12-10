@@ -2274,7 +2274,7 @@ var Drawer = function () {
       height: 500,
       bondThickness: 0.6, // TODO: Add to doc
       bondLength: 15,
-      shortBondLength: 0.85 * 15,
+      shortBondLength: 0.85,
       bondSpacing: 0.18 * 14.4,
       atomVisualization: 'default',
       isomeric: true,
@@ -3751,7 +3751,7 @@ var Drawer = function () {
             line = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
           }
 
-          line.shorten(this.opts.bondLength - this.opts.shortBondLength);
+          line.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
 
           // The shortened edge
           if (edge.isPartOfAromaticRing) {
@@ -3762,7 +3762,7 @@ var Drawer = function () {
 
           // The normal edge
           this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
-        } else if (edge.center) {
+        } else if (edge.center || vertexA.isTerminal() && vertexB.isTerminal()) {
           normals[0].multiplyScalar(that.opts.halfBondSpacing);
           normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
@@ -3788,7 +3788,7 @@ var Drawer = function () {
 
           var _line = new _Line2.default(_Vector2.default.add(a, normals[0]), _Vector2.default.add(b, normals[0]), elementA, elementB);
 
-          _line.shorten(this.opts.bondLength - this.opts.shortBondLength);
+          _line.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
           this.canvasWrapper.drawLine(_line);
           this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
         } else if (s.sideCount[0] < s.sideCount[1]) {
@@ -3797,7 +3797,7 @@ var Drawer = function () {
 
           var _line2 = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
 
-          _line2.shorten(this.opts.bondLength - this.opts.shortBondLength);
+          _line2.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
           this.canvasWrapper.drawLine(_line2);
           this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
         } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
@@ -3806,7 +3806,7 @@ var Drawer = function () {
 
           var _line3 = new _Line2.default(_Vector2.default.add(a, normals[0]), _Vector2.default.add(b, normals[0]), elementA, elementB);
 
-          _line3.shorten(this.opts.bondLength - this.opts.shortBondLength);
+          _line3.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
           this.canvasWrapper.drawLine(_line3);
           this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
         } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
@@ -3815,7 +3815,7 @@ var Drawer = function () {
 
           var _line4 = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
 
-          _line4.shorten(this.opts.bondLength - this.opts.shortBondLength);
+          _line4.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
           this.canvasWrapper.drawLine(_line4);
           this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
         } else {}
@@ -3881,7 +3881,7 @@ var Drawer = function () {
 
         if (this.opts.atomVisualization === 'allballs') {
           this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
-        } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) {
+        } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements || atom.bracket && isTerminal)) {
           if (this.opts.atomVisualization === 'default') {
             this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
           } else if (this.opts.atomVisualization === 'balls') {
@@ -4332,10 +4332,10 @@ var Drawer = function () {
 
           done[vertex.id] = true;
 
-          // Look for rings where there are atoms with two bonds outside the ring (overlaps)
           var nonRingNeighbours = this.getNonRingNeighbours(vertex.id);
 
           if (nonRingNeighbours.length > 1) {
+            // Look for rings where there are atoms with two bonds outside the ring (overlaps)
             var rings = Array();
 
             for (var k = 0; k < vertex.value.rings.length; k++) {
@@ -4345,6 +4345,20 @@ var Drawer = function () {
             overlaps.push({
               common: vertex,
               rings: rings,
+              vertices: nonRingNeighbours
+            });
+          } else if (nonRingNeighbours.length === 1 && vertex.value.rings.length === 2) {
+            // Look for bonds coming out of joined rings to adjust the angle, an example is: C1=CC(=CC=C1)[C@]12SCCN1CC1=CC=CC=C21
+            // where the angle has to be adjusted to account for fused ring
+            var _rings = Array();
+
+            for (var k = 0; k < vertex.value.rings.length; k++) {
+              _rings.push(vertex.value.rings[k]);
+            }
+
+            overlaps.push({
+              common: vertex,
+              rings: _rings,
               vertices: nonRingNeighbours
             });
           }
@@ -4383,6 +4397,10 @@ var Drawer = function () {
           if (subTreeOverlapA.value + subTreeOverlapB.value > total) {
             this.rotateSubtree(a.id, overlap.common.id, 2.0 * angle, overlap.common.position);
             this.rotateSubtree(b.id, overlap.common.id, -2.0 * angle, overlap.common.position);
+          }
+        } else if (overlap.vertices.length === 1) {
+          if (overlap.rings.length === 2) {
+            console.log(overlap);
           }
         }
       }
@@ -4564,31 +4582,33 @@ var Drawer = function () {
       // If two rings are connected by a bond ...
       if (vertex.value.bridgedRing !== null) {
         var nextRing = this.getRing(vertex.value.bridgedRing);
-        var nextCenter = _Vector2.default.subtract(vertex.previousPosition, vertex.position);
-
-        nextCenter.invert();
-        nextCenter.normalize();
-
-        var r = _MathHelper2.default.polyCircumradius(this.opts.bondLength, nextRing.members.length);
-        nextCenter.multiplyScalar(r);
-        nextCenter.add(vertex.position);
 
         if (!nextRing.positioned) {
+          var nextCenter = _Vector2.default.subtract(vertex.previousPosition, vertex.position);
+
+          nextCenter.invert();
+          nextCenter.normalize();
+
+          var r = _MathHelper2.default.polyCircumradius(this.opts.bondLength, nextRing.members.length);
+          nextCenter.multiplyScalar(r);
+          nextCenter.add(vertex.position);
+
           this.createRing(nextRing, nextCenter, vertex);
         }
       } else if (vertex.value.rings.length > 0) {
         var _nextRing = this.getRing(vertex.value.rings[0]);
-        var _nextCenter2 = _Vector2.default.subtract(vertex.previousPosition, vertex.position);
-
-        _nextCenter2.invert();
-        _nextCenter2.normalize();
-
-        var _r2 = _MathHelper2.default.polyCircumradius(this.opts.bondLength, _nextRing.getSize());
-
-        _nextCenter2.multiplyScalar(_r2);
-        _nextCenter2.add(vertex.position);
 
         if (!_nextRing.positioned) {
+          var _nextCenter2 = _Vector2.default.subtract(vertex.previousPosition, vertex.position);
+
+          _nextCenter2.invert();
+          _nextCenter2.normalize();
+
+          var _r2 = _MathHelper2.default.polyCircumradius(this.opts.bondLength, _nextRing.getSize());
+
+          _nextCenter2.multiplyScalar(_r2);
+          _nextCenter2.add(vertex.position);
+
           this.createRing(_nextRing, _nextCenter2, vertex);
         }
       } else {
@@ -5213,30 +5233,9 @@ var Drawer = function () {
 
         // If all neighbours are in a ring, do not draw wedge, the hydrogen will be drawn.
         if (!showHydrogen) {
-          console.log(vertex.id);
-          console.log(neighbours);
-          console.log(priorities);
-          console.log(order);
-          console.log(wedgeOrder);
-          console.log(rs);
-          if (vertex.value.hasHydrogen) console.log('H goes ' + wedgeA);
-          console.log('...');
           var wedgeId = wedgeOrder[0][1];
 
           if (vertex.value.hasHydrogen) {
-            // let wedge = wedgeA;          
-
-            // for (var j = order.length - 2; j >= 0; j--) {
-            //   if (wedge === wedgeA) {
-            //     wedge = wedgeB;
-            //   } else {
-            //     wedge = wedgeA;
-            //   }
-            //   if (neighbours[order[j]] === wedgeId) {
-            //     break;
-            //   }
-            // }
-
             this.graph.getEdge(vertex.id, wedgeId).wedge = wedgeB;
           } else {
             var wedge = wedgeB;

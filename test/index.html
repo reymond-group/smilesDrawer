@@ -9,6 +9,7 @@
     </head>
     <body>
         <canvas id="example-canvas" width="500" height="500"></canvas>
+        <div id="output"></div>
 
         <script src="../dist/smiles-drawer.js"></script>
         <script src="drugbank.js"></script>
@@ -67,6 +68,12 @@
             console.log('Success rate: ' + (nSuccesses / fdb.length));
             console.log('Avg speed: ' + totalSpeed / nSuccesses);
             console.log('Avg overlap: ' + totalOverlap / nSuccesses);
+
+            document.getElementById('output').innerHTML += 'Failed count: ' + nErrors + '<br />' +
+              'Success count: ' + nSuccesses + '<br />' +
+              'Success rate: ' + (nSuccesses / fdb.length) + '<br />' +
+              'Avg speed: ' + totalSpeed / nSuccesses + '<br />' +
+              'Avg overlap: ' + totalOverlap / nSuccesses;
         </script>
     </body>
 </html>
