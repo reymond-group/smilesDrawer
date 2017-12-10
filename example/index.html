@@ -6,6 +6,7 @@
   <title>SMILES Parser Demo</title>
   <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Megrim" rel="stylesheet">
   <script src="../dist/smiles-drawer.js"></script>
   <style>
     html,
@@ -18,21 +19,30 @@
 
     body {
       background: linear-gradient(330deg, #00323D, #004C42);
+      overflow-y: auto;
     }
 
     h1 {
-      font-family: Lato;
-      font-weight: 700;
-      font-size: 3.5em;
-      color: #fff;
+      display: inline-block;
+      font-family: 'Megrim';
+      font-weight: 400;
+      font-size: 2.0em;
+      color: #50C5A9;
+      text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.25);
 
       margin: 0;
       padding: 0;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
     }
 
     table tbody tr td {
-      padding: 5px;
+      padding: 3px;
+      vertical-align: bottom;
+      text-align: center;
     }
 
     .input-container {
@@ -42,11 +52,10 @@
     .settings-container {
       position: absolute;
       bottom: 0;
-      left: 0;
-      width: 100%;
-      padding: 10px;
-      box-sizing: border-box;
-      background-color: #000;
+      left: 5%;
+      right: 5%;
+      padding: 5px;
+      background-color: rgba(0, 0, 0, 0.8);
     }
 
     .canvas-container {
@@ -54,18 +63,23 @@
       text-align: center;
     }
 
+    .logo {
+      display: none;
+      width: 1.3em; 
+      height: 1.3em; 
+    }
+
     input[type=text] {
       display: block;
       box-sizing: border-box;
       width: 100%;
       background: rgba(255, 255, 255, 0.1);
-      border: 0;
-      border-bottom: 2px solid #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 10px;
       margin-bottom: 5px;
       border-radius: 2px;
       color: #fff;
-      font-size: 1.25em;
+      font-size: 1.00em;
       outline: none;
     }
 
@@ -75,7 +89,7 @@
 
     label {
       font-family: Lato;
-      font-size: 0.9em;
+      font-size: 0.75em;
       color: #fff;
       display: block;
     }
@@ -123,6 +137,7 @@
 
 <body>
   <div class="input-container">
+    <img src="logo.png" class="logo" />
     <h1>SmilesDrawer</h1>
     <input id="input" type="text" class="parser" placeholder="Enter a valid SMILES ..." />
     <div id="log">&nbsp;</div>
