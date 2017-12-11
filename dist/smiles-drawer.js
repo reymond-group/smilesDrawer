@@ -4400,7 +4400,8 @@ var Drawer = function () {
           }
         } else if (overlap.vertices.length === 1) {
           if (overlap.rings.length === 2) {
-            console.log(overlap);
+            // TODO: Implement for more overlap resolution
+            // console.log(overlap);
           }
         }
       }

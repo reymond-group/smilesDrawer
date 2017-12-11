@@ -10,6 +10,7 @@
     <body>
         <canvas id="example-canvas" width="500" height="500"></canvas>
         <div id="output"></div>
+        <textarea id="textbox"></textarea>
 
         <script src="../dist/smiles-drawer.js"></script>
         <script src="drugbank.js"></script>
@@ -18,7 +19,42 @@
         <script src="chembl.js"></script>
         <script src="fdb.js"></script>
         <script>
+            var parseQueryString = function(url) {
+                var urlParams = {};
+                url.replace(
+                    new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+                    function($0, $1, $2, $3) {
+                        urlParams[$1] = $3;
+                    }
+                );
+                
+                return urlParams;
+            }
+
             let options = { compactDrawing: true };
+            let set = drugbank;
+            let setName = 'drugbank'
+
+            let setNameQuery = parseQueryString(window.location.href).set;
+            if (setNameQuery) {
+                if (setNameQuery === 'drugbank') {
+                    set = drugbank;
+                    setName = 'drugbank';
+                } else if (setNameQuery === 'schembl') {
+                    set = schembl;
+                    setName = 'schembl';
+                } else if (setNameQuery === 'gdb17') {
+                    set = gdb17;
+                    setName = 'gdb17';
+                } else if (setNameQuery === 'chembl') {
+                    set = chembl;
+                    setName = 'chembl';
+                } else if (setNameQuery === 'fdb') {
+                    set = fdb;
+                    setName = 'fdb';
+                }
+            }
+
             
             // Initialize the drawer
             let smilesDrawer = new SmilesDrawer.Drawer(options);
@@ -29,20 +65,20 @@
             let str = 'depictor,set,parsetime,rendertime,overlap,rings,hac,bridged,smiles\n';
             
             let failed = '';
-            for (let i = 0; i < drugbank.length; i++) {                
+            for (let i = 0; i < set.length; i++) {                
                 let td = null;
                 let t2 = null;
                 let td2 = null;
                 let t = performance.now();
                 
-                SmilesDrawer.parse(drugbank[i], function(tree) {
+                SmilesDrawer.parse(set[i], function(tree) {
                     td = performance.now() - t;
                     t2 = performance.now();
                     smilesDrawer.draw(tree, 'example-canvas', 'light', false);
                     td2 = performance.now() - t2;
                 }, function(err) {
                     nErrors++;
-                    failed += drugbank[i] + '\n';
+                    failed += set[i] + '\n';
                 });
 
                 if (td2 === null) {
@@ -52,16 +88,15 @@
                 totalSpeed += td + td2;
                 totalOverlap += smilesDrawer.getTotalOverlapScore();
                 nSuccesses++;
-                str += 'SmilesDrawer,' + 'drugbank,' + td + ',' + 
+                str += 'SmilesDrawer,' + setName + td + ',' + 
                        td2 + ',' + 
                        smilesDrawer.getTotalOverlapScore() + ',' +
                        smilesDrawer.getRingCount() + ',' + 
                        smilesDrawer.getHeavyAtomCount() + ',' +
-                       smilesDrawer.hasBridgedRing() + ',' + drugbank[i] + '\n';
+                       smilesDrawer.hasBridgedRing() + ',' + set[i] + '\n';
             }
 
-            console.log(str);
-            // console.log(failed);
+            document.getElementById('textbox').value = str;
             
             console.log('Failed count: ' + nErrors);
             console.log('Success count: ' + nSuccesses);

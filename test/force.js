@@ -1,8 +1,10 @@
 let force = [
+    'CN[C@H](CC(C)C)C(=O)N[C@@H]1[C@H](O)C2=CC=C(OC3=C(O[C@@H]4O[C@H](CO)[C@@H](O)[C@H](O)[C@H]4O[C@H]4C[C@](C)(N)[C@H](O)[C@H](C)O4)C4=CC(=C3)[C@@H](NC(=O)[C@H](CC(N)=O)NC1=O)C(=O)N[C@@H]1C3=CC(=C(O)C=C3)C3=C(C=C(O)C=C3O)[C@H](NC(=O)[C@@H](NC1=O)[C@H](O)C1=CC=C(O4)C(Cl)=C1)C(O)=O)C(Cl)=C2',
+    'C[C@](O)(CC(O)=O)CC(=O)SCCNC(=O)CCNC(=O)[C@H](O)C(C)(C)COP(O)(=O)OP(O)(=O)OC[C@H]1O[C@H]([C@H](O)[C@@H]1OP(O)(O)=O)N1C=NC2=C(N)N=CN=C12',
     'O=C1C[C@@H]2OCC=C3CN4CC[C@@]56[C@@H]4C[C@@H]3[C@@H]2[C@@H]5N1C1=CC=CC=C61',
     '[C@@H]12N3C4=C([N]([Co+]567(N8C9=C(C%10=[N]5C([C@H]([C@]%10(C)CC(N)=O)CCC(N)=O)=CC5=[N]6C([C@H](C5(C)C)CCC(N)=O)=C(C5=[N]7[C@H]([C@@H]([C@@]5(C)CCC(=O)NCC(C)OP([O-])(=O)O[C@@H]([C@H]1O)[C@@H](CO)O2)CC(N)=O)[C@]8([C@@]([C@@H]9CCC(N)=O)(C)CC(N)=O)C)C)C)C)=C3)C=C(C(C)=C4)C',
     '[C@@H]12N3C4=C([N]([Co+]567(N8C9=C(C%10=[N]5C([C@H]([C@]%10(C)CC(N)=O)CCC(N)=O)=CC5=[N]6C([C@H](C5(C)C)CCC(N)=O)=C(C5=[N]7[C@H]([C@@H]([C@@]5(C)CCC(=O)NCC(C)OP([O-])(=O)O[C@@H]([C@H]1O)[C@@H](CO)O2)CC(N)=O)[C@]8([C@@]([C@@H]9CCC(N)=O)(C)CC(N)=O)C)C)C)C#N)=C3)C=C(C(C)=C4)C',
-    'C[C@@H](CNC(=O)CC[C@]1(C)[C@@H](CC(N)=O)[C@H]2[N]3=C1C(C)=C1[C@@H](CCC(N)=O)C(C)(C)C4=[N]1[Co+]31(C#N)N3C([C@@H](CCC(N)=O)[C@](C)(CC(N)=O)[C@]23C)=C(C)C2=[N]1C(=C4)[C@@H](CCC(N)=O)[C@]2(C)CC(N)=O)OP([O-])(=O)O[C@@H]1[C@@H](CO)O[C@@H]([C@@H]1O)N1C=NC2=C1C=C(C)C(C)=C2',
+    'C[C@H](CNC(=O)CC[C@]1(C)[C@@H](CC(N)=O)[C@H]2[N]3=C1C(C)=C1[C@@H](CCC(N)=O)C(C)(C)C4=[N]1[Co+]31(C#N)N3C([C@@H](CCC(N)=O)[C@](C)(CC(N)=O)[C@]23C)=C(C)C2=[N]1C(=C4)[C@@H](CCC(N)=O)[C@]2(C)CC(N)=O)OP([O-])(=O)O[C@@H]1[C@@H](CO)O[C@@H]([C@@H]1O)N1C=NC2=C1C=C(C)C(C)=C2',
     'CO[C@H]1[C@@H](C[C@@H]2CN3CCC4=C(NC5=C4C=CC(OC)=C5)[C@H]3C[C@@H]2[C@@H]1C(=O)OC)OC(=O)C1=CC(OC)=C(OC)C(OC)=C1',
     'CCCCC[C@@H](/C=C/[C@H]1[C@@H](CC(=O)[C@@H]1CCCCCCC(=O)O)O)O',
     'CCCCC/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O',
