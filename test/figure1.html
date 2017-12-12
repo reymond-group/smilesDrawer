@@ -12,24 +12,29 @@
     </head>
     <body>
         <script src="../dist/smiles-drawer.min.js"></script>
-        <script src="drugbank.js"></script>
+        <script src="force.js"></script>
         <script>
-            let options = {};
+            let options = { width: 4000, height: 4000, bondLength: 15, overlapResolutionIterations: 4 };
             
             // Initialize the drawer
             let smilesDrawer = new SmilesDrawer.Drawer(options);
             
-            for (let i = 0; i < 2000; i++) {
+            for (let i = 0; i < force.length; i++) {
                 try {
                     let canvas = document.createElement('canvas');
                     canvas.setAttribute('id', 'canvas' + i);
-                    canvas.setAttribute('width', '200');
-                    canvas.setAttribute('height', '200');
-                    canvas.setAttribute('alt', drugbank[i]);
+                    canvas.setAttribute('width', '100');
+                    canvas.setAttribute('height', '100');
+                    canvas.setAttribute('alt', force[i]);
                     document.body.appendChild(canvas);
                     
-                    SmilesDrawer.parse(drugbank[i], function(tree) {
+                    let t = performance.now();
+                    SmilesDrawer.parse(force[i], function(tree) {
                         smilesDrawer.draw(tree, 'canvas' + i, 'light', false);
+                        let td = performance.now() -t;
+                        let div = document.createElement('div');
+                        div.innerHTML = td;
+                        document.body.appendChild(div);
                     });
 
                     // if (td > 1000) console.log(schembl[i]);

@@ -20,7 +20,7 @@
     }
 
     body {
-      background: linear-gradient(330deg, #00323D, #004C42);
+      background: #eee;
       overflow-y: auto;
     }
 
@@ -30,7 +30,7 @@
       font-weight: 400;
       font-size: 2.0em;
       color: #50C5A9;
-      text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.25);
+      text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
 
       margin: 0;
       padding: 0;
@@ -57,7 +57,7 @@
       left: 5%;
       right: 5%;
       padding: 5px;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 1.0);
     }
 
     .canvas-container {
@@ -75,18 +75,18 @@
       display: block;
       box-sizing: border-box;
       width: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.15);
       padding: 10px;
       margin-bottom: 5px;
       border-radius: 2px;
-      color: #fff;
+      color: #000;
       font-size: 1.00em;
       outline: none;
     }
 
     input[type=text]::placeholder {
-      color: rgba(255, 255, 255, 0.25);
+      color: rgba(0, 0, 0, 0.25);
     }
 
     label {
@@ -214,7 +214,7 @@
       let t = performance.now();
 
       SmilesDrawer.parse(input.value, function (tree) {
-        smilesDrawer.draw(tree, 'output-canvas', 'dark', false);
+        smilesDrawer.draw(tree, 'output-canvas', 'light', false);
         let td = performance.now() - t;
         log.innerHTML = '&nbsp;';
         log.style.visibility = 'hidden';
