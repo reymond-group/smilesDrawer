@@ -20,7 +20,7 @@
     }
 
     body {
-      background: #eee;
+      background: linear-gradient(330deg, #ccc, #fff);
       overflow-y: auto;
     }
 
@@ -57,7 +57,7 @@
       left: 5%;
       right: 5%;
       padding: 5px;
-      background-color: rgba(0, 0, 0, 1.0);
+      background-color: rgba(255, 255, 255, 0.8);
     }
 
     .canvas-container {
@@ -92,7 +92,7 @@
     label {
       font-family: Lato;
       font-size: 0.75em;
-      color: #fff;
+      color: #000;
       display: block;
     }
 
@@ -110,7 +110,7 @@
       width: 100%;
       height: 2px;
       border-radius: 5px;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(0, 0, 0, 0.75);
       outline: none;
       -webkit-transition: .2s;
       transition: opacity .2s;
@@ -122,16 +122,16 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: #fff;
+      background: #000;
       cursor: pointer;
-      border: 4px solid #000;
+      border: 4px solid #fff;
     }
 
     .slider::-moz-range-thumb {
       width: 25px;
       height: 25px;
       border-radius: 50%;
-      background: #fff;
+      background: #000;
       cursor: pointer;
     }
   </style>
@@ -220,7 +220,7 @@
         log.style.visibility = 'hidden';
 
         new Noty({
-          text: 'Drawing took ' + td.toFixed(3),
+          text: 'Drawing took ' + td.toFixed(3) + 'ms with a total overlap score of ' + smilesDrawer.getTotalOverlapScore().toFixed(3) + '.',
           killer: true,
           timeout: 2000,
           animation: {

@@ -220,7 +220,7 @@
         log.style.visibility = 'hidden';
 
         new Noty({
-          text: 'Drawing took ' + td.toFixed(3),
+          text: 'Drawing took ' + td.toFixed(3) + 'ms with a total overlap score of ' + smilesDrawer.getTotalOverlapScore().toFixed(3) + '.',
           killer: true,
           timeout: 2000,
           animation: {
