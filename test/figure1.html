@@ -14,12 +14,12 @@
         <script src="../dist/smiles-drawer.min.js"></script>
         <script src="force.js"></script>
         <script>
-            let options = { width: 4000, height: 4000, bondLength: 15, overlapResolutionIterations: 4 };
+            let options = { width: 5000, height: 5000, bondLength: 15, overlapResolutionIterations: 4 };
             
             // Initialize the drawer
             let smilesDrawer = new SmilesDrawer.Drawer(options);
             
-            for (let i = 0; i < force.length; i++) {
+            for (let i = 0; i < 2; i++) {
                 try {
                     let canvas = document.createElement('canvas');
                     canvas.setAttribute('id', 'canvas' + i);
