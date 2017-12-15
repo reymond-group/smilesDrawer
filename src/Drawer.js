@@ -226,7 +226,7 @@ export default class Drawer {
 
                 let neighbourA = this.graph.vertices[neighboursB[0]];
                 let neighbourB = this.graph.vertices[neighboursB[1]];
-                
+
                 if (neighbourA.value.rings.length === 1 && neighbourB.value.rings.length === 1) {
                   // Both neighbours in same ring. TODO: does this create problems with wedges? (up = down and vice versa?)
                   if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
@@ -1897,7 +1897,7 @@ export default class Drawer {
           // Look for bonds coming out of joined rings to adjust the angle, an example is: C1=CC(=CC=C1)[C@]12SCCN1CC1=CC=CC=C21
           // where the angle has to be adjusted to account for fused ring
           let rings = Array();
-          
+
           for (var k = 0; k < vertex.value.rings.length; k++) {
             rings.push(vertex.value.rings[k]);
           }
@@ -1944,11 +1944,35 @@ export default class Drawer {
           this.rotateSubtree(a.id, overlap.common.id, 2.0 * angle, overlap.common.position);
           this.rotateSubtree(b.id, overlap.common.id, -2.0 * angle, overlap.common.position);
         }
-      } else if (overlap.vertices.length === 1) {
-        if (overlap.rings.length === 2) {
-          // TODO: Implement for more overlap resolution
-          // console.log(overlap);
+      } else if (overlap.vertices.length === 1 && overlap.rings.length === 2) {
+        let vertex = overlap.vertices[0];
+        let centerVertex = overlap.common;
+        let neighbours = centerVertex.getNeighbours(vertex.id);
+        let pos = new Vector2(0.0, 0.0);
+        
+        if (neighbours.length === 2) {
+          for (var j = 0; j < neighbours.length; j++) {
+            let v = this.graph.vertices[neighbours[j]];
+            pos.add(Vector2.subtract(v.position, centerVertex.position));
+          }
+
+          pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(centerVertex.position);
+        } else {
+          let visavis = null;
+
+          for (var j = 0; j < neighbours.length; j++) {
+            let v = this.graph.vertices[neighbours[j]];
+
+            if (ArrayHelper.containsAll(v.value.rings, centerVertex.value.rings)) {
+              visavis = v;
+              break;
+            }
+          }
+          
+          pos = Vector2.subtract(visavis.position, centerVertex.position).invert().add(centerVertex.position);
         }
+
+        this.rotateSubtree(vertex.id, centerVertex.id, vertex.position.getRotateToAngle(pos, centerVertex.position), centerVertex.position);
       }
     }
   }
@@ -2066,33 +2090,63 @@ export default class Drawer {
           vertex.positioned = true;
         }
       } else if (previousVertex.value.rings.length > 0) {
+        vertex.position = Vector2.subtract(previousVertex.position, this.originalRings[previousVertex.value.originalRings[0]].center)
+                          .normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+        vertex.previousPosition = previousVertex.position;
+        vertex.positioned = true;
+
+        // What to do with bridged rings?
+        
+      } else if (previousVertex.value.rings.length > 1) {
         let neighbours = previousVertex.neighbours;
         let joinedVertex = null;
         let pos = new Vector2(0.0, 0.0);
 
-        if (previousVertex.value.bridgedRing === null && previousVertex.value.rings.length > 1) {
-          for (var i = 0; i < neighbours.length; i++) {
-            let neighbour = this.graph.vertices[neighbours[i]];
-            if (ArrayHelper.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
-              joinedVertex = neighbour;
-              break;
-            }
-          }
-        }
-
-        if (joinedVertex === null) {
-          for (var i = 0; i < neighbours.length; i++) {
-            let v = this.graph.vertices[neighbours[i]];
-
-            if (v.positioned && this.areVerticesInSameRing(v, previousVertex)) {
-              pos.add(Vector2.subtract(v.position, previousVertex.position));
-            }
+        if (neighbours.length === 2) {
+          for (var j = 0; j < neighbours.length; j++) {
+            let v = this.graph.vertices[neighbours[j]];
+            pos.add(Vector2.subtract(v.position, previousVertex.position));
           }
 
           pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
         } else {
-          pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);
+          let visavis = null;
+
+          for (var j = 0; j < neighbours.length; j++) {
+            let v = this.graph.vertices[neighbours[j]];
+
+            if (ArrayHelper.containsAll(v.value.rings, previousVertex.value.rings)) {
+              visavis = v;
+              break;
+            }
+          }
+
+          pos = Vector2.subtract(visavis.position, previousVertex.position).invert().add(previousVertex.position);
         }
+
+        // if (previousVertex.value.bridgedRing === null && previousVertex.value.rings.length > 1) {
+        //   for (var i = 0; i < neighbours.length; i++) {
+        //     let neighbour = this.graph.vertices[neighbours[i]];
+        //     if (ArrayHelper.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
+        //       joinedVertex = neighbour;
+        //       break;
+        //     }
+        //   }
+        // }
+
+        // if (joinedVertex === null) {
+        //   for (var i = 0; i < neighbours.length; i++) {
+        //     let v = this.graph.vertices[neighbours[i]];
+
+        //     if (v.positioned && this.areVerticesInSameRing(v, previousVertex)) {
+        //       pos.add(Vector2.subtract(v.position, previousVertex.position));
+        //     }
+        //   }
+
+        //   pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+        // } else {
+        //   pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);
+        // }
 
         vertex.previousPosition = previousVertex.position;
         vertex.setPositionFromVector(pos);
@@ -2125,12 +2179,12 @@ export default class Drawer {
         let r = MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
         nextCenter.multiplyScalar(r);
         nextCenter.add(vertex.position);
-      
+
         this.createRing(nextRing, nextCenter, vertex);
       }
     } else if (vertex.value.rings.length > 0) {
       let nextRing = this.getRing(vertex.value.rings[0]);
-      
+
       if (!nextRing.positioned) {
         let nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
 
@@ -2141,7 +2195,7 @@ export default class Drawer {
 
         nextCenter.multiplyScalar(r);
         nextCenter.add(vertex.position);
-      
+
         this.createRing(nextRing, nextCenter, vertex);
       }
     } else {
@@ -2737,7 +2791,7 @@ export default class Drawer {
         wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
         wedgeOrder[j][1] = neighbours[order[j]];
       }
-      
+
 
       wedgeOrder.sort(function (a, b) {
         if (a[0] > b[0]) {
@@ -2753,9 +2807,9 @@ export default class Drawer {
         let wedgeId = wedgeOrder[0][1];
 
         if (vertex.value.hasHydrogen) {
-          this.graph.getEdge(vertex.id, wedgeId).wedge = wedgeB;          
+          this.graph.getEdge(vertex.id, wedgeId).wedge = wedgeB;
         } else {
-          let wedge = wedgeB;          
+          let wedge = wedgeB;
 
           for (var j = order.length - 1; j >= 0; j--) {
             if (wedge === wedgeA) {

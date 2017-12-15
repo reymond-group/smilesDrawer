@@ -316,15 +316,13 @@ export default class ArrayHelper {
      */
     static containsAll(arrA, arrB) {
         let containing = 0;
-        for (let i = 0; i < arrA.length; i++) {
-            for (let j = 0; j < arrB.length; j++) {
-                if (arrA[i] === arrB[j]) {
-                    containing++;
-                }
+        for (let i = 0; i < arrB.length; i++) {
+            if (arrA.indexOf(arrB[i]) === -1) {
+                return false;
             }
         }
 
-        return containing === arrB.length;
+        return true
     }
     
     /**

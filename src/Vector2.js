@@ -82,7 +82,7 @@ export default class Vector2 {
 
         return this;
     }
-    
+
     /**
      * Multiply the x and y coordinate values of this vector by the values of another vector.
      *
@@ -159,7 +159,7 @@ export default class Vector2 {
     clockwise(vec) {
         let a = this.y * vec.x;
         let b = this.x * vec.y;
-        
+
         if (a > b) {
             return -1;
         }
@@ -180,7 +180,7 @@ export default class Vector2 {
     relativeClockwise(center, vec) {
         let a = (this.y - center.y) * (vec.x - center.x);
         let b = (this.x - center.x) * (vec.y - center.y);
-        
+
         if (a > b) {
             return -1;
         }
@@ -204,7 +204,7 @@ export default class Vector2 {
 
         tmp.x = this.x * cosAngle - this.y * sinAngle;
         tmp.y = this.x * sinAngle + this.y * cosAngle;
-        
+
         this.x = tmp.x;
         this.y = tmp.y;
 
@@ -265,9 +265,9 @@ export default class Vector2 {
      */
     rotateAwayFrom(vec, center, angle) {
         this.rotateAround(angle, center);
-        
+
         let distSqA = this.distanceSq(vec);
-        
+
         this.rotateAround(-2.0 * angle, center);
 
         let distSqB = this.distanceSq(vec);
@@ -290,9 +290,9 @@ export default class Vector2 {
         let tmp = this.clone();
 
         tmp.rotateAround(angle, center);
-        
+
         let distSqA = tmp.distanceSq(vec);
-        
+
         tmp.rotateAround(-2.0 * angle, center);
 
         let distSqB = tmp.distanceSq(vec);
@@ -316,9 +316,9 @@ export default class Vector2 {
         let tmp = this.clone();
 
         tmp.rotateAround(angle, center);
-        
+
         let distSqA = tmp.distanceSq(vec);
-        
+
         tmp.rotateAround(-2.0 * angle, center);
 
         let distSqB = tmp.distanceSq(vec);
@@ -340,8 +340,8 @@ export default class Vector2 {
     getRotateToAngle(vec, center) {
         let a = Vector2.subtract(this, center);
         let b = Vector2.subtract(vec, center);
-        let angle = Vector2.angle(b, a);
-        
+        let angle = -Vector2.signedAngle(b, a);
+
         return Number.isNaN(angle) ? 0.0 : angle;
     }
 
@@ -358,7 +358,7 @@ export default class Vector2 {
         for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
             if (((polygon[i].y > this.y) != (polygon[j].y > this.y)) &&
                 (this.x < (polygon[j].x - polygon[i].x) * (this.y - polygon[i].y) /
-                (polygon[j].y - polygon[i].y) + polygon[i].x)) {
+                    (polygon[j].y - polygon[i].y) + polygon[i].x)) {
                 inside = !inside;
             }
         }
@@ -534,7 +534,7 @@ export default class Vector2 {
      * @returns {Vector2} The fraction of the two vectors.
      */
     static divide(vecA, vecB) {
-      return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
+        return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
     }
 
     /**
@@ -576,6 +576,18 @@ export default class Vector2 {
     }
 
     /**
+     * Returns the signed angle between two vectors.
+     *
+     * @static
+     * @param {Vector2} vecA A vector.
+     * @param {Vector2} vecB A vector.
+     * @returns {Number} The signed angle between two vectors in radians.
+     */
+    static signedAngle(vecA, vecB) {
+        return Math.atan2(vecB.y, vecB.x) - Math.atan2(vecA.y, vecA.x);        
+    }
+
+    /**
      * Returns the angle between two vectors based on a third vector in between.
      *
      * @static
@@ -592,7 +604,7 @@ export default class Vector2 {
 
         return Math.acos(Vector2.dot(ab, bc) / (abLength * bcLength));
     }
-    
+
     /**
      * Returns the scalar projection of a vector on another vector.
      *
@@ -603,23 +615,23 @@ export default class Vector2 {
      */
     static scalarProjection(vecA, vecB) {
         let unit = vecB.normalized();
-        
+
         return Vector2.dot(vecA, unit);
     }
 
-     /**
-     * Returns the average vector (normalized) of the input vectors.
-     *
-     * @static
-     * @param {Array} vecs An array containing vectors.
-     * @returns {Vector2} The resulting vector (normalized).
-     */
+    /**
+    * Returns the average vector (normalized) of the input vectors.
+    *
+    * @static
+    * @param {Array} vecs An array containing vectors.
+    * @returns {Vector2} The resulting vector (normalized).
+    */
     static averageDirection(vecs) {
         let avg = new Vector2(0.0, 0.0);
 
         for (var i = 0; i < vecs.length; i++) {
-          let vec = vecs[i];
-          avg.add(vec);
+            let vec = vecs[i];
+            avg.add(vec);
         }
 
         return avg.normalize();

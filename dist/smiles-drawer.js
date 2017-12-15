@@ -509,15 +509,13 @@ var ArrayHelper = function () {
         key: 'containsAll',
         value: function containsAll(arrA, arrB) {
             var containing = 0;
-            for (var i = 0; i < arrA.length; i++) {
-                for (var j = 0; j < arrB.length; j++) {
-                    if (arrA[i] === arrB[j]) {
-                        containing++;
-                    }
+            for (var i = 0; i < arrB.length; i++) {
+                if (arrA.indexOf(arrB[i]) === -1) {
+                    return false;
                 }
             }
 
-            return containing === arrB.length;
+            return true;
         }
 
         /**
@@ -2272,17 +2270,17 @@ var Drawer = function () {
     this.defaultOptions = {
       width: 500,
       height: 500,
-      bondThickness: 0.6, // TODO: Add to doc
+      bondThickness: 0.6,
       bondLength: 15,
       shortBondLength: 0.85,
-      bondSpacing: 0.18 * 14.4,
+      bondSpacing: 0.18 * 15,
       atomVisualization: 'default',
       isomeric: true,
       debug: false,
       terminalCarbons: false,
-      explicitHydrogens: false, // TODO: Add to doc
-      overlapSensitivity: 0.42, // TODO: Add to doc
-      overlapResolutionIterations: 1, // TODO: Add to doc
+      explicitHydrogens: false,
+      overlapSensitivity: 0.42,
+      overlapResolutionIterations: 1,
       compactDrawing: true,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
@@ -4398,11 +4396,35 @@ var Drawer = function () {
             this.rotateSubtree(a.id, overlap.common.id, 2.0 * angle, overlap.common.position);
             this.rotateSubtree(b.id, overlap.common.id, -2.0 * angle, overlap.common.position);
           }
-        } else if (overlap.vertices.length === 1) {
-          if (overlap.rings.length === 2) {
-            // TODO: Implement for more overlap resolution
-            // console.log(overlap);
+        } else if (overlap.vertices.length === 1 && overlap.rings.length === 2) {
+          var _vertex4 = overlap.vertices[0];
+          var centerVertex = overlap.common;
+          var neighbours = centerVertex.getNeighbours(_vertex4.id);
+          var pos = new _Vector2.default(0.0, 0.0);
+
+          if (neighbours.length === 2) {
+            for (var j = 0; j < neighbours.length; j++) {
+              var v = this.graph.vertices[neighbours[j]];
+              pos.add(_Vector2.default.subtract(v.position, centerVertex.position));
+            }
+
+            pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(centerVertex.position);
+          } else {
+            var visavis = null;
+
+            for (var j = 0; j < neighbours.length; j++) {
+              var _v2 = this.graph.vertices[neighbours[j]];
+
+              if (_ArrayHelper2.default.containsAll(_v2.value.rings, centerVertex.value.rings)) {
+                visavis = _v2;
+                break;
+              }
+            }
+
+            pos = _Vector2.default.subtract(visavis.position, centerVertex.position).invert().add(centerVertex.position);
           }
+
+          this.rotateSubtree(_vertex4.id, centerVertex.id, _vertex4.position.getRotateToAngle(pos, centerVertex.position), centerVertex.position);
         }
       }
     }
@@ -4534,33 +4556,59 @@ var Drawer = function () {
             vertex.positioned = true;
           }
         } else if (previousVertex.value.rings.length > 0) {
+          vertex.position = _Vector2.default.subtract(previousVertex.position, this.originalRings[previousVertex.value.originalRings[0]].center).normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+          vertex.previousPosition = previousVertex.position;
+          vertex.positioned = true;
+        } else if (previousVertex.value.rings.length > 1) {
           var neighbours = previousVertex.neighbours;
           var joinedVertex = null;
           var pos = new _Vector2.default(0.0, 0.0);
 
-          if (previousVertex.value.bridgedRing === null && previousVertex.value.rings.length > 1) {
-            for (var i = 0; i < neighbours.length; i++) {
-              var neighbour = this.graph.vertices[neighbours[i]];
-              if (_ArrayHelper2.default.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
-                joinedVertex = neighbour;
-                break;
-              }
-            }
-          }
-
-          if (joinedVertex === null) {
-            for (var i = 0; i < neighbours.length; i++) {
-              var v = this.graph.vertices[neighbours[i]];
-
-              if (v.positioned && this.areVerticesInSameRing(v, previousVertex)) {
-                pos.add(_Vector2.default.subtract(v.position, previousVertex.position));
-              }
+          if (neighbours.length === 2) {
+            for (var j = 0; j < neighbours.length; j++) {
+              var v = this.graph.vertices[neighbours[j]];
+              pos.add(_Vector2.default.subtract(v.position, previousVertex.position));
             }
 
             pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
           } else {
-            pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);
+            var visavis = null;
+
+            for (var j = 0; j < neighbours.length; j++) {
+              var _v3 = this.graph.vertices[neighbours[j]];
+
+              if (_ArrayHelper2.default.containsAll(_v3.value.rings, previousVertex.value.rings)) {
+                visavis = _v3;
+                break;
+              }
+            }
+
+            pos = _Vector2.default.subtract(visavis.position, previousVertex.position).invert().add(previousVertex.position);
           }
+
+          // if (previousVertex.value.bridgedRing === null && previousVertex.value.rings.length > 1) {
+          //   for (var i = 0; i < neighbours.length; i++) {
+          //     let neighbour = this.graph.vertices[neighbours[i]];
+          //     if (ArrayHelper.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
+          //       joinedVertex = neighbour;
+          //       break;
+          //     }
+          //   }
+          // }
+
+          // if (joinedVertex === null) {
+          //   for (var i = 0; i < neighbours.length; i++) {
+          //     let v = this.graph.vertices[neighbours[i]];
+
+          //     if (v.positioned && this.areVerticesInSameRing(v, previousVertex)) {
+          //       pos.add(Vector2.subtract(v.position, previousVertex.position));
+          //     }
+          //   }
+
+          //   pos.invert().normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
+          // } else {
+          //   pos = joinedVertex.position.clone().rotateAround(Math.PI, previousVertex.position);
+          // }
 
           vertex.previousPosition = previousVertex.position;
           vertex.setPositionFromVector(pos);
@@ -4568,12 +4616,12 @@ var Drawer = function () {
         } else {
           // If the previous vertex was not part of a ring, draw a bond based
           // on the global angle of the previous bond
-          var _v2 = new _Vector2.default(this.opts.bondLength, 0);
+          var _v4 = new _Vector2.default(this.opts.bondLength, 0);
 
-          _v2.rotate(angle);
-          _v2.add(previousVertex.position);
+          _v4.rotate(angle);
+          _v4.add(previousVertex.position);
 
-          vertex.setPositionFromVector(_v2);
+          vertex.setPositionFromVector(_v4);
           vertex.previousPosition = previousVertex.position;
           vertex.positioned = true;
         }
@@ -4688,8 +4736,8 @@ var Drawer = function () {
                 a = 1.0472;
               }
             } else if (!a) {
-              var _v3 = this.getLastVertexWithAngle(vertex.id);
-              a = _v3.angle;
+              var _v5 = this.getLastVertexWithAngle(vertex.id);
+              a = _v5.angle;
 
               if (!a) {
                 a = 1.0472;
@@ -5406,15 +5454,15 @@ var Drawer = function () {
 
       // The second pass
       for (var i = 0; i < this.graph.vertices.length; i++) {
-        var _vertex4 = this.graph.vertices[i];
-        var atom = _vertex4.value;
+        var _vertex5 = this.graph.vertices[i];
+        var atom = _vertex5.value;
         var element = atom.element;
 
         if (element === 'C' || element === 'H' || !atom.isDrawn) {
           continue;
         }
 
-        var _neighbourIds = _vertex4.neighbours;
+        var _neighbourIds = _vertex5.neighbours;
         var _neighbours2 = Array(_neighbourIds.length);
 
         for (var j = 0; j < _neighbourIds.length; j++) {
@@ -5432,7 +5480,7 @@ var Drawer = function () {
 
           if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
             _neighbour3.isDrawn = false;
-            _vertex4.value.attachPseudoElement('Ac', '', 0);
+            _vertex5.value.attachPseudoElement('Ac', '', 0);
           }
         }
       }
@@ -10675,7 +10723,7 @@ var Vector2 = function () {
         value: function getRotateToAngle(vec, center) {
             var a = Vector2.subtract(this, center);
             var b = Vector2.subtract(vec, center);
-            var angle = Vector2.angle(b, a);
+            var angle = -Vector2.signedAngle(b, a);
 
             return Number.isNaN(angle) ? 0.0 : angle;
         }
@@ -10953,6 +11001,21 @@ var Vector2 = function () {
             var dot = Vector2.dot(vecA, vecB);
 
             return Math.acos(dot / (vecA.length() * vecB.length()));
+        }
+
+        /**
+         * Returns the signed angle between two vectors.
+         *
+         * @static
+         * @param {Vector2} vecA A vector.
+         * @param {Vector2} vecB A vector.
+         * @returns {Number} The signed angle between two vectors in radians.
+         */
+
+    }, {
+        key: 'signedAngle',
+        value: function signedAngle(vecA, vecB) {
+            return Math.atan2(vecB.y, vecB.x) - Math.atan2(vecA.y, vecA.x);
         }
 
         /**

@@ -714,6 +714,9 @@ the involved atoms not to be displayed.</p>
 <dt><a href="#angle">angle(vecA, vecB)</a> ⇒ <code>Number</code></dt>
 <dd><p>Returns the angle between two vectors.</p>
 </dd>
+<dt><a href="#signedAngle">signedAngle(vecA, vecB)</a> ⇒ <code>Number</code></dt>
+<dd><p>Returns the signed angle between two vectors.</p>
+</dd>
 <dt><a href="#threePointangle">threePointangle(vecA, vecB, vecC)</a> ⇒ <code>Number</code></dt>
 <dd><p>Returns the angle between two vectors based on a third vector in between.</p>
 </dd>
@@ -3346,6 +3349,19 @@ Returns the angle between two vectors.
 
 **Kind**: global function  
 **Returns**: <code>Number</code> - The angle between two vectors in radians.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| vecA | <code>Vector2</code> | A vector. |
+| vecB | <code>Vector2</code> | A vector. |
+
+<a name="signedAngle"></a>
+
+## signedAngle(vecA, vecB) ⇒ <code>Number</code>
+Returns the signed angle between two vectors.
+
+**Kind**: global function  
+**Returns**: <code>Number</code> - The signed angle between two vectors in radians.  
 
 | Param | Type | Description |
 | --- | --- | --- |
