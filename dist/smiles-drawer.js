@@ -4559,6 +4559,8 @@ var Drawer = function () {
           vertex.position = _Vector2.default.subtract(previousVertex.position, this.originalRings[previousVertex.value.originalRings[0]].center).normalize().multiplyScalar(this.opts.bondLength).add(previousVertex.position);
           vertex.previousPosition = previousVertex.position;
           vertex.positioned = true;
+
+          // What to do with bridged rings?
         } else if (previousVertex.value.rings.length > 1) {
           var neighbours = previousVertex.neighbours;
           var joinedVertex = null;
