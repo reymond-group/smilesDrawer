@@ -1,6 +1,25 @@
 ![Smiles Drawer](https://github.com/reymond-group/smilesDrawer/blob/master/logo.png?raw=true)
 # Smiles Drawer
-Current Version: 1.0.0 Beta ([Ballroom Blitz](https://www.youtube.com/watch?v=ewFBuYHldeY))
+Current Version: 1.0.x ([Ballroom Blitz](https://www.youtube.com/watch?v=ewFBuYHldeY))
+
+If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: [10.1021/acs.jcim.7b00425](http://dx.doi.org/10.1021/acs.jcim.7b00425)
+
+<img src="http://doc.gdb.tools/smilesDrawer/structures.png"></img>
+
+### Examples
+An example using the light theme can be found [here](http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html), while one using the dark theme can be found [here](http://doc.gdb.tools/smilesDrawer/sd/example/index.html) . The colors of SmilesDrawer are completely configurable.
+
+### "Installation"
+SmilesDrawer is available from the unpkg content delivery network:
+```
+https://unpkg.com/smiles-drawer@1.0.2/dist/smiles-drawer.min.js
+```
+You can easily get smiles-drawer using yarn:
+```
+yarn add smiles-drawer
+```
+or you can just download the files from here.
+
 ### Building Smiles Drawer
 If you decide not to use the ready-to-go scripts in `dist`, you can (edit and) build the project by running:
 ```bash
@@ -27,13 +46,13 @@ In order to have nice consistent font rendering you have to include the droid sa
         <input id="example-input" name="example-input" />
         <canvas id="example-canvas" width="500" height="500"></canvas>
 
-        <script src="/dist/smiles-drawer.min.js"></script>
+        <script src="https://unpkg.com/smiles-drawer@1.0.2/dist/smiles-drawer.min.js"></script>
         <script>
             let input = document.getElementById('example-input');
             let options = {};
             
             // Initialize the drawer
-            let smilesDrawer = new SmilesDrawer(options);
+            let smilesDrawer = new SmilesDrawer.Drawer(options);
             
             input.addEventListener('input', function() {
                 // Clean the input (remove unrecognized characters, such as spaces and tabs) and parse it
