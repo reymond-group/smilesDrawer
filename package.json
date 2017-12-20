@@ -1,50 +1,10 @@
 {
   "name": "smiles-drawer",
-  "version": "1.0.0",
-  "description": "A SMILES parser and drawer.",
-  "main": "gulpfile.js",
-  "directories": {
-    "example": "example"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/daenuprobst/smilesDrawer.git"
-  },
-  "author": "Daniel Probst, Reymond Group, University of Bern",
+  "version": "1.0.1",
+  "description": "A SMILES drawer and parser. Generate molecular structure depictions in pure JavaScript.",
+  "main": "./dist/smiles-drawer.js",
+  "repository": "https://github.com/reymond-group/smilesDrawer.git",
+  "author": "Daniel Probst, Reymond Group, University of Berne",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/daenuprobst/smilesDrawer/issues"
-  },
-  "homepage": "https://github.com/daenuprobst/smilesDrawer#readme",
-  "dependencies": {
-    "babelify": "^8.0.0",
-    "browserify": "^14.5.0",
-    "gulp-browserify": "^0.5.1",
-    "gulp-exit": "0.0.2",
-    "gulp-sourcemaps": "^2.6.1",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.9.0"
-  },
-  "devDependencies": {
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-es2016": "^6.24.1",
-    "babel-preset-modern-browsers": "^9.0.2",
-    "babili": "0.0.12",
-    "docdash": "^0.4.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-babel-minify": "^0.2.0",
-    "gulp-babili": "0.0.2",
-    "gulp-concat": "^2.6.1",
-    "gulp-jsdoc-to-markdown": "^1.2.2",
-    "gulp-jsdoc3": "^1.0.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^2.0.1",
-    "gulp-util": "^3.0.8",
-    "webpack-stream": "^3.2.0"
-  }
+  "private": false
 }
