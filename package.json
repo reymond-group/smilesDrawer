@@ -1,6 +1,6 @@
 {
   "name": "smiles-drawer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A SMILES drawer and parser. Generate molecular structure depictions in pure JavaScript.",
   "main": "./dist/smiles-drawer.js",
   "repository": "https://github.com/reymond-group/smilesDrawer.git",
