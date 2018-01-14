@@ -103,6 +103,8 @@
             console.log('Success rate: ' + (nSuccesses / fdb.length));
             console.log('Avg speed: ' + totalSpeed / nSuccesses);
             console.log('Avg overlap: ' + totalOverlap / nSuccesses);
+            console.log('Failed:');
+            console.log(failed);
 
             document.getElementById('output').innerHTML += 'Failed count: ' + nErrors + '<br />' +
               'Success count: ' + nSuccesses + '<br />' +
