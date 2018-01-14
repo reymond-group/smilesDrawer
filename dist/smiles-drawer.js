@@ -2272,17 +2272,17 @@ var Drawer = function () {
     this.defaultOptions = {
       width: 500,
       height: 500,
-      bondThickness: 0.6, // TODO: Add to doc
+      bondThickness: 0.6,
       bondLength: 15,
       shortBondLength: 0.85,
-      bondSpacing: 0.18 * 14.4,
+      bondSpacing: 0.18 * 15,
       atomVisualization: 'default',
       isomeric: true,
       debug: false,
       terminalCarbons: false,
-      explicitHydrogens: false, // TODO: Add to doc
-      overlapSensitivity: 0.42, // TODO: Add to doc
-      overlapResolutionIterations: 1, // TODO: Add to doc
+      explicitHydrogens: false,
+      overlapSensitivity: 0.42,
+      overlapResolutionIterations: 1,
       compactDrawing: true,
       fontSizeLarge: 5,
       fontSizeSmall: 3,

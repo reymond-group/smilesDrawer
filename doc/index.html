@@ -47,7 +47,21 @@
 
     <section class="readme">
         <article><p><img src="https://github.com/reymond-group/smilesDrawer/blob/master/logo.png?raw=true" alt="Smiles Drawer"></p>
-<h1>Smiles Drawer</h1><p>Current Version: 1.0.0 Beta (<a href="https://www.youtube.com/watch?v=ewFBuYHldeY">Ballroom Blitz</a>)</p>
+<h1>Smiles Drawer</h1><p>Current Version: 1.0.x (<a href="https://www.youtube.com/watch?v=ewFBuYHldeY">Ballroom Blitz</a>)</p>
+<p>If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: <a href="http://dx.doi.org/10.1021/acs.jcim.7b00425">10.1021/acs.jcim.7b00425</a></p>
+<p><img src="http://doc.gdb.tools/smilesDrawer/structures.png"></img></p>
+<h3>Examples</h3><p>An example using the light theme can be found <a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html">here</a>, while one using the dark theme can be found <a href="http://doc.gdb.tools/smilesDrawer/sd/example/index.html">here</a> . The colors of SmilesDrawer are completely configurable.</p>
+<p>Examples showing molecules from different databases:</p>
+<ul>
+<li><a href="http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=drugbank">Drugbank</a></li>
+<li><a href="http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=gdb17">GDB-17</a></li>
+<li><a href="http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=fdb">FDB-17</a></li>
+<li><a href="http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=schembl">SureChEMBL</a></li>
+<li><a href="http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=chembl">ChEMBL</a></li>
+</ul>
+<h3>&quot;Installation&quot;</h3><p>SmilesDrawer is available from the unpkg content delivery network:</p>
+<pre class="prettyprint source"><code>https://unpkg.com/smiles-drawer@1.0.2/dist/smiles-drawer.min.js</code></pre><p>You can easily get smiles-drawer using yarn:</p>
+<pre class="prettyprint source"><code>yarn add smiles-drawer</code></pre><p>or you can just download the files from here.</p>
 <h3>Building Smiles Drawer</h3><p>If you decide not to use the ready-to-go scripts in <code>dist</code>, you can (edit and) build the project by running:</p>
 <pre class="prettyprint source lang-bash"><code>npm install
 gulp</code></pre><h3>Getting Started</h3><p>To get a simple input box which lets the user enter a SMILES and then display it in a canvas, the following minimal example is sufficient.
@@ -67,13 +81,13 @@ In order to have nice consistent font rendering you have to include the droid sa
         &lt;input id=&quot;example-input&quot; name=&quot;example-input&quot; />
         &lt;canvas id=&quot;example-canvas&quot; width=&quot;500&quot; height=&quot;500&quot;>&lt;/canvas>
 
-        &lt;script src=&quot;/dist/smiles-drawer.min.js&quot;>&lt;/script>
+        &lt;script src=&quot;https://unpkg.com/smiles-drawer@1.0.2/dist/smiles-drawer.min.js&quot;>&lt;/script>
         &lt;script>
             let input = document.getElementById('example-input');
             let options = {};
 
             // Initialize the drawer
-            let smilesDrawer = new SmilesDrawer(options);
+            let smilesDrawer = new SmilesDrawer.Drawer(options);
 
             input.addEventListener('input', function() {
                 // Clean the input (remove unrecognized characters, such as spaces and tabs) and parse it
@@ -99,22 +113,40 @@ let smilesDrawer = new SmilesDrawer(options);</code></pre><p>The following optio
 </thead>
 <tbody>
 <tr>
+<td>Drawing width</td>
+<td>width</td>
+<td>number</td>
+<td>500</td>
+</tr>
+<tr>
+<td>Drawing height</td>
+<td>height</td>
+<td>number</td>
+<td>500</td>
+</tr>
+<tr>
+<td>Bond thickness</td>
+<td>bondThickness</td>
+<td>number</td>
+<td>0.6</td>
+</tr>
+<tr>
 <td>Bond length</td>
 <td>bondLength</td>
 <td>number</td>
-<td>16</td>
+<td>15</td>
 </tr>
 <tr>
-<td>Short bond length (e.g. double bonds in rings)</td>
+<td>Short bond length (e.g. double bonds) in percent of bond length</td>
 <td>shortBondLength</td>
 <td>number</td>
-<td>9</td>
+<td>0.85</td>
 </tr>
 <tr>
 <td>Bond spacing (e.g. space between double bonds)</td>
 <td>bondSpacing</td>
 <td>number</td>
-<td>4</td>
+<td>0.18 * 15</td>
 </tr>
 <tr>
 <td>Atom Visualization</td>
@@ -141,22 +173,34 @@ let smilesDrawer = new SmilesDrawer(options);</code></pre><p>The following optio
 <td>false</td>
 </tr>
 <tr>
+<td>Show explicit hydrogens</td>
+<td>explicitHydrogens</td>
+<td>boolean</td>
+<td>false</td>
+</tr>
+<tr>
+<td>Overlap sensitivity</td>
+<td>overlapSensitivity</td>
+<td>number</td>
+<td>0.42</td>
+</tr>
+<tr>
+<td># of overlap resolution iterations</td>
+<td>overlapResolutionIterations</td>
+<td>number</td>
+<td>1</td>
+</tr>
+<tr>
 <td>Draw concatenated terminals and pseudo elements</td>
-<td>drawCompact</td>
+<td>compactDrawing</td>
 <td>boolean</td>
 <td>true</td>
 </tr>
 <tr>
-<td>Allow Flips (flipping hydrogens etc. inside a ring)</td>
-<td>allowFlips</td>
-<td>boolean</td>
-<td>false</td>
-</tr>
-<tr>
-<td>Isometric (EXPERIMENTAL)</td>
+<td>Draw isometric SMILES if available</td>
 <td>isometric</td>
 <td>boolean</td>
-<td>false</td>
+<td>true</td>
 </tr>
 <tr>
 <td>Debug (draw debug information to canvas)</td>
@@ -174,17 +218,22 @@ let smilesDrawer = new SmilesDrawer(options);</code></pre><p>The following optio
 </table>
 <p>The default options are defined as follows:</p>
 <pre class="prettyprint source lang-javascript"><code>{
-    bondLength: 16,
-    shortBondLength: 9,
-    bondSpacing: 4,
+    width: 500,
+    height: 500,
+    bondThickness: 0.6,
+    bondLength: 15,
+    shortBondLength: 0.85,
+    bondSpacing: 0.18 * 15,
     atomVisualization: 'default',
-    terminalCarbons: false,
-    compactDrawing: true,
-    fontSizeLarge: 6,
-    fontSizeSmall: 4,
-    allowFlips: false,
-    isomeric: false,
+    isomeric: true,
     debug: false,
+    terminalCarbons: false,
+    explicitHydrogens: false,
+    overlapSensitivity: 0.42,
+    overlapResolutionIterations: 1,
+    compactDrawing: true,
+    fontSizeLarge: 5,
+    fontSizeSmall: 3,
     themes: {
         dark: {
             C: '#fff',
@@ -217,7 +266,14 @@ let smilesDrawer = new SmilesDrawer(options);</code></pre><p>The following optio
             BACKGROUND: '#fff'
         }
     }
-};</code></pre><h3>Bridged Rings</h3><p>Bridged rings are positioned using the Kamada–Kawai algorithm. If there is a bridged ring in the molecule, explicitly defined aromatic rings are not drawn with a circle inside the ring, but with dashed gray lines where double bonds would be.</p>
+};</code></pre><h3>Usage</h3><p>An instance of SmilesDrawer is able to draw to multiple targets. Initialize SmilesDrawer once for each set of options (you would initialize two different objects if you were to draw in two different sizes).</p>
+<pre class="prettyprint source lang-javascript"><code>let smilesDrawer = new SmilesDrawer.Drawer({ width: 250, height: 250 });</code></pre><p>In order to depict a SMILES string it has to be parsed using SmilesDrawer's SMILES parser, which is encapsulated in the static function <code>SmilesDrawer.parse()</code> where the first argument is the SMILES string and the second argument a callback for a successfull parsing. The third argument provides a way to handle errors using a callback.</p>
+<pre class="prettyprint source lang-javascript"><code>SmilesDrawer.parse('C1CCCCC1', function (tree) {
+    smilesDrawer.draw(tree, 'output-canvas', 'light', false);
+}, function (err) {
+    console.log(err);
+}</code></pre><p>The function <code>smilesDrawer.draw()</code> requires two and accepts up to four arguments. The first argument is the parse tree returned by the parse function (through the callback), the second is the <code>id</code> of a HTML canvas element on which the structure will be drawn. The two optional arguments are whether to use the light or dark theme (defaults to <code>'light'</code>) and whether to only compute properties such as ring count, hac, etc. and not depict the structure (defaults to <code>false</code>).</p>
+<h3>Bridged Rings</h3><p>Bridged rings are positioned using the Kamada–Kawai algorithm. If there is a bridged ring in the molecule, explicitly defined aromatic rings are not drawn with a circle inside the ring, but with dashed gray lines where double bonds would be.</p>
 <h3><a href="/doc/all.md">Documentation</a></h3><p>The documentation can be found in the docs folder. A markdown version is available <a href="/doc/all.md">here</a>.</p></article>
     </section>
 
@@ -231,7 +287,7 @@ let smilesDrawer = new SmilesDrawer(options);</code></pre><p>The following optio
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Dec 12 2017 13:40:31 GMT+0100 (W. Europe Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 14 2018 13:52:41 GMT+0100 (W. Europe Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
