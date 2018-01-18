@@ -80,8 +80,32 @@ wildcard = w:('*') {
     return w;
 }
 
-elementsymbol = e:([A-Z][a-z]?) {
-    return e.join('');
+elementsymbol = e:('Ac' / 'Ag' / 'Al' / 'Am' / 'Ar' / 'As' / 'At' / 'Au' /
+'B'[aehikr]? /
+'C'[adeflmnorsu]? /
+'Db' / 'Ds' / 'Dy' /
+'Er' / 'Es' / 'Eu' /
+'F'[elmr]? /
+'Ga' / 'Ge' / 'Gd' / 'Ge' /
+'H'[efgos]? /
+'I'[nr]? /
+'K'[r]? /
+'La' / 'Li' / 'Lr' / 'Lu' / 'Lv' /
+'Mc' / 'Md' / 'Mg' / 'Mn' / 'Mo' / 'Mt' /
+'N'[abdehiop]? /
+'O'[gs]? /
+'P'[abdmortu]? /
+'Ra' / 'Rb' / 'Re' / 'Rf' / 'Rg' / 'Rh' / 'Rn' / 'Ru' /
+'S'[bcegimnr]? /
+'Ta' / 'Tb' / 'Tc' / 'Te' / 'Th' / 'Ti' / 'Tl' / 'Tm' / 'Ts' /
+'U' /
+'V' /
+'W' /
+'Xe' /
+'Y''b'? /
+'Zn' / 'Zr') {
+	if(Array.isArray(e)) return e.join('');
+    return e;
 }
 
 ring = r:('%'[1-9][0-9] / [0-9]) {
