@@ -1,3 +1,10 @@
+start = s:chain whitespace* x:('|' [a-z]i* '|')?{
+	if (x.join) {
+		s.extended = x[1].join('')
+    }
+	return s;
+}
+
 chain = s:(atom branch* (bond? ring)* branch* bond? chain? branch*) {
     var branches = [];
     var rings = [];
@@ -55,16 +62,19 @@ bond = b:([-=#$:/\\.]) {
     return b;
 }
 
-bracketatom = b:('[' isotope? ('se' / 'as' / aromaticsymbol / elementsymbol / wildcard) chiral?
-                     hcount? charge? class? ']') {
+bracketatom = '[' b:bracketcontent ']' {
     return {
-        'isotope': b[1],
-        'element': b[2],
-        'chirality': b[3],
-        'hcount': b[4],
-        'charge': b[5],
-        'class': b[6]
+        'isotope': b[0],
+        'element': b[1],
+        'chirality': b[2],
+        'hcount': b[3],
+        'charge': b[4],
+        'class': b[5]
     }
+}
+
+bracketcontent = b:(isotope? ('se' / 'as' / aromaticsymbol / elementsymbol / wildcard) chiral? hcount? charge? class?) {
+	return b;
 }
 
 organicsymbol = o:('B''r'? / 'C''l'? / [NOPSFI]) {
@@ -151,3 +161,14 @@ class = c:(':'([1-9][0-9]* / [0])) {
 isotope = i:([1-9][0-9]?[0-9]?) {
     return Number(i.join(''));
 }
+
+whitespace 'whitespace'
+  = '\t'
+  / '\v'
+  / '\f'
+  / ' '
+  / '\u00A0'
+  / '\uFEFF'
+  / Zs
+  
+ Zs = [\u0020\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]

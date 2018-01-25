@@ -26,6 +26,7 @@ chain = s:(atom branch* (bond? ring)* branch* bond? chain? branch*) {
     return {
         'atom': s[0],
         'isBracket': s[0].element ? true : false,
+        'isSMARTS': s[0].property ? true : false,
         'branches': branches,
         'branchCount': branches.length,
         'ringbonds': rings,
@@ -46,7 +47,7 @@ branch = b:('(' bond? chain ')') {
     return b[2]
 }
 
-atom = a:(smartsexpression / organicsymbol / aromaticsymbol / bracketatom / wildcard) {
+atom = a:(organicsymbol / aromaticsymbol / bracket / wildcard) {
     return a;
 }
 
@@ -55,30 +56,49 @@ bond = b:([-=#$:/\\.]) {
     return b;
 }
 
-bracketatom = '[' b:smartsexpression ']' {
-    return b
+bracket = b:('[' (bracketatom / smartsatomicsymbol) ']') {
+	return b[1];
 }
 
-bracketcontent = b:(isotope? ('se' / 'as' / aromaticsymbol / elementsymbol / wildcard) chiral?
-                    hcount? charge? class?) {
+bracketatom = b: (isotope? ('se' / 'as' / aromaticsymbol / elementsymbol ![0-9] / wildcard) chiral?
+                     hcount? charge? class?) {
     return {
-        'isotope': b[1],
-        'element': b[2],
-        'chirality': b[3],
-        'hcount': b[4],
-        'charge': b[5],
-        'class': b[6]
+        'isotope': b[0],
+        'element': b[1][0],
+        'chirality': b[2] && b[2].join ? b[2].join('').replace(',', '') : b[2],
+        'hcount': b[3],
+        'charge': b[4],
+        'class': b[5]
     }
 }
 
-smartsexpression = e:(smartsatomicsymbol / bracketcontent ([,;] (smartsatomicsymbol / bracketcontent))*) {
-	return {
-    	'smarts': e
+smartsatomicsymbol = s:(chiral[\?]? / [aA] / '#'[1-9][0-9]?[0-9]? / [DHhRrvXx][0-9]? / poscharge / negcharge) {
+	if (Number.isInteger(s)) {
+    	return {
+        	property: 'charge',
+            value: s
+        }
+    } else if (s === '@' || s === '@@') {
+    	return {
+        	property: 'chirality',
+            value: s
+        }
+    } else if (s[0] === '#') {
+    	return {
+        	property: 'atomic_number',
+            value: Number(s.slice(1).join('').replace(',', ''))
+        }
+    } else if (s[0].length === 2) {
+    	return {
+        	property: 'chirality',
+            value: [s[0][0], Number(s[0].slice(1).join('')), s[1] ? true : false],
+        }
+    } else {
+    	return {
+        	property: s[0],
+            value: s[1]
+        }
     }
-}
-
-smartsatomicsymbol = s:([aA@] / '#'[1-9][0-9]* / [DHhRrvXx\-+][0-9]?) {
-	return s;
 }
 
 organicsymbol = o:('B''r'? / 'C''l'? / [NOPSFI]) {
@@ -94,8 +114,32 @@ wildcard = w:('*') {
     return w;
 }
 
-elementsymbol = e:([A-Z][a-z]?) {
-    return e.join('');
+elementsymbol = e:('Ac' / 'Ag' / 'Al' / 'Am' / 'Ar' / 'As' / 'At' / 'Au' /
+'B'[aehikr]? /
+'C'[adeflmnorsu]? /
+'Db' / 'Ds' / 'Dy' /
+'Er' / 'Es' / 'Eu' /
+'F'[elmr]? /
+'Ga' / 'Ge' / 'Gd' / 'Ge' /
+'H'[efgos]? /
+'I'[nr]? /
+'K'[r]? /
+'La' / 'Li' / 'Lr' / 'Lu' / 'Lv' /
+'Mc' / 'Md' / 'Mg' / 'Mn' / 'Mo' / 'Mt' /
+'N'[abdehiop]? /
+'O'[gs]? /
+'P'[abdmortu]? /
+'Ra' / 'Rb' / 'Re' / 'Rf' / 'Rg' / 'Rh' / 'Rn' / 'Ru' /
+'S'[bcegimnr]? /
+'Ta' / 'Tb' / 'Tc' / 'Te' / 'Th' / 'Ti' / 'Tl' / 'Tm' / 'Ts' /
+'U' /
+'V' /
+'W' /
+'Xe' /
+'Y''b'? /
+'Zn' / 'Zr') {
+	if(Array.isArray(e)) return e.join('');
+    return e;
 }
 
 ring = r:('%'[1-9][0-9] / [0-9]) {
@@ -107,7 +151,7 @@ chiral = c:('@'('@' / 'TH'[12] / 'AL'[12] / 'SP'[1-3] / 'TB'[1-9][0-9]? / 'OH'[1
     if(!c[1]) return '@';
     if(c[1] == '@') return '@@';
 
-    return c[1].join('').replace(',', '');
+    return c[1];
 }
 
 charge = c:(poscharge / negcharge) {

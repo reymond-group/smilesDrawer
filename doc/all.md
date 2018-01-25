@@ -831,7 +831,8 @@ Clone an array or an object. If an object is passed, a shallow clone will be cre
 <a name="equals"></a>
 
 ## equals(arrA, arrB) ⇒ <code>Boolean</code>
-Returns a boolean indicating whether or not the two arrays contain the same elements.Only supports 1d, non-nested arrays.
+Returns a boolean indicating whether or not the two arrays contain the same elements.
+Only supports 1d, non-nested arrays.
 
 **Kind**: global function  
 **Returns**: <code>Boolean</code> - A boolean indicating whether or not the two arrays contain the same elements.  
@@ -2004,7 +2005,8 @@ Annotaed stereochemistry information for visualization.
 <a name="initPseudoElements"></a>
 
 ## initPseudoElements()
-Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon setsthe involved atoms not to be displayed.
+Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+the involved atoms not to be displayed.
 
 **Kind**: global function  
 <a name="setBondType"></a>
@@ -3428,7 +3430,10 @@ Add a child vertex id to this vertex.
 <a name="addRingbondChild"></a>
 
 ## addRingbondChild(vertexId, ringbondIndex)
-Add a child vertex id to this vertex as the second child of the neighbours array,except this vertex is the first vertex of the SMILE string, then it is added as the first.This is used to get the correct ordering of neighbours for parity calculations.If a hydrogen is implicitly attached to the chiral center, insert as the third child.
+Add a child vertex id to this vertex as the second child of the neighbours array,
+except this vertex is the first vertex of the SMILE string, then it is added as the first.
+This is used to get the correct ordering of neighbours for parity calculations.
+If a hydrogen is implicitly attached to the chiral center, insert as the third child.
 
 **Kind**: global function  
 
