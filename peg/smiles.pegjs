@@ -1,6 +1,6 @@
-start = s:chain whitespace* x:('|' [a-z]i* '|')?{
-	if (x.join) {
-		s.extended = x[1].join('')
+start = s:chain whitespace* x:('|' [a-z0-9,;]i* '|')?{
+	if (x && x[1].join) {
+		s.extended = x[1].join('');
     }
 	return s;
 }
