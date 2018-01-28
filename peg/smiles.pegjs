@@ -1,6 +1,7 @@
-start = s:chain whitespace* x:('|' [a-z0-9,;]i* '|')?{
+start = s:chain whitespace* x:('|' (cxdelimiters? (!cxdelimiters x:[a-z0-9,;:\.]i { return x })+)* '|')?{
 	if (x && x[1].join) {
-		s.extended = x[1].join('');
+		// s.extended = x[1].join('');
+        s.extended = x[1]
     }
 	return s;
 }
@@ -162,13 +163,11 @@ isotope = i:([1-9][0-9]?[0-9]?) {
     return Number(i.join(''));
 }
 
-whitespace 'whitespace'
-  = '\t'
-  / '\v'
-  / '\f'
-  / ' '
-  / '\u00A0'
-  / '\uFEFF'
-  / Zs
+cxdelimiters 'cxdelimiters' = '$' / '$_AV:' / 'LN:' / 'atomprop:' / 'LP:' / 'lp:' / 
+	'C:' / 'c:' / 't:' / 'ctu:' / 'f:' / 'H:' / 'r:' / 'w:' / 'wU:' / 'wD:' / '@:' /
+    '@@:' / 'THB:' / 'TLB:' / 'TEB:' / '^1:' / '^2:' / '^3:' / '^4:' / '^5:' /
+    '^6:' / '^7:' / 'M:' / 'LN:' / 'SgD:' / 'RG:' / 'LO:' / 'Sg:' / 'SgH:'
+
+whitespace 'whitespace' = '\t' / '\v' / '\f' / ' ' / '\u00A0' / '\uFEFF' / Zs
   
- Zs = [\u0020\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]
+Zs = [\u0020\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]
