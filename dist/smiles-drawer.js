@@ -11,17 +11,20 @@ var _Parser2 = _interopRequireDefault(_Parser);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Detect SSR (server side rendering)
+//@ts-check
+var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
+
 /**
  * The SmilesDrawer namespace.
  * @typicalname SmilesDrawer
  */
-//@ts-check
-window.SmilesDrawer = {
-    Version: '1.0.0'
+var SmilesDrawer = {
+  Version: '1.0.0'
 };
 
-window.SmilesDrawer.Drawer = _Drawer2.default;
-window.SmilesDrawer.Parser = _Parser2.default;
+SmilesDrawer.Drawer = _Drawer2.default;
+SmilesDrawer.Parser = _Parser2.default;
 
 /**
 * Cleans a SMILES string (removes non-valid characters)
@@ -30,8 +33,8 @@ window.SmilesDrawer.Parser = _Parser2.default;
 * @param {String} smiles A SMILES string.
 * @returns {String} The clean SMILES string.
 */
-window.SmilesDrawer.clean = function (smiles) {
-    return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
+SmilesDrawer.clean = function (smiles) {
+  return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
 };
 
 /**
@@ -43,29 +46,29 @@ window.SmilesDrawer.clean = function (smiles) {
 * @param {String} [themeName='light'] The theme to apply.
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
-window.SmilesDrawer.apply = function (options) {
-    var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
-    var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
-    var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+SmilesDrawer.apply = function (options) {
+  var selector = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'canvas[data-smiles]';
+  var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
+  var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-    var smilesDrawer = new _Drawer2.default(options);
-    var elements = document.querySelectorAll(selector);
+  var smilesDrawer = new _Drawer2.default(options);
+  var elements = document.querySelectorAll(selector);
 
-    var _loop = function _loop() {
-        var element = elements[i];
+  var _loop = function _loop() {
+    var element = elements[i];
 
-        SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
-            smilesDrawer.draw(tree, element, themeName, false);
-        }, function (err) {
-            if (onError) {
-                onError(err);
-            }
-        });
-    };
+    SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
+      smilesDrawer.draw(tree, element, themeName, false);
+    }, function (err) {
+      if (onError) {
+        onError(err);
+      }
+    });
+  };
 
-    for (var i = 0; i < elements.length; i++) {
-        _loop();
-    }
+  for (var i = 0; i < elements.length; i++) {
+    _loop();
+  }
 };
 
 /**
@@ -76,58 +79,64 @@ window.SmilesDrawer.apply = function (options) {
 * @param {Function} successCallback A callback that is called on success with the parse tree.
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
-window.SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
-    try {
-        if (successCallback) {
-            successCallback(_Parser2.default.parse(smiles));
-        }
-    } catch (err) {
-        if (errorCallback) {
-            errorCallback(err);
-        }
+SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
+  try {
+    if (successCallback) {
+      successCallback(_Parser2.default.parse(smiles));
     }
+  } catch (err) {
+    if (errorCallback) {
+      errorCallback(err);
+    }
+  }
 };
+
+if (canUseDOM) {
+  window.SmilesDrawer = SmilesDrawer;
+}
+
+module.exports = SmilesDrawer;
 
 // There be dragons (polyfills)
 
 if (!Array.prototype.fill) {
-    Object.defineProperty(Array.prototype, 'fill', {
-        value: function value(_value) {
+  Object.defineProperty(Array.prototype, 'fill', {
+    value: function value(_value) {
 
-            // Steps 1-2.
-            if (this == null) {
-                throw new TypeError('this is null or not defined');
-            }
+      // Steps 1-2.
+      if (this == null) {
+        throw new TypeError('this is null or not defined');
+      }
 
-            var O = Object(this);
+      var O = Object(this);
 
-            // Steps 3-5.
-            var len = O.length >>> 0;
+      // Steps 3-5.
+      var len = O.length >>> 0;
 
-            // Steps 6-7.
-            var start = arguments[1];
-            var relativeStart = start >> 0;
+      // Steps 6-7.
+      var start = arguments[1];
+      var relativeStart = start >> 0;
 
-            // Step 8.
-            var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
+      // Step 8.
+      var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
 
-            // Steps 9-10.
-            var end = arguments[2];
-            var relativeEnd = end === undefined ? len : end >> 0;
+      // Steps 9-10.
+      var end = arguments[2];
+      var relativeEnd = end === undefined ? len : end >> 0;
 
-            // Step 11.
-            var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
+      // Step 11.
+      var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
 
-            // Step 12.
-            while (k < final) {
-                O[k] = _value;
-                k++;
-            }
+      // Step 12.
+      while (k < final) {
+        O[k] = _value;
+        k++;
+      }
 
-            // Step 13.
-            return O;
-        }
-    });
+      // Step 13.
+      return O;
+    }
+  });
 }
 
 },{"./src/Drawer":5,"./src/Parser":10}],2:[function(require,module,exports){
