@@ -81,8 +81,6 @@ if (canUseDOM) {
   window.SmilesDrawer = SmilesDrawer;
 }
 
-module.exports = SmilesDrawer;
-
 // There be dragons (polyfills)
 
 if (!Array.prototype.fill) {
