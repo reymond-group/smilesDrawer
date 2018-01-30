@@ -1,8 +1,8 @@
 //@ts-check
-import ArrayHelper from './ArrayHelper'
-import Vector2 from './Vector2'
-import Vertex from './Vertex'
-import RingConnection from './RingConnection'
+const ArrayHelper = require('./ArrayHelper')
+const Vector2 = require('./Vector2')
+const Vertex = require('./Vertex')
+const RingConnection = require('./RingConnection')
 
 /** 
  * A class representing a ring.
@@ -22,7 +22,7 @@ import RingConnection from './RingConnection'
  * @property {Number} centralAngle The central angle of this ring.
  * @property {Boolean} canFlip A boolean indicating whether or not this ring allows flipping of attached vertices to the inside of the ring.
  */
-export default class Ring {
+class Ring {
     /**
      * The constructor for the class Ring.
      *
@@ -208,3 +208,5 @@ export default class Ring {
         return false;
     }
 }
+
+module.exports = Ring;

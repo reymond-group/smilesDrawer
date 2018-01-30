@@ -1,6 +1,6 @@
 //@ts-check
-import Drawer from './src/Drawer'
-import Parser from './src/Parser'
+const Drawer = require('./src/Drawer')
+const Parser = require('./src/Parser')
 
 
 // Detect SSR (server side rendering)
@@ -127,3 +127,5 @@ Object.defineProperty(Array.prototype, 'fill', {
   }
 });
 }
+
+module.exports = SmilesDrawer;

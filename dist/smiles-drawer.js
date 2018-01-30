@@ -1,18 +1,11 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var _Drawer = require('./src/Drawer');
-
-var _Drawer2 = _interopRequireDefault(_Drawer);
-
-var _Parser = require('./src/Parser');
-
-var _Parser2 = _interopRequireDefault(_Parser);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+//@ts-check
+var Drawer = require('./src/Drawer');
+var Parser = require('./src/Parser');
 
 // Detect SSR (server side rendering)
-//@ts-check
 var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 
 /**
@@ -23,8 +16,8 @@ var SmilesDrawer = {
   Version: '1.0.0'
 };
 
-SmilesDrawer.Drawer = _Drawer2.default;
-SmilesDrawer.Parser = _Parser2.default;
+SmilesDrawer.Drawer = Drawer;
+SmilesDrawer.Parser = Parser;
 
 /**
 * Cleans a SMILES string (removes non-valid characters)
@@ -51,7 +44,7 @@ SmilesDrawer.apply = function (options) {
   var themeName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'light';
   var onError = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-  var smilesDrawer = new _Drawer2.default(options);
+  var smilesDrawer = new Drawer(options);
   var elements = document.querySelectorAll(selector);
 
   var _loop = function _loop() {
@@ -82,7 +75,7 @@ SmilesDrawer.apply = function (options) {
 SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
   try {
     if (successCallback) {
-      successCallback(_Parser2.default.parse(smiles));
+      successCallback(Parser.parse(smiles));
     }
   } catch (err) {
     if (errorCallback) {
@@ -94,8 +87,6 @@ SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
 if (canUseDOM) {
   window.SmilesDrawer = SmilesDrawer;
 }
-
-module.exports = SmilesDrawer;
 
 // There be dragons (polyfills)
 
@@ -139,12 +130,10 @@ if (!Array.prototype.fill) {
   });
 }
 
+module.exports = SmilesDrawer;
+
 },{"./src/Drawer":5,"./src/Parser":10}],2:[function(require,module,exports){
 'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -590,33 +579,19 @@ var ArrayHelper = function () {
     return ArrayHelper;
 }();
 
-exports.default = ArrayHelper;
+module.exports = ArrayHelper;
 
 },{}],3:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _ArrayHelper = require('./ArrayHelper');
-
-var _ArrayHelper2 = _interopRequireDefault(_ArrayHelper);
-
-var _Vertex = require('./Vertex');
-
-var _Vertex2 = _interopRequireDefault(_Vertex);
-
-var _Ring = require('./Ring');
-
-var _Ring2 = _interopRequireDefault(_Ring);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//@ts-check
+var ArrayHelper = require('./ArrayHelper');
+var Vertex = require('./Vertex');
+var Ring = require('./Ring');
 
 /** 
  * A class representing an atom.
@@ -652,6 +627,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
  */
+
 var Atom = function () {
   /**
    * The constructor of the class Atom.
@@ -797,7 +773,7 @@ var Atom = function () {
   }, {
     key: 'addAnchoredRing',
     value: function addAnchoredRing(ringId) {
-      if (!_ArrayHelper2.default.contains(this.anchoredRings, {
+      if (!ArrayHelper.contains(this.anchoredRings, {
         value: ringId
       })) {
         this.anchoredRings.push(ringId);
@@ -1211,41 +1187,21 @@ var Atom = function () {
   return Atom;
 }();
 
-exports.default = Atom;
+module.exports = Atom;
 
 },{"./ArrayHelper":2,"./Ring":11,"./Vertex":15}],4:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _MathHelper = require('./MathHelper');
-
-var _MathHelper2 = _interopRequireDefault(_MathHelper);
-
-var _Vector = require('./Vector2');
-
-var _Vector2 = _interopRequireDefault(_Vector);
-
-var _Line = require('./Line');
-
-var _Line2 = _interopRequireDefault(_Line);
-
-var _Vertex = require('./Vertex');
-
-var _Vertex2 = _interopRequireDefault(_Vertex);
-
-var _Ring = require('./Ring');
-
-var _Ring2 = _interopRequireDefault(_Ring);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//@ts-check
+var MathHelper = require('./MathHelper');
+var Vector2 = require('./Vector2');
+var Line = require('./Line');
+var Vertex = require('./Vertex');
+var Ring = require('./Ring');
 
 /** 
  * A class wrapping a canvas element.
@@ -1261,6 +1217,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Number} fontLarge The large font size in pt.
  * @property {Number} fontSmall The small font size in pt.
  */
+
 var CanvasWrapper = function () {
     /**
      * The constructor for the class CanvasWrapper.
@@ -1449,7 +1406,7 @@ var CanvasWrapper = function () {
             ctx.save();
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            ctx.arc(x + offsetX, y + offsetY, radius, 0, _MathHelper2.default.twoPI, true);
+            ctx.arc(x + offsetX, y + offsetY, radius, 0, MathHelper.twoPI, true);
             ctx.closePath();
 
             if (debug) {
@@ -1598,7 +1555,7 @@ var CanvasWrapper = function () {
 
             ctx.save();
 
-            var normals = _Vector2.default.normals(l, r);
+            var normals = Vector2.normals(l, r);
 
             normals[0].normalize();
             normals[1].normalize();
@@ -1613,10 +1570,10 @@ var CanvasWrapper = function () {
                 end = l;
             }
 
-            var t = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[0], this.halfBondThickness));
-            var u = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[0], 1.5 + this.halfBondThickness));
-            var v = _Vector2.default.add(end, _Vector2.default.multiplyScalar(normals[1], 1.5 + this.halfBondThickness));
-            var w = _Vector2.default.add(start, _Vector2.default.multiplyScalar(normals[1], this.halfBondThickness));
+            var t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness));
+            var u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 1.5 + this.halfBondThickness));
+            var v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 1.5 + this.halfBondThickness));
+            var w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
 
             ctx.beginPath();
             ctx.moveTo(t.x, t.y);
@@ -1662,7 +1619,7 @@ var CanvasWrapper = function () {
 
             ctx.save();
 
-            var normals = _Vector2.default.normals(l, r);
+            var normals = Vector2.normals(l, r);
 
             normals[0].normalize();
             normals[1].normalize();
@@ -1699,7 +1656,7 @@ var CanvasWrapper = function () {
             sEnd.x += offsetX;
             sEnd.y += offsetY;
 
-            var dir = _Vector2.default.subtract(end, start).normalize();
+            var dir = Vector2.subtract(end, start).normalize();
             ctx.strokeStyle = this.getColor('C');
             ctx.lineCap = 'round';
             ctx.lineWidth = this.opts.bondThickness;
@@ -1709,10 +1666,10 @@ var CanvasWrapper = function () {
 
             var changed = false;
             for (var t = 0.0; t < 1.0; t += step) {
-                var to = _Vector2.default.multiplyScalar(dir, t * length);
-                var startDash = _Vector2.default.add(start, to);
+                var to = Vector2.multiplyScalar(dir, t * length);
+                var startDash = Vector2.add(start, to);
                 var width = 1.5 * t;
-                var dashOffset = _Vector2.default.multiplyScalar(normals[0], width);
+                var dashOffset = Vector2.multiplyScalar(normals[0], width);
 
                 if (!changed && t > 0.5) {
                     ctx.stroke();
@@ -1723,7 +1680,7 @@ var CanvasWrapper = function () {
 
                 startDash.subtract(dashOffset);
                 ctx.moveTo(startDash.x, startDash.y);
-                startDash.add(_Vector2.default.multiplyScalar(dashOffset, 2.0));
+                startDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
                 ctx.lineTo(startDash.x, startDash.y);
             }
 
@@ -1768,7 +1725,7 @@ var CanvasWrapper = function () {
 
             ctx.save();
             ctx.beginPath();
-            ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, _MathHelper2.default.twoPI, false);
+            ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, MathHelper.twoPI, false);
             ctx.fillStyle = this.getColor(elementName);
             ctx.fill();
             ctx.restore();
@@ -1792,13 +1749,13 @@ var CanvasWrapper = function () {
             ctx.save();
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
-            ctx.arc(x + offsetX, y + offsetY, 1.5, 0, _MathHelper2.default.twoPI, true);
+            ctx.arc(x + offsetX, y + offsetY, 1.5, 0, MathHelper.twoPI, true);
             ctx.closePath();
             ctx.fill();
             ctx.globalCompositeOperation = 'source-over';
 
             ctx.beginPath();
-            ctx.arc(x + this.offsetX, y + this.offsetY, 0.75, 0, _MathHelper2.default.twoPI, false);
+            ctx.arc(x + this.offsetX, y + this.offsetY, 0.75, 0, MathHelper.twoPI, false);
             ctx.fillStyle = this.getColor(elementName);
             ctx.fill();
             ctx.restore();
@@ -1877,7 +1834,7 @@ var CanvasWrapper = function () {
 
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
-            ctx.arc(x + offsetX, y + offsetY, r, 0, _MathHelper2.default.twoPI, true);
+            ctx.arc(x + offsetX, y + offsetY, r, 0, MathHelper.twoPI, true);
             ctx.closePath();
             ctx.fill();
             ctx.globalCompositeOperation = 'source-over';
@@ -2156,7 +2113,7 @@ var CanvasWrapper = function () {
         key: 'drawAromaticityRing',
         value: function drawAromaticityRing(ring) {
             var ctx = this.ctx;
-            var radius = _MathHelper2.default.apothemFromSideLength(this.opts.bondLength, ring.getSize());
+            var radius = MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
 
             ctx.save();
             ctx.strokeStyle = this.getColor('C');
@@ -2183,71 +2140,30 @@ var CanvasWrapper = function () {
     return CanvasWrapper;
 }();
 
-exports.default = CanvasWrapper;
+module.exports = CanvasWrapper;
 
 },{"./Line":8,"./MathHelper":9,"./Ring":11,"./Vector2":14,"./Vertex":15}],5:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _MathHelper = require('./MathHelper');
-
-var _MathHelper2 = _interopRequireDefault(_MathHelper);
-
-var _ArrayHelper = require('./ArrayHelper');
-
-var _ArrayHelper2 = _interopRequireDefault(_ArrayHelper);
-
-var _Vector = require('./Vector2');
-
-var _Vector2 = _interopRequireDefault(_Vector);
-
-var _Line = require('./Line');
-
-var _Line2 = _interopRequireDefault(_Line);
-
-var _Vertex = require('./Vertex');
-
-var _Vertex2 = _interopRequireDefault(_Vertex);
-
-var _Edge = require('./Edge');
-
-var _Edge2 = _interopRequireDefault(_Edge);
-
-var _Atom = require('./Atom');
-
-var _Atom2 = _interopRequireDefault(_Atom);
-
-var _Ring = require('./Ring');
-
-var _Ring2 = _interopRequireDefault(_Ring);
-
-var _RingConnection = require('./RingConnection');
-
-var _RingConnection2 = _interopRequireDefault(_RingConnection);
-
-var _CanvasWrapper = require('./CanvasWrapper');
-
-var _CanvasWrapper2 = _interopRequireDefault(_CanvasWrapper);
-
-var _Graph = require('./Graph');
-
-var _Graph2 = _interopRequireDefault(_Graph);
-
-var _SSSR = require('./SSSR');
-
-var _SSSR2 = _interopRequireDefault(_SSSR);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//@ts-check
+var MathHelper = require('./MathHelper');
+var ArrayHelper = require('./ArrayHelper');
+var Vector2 = require('./Vector2');
+var Line = require('./Line');
+var Vertex = require('./Vertex');
+var Edge = require('./Edge');
+var Atom = require('./Atom');
+var Ring = require('./Ring');
+var RingConnection = require('./RingConnection');
+var CanvasWrapper = require('./CanvasWrapper');
+var Graph = require('./Graph');
+var SSSR = require('./SSSR');
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -2261,6 +2177,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Object} opts The merged options.
  * @property {Object} theme The current theme.
  */
+
 var Drawer = function () {
   /**
    * The constructor for the class SmilesDrawer.
@@ -2395,13 +2312,13 @@ var Drawer = function () {
       var infoOnly = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
       this.data = data;
-      this.canvasWrapper = new _CanvasWrapper2.default(target, this.opts.themes[themeName], this.opts);
+      this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts);
       this.infoOnly = infoOnly;
 
       this.ringIdCounter = 0;
       this.ringConnectionIdCounter = 0;
 
-      this.graph = new _Graph2.default(data, this.opts.isomeric);
+      this.graph = new Graph(data, this.opts.isomeric);
       this.rings = Array();
       this.ringConnections = Array();
 
@@ -2454,7 +2371,7 @@ var Drawer = function () {
 
                 if (neighboursB.length === 1) {
                   var neighbour = this.graph.vertices[neighboursB[0]];
-                  var angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
+                  var angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
 
                   this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
                   // If the new overlap is bigger, undo change
@@ -2484,8 +2401,8 @@ var Drawer = function () {
                   } else if (neighbourA.value.rings.length !== 0 || neighbourB.value.rings.length !== 0) {
                     continue;
                   } else {
-                    var angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
-                    var angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, _MathHelper2.default.toRad(120));
+                    var angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
+                    var angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
 
                     this.rotateSubtree(neighbourA.id, vertexB.id, angleA, vertexB.position);
                     this.rotateSubtree(neighbourB.id, vertexB.id, angleB, vertexB.position);
@@ -2669,7 +2586,7 @@ var Drawer = function () {
         }
       }
 
-      var angle = -_Vector2.default.subtract(this.graph.vertices[a].position, this.graph.vertices[b].position).angle();
+      var angle = -Vector2.subtract(this.graph.vertices[a].position, this.graph.vertices[b].position).angle();
 
       if (!isNaN(angle)) {
         // Round to 30 degrees
@@ -2817,7 +2734,7 @@ var Drawer = function () {
           } else {
             var sourceVertexId = vertex.id;
             var targetVertexId = openBonds.get(ringbondId);
-            var edgeId = this.graph.addEdge(new _Edge2.default(sourceVertexId, targetVertexId, 1));
+            var edgeId = this.graph.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
             var targetVertex = this.graph.vertices[targetVertexId];
 
             vertex.addRingbondChild(targetVertexId, j);
@@ -2833,7 +2750,7 @@ var Drawer = function () {
       }
 
       // Get the rings in the graph (the SSSR)
-      var rings = _SSSR2.default.getRings(this.graph);
+      var rings = SSSR.getRings(this.graph);
 
       if (rings === null) {
         return;
@@ -2841,7 +2758,7 @@ var Drawer = function () {
 
       for (var i = 0; i < rings.length; i++) {
         var ringVertices = [].concat(_toConsumableArray(rings[i]));
-        var ringId = this.addRing(new _Ring2.default(ringVertices));
+        var ringId = this.addRing(new Ring(ringVertices));
 
         // Add the ring to the atoms
         for (var j = 0; j < ringVertices.length; j++) {
@@ -2856,7 +2773,7 @@ var Drawer = function () {
         for (var j = i + 1; j < this.rings.length; j++) {
           var a = this.rings[i];
           var b = this.rings[j];
-          var ringConnection = new _RingConnection2.default(a, b);
+          var ringConnection = new RingConnection(a, b);
 
           // If there are no vertices in the ring connection, then there
           // is no ring connection
@@ -2869,7 +2786,7 @@ var Drawer = function () {
       // Add neighbours to the rings
       for (var i = 0; i < this.rings.length; i++) {
         var ring = this.rings[i];
-        ring.neighbours = _RingConnection2.default.getNeighbours(this.ringConnections, ring.id);
+        ring.neighbours = RingConnection.getNeighbours(this.ringConnections, ring.id);
       }
 
       // Anchor the ring to one of it's members, so that the ring center will always
@@ -2957,7 +2874,7 @@ var Drawer = function () {
         for (var i = 0; i < ring.neighbours.length; i++) {
           var n = ring.neighbours[i];
 
-          if (involvedRings.indexOf(n) === -1 && n !== r && _RingConnection2.default.isBridge(that.ringConnections, that.graph.vertices, r, n)) {
+          if (involvedRings.indexOf(n) === -1 && n !== r && RingConnection.isBridge(that.ringConnections, that.graph.vertices, r, n)) {
             recurse(n);
           }
         }
@@ -2965,7 +2882,7 @@ var Drawer = function () {
 
       recurse(ringId);
 
-      return _ArrayHelper2.default.unique(involvedRings);
+      return ArrayHelper.unique(involvedRings);
     }
 
     /**
@@ -3033,7 +2950,7 @@ var Drawer = function () {
           var _id = _step.value;
 
           var _vertex = this.graph.vertices[_id];
-          var intersection = _ArrayHelper2.default.intersection(ringIds, _vertex.value.rings);
+          var intersection = ArrayHelper.intersection(ringIds, _vertex.value.rings);
 
           if (_vertex.value.rings.length === 1 || intersection.length === 1) {
             ringMembers.add(_vertex.id);
@@ -3105,7 +3022,7 @@ var Drawer = function () {
         }
       }
 
-      var ring = new _Ring2.default([].concat(_toConsumableArray(ringMembers)));
+      var ring = new Ring([].concat(_toConsumableArray(ringMembers)));
 
       ring.isBridged = true;
       ring.neighbours = [].concat(_toConsumableArray(neighbours));
@@ -3137,7 +3054,7 @@ var Drawer = function () {
           var _id3 = _step3.value;
 
           var _vertex3 = this.graph.vertices[_id3];
-          _vertex3.value.rings = _ArrayHelper2.default.removeAll(_vertex3.value.rings, ringIds);
+          _vertex3.value.rings = ArrayHelper.removeAll(_vertex3.value.rings, ringIds);
           _vertex3.value.rings.push(ring.id);
         }
 
@@ -3523,7 +3440,7 @@ var Drawer = function () {
             continue;
           }
 
-          var dist = _Vector2.default.subtract(a.position, b.position).lengthSq();
+          var dist = Vector2.subtract(a.position, b.position).lengthSq();
 
           if (dist < this.opts.bondLengthSq) {
             var weighted = (this.opts.bondLength - Math.sqrt(dist)) / this.opts.bondLength;
@@ -3581,7 +3498,7 @@ var Drawer = function () {
       var bnCount = bn.length;
 
       // All vertices connected to the edge vertexA to vertexB
-      var tn = _ArrayHelper2.default.merge(an, bn);
+      var tn = ArrayHelper.merge(an, bn);
 
       // Only considering the connected vertices
       var sideCount = [0, 0];
@@ -3630,7 +3547,7 @@ var Drawer = function () {
     key: 'setRingCenter',
     value: function setRingCenter(ring) {
       var ringSize = ring.getSize();
-      var total = new _Vector2.default(0, 0);
+      var total = new Vector2(0, 0);
 
       for (var i = 0; i < ringSize; i++) {
         total.add(this.graph.vertices[ring.members[i]].position);
@@ -3731,7 +3648,7 @@ var Drawer = function () {
       var normals = this.getEdgeNormals(edge);
 
       // Create a point on each side of the line
-      var sides = _ArrayHelper2.default.clone(normals);
+      var sides = ArrayHelper.clone(normals);
 
       sides[0].multiplyScalar(10).add(a);
       sides[1].multiplyScalar(10).add(a);
@@ -3754,10 +3671,10 @@ var Drawer = function () {
           // Choose the normal that is on the same side as the center
           var line = null;
 
-          if (center.sameSideAs(vertexA.position, vertexB.position, _Vector2.default.add(a, normals[0]))) {
-            line = new _Line2.default(_Vector2.default.add(a, normals[0]), _Vector2.default.add(b, normals[0]), elementA, elementB);
+          if (center.sameSideAs(vertexA.position, vertexB.position, Vector2.add(a, normals[0]))) {
+            line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
           } else {
-            line = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
+            line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
           }
 
           line.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
@@ -3770,13 +3687,13 @@ var Drawer = function () {
           }
 
           // The normal edge
-          this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
+          this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
         } else if (edge.center || vertexA.isTerminal() && vertexB.isTerminal()) {
           normals[0].multiplyScalar(that.opts.halfBondSpacing);
           normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
-          var lineA = new _Line2.default(_Vector2.default.add(a, normals[0]), _Vector2.default.add(b, normals[0]), elementA, elementB);
-          var lineB = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
+          var lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+          var lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
           this.canvasWrapper.drawLine(lineA);
           this.canvasWrapper.drawLine(lineB);
@@ -3786,8 +3703,8 @@ var Drawer = function () {
           normals[0].multiplyScalar(that.opts.halfBondSpacing);
           normals[1].multiplyScalar(that.opts.halfBondSpacing);
 
-          var _lineA = new _Line2.default(_Vector2.default.add(a, normals[0]), _Vector2.default.add(b, normals[0]), elementA, elementB);
-          var _lineB = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
+          var _lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+          var _lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
           this.canvasWrapper.drawLine(_lineA);
           this.canvasWrapper.drawLine(_lineB);
@@ -3795,50 +3712,50 @@ var Drawer = function () {
           normals[0].multiplyScalar(that.opts.bondSpacing);
           normals[1].multiplyScalar(that.opts.bondSpacing);
 
-          var _line = new _Line2.default(_Vector2.default.add(a, normals[0]), _Vector2.default.add(b, normals[0]), elementA, elementB);
+          var _line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
 
           _line.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
           this.canvasWrapper.drawLine(_line);
-          this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
+          this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
         } else if (s.sideCount[0] < s.sideCount[1]) {
           normals[0].multiplyScalar(that.opts.bondSpacing);
           normals[1].multiplyScalar(that.opts.bondSpacing);
 
-          var _line2 = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
+          var _line2 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
           _line2.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
           this.canvasWrapper.drawLine(_line2);
-          this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
+          this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
         } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
           normals[0].multiplyScalar(that.opts.bondSpacing);
           normals[1].multiplyScalar(that.opts.bondSpacing);
 
-          var _line3 = new _Line2.default(_Vector2.default.add(a, normals[0]), _Vector2.default.add(b, normals[0]), elementA, elementB);
+          var _line3 = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
 
           _line3.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
           this.canvasWrapper.drawLine(_line3);
-          this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
+          this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
         } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
           normals[0].multiplyScalar(that.opts.bondSpacing);
           normals[1].multiplyScalar(that.opts.bondSpacing);
 
-          var _line4 = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
+          var _line4 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
           _line4.shorten(this.opts.bondLength - this.opts.shortBondLength * this.opts.bondLength);
           this.canvasWrapper.drawLine(_line4);
-          this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
+          this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
         } else {}
       } else if (edge.bondType === '#') {
         normals[0].multiplyScalar(that.opts.bondSpacing / 1.5);
         normals[1].multiplyScalar(that.opts.bondSpacing / 1.5);
 
-        var _lineA2 = new _Line2.default(_Vector2.default.add(a, normals[0]), _Vector2.default.add(b, normals[0]), elementA, elementB);
-        var _lineB2 = new _Line2.default(_Vector2.default.add(a, normals[1]), _Vector2.default.add(b, normals[1]), elementA, elementB);
+        var _lineA2 = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        var _lineB2 = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         this.canvasWrapper.drawLine(_lineA2);
         this.canvasWrapper.drawLine(_lineB2);
 
-        this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB));
+        this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (edge.bondType === '.') {
         // TODO: Something... maybe... version 2?
       } else {
@@ -3846,16 +3763,16 @@ var Drawer = function () {
         var isChiralCenterB = vertexB.value.isStereoCenter;
 
         if (edge.wedge === 'up') {
-          this.canvasWrapper.drawWedge(new _Line2.default(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+          this.canvasWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
         } else if (edge.wedge === 'down') {
-          this.canvasWrapper.drawDashedWedge(new _Line2.default(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+          this.canvasWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
         } else {
-          this.canvasWrapper.drawLine(new _Line2.default(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+          this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
         }
       }
 
       if (debug) {
-        var midpoint = _Vector2.default.midpoint(a, b);
+        var midpoint = Vector2.midpoint(a, b);
         this.canvasWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
       }
     }
@@ -3877,7 +3794,7 @@ var Drawer = function () {
         var isotope = 0;
         var bondCount = this.getBondCount(vertex);
         var element = atom.element;
-        var hydrogens = _Atom2.default.maxBonds[element] - bondCount;
+        var hydrogens = Atom.maxBonds[element] - bondCount;
         var dir = vertex.getTextDirection(this.graph.vertices);
         var isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
         var isCarbon = atom.element === 'C';
@@ -3900,7 +3817,7 @@ var Drawer = function () {
           // If there is a carbon which bonds are in a straight line, draw a dot
           var a = this.graph.vertices[vertex.neighbours[0]].position;
           var b = this.graph.vertices[vertex.neighbours[1]].position;
-          var angle = _Vector2.default.threePointangle(vertex.position, a, b);
+          var angle = Vector2.threePointangle(vertex.position, a, b);
 
           if (Math.abs(Math.PI - angle) < 0.1) {
             this.canvasWrapper.drawPoint(vertex.position.x, vertex.position.y, element);
@@ -3908,7 +3825,7 @@ var Drawer = function () {
         }
 
         if (debug) {
-          var value = 'v: ' + vertex.id + ' ' + _ArrayHelper2.default.print(atom.ringbonds);
+          var value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
           this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
         } else {
           // this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
@@ -4041,13 +3958,13 @@ var Drawer = function () {
         return;
       }
 
-      center = center ? center : new _Vector2.default(0, 0);
+      center = center ? center : new Vector2(0, 0);
 
       var orderedNeighbours = ring.getOrderedNeighbours(this.ringConnections);
-      var startingAngle = startVertex ? _Vector2.default.subtract(startVertex.position, center).angle() : 0;
+      var startingAngle = startVertex ? Vector2.subtract(startVertex.position, center).angle() : 0;
 
-      var radius = _MathHelper2.default.polyCircumradius(this.opts.bondLength, ring.getSize());
-      var angle = _MathHelper2.default.centralAngle(ring.getSize());
+      var radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
+      var angle = MathHelper.centralAngle(ring.getSize());
 
       ring.centralAngle = angle;
 
@@ -4105,7 +4022,7 @@ var Drawer = function () {
           continue;
         }
 
-        var vertices = _RingConnection2.default.getVertices(this.ringConnections, ring.id, neighbour.id);
+        var vertices = RingConnection.getVertices(this.ringConnections, ring.id, neighbour.id);
 
         if (vertices.length === 2) {
           // This ring is a fused ring
@@ -4116,18 +4033,18 @@ var Drawer = function () {
           var vertexB = this.graph.vertices[vertices[1]];
 
           // Get middle between vertex A and B
-          var midpoint = _Vector2.default.midpoint(vertexA.position, vertexB.position);
+          var midpoint = Vector2.midpoint(vertexA.position, vertexB.position);
 
           // Get the normals to the line between A and B
-          var normals = _Vector2.default.normals(vertexA.position, vertexB.position);
+          var normals = Vector2.normals(vertexA.position, vertexB.position);
 
           // Normalize the normals
           normals[0].normalize();
           normals[1].normalize();
 
           // Set length from middle of side to center (the apothem)
-          var r = _MathHelper2.default.polyCircumradius(this.opts.bondLength, neighbour.getSize());
-          var apothem = _MathHelper2.default.apothem(r, neighbour.getSize());
+          var r = MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
+          var apothem = MathHelper.apothem(r, neighbour.getSize());
 
           normals[0].multiplyScalar(apothem).add(midpoint);
           normals[1].multiplyScalar(apothem).add(midpoint);
@@ -4135,13 +4052,13 @@ var Drawer = function () {
           // Pick the normal which results in a larger distance to the previous center
           // Also check whether it's inside another ring
           var nextCenter = normals[0];
-          if (_Vector2.default.subtract(center, normals[1]).lengthSq() > _Vector2.default.subtract(center, normals[0]).lengthSq()) {
+          if (Vector2.subtract(center, normals[1]).lengthSq() > Vector2.subtract(center, normals[0]).lengthSq()) {
             nextCenter = normals[1];
           }
 
           // Get the vertex (A or B) which is in clock-wise direction of the other
-          var posA = _Vector2.default.subtract(vertexA.position, nextCenter);
-          var posB = _Vector2.default.subtract(vertexB.position, nextCenter);
+          var posA = Vector2.subtract(vertexA.position, nextCenter);
+          var posB = Vector2.subtract(vertexB.position, nextCenter);
 
           if (posA.clockwise(posB) === -1) {
             if (!neighbour.positioned) {
@@ -4160,13 +4077,13 @@ var Drawer = function () {
           var _vertexA = this.graph.vertices[vertices[0]];
 
           // Get the vector pointing from the shared vertex to the new centpositioner
-          var _nextCenter = _Vector2.default.subtract(center, _vertexA.position);
+          var _nextCenter = Vector2.subtract(center, _vertexA.position);
 
           _nextCenter.invert();
           _nextCenter.normalize();
 
           // Get the distance from the vertex to the center
-          var _r = _MathHelper2.default.polyCircumradius(this.opts.bondLength, neighbour.getSize());
+          var _r = MathHelper.polyCircumradius(this.opts.bondLength, neighbour.getSize());
 
           _nextCenter.multiplyScalar(_r);
           _nextCenter.add(_vertexA.position);
@@ -4237,7 +4154,7 @@ var Drawer = function () {
     value: function getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores) {
       var that = this;
       var score = 0;
-      var center = new _Vector2.default(0, 0);
+      var center = new Vector2(0, 0);
       var count = 0;
 
       this.graph.traverseTree(vertexId, parentVertexId, function (vertex) {
@@ -4273,7 +4190,7 @@ var Drawer = function () {
   }, {
     key: 'getCurrentCenterOfMass',
     value: function getCurrentCenterOfMass() {
-      var total = new _Vector2.default(0, 0);
+      var total = new Vector2(0, 0);
       var count = 0;
 
       for (var i = 0; i < this.graph.vertices.length; i++) {
@@ -4301,7 +4218,7 @@ var Drawer = function () {
     value: function getCurrentCenterOfMassInNeigbourhood(vec) {
       var r = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.opts.bondLength * 2.0;
 
-      var total = new _Vector2.default(0, 0);
+      var total = new Vector2(0, 0);
       var count = 0;
       var rSq = r * r;
 
@@ -4447,7 +4364,7 @@ var Drawer = function () {
 
               var vertexPreviousPosition = vertex.id === 0 ? this.graph.vertices[1].position : vertex.previousPosition;
 
-              vertex.position.rotateAwayFrom(closestPosition, vertexPreviousPosition, _MathHelper2.default.toRad(20));
+              vertex.position.rotateAwayFrom(closestPosition, vertexPreviousPosition, MathHelper.toRad(20));
             }
           }
         }
@@ -4531,12 +4448,12 @@ var Drawer = function () {
           // Since the first vertex is at (0, 0), create a vector at (bondLength, 0)
           // and rotate it by 90°
 
-          var dummy = new _Vector2.default(this.opts.bondLength, 0);
-          dummy.rotate(_MathHelper2.default.toRad(-60));
+          var dummy = new Vector2(this.opts.bondLength, 0);
+          dummy.rotate(MathHelper.toRad(-60));
 
           vertex.previousPosition = dummy;
           vertex.setPosition(this.opts.bondLength, 0);
-          vertex.angle = _MathHelper2.default.toRad(-60);
+          vertex.angle = MathHelper.toRad(-60);
 
           // Do not position the vertex if it belongs to a bridged ring that is positioned using a layout algorithm.
           if (vertex.value.bridgedRing === null) {
@@ -4545,12 +4462,12 @@ var Drawer = function () {
         } else if (previousVertex.value.rings.length > 0) {
           var neighbours = previousVertex.neighbours;
           var joinedVertex = null;
-          var pos = new _Vector2.default(0.0, 0.0);
+          var pos = new Vector2(0.0, 0.0);
 
           if (previousVertex.value.bridgedRing === null && previousVertex.value.rings.length > 1) {
             for (var i = 0; i < neighbours.length; i++) {
               var neighbour = this.graph.vertices[neighbours[i]];
-              if (_ArrayHelper2.default.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
+              if (ArrayHelper.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
                 joinedVertex = neighbour;
                 break;
               }
@@ -4562,7 +4479,7 @@ var Drawer = function () {
               var v = this.graph.vertices[neighbours[i]];
 
               if (v.positioned && this.areVerticesInSameRing(v, previousVertex)) {
-                pos.add(_Vector2.default.subtract(v.position, previousVertex.position));
+                pos.add(Vector2.subtract(v.position, previousVertex.position));
               }
             }
 
@@ -4577,7 +4494,7 @@ var Drawer = function () {
         } else {
           // If the previous vertex was not part of a ring, draw a bond based
           // on the global angle of the previous bond
-          var _v2 = new _Vector2.default(this.opts.bondLength, 0);
+          var _v2 = new Vector2(this.opts.bondLength, 0);
 
           _v2.rotate(angle);
           _v2.add(previousVertex.position);
@@ -4594,12 +4511,12 @@ var Drawer = function () {
         var nextRing = this.getRing(vertex.value.bridgedRing);
 
         if (!nextRing.positioned) {
-          var nextCenter = _Vector2.default.subtract(vertex.previousPosition, vertex.position);
+          var nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
 
           nextCenter.invert();
           nextCenter.normalize();
 
-          var r = _MathHelper2.default.polyCircumradius(this.opts.bondLength, nextRing.members.length);
+          var r = MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
           nextCenter.multiplyScalar(r);
           nextCenter.add(vertex.position);
 
@@ -4609,12 +4526,12 @@ var Drawer = function () {
         var _nextRing = this.getRing(vertex.value.rings[0]);
 
         if (!_nextRing.positioned) {
-          var _nextCenter2 = _Vector2.default.subtract(vertex.previousPosition, vertex.position);
+          var _nextCenter2 = Vector2.subtract(vertex.previousPosition, vertex.position);
 
           _nextCenter2.invert();
           _nextCenter2.normalize();
 
-          var _r2 = _MathHelper2.default.polyCircumradius(this.opts.bondLength, _nextRing.getSize());
+          var _r2 = MathHelper.polyCircumradius(this.opts.bondLength, _nextRing.getSize());
 
           _nextCenter2.multiplyScalar(_r2);
           _nextCenter2.add(vertex.position);
@@ -4636,7 +4553,7 @@ var Drawer = function () {
 
         // Remove the previous vertex (which has already been drawn)
         if (previousVertex) {
-          _neighbours = _ArrayHelper2.default.remove(_neighbours, previousVertex.id);
+          _neighbours = ArrayHelper.remove(_neighbours, previousVertex.id);
         }
 
         var previousAngle = vertex.getAngle();
@@ -4666,11 +4583,11 @@ var Drawer = function () {
             this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
           } else if (previousVertex && previousVertex.value.rings.length > 0) {
             // If coming out of a ring, always draw away from the center of mass
-            var proposedAngleA = _MathHelper2.default.toRad(60);
+            var proposedAngleA = MathHelper.toRad(60);
             var proposedAngleB = -proposedAngleA;
 
-            var proposedVectorA = new _Vector2.default(this.opts.bondLength, 0);
-            var proposedVectorB = new _Vector2.default(this.opts.bondLength, 0);
+            var proposedVectorA = new Vector2(this.opts.bondLength, 0);
+            var proposedVectorB = new Vector2(this.opts.bondLength, 0);
 
             proposedVectorA.rotate(proposedAngleA).add(vertex.position);
             proposedVectorB.rotate(proposedAngleB).add(vertex.position);
@@ -4833,11 +4750,11 @@ var Drawer = function () {
 
             s.angle = -vertex.angle;
             if (vertex.angle >= 0) {
-              _l.angle = _MathHelper2.default.toRad(30);
-              _r4.angle = _MathHelper2.default.toRad(90);
+              _l.angle = MathHelper.toRad(30);
+              _r4.angle = MathHelper.toRad(90);
             } else {
-              _l.angle = -_MathHelper2.default.toRad(30);
-              _r4.angle = -_MathHelper2.default.toRad(90);
+              _l.angle = -MathHelper.toRad(30);
+              _r4.angle = -MathHelper.toRad(90);
             }
 
             this.createNextBond(s, vertex, previousAngle + s.angle);
@@ -4845,8 +4762,8 @@ var Drawer = function () {
             this.createNextBond(_r4, vertex, previousAngle + _r4.angle);
           } else {
             s.angle = 0.0;
-            _l.angle = _MathHelper2.default.toRad(90);
-            _r4.angle = -_MathHelper2.default.toRad(90);
+            _l.angle = MathHelper.toRad(90);
+            _r4.angle = -MathHelper.toRad(90);
 
             this.createNextBond(s, vertex, previousAngle + s.angle);
             this.createNextBond(_l, vertex, previousAngle + _l.angle);
@@ -4886,10 +4803,10 @@ var Drawer = function () {
             z = this.graph.vertices[_neighbours[2]];
           }
 
-          w.angle = -_MathHelper2.default.toRad(36);
-          x.angle = _MathHelper2.default.toRad(36);
-          y.angle = -_MathHelper2.default.toRad(108);
-          z.angle = _MathHelper2.default.toRad(108);
+          w.angle = -MathHelper.toRad(36);
+          x.angle = MathHelper.toRad(36);
+          y.angle = -MathHelper.toRad(108);
+          z.angle = MathHelper.toRad(108);
 
           this.createNextBond(w, vertex, previousAngle + w.angle);
           this.createNextBond(x, vertex, previousAngle + x.angle);
@@ -4914,7 +4831,7 @@ var Drawer = function () {
       for (var i = 0; i < neighbours.length; i++) {
         var neighbour = this.graph.vertices[neighbours[i]];
 
-        if (_ArrayHelper2.default.containsAll(neighbour.value.rings, vertex.value.rings)) {
+        if (ArrayHelper.containsAll(neighbour.value.rings, vertex.value.rings)) {
           return neighbour;
         }
       }
@@ -4939,7 +4856,7 @@ var Drawer = function () {
           continue;
         }
 
-        var radius = _MathHelper2.default.polyCircumradius(this.opts.bondLength, ring.getSize());
+        var radius = MathHelper.polyCircumradius(this.opts.bondLength, ring.getSize());
         var radiusSq = radius * radius;
 
         if (vec.distanceSq(ring.center) < radiusSq) {
@@ -5037,7 +4954,7 @@ var Drawer = function () {
       var v2 = this.graph.vertices[edge.targetId].position;
 
       // Get the normalized normals for the edge
-      var normals = _Vector2.default.units(v1, v2);
+      var normals = Vector2.units(v1, v2);
 
       return normals;
     }
@@ -5077,7 +4994,7 @@ var Drawer = function () {
 
       for (var i = 0; i < neighbours.length; i++) {
         var neighbour = this.graph.vertices[neighbours[i]];
-        var nIntersections = _ArrayHelper2.default.intersection(vertex.value.rings, neighbour.value.rings).length;
+        var nIntersections = ArrayHelper.intersection(vertex.value.rings, neighbour.value.rings).length;
 
         if (nIntersections === 0 && neighbour.value.isBridge == false) {
           nrneighbours.push(neighbour);
@@ -5193,7 +5110,7 @@ var Drawer = function () {
         var isCw = cwA === -1;
 
         var rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
-        var rs = _MathHelper2.default.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
+        var rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
 
         // Flip the hydrogen direction when the drawing doesn't match the chirality.
         var wedgeA = 'down';
@@ -5401,7 +5318,7 @@ var Drawer = function () {
 
           _neighbour2.value.isDrawn = false;
 
-          var hydrogens = _Atom2.default.maxBonds[_neighbour2.value.element] - this.getBondCount(_neighbour2);
+          var hydrogens = Atom.maxBonds[_neighbour2.value.element] - this.getBondCount(_neighbour2);
           var charge = '';
 
           if (_neighbour2.value.bracket) {
@@ -5451,14 +5368,10 @@ var Drawer = function () {
   return Drawer;
 }();
 
-exports.default = Drawer;
+module.exports = Drawer;
 
 },{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":6,"./Graph":7,"./Line":8,"./MathHelper":9,"./Ring":11,"./RingConnection":12,"./SSSR":13,"./Vector2":14,"./Vertex":15}],6:[function(require,module,exports){
 'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -5537,47 +5450,24 @@ var Edge = function () {
     return Edge;
 }();
 
-exports.default = Edge;
+module.exports = Edge;
 
 },{}],7:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _MathHelper = require('./MathHelper');
-
-var _MathHelper2 = _interopRequireDefault(_MathHelper);
-
-var _Vector = require('./Vector2');
-
-var _Vector2 = _interopRequireDefault(_Vector);
-
-var _Vertex = require('./Vertex');
-
-var _Vertex2 = _interopRequireDefault(_Vertex);
-
-var _Edge = require('./Edge');
-
-var _Edge2 = _interopRequireDefault(_Edge);
-
-var _Ring = require('./Ring');
-
-var _Ring2 = _interopRequireDefault(_Ring);
-
-var _Atom = require('./Atom');
-
-var _Atom2 = _interopRequireDefault(_Atom);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//@ts-check
+var MathHelper = require('./MathHelper');
+var Vector2 = require('./Vector2');
+var Vertex = require('./Vertex');
+var Edge = require('./Edge');
+var Ring = require('./Ring');
+var Atom = require('./Atom');
 
 /** 
  * A class representing the molecular graph. 
@@ -5588,6 +5478,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Object} elementCount A map associating element symbols with the number of occurences in this graph.
  * @property {Boolean} isometric A boolean indicating whether or not the SMILES associated with this graph is isometric.
  */
+
 var Graph = function () {
   /**
    * The constructor of the class Graph.
@@ -5629,13 +5520,13 @@ var Graph = function () {
       var isBranch = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
       // Create a new vertex object
-      var atom = new _Atom2.default(node.atom.element ? node.atom.element : node.atom, node.bond);
+      var atom = new Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
 
       atom.branchBond = node.branchBond;
       atom.ringbonds = node.ringbonds;
       atom.bracket = node.atom.element ? node.atom : null;
 
-      var vertex = new _Vertex2.default(atom);
+      var vertex = new Vertex(atom);
       var parentVertex = this.vertices[parentVertexId];
 
       this.addVertex(vertex);
@@ -5652,7 +5543,7 @@ var Graph = function () {
         parentVertex.spanningTreeChildren.push(vertex.id);
 
         // Add edge between this node and its parent
-        var edge = new _Edge2.default(parentVertexId, vertex.id, 1);
+        var edge = new Edge(parentVertexId, vertex.id, 1);
         var vertexId = null;
 
         if (isBranch) {
@@ -6244,8 +6135,8 @@ var Graph = function () {
       var length = vertexIds.length;
 
       // Initialize the positions. Place all vertices on a ring around the center
-      var radius = _MathHelper2.default.polyCircumradius(500, length);
-      var angle = _MathHelper2.default.centralAngle(length);
+      var radius = MathHelper.polyCircumradius(500, length);
+      var angle = MathHelper.centralAngle(length);
       var a = 0.0;
       var arrPositionX = new Float32Array(length);
       var arrPositionY = new Float32Array(length);
@@ -6629,25 +6520,17 @@ var Graph = function () {
   return Graph;
 }();
 
-exports.default = Graph;
+module.exports = Graph;
 
 },{"./Atom":3,"./Edge":6,"./MathHelper":9,"./Ring":11,"./Vector2":14,"./Vertex":15}],8:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _Vector = require('./Vector2');
-
-var _Vector2 = _interopRequireDefault(_Vector);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//@ts-check
+var Vector2 = require('./Vector2');
 
 /** 
  * A class representing a line.
@@ -6659,6 +6542,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Boolean} chiralFrom A boolean indicating whether or not the source atom is a chiral center.
  * @property {Boolean} chiralTo A boolean indicating whether or tno the target atom is a chiral center.
  */
+
 var Line = function () {
     /**
      * The constructor for the class Line.
@@ -6671,8 +6555,8 @@ var Line = function () {
      * @param {Boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
      */
     function Line() {
-        var from = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new _Vector2.default(0, 0);
-        var to = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new _Vector2.default(0, 0);
+        var from = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Vector2(0, 0);
+        var to = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Vector2(0, 0);
         var elementFrom = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
         var elementTo = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
         var chiralFrom = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
@@ -6723,7 +6607,7 @@ var Line = function () {
         key: 'getAngle',
         value: function getAngle() {
             // Get the angle between the line and the x-axis
-            var diff = _Vector2.default.subtract(this.getRightVector(), this.getLeftVector());
+            var diff = Vector2.subtract(this.getRightVector(), this.getLeftVector());
             return diff.angle();
         }
 
@@ -6918,7 +6802,7 @@ var Line = function () {
     }, {
         key: 'shortenFrom',
         value: function shortenFrom(by) {
-            var f = _Vector2.default.subtract(this.to, this.from);
+            var f = Vector2.subtract(this.to, this.from);
 
             f.normalize();
             f.multiplyScalar(by);
@@ -6938,7 +6822,7 @@ var Line = function () {
     }, {
         key: 'shortenTo',
         value: function shortenTo(by) {
-            var f = _Vector2.default.subtract(this.from, this.to);
+            var f = Vector2.subtract(this.from, this.to);
 
             f.normalize();
             f.multiplyScalar(by);
@@ -6996,7 +6880,7 @@ var Line = function () {
     }, {
         key: 'shorten',
         value: function shorten(by) {
-            var f = _Vector2.default.subtract(this.from, this.to);
+            var f = Vector2.subtract(this.from, this.to);
 
             f.normalize();
             f.multiplyScalar(by / 2.0);
@@ -7011,14 +6895,10 @@ var Line = function () {
     return Line;
 }();
 
-exports.default = Line;
+module.exports = Line;
 
 },{"./Vector2":14}],9:[function(require,module,exports){
 'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -7228,16 +7108,12 @@ var MathHelper = function () {
     return MathHelper;
 }();
 
-exports.default = MathHelper;
+module.exports = MathHelper;
 
 },{}],10:[function(require,module,exports){
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function () {
+module.exports = function () {
   "use strict";
 
   /*
@@ -8935,32 +8811,15 @@ exports.default = function () {
 },{}],11:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _ArrayHelper = require('./ArrayHelper');
-
-var _ArrayHelper2 = _interopRequireDefault(_ArrayHelper);
-
-var _Vector = require('./Vector2');
-
-var _Vector2 = _interopRequireDefault(_Vector);
-
-var _Vertex = require('./Vertex');
-
-var _Vertex2 = _interopRequireDefault(_Vertex);
-
-var _RingConnection = require('./RingConnection');
-
-var _RingConnection2 = _interopRequireDefault(_RingConnection);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//@ts-check
+var ArrayHelper = require('./ArrayHelper');
+var Vector2 = require('./Vector2');
+var Vertex = require('./Vertex');
+var RingConnection = require('./RingConnection');
 
 /** 
  * A class representing a ring.
@@ -8980,6 +8839,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Number} centralAngle The central angle of this ring.
  * @property {Boolean} canFlip A boolean indicating whether or not this ring allows flipping of attached vertices to the inside of the ring.
  */
+
 var Ring = function () {
     /**
      * The constructor for the class Ring.
@@ -8995,7 +8855,7 @@ var Ring = function () {
         this.insiders = [];
         this.neighbours = [];
         this.positioned = false;
-        this.center = new _Vector2.default(0, 0);
+        this.center = new Vector2(0, 0);
         this.rings = [];
         this.isBridged = false;
         this.isPartOfBridged = false;
@@ -9018,11 +8878,11 @@ var Ring = function () {
             var clone = new Ring(this.members);
 
             clone.id = this.id;
-            clone.insiders = _ArrayHelper2.default.clone(this.insiders);
-            clone.neighbours = _ArrayHelper2.default.clone(this.neighbours);
+            clone.insiders = ArrayHelper.clone(this.insiders);
+            clone.neighbours = ArrayHelper.clone(this.neighbours);
             clone.positioned = this.positioned;
             clone.center = this.center.clone();
-            clone.rings = _ArrayHelper2.default.clone(this.rings);
+            clone.rings = ArrayHelper.clone(this.rings);
             clone.isBridged = this.isBridged;
             clone.isPartOfBridged = this.isPartOfBridged;
             clone.isSpiro = this.isSpiro;
@@ -9121,7 +8981,7 @@ var Ring = function () {
             var orderedNeighbours = Array(this.neighbours.length);
 
             for (var i = 0; i < this.neighbours.length; i++) {
-                var vertices = _RingConnection2.default.getVertices(ringConnections, this.id, this.neighbours[i]);
+                var vertices = RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
 
                 orderedNeighbours[i] = {
                     n: vertices.length,
@@ -9199,31 +9059,20 @@ var Ring = function () {
     return Ring;
 }();
 
-exports.default = Ring;
+module.exports = Ring;
 
 },{"./ArrayHelper":2,"./RingConnection":12,"./Vector2":14,"./Vertex":15}],12:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _Vertex = require('./Vertex');
-
-var _Vertex2 = _interopRequireDefault(_Vertex);
-
-var _Ring = require('./Ring');
-
-var _Ring2 = _interopRequireDefault(_Ring);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//@ts-check
+var Vertex = require('./Vertex');
+var Ring = require('./Ring');
 
 /** 
  * A class representing a ring connection.
@@ -9233,6 +9082,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {Number} secondRingId A ring id.
  * @property {Set<Number>} vertices A set containing the vertex ids participating in the ring connection.
  */
+
 var RingConnection = function () {
     /**
      * The constructor for the class RingConnection.
@@ -9427,29 +9277,22 @@ var RingConnection = function () {
     return RingConnection;
 }();
 
-exports.default = RingConnection;
+module.exports = RingConnection;
 
 },{"./Ring":11,"./Vertex":15}],13:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _Graph = require('./Graph');
-
-var _Graph2 = _interopRequireDefault(_Graph);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+//@ts-check
+var Graph = require('./Graph');
+
 /** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
+
 var SSSR = function () {
     function SSSR() {
         _classCallCheck(this, SSSR);
@@ -9470,7 +9313,7 @@ var SSSR = function () {
                 return null;
             }
 
-            var connectedComponents = _Graph2.default.getConnectedComponents(adjacencyMatrix);
+            var connectedComponents = Graph.getConnectedComponents(adjacencyMatrix);
             var rings = Array();
 
             for (var i = 0; i < connectedComponents.length; i++) {
@@ -10199,14 +10042,10 @@ var SSSR = function () {
     return SSSR;
 }();
 
-exports.default = SSSR;
+module.exports = SSSR;
 
 },{"./Graph":7}],14:[function(require,module,exports){
 'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -10960,37 +10799,20 @@ var Vector2 = function () {
     return Vector2;
 }();
 
-exports.default = Vector2;
+module.exports = Vector2;
 
 },{}],15:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); //@ts-check
-
-
-var _MathHelper = require('./MathHelper');
-
-var _MathHelper2 = _interopRequireDefault(_MathHelper);
-
-var _ArrayHelper = require('./ArrayHelper');
-
-var _ArrayHelper2 = _interopRequireDefault(_ArrayHelper);
-
-var _Vector = require('./Vector2');
-
-var _Vector2 = _interopRequireDefault(_Vector);
-
-var _Atom = require('./Atom');
-
-var _Atom2 = _interopRequireDefault(_Atom);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+//@ts-check
+var MathHelper = require('./MathHelper');
+var ArrayHelper = require('./ArrayHelper');
+var Vector2 = require('./Vector2');
+var Atom = require('./Atom');
 
 /** 
  * A class representing a vertex.
@@ -11028,8 +10850,8 @@ var Vertex = function () {
 
     this.id = null;
     this.value = value;
-    this.position = new _Vector2.default(x ? x : 0, y ? y : 0);
-    this.previousPosition = new _Vector2.default(0, 0);
+    this.position = new Vector2(x ? x : 0, y ? y : 0);
+    this.previousPosition = new Vector2(0, 0);
     this.parentVertexId = null;
     this.children = Array();
     this.spanningTreeChildren = Array();
@@ -11185,11 +11007,11 @@ var Vertex = function () {
     value: function clone() {
       var clone = new Vertex(this.value, this.position.x, this.position.y);
       clone.id = this.id;
-      clone.previousPosition = new _Vector2.default(this.previousPosition.x, this.previousPosition.y);
+      clone.previousPosition = new Vector2(this.previousPosition.x, this.previousPosition.y);
       clone.parentVertexId = this.parentVertexId;
-      clone.children = _ArrayHelper2.default.clone(this.children);
-      clone.spanningTreeChildren = _ArrayHelper2.default.clone(this.spanningTreeChildren);
-      clone.edges = _ArrayHelper2.default.clone(this.edges);
+      clone.children = ArrayHelper.clone(this.children);
+      clone.spanningTreeChildren = ArrayHelper.clone(this.spanningTreeChildren);
+      clone.edges = ArrayHelper.clone(this.edges);
       clone.positioned = this.positioned;
       clone.angle = this.angle;
       clone.forcePositioned = this.forcePositioned;
@@ -11226,13 +11048,13 @@ var Vertex = function () {
       var u = null;
 
       if (!referenceVector) {
-        u = _Vector2.default.subtract(this.position, this.previousPosition);
+        u = Vector2.subtract(this.position, this.previousPosition);
       } else {
-        u = _Vector2.default.subtract(this.position, referenceVector);
+        u = Vector2.subtract(this.position, referenceVector);
       }
 
       if (returnAsDegrees) {
-        return _MathHelper2.default.toDeg(u.angle());
+        return MathHelper.toDeg(u.angle());
       }
 
       return u.angle();
@@ -11255,7 +11077,7 @@ var Vertex = function () {
         angles.push(this.getAngle(vertices[neighbours[i]].position));
       }
 
-      var textAngle = _MathHelper2.default.meanAngle(angles);
+      var textAngle = MathHelper.meanAngle(angles);
 
       // Round to 0, 90, 180 or 270 degree
       var halfPi = Math.PI / 2.0;
@@ -11378,7 +11200,7 @@ var Vertex = function () {
       var neighbours = this.getNeighbours();
 
       for (var i = 0; i < neighbours.length; i++) {
-        if (_ArrayHelper2.default.contains(vertices[neighbours[i]].value.rings, {
+        if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, {
           value: ringId
         }) && neighbours[i] != previousVertexId) {
           return neighbours[i];
@@ -11392,7 +11214,7 @@ var Vertex = function () {
   return Vertex;
 }();
 
-exports.default = Vertex;
+module.exports = Vertex;
 
 },{"./ArrayHelper":2,"./Atom":3,"./MathHelper":9,"./Vector2":14}]},{},[1])
 

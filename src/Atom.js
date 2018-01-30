@@ -1,7 +1,7 @@
 //@ts-check
-import ArrayHelper from './ArrayHelper'
-import Vertex from './Vertex'
-import Ring from './Ring'
+const ArrayHelper = require('./ArrayHelper')
+const Vertex = require('./Vertex')
+const Ring = require('./Ring')
 
 /** 
  * A class representing an atom.
@@ -37,7 +37,7 @@ import Ring from './Ring'
  * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
  */
-export default class Atom {
+class Atom {
   /**
    * The constructor of the class Atom.
    *
@@ -536,3 +536,5 @@ export default class Atom {
     };
   }
 }
+
+module.exports = Atom;

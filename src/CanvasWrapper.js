@@ -1,9 +1,9 @@
 //@ts-check
-import MathHelper from './MathHelper'
-import Vector2 from './Vector2'
-import Line from './Line'
-import Vertex from './Vertex'
-import Ring from './Ring'
+const MathHelper = require('./MathHelper')
+const Vector2 = require('./Vector2')
+const Line = require('./Line')
+const Vertex = require('./Vertex')
+const Ring = require('./Ring')
 
 /** 
  * A class wrapping a canvas element.
@@ -19,7 +19,7 @@ import Ring from './Ring'
  * @property {Number} fontLarge The large font size in pt.
  * @property {Number} fontSmall The small font size in pt.
  */
-export default class CanvasWrapper {
+class CanvasWrapper {
     /**
      * The constructor for the class CanvasWrapper.
      *
@@ -887,3 +887,5 @@ export default class CanvasWrapper {
     }
 
 }
+
+module.exports = CanvasWrapper;

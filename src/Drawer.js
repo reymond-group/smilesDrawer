@@ -1,16 +1,16 @@
 //@ts-check
-import MathHelper from './MathHelper'
-import ArrayHelper from './ArrayHelper'
-import Vector2 from './Vector2'
-import Line from './Line'
-import Vertex from './Vertex'
-import Edge from './Edge'
-import Atom from './Atom'
-import Ring from './Ring'
-import RingConnection from './RingConnection'
-import CanvasWrapper from './CanvasWrapper'
-import Graph from './Graph'
-import SSSR from './SSSR'
+const MathHelper = require('./MathHelper')
+const ArrayHelper = require('./ArrayHelper')
+const Vector2 = require('./Vector2')
+const Line = require('./Line')
+const Vertex = require('./Vertex')
+const Edge = require('./Edge')
+const Atom = require('./Atom')
+const Ring = require('./Ring')
+const RingConnection = require('./RingConnection')
+const CanvasWrapper = require('./CanvasWrapper')
+const Graph = require('./Graph')
+const SSSR = require('./SSSR')
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -24,7 +24,7 @@ import SSSR from './SSSR'
  * @property {Object} opts The merged options.
  * @property {Object} theme The current theme.
  */
-export default class Drawer {
+class Drawer {
   /**
    * The constructor for the class SmilesDrawer.
    *
@@ -2948,3 +2948,5 @@ export default class Drawer {
     }
   }
 }
+
+module.exports = Drawer;

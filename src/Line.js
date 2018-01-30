@@ -1,5 +1,5 @@
 //@ts-check
-import Vector2 from './Vector2'
+const Vector2 = require('./Vector2')
 
 /** 
  * A class representing a line.
@@ -11,7 +11,7 @@ import Vector2 from './Vector2'
  * @property {Boolean} chiralFrom A boolean indicating whether or not the source atom is a chiral center.
  * @property {Boolean} chiralTo A boolean indicating whether or tno the target atom is a chiral center.
  */
-export default class Line {
+class Line {
     /**
      * The constructor for the class Line.
      *
@@ -297,3 +297,5 @@ export default class Line {
         return this;
     }
 }
+
+module.exports = Line;

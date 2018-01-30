@@ -6,7 +6,7 @@
  * @property {Number} x The x component of the vector.
  * @property {Number} y The y component of the vector.
  */
-export default class Vector2 {
+class Vector2 {
     /**
      * The constructor of the class Vector2.
      *
@@ -625,3 +625,5 @@ export default class Vector2 {
         return avg.normalize();
     }
 }
+
+module.exports = Vector2;
