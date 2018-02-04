@@ -1,8 +1,8 @@
-start = s:chain whitespace* x:('|' (cxdelimiters? (!cxdelimiters x:[a-z0-9,;:\.]i { return x })+)* '|')?{
-	if (x && x[1].join) {
-		// s.extended = x[1].join('');
-        s.extended = x[1]
+start = s:chain whitespace* x:('|' cx '|')?{
+	if (x && x[1]) {
+    	s.extended = x[1]
     }
+    
 	return s;
 }
 
@@ -153,20 +153,57 @@ hcount = h:('H'[0-9]?) {
     return 1;
 }
 
-
 class = c:(':'([1-9][0-9]* / [0])) {
     return Number(c[1][0] + c[1][1].join(''));
 }
-
 
 isotope = i:([1-9][0-9]?[0-9]?) {
     return Number(i.join(''));
 }
 
-cxdelimiters 'cxdelimiters' = '$' / '$_AV:' / 'LN:' / 'atomprop:' / 'LP:' / 'lp:' / 
+cx = c:((cxdelimiters cxcontent) / '$' cxlabels '$' ','?)* {
+	var options = Array(c.length);
+    
+    for (var i = 0; i < c.length; i++) {
+    	options[i] = {
+        	'property': c[i][0] === '$' ? c[i][0] : c[i][0].slice(0, -1),
+            'value': c[i][1]
+        }
+    }
+    
+    return options;
+}
+
+cxlabels = c:(cxlabel ';'? / ';')+ {
+	var labels = Array(c.length)
+    for (var i = 0; i < c.length; i++) {
+    	if (c[i][0] === ';') {
+        	labels[i] = null;
+        } else {
+        	labels[i] = c[i][0];
+        }
+    }
+    return labels;
+}
+
+cxlabel = c:(cxtext '_p' / cxtext '_e' / cxrgroupindex) {
+	return c;
+}
+
+cxrgroupindex = c:('_R' [1-9]) {
+	return [c[1], c[0]];
+}
+
+cxcontent = (!cxdelimiters x:[a-z0-9,;:\.()-_]i { return x })+
+
+cxdelimiters 'cxdelimiters' = '$_AV:' / 'LN:' / 'atomprop:' / 'LP:' / 'lp:' / 
 	'C:' / 'c:' / 't:' / 'ctu:' / 'f:' / 'H:' / 'r:' / 'w:' / 'wU:' / 'wD:' / '@:' /
     '@@:' / 'THB:' / 'TLB:' / 'TEB:' / '^1:' / '^2:' / '^3:' / '^4:' / '^5:' /
     '^6:' / '^7:' / 'M:' / 'LN:' / 'SgD:' / 'RG:' / 'LO:' / 'Sg:' / 'SgH:'
+
+cxtext 'cxtext' = t:[a-z0-9]i* {
+	return t.join('')
+}
 
 whitespace 'whitespace' = '\t' / '\v' / '\f' / ' ' / '\u00A0' / '\uFEFF' / Zs
   
