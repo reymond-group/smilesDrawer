@@ -36,7 +36,6 @@ const Ring = require('./Ring')
  * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
  * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
- * @property {Number} bondCount The number of bonds this atom takes part in.
  */
 class Atom {
   /**
@@ -73,7 +72,6 @@ class Atom {
     this.hydrogenDirection = 'down';
     this.subtreeDepth = 1;
     this.hasHydrogen = false;
-    this.bondCount = 0;
   }
 
   /**

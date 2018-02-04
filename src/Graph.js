@@ -81,12 +81,6 @@ class Graph {
       }
 
       let edgeId = this.addEdge(edge);
-
-      vertex.value.bondCount += edge.weight;
-      parentVertex.value.bondCount += edge.weight;
-
-      vertex.edges.push(edgeId);
-      parentVertex.edges.push(edgeId);
     }
 
     let offset = node.ringbondCount + 1;
@@ -152,11 +146,13 @@ class Graph {
       // of hydrogens specified explicitly
       if (!atom.bracket) {
         if (typeof this.elementCount['H'] !== 'undefined') {
-          this.elementCount['H'] += 0;
+          this.elementCount['H'] += Atom.maxBonds[atom.element] - atom.bondCount;
         } else {
-          this.elementCount['H'] = 0;
+          this.elementCount['H'] = Atom.maxBonds[atom.element] - atom.bondCount;
         }
       }
+
+      // TODO: Aromatic rings, that's were it gets complicated (c1cccc1 -> Number of hydrogens?)
     }
   }
 
@@ -189,12 +185,21 @@ class Graph {
    * @returns {Number} The edge id of the new edge.
    */
   addEdge(edge) {
+    let source = this.vertices[edge.sourceId];
+    let target = this.vertices[edge.targetId];
+
     edge.id = this.edges.length;
     this.edges.push(edge);
 
     this.vertexIdsToEdgeId[edge.sourceId + '_' + edge.targetId] = edge.id;
     this.vertexIdsToEdgeId[edge.targetId + '_' + edge.sourceId] = edge.id;
-    edge.isPartOfAromaticRing = this.vertices[edge.sourceId].value.isPartOfAromaticRing && this.vertices[edge.targetId].value.isPartOfAromaticRing;
+    edge.isPartOfAromaticRing = source.value.isPartOfAromaticRing && target.value.isPartOfAromaticRing;
+
+    source.value.bondCount += edge.weight;
+    target.value.bondCount += edge.weight;
+
+    source.edges.push(edge.id);
+    target.edges.push(edge.id);
 
     return edge.id;
   }

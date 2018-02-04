@@ -332,7 +332,6 @@ A class representing an atom.
 | mainChain | <code>Boolean</code> | A boolean indicating whether or not this atom is part of the main chain (used for chirality). |
 | hydrogenDirection | <code>String</code> | The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen. |
 | subtreeDepth | <code>Number</code> | The depth of the subtree coming from a stereocenter. |
-| bondCount | <code>Number</code> | The number of bonds this atom takes part in. |
 
 
 * [Atom](#Atom)
@@ -841,7 +840,6 @@ The main class of the application representing the smiles drawer
     * [.isEdgeRotatable(edge)](#Drawer+isEdgeRotatable) ⇒ <code>Boolean</code>
     * [.isRingAromatic(ring)](#Drawer+isRingAromatic) ⇒ <code>Boolean</code>
     * [.getEdgeNormals(edge)](#Drawer+getEdgeNormals) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
-    * [.getBondCount(vertex)](#Drawer+getBondCount) ⇒ <code>Number</code>
     * [.getNonRingNeighbours(vertexId)](#Drawer+getNonRingNeighbours) ⇒ <code>[Array.&lt;Vertex&gt;](#Vertex)</code>
     * [.annotateStereochemistry()](#Drawer+annotateStereochemistry)
     * [.visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth)](#Drawer+visitStereochemistry)
@@ -1458,18 +1456,6 @@ Get the normals of an edge.
 | Param | Type | Description |
 | --- | --- | --- |
 | edge | <code>[Edge](#Edge)</code> | An edge. |
-
-<a name="Drawer+getBondCount"></a>
-
-### drawer.getBondCount(vertex) ⇒ <code>Number</code>
-Gets the number of bonds of a vertex.
-
-**Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>Number</code> - The number of bonds the vertex participates in.  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| vertex | <code>[Vertex](#Vertex)</code> | A vertex. |
 
 <a name="Drawer+getNonRingNeighbours"></a>
 

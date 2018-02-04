@@ -1462,7 +1462,7 @@ class Drawer {
       let atom = vertex.value;
       let charge = 0;
       let isotope = 0;
-      let bondCount = this.getBondCount(vertex);
+      let bondCount = vertex.value.bondCount;
       let element = atom.element;
       let hydrogens = Atom.maxBonds[element] - bondCount;
       let dir = vertex.getTextDirection(this.graph.vertices);
@@ -2576,22 +2576,6 @@ class Drawer {
   }
 
   /**
-   * Gets the number of bonds of a vertex.
-   *
-   * @param {Vertex} vertex A vertex.
-   * @returns {Number} The number of bonds the vertex participates in.
-   */
-  getBondCount(vertex) {
-    let count = 0;
-
-    for (var i = 0; i < vertex.edges.length; i++) {
-      count += this.graph.edges[vertex.edges[i]].weight;
-    }
-
-    return count;
-  }
-
-  /**
    * Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
    *
    * @param {Number} vertexId A vertex id.
@@ -2920,7 +2904,7 @@ class Drawer {
 
         neighbour.value.isDrawn = false;
 
-        let hydrogens = Atom.maxBonds[neighbour.value.element] - this.getBondCount(neighbour);
+        let hydrogens = Atom.maxBonds[neighbour.value.element] - neighbour.value.bondCount;
         let charge = '';
 
         if (neighbour.value.bracket) {

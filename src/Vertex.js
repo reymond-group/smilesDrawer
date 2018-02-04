@@ -82,7 +82,6 @@ class Vertex {
     this.neighbours.push(vertexId);
 
     this.neighbourCount++;
-    this.value.bondCount++;
   }
 
   /**
@@ -133,7 +132,6 @@ class Vertex {
     }
 
     this.neighbourCount++;
-    this.value.bondCount++;
   }
 
   /**
@@ -145,8 +143,6 @@ class Vertex {
     this.neighbourCount++;
     this.parentVertexId = parentVertexId;
     this.neighbours.push(parentVertexId);
-
-    this.value.bondCount++;
   }
 
   /**

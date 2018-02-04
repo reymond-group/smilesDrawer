@@ -626,7 +626,6 @@ var Ring = require('./Ring');
  * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
  * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
- * @property {Number} bondCount The number of bonds this atom takes part in.
  */
 
 var Atom = function () {
@@ -668,7 +667,6 @@ var Atom = function () {
     this.hydrogenDirection = 'down';
     this.subtreeDepth = 1;
     this.hasHydrogen = false;
-    this.bondCount = 0;
   }
 
   /**
@@ -3815,7 +3813,7 @@ var Drawer = function () {
         var atom = vertex.value;
         var charge = 0;
         var isotope = 0;
-        var bondCount = this.getBondCount(vertex);
+        var bondCount = vertex.value.bondCount;
         var element = atom.element;
         var hydrogens = Atom.maxBonds[element] - bondCount;
         var dir = vertex.getTextDirection(this.graph.vertices);
@@ -4983,25 +4981,6 @@ var Drawer = function () {
     }
 
     /**
-     * Gets the number of bonds of a vertex.
-     *
-     * @param {Vertex} vertex A vertex.
-     * @returns {Number} The number of bonds the vertex participates in.
-     */
-
-  }, {
-    key: 'getBondCount',
-    value: function getBondCount(vertex) {
-      var count = 0;
-
-      for (var i = 0; i < vertex.edges.length; i++) {
-        count += this.graph.edges[vertex.edges[i]].weight;
-      }
-
-      return count;
-    }
-
-    /**
      * Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
      *
      * @param {Number} vertexId A vertex id.
@@ -5341,7 +5320,7 @@ var Drawer = function () {
 
           _neighbour2.value.isDrawn = false;
 
-          var hydrogens = Atom.maxBonds[_neighbour2.value.element] - this.getBondCount(_neighbour2);
+          var hydrogens = Atom.maxBonds[_neighbour2.value.element] - _neighbour2.value.bondCount;
           var charge = '';
 
           if (_neighbour2.value.bracket) {
@@ -5580,12 +5559,6 @@ var Graph = function () {
         }
 
         var edgeId = this.addEdge(edge);
-
-        vertex.value.bondCount += edge.weight;
-        parentVertex.value.bondCount += edge.weight;
-
-        vertex.edges.push(edgeId);
-        parentVertex.edges.push(edgeId);
       }
 
       var offset = node.ringbondCount + 1;
@@ -5654,11 +5627,13 @@ var Graph = function () {
         // of hydrogens specified explicitly
         if (!atom.bracket) {
           if (typeof this.elementCount['H'] !== 'undefined') {
-            this.elementCount['H'] += 0;
+            this.elementCount['H'] += Atom.maxBonds[atom.element] - atom.bondCount;
           } else {
-            this.elementCount['H'] = 0;
+            this.elementCount['H'] = Atom.maxBonds[atom.element] - atom.bondCount;
           }
         }
+
+        // TODO: Aromatic rings, that's were it gets complicated (c1cccc1 -> Number of hydrogens?)
       }
     }
 
@@ -5700,12 +5675,21 @@ var Graph = function () {
   }, {
     key: 'addEdge',
     value: function addEdge(edge) {
+      var source = this.vertices[edge.sourceId];
+      var target = this.vertices[edge.targetId];
+
       edge.id = this.edges.length;
       this.edges.push(edge);
 
       this.vertexIdsToEdgeId[edge.sourceId + '_' + edge.targetId] = edge.id;
       this.vertexIdsToEdgeId[edge.targetId + '_' + edge.sourceId] = edge.id;
-      edge.isPartOfAromaticRing = this.vertices[edge.sourceId].value.isPartOfAromaticRing && this.vertices[edge.targetId].value.isPartOfAromaticRing;
+      edge.isPartOfAromaticRing = source.value.isPartOfAromaticRing && target.value.isPartOfAromaticRing;
+
+      source.value.bondCount += edge.weight;
+      target.value.bondCount += edge.weight;
+
+      source.edges.push(edge.id);
+      target.edges.push(edge.id);
 
       return edge.id;
     }
@@ -10958,7 +10942,6 @@ var Vertex = function () {
       this.neighbours.push(vertexId);
 
       this.neighbourCount++;
-      this.value.bondCount++;
     }
 
     /**
@@ -11012,7 +10995,6 @@ var Vertex = function () {
       }
 
       this.neighbourCount++;
-      this.value.bondCount++;
     }
 
     /**
@@ -11027,8 +11009,6 @@ var Vertex = function () {
       this.neighbourCount++;
       this.parentVertexId = parentVertexId;
       this.neighbours.push(parentVertexId);
-
-      this.value.bondCount++;
     }
 
     /**
