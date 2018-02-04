@@ -1,17 +1,24 @@
 //@ts-check
-import Drawer from './src/Drawer'
-import Parser from './src/Parser'
+const Drawer = require('./src/Drawer')
+const Parser = require('./src/Parser')
+
+
+// Detect SSR (server side rendering)
+var canUseDOM = !!(
+  (typeof window !== 'undefined' &&
+  window.document && window.document.createElement)
+);
 
 /**
  * The SmilesDrawer namespace.
  * @typicalname SmilesDrawer
  */
-window.SmilesDrawer = {
+var SmilesDrawer = {
   Version: '1.0.0'
 };
 
-window.SmilesDrawer.Drawer = Drawer;
-window.SmilesDrawer.Parser = Parser;
+SmilesDrawer.Drawer = Drawer;
+SmilesDrawer.Parser = Parser;
 
 /**
 * Cleans a SMILES string (removes non-valid characters)
@@ -20,7 +27,7 @@ window.SmilesDrawer.Parser = Parser;
 * @param {String} smiles A SMILES string.
 * @returns {String} The clean SMILES string.
 */
-window.SmilesDrawer.clean = function(smiles) {
+SmilesDrawer.clean = function(smiles) {
   return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g,'');
 }
 
@@ -33,7 +40,7 @@ window.SmilesDrawer.clean = function(smiles) {
 * @param {String} [themeName='light'] The theme to apply.
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
-window.SmilesDrawer.apply = function(options, selector='canvas[data-smiles]', themeName='light', onError=null) {
+SmilesDrawer.apply = function(options, selector='canvas[data-smiles]', themeName='light', onError=null) {
   let smilesDrawer = new Drawer(options);
   let elements = document.querySelectorAll(selector);
 
@@ -58,7 +65,7 @@ window.SmilesDrawer.apply = function(options, selector='canvas[data-smiles]', th
 * @param {Function} successCallback A callback that is called on success with the parse tree.
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
-window.SmilesDrawer.parse = function(smiles, successCallback, errorCallback) {
+SmilesDrawer.parse = function(smiles, successCallback, errorCallback) {
   try {
       if (successCallback) {
           successCallback(Parser.parse(smiles));
@@ -70,6 +77,9 @@ window.SmilesDrawer.parse = function(smiles, successCallback, errorCallback) {
   }
 }
 
+if (canUseDOM) {
+  window.SmilesDrawer = SmilesDrawer;
+}
 
 // There be dragons (polyfills)
 
@@ -117,3 +127,5 @@ Object.defineProperty(Array.prototype, 'fill', {
   }
 });
 }
+
+module.exports = SmilesDrawer;

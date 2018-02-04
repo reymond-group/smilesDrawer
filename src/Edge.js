@@ -12,7 +12,7 @@
  * @property {Boolean} [center=false] Wheter or not the bond is centered. For example, this affects straight double bonds.
  * @property {String} [wedge=''] Wedge direction. Either '', 'up' or 'down'
  */
-export default class Edge {
+class Edge {
     /**
      * The constructor for the class Edge.
      *
@@ -57,3 +57,4 @@ export default class Edge {
     }
 }
 
+module.exports = Edge

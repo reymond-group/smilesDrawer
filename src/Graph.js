@@ -1,10 +1,10 @@
 //@ts-check
-import MathHelper from './MathHelper'
-import Vector2 from './Vector2'
-import Vertex from './Vertex'
-import Edge from './Edge'
-import Ring from './Ring'
-import Atom from './Atom'
+const MathHelper = require('./MathHelper')
+const Vector2 = require('./Vector2')
+const Vertex = require('./Vertex')
+const Edge = require('./Edge')
+const Ring = require('./Ring')
+const Atom = require('./Atom')
 
 /** 
  * A class representing the molecular graph. 
@@ -15,7 +15,7 @@ import Atom from './Atom'
  * @property {Object} elementCount A map associating element symbols with the number of occurences in this graph.
  * @property {Boolean} isometric A boolean indicating whether or not the SMILES associated with this graph is isometric.
  */
-export default class Graph {
+class Graph {
   /**
    * The constructor of the class Graph.
    * 
@@ -931,3 +931,5 @@ export default class Graph {
     }
   }
 }
+
+module.exports = Graph
