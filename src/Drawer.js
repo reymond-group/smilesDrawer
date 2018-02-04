@@ -476,6 +476,20 @@ class Drawer {
   }
 
   /**
+   * Returns the molecular formula of the loaded molecule as a string.
+   * 
+   * @returns {String} The molecular formula.
+   */
+  getMolecularFormula() {
+    let molecularFormula = '';
+    
+    let elementCount = this.graph.elementCount;
+    console.log(elementCount);
+
+    return molecularFormula;
+  }
+
+  /**
    * Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond represents the break in a ring introduced when creating the MST. If the two vertices supplied as arguments are not part of a common ringbond, the method returns null.
    *
    * @param {Vertex} vertexA A vertex.
@@ -523,17 +537,21 @@ class Drawer {
 
       for (var j = 0; j < vertex.value.ringbonds.length; j++) {
         let ringbondId = vertex.value.ringbonds[j].id;
+        let ringbondBond = vertex.value.ringbonds[j].bond;
 
         // If the other ringbond id has not been discovered,
         // add it to the open bonds map and continue.
         // if the other ringbond id has already been discovered,
         // create a bond between the two atoms.
         if (!openBonds.has(ringbondId)) {
-          openBonds.set(ringbondId, vertex.id);
+          openBonds.set(ringbondId, [vertex.id, ringbondBond]);
         } else {
           let sourceVertexId = vertex.id;
-          let targetVertexId = openBonds.get(ringbondId);
-          let edgeId = this.graph.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
+          let targetVertexId = openBonds.get(ringbondId)[0];
+          let targetRingbondBond = openBonds.get(ringbondId)[1];
+          let edge = new Edge(sourceVertexId, targetVertexId, 1);
+          edge.setBondType(targetRingbondBond || ringbondBond || '-');
+          let edgeId = this.graph.addEdge(edge);
           let targetVertex = this.graph.vertices[targetVertexId];
 
           vertex.addRingbondChild(targetVertexId, j);

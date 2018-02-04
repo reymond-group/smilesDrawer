@@ -626,6 +626,7 @@ var Ring = require('./Ring');
  * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
  * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
+ * @property {Number} bondCount The number of bonds this atom takes part in.
  */
 
 var Atom = function () {
@@ -667,6 +668,7 @@ var Atom = function () {
     this.hydrogenDirection = 'down';
     this.subtreeDepth = 1;
     this.hasHydrogen = false;
+    this.bondCount = 0;
   }
 
   /**
@@ -2671,6 +2673,23 @@ var Drawer = function () {
     }
 
     /**
+     * Returns the molecular formula of the loaded molecule as a string.
+     * 
+     * @returns {String} The molecular formula.
+     */
+
+  }, {
+    key: 'getMolecularFormula',
+    value: function getMolecularFormula() {
+      var molecularFormula = '';
+
+      var elementCount = this.graph.elementCount;
+      console.log(elementCount);
+
+      return molecularFormula;
+    }
+
+    /**
      * Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond represents the break in a ring introduced when creating the MST. If the two vertices supplied as arguments are not part of a common ringbond, the method returns null.
      *
      * @param {Vertex} vertexA A vertex.
@@ -2724,17 +2743,21 @@ var Drawer = function () {
 
         for (var j = 0; j < vertex.value.ringbonds.length; j++) {
           var ringbondId = vertex.value.ringbonds[j].id;
+          var ringbondBond = vertex.value.ringbonds[j].bond;
 
           // If the other ringbond id has not been discovered,
           // add it to the open bonds map and continue.
           // if the other ringbond id has already been discovered,
           // create a bond between the two atoms.
           if (!openBonds.has(ringbondId)) {
-            openBonds.set(ringbondId, vertex.id);
+            openBonds.set(ringbondId, [vertex.id, ringbondBond]);
           } else {
             var sourceVertexId = vertex.id;
-            var targetVertexId = openBonds.get(ringbondId);
-            var edgeId = this.graph.addEdge(new Edge(sourceVertexId, targetVertexId, 1));
+            var targetVertexId = openBonds.get(ringbondId)[0];
+            var targetRingbondBond = openBonds.get(ringbondId)[1];
+            var edge = new Edge(sourceVertexId, targetVertexId, 1);
+            edge.setBondType(targetRingbondBond || ringbondBond || '-');
+            var edgeId = this.graph.addEdge(edge);
             var targetVertex = this.graph.vertices[targetVertexId];
 
             vertex.addRingbondChild(targetVertexId, j);
@@ -5549,12 +5572,18 @@ var Graph = function () {
         if (isBranch) {
           edge.setBondType(vertex.value.branchBond || '-');
           vertexId = vertex.id;
+          edge.setBondType(vertex.value.branchBond || '-');
+          vertexId = vertex.id;
         } else {
           edge.setBondType(parentVertex.value.bondType || '-');
           vertexId = parentVertex.id;
         }
 
         var edgeId = this.addEdge(edge);
+
+        vertex.value.bondCount += edge.weight;
+        parentVertex.value.bondCount += edge.weight;
+
         vertex.edges.push(edgeId);
         parentVertex.edges.push(edgeId);
       }
@@ -5600,13 +5629,35 @@ var Graph = function () {
   }, {
     key: '_initInfos',
     value: function _initInfos() {
+      // Initialize element count
       for (var i = 0; i < this.vertices.length; i++) {
         var atom = this.vertices[i].value;
 
         if (typeof this.elementCount[atom.element] !== 'undefined') {
           this.elementCount[atom.element] += 1;
         } else {
-          this.elementCount[atom.element] = 0;
+          this.elementCount[atom.element] = 1;
+        }
+
+        // Hydrogens attached to a chiral center were added as vertices,
+        // those in non chiral brackets are added here
+        if (atom.bracket && !atom.bracket.chirality) {
+          if (typeof this.elementCount['H'] !== 'undefined') {
+            this.elementCount['H'] += atom.bracket.hcount;
+          } else {
+            this.elementCount['H'] = atom.bracket.hcount;
+          }
+        }
+
+        // Add the implicit hydrogens according to valency, exclude
+        // bracket atoms as they were handled and always have the number
+        // of hydrogens specified explicitly
+        if (!atom.bracket) {
+          if (typeof this.elementCount['H'] !== 'undefined') {
+            this.elementCount['H'] += 0;
+          } else {
+            this.elementCount['H'] = 0;
+          }
         }
       }
     }

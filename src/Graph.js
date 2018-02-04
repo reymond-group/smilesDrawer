@@ -73,12 +73,18 @@ class Graph {
       if (isBranch) {
         edge.setBondType(vertex.value.branchBond || '-');
         vertexId = vertex.id;
+        edge.setBondType(vertex.value.branchBond || '-');
+        vertexId = vertex.id;
       } else {
         edge.setBondType(parentVertex.value.bondType || '-');
         vertexId = parentVertex.id;
       }
 
       let edgeId = this.addEdge(edge);
+
+      vertex.value.bondCount += edge.weight;
+      parentVertex.value.bondCount += edge.weight;
+
       vertex.edges.push(edgeId);
       parentVertex.edges.push(edgeId);
     }
@@ -121,13 +127,35 @@ class Graph {
    * PRIVATE FUNCTION. Initializes element counts etc.
    */
   _initInfos() {
+    // Initialize element count
     for (var i = 0; i < this.vertices.length; i++) {
       let atom = this.vertices[i].value;
 
       if (typeof this.elementCount[atom.element] !== 'undefined') {
         this.elementCount[atom.element] += 1;
       } else {
-        this.elementCount[atom.element] = 0;
+        this.elementCount[atom.element] = 1;
+      }
+
+      // Hydrogens attached to a chiral center were added as vertices,
+      // those in non chiral brackets are added here
+      if (atom.bracket && !atom.bracket.chirality) {
+        if (typeof this.elementCount['H'] !== 'undefined') {
+          this.elementCount['H'] += atom.bracket.hcount;
+        } else {
+          this.elementCount['H'] = atom.bracket.hcount;
+        }
+      }
+
+      // Add the implicit hydrogens according to valency, exclude
+      // bracket atoms as they were handled and always have the number
+      // of hydrogens specified explicitly
+      if (!atom.bracket) {
+        if (typeof this.elementCount['H'] !== 'undefined') {
+          this.elementCount['H'] += 0;
+        } else {
+          this.elementCount['H'] = 0;
+        }
       }
     }
   }
