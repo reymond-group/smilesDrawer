@@ -174,6 +174,12 @@ SmilesDrawer.parse('C1CCCCC1', function (tree) {
 
 The function `smilesDrawer.draw()` requires two and accepts up to four arguments. The first argument is the parse tree returned by the parse function (through the callback), the second is the `id` of a HTML canvas element on which the structure will be drawn. The two optional arguments are whether to use the light or dark theme (defaults to `'light'`) and whether to only compute properties such as ring count, hac, etc. and not depict the structure (defaults to `false`).
 
+### API
+The SmilesDrawer object exposes methods that can be used for purposes other than drawing chemical structures.
+
+| Method | Description | Returns |
+|---|---|---|
+| `getMolecularFormula()` | Returns the molcular formula, eg. C22H30N6O4S, of the currently loaded molecule. | `String` |
 
 ### Bridged Rings
 Bridged rings are positioned using the Kamada–Kawai algorithm. If there is a bridged ring in the molecule, explicitly defined aromatic rings are not drawn with a circle inside the ring, but with dashed gray lines where double bonds would be.

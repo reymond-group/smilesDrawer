@@ -12,7 +12,6 @@ const Atom = require('./Atom')
  * @property {Vertex[]} vertices The vertices of the graph.
  * @property {Edge[]} edges The edges of this graph.
  * @property {Object} vertexIdsToEdgeId A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId.
- * @property {Object} elementCount A map associating element symbols with the number of occurences in this graph.
  * @property {Boolean} isometric A boolean indicating whether or not the SMILES associated with this graph is isometric.
  */
 class Graph {
@@ -26,13 +25,11 @@ class Graph {
     this.vertices = Array();
     this.edges = Array();
     this.vertexIdsToEdgeId = {};
-    this.elementCount = {};
     this.isomeric = isomeric;
 
     // Used for the bridge detection algorithm
     this._time = 0;
     this._init(parseTree);
-    this._initInfos();
   }
 
   /**
@@ -114,45 +111,6 @@ class Graph {
 
     if (node.hasNext) {
       this._init(node.next, node.branchCount + offset, vertex.id);
-    }
-  }
-
-  /**
-   * PRIVATE FUNCTION. Initializes element counts etc.
-   */
-  _initInfos() {
-    // Initialize element count
-    for (var i = 0; i < this.vertices.length; i++) {
-      let atom = this.vertices[i].value;
-
-      if (typeof this.elementCount[atom.element] !== 'undefined') {
-        this.elementCount[atom.element] += 1;
-      } else {
-        this.elementCount[atom.element] = 1;
-      }
-
-      // Hydrogens attached to a chiral center were added as vertices,
-      // those in non chiral brackets are added here
-      if (atom.bracket && !atom.bracket.chirality) {
-        if (typeof this.elementCount['H'] !== 'undefined') {
-          this.elementCount['H'] += atom.bracket.hcount;
-        } else {
-          this.elementCount['H'] = atom.bracket.hcount;
-        }
-      }
-
-      // Add the implicit hydrogens according to valency, exclude
-      // bracket atoms as they were handled and always have the number
-      // of hydrogens specified explicitly
-      if (!atom.bracket) {
-        if (typeof this.elementCount['H'] !== 'undefined') {
-          this.elementCount['H'] += Atom.maxBonds[atom.element] - atom.bondCount;
-        } else {
-          this.elementCount['H'] = Atom.maxBonds[atom.element] - atom.bondCount;
-        }
-      }
-
-      // TODO: Aromatic rings, that's were it gets complicated (c1cccc1 -> Number of hydrogens?)
     }
   }
 

@@ -259,6 +259,7 @@ class Atom {
    */
   static get maxBonds() {
     return {
+      'H': 1,
       'C': 4,
       'N': 3,
       'O': 2,
