@@ -2313,8 +2313,11 @@ var Drawer = function () {
       var infoOnly = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
       this.data = data;
-      this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts);
       this.infoOnly = infoOnly;
+
+      if (!this.infoOnly) {
+        this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts);
+      }
 
       this.ringIdCounter = 0;
       this.ringConnectionIdCounter = 0;
