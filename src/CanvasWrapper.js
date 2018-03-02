@@ -116,7 +116,7 @@ class CanvasWrapper {
         }
 
         // Add padding
-        var padding = 20.0;
+        var padding = this.opts.padding;
         maxX += padding;
         maxY += padding;
         minX -= padding;
