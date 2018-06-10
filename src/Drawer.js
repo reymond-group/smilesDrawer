@@ -56,6 +56,7 @@ class Drawer {
       compactDrawing: true,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
+      padding: 20.0,
       themes: {
         dark: {
           C: '#fff',
