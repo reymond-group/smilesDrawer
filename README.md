@@ -188,3 +188,7 @@ Bridged rings are positioned using the Kamada–Kawai algorithm. If there is a b
 
 ### [Documentation](/doc/all.md)
 The documentation can be found in the docs folder. A markdown version is available [here](/doc/all.md).
+
+### Contributors
+Thank you for contributing:
+[ohardy](https://github.com/ohardy)
