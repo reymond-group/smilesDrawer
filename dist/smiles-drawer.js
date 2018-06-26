@@ -1326,7 +1326,7 @@ var CanvasWrapper = function () {
             }
 
             // Add padding
-            var padding = 20.0;
+            var padding = this.opts.padding;
             maxX += padding;
             maxY += padding;
             minX -= padding;
@@ -1499,8 +1499,8 @@ var CanvasWrapper = function () {
             gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
 
             if (dashed) {
-                ctx.setLineDash([1, 1]);
-                ctx.lineWidth = this.opts.bondThickness;
+                ctx.setLineDash([1, 1.5]);
+                ctx.lineWidth = this.opts.bondThickness / 1.5;
             }
 
             if (alpha < 1.0) {
@@ -2213,6 +2213,7 @@ var Drawer = function () {
       compactDrawing: true,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
+      padding: 20.0,
       themes: {
         dark: {
           C: '#fff',

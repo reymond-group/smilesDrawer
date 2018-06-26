@@ -272,8 +272,8 @@ class CanvasWrapper {
             this.getColor('C'));
 
         if (dashed) {
-            ctx.setLineDash([1, 1]);
-            ctx.lineWidth = this.opts.bondThickness;
+            ctx.setLineDash([1, 1.5]);
+            ctx.lineWidth = this.opts.bondThickness / 1.5;
         }
 
         if (alpha < 1.0) {
