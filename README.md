@@ -6,6 +6,8 @@ If you use this code or application, please cite the original paper published by
 
 <img src="http://doc.gdb.tools/smilesDrawer/structures.png"></img>
 
+<h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html">Demo</a></h3>
+
 ### Examples
 An example using the light theme can be found [here](http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html), while one using the dark theme can be found [here](http://doc.gdb.tools/smilesDrawer/sd/example/index.html) . The colors of SmilesDrawer are completely configurable.
 
