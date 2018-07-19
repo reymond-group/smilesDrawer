@@ -18,6 +18,7 @@ Examples showing molecules from different databases:
 - [SureChEMBL](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=schembl)
 - [ChEMBL](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=chembl)
 
+A very simple JSFiddle example can be found [here](https://jsfiddle.net/zjdtkL57/1/). This example shows the `SmilesDrawer.apply()` functionality which draws the structure for every `canvas` element with a `data-smiles` attribute. E.g. `<canvas data-smiles="C1CCCCC1"></canvas>`
 ### "Installation"
 SmilesDrawer is available from the unpkg content delivery network:
 ```
