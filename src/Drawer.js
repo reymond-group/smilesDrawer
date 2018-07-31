@@ -1530,6 +1530,12 @@ class Drawer {
       let isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
 
+      // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
+      // should be the most common state. This has to be fixed by kekulization
+      if (atom.element === 'N' && atom.isPartOfAromaticRing) {
+        hydrogens = 0;
+      }
+
       if (atom.bracket) {
         hydrogens = atom.bracket.hcount;
         charge = atom.bracket.charge;
