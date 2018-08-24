@@ -1,6 +1,6 @@
 ![Smiles Drawer](https://github.com/reymond-group/smilesDrawer/blob/master/logo.png?raw=true)
 # Smiles Drawer
-Current Version: 1.0.9 ([Ballroom Blitz](https://www.youtube.com/watch?v=ewFBuYHldeY))
+Current Version: 1.0.10 ([Ballroom Blitz](https://www.youtube.com/watch?v=ewFBuYHldeY))
 
 If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: [10.1021/acs.jcim.7b00425](http://dx.doi.org/10.1021/acs.jcim.7b00425)
 

@@ -1565,7 +1565,6 @@ A class representing the molecular graph.
 | vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | The vertices of the graph. |
 | edges | <code>[Array.&lt;Edge&gt;](#Edge)</code> | The edges of this graph. |
 | vertexIdsToEdgeId | <code>Object</code> | A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId. |
-| elementCount | <code>Object</code> | A map associating element symbols with the number of occurences in this graph. |
 | isometric | <code>Boolean</code> | A boolean indicating whether or not the SMILES associated with this graph is isometric. |
 
 
@@ -1573,7 +1572,6 @@ A class representing the molecular graph.
     * [new Graph(parseTree, [isomeric])](#new_Graph_new)
     * _instance_
         * [._init(node, parentVertexId, isBranch)](#Graph+_init)
-        * [._initInfos()](#Graph+_initInfos)
         * [.clear()](#Graph+clear)
         * [.addVertex(vertex)](#Graph+addVertex) ⇒ <code>Number</code>
         * [.addEdge(edge)](#Graph+addEdge) ⇒ <code>Number</code>
@@ -1625,12 +1623,6 @@ PRIVATE FUNCTION. Initializing the graph from the parse tree.
 | parentVertexId | <code>Number</code> | <code></code> | The id of the previous vertex. |
 | isBranch | <code>Boolean</code> | <code>false</code> | Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C). |
 
-<a name="Graph+_initInfos"></a>
-
-### graph._initInfos()
-PRIVATE FUNCTION. Initializes element counts etc.
-
-**Kind**: instance method of <code>[Graph](#Graph)</code>  
 <a name="Graph+clear"></a>
 
 ### graph.clear()
