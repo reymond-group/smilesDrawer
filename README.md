@@ -56,7 +56,7 @@ In order to have nice consistent font rendering you have to include the droid sa
         <input id="example-input" name="example-input" />
         <canvas id="example-canvas" width="500" height="500"></canvas>
 
-        <script src="https://unpkg.com/smiles-drawer@1.0.2/dist/smiles-drawer.min.js"></script>
+        <script src="https://unpkg.com/smiles-drawer@1.0.10/dist/smiles-drawer.min.js"></script>
         <script>
             let input = document.getElementById('example-input');
             let options = {};
