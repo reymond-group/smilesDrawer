@@ -7171,6 +7171,9 @@ module.exports = MathHelper;
 },{}],10:[function(require,module,exports){
 "use strict";
 
+// WHEN REPLACING, CHECK FOR:
+// KEEP THIS WHEN REGENERATING THE PARSER !!
+
 module.exports = function () {
   "use strict";
 
@@ -7298,6 +7301,15 @@ module.exports = function () {
 
   function peg$parse(input, options) {
     options = options !== void 0 ? options : {};
+
+    // KEEP THIS WHEN REGENERATING THE PARSER !!
+    var nOpenParentheses = input.split('(').length - 1;
+    var nCloseParentheses = input.split(')').length - 1;
+
+    if (nOpenParentheses !== nCloseParentheses) {
+      throw peg$buildSimpleError('The number of opening parentheses does not match the number of closing parentheses.', 0);
+    }
+    // KEEP THIS WHEN REGENERATING THE PARSER !!
 
     var peg$FAILED = {},
         peg$startRuleFunctions = {
