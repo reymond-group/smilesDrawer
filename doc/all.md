@@ -67,7 +67,7 @@ A static class containing helper functions for array-related tasks.
     * [.removeAll(arrA, arrB)](#ArrayHelper.removeAll) ⇒ <code>Array</code>
     * [.merge(arrA, arrB)](#ArrayHelper.merge) ⇒ <code>Array</code>
     * [.containsAll(arrA, arrB)](#ArrayHelper.containsAll) ⇒ <code>Boolean</code>
-    * [.sortByAtomicNumberDesc(arr)](#ArrayHelper.sortByAtomicNumberDesc) ⇒ <code>Array.&lt;Object&gt;</code>
+    * [.sortByAtomicNumberDesc(arr)](#ArrayHelper.sortByAtomicNumberDesc) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code>
     * [.deepCopy(arr)](#ArrayHelper.deepCopy) ⇒ <code>Array</code>
 
 <a name="ArrayHelper.clone"></a>
@@ -105,7 +105,7 @@ Returns a string representation of an array. If the array contains objects with 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| arr | <code>Array.&lt;Object&gt;</code> | An array. |
+| arr | <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code> | An array. |
 | arr[].id | <code>\*</code> | If the array contains an object with the property 'id', the properties value is printed. Else, the array elements value is printend. |
 
 <a name="ArrayHelper.each"></a>
@@ -268,15 +268,15 @@ Checks whether or not an array contains all the elements of another array, witho
 
 <a name="ArrayHelper.sortByAtomicNumberDesc"></a>
 
-### ArrayHelper.sortByAtomicNumberDesc(arr) ⇒ <code>Array.&lt;Object&gt;</code>
+### ArrayHelper.sortByAtomicNumberDesc(arr) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code>
 Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...
 
 **Kind**: static method of <code>[ArrayHelper](#ArrayHelper)</code>  
-**Returns**: <code>Array.&lt;Object&gt;</code> - The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code> - The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| arr | <code>Array.&lt;Object&gt;</code> | An array of vertex ids with their associated atomic numbers. |
+| arr | <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code> | An array of vertex ids with their associated atomic numbers. |
 | arr[].vertexId | <code>Number</code> | A vertex id. |
 | arr[].atomicNumber | <code>String</code> | The atomic number associated with the vertex id. |
 
@@ -304,27 +304,27 @@ A class representing an atom.
 | --- | --- | --- |
 | element | <code>String</code> | The element symbol of this atom. Single-letter symbols are always uppercase. Examples: H, C, F, Br, Si, ... |
 | drawExplicit | <code>Boolean</code> | A boolean indicating whether or not this atom is drawn explicitly (for example, a carbon atom). This overrides the default behaviour. |
-| ringbonds | <code>Array.&lt;Object&gt;</code> | An array containing the ringbond ids and bond types as specified in the original SMILE. |
+| ringbonds | <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code> | An array containing the ringbond ids and bond types as specified in the original SMILE. |
 | branchBond | <code>String</code> | The branch bond as defined in the SMILES. |
 | ringbonds[].id | <code>Number</code> | The ringbond id as defined in the SMILES. |
 | ringbonds[].bondType | <code>String</code> | The bond type of the ringbond as defined in the SMILES. |
-| rings | <code>Array.&lt;Number&gt;</code> | The ids of rings which contain this atom. |
+| rings | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | The ids of rings which contain this atom. |
 | bondType | <code>String</code> | The bond type associated with this array. Examples: -, =, #, ... |
 | isBridge | <code>Boolean</code> | A boolean indicating whether or not this atom is part of a bridge in a bridged ring (contained by the largest ring). |
 | isBridgeNode | <code>Boolean</code> | A boolean indicating whether or not this atom is a bridge node (a member of the largest ring in a bridged ring which is connected to a bridge-atom). |
-| originalRings | <code>Array.&lt;Number&gt;</code> | Used to back up rings when they are replaced by a bridged ring. |
+| originalRings | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | Used to back up rings when they are replaced by a bridged ring. |
 | bridgedRing | <code>Number</code> | The id of the bridged ring if the atom is part of a bridged ring. |
-| anchoredRings | <code>Array.&lt;Number&gt;</code> | The ids of the rings that are anchored to this atom. The centers of anchored rings are translated when this atom is translated. |
+| anchoredRings | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | The ids of the rings that are anchored to this atom. The centers of anchored rings are translated when this atom is translated. |
 | bracket | <code>Object</code> | If this atom is defined as a bracket atom in the original SMILES, this object contains all the bracket information. Example: { hcount: {Number}, charge: ['--', '-', '+', '++'], isotope: {Number} }. |
 | plane | <code>Number</code> | Specifies on which "plane" the atoms is in stereochemical deptictions (-1 back, 0 middle, 1 front). |
-| attachedPseudoElements | <code>Array.&lt;Object&gt;</code> | A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count. |
+| attachedPseudoElements | <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code> | A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count. |
 | attachedPseudoElement[].element | <code>String</code> | The element symbol. |
 | attachedPseudoElement[].count | <code>Number</code> | The number of occurences that match the key. |
 | attachedPseudoElement[].hyrogenCount | <code>Number</code> | The number of hydrogens attached to each atom matching the key. |
 | hasAttachedPseudoElements | <code>Boolean</code> | A boolean indicating whether or not this attom will be drawn with an attached pseudo element or concatinated elements. |
 | isDrawn | <code>Boolean</code> | A boolean indicating whether or not this atom is drawn. In contrast to drawExplicit, the bond is drawn neither. |
 | isConnectedToRing | <code>Boolean</code> | A boolean indicating whether or not this atom is directly connected (but not a member of) a ring. |
-| neighbouringElements | <code>Array.&lt;String&gt;</code> | An array containing the element symbols of neighbouring atoms. |
+| neighbouringElements | <code>[ &#x27;Array&#x27; ].&lt;String&gt;</code> | An array containing the element symbols of neighbouring atoms. |
 | isPartOfAromaticRing | <code>Boolean</code> | A boolean indicating whether or not this atom is part of an explicitly defined aromatic ring. Example: c1ccccc1. |
 | bondCount | <code>Number</code> | The number of bonds in which this atom is participating. |
 | chirality | <code>String</code> | The chirality of this atom if it is a stereocenter (R or S). |
@@ -465,7 +465,7 @@ Check whether or not the neighbouring elements of this atom equal the supplied a
 
 | Param | Type | Description |
 | --- | --- | --- |
-| arr | <code>Array.&lt;String&gt;</code> | An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N'] |
+| arr | <code>[ &#x27;Array&#x27; ].&lt;String&gt;</code> | An array containing all the elements that are neighbouring this atom. E.g. ['C', 'O', 'O', 'N'] |
 
 <a name="Atom+getAtomicNumber"></a>
 
@@ -585,7 +585,7 @@ Scale the canvas based on vertex positions.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | An array of vertices containing the vertices associated with the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | An array of vertices containing the vertices associated with the current molecule. |
 
 <a name="CanvasWrapper+reset"></a>
 
@@ -787,9 +787,9 @@ The main class of the application representing the smiles drawer
     * [.extend()](#Drawer+extend)
     * [.draw(data, target, themeName, infoOnly)](#Drawer+draw)
     * [.edgeRingCount(edgeId)](#Drawer+edgeRingCount) ⇒ <code>Number</code>
-    * [.getBridgedRings()](#Drawer+getBridgedRings) ⇒ <code>[Array.&lt;Ring&gt;](#Ring)</code>
-    * [.getFusedRings()](#Drawer+getFusedRings) ⇒ <code>[Array.&lt;Ring&gt;](#Ring)</code>
-    * [.getSpiros()](#Drawer+getSpiros) ⇒ <code>[Array.&lt;Ring&gt;](#Ring)</code>
+    * [.getBridgedRings()](#Drawer+getBridgedRings) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code>
+    * [.getFusedRings()](#Drawer+getFusedRings) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code>
+    * [.getSpiros()](#Drawer+getSpiros) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code>
     * [.printRingInfo()](#Drawer+printRingInfo) ⇒ <code>String</code>
     * [.rotateDrawing()](#Drawer+rotateDrawing)
     * [.getTotalOverlapScore()](#Drawer+getTotalOverlapScore) ⇒ <code>Number</code>
@@ -799,13 +799,13 @@ The main class of the application representing the smiles drawer
     * [.getMolecularFormula()](#Drawer+getMolecularFormula) ⇒ <code>String</code>
     * [.getRingbondType(vertexA, vertexB)](#Drawer+getRingbondType) ⇒ <code>String</code> &#124; <code>null</code>
     * [.initRings()](#Drawer+initRings)
-    * [.getBridgedRingRings(ringId)](#Drawer+getBridgedRingRings) ⇒ <code>Array.&lt;Number&gt;</code>
+    * [.getBridgedRingRings(ringId)](#Drawer+getBridgedRingRings) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
     * [.isPartOfBridgedRing(ringId)](#Drawer+isPartOfBridgedRing) ⇒ <code>Boolean</code>
     * [.createBridgedRing(ringIds, sourceVertexId)](#Drawer+createBridgedRing) ⇒ <code>[Ring](#Ring)</code>
     * [.areVerticesInSameRing(vertexA, vertexB)](#Drawer+areVerticesInSameRing) ⇒ <code>Boolean</code>
-    * [.getCommonRings(vertexA, vertexB)](#Drawer+getCommonRings) ⇒ <code>Array.&lt;Number&gt;</code>
+    * [.getCommonRings(vertexA, vertexB)](#Drawer+getCommonRings) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
     * [.getLargestOrAromaticCommonRing(vertexA, vertexB)](#Drawer+getLargestOrAromaticCommonRing) ⇒ <code>[Ring](#Ring)</code> &#124; <code>null</code>
-    * [.getVerticesAt(position, radius, excludeVertexId)](#Drawer+getVerticesAt) ⇒ <code>Array.&lt;Number&gt;</code>
+    * [.getVerticesAt(position, radius, excludeVertexId)](#Drawer+getVerticesAt) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
     * [.getClosestVertex(vertex)](#Drawer+getClosestVertex) ⇒ <code>[Vertex](#Vertex)</code>
     * [.addRing(ring)](#Drawer+addRing) ⇒ <code>Number</code>
     * [.removeRing(ringId)](#Drawer+removeRing)
@@ -814,7 +814,7 @@ The main class of the application representing the smiles drawer
     * [.removeRingConnection(ringConnectionId)](#Drawer+removeRingConnection)
     * [.removeRingConnectionsBetween(vertexIdA, vertexIdB)](#Drawer+removeRingConnectionsBetween)
     * [.getRingConnection(id)](#Drawer+getRingConnection) ⇒ <code>[RingConnection](#RingConnection)</code>
-    * [.getRingConnections(ringId, ringIds)](#Drawer+getRingConnections) ⇒ <code>Array.&lt;Number&gt;</code>
+    * [.getRingConnections(ringId, ringIds)](#Drawer+getRingConnections) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
     * [.getOverlapScore()](#Drawer+getOverlapScore) ⇒ <code>Object</code>
     * [.chooseSide(vertexA, vertexB, sides)](#Drawer+chooseSide) ⇒ <code>Object</code>
     * [.setRingCenter(ring)](#Drawer+setRingCenter)
@@ -839,8 +839,8 @@ The main class of the application representing the smiles drawer
     * [.isEdgeInRing(edge)](#Drawer+isEdgeInRing) ⇒ <code>Boolean</code>
     * [.isEdgeRotatable(edge)](#Drawer+isEdgeRotatable) ⇒ <code>Boolean</code>
     * [.isRingAromatic(ring)](#Drawer+isRingAromatic) ⇒ <code>Boolean</code>
-    * [.getEdgeNormals(edge)](#Drawer+getEdgeNormals) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
-    * [.getNonRingNeighbours(vertexId)](#Drawer+getNonRingNeighbours) ⇒ <code>[Array.&lt;Vertex&gt;](#Vertex)</code>
+    * [.getEdgeNormals(edge)](#Drawer+getEdgeNormals) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code>
+    * [.getNonRingNeighbours(vertexId)](#Drawer+getNonRingNeighbours) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code>
     * [.annotateStereochemistry()](#Drawer+annotateStereochemistry)
     * [.visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth)](#Drawer+visitStereochemistry)
     * [.initPseudoElements()](#Drawer+initPseudoElements)
@@ -889,25 +889,25 @@ Returns the number of rings this edge is a part of.
 
 <a name="Drawer+getBridgedRings"></a>
 
-### drawer.getBridgedRings() ⇒ <code>[Array.&lt;Ring&gt;](#Ring)</code>
+### drawer.getBridgedRings() ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code>
 Returns an array containing the bridged rings associated with this  molecule.
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>[Array.&lt;Ring&gt;](#Ring)</code> - An array containing all bridged rings associated with this molecule.  
+**Returns**: <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code> - An array containing all bridged rings associated with this molecule.  
 <a name="Drawer+getFusedRings"></a>
 
-### drawer.getFusedRings() ⇒ <code>[Array.&lt;Ring&gt;](#Ring)</code>
+### drawer.getFusedRings() ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code>
 Returns an array containing all fused rings associated with this molecule.
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>[Array.&lt;Ring&gt;](#Ring)</code> - An array containing all fused rings associated with this molecule.  
+**Returns**: <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code> - An array containing all fused rings associated with this molecule.  
 <a name="Drawer+getSpiros"></a>
 
-### drawer.getSpiros() ⇒ <code>[Array.&lt;Ring&gt;](#Ring)</code>
+### drawer.getSpiros() ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code>
 Returns an array containing all spiros associated with this molecule.
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>[Array.&lt;Ring&gt;](#Ring)</code> - An array containing all spiros associated with this molecule.  
+**Returns**: <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code> - An array containing all spiros associated with this molecule.  
 <a name="Drawer+printRingInfo"></a>
 
 ### drawer.printRingInfo() ⇒ <code>String</code>
@@ -977,11 +977,11 @@ Initializes rings and ringbonds for the current molecule.
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
 <a name="Drawer+getBridgedRingRings"></a>
 
-### drawer.getBridgedRingRings(ringId) ⇒ <code>Array.&lt;Number&gt;</code>
+### drawer.getBridgedRingRings(ringId) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns all rings connected by bridged bonds starting from the ring with the supplied ring id.
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing all ring ids of rings part of a bridged ring system.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array containing all ring ids of rings part of a bridged ring system.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1009,7 +1009,7 @@ Creates a bridged ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ringIds | <code>Array.&lt;Number&gt;</code> | An array of ids of rings involved in the bridged ring. |
+| ringIds | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array of ids of rings involved in the bridged ring. |
 | sourceVertexId | <code>Number</code> | The vertex id to start the bridged ring discovery from. |
 
 <a name="Drawer+areVerticesInSameRing"></a>
@@ -1027,11 +1027,11 @@ Checks whether or not two vertices are in the same ring.
 
 <a name="Drawer+getCommonRings"></a>
 
-### drawer.getCommonRings(vertexA, vertexB) ⇒ <code>Array.&lt;Number&gt;</code>
+### drawer.getCommonRings(vertexA, vertexB) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns an array of ring ids shared by both vertices.
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array of ids of rings shared by the two vertices.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array of ids of rings shared by the two vertices.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1053,11 +1053,11 @@ Returns the aromatic or largest ring shared by the two vertices.
 
 <a name="Drawer+getVerticesAt"></a>
 
-### drawer.getVerticesAt(position, radius, excludeVertexId) ⇒ <code>Array.&lt;Number&gt;</code>
+### drawer.getVerticesAt(position, radius, excludeVertexId) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns an array of vertices positioned at a specified location.
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing vertex ids in a given location.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array containing vertex ids in a given location.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1161,16 +1161,16 @@ Get a ring connection with a given id.
 
 <a name="Drawer+getRingConnections"></a>
 
-### drawer.getRingConnections(ringId, ringIds) ⇒ <code>Array.&lt;Number&gt;</code>
+### drawer.getRingConnections(ringId, ringIds) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Get the ring connections between a ring and a set of rings.
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array of ring connection ids.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array of ring connection ids.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | ringId | <code>Number</code> | A ring id. |
-| ringIds | <code>Array.&lt;Number&gt;</code> | An array of ring ids. |
+| ringIds | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array of ring ids. |
 
 <a name="Drawer+getOverlapScore"></a>
 
@@ -1198,7 +1198,7 @@ When drawing a double bond, choose the side to place the double bond. E.g. a dou
 | --- | --- | --- |
 | vertexA | <code>[Vertex](#Vertex)</code> | A vertex. |
 | vertexB | <code>[Vertex](#Vertex)</code> | A vertex. |
-| sides | <code>[Array.&lt;Vector2&gt;](#Vector2)</code> | An array containing the two normals of the line spanned by the two provided vertices. |
+| sides | <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code> | An array containing the two normals of the line spanned by the two provided vertices. |
 
 <a name="Drawer+setRingCenter"></a>
 
@@ -1317,7 +1317,7 @@ Gets the overlap score of a subtree.
 | --- | --- | --- |
 | vertexId | <code>Number</code> | A vertex id (the root of the sub-tree). |
 | parentVertexId | <code>Number</code> | A vertex id in the previous direction of the subtree. |
-| vertexOverlapScores | <code>Array.&lt;Number&gt;</code> | An array containing the vertex overlap scores indexed by vertex id. |
+| vertexOverlapScores | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the vertex overlap scores indexed by vertex id. |
 
 <a name="Drawer+getCurrentCenterOfMass"></a>
 
@@ -1354,7 +1354,7 @@ Resolve secondary overlaps. Those overlaps are due to the structure turning back
 
 | Param | Type | Description |
 | --- | --- | --- |
-| scores | <code>Array.&lt;Object&gt;</code> | An array of objects sorted descending by score. |
+| scores | <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code> | An array of objects sorted descending by score. |
 | scores[].id | <code>Number</code> | A vertex id. |
 | scores[].score | <code>Number</code> | The overlap score associated with the vertex id. |
 
@@ -1447,11 +1447,11 @@ Check whether or not a ring is an implicitly defined aromatic ring (lower case s
 
 <a name="Drawer+getEdgeNormals"></a>
 
-### drawer.getEdgeNormals(edge) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
+### drawer.getEdgeNormals(edge) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code>
 Get the normals of an edge.
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#Vector2)</code> - An array containing two vectors, representing the normals.  
+**Returns**: <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code> - An array containing two vectors, representing the normals.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1459,11 +1459,11 @@ Get the normals of an edge.
 
 <a name="Drawer+getNonRingNeighbours"></a>
 
-### drawer.getNonRingNeighbours(vertexId) ⇒ <code>[Array.&lt;Vertex&gt;](#Vertex)</code>
+### drawer.getNonRingNeighbours(vertexId) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code>
 Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
 
 **Kind**: instance method of <code>[Drawer](#Drawer)</code>  
-**Returns**: <code>[Array.&lt;Vertex&gt;](#Vertex)</code> - An array of vertices.  
+**Returns**: <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> - An array of vertices.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1562,8 +1562,8 @@ A class representing the molecular graph.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | The vertices of the graph. |
-| edges | <code>[Array.&lt;Edge&gt;](#Edge)</code> | The edges of this graph. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | The vertices of the graph. |
+| edges | <code>[[ &#x27;Array&#x27; ].&lt;Edge&gt;](#Edge)</code> | The edges of this graph. |
 | vertexIdsToEdgeId | <code>Object</code> | A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId. |
 | isometric | <code>Boolean</code> | A boolean indicating whether or not the SMILES associated with this graph is isometric. |
 
@@ -1576,25 +1576,25 @@ A class representing the molecular graph.
         * [.addVertex(vertex)](#Graph+addVertex) ⇒ <code>Number</code>
         * [.addEdge(edge)](#Graph+addEdge) ⇒ <code>Number</code>
         * [.getEdge(vertexIdA, vertexIdB)](#Graph+getEdge) ⇒ <code>[Edge](#Edge)</code> &#124; <code>null</code>
-        * [.getEdges(vertexId)](#Graph+getEdges) ⇒ <code>Array.&lt;Number&gt;</code>
+        * [.getEdges(vertexId)](#Graph+getEdges) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
         * [.hasEdge(vertexIdA, vertexIdB)](#Graph+hasEdge) ⇒ <code>Boolean</code>
-        * [.getVertexList()](#Graph+getVertexList) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.getEdgeList()](#Graph+getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getAdjacencyMatrix()](#Graph+getAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getComponentsAdjacencyMatrix()](#Graph+getComponentsAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getSubgraphAdjacencyMatrix(vertexIds)](#Graph+getSubgraphAdjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getDistanceMatrix()](#Graph+getDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getSubgraphDistanceMatrix(vertexIds)](#Graph+getSubgraphDistanceMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getAdjacencyList()](#Graph+getAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getSubgraphAdjacencyList(vertexIds)](#Graph+getSubgraphAdjacencyList) ⇒ <code>Array.&lt;Array&gt;</code>
-        * [.getBridges()](#Graph+getBridges) ⇒ <code>Array.&lt;Number&gt;</code>
+        * [.getVertexList()](#Graph+getVertexList) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
+        * [.getEdgeList()](#Graph+getEdgeList) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+        * [.getAdjacencyMatrix()](#Graph+getAdjacencyMatrix) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+        * [.getComponentsAdjacencyMatrix()](#Graph+getComponentsAdjacencyMatrix) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+        * [.getSubgraphAdjacencyMatrix(vertexIds)](#Graph+getSubgraphAdjacencyMatrix) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+        * [.getDistanceMatrix()](#Graph+getDistanceMatrix) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+        * [.getSubgraphDistanceMatrix(vertexIds)](#Graph+getSubgraphDistanceMatrix) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+        * [.getAdjacencyList()](#Graph+getAdjacencyList) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+        * [.getSubgraphAdjacencyList(vertexIds)](#Graph+getSubgraphAdjacencyList) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+        * [.getBridges()](#Graph+getBridges) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
         * [.traverseBF(startVertexId, callback)](#Graph+traverseBF)
         * [.getTreeDepth(vertexId, parentVertexId)](#Graph+getTreeDepth) ⇒ <code>Number</code>
         * [.traverseTree(vertexId, parentVertexId, callback, [maxDepth], [ignoreFirst], [depth], [visited])](#Graph+traverseTree)
         * [.kkLayout(vertexIds, center, startVertexId, ring)](#Graph+kkLayout)
         * [._bridgeDfs()](#Graph+_bridgeDfs)
     * _static_
-        * [.getConnectedComponents(adjacencyMatrix)](#Graph.getConnectedComponents) ⇒ <code>Array.&lt;Set&gt;</code>
+        * [.getConnectedComponents(adjacencyMatrix)](#Graph.getConnectedComponents) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Set&gt;</code>
         * [.getConnectedComponentCount(adjacencyMatrix)](#Graph.getConnectedComponentCount) ⇒ <code>Number</code>
         * [._ccCountDfs()](#Graph._ccCountDfs)
         * [._ccGetDfs()](#Graph._ccGetDfs)
@@ -1668,11 +1668,11 @@ Returns the edge between two given vertices.
 
 <a name="Graph+getEdges"></a>
 
-### graph.getEdges(vertexId) ⇒ <code>Array.&lt;Number&gt;</code>
+### graph.getEdges(vertexId) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns the ids of edges connected to a vertex.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of edges connected to the vertex.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array containing the ids of edges connected to the vertex.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1693,89 +1693,89 @@ Check whether or not two vertices are connected by an edge.
 
 <a name="Graph+getVertexList"></a>
 
-### graph.getVertexList() ⇒ <code>Array.&lt;Number&gt;</code>
+### graph.getVertexList() ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns an array containing the vertex ids of this graph.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing all vertex ids of this graph.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array containing all vertex ids of this graph.  
 <a name="Graph+getEdgeList"></a>
 
-### graph.getEdgeList() ⇒ <code>Array.&lt;Array&gt;</code>
+### graph.getEdgeList() ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Returns an array containing source, target arrays of this graphs edges.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - An array containing source, target arrays of this graphs edges. Example: [ [ 2, 5 ], [ 6, 9 ] ].  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - An array containing source, target arrays of this graphs edges. Example: [ [ 2, 5 ], [ 6, 9 ] ].  
 <a name="Graph+getAdjacencyMatrix"></a>
 
-### graph.getAdjacencyMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
+### graph.getAdjacencyMatrix() ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Get the adjacency matrix of the graph.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the molecular graph.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - The adjancency matrix of the molecular graph.  
 <a name="Graph+getComponentsAdjacencyMatrix"></a>
 
-### graph.getComponentsAdjacencyMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
+### graph.getComponentsAdjacencyMatrix() ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Get the adjacency matrix of the graph with all bridges removed (thus the components). Thus the remaining vertices are all part of ring systems.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the molecular graph with all bridges removed.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - The adjancency matrix of the molecular graph with all bridges removed.  
 <a name="Graph+getSubgraphAdjacencyMatrix"></a>
 
-### graph.getSubgraphAdjacencyMatrix(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
+### graph.getSubgraphAdjacencyMatrix(vertexIds) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Get the adjacency matrix of a subgraph.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency matrix of the subgraph.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - The adjancency matrix of the subgraph.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
+| vertexIds | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
 
 <a name="Graph+getDistanceMatrix"></a>
 
-### graph.getDistanceMatrix() ⇒ <code>Array.&lt;Array&gt;</code>
+### graph.getDistanceMatrix() ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Get the distance matrix of the graph.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The distance matrix of the graph.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - The distance matrix of the graph.  
 <a name="Graph+getSubgraphDistanceMatrix"></a>
 
-### graph.getSubgraphDistanceMatrix(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
+### graph.getSubgraphDistanceMatrix(vertexIds) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Get the distance matrix of a subgraph.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The distance matrix of the subgraph.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - The distance matrix of the subgraph.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
+| vertexIds | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
 
 <a name="Graph+getAdjacencyList"></a>
 
-### graph.getAdjacencyList() ⇒ <code>Array.&lt;Array&gt;</code>
+### graph.getAdjacencyList() ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Get the adjacency list of the graph.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency list of the graph.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - The adjancency list of the graph.  
 <a name="Graph+getSubgraphAdjacencyList"></a>
 
-### graph.getSubgraphAdjacencyList(vertexIds) ⇒ <code>Array.&lt;Array&gt;</code>
+### graph.getSubgraphAdjacencyList(vertexIds) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Get the adjacency list of a subgraph.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The adjancency list of the subgraph.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - The adjancency list of the subgraph.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
+| vertexIds | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the vertex ids contained within the subgraph. |
 
 <a name="Graph+getBridges"></a>
 
-### graph.getBridges() ⇒ <code>Array.&lt;Number&gt;</code>
+### graph.getBridges() ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the edge ids of the bridges.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array containing the edge ids of the bridges.  
 <a name="Graph+traverseBF"></a>
 
 ### graph.traverseBF(startVertexId, callback)
@@ -1827,7 +1827,7 @@ Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertexIds | <code>Array.&lt;Number&gt;</code> | An array containing vertexIds to be placed using the force based layout. |
+| vertexIds | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing vertexIds to be placed using the force based layout. |
 | center | <code>[Vector2](#Vector2)</code> | The center of the layout. |
 | startVertexId | <code>Number</code> | A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex. |
 | ring | <code>[Ring](#Ring)</code> | The bridged ring associated with this force-based layout. |
@@ -1840,15 +1840,15 @@ PRIVATE FUNCTION used by getBridges().
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
 <a name="Graph.getConnectedComponents"></a>
 
-### Graph.getConnectedComponents(adjacencyMatrix) ⇒ <code>Array.&lt;Set&gt;</code>
+### Graph.getConnectedComponents(adjacencyMatrix) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Set&gt;</code>
 Returns the connected components of the graph.
 
 **Kind**: static method of <code>[Graph](#Graph)</code>  
-**Returns**: <code>Array.&lt;Set&gt;</code> - Connected components as sets.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Set&gt;</code> - Connected components as sets.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+| adjacencyMatrix | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | An adjacency matrix. |
 
 <a name="Graph.getConnectedComponentCount"></a>
 
@@ -1860,7 +1860,7 @@ Returns the number of connected components for the graph.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+| adjacencyMatrix | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | An adjacency matrix. |
 
 <a name="Graph._ccCountDfs"></a>
 
@@ -2158,7 +2158,7 @@ Returns the means of the angles contained in an array. In radians.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| arr | <code>Array.&lt;Number&gt;</code> | An array containing angles (in radians). |
+| arr | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing angles (in radians). |
 
 <a name="MathHelper.innerAngle"></a>
 
@@ -2257,13 +2257,13 @@ A class representing a ring.
 | Name | Type | Description |
 | --- | --- | --- |
 | id | <code>Number</code> | The id of this ring. |
-| members | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids of the ring members. |
-| edges | <code>Array.&lt;Number&gt;</code> | An array containing the edge ids of the edges between the ring members. |
-| insiders | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids of the vertices contained within the ring if it is a bridged ring. |
-| neighbours | <code>Array.&lt;Number&gt;</code> | An array containing the ids of neighbouring rings. |
+| members | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the vertex ids of the ring members. |
+| edges | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the edge ids of the edges between the ring members. |
+| insiders | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the vertex ids of the vertices contained within the ring if it is a bridged ring. |
+| neighbours | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the ids of neighbouring rings. |
 | positioned | <code>Boolean</code> | A boolean indicating whether or not this ring has been positioned. |
 | center | <code>[Vector2](#Vector2)</code> | The center of this ring. |
-| rings | <code>[Array.&lt;Ring&gt;](#Ring)</code> | The rings contained within this ring if this ring is bridged. |
+| rings | <code>[[ &#x27;Array&#x27; ].&lt;Ring&gt;](#Ring)</code> | The rings contained within this ring if this ring is bridged. |
 | isBridged | <code>Boolean</code> | A boolean whether or not this ring is bridged. |
 | isPartOfBridged | <code>Boolean</code> | A boolean whether or not this ring is part of a bridge ring. |
 | isSpiro | <code>Boolean</code> | A boolean whether or not this ring is part of a spiro. |
@@ -2276,10 +2276,10 @@ A class representing a ring.
     * [new Ring(members)](#new_Ring_new)
     * [.clone()](#Ring+clone) ⇒ <code>[Ring](#Ring)</code>
     * [.getSize()](#Ring+getSize) ⇒ <code>Number</code>
-    * [.getPolygon(vertices)](#Ring+getPolygon) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
+    * [.getPolygon(vertices)](#Ring+getPolygon) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code>
     * [.getAngle()](#Ring+getAngle) ⇒ <code>Number</code>
     * [.eachMember(vertices, callback, startVertexId, previousVertexId)](#Ring+eachMember)
-    * [.getOrderedNeighbours(ringConnections)](#Ring+getOrderedNeighbours) ⇒ <code>Array.&lt;Object&gt;</code>
+    * [.getOrderedNeighbours(ringConnections)](#Ring+getOrderedNeighbours) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code>
     * [.isBenzeneLike(vertices)](#Ring+isBenzeneLike) ⇒ <code>Boolean</code>
     * [.getDoubleBondCount(vertices)](#Ring+getDoubleBondCount) ⇒ <code>Number</code>
     * [.contains(vertexId)](#Ring+contains) ⇒ <code>Boolean</code>
@@ -2292,7 +2292,7 @@ The constructor for the class Ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| members | <code>Array.&lt;Number&gt;</code> | An array containing the vertex ids of the members of the ring to be created. |
+| members | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | An array containing the vertex ids of the members of the ring to be created. |
 
 <a name="Ring+clone"></a>
 
@@ -2310,15 +2310,15 @@ Returns the size (number of members) of this ring.
 **Returns**: <code>Number</code> - The size (number of members) of this ring.  
 <a name="Ring+getPolygon"></a>
 
-### ring.getPolygon(vertices) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
+### ring.getPolygon(vertices) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code>
 Gets the polygon representation (an array of the ring-members positional vectors) of this ring.
 
 **Kind**: instance method of <code>[Ring](#Ring)</code>  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#Vector2)</code> - An array of the positional vectors of the ring members.  
+**Returns**: <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code> - An array of the positional vectors of the ring members.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | An array of vertices representing the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | An array of vertices representing the current molecule. |
 
 <a name="Ring+getAngle"></a>
 
@@ -2336,22 +2336,22 @@ Loops over the members of this ring from a given start position in a direction o
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | The vertices associated with the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | The vertices associated with the current molecule. |
 | callback | <code>function</code> | A callback with the current vertex id as a parameter. |
 | startVertexId | <code>Number</code> | The vertex id of the start vertex. |
 | previousVertexId | <code>Number</code> | The vertex id of the previous vertex (the loop calling the callback function will run in the opposite direction of this vertex). |
 
 <a name="Ring+getOrderedNeighbours"></a>
 
-### ring.getOrderedNeighbours(ringConnections) ⇒ <code>Array.&lt;Object&gt;</code>
+### ring.getOrderedNeighbours(ringConnections) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code>
 Returns an array containing the neighbouring rings of this ring ordered by ring size.
 
 **Kind**: instance method of <code>[Ring](#Ring)</code>  
-**Returns**: <code>Array.&lt;Object&gt;</code> - An array of neighbouring rings sorted by ring size. Example: { n: 5, neighbour: 1 }.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Object&gt;</code> - An array of neighbouring rings sorted by ring size. Example: { n: 5, neighbour: 1 }.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#RingConnection)</code> | An array of ring connections associated with the current molecule. |
+| ringConnections | <code>[[ &#x27;Array&#x27; ].&lt;RingConnection&gt;](#RingConnection)</code> | An array of ring connections associated with the current molecule. |
 
 <a name="Ring+isBenzeneLike"></a>
 
@@ -2363,7 +2363,7 @@ Check whether this ring is an implicitly defined benzene-like (e.g. C1=CC=CC=C1)
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | An array of vertices associated with the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | An array of vertices associated with the current molecule. |
 
 <a name="Ring+getDoubleBondCount"></a>
 
@@ -2375,7 +2375,7 @@ Get the number of double bonds inside this ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | An array of vertices associated with the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | An array of vertices associated with the current molecule. |
 
 <a name="Ring+contains"></a>
 
@@ -2402,7 +2402,7 @@ A class representing a ring connection.
 | id | <code>Number</code> | The id of this ring connection. |
 | firstRingId | <code>Number</code> | A ring id. |
 | secondRingId | <code>Number</code> | A ring id. |
-| vertices | <code>Set.&lt;Number&gt;</code> | A set containing the vertex ids participating in the ring connection. |
+| vertices | <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code> | A set containing the vertex ids participating in the ring connection. |
 
 
 * [RingConnection](#RingConnection)
@@ -2414,8 +2414,8 @@ A class representing a ring connection.
         * [.isBridge(vertices)](#RingConnection+isBridge) ⇒ <code>Boolean</code>
     * _static_
         * [.isBridge(ringConnections, vertices, firstRingId, secondRingId)](#RingConnection.isBridge) ⇒ <code>Boolean</code>
-        * [.getNeighbours(ringConnections, ringId)](#RingConnection.getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-        * [.getVertices(ringConnections, firstRingId, secondRingId)](#RingConnection.getVertices) ⇒ <code>Array.&lt;Number&gt;</code>
+        * [.getNeighbours(ringConnections, ringId)](#RingConnection.getNeighbours) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
+        * [.getVertices(ringConnections, firstRingId, secondRingId)](#RingConnection.getVertices) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 
 <a name="new_RingConnection_new"></a>
 
@@ -2473,7 +2473,7 @@ Checks whether or not this ring connection is a bridge in a bridged ring.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | The array of vertices associated with the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | The array of vertices associated with the current molecule. |
 
 <a name="RingConnection.isBridge"></a>
 
@@ -2485,35 +2485,35 @@ Checks whether or not two rings are connected by a bridged bond.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#RingConnection)</code> | An array of ring connections containing the ring connections associated with the current molecule. |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | An array of vertices containing the vertices associated with the current molecule. |
+| ringConnections | <code>[[ &#x27;Array&#x27; ].&lt;RingConnection&gt;](#RingConnection)</code> | An array of ring connections containing the ring connections associated with the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | An array of vertices containing the vertices associated with the current molecule. |
 | firstRingId | <code>Number</code> | A ring id. |
 | secondRingId | <code>Number</code> | A ring id. |
 
 <a name="RingConnection.getNeighbours"></a>
 
-### RingConnection.getNeighbours(ringConnections, ringId) ⇒ <code>Array.&lt;Number&gt;</code>
+### RingConnection.getNeighbours(ringConnections, ringId) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Retruns the neighbouring rings of a given ring.
 
 **Kind**: static method of <code>[RingConnection](#RingConnection)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array of ring ids of neighbouring rings.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array of ring ids of neighbouring rings.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#RingConnection)</code> | An array of ring connections containing ring connections associated with the current molecule. |
+| ringConnections | <code>[[ &#x27;Array&#x27; ].&lt;RingConnection&gt;](#RingConnection)</code> | An array of ring connections containing ring connections associated with the current molecule. |
 | ringId | <code>Number</code> | A ring id. |
 
 <a name="RingConnection.getVertices"></a>
 
-### RingConnection.getVertices(ringConnections, firstRingId, secondRingId) ⇒ <code>Array.&lt;Number&gt;</code>
+### RingConnection.getVertices(ringConnections, firstRingId, secondRingId) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns an array of vertex ids associated with a given ring connection.
 
 **Kind**: static method of <code>[RingConnection](#RingConnection)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array of vertex ids associated with the ring connection.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array of vertex ids associated with the ring connection.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| ringConnections | <code>[Array.&lt;RingConnection&gt;](#RingConnection)</code> | An array of ring connections containing ring connections associated with the current molecule. |
+| ringConnections | <code>[[ &#x27;Array&#x27; ].&lt;RingConnection&gt;](#RingConnection)</code> | An array of ring connections containing ring connections associated with the current molecule. |
 | firstRingId | <code>Number</code> | A ring id. |
 | secondRingId | <code>Number</code> | A ring id. |
 
@@ -2525,14 +2525,14 @@ A class encapsulating the functionality to find the smallest set of smallest rin
 **Kind**: global class  
 
 * [SSSR](#SSSR)
-    * [.getRings(graph)](#SSSR.getRings) ⇒ <code>Array.&lt;Array&gt;</code>
+    * [.getRings(graph)](#SSSR.getRings) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
     * [.matrixToString(matrix)](#SSSR.matrixToString) ⇒ <code>String</code>
     * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SSSR.getPathIncludedDistanceMatrices) ⇒ <code>Object</code>
-    * [.getRingCandidates(d, pe, pe_prime)](#SSSR.getRingCandidates) ⇒ <code>Array.&lt;Array&gt;</code>
-    * [.getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr)](#SSSR.getSSSR) ⇒ <code>Array.&lt;Set&gt;</code>
+    * [.getRingCandidates(d, pe, pe_prime)](#SSSR.getRingCandidates) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+    * [.getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr)](#SSSR.getSSSR) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Set&gt;</code>
     * [.getEdgeCount(adjacencyMatrix)](#SSSR.getEdgeCount) ⇒ <code>Number</code>
-    * [.getEdgeList(adjacencyMatrix)](#SSSR.getEdgeList) ⇒ <code>Array.&lt;Array&gt;</code>
-    * [.bondsToAtoms(bonds)](#SSSR.bondsToAtoms) ⇒ <code>Set.&lt;Number&gt;</code>
+    * [.getEdgeList(adjacencyMatrix)](#SSSR.getEdgeList) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+    * [.bondsToAtoms(bonds)](#SSSR.bondsToAtoms) ⇒ <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code>
     * [.getBondCount(atoms, adjacencyMatrix)](#SSSR.getBondCount) ⇒ <code>Number</code>
     * [.pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount)](#SSSR.pathSetsContain) ⇒ <code>Boolean</code>
     * [.areSetsEqual(setA, setB)](#SSSR.areSetsEqual) ⇒ <code>Boolean</code>
@@ -2540,11 +2540,11 @@ A class encapsulating the functionality to find the smallest set of smallest rin
 
 <a name="SSSR.getRings"></a>
 
-### SSSR.getRings(graph) ⇒ <code>Array.&lt;Array&gt;</code>
+### SSSR.getRings(graph) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
 
 **Kind**: static method of <code>[SSSR](#SSSR)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2560,7 +2560,7 @@ Creates a printable string from a matrix (2D array).
 
 | Param | Type | Description |
 | --- | --- | --- |
-| matrix | <code>Array.&lt;Array&gt;</code> | A 2D array. |
+| matrix | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | A 2D array. |
 
 <a name="SSSR.getPathIncludedDistanceMatrices"></a>
 
@@ -2572,37 +2572,37 @@ Returnes the two path-included distance matrices used to find the sssr.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+| adjacencyMatrix | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | An adjacency matrix. |
 
 <a name="SSSR.getRingCandidates"></a>
 
-### SSSR.getRingCandidates(d, pe, pe_prime) ⇒ <code>Array.&lt;Array&gt;</code>
+### SSSR.getRingCandidates(d, pe, pe_prime) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Get the ring candidates from the path-included distance matrices.
 
 **Kind**: static method of <code>[SSSR](#SSSR)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - The ring candidates.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - The ring candidates.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| d | <code>Array.&lt;Array&gt;</code> | The distance matrix. |
-| pe | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths. |
-| pe_prime | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
+| d | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | The distance matrix. |
+| pe | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | A matrix containing the shortest paths. |
+| pe_prime | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
 
 <a name="SSSR.getSSSR"></a>
 
-### SSSR.getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) ⇒ <code>Array.&lt;Set&gt;</code>
+### SSSR.getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Set&gt;</code>
 Searches the candidates for the smallest set of smallest rings.
 
 **Kind**: static method of <code>[SSSR](#SSSR)</code>  
-**Returns**: <code>Array.&lt;Set&gt;</code> - The smallest set of smallest rings.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Set&gt;</code> - The smallest set of smallest rings.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| c | <code>Array.&lt;Array&gt;</code> | The candidates. |
-| d | <code>Array.&lt;Array&gt;</code> | The distance matrix. |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
-| pe | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths. |
-| pe_prime | <code>Array.&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
+| c | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | The candidates. |
+| d | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | The distance matrix. |
+| adjacencyMatrix | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | An adjacency matrix. |
+| pe | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | A matrix containing the shortest paths. |
+| pe_prime | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | A matrix containing the shortest paths + one vertex. |
 | arrBondCount | <code>Uint16Array</code> | A matrix containing the bond count of each vertex. |
 | arrRingCount | <code>Uint16Array</code> | A matrix containing the number of rings associated with each vertex. |
 | nsssr | <code>Number</code> | The theoretical number of rings in the graph. |
@@ -2617,27 +2617,27 @@ Returns the number of edges in a graph defined by an adjacency matrix.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+| adjacencyMatrix | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | An adjacency matrix. |
 
 <a name="SSSR.getEdgeList"></a>
 
-### SSSR.getEdgeList(adjacencyMatrix) ⇒ <code>Array.&lt;Array&gt;</code>
+### SSSR.getEdgeList(adjacencyMatrix) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Returns an edge list constructed form an adjacency matrix.
 
 **Kind**: static method of <code>[SSSR](#SSSR)</code>  
-**Returns**: <code>Array.&lt;Array&gt;</code> - An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+| adjacencyMatrix | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | An adjacency matrix. |
 
 <a name="SSSR.bondsToAtoms"></a>
 
-### SSSR.bondsToAtoms(bonds) ⇒ <code>Set.&lt;Number&gt;</code>
+### SSSR.bondsToAtoms(bonds) ⇒ <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code>
 Return a set of vertex indices contained in an array of bonds.
 
 **Kind**: static method of <code>[SSSR](#SSSR)</code>  
-**Returns**: <code>Set.&lt;Number&gt;</code> - An array of vertices.  
+**Returns**: <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code> - An array of vertices.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2653,8 +2653,8 @@ Returns the number of bonds within a set of atoms.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| atoms | <code>Set.&lt;Number&gt;</code> | An array of atom ids. |
-| adjacencyMatrix | <code>Array.&lt;Array&gt;</code> | An adjacency matrix. |
+| atoms | <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code> | An array of atom ids. |
+| adjacencyMatrix | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | An adjacency matrix. |
 
 <a name="SSSR.pathSetsContain"></a>
 
@@ -2666,10 +2666,10 @@ Checks whether or not a given path already exists in an array of paths.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| pathSets | <code>Array.&lt;Set&gt;</code> | An array of sets each representing a path. |
-| pathSet | <code>Set.&lt;Number&gt;</code> | A set representing a path. |
-| bonds | <code>Array.&lt;Array&gt;</code> | The bonds associated with the current path. |
-| allBonds | <code>Array.&lt;Array&gt;</code> | All bonds currently associated with rings in the SSSR set. |
+| pathSets | <code>[ &#x27;Array&#x27; ].&lt;Set&gt;</code> | An array of sets each representing a path. |
+| pathSet | <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code> | A set representing a path. |
+| bonds | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | The bonds associated with the current path. |
+| allBonds | <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> | All bonds currently associated with rings in the SSSR set. |
 | arrBondCount | <code>Uint16Array</code> | A matrix containing the bond count of each vertex. |
 | arrRingCount | <code>Uint16Array</code> | A matrix containing the number of rings associated with each vertex. |
 
@@ -2683,8 +2683,8 @@ Checks whether or not two sets are equal (contain the same elements).
 
 | Param | Type | Description |
 | --- | --- | --- |
-| setA | <code>Set.&lt;Number&gt;</code> | A set. |
-| setB | <code>Set.&lt;Number&gt;</code> | A set. |
+| setA | <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code> | A set. |
+| setB | <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code> | A set. |
 
 <a name="SSSR.isSupersetOf"></a>
 
@@ -2696,8 +2696,8 @@ Checks whether or not a set (setA) is a superset of another set (setB).
 
 | Param | Type | Description |
 | --- | --- | --- |
-| setA | <code>Set.&lt;Number&gt;</code> | A set. |
-| setB | <code>Set.&lt;Number&gt;</code> | A set. |
+| setA | <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code> | A set. |
+| setB | <code>[ &#x27;Set&#x27; ].&lt;Number&gt;</code> | A set. |
 
 <a name="Vector2"></a>
 
@@ -2749,8 +2749,8 @@ A class representing a 2D vector.
         * [.multiply(vecA, vecB)](#Vector2.multiply) ⇒ <code>[Vector2](#Vector2)</code>
         * [.multiplyScalar(vec, scalar)](#Vector2.multiplyScalar) ⇒ <code>[Vector2](#Vector2)</code>
         * [.midpoint(vecA, vecB)](#Vector2.midpoint) ⇒ <code>[Vector2](#Vector2)</code>
-        * [.normals(vecA, vecB)](#Vector2.normals) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
-        * [.units(vecA, vecB)](#Vector2.units) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
+        * [.normals(vecA, vecB)](#Vector2.normals) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code>
+        * [.units(vecA, vecB)](#Vector2.units) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code>
         * [.divide(vecA, vecB)](#Vector2.divide) ⇒ <code>[Vector2](#Vector2)</code>
         * [.divideScalar(vecA, s)](#Vector2.divideScalar) ⇒ <code>[Vector2](#Vector2)</code>
         * [.dot(vecA, vecB)](#Vector2.dot) ⇒ <code>Number</code>
@@ -3010,7 +3010,7 @@ Checks whether a vector lies within a polygon spanned by a set of vectors.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| polygon | <code>[Array.&lt;Vector2&gt;](#Vector2)</code> | An array of vectors spanning the polygon. |
+| polygon | <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code> | An array of vectors spanning the polygon. |
 
 <a name="Vector2+length"></a>
 
@@ -3134,11 +3134,11 @@ Returns the midpoint of a line spanned by two vectors.
 
 <a name="Vector2.normals"></a>
 
-### Vector2.normals(vecA, vecB) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
+### Vector2.normals(vecA, vecB) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code>
 Returns the normals of a line spanned by two vectors.
 
 **Kind**: static method of <code>[Vector2](#Vector2)</code>  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#Vector2)</code> - An array containing the two normals, each represented by a vector.  
+**Returns**: <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code> - An array containing the two normals, each represented by a vector.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -3147,11 +3147,11 @@ Returns the normals of a line spanned by two vectors.
 
 <a name="Vector2.units"></a>
 
-### Vector2.units(vecA, vecB) ⇒ <code>[Array.&lt;Vector2&gt;](#Vector2)</code>
+### Vector2.units(vecA, vecB) ⇒ <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code>
 Returns the unit (normalized normal) vectors of a line spanned by two vectors.
 
 **Kind**: static method of <code>[Vector2](#Vector2)</code>  
-**Returns**: <code>[Array.&lt;Vector2&gt;](#Vector2)</code> - An array containing the two unit vectors.  
+**Returns**: <code>[[ &#x27;Array&#x27; ].&lt;Vector2&gt;](#Vector2)</code> - An array containing the two unit vectors.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -3264,15 +3264,15 @@ A class representing a vertex.
 | position | <code>[Vector2](#Vector2)</code> | The position of this vertex. |
 | previousPosition | <code>[Vector2](#Vector2)</code> | The position of the previous vertex. |
 | parentVertexId | <code>Number</code> &#124; <code>null</code> | The id of the previous vertex. |
-| children | <code>Array.&lt;Number&gt;</code> | The ids of the children of this vertex. |
-| spanningTreeChildren | <code>Array.&lt;Number&gt;</code> | The ids of the children of this vertex as defined in the spanning tree defined by the SMILES. |
-| edges | <code>Array.&lt;Number&gt;</code> | The ids of edges associated with this vertex. |
+| children | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | The ids of the children of this vertex. |
+| spanningTreeChildren | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | The ids of the children of this vertex as defined in the spanning tree defined by the SMILES. |
+| edges | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | The ids of edges associated with this vertex. |
 | positioned | <code>Boolean</code> | A boolean indicating whether or not this vertex has been positioned. |
 | angle | <code>Number</code> | The angle of this vertex. |
 | dir | <code>Number</code> | The direction of this vertex. |
 | neighbourCount | <code>Number</code> | The number of neighbouring vertices. |
-| neighbours | <code>Array.&lt;Number&gt;</code> | The vertex ids of neighbouring vertices. |
-| neighbouringElements | <code>Array.&lt;String&gt;</code> | The element symbols associated with neighbouring vertices. |
+| neighbours | <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> | The vertex ids of neighbouring vertices. |
+| neighbouringElements | <code>[ &#x27;Array&#x27; ].&lt;String&gt;</code> | The element symbols associated with neighbouring vertices. |
 | forcePositioned | <code>Boolean</code> | A boolean indicating whether or not this vertex was positioned using a force-based approach. |
 
 
@@ -3288,10 +3288,10 @@ A class representing a vertex.
     * [.equals(vertex)](#Vertex+equals) ⇒ <code>Boolean</code>
     * [.getAngle([referenceVector], [returnAsDegrees])](#Vertex+getAngle) ⇒ <code>Number</code>
     * [.getTextDirection(vertices)](#Vertex+getTextDirection) ⇒ <code>String</code>
-    * [.getNeighbours([vertexId])](#Vertex+getNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
-    * [.getDrawnNeighbours(vertices)](#Vertex+getDrawnNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
+    * [.getNeighbours([vertexId])](#Vertex+getNeighbours) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
+    * [.getDrawnNeighbours(vertices)](#Vertex+getDrawnNeighbours) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
     * [.getNeighbourCount()](#Vertex+getNeighbourCount) ⇒ <code>Number</code>
-    * [.getSpanningTreeNeighbours([vertexId])](#Vertex+getSpanningTreeNeighbours) ⇒ <code>Array.&lt;Number&gt;</code>
+    * [.getSpanningTreeNeighbours([vertexId])](#Vertex+getSpanningTreeNeighbours) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
     * [.getNextInRing(vertices, ringId, previousVertexId)](#Vertex+getNextInRing) ⇒ <code>Number</code>
 
 <a name="new_Vertex_new"></a>
@@ -3412,15 +3412,15 @@ Returns the suggested text direction when text is added at the position of this 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | The array of vertices for the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | The array of vertices for the current molecule. |
 
 <a name="Vertex+getNeighbours"></a>
 
-### vertex.getNeighbours([vertexId]) ⇒ <code>Array.&lt;Number&gt;</code>
+### vertex.getNeighbours([vertexId]) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns an array of ids of neighbouring vertices.
 
 **Kind**: instance method of <code>[Vertex](#Vertex)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of neighbouring vertices.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array containing the ids of neighbouring vertices.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -3428,15 +3428,15 @@ Returns an array of ids of neighbouring vertices.
 
 <a name="Vertex+getDrawnNeighbours"></a>
 
-### vertex.getDrawnNeighbours(vertices) ⇒ <code>Array.&lt;Number&gt;</code>
+### vertex.getDrawnNeighbours(vertices) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns an array of ids of neighbouring vertices that will be drawn (vertex.value.isDrawn === true).
 
 **Kind**: instance method of <code>[Vertex](#Vertex)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of neighbouring vertices that will be drawn.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array containing the ids of neighbouring vertices that will be drawn.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | An array containing the vertices associated with the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | An array containing the vertices associated with the current molecule. |
 
 <a name="Vertex+getNeighbourCount"></a>
 
@@ -3447,11 +3447,11 @@ Returns the number of neighbours of this vertex.
 **Returns**: <code>Number</code> - The number of neighbours.  
 <a name="Vertex+getSpanningTreeNeighbours"></a>
 
-### vertex.getSpanningTreeNeighbours([vertexId]) ⇒ <code>Array.&lt;Number&gt;</code>
+### vertex.getSpanningTreeNeighbours([vertexId]) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code>
 Returns a list of ids of vertices neighbouring this one in the original spanning tree, excluding the ringbond connections.
 
 **Kind**: instance method of <code>[Vertex](#Vertex)</code>  
-**Returns**: <code>Array.&lt;Number&gt;</code> - An array containing the ids of the neighbouring vertices.  
+**Returns**: <code>[ &#x27;Array&#x27; ].&lt;Number&gt;</code> - An array containing the ids of the neighbouring vertices.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -3467,7 +3467,7 @@ Gets the next vertex in the ring in opposide direction to the supplied vertex id
 
 | Param | Type | Description |
 | --- | --- | --- |
-| vertices | <code>[Array.&lt;Vertex&gt;](#Vertex)</code> | The array of vertices for the current molecule. |
+| vertices | <code>[[ &#x27;Array&#x27; ].&lt;Vertex&gt;](#Vertex)</code> | The array of vertices for the current molecule. |
 | ringId | <code>Number</code> | The id of the ring containing this vertex. |
 | previousVertexId | <code>Number</code> | The id of the previous vertex. The next vertex will be opposite from the vertex with this id as seen from this vertex. |
 

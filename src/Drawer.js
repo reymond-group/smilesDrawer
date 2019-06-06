@@ -57,6 +57,12 @@ class Drawer {
       fontSizeLarge: 5,
       fontSizeSmall: 3,
       padding: 20.0,
+      experimentalSSSR: false,
+      kkThreshold: 0.1,
+      kkInnerThreshold: 0.1,
+      kkMaxIteration: 20000,
+      kkMaxInnerIteration: 50,
+      kkMaxEnergy: 1e9,
       themes: {
         dark: {
           C: '#fff',
@@ -283,6 +289,12 @@ class Drawer {
       this.drawEdges(this.opts.debug);
       this.drawVertices(this.opts.debug);
       this.canvasWrapper.reset();
+
+      if (this.opts.debug) {
+        console.log(this.graph);
+        console.log(this.rings);
+        console.log(this.ringConnections);
+      }
     }
   }
 
@@ -628,7 +640,7 @@ class Drawer {
     }
 
     // Get the rings in the graph (the SSSR)
-    let rings = SSSR.getRings(this.graph);
+    let rings = SSSR.getRings(this.graph, this.opts.experimentalSSSR);
 
     if (rings === null) {
       return;
@@ -852,6 +864,7 @@ class Drawer {
 
     // Create the ring
     let ring = new Ring([...ringMembers]);
+    this.addRing(ring);
 
     ring.isBridged = true;
     ring.neighbours = [...neighbours];
@@ -859,8 +872,6 @@ class Drawer {
     for (var i = 0; i < ringIds.length; i++) {
       ring.rings.push(this.getRing(ringIds[i]).clone());
     }
-
-    this.addRing(ring);
 
     for (var i = 0; i < ring.members.length; i++) {
       this.graph.vertices[ring.members[i]].value.bridgedRing = ring.id;
@@ -1705,7 +1716,9 @@ class Drawer {
     // If the ring is bridged, then draw the vertices inside the ring
     // using a force based approach
     if (ring.isBridged) {
-      this.graph.kkLayout(ring.members.slice(), center, startVertex.id, ring, this.opts.bondLength);
+      this.graph.kkLayout(ring.members.slice(), center, startVertex.id, ring, this.opts.bondLength,
+        this.opts.kkThreshold, this.opts.kkInnerThreshold, this.opts.kkMaxIteration, 
+        this.opts.kkMaxInnerIteration, this.opts.kkMaxEnergy);
       ring.positioned = true;
 
       // Update the center of the bridged ring

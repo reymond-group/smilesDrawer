@@ -563,13 +563,17 @@ class Graph {
 
   /**
    * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
+   * There are undocumented layout parameters. They are undocumented for a reason, so be very careful.
    * 
    * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
    * @param {Vector2} center The center of the layout.
    * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
    * @param {Ring} ring The bridged ring associated with this force-based layout.
    */
-  kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
+  kkLayout(vertexIds, center, startVertexId, ring, bondLength,
+    threshold = 0.1, innerThreshold = 0.1, maxIteration = 2000,
+    maxInnerIteration = 50, maxEnergy = 1e9) {
+
     let edgeStrength = bondLength;
 
     // Add vertices that are directly connected to the ring
@@ -769,13 +773,6 @@ class Graph {
       arrEnergySumX[index] = dEX;
       arrEnergySumY[index] = dEY;
     }
-
-    // Setting parameters
-    let threshold = 0.1;
-    let innerThreshold = 0.1;
-    let maxIteration = 2000;
-    let maxInnerIteration = 50;
-    let maxEnergy = 1e9;
 
     // Setting up variables for the while loops
     let maxEnergyId = 0;

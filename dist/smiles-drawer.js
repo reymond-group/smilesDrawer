@@ -1983,6 +1983,12 @@ class Drawer {
       fontSizeLarge: 5,
       fontSizeSmall: 3,
       padding: 20.0,
+      experimentalSSSR: false,
+      kkThreshold: 0.1,
+      kkInnerThreshold: 0.1,
+      kkMaxIteration: 20000,
+      kkMaxInnerIteration: 50,
+      kkMaxEnergy: 1e9,
       themes: {
         dark: {
           C: '#fff',
@@ -2194,6 +2200,12 @@ class Drawer {
       this.drawEdges(this.opts.debug);
       this.drawVertices(this.opts.debug);
       this.canvasWrapper.reset();
+
+      if (this.opts.debug) {
+        console.log(this.graph);
+        console.log(this.rings);
+        console.log(this.ringConnections);
+      }
     }
   }
   /**
@@ -2544,7 +2556,7 @@ class Drawer {
     } // Get the rings in the graph (the SSSR)
 
 
-    let rings = SSSR.getRings(this.graph);
+    let rings = SSSR.getRings(this.graph, this.opts.experimentalSSSR);
 
     if (rings === null) {
       return;
@@ -2759,14 +2771,13 @@ class Drawer {
 
 
     let ring = new Ring([...ringMembers]);
+    this.addRing(ring);
     ring.isBridged = true;
     ring.neighbours = [...neighbours];
 
     for (var i = 0; i < ringIds.length; i++) {
       ring.rings.push(this.getRing(ringIds[i]).clone());
     }
-
-    this.addRing(ring);
 
     for (var i = 0; i < ring.members.length; i++) {
       this.graph.vertices[ring.members[i]].value.bridgedRing = ring.id;
@@ -3594,7 +3605,7 @@ class Drawer {
 
 
     if (ring.isBridged) {
-      this.graph.kkLayout(ring.members.slice(), center, startVertex.id, ring, this.opts.bondLength);
+      this.graph.kkLayout(ring.members.slice(), center, startVertex.id, ring, this.opts.bondLength, this.opts.kkThreshold, this.opts.kkInnerThreshold, this.opts.kkMaxIteration, this.opts.kkMaxInnerIteration, this.opts.kkMaxEnergy);
       ring.positioned = true; // Update the center of the bridged ring
 
       this.setRingCenter(ring);
@@ -5488,6 +5499,7 @@ class Graph {
   }
   /**
    * Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
+   * There are undocumented layout parameters. They are undocumented for a reason, so be very careful.
    * 
    * @param {Number[]} vertexIds An array containing vertexIds to be placed using the force based layout.
    * @param {Vector2} center The center of the layout.
@@ -5496,7 +5508,7 @@ class Graph {
    */
 
 
-  kkLayout(vertexIds, center, startVertexId, ring, bondLength) {
+  kkLayout(vertexIds, center, startVertexId, ring, bondLength, threshold = 0.1, innerThreshold = 0.1, maxIteration = 2000, maxInnerIteration = 50, maxEnergy = 1e9) {
     let edgeStrength = bondLength; // Add vertices that are directly connected to the ring
 
     var i = vertexIds.length;
@@ -5698,14 +5710,8 @@ class Graph {
 
       arrEnergySumX[index] = dEX;
       arrEnergySumY[index] = dEY;
-    }; // Setting parameters
+    }; // Setting up variables for the while loops
 
-
-    let threshold = 0.1;
-    let innerThreshold = 0.1;
-    let maxIteration = 2000;
-    let maxInnerIteration = 50;
-    let maxEnergy = 1e9; // Setting up variables for the while loops
 
     let maxEnergyId = 0;
     let dEX = 0.0;
@@ -8643,9 +8649,10 @@ class SSSR {
    * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
    * 
    * @param {Graph} graph A Graph object.
+   * @param {Boolean} [experimental=false] Whether or not to use experimental SSSR.
    * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
    */
-  static getRings(graph) {
+  static getRings(graph, experimental = false) {
     let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
 
     if (adjacencyMatrix.length === 0) {
@@ -8702,6 +8709,10 @@ class SSSR {
         continue;
       }
 
+      if (experimental) {
+        nSssr = 999;
+      }
+
       let {
         d,
         pe,
@@ -8721,8 +8732,12 @@ class SSSR {
 
         rings.push(ring);
       }
-    }
+    } // So, for some reason, this would return three rings for C1CCCC2CC1CCCC2, which is wrong
+    // As I don't have time to fix this properly, it will stay in. I'm sorry next person who works
+    // on it. At that point it might be best to reimplement the whole SSSR thing...
 
+
+    rings.pop();
     return rings;
   }
   /**

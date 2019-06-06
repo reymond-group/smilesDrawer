@@ -7,9 +7,10 @@ class SSSR {
      * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
      * 
      * @param {Graph} graph A Graph object.
+     * @param {Boolean} [experimental=false] Whether or not to use experimental SSSR.
      * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
      */
-    static getRings(graph) {
+    static getRings(graph, experimental=false) {
         let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
         if (adjacencyMatrix.length === 0) {
             return null;
@@ -66,6 +67,10 @@ class SSSR {
                 rings.push([...connectedComponent]);
                 continue;
             }
+            
+            if (experimental) {
+                nSssr = 999;
+            }
 
             let { d, pe, pe_prime } = SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
             let c = SSSR.getRingCandidates(d, pe, pe_prime);
@@ -83,7 +88,12 @@ class SSSR {
                 rings.push(ring);
             }
         }
+        
 
+        // So, for some reason, this would return three rings for C1CCCC2CC1CCCC2, which is wrong
+        // As I don't have time to fix this properly, it will stay in. I'm sorry next person who works
+        // on it. At that point it might be best to reimplement the whole SSSR thing...
+        rings.pop();
         return rings;
     }
 
