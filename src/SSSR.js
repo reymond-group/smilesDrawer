@@ -93,7 +93,6 @@ class SSSR {
         // So, for some reason, this would return three rings for C1CCCC2CC1CCCC2, which is wrong
         // As I don't have time to fix this properly, it will stay in. I'm sorry next person who works
         // on it. At that point it might be best to reimplement the whole SSSR thing...
-        rings.pop();
         return rings;
     }
 

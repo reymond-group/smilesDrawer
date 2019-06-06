@@ -8737,7 +8737,6 @@ class SSSR {
     // on it. At that point it might be best to reimplement the whole SSSR thing...
 
 
-    rings.pop();
     return rings;
   }
   /**
