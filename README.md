@@ -29,6 +29,10 @@ Examples showing molecules from different databases:
 - [ChEMBL](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=chembl)
 
 A very simple JSFiddle example can be found [here](https://jsfiddle.net/zjdtkL57/1/). This example shows the `SmilesDrawer.apply()` functionality which draws the structure for every `canvas` element with a `data-smiles` attribute. E.g. `<canvas data-smiles="C1CCCCC1"></canvas>`
+
+### Experimental Features
+If you experience problems with the drawing of complex ring systems (including very long bonds), please enable experimental features (see options).
+
 ### "Installation"
 SmilesDrawer is available from the unpkg content delivery network:
 ```
@@ -106,6 +110,7 @@ The following options are available:
 | Large Font Size (in pt for elements) | fontSizeLarge | number | 6 |
 | Small Font Size (in pt for numbers) | fontSizeSmall | number | 4 |
 | Padding | padding | number | 20.0 |
+| Use experimental features | experimental | boolean | false |
 | Show Terminal Carbons (CH3) | terminalCarbons | boolean | false |
 | Show explicit hydrogens | explicitHydrogens | boolean | false |
 | Overlap sensitivity | overlapSensitivity | number | 0.42 |
@@ -136,6 +141,7 @@ The default options are defined as follows:
     fontSizeLarge: 5,
     fontSizeSmall: 3,
     padding: 20.0,
+    experimental: false,
     themes: {
         dark: {
             C: '#fff',

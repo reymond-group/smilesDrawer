@@ -7040,7 +7040,19 @@ module.exports = function () {
       s0 = peg$currPos;
 
       if (peg$c7.test(input.charAt(peg$currPos))) {
-        s1 = input.charAt(peg$currPos);
+        s1 = input.charAt(peg$currPos); // Hack to resolve problem caused by:
+        // O=C(N[C@@H](CC(O)=O)C(N[C@H](C1=CC=C(O)C=C1)C(N[C@@H](CC(O)=O)C(NCC(N[C@@H](C(N[C@@H]([C@H](C)CC(O)=O)C(N/C(C(O[C@H](C)[C@@H]2NC([C@H](CO)NC(C(O3)C3CCC)=O)=O)=O)=C\\\\C4=CNC5=C4C=CC=C5)=O)=O)[C@H](O)C(N)=O)=O)=O)=O)=O)[C@H](CC(O)=O)NC([C@@H](CC6=CNC7=C6C=CC=C7)NC2=O)=O
+        // KEEP THIS WHEN REGENERATING THE PARSER !!
+
+        if (s1 === input.charAt(peg$currPos + 1)) {
+          s1 = peg$FAILED;
+
+          if (peg$silentFails === 0) {
+            throw peg$buildSimpleError('The parser encountered a bond repetition.', peg$currPos + 1);
+          }
+        } // KEEP THIS WHEN REGENERATING THE PARSER !!
+
+
         peg$currPos++;
       } else {
         s1 = peg$FAILED;

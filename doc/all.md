@@ -1821,7 +1821,7 @@ Traverse a sub-tree in the graph.
 <a name="Graph+kkLayout"></a>
 
 ### graph.kkLayout(vertexIds, center, startVertexId, ring)
-Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdf
+Positiones the (sub)graph using Kamada and Kawais algorithm for drawing general undirected graphs. https://pdfs.semanticscholar.org/b8d3/bca50ccc573c5cb99f7d201e8acce6618f04.pdfThere are undocumented layout parameters. They are undocumented for a reason, so be very careful.
 
 **Kind**: instance method of <code>[Graph](#Graph)</code>  
 
@@ -2525,7 +2525,7 @@ A class encapsulating the functionality to find the smallest set of smallest rin
 **Kind**: global class  
 
 * [SSSR](#SSSR)
-    * [.getRings(graph)](#SSSR.getRings) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+    * [.getRings(graph, [experimental])](#SSSR.getRings) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
     * [.matrixToString(matrix)](#SSSR.matrixToString) ⇒ <code>String</code>
     * [.getPathIncludedDistanceMatrices(adjacencyMatrix)](#SSSR.getPathIncludedDistanceMatrices) ⇒ <code>Object</code>
     * [.getRingCandidates(d, pe, pe_prime)](#SSSR.getRingCandidates) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
@@ -2540,15 +2540,16 @@ A class encapsulating the functionality to find the smallest set of smallest rin
 
 <a name="SSSR.getRings"></a>
 
-### SSSR.getRings(graph) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
+### SSSR.getRings(graph, [experimental]) ⇒ <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code>
 Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
 
 **Kind**: static method of <code>[SSSR](#SSSR)</code>  
 **Returns**: <code>[ &#x27;Array&#x27; ].&lt;Array&gt;</code> - An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| graph | <code>[Graph](#Graph)</code> | A Graph object. |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| graph | <code>[Graph](#Graph)</code> |  | A Graph object. |
+| [experimental] | <code>Boolean</code> | <code>false</code> | Whether or not to use experimental SSSR. |
 
 <a name="SSSR.matrixToString"></a>
 
