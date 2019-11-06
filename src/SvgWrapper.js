@@ -213,6 +213,23 @@ class SvgWrapper {
   }
 
   /**
+   * Draw an svg ellipse as a ball.
+   *
+   * @param {Number} x The x position of the text.
+   * @param {Number} y The y position of the text.
+   * @param {String} elementName The name of the element (single-letter).
+   */
+  drawBall(x, y, elementName) {
+    let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ball.setAttributeNS(null, 'cx', x + this.offsetX);
+    ball.setAttributeNS(null, 'cy', y + this.offsetY);
+    ball.setAttributeNS(null, 'r', this.opts.bondLength / 4.5);
+    ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
+
+    this.vertices.push(ball);
+  }
+
+  /**
    * Draw a dashed wedge on the canvas.
    *
    * @param {Line} line A line.
@@ -266,6 +283,45 @@ class SvgWrapper {
   }
 
   /**
+   * Draws a debug dot at a given coordinate and adds text.
+   *
+   * @param {Number} x The x coordinate.
+   * @param {Number} y The y coordindate.
+   * @param {String} [debugText=''] A string.
+   * @param {String} [color='#f00'] A color in hex form.
+   */
+  drawDebugPoint(x, y, debugText = '', color = '#f00') {
+    let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    point.setAttributeNS(null, 'cx', x + this.offsetX);
+    point.setAttributeNS(null, 'cy', y + this.offsetY);
+    point.setAttributeNS(null, 'r', '2');
+    point.setAttributeNS(null, 'fill', '#f00');
+    this.vertices.push(point);
+    this.drawDebugText(x, y, debugText);
+  }
+
+  /**
+   * Draws a debug text message at a given position
+   *
+   * @param {Number} x The x coordinate.
+   * @param {Number} y The y coordinate.
+   * @param {String} text The debug text.
+   */
+  drawDebugText(x, y, text) {
+    let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElem.setAttributeNS(null, 'x', x + this.offsetX);
+    textElem.setAttributeNS(null, 'y', y + this.offsetY);
+    textElem.setAttributeNS(null, 'class', 'debug');
+    textElem.setAttributeNS(null, 'fill', '#ff0000');
+    textElem.setAttributeNS(null, 'style', `
+                font: 5px Droid Sans, sans-serif;
+            `);
+    textElem.appendChild(document.createTextNode(text));
+
+    this.vertices.push(textElem);
+  }
+
+  /**
    * Draws a line.
    *
    * @param {Line} line A line.
@@ -299,6 +355,35 @@ class SvgWrapper {
       gradient = this.createGradient(line, fromX, fromY, toX, toY);
     }
     lineElem.setAttributeNS(null, 'stroke', `url('#${gradient}')`);
+  }
+
+  /**
+   * Draw a point.
+   *
+   * @param {Number} x The x position of the point.
+   * @param {Number} y The y position of the point.
+   * @param {String} elementName The name of the element (single-letter).
+   */
+  drawPoint(x, y, elementName) {
+    let ctx = this.ctx;
+    let offsetX = this.offsetX;
+    let offsetY = this.offsetY;
+
+    // first create a mask
+    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    mask.setAttributeNS(null, 'cx', x + offsetX);
+    mask.setAttributeNS(null, 'cy', y + offsetY);
+    mask.setAttributeNS(null, 'r', '1.5');
+    mask.setAttributeNS(null, 'fill', 'black');
+    this.maskElements.push(mask);
+
+    // now create the point
+    let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    point.setAttributeNS(null, 'cx', x + offsetX);
+    point.setAttributeNS(null, 'cy', y + offsetY);
+    point.setAttributeNS(null, 'r', '0.75');
+    point.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
+    this.vertices.push(point);
   }
 
   /**

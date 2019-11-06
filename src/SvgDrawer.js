@@ -230,7 +230,7 @@ class SvgDrawer {
 
     if (debug) {
       let midpoint = Vector2.midpoint(a, b);
-      this.canvasWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
+      svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
     }
   }
 
@@ -272,13 +272,13 @@ class SvgDrawer {
       }
 
       if (opts.atomVisualization === 'allballs') {
-        // this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+        svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
           svgWrapper.drawText(vertex.position.x, vertex.position.y,
             element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
         } else if (opts.atomVisualization === 'balls') {
-          // this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+          svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
       } else if (vertex.getNeighbourCount() === 2 && vertex.forcePositioned == true) {
         // If there is a carbon which bonds are in a straight line, draw a dot
@@ -287,15 +287,15 @@ class SvgDrawer {
         let angle = Vector2.threePointangle(vertex.position, a, b);
 
         if (Math.abs(Math.PI - angle) < 0.1) {
-          // this.canvasWrapper.drawPoint(vertex.position.x, vertex.position.y, element);
+          svgWrapper.drawPoint(vertex.position.x, vertex.position.y, element);
         }
       }
 
       if (debug) {
         let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
-        this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
+        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
       } else {
-        // this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
+        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
       }
     }
 
@@ -303,11 +303,28 @@ class SvgDrawer {
     if (opts.debug) {
       for (var i = 0; i < rings.length; i++) {
         let center = rings[i].center;
-        this.canvasWrapper.drawDebugPoint(center.x, center.y, 'r: ' + this.rings[i].id);
+        svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
       }
     }
   }
 
+  /**
+   * Returns the total overlap score of the current molecule.
+   *
+   * @returns {Number} The overlap score.
+   */
+  getTotalOverlapScore() {
+    return this.preprocessor.getTotalOverlapScore();
+  }
+
+  /**
+   * Returns the molecular formula of the loaded molecule as a string.
+   *
+   * @returns {String} The molecular formula.
+   */
+  getMolecularFormula() {
+    return this.preprocessor.getMolecularFormula();
+  }
 
   /**
    * @param {Array} normals list of normals to multiply
