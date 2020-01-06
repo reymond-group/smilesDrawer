@@ -2934,6 +2934,11 @@ class Drawer {
         continue;
       }
 
+      // Ignore sulfonates
+      if (vertex.value.element === 'S') {
+        continue;
+      }
+
       // Ignore also guanidine
       if (vertex.value.element === 'C' && neighbours.length === 3 &&
         neighbours[0].value.element === 'N' && neighbours[1].value.element === 'N' && neighbours[2].value.element === 'N') {
