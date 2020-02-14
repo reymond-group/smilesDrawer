@@ -4,7 +4,9 @@
 //@ts-check
 const Drawer = require('./src/Drawer');
 
-const Parser = require('./src/Parser'); // Detect SSR (server side rendering)
+const Parser = require('./src/Parser');
+
+const SvgDrawer = require('./src/SvgDrawer'); // Detect SSR (server side rendering)
 
 
 var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
@@ -18,6 +20,7 @@ var SmilesDrawer = {
 };
 SmilesDrawer.Drawer = Drawer;
 SmilesDrawer.Parser = Parser;
+SmilesDrawer.SvgDrawer = SvgDrawer;
 /**
 * Cleans a SMILES string (removes non-valid characters)
 *
@@ -117,7 +120,7 @@ if (!Array.prototype.fill) {
 
 module.exports = SmilesDrawer;
 
-},{"./src/Drawer":5,"./src/Parser":10}],2:[function(require,module,exports){
+},{"./src/Drawer":5,"./src/Parser":10,"./src/SvgDrawer":14}],2:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1083,7 +1086,7 @@ class Atom {
 
 module.exports = Atom;
 
-},{"./ArrayHelper":2,"./Ring":11,"./Vertex":15}],4:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Ring":11,"./Vertex":19}],4:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1096,6 +1099,10 @@ const Line = require('./Line');
 const Vertex = require('./Vertex');
 
 const Ring = require('./Ring');
+
+const {
+  getChargeText
+} = require('./UtilityFunctions');
 /** 
  * A class wrapping a canvas element.
  * 
@@ -1117,10 +1124,10 @@ class CanvasWrapper {
    * The constructor for the class CanvasWrapper.
    *
    * @param {(String|HTMLElement)} target The canvas id or the canvas HTMLElement.
-   * @param {Object} theme A theme from the smiles drawer options.
+   * @param {ThemeManager} themeManager Theme manager for setting proper colors.
    * @param {Object} options The smiles drawer options object.
    */
-  constructor(target, theme, options) {
+  constructor(target, themeManager, options) {
     if (typeof target === 'string' || target instanceof String) {
       this.canvas = document.getElementById(target);
     } else {
@@ -1128,7 +1135,7 @@ class CanvasWrapper {
     }
 
     this.ctx = this.canvas.getContext('2d');
-    this.colors = theme;
+    this.themeManager = themeManager;
     this.opts = options;
     this.drawingWidth = 0.0;
     this.drawingHeight = 0.0;
@@ -1323,7 +1330,7 @@ class CanvasWrapper {
       ctx.lineTo(r.x, r.y);
       ctx.lineCap = 'round';
       ctx.lineWidth = this.opts.bondThickness + 1.2;
-      ctx.strokeStyle = this.getColor('BACKGROUND');
+      ctx.strokeStyle = this.themeManager.getColor('BACKGROUND');
       ctx.stroke();
       ctx.globalCompositeOperation = 'source-over';
       ctx.restore();
@@ -1342,8 +1349,8 @@ class CanvasWrapper {
     ctx.lineCap = 'round';
     ctx.lineWidth = this.opts.bondThickness;
     let gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
-    gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || this.getColor('C'));
-    gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
+    gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement()) || this.themeManager.getColor('C'));
+    gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement()) || this.themeManager.getColor('C'));
 
     if (dashed) {
       ctx.setLineDash([1, 1.5]);
@@ -1411,8 +1418,8 @@ class CanvasWrapper {
     ctx.lineTo(v.x, v.y);
     ctx.lineTo(w.x, w.y);
     let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
-    gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) || this.getColor('C'));
-    gradient.addColorStop(0.6, this.getColor(line.getRightElement()) || this.getColor('C'));
+    gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement()) || this.themeManager.getColor('C'));
+    gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement()) || this.themeManager.getColor('C'));
     ctx.fillStyle = gradient;
     ctx.fill();
     ctx.restore();
@@ -1468,7 +1475,7 @@ class CanvasWrapper {
     sEnd.x += offsetX;
     sEnd.y += offsetY;
     let dir = Vector2.subtract(end, start).normalize();
-    ctx.strokeStyle = this.getColor('C');
+    ctx.strokeStyle = this.themeManager.getColor('C');
     ctx.lineCap = 'round';
     ctx.lineWidth = this.opts.bondThickness;
     ctx.beginPath();
@@ -1485,7 +1492,7 @@ class CanvasWrapper {
       if (!changed && t > 0.5) {
         ctx.stroke();
         ctx.beginPath();
-        ctx.strokeStyle = this.getColor(line.getRightElement()) || this.getColor('C');
+        ctx.strokeStyle = this.themeManager.getColor(line.getRightElement()) || this.themeManager.getColor('C');
         changed = true;
       }
 
@@ -1531,7 +1538,7 @@ class CanvasWrapper {
     ctx.save();
     ctx.beginPath();
     ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, MathHelper.twoPI, false);
-    ctx.fillStyle = this.getColor(elementName);
+    ctx.fillStyle = this.themeManager.getColor(elementName);
     ctx.fill();
     ctx.restore();
   }
@@ -1557,7 +1564,7 @@ class CanvasWrapper {
     ctx.globalCompositeOperation = 'source-over';
     ctx.beginPath();
     ctx.arc(x + this.offsetX, y + this.offsetY, 0.75, 0, MathHelper.twoPI, false);
-    ctx.fillStyle = this.getColor(elementName);
+    ctx.fillStyle = this.themeManager.getColor(elementName);
     ctx.fill();
     ctx.restore();
   }
@@ -1592,7 +1599,7 @@ class CanvasWrapper {
     let chargeWidth = 0;
 
     if (charge) {
-      chargeText = this.getChargeText(charge);
+      chargeText = getChargeText(charge);
       ctx.font = this.fontSmall;
       chargeWidth = ctx.measureText(chargeText).width;
     }
@@ -1622,7 +1629,7 @@ class CanvasWrapper {
     }
 
     ctx.font = this.fontLarge;
-    ctx.fillStyle = this.getColor('BACKGROUND');
+    ctx.fillStyle = this.themeManager.getColor('BACKGROUND');
     let dim = ctx.measureText(elementName);
     dim.totalWidth = dim.width + chargeWidth;
     dim.height = parseInt(this.fontLarge, 10);
@@ -1636,7 +1643,7 @@ class CanvasWrapper {
     ctx.globalCompositeOperation = 'source-over';
     let cursorPos = -dim.width / 2.0;
     let cursorPosLeft = -dim.width / 2.0;
-    ctx.fillStyle = this.getColor(elementName);
+    ctx.fillStyle = this.themeManager.getColor(elementName);
     ctx.fillText(elementName, x + offsetX + cursorPos, y + this.opts.halfFontSizeLarge + offsetY);
     cursorPos += dim.width;
 
@@ -1751,7 +1758,7 @@ class CanvasWrapper {
       }
 
       if (elementCharge !== 0) {
-        elementChargeText = this.getChargeText(elementCharge);
+        elementChargeText = getChargeText(elementCharge);
         elementChargeWidth = ctx.measureText(elementChargeText).width;
       }
 
@@ -1764,7 +1771,7 @@ class CanvasWrapper {
       ctx.font = this.fontLarge;
       let hx = x + offsetX;
       let hy = y + offsetY + this.opts.halfFontSizeLarge;
-      ctx.fillStyle = this.getColor(element);
+      ctx.fillStyle = this.themeManager.getColor(element);
 
       if (elementCount > 0) {
         cursorPosLeft -= elementCountWidth;
@@ -1888,7 +1895,7 @@ class CanvasWrapper {
     let ctx = this.ctx;
     let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
     ctx.save();
-    ctx.strokeStyle = this.getColor('C');
+    ctx.strokeStyle = this.themeManager.getColor('C');
     ctx.lineWidth = this.opts.bondThickness;
     ctx.beginPath();
     ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, radius - this.opts.bondSpacing, 0, Math.PI * 2, true);
@@ -1910,7 +1917,7 @@ class CanvasWrapper {
 
 module.exports = CanvasWrapper;
 
-},{"./Line":8,"./MathHelper":9,"./Ring":11,"./Vector2":14,"./Vertex":15}],5:[function(require,module,exports){
+},{"./Line":8,"./MathHelper":9,"./Ring":11,"./UtilityFunctions":17,"./Vector2":18,"./Vertex":19}],5:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1937,6 +1944,8 @@ const CanvasWrapper = require('./CanvasWrapper');
 const Graph = require('./Graph');
 
 const SSSR = require('./SSSR');
+
+const ThemeManager = require('./ThemeManager');
 /** 
  * The main class of the application representing the smiles drawer 
  * 
@@ -2077,123 +2086,15 @@ class Drawer {
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
-    this.data = data;
-    this.infoOnly = infoOnly;
+    this.initDraw(data, themeName, infoOnly);
 
     if (!this.infoOnly) {
-      this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts);
+      this.themeManager = new ThemeManager(this.opts.themes, themeName);
+      this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
     }
 
-    this.ringIdCounter = 0;
-    this.ringConnectionIdCounter = 0;
-    this.graph = new Graph(data, this.opts.isomeric);
-    this.rings = Array();
-    this.ringConnections = Array();
-    this.originalRings = Array();
-    this.originalRingConnections = Array();
-    this.bridgedRing = false; // Reset those, in case the previous drawn SMILES had a dangling \ or /
-
-    this.doubleBondConfigCount = null;
-    this.doubleBondConfig = null;
-    this.initRings();
-    this.initHydrogens();
-
-    if (!this.infoOnly) {
-      this.position(); // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
-
-      this.restoreRingInformation(); // Atoms bonded to the same ring atom
-
-      this.resolvePrimaryOverlaps();
-      let overlapScore = this.getOverlapScore();
-      this.totalOverlapScore = this.getOverlapScore().total;
-
-      for (var o = 0; o < this.opts.overlapResolutionIterations; o++) {
-        for (var i = 0; i < this.graph.edges.length; i++) {
-          let edge = this.graph.edges[i];
-
-          if (this.isEdgeRotatable(edge)) {
-            let subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
-            let subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId); // Only rotate the shorter subtree
-
-            let a = edge.targetId;
-            let b = edge.sourceId;
-
-            if (subTreeDepthA > subTreeDepthB) {
-              a = edge.sourceId;
-              b = edge.targetId;
-            }
-
-            let subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
-
-            if (subTreeOverlap.value > this.opts.overlapSensitivity) {
-              let vertexA = this.graph.vertices[a];
-              let vertexB = this.graph.vertices[b];
-              let neighboursB = vertexB.getNeighbours(a);
-
-              if (neighboursB.length === 1) {
-                let neighbour = this.graph.vertices[neighboursB[0]];
-                let angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
-                this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position); // If the new overlap is bigger, undo change
-
-                let newTotalOverlapScore = this.getOverlapScore().total;
-
-                if (newTotalOverlapScore > this.totalOverlapScore) {
-                  this.rotateSubtree(neighbour.id, vertexB.id, -angle, vertexB.position);
-                } else {
-                  this.totalOverlapScore = newTotalOverlapScore;
-                }
-              } else if (neighboursB.length === 2) {
-                // Switch places / sides
-                // If vertex a is in a ring, do nothing
-                if (vertexB.value.rings.length !== 0 && vertexA.value.rings.length !== 0) {
-                  continue;
-                }
-
-                let neighbourA = this.graph.vertices[neighboursB[0]];
-                let neighbourB = this.graph.vertices[neighboursB[1]];
-
-                if (neighbourA.value.rings.length === 1 && neighbourB.value.rings.length === 1) {
-                  // Both neighbours in same ring. TODO: does this create problems with wedges? (up = down and vice versa?)
-                  if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
-                    continue;
-                  } // TODO: Rotate circle
-
-                } else if (neighbourA.value.rings.length !== 0 || neighbourB.value.rings.length !== 0) {
-                  continue;
-                } else {
-                  let angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
-                  let angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
-                  this.rotateSubtree(neighbourA.id, vertexB.id, angleA, vertexB.position);
-                  this.rotateSubtree(neighbourB.id, vertexB.id, angleB, vertexB.position);
-                  let newTotalOverlapScore = this.getOverlapScore().total;
-
-                  if (newTotalOverlapScore > this.totalOverlapScore) {
-                    this.rotateSubtree(neighbourA.id, vertexB.id, -angleA, vertexB.position);
-                    this.rotateSubtree(neighbourB.id, vertexB.id, -angleB, vertexB.position);
-                  } else {
-                    this.totalOverlapScore = newTotalOverlapScore;
-                  }
-                }
-              }
-
-              overlapScore = this.getOverlapScore();
-            }
-          }
-        }
-      }
-
-      this.resolveSecondaryOverlaps(overlapScore.scores);
-
-      if (this.opts.isomeric) {
-        this.annotateStereochemistry();
-      } // Initialize pseudo elements or shortcuts
-
-
-      if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
-        this.initPseudoElements();
-      }
-
-      this.rotateDrawing(); // Set the canvas to the appropriate size
+    if (!infoOnly) {
+      this.processGraph(); // Set the canvas to the appropriate size
 
       this.canvasWrapper.scale(this.graph.vertices); // Do the actual drawing
 
@@ -2511,6 +2412,122 @@ class Drawer {
     }
 
     return null;
+  }
+
+  initDraw(data, themeName, infoOnly) {
+    this.data = data;
+    this.infoOnly = infoOnly;
+    this.ringIdCounter = 0;
+    this.ringConnectionIdCounter = 0;
+    this.graph = new Graph(data, this.opts.isomeric);
+    this.rings = Array();
+    this.ringConnections = Array();
+    this.originalRings = Array();
+    this.originalRingConnections = Array();
+    this.bridgedRing = false; // Reset those, in case the previous drawn SMILES had a dangling \ or /
+
+    this.doubleBondConfigCount = null;
+    this.doubleBondConfig = null;
+    this.initRings();
+    this.initHydrogens();
+  }
+
+  processGraph() {
+    this.position(); // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
+
+    this.restoreRingInformation(); // Atoms bonded to the same ring atom
+
+    this.resolvePrimaryOverlaps();
+    let overlapScore = this.getOverlapScore();
+    this.totalOverlapScore = this.getOverlapScore().total;
+
+    for (var o = 0; o < this.opts.overlapResolutionIterations; o++) {
+      for (var i = 0; i < this.graph.edges.length; i++) {
+        let edge = this.graph.edges[i];
+
+        if (this.isEdgeRotatable(edge)) {
+          let subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
+          let subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId); // Only rotate the shorter subtree
+
+          let a = edge.targetId;
+          let b = edge.sourceId;
+
+          if (subTreeDepthA > subTreeDepthB) {
+            a = edge.sourceId;
+            b = edge.targetId;
+          }
+
+          let subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
+
+          if (subTreeOverlap.value > this.opts.overlapSensitivity) {
+            let vertexA = this.graph.vertices[a];
+            let vertexB = this.graph.vertices[b];
+            let neighboursB = vertexB.getNeighbours(a);
+
+            if (neighboursB.length === 1) {
+              let neighbour = this.graph.vertices[neighboursB[0]];
+              let angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
+              this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position); // If the new overlap is bigger, undo change
+
+              let newTotalOverlapScore = this.getOverlapScore().total;
+
+              if (newTotalOverlapScore > this.totalOverlapScore) {
+                this.rotateSubtree(neighbour.id, vertexB.id, -angle, vertexB.position);
+              } else {
+                this.totalOverlapScore = newTotalOverlapScore;
+              }
+            } else if (neighboursB.length === 2) {
+              // Switch places / sides
+              // If vertex a is in a ring, do nothing
+              if (vertexB.value.rings.length !== 0 && vertexA.value.rings.length !== 0) {
+                continue;
+              }
+
+              let neighbourA = this.graph.vertices[neighboursB[0]];
+              let neighbourB = this.graph.vertices[neighboursB[1]];
+
+              if (neighbourA.value.rings.length === 1 && neighbourB.value.rings.length === 1) {
+                // Both neighbours in same ring. TODO: does this create problems with wedges? (up = down and vice versa?)
+                if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
+                  continue;
+                } // TODO: Rotate circle
+
+              } else if (neighbourA.value.rings.length !== 0 || neighbourB.value.rings.length !== 0) {
+                continue;
+              } else {
+                let angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
+                let angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
+                this.rotateSubtree(neighbourA.id, vertexB.id, angleA, vertexB.position);
+                this.rotateSubtree(neighbourB.id, vertexB.id, angleB, vertexB.position);
+                let newTotalOverlapScore = this.getOverlapScore().total;
+
+                if (newTotalOverlapScore > this.totalOverlapScore) {
+                  this.rotateSubtree(neighbourA.id, vertexB.id, -angleA, vertexB.position);
+                  this.rotateSubtree(neighbourB.id, vertexB.id, -angleB, vertexB.position);
+                } else {
+                  this.totalOverlapScore = newTotalOverlapScore;
+                }
+              }
+            }
+
+            overlapScore = this.getOverlapScore();
+          }
+        }
+      }
+    }
+
+    this.resolveSecondaryOverlaps(overlapScore.scores);
+
+    if (this.opts.isomeric) {
+      this.annotateStereochemistry();
+    } // Initialize pseudo elements or shortcuts
+
+
+    if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
+      this.initPseudoElements();
+    }
+
+    this.rotateDrawing();
   }
   /**
    * Initializes rings and ringbonds for the current molecule.
@@ -4857,7 +4874,7 @@ class Drawer {
 
 module.exports = Drawer;
 
-},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":6,"./Graph":7,"./Line":8,"./MathHelper":9,"./Ring":11,"./RingConnection":12,"./SSSR":13,"./Vector2":14,"./Vertex":15}],6:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":6,"./Graph":7,"./Line":8,"./MathHelper":9,"./Ring":11,"./RingConnection":12,"./SSSR":13,"./ThemeManager":16,"./Vector2":18,"./Vertex":19}],6:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5870,7 +5887,7 @@ class Graph {
 
 module.exports = Graph;
 
-},{"./Atom":3,"./Edge":6,"./MathHelper":9,"./Ring":11,"./Vector2":14,"./Vertex":15}],8:[function(require,module,exports){
+},{"./Atom":3,"./Edge":6,"./MathHelper":9,"./Ring":11,"./Vector2":18,"./Vertex":19}],8:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -6179,7 +6196,7 @@ class Line {
 
 module.exports = Line;
 
-},{"./Vector2":14}],9:[function(require,module,exports){
+},{"./Vector2":18}],9:[function(require,module,exports){
 "use strict";
 
 /** 
@@ -8474,7 +8491,7 @@ class Ring {
 
 module.exports = Ring;
 
-},{"./ArrayHelper":2,"./RingConnection":12,"./Vector2":14,"./Vertex":15}],12:[function(require,module,exports){
+},{"./ArrayHelper":2,"./RingConnection":12,"./Vector2":18,"./Vertex":19}],12:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8648,7 +8665,7 @@ class RingConnection {
 
 module.exports = RingConnection;
 
-},{"./Ring":11,"./Vertex":15}],13:[function(require,module,exports){
+},{"./Ring":11,"./Vertex":19}],13:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -9260,6 +9277,985 @@ class SSSR {
 module.exports = SSSR;
 
 },{"./Graph":7}],14:[function(require,module,exports){
+"use strict";
+
+// we use the drawer to do all the preprocessing. then we take over the drawing
+// portion to output to svg
+const ArrayHelper = require('./ArrayHelper');
+
+const Atom = require('./Atom');
+
+const Drawer = require('./Drawer');
+
+const Graph = require('./Graph');
+
+const Line = require('./Line');
+
+const SvgWrapper = require('./SvgWrapper');
+
+const ThemeManager = require('./ThemeManager');
+
+const Vector2 = require('./Vector2');
+
+class SvgDrawer {
+  constructor(options) {
+    this.preprocessor = new Drawer(options);
+  }
+  /**
+   * Draws the parsed smiles data to an svg element.
+   *
+   * @param {Object} data The tree returned by the smiles parser.
+   * @param {(String|HTMLElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+     * @returns {Oject} The dimensions of the drawing in { width, height }
+   */
+
+
+  draw(data, target, themeName = 'light', infoOnly = false) {
+    let preprocessor = this.preprocessor;
+    preprocessor.initDraw(data, themeName, infoOnly);
+
+    if (!infoOnly) {
+      this.themeManager = new ThemeManager(this.preprocessor.opts.themes, themeName);
+      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.preprocessor.opts);
+    }
+
+    preprocessor.processGraph(); // Set the canvas to the appropriate size
+
+    this.svgWrapper.determineDimensions(preprocessor.graph.vertices); // Do the actual drawing
+
+    this.drawEdges(preprocessor.opts.debug);
+    this.drawVertices(preprocessor.opts.debug);
+
+    if (preprocessor.opts.debug) {
+      console.log(preprocessor.graph);
+      console.log(preprocessor.rings);
+      console.log(preprocessor.ringConnections);
+    }
+
+    return this.svgWrapper.constructSvg();
+  }
+  /**
+   * Draws a ring inside a provided ring, indicating aromaticity.
+   *
+   * @param {Ring} ring A ring.
+   */
+
+
+  drawAromaticityRing(ring) {
+    let ctx = this.ctx;
+    let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
+    ctx.save();
+    ctx.strokeStyle = this.getColor('C');
+    ctx.lineWidth = this.opts.bondThickness;
+    ctx.beginPath();
+    ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, radius - this.opts.bondSpacing, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+  /**
+   * Draw the actual edges as bonds.
+   *
+   * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+   */
+
+
+  drawEdges(debug) {
+    let preprocessor = this.preprocessor,
+        graph = preprocessor.graph,
+        rings = preprocessor.rings,
+        drawn = Array(this.preprocessor.graph.edges.length);
+    drawn.fill(false);
+    graph.traverseBF(0, vertex => {
+      let edges = graph.getEdges(vertex.id);
+
+      for (var i = 0; i < edges.length; i++) {
+        let edgeId = edges[i];
+
+        if (!drawn[edgeId]) {
+          drawn[edgeId] = true;
+          this.drawEdge(edgeId, debug);
+        }
+      }
+    }); // Draw ring for implicitly defined aromatic rings
+
+    if (!this.bridgedRing) {
+      for (var i = 0; i < rings.length; i++) {
+        let ring = rings[i];
+
+        if (preprocessor.isRingAromatic(ring)) {
+          this.drawAromaticityRing(ring);
+        }
+      }
+    }
+  }
+  /**
+   * Draw the an edge as a bond.
+   *
+   * @param {Number} edgeId An edge id.
+   * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+   */
+
+
+  drawEdge(edgeId, debug) {
+    let preprocessor = this.preprocessor,
+        opts = preprocessor.opts,
+        svgWrapper = this.svgWrapper,
+        edge = preprocessor.graph.edges[edgeId],
+        vertexA = preprocessor.graph.vertices[edge.sourceId],
+        vertexB = preprocessor.graph.vertices[edge.targetId],
+        elementA = vertexA.value.element,
+        elementB = vertexB.value.element;
+
+    if ((!vertexA.value.isDrawn || !vertexB.value.isDrawn) && preprocessor.opts.atomVisualization === 'default') {
+      return;
+    }
+
+    let a = vertexA.position,
+        b = vertexB.position,
+        normals = preprocessor.getEdgeNormals(edge),
+        // Create a point on each side of the line
+    sides = ArrayHelper.clone(normals);
+    sides[0].multiplyScalar(10).add(a);
+    sides[1].multiplyScalar(10).add(a);
+
+    if (edge.bondType === '=' || preprocessor.getRingbondType(vertexA, vertexB) === '=' || edge.isPartOfAromaticRing && preprocessor.bridgedRing) {
+      // Always draw double bonds inside the ring
+      let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);
+      let s = preprocessor.chooseSide(vertexA, vertexB, sides);
+
+      if (inRing) {
+        // Always draw double bonds inside a ring
+        // if the bond is shared by two rings, it is drawn in the larger
+        // problem: smaller ring is aromatic, bond is still drawn in larger -> fix this
+        let lcr = preprocessor.getLargestOrAromaticCommonRing(vertexA, vertexB);
+        let center = lcr.center;
+        normals[0].multiplyScalar(opts.bondSpacing);
+        normals[1].multiplyScalar(opts.bondSpacing); // Choose the normal that is on the same side as the center
+
+        let line = null;
+
+        if (center.sameSideAs(vertexA.position, vertexB.position, Vector2.add(a, normals[0]))) {
+          line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        } else {
+          line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+        }
+
+        line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength); // The shortened edge
+
+        if (edge.isPartOfAromaticRing) {
+          // preprocessor.canvasWrapper.drawLine(line, true);
+          svgWrapper.drawLine(line, true);
+        } else {
+          // preprocessor.canvasWrapper.drawLine(line);
+          svgWrapper.drawLine(line);
+        }
+
+        svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+      } else if (edge.center || vertexA.isTerminal() && vertexB.isTerminal() || s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
+        this.multiplyNormals(normals, opts.halfBondSpacing);
+        let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB),
+            lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+        svgWrapper.drawLine(lineA);
+        svgWrapper.drawLine(lineB);
+      } else if (s.sideCount[0] > s.sideCount[1] || s.totalSideCount[0] > s.totalSideCount[1]) {
+        this.multiplyNormals(normals, opts.bondSpacing);
+        let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
+        svgWrapper.drawLine(line);
+        svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+      } else if (s.sideCount[0] < s.sideCount[1] || s.totalSideCount[0] <= s.totalSideCount[1]) {
+        this.multiplyNormals(normals, opts.bondSpacing);
+        let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+        line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
+        svgWrapper.drawLine(line);
+        svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+      }
+    } else if (edge.bondType === '#') {
+      normals[0].multiplyScalar(opts.bondSpacing / 1.5);
+      normals[1].multiplyScalar(opts.bondSpacing / 1.5);
+      let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+      let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+      svgWrapper.drawLine(lineA);
+      svgWrapper.drawLine(lineB);
+      svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+    } else if (edge.bondType === '.') {// TODO: Something... maybe... version 2?
+    } else {
+      let isChiralCenterA = vertexA.value.isStereoCenter;
+      let isChiralCenterB = vertexB.value.isStereoCenter;
+
+      if (edge.wedge === 'up') {
+        svgWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+      } else if (edge.wedge === 'down') {
+        svgWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+      } else {
+        svgWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+      }
+    }
+
+    if (debug) {
+      let midpoint = Vector2.midpoint(a, b);
+      svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
+    }
+  }
+  /**
+   * Draws the vertices representing atoms to the canvas.
+   *
+   * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
+   */
+
+
+  drawVertices(debug) {
+    let preprocessor = this.preprocessor,
+        opts = preprocessor.opts,
+        graph = preprocessor.graph,
+        rings = preprocessor.rings,
+        svgWrapper = this.svgWrapper;
+    var i = graph.vertices.length;
+
+    for (var i = 0; i < graph.vertices.length; i++) {
+      let vertex = graph.vertices[i];
+      let atom = vertex.value;
+      let charge = 0;
+      let isotope = 0;
+      let bondCount = vertex.value.bondCount;
+      let element = atom.element;
+      let hydrogens = Atom.maxBonds[element] - bondCount;
+      let dir = vertex.getTextDirection(graph.vertices);
+      let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
+      let isCarbon = atom.element === 'C'; // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
+      // should be the most common state. This has to be fixed by kekulization
+
+      if (atom.element === 'N' && atom.isPartOfAromaticRing) {
+        hydrogens = 0;
+      }
+
+      if (atom.bracket) {
+        hydrogens = atom.bracket.hcount;
+        charge = atom.bracket.charge;
+        isotope = atom.bracket.isotope;
+      }
+
+      if (opts.atomVisualization === 'allballs') {
+        svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+      } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements) || graph.vertices.length === 1) {
+        if (opts.atomVisualization === 'default') {
+          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+        } else if (opts.atomVisualization === 'balls') {
+          svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+        }
+      } else if (vertex.getNeighbourCount() === 2 && vertex.forcePositioned == true) {
+        // If there is a carbon which bonds are in a straight line, draw a dot
+        let a = graph.vertices[vertex.neighbours[0]].position;
+        let b = graph.vertices[vertex.neighbours[1]].position;
+        let angle = Vector2.threePointangle(vertex.position, a, b);
+
+        if (Math.abs(Math.PI - angle) < 0.1) {
+          svgWrapper.drawPoint(vertex.position.x, vertex.position.y, element);
+        }
+      }
+
+      if (debug) {
+        let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
+        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
+      } else {
+        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
+      }
+    } // Draw the ring centers for debug purposes
+
+
+    if (opts.debug) {
+      for (var i = 0; i < rings.length; i++) {
+        let center = rings[i].center;
+        svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
+      }
+    }
+  }
+  /**
+   * Returns the total overlap score of the current molecule.
+   *
+   * @returns {Number} The overlap score.
+   */
+
+
+  getTotalOverlapScore() {
+    return this.preprocessor.getTotalOverlapScore();
+  }
+  /**
+   * Returns the molecular formula of the loaded molecule as a string.
+   *
+   * @returns {String} The molecular formula.
+   */
+
+
+  getMolecularFormula() {
+    return this.preprocessor.getMolecularFormula();
+  }
+  /**
+   * @param {Array} normals list of normals to multiply
+   * @param {Number} spacing value to multiply normals by
+   */
+
+
+  multiplyNormals(normals, spacing) {
+    normals[0].multiplyScalar(spacing);
+    normals[1].multiplyScalar(spacing);
+  }
+
+}
+
+module.exports = SvgDrawer;
+
+},{"./ArrayHelper":2,"./Atom":3,"./Drawer":5,"./Graph":7,"./Line":8,"./SvgWrapper":15,"./ThemeManager":16,"./Vector2":18}],15:[function(require,module,exports){
+"use strict";
+
+const {
+  getChargeText
+} = require('./UtilityFunctions');
+
+const Line = require('./Line');
+
+const Vector2 = require('./Vector2');
+
+class SvgWrapper {
+  constructor(themeManager, target, options) {
+    this.svg = document.getElementById(target);
+    this.opts = options;
+    this.gradientId = 0; // maintain a list of line elements and their corresponding gradients
+    // maintain a list of vertex elements
+
+    this.paths = [];
+    this.vertices = [];
+    this.gradients = []; // maintain the offset for drawing purposes
+
+    this.offsetX = 0.0;
+    this.offsetY = 0.0; // maintain the dimensions
+
+    this.drawingWidth = 0;
+    this.drawingHeight = 0;
+    this.halfBondThickness = this.opts.bondThickness / 2.0; // for managing color schemes
+
+    this.themeManager = themeManager; // create the mask
+
+    this.maskElements = [];
+    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    mask.setAttributeNS(null, 'x', 0);
+    mask.setAttributeNS(null, 'y', 0);
+    mask.setAttributeNS(null, 'width', '100%');
+    mask.setAttributeNS(null, 'height', '100%');
+    mask.setAttributeNS(null, 'fill', 'white');
+    this.maskElements.push(mask); // clear the svg element
+
+    while (this.svg.firstChild) {
+      this.svg.removeChild(this.svg.firstChild);
+    }
+  }
+
+  constructSvg() {
+    // TODO: add the defs element to put gradients in
+    let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
+        masks = document.createElementNS('http://www.w3.org/2000/svg', 'mask'),
+        style = document.createElementNS('http://www.w3.org/2000/svg', 'style'),
+        paths = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
+        vertices = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
+        pathChildNodes = this.paths; // give the mask an id
+
+    masks.setAttributeNS(null, 'id', 'text-mask'); // create the css styles
+
+    style.appendChild(document.createTextNode(`
+                .element {
+                    font: ${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif;
+                    alignment-baseline: 'middle';
+                }
+                .sub {
+                    font: ${this.opts.fontSizeSmall}pt Helvetica, Arial, sans-serif;
+                }
+            `));
+
+    for (let path of pathChildNodes) {
+      paths.appendChild(path);
+    }
+
+    for (let vertex of this.vertices) {
+      vertices.appendChild(vertex);
+    }
+
+    for (let mask of this.maskElements) {
+      masks.appendChild(mask);
+    }
+
+    for (let gradient of this.gradients) {
+      defs.appendChild(gradient);
+    }
+
+    paths.setAttributeNS(null, 'mask', 'url(#text-mask)');
+
+    if (this.svg) {
+      this.svg.appendChild(defs);
+      this.svg.appendChild(masks);
+      this.svg.appendChild(style);
+      this.svg.appendChild(paths);
+      this.svg.appendChild(vertices);
+      return this.svg;
+    } else {
+      let container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      container.appendChild(defs);
+      container.appendChild(masks);
+      container.appendChild(style);
+      container.appendChild(paths);
+      container.appendChild(vertices);
+      return container;
+    }
+  }
+  /**
+   * Create a linear gradient to apply to a line
+   *
+   * @param {Line} line the line to apply the gradiation to.
+   */
+
+
+  createGradient(line) {
+    // create the gradient and add it
+    let gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'),
+        gradientUrl = `line-${this.gradientId++}`,
+        l = line.getLeftVector(),
+        r = line.getRightVector(),
+        fromX = l.x + this.offsetX,
+        fromY = l.y + this.offsetY,
+        toX = r.x + this.offsetX,
+        toY = r.y + this.offsetY;
+    gradient.setAttributeNS(null, 'id', gradientUrl);
+    gradient.setAttributeNS(null, 'gradientUnits', 'userSpaceOnUse');
+    gradient.setAttributeNS(null, 'x1', fromX);
+    gradient.setAttributeNS(null, 'y1', fromY);
+    gradient.setAttributeNS(null, 'x2', toX);
+    gradient.setAttributeNS(null, 'y2', toY);
+    let firstStop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    firstStop.setAttributeNS(null, 'stop-color', this.themeManager.getColor(line.getLeftElement()) || this.themeManager.getColor('C'));
+    firstStop.setAttributeNS(null, 'offset', '20%');
+    let secondStop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    secondStop.setAttributeNS(null, 'stop-color', this.themeManager.getColor(line.getRightElement() || this.themeManager.getColor('C')));
+    secondStop.setAttributeNS(null, 'offset', '100%');
+    gradient.appendChild(firstStop);
+    gradient.appendChild(secondStop);
+    this.gradients.push(gradient);
+    return gradientUrl;
+  }
+  /**
+   * Create a tspan element for sub or super scripts that styles the text
+   * appropriately as one of those text types.
+   *
+   * @param {String} text the actual text
+   * @param {String} shift the type of text, either 'sub', or 'super'
+   */
+
+
+  createSubSuperScripts(text, shift) {
+    let elem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    elem.setAttributeNS(null, 'baseline-shift', shift);
+    elem.appendChild(document.createTextNode(text));
+    elem.setAttributeNS(null, 'class', 'sub');
+    return elem;
+  }
+  /**
+   * Determine drawing dimensiosn based on vertex positions.
+   *
+   * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+   */
+
+
+  determineDimensions(vertices) {
+    // Figure out the final size of the image
+    let maxX = -Number.MAX_VALUE;
+    let maxY = -Number.MAX_VALUE;
+    let minX = Number.MAX_VALUE;
+    let minY = Number.MAX_VALUE;
+
+    for (var i = 0; i < vertices.length; i++) {
+      if (!vertices[i].value.isDrawn) {
+        continue;
+      }
+
+      let p = vertices[i].position;
+      if (maxX < p.x) maxX = p.x;
+      if (maxY < p.y) maxY = p.y;
+      if (minX > p.x) minX = p.x;
+      if (minY > p.y) minY = p.y;
+    } // Add padding
+
+
+    let padding = this.opts.padding;
+    maxX += padding;
+    maxY += padding;
+    minX -= padding;
+    minY -= padding;
+    this.drawingWidth = maxX - minX;
+    this.drawingHeight = maxY - minY;
+    let scaleX = this.svg.clientWidth / this.drawingWidth;
+    let scaleY = this.svg.clientHeight / this.drawingHeight;
+    let scale = scaleX < scaleY ? scaleX : scaleY;
+    let viewBoxDim = Math.round(this.drawingWidth > this.drawingHeight ? this.drawingWidth : this.drawingHeight);
+    this.svg.setAttributeNS(null, 'viewBox', `0 0 ${viewBoxDim} ${viewBoxDim}`);
+    this.offsetX = -minX;
+    this.offsetY = -minY; // Center
+
+    if (scaleX < scaleY) {
+      this.offsetY += this.svg.clientHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+    } else {
+      this.offsetX += this.svg.clientWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+    }
+  }
+  /**
+   * Draw an svg ellipse as a ball.
+   *
+   * @param {Number} x The x position of the text.
+   * @param {Number} y The y position of the text.
+   * @param {String} elementName The name of the element (single-letter).
+   */
+
+
+  drawBall(x, y, elementName) {
+    let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ball.setAttributeNS(null, 'cx', x + this.offsetX);
+    ball.setAttributeNS(null, 'cy', y + this.offsetY);
+    ball.setAttributeNS(null, 'r', this.opts.bondLength / 4.5);
+    ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
+    this.vertices.push(ball);
+  }
+  /**
+   * Draw a dashed wedge on the canvas.
+   *
+   * @param {Line} line A line.
+   */
+
+
+  drawDashedWedge(line) {
+    if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
+      return;
+    }
+
+    let offsetX = this.offsetX,
+        offsetY = this.offsetY,
+        l = line.getLeftVector().clone(),
+        r = line.getRightVector().clone(),
+        normals = Vector2.normals(l, r);
+    normals[0].normalize();
+    normals[1].normalize();
+    let isRightChiralCenter = line.getRightChiral(),
+        start,
+        end;
+
+    if (isRightChiralCenter) {
+      start = r;
+      end = l;
+    } else {
+      start = l;
+      end = r;
+    }
+
+    let dir = Vector2.subtract(end, start).normalize(),
+        length = line.getLength(),
+        step = 1.25 / (length / (this.opts.bondThickness * 3.0)),
+        changed = false;
+    let gradient = this.createGradient(line);
+
+    for (let t = 0.0; t < 1.0; t += step) {
+      let to = Vector2.multiplyScalar(dir, t * length),
+          startDash = Vector2.add(start, to),
+          width = 1.5 * t,
+          dashOffset = Vector2.multiplyScalar(normals[0], width);
+      startDash.subtract(dashOffset);
+      let endDash = startDash.clone();
+      endDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
+      this.drawLine(new Line(startDash, endDash), null, gradient);
+    }
+  }
+  /**
+   * Draws a debug dot at a given coordinate and adds text.
+   *
+   * @param {Number} x The x coordinate.
+   * @param {Number} y The y coordindate.
+   * @param {String} [debugText=''] A string.
+   * @param {String} [color='#f00'] A color in hex form.
+   */
+
+
+  drawDebugPoint(x, y, debugText = '', color = '#f00') {
+    let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    point.setAttributeNS(null, 'cx', x + this.offsetX);
+    point.setAttributeNS(null, 'cy', y + this.offsetY);
+    point.setAttributeNS(null, 'r', '2');
+    point.setAttributeNS(null, 'fill', '#f00');
+    this.vertices.push(point);
+    this.drawDebugText(x, y, debugText);
+  }
+  /**
+   * Draws a debug text message at a given position
+   *
+   * @param {Number} x The x coordinate.
+   * @param {Number} y The y coordinate.
+   * @param {String} text The debug text.
+   */
+
+
+  drawDebugText(x, y, text) {
+    let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElem.setAttributeNS(null, 'x', x + this.offsetX);
+    textElem.setAttributeNS(null, 'y', y + this.offsetY);
+    textElem.setAttributeNS(null, 'class', 'debug');
+    textElem.setAttributeNS(null, 'fill', '#ff0000');
+    textElem.setAttributeNS(null, 'style', `
+                font: 5px Droid Sans, sans-serif;
+            `);
+    textElem.appendChild(document.createTextNode(text));
+    this.vertices.push(textElem);
+  }
+  /**
+   * Draws a line.
+   *
+   * @param {Line} line A line.
+   * @param {Boolean} dashed defaults to false.
+   * @param {String} gradient gradient url. Defaults to null.
+   */
+
+
+  drawLine(line, dashed = false, gradient = null) {
+    let opts = this.opts,
+        stylesArr = [['stroke-linecap', 'round'], ['stroke-dasharray', dashed ? '5, 5' : 'none']],
+        l = line.getLeftVector(),
+        r = line.getRightVector(),
+        fromX = l.x + this.offsetX,
+        fromY = l.y + this.offsetY,
+        toX = r.x + this.offsetX,
+        toY = r.y + this.offsetY;
+    let styles = stylesArr.map(sub => sub.join(':')).join(';'),
+        lineElem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    lineElem.setAttributeNS(null, 'x1', fromX);
+    lineElem.setAttributeNS(null, 'y1', fromY);
+    lineElem.setAttributeNS(null, 'x2', toX);
+    lineElem.setAttributeNS(null, 'y2', toY);
+    lineElem.setAttributeNS(null, 'style', styles);
+    this.paths.push(lineElem);
+
+    if (gradient == null) {
+      gradient = this.createGradient(line, fromX, fromY, toX, toY);
+    }
+
+    lineElem.setAttributeNS(null, 'stroke', `url('#${gradient}')`);
+  }
+  /**
+   * Draw a point.
+   *
+   * @param {Number} x The x position of the point.
+   * @param {Number} y The y position of the point.
+   * @param {String} elementName The name of the element (single-letter).
+   */
+
+
+  drawPoint(x, y, elementName) {
+    let ctx = this.ctx;
+    let offsetX = this.offsetX;
+    let offsetY = this.offsetY; // first create a mask
+
+    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    mask.setAttributeNS(null, 'cx', x + offsetX);
+    mask.setAttributeNS(null, 'cy', y + offsetY);
+    mask.setAttributeNS(null, 'r', '1.5');
+    mask.setAttributeNS(null, 'fill', 'black');
+    this.maskElements.push(mask); // now create the point
+
+    let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    point.setAttributeNS(null, 'cx', x + offsetX);
+    point.setAttributeNS(null, 'cy', y + offsetY);
+    point.setAttributeNS(null, 'r', '0.75');
+    point.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
+    this.vertices.push(point);
+  }
+  /**
+   * Draw a text to the canvas.
+   *
+   * @param {Number} x The x position of the text.
+   * @param {Number} y The y position of the text.
+   * @param {String} elementName The name of the element (single-letter).
+   * @param {Number} hydrogens The number of hydrogen atoms.
+   * @param {String} direction The direction of the text in relation to the associated vertex.
+   * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
+   * @param {Number} charge The charge of the atom.
+   * @param {Number} isotope The isotope number.
+   * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
+   * @param {String} attachedPseudoElement.element The element symbol.
+   * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
+   * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
+   */
+
+
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+    let offsetX = this.offsetX,
+        offsetY = this.offsetY,
+        pos = {
+      x: x + offsetX,
+      y: y + offsetY
+    },
+        textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+        writingMode = 'horizontal-tb',
+        letterSpacing = 'normal',
+        textOrientation = 'mixed',
+        textDirection = 'direction: ltr;',
+        xShift = -2,
+        yShift = 2.5;
+    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    mask.setAttributeNS(null, 'cx', pos.x);
+    mask.setAttributeNS(null, 'cy', pos.y);
+    mask.setAttributeNS(null, 'r', '3.5');
+    mask.setAttributeNS(null, 'fill', 'black');
+    this.maskElements.push(mask); // determine writing mode
+
+    if (/up|down/.test(direction) && !isTerminal) {
+      writingMode = 'vertical-rl';
+      textOrientation = 'upright';
+      letterSpacing = '-1px';
+    }
+
+    if (direction === 'down' && !isTerminal) {
+      xShift = 0;
+      yShift = -2;
+    } else if (direction === 'up' && !isTerminal) {
+      xShift = 0.5;
+    } else if (direction === 'left') {
+      xShift = 2;
+    }
+
+    if (direction === 'left' || direction === 'up' && !isTerminal) {
+      textDirection = 'direction: rtl; unicode-bidi: bidi-override;';
+    } // now the text element
+
+
+    textElem.setAttributeNS(null, 'x', pos.x + xShift);
+    textElem.setAttributeNS(null, 'y', pos.y + yShift);
+    textElem.setAttributeNS(null, 'class', 'element');
+    textElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
+    textElem.setAttributeNS(null, 'style', `
+                text-anchor: start;
+                writing-mode: ${writingMode};
+                text-orientation: ${textOrientation};
+                letter-spacing: ${letterSpacing};
+                ${textDirection}
+            `);
+    let textNode = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); // special case for element names that are 2 letters
+
+    if (elementName.length > 1) {
+      let textAnchor = /up|down/.test(direction) ? 'middle' : 'start';
+      textNode.setAttributeNS(null, 'style', `
+                unicode-bidi: plaintext;
+                writing-mode: lr-tb;
+                letter-spacing: normal;
+                text-anchor: ${textAnchor};
+            `);
+    }
+
+    textNode.appendChild(document.createTextNode(elementName));
+    textElem.appendChild(textNode); // Charge
+
+    if (charge) {
+      let chargeElem = this.createSubSuperScripts(getChargeText(charge), 'super');
+      textNode.appendChild(chargeElem);
+    }
+
+    let isotopeText = '0';
+
+    if (isotope > 0) {
+      let isotopeElem = this.createSubSuperScripts(isotope.toString(), 'super');
+      textNode.appendChild(isotopeElem);
+    } // TODO: Better handle exceptions
+    // Exception for nitro (draw nitro as NO2 instead of N+O-O)
+
+
+    if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') && attachedPseudoElement.hasOwnProperty('0O-1')) {
+      attachedPseudoElement = {
+        '0O': {
+          element: 'O',
+          count: 2,
+          hydrogenCount: 0,
+          previousElement: 'C',
+          charge: ''
+        }
+      };
+      charge = 0;
+    }
+
+    if (hydrogens > 0) {
+      let hydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      hydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
+      hydrogenElem.appendChild(document.createTextNode('H'));
+      textElem.appendChild(hydrogenElem);
+
+      if (hydrogens > 1) {
+        let hydrogenCountElem = this.createSubSuperScripts(hydrogens, 'sub');
+        hydrogenElem.appendChild(hydrogenCountElem);
+      }
+    }
+
+    for (let key in attachedPseudoElement) {
+      if (!attachedPseudoElement.hasOwnProperty(key)) {
+        continue;
+      }
+
+      let element = attachedPseudoElement[key].element,
+          elementCount = attachedPseudoElement[key].count,
+          hydrogenCount = attachedPseudoElement[key].hydrogenCount,
+          elementCharge = attachedPseudoElement[key].charge,
+          pseudoElementElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      pseudoElementElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
+      pseudoElementElem.appendChild(document.createTextNode(element));
+      pseudoElementElem.setAttributeNS(null, 'fill', this.themeManager.getColor(element));
+
+      if (elementCharge !== 0) {
+        let elementChargeElem = this.createSubSuperScripts(getChargeText(elementCharge), 'super');
+        pseudoElementElem.appendChild(elementChargeElem);
+      }
+
+      if (hydrogenCount > 0) {
+        let pseudoHydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+        pseudoHydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
+        pseudoHydrogenElem.appendChild(document.createTextNode('H'));
+        pseudoElementElem.appendChild(pseudoHydrogenElem);
+
+        if (hydrogenCount > 1) {
+          let hydrogenCountElem = this.createSubSuperScripts(hydrogenCount, 'sub');
+          pseudoHydrogenElem.appendChild(hydrogenCountElem);
+        }
+      }
+
+      if (elementCount > 1) {
+        let elementCountElem = this.createSubSuperScripts(elementCount, 'sub');
+        pseudoElementElem.appendChild(elementCountElem);
+      }
+
+      textElem.appendChild(pseudoElementElem);
+    }
+
+    this.vertices.push(textElem);
+  }
+  /**
+   * @param {Line} line the line object to create the wedge from
+   */
+
+
+  drawWedge(line) {
+    let offsetX = this.offsetX,
+        offsetY = this.offsetY,
+        l = line.getLeftVector().clone(),
+        r = line.getRightVector().clone();
+    l.x += offsetX;
+    l.y += offsetY;
+    r.x += offsetX;
+    r.y += offsetY;
+    let normals = Vector2.normals(l, r);
+    normals[0].normalize();
+    normals[1].normalize();
+    let isRightChiralCenter = line.getRightChiral();
+    let start = l,
+        end = r;
+
+    if (isRightChiralCenter) {
+      start = r;
+      end = l;
+    }
+
+    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
+        u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 1.5 + this.halfBondThickness)),
+        v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 1.5 + this.halfBondThickness)),
+        w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
+    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
+        gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
+    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
+    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
+    this.paths.push(polygon);
+  }
+
+}
+
+module.exports = SvgWrapper;
+
+},{"./Line":8,"./UtilityFunctions":17,"./Vector2":18}],16:[function(require,module,exports){
+"use strict";
+
+class ThemeManager {
+  constructor(colors, theme) {
+    this.colors = colors;
+    this.theme = this.colors[theme];
+  }
+  /**
+   * Returns the hex code of a color associated with a key from the current theme.
+   *
+   * @param {String} key The color key in the theme (e.g. C, N, BACKGROUND, ...).
+   * @returns {String} A color hex value.
+   */
+
+
+  getColor(key) {
+    if (key) {
+      key = key.toUpperCase();
+
+      if (key in this.theme) {
+        return this.theme[key];
+      }
+    }
+
+    return this.theme['C'];
+  }
+  /**
+   * Sets the theme to the specified string if it exists. If it does not, this
+   * does nothing.
+   *
+   * @param {String} theme the name of the theme to switch to
+   */
+
+
+  setTheme(theme) {
+    if (this.colors.hasOwnProperty(theme)) {
+      this.theme = this.colors[theme];
+    } // TODO: this probably should notify those who are watching this theme
+    // manager that the theme has changed so that colors can be changed
+    // on the fly
+
+  }
+
+}
+
+module.exports = ThemeManager;
+
+},{}],17:[function(require,module,exports){
+"use strict";
+
+/**
+ * Translate the integer indicating the charge to the appropriate text.
+ * @param {Number} charge The integer indicating the charge.
+ * @returns {String} A string representing a charge.
+ */
+function getChargeText(charge) {
+  console.log('in the utility version of getChargeText');
+
+  if (charge === 1) {
+    return '+';
+  } else if (charge === 2) {
+    return '2+';
+  } else if (charge === -1) {
+    return '-';
+  } else if (charge === -2) {
+    return '2-';
+  } else {
+    return '';
+  }
+}
+
+module.exports = {
+  getChargeText
+};
+
+},{}],18:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -9886,7 +10882,7 @@ class Vector2 {
 
 module.exports = Vector2;
 
-},{}],15:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -10249,5 +11245,5 @@ class Vertex {
 
 module.exports = Vertex;
 
-},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":9,"./Vector2":14}]},{},[1])
+},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":9,"./Vector2":18}]},{},[1])
 

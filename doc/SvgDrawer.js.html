@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>RingConnection - Documentation</title>
+    <title>SvgDrawer.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,1565 +32,357 @@
 
 <div id="main">
     
-    <h1 class="page-title">RingConnection</h1>
-    
-
-    
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>
-        RingConnection
-        </h2>
-        
-            <div class="class-description usertext"><p>A class representing a ring connection.</p></div>
-        
-    
-</header>
-
-<article>
-    
-        <div class="container-overview">
-        
-            
-
-    
-    <h2>Constructor</h2>
-    
-
-    <h4 class="name" id="RingConnection"><span class="type-signature"></span>new RingConnection<span class="signature">(firstRing, secondRing)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RingConnection.js.html">RingConnection.js</a>, <a href="RingConnection.js.html#line20">line 20</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The id of this ring connection.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>firstRingId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>secondRingId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>vertices</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Set.&lt;Number></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A set containing the vertex ids participating in the ring connection.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<div class="description usertext">
-    <p>The constructor for the class RingConnection.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>firstRing</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Ring.html">Ring</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>secondRing</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Ring.html">Ring</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        </div>
-    
-
-    
-
-    
-
-    
-    
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".getNeighbours"><span class="type-signature">(static) </span>getNeighbours<span class="signature">(ringConnections, ringId)</span><span class="type-signature"> &rarr; {Array.&lt;Number>}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RingConnection.js.html">RingConnection.js</a>, <a href="RingConnection.js.html#line125">line 125</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Retruns the neighbouring rings of a given ring.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ringConnections</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="RingConnection.html">RingConnection</a>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>An array of ring connections containing ring connections associated with the current molecule.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ringId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>An array of ring ids of neighbouring rings.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array.&lt;Number></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".getVertices"><span class="type-signature">(static) </span>getVertices<span class="signature">(ringConnections, firstRingId, secondRingId)</span><span class="type-signature"> &rarr; {Array.&lt;Number>}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RingConnection.js.html">RingConnection.js</a>, <a href="RingConnection.js.html#line150">line 150</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Returns an array of vertex ids associated with a given ring connection.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ringConnections</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="RingConnection.html">RingConnection</a>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>An array of ring connections containing ring connections associated with the current molecule.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>firstRingId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>secondRingId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>An array of vertex ids associated with the ring connection.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array.&lt;Number></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".isBridge"><span class="type-signature">(static) </span>isBridge<span class="signature">(ringConnections, vertices, firstRingId, secondRingId)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RingConnection.js.html">RingConnection.js</a>, <a href="RingConnection.js.html#line102">line 102</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Checks whether or not two rings are connected by a bridged bond.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ringConnections</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="RingConnection.html">RingConnection</a>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>An array of ring connections containing the ring connections associated with the current molecule.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>vertices</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="Vertex.html">Vertex</a>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>An array of vertices containing the vertices associated with the current molecule.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>firstRingId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>secondRingId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A boolean indicating whether or not two rings ar connected by a bridged bond.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="addVertex"><span class="type-signature"></span>addVertex<span class="signature">(vertexId)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RingConnection.js.html">RingConnection.js</a>, <a href="RingConnection.js.html#line44">line 44</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Adding a vertex to the ring connection.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>vertexId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A vertex id.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="containsRing"><span class="type-signature"></span>containsRing<span class="signature">(ringId)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RingConnection.js.html">RingConnection.js</a>, <a href="RingConnection.js.html#line68">line 68</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Returns a boolean indicating whether or not a ring with a given id is participating in this ring connection.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ringId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A boolean indicating whether or not a ring with a given id participates in this ring connection.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="isBridge"><span class="type-signature"></span>isBridge<span class="signature">(vertices)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RingConnection.js.html">RingConnection.js</a>, <a href="RingConnection.js.html#line78">line 78</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Checks whether or not this ring connection is a bridge in a bridged ring.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>vertices</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="Vertex.html">Vertex</a>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The array of vertices associated with the current molecule.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A boolean indicating whether or not this ring connection is a bridge.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="updateOther"><span class="type-signature"></span>updateOther<span class="signature">(ringId, otherRingId)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="RingConnection.js.html">RingConnection.js</a>, <a href="RingConnection.js.html#line54">line 54</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Update the ring id of this ring connection that is not the ring id supplied as the second argument.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>ringId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id. The new ring id to be set.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>otherRingId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A ring id. The id that is NOT to be updated.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <h1 class="page-title">SvgDrawer.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// we use the drawer to do all the preprocessing. then we take over the drawing
+// portion to output to svg
+const ArrayHelper = require('./ArrayHelper');
+const Atom = require('./Atom');
+const Drawer = require('./Drawer');
+const Graph = require('./Graph');
+const Line = require('./Line');
+const SvgWrapper = require('./SvgWrapper');
+const ThemeManager = require('./ThemeManager');
+const Vector2 = require('./Vector2');
+
+class SvgDrawer {
+  constructor(options) {
+    this.preprocessor = new Drawer(options);
+  }
+
+  /**
+   * Draws the parsed smiles data to an svg element.
+   *
+   * @param {Object} data The tree returned by the smiles parser.
+   * @param {(String|HTMLElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+
+   * @returns {Oject} The dimensions of the drawing in { width, height }
+   */
+  draw(data, target, themeName = 'light', infoOnly = false) {
+    let preprocessor = this.preprocessor;
+
+    preprocessor.initDraw(data, themeName, infoOnly);
+
+    if (!infoOnly) {
+      this.themeManager = new ThemeManager(this.preprocessor.opts.themes, themeName);
+      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.preprocessor.opts);
+    }
+
+    preprocessor.processGraph();
+
+    // Set the canvas to the appropriate size
+    this.svgWrapper.determineDimensions(preprocessor.graph.vertices);
+
+    // Do the actual drawing
+    this.drawEdges(preprocessor.opts.debug);
+    this.drawVertices(preprocessor.opts.debug);
+
+    if (preprocessor.opts.debug) {
+      console.log(preprocessor.graph);
+      console.log(preprocessor.rings);
+      console.log(preprocessor.ringConnections);
+    }
+
+    return this.svgWrapper.constructSvg();
+  }
+
+  /**
+   * Draws a ring inside a provided ring, indicating aromaticity.
+   *
+   * @param {Ring} ring A ring.
+   */
+  drawAromaticityRing(ring) {
+    let ctx = this.ctx;
+    let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
+
+    ctx.save();
+    ctx.strokeStyle = this.getColor('C');
+    ctx.lineWidth = this.opts.bondThickness;
+    ctx.beginPath();
+    ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY,
+      radius - this.opts.bondSpacing, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
+   * Draw the actual edges as bonds.
+   *
+   * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+   */
+  drawEdges(debug) {
+    let preprocessor = this.preprocessor,
+      graph = preprocessor.graph,
+      rings = preprocessor.rings,
+      drawn = Array(this.preprocessor.graph.edges.length);
+
+    drawn.fill(false);
+
+    graph.traverseBF(0, vertex => {
+      let edges = graph.getEdges(vertex.id);
+      for (var i = 0; i &lt; edges.length; i++) {
+        let edgeId = edges[i];
+        if (!drawn[edgeId]) {
+          drawn[edgeId] = true;
+          this.drawEdge(edgeId, debug);
+        }
+      }
+    });
+
+    // Draw ring for implicitly defined aromatic rings
+    if (!this.bridgedRing) {
+      for (var i = 0; i &lt; rings.length; i++) {
+        let ring = rings[i];
+
+        if (preprocessor.isRingAromatic(ring)) {
+          this.drawAromaticityRing(ring);
+        }
+      }
+    }
+  }
+
+  /**
+   * Draw the an edge as a bond.
+   *
+   * @param {Number} edgeId An edge id.
+   * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+   */
+  drawEdge(edgeId, debug) {
+    let preprocessor = this.preprocessor,
+      opts = preprocessor.opts,
+      svgWrapper = this.svgWrapper,
+      edge = preprocessor.graph.edges[edgeId],
+      vertexA = preprocessor.graph.vertices[edge.sourceId],
+      vertexB = preprocessor.graph.vertices[edge.targetId],
+      elementA = vertexA.value.element,
+      elementB = vertexB.value.element;
+
+    if ((!vertexA.value.isDrawn || !vertexB.value.isDrawn) &amp;&amp; preprocessor.opts.atomVisualization === 'default') {
+      return;
+    }
+
+    let a = vertexA.position,
+      b = vertexB.position,
+      normals = preprocessor.getEdgeNormals(edge),
+      // Create a point on each side of the line
+      sides = ArrayHelper.clone(normals);
+
+    sides[0].multiplyScalar(10).add(a);
+    sides[1].multiplyScalar(10).add(a);
+
+    if (edge.bondType === '=' || preprocessor.getRingbondType(vertexA, vertexB) === '=' ||
+      (edge.isPartOfAromaticRing &amp;&amp; preprocessor.bridgedRing)) {
+      // Always draw double bonds inside the ring
+      let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);
+      let s = preprocessor.chooseSide(vertexA, vertexB, sides);
+
+      if (inRing) {
+        // Always draw double bonds inside a ring
+        // if the bond is shared by two rings, it is drawn in the larger
+        // problem: smaller ring is aromatic, bond is still drawn in larger -> fix this
+        let lcr = preprocessor.getLargestOrAromaticCommonRing(vertexA, vertexB);
+        let center = lcr.center;
+
+        normals[0].multiplyScalar(opts.bondSpacing);
+        normals[1].multiplyScalar(opts.bondSpacing);
+
+        // Choose the normal that is on the same side as the center
+        let line = null;
+
+        if (center.sameSideAs(vertexA.position, vertexB.position, Vector2.add(a, normals[0]))) {
+          line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+        } else {
+          line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+        }
+
+        line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
+
+        // The shortened edge
+        if (edge.isPartOfAromaticRing) {
+          // preprocessor.canvasWrapper.drawLine(line, true);
+          svgWrapper.drawLine(line, true);
+        } else {
+          // preprocessor.canvasWrapper.drawLine(line);
+          svgWrapper.drawLine(line);
+        }
+
+        svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+      } else if ((edge.center || vertexA.isTerminal() &amp;&amp; vertexB.isTerminal()) ||
+        (s.anCount == 0 &amp;&amp; s.bnCount > 1 || s.bnCount == 0 &amp;&amp; s.anCount > 1)) {
+        this.multiplyNormals(normals, opts.halfBondSpacing);
+
+        let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB),
+          lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+
+        svgWrapper.drawLine(lineA);
+        svgWrapper.drawLine(lineB);
+      } else if ((s.sideCount[0] > s.sideCount[1]) ||
+        (s.totalSideCount[0] > s.totalSideCount[1])) {
+        this.multiplyNormals(normals, opts.bondSpacing);
+
+        let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+
+        line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
+
+        svgWrapper.drawLine(line);
+        svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+      } else if ((s.sideCount[0] &lt; s.sideCount[1]) ||
+        (s.totalSideCount[0] &lt;= s.totalSideCount[1])) {
+        this.multiplyNormals(normals, opts.bondSpacing);
+
+        let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+
+        line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
+        svgWrapper.drawLine(line);
+        svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+      }
+    } else if (edge.bondType === '#') {
+      normals[0].multiplyScalar(opts.bondSpacing / 1.5);
+      normals[1].multiplyScalar(opts.bondSpacing / 1.5);
+
+      let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
+      let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
+
+      svgWrapper.drawLine(lineA);
+      svgWrapper.drawLine(lineB);
+      svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+    } else if (edge.bondType === '.') {
+      // TODO: Something... maybe... version 2?
+    } else {
+      let isChiralCenterA = vertexA.value.isStereoCenter;
+      let isChiralCenterB = vertexB.value.isStereoCenter;
+
+      if (edge.wedge === 'up') {
+        svgWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+      } else if (edge.wedge === 'down') {
+        svgWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+      } else {
+        svgWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+      }
+    }
+
+    if (debug) {
+      let midpoint = Vector2.midpoint(a, b);
+      svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
+    }
+  }
+
+  /**
+   * Draws the vertices representing atoms to the canvas.
+   *
+   * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
+   */
+  drawVertices(debug) {
+    let preprocessor = this.preprocessor,
+      opts = preprocessor.opts,
+      graph = preprocessor.graph,
+      rings = preprocessor.rings,
+      svgWrapper = this.svgWrapper;
+
+    var i = graph.vertices.length;
+    for (var i = 0; i &lt; graph.vertices.length; i++) {
+      let vertex = graph.vertices[i];
+      let atom = vertex.value;
+      let charge = 0;
+      let isotope = 0;
+      let bondCount = vertex.value.bondCount;
+      let element = atom.element;
+      let hydrogens = Atom.maxBonds[element] - bondCount;
+      let dir = vertex.getTextDirection(graph.vertices);
+      let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
+      let isCarbon = atom.element === 'C';
+
+      // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
+      // should be the most common state. This has to be fixed by kekulization
+      if (atom.element === 'N' &amp;&amp; atom.isPartOfAromaticRing) {
+        hydrogens = 0;
+      }
+
+      if (atom.bracket) {
+        hydrogens = atom.bracket.hcount;
+        charge = atom.bracket.charge;
+        isotope = atom.bracket.isotope;
+      }
+
+      if (opts.atomVisualization === 'allballs') {
+        svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+      } else if ((atom.isDrawn &amp;&amp; (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || graph.vertices.length === 1) {
+        if (opts.atomVisualization === 'default') {
+          svgWrapper.drawText(vertex.position.x, vertex.position.y,
+            element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+        } else if (opts.atomVisualization === 'balls') {
+          svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
+        }
+      } else if (vertex.getNeighbourCount() === 2 &amp;&amp; vertex.forcePositioned == true) {
+        // If there is a carbon which bonds are in a straight line, draw a dot
+        let a = graph.vertices[vertex.neighbours[0]].position;
+        let b = graph.vertices[vertex.neighbours[1]].position;
+        let angle = Vector2.threePointangle(vertex.position, a, b);
+
+        if (Math.abs(Math.PI - angle) &lt; 0.1) {
+          svgWrapper.drawPoint(vertex.position.x, vertex.position.y, element);
+        }
+      }
+
+      if (debug) {
+        let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
+        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
+      } else {
+        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
+      }
+    }
+
+    // Draw the ring centers for debug purposes
+    if (opts.debug) {
+      for (var i = 0; i &lt; rings.length; i++) {
+        let center = rings[i].center;
+        svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
+      }
+    }
+  }
+
+  /**
+   * Returns the total overlap score of the current molecule.
+   *
+   * @returns {Number} The overlap score.
+   */
+  getTotalOverlapScore() {
+    return this.preprocessor.getTotalOverlapScore();
+  }
+
+  /**
+   * Returns the molecular formula of the loaded molecule as a string.
+   *
+   * @returns {String} The molecular formula.
+   */
+  getMolecularFormula() {
+    return this.preprocessor.getMolecularFormula();
+  }
+
+  /**
+   * @param {Array} normals list of normals to multiply
+   * @param {Number} spacing value to multiply normals by
+   */
+  multiplyNormals(normals, spacing) {
+    normals[0].multiplyScalar(spacing);
+    normals[1].multiplyScalar(spacing);
+  }
+}
+
+module.exports = SvgDrawer;</code></pre>
+        </article>
+    </section>
 
 
 
