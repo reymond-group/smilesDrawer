@@ -59,11 +59,12 @@
     <section class="readme usertext">
         <article><p><img src="https://github.com/reymond-group/smilesDrawer/blob/master/logo.png?raw=true" alt="Smiles Drawer"></p>
 <h1>Smiles Drawer</h1>
-<p>Current Version: 1.1.20 (<a href="https://www.youtube.com/watch?v=ewFBuYHldeY">Ballroom Blitz</a>)</p>
+<p>Current Version: 1.2.0 (<a href="https://www.youtube.com/watch?v=ucTg6rZJCu4">Rumble</a>)</p>
 <p>If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: <a href="http://dx.doi.org/10.1021/acs.jcim.7b00425">10.1021/acs.jcim.7b00425</a></p>
 <p><img src="http://doc.gdb.tools/smilesDrawer/structures.png"></img></p>
-<h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html">Demo</a></h3>
-<h3>Compatibility</h3>
+<h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html">Demo (Canvas)</a></h3>
+<h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_svg.html">Demo (SVG)</a></h3>
+### Compatibility
 <p>All the current versions of the major browsers are supported and the application has been tested on the following browsers (versions):</p>
 <ul>
 <li>Chrome (68.0.3440.106)</li>
@@ -88,7 +89,7 @@
 <p>If you experience problems with the drawing of complex ring systems (including very long bonds), please enable experimental features (see options).</p>
 <h3>&quot;Installation&quot;</h3>
 <p>SmilesDrawer is available from the unpkg content delivery network:</p>
-<pre class="prettyprint source"><code>https://unpkg.com/smiles-drawer@1.0.2/dist/smiles-drawer.min.js
+<pre class="prettyprint source"><code>https://unpkg.com/smiles-drawer@1.2.0/dist/smiles-drawer.min.js
 </code></pre>
 <p>You can easily get smiles-drawer using yarn:</p>
 <pre class="prettyprint source"><code>yarn add smiles-drawer
@@ -102,38 +103,45 @@ gulp
 <h3>Getting Started</h3>
 <p>To get a simple input box which lets the user enter a SMILES and then display it in a canvas, the following minimal example is sufficient.
 In order to have nice consistent font rendering you have to include the droid sans font from google fonts.</p>
-<pre class="prettyprint source lang-html"><code>&lt;!doctype html>
+<pre class="prettyprint source lang-html"><code>&lt;!DOCTYPE html>
 &lt;html>
-    &lt;head>
-        &lt;meta charset=&quot;utf-8&quot;>
-        &lt;meta http-equiv=&quot;x-ua-compatible&quot; content=&quot;ie=edge&quot;>
-        &lt;title>Smiles Drawer Example&lt;/title>
-        &lt;meta name=&quot;description&quot; content=&quot;A minimal smiles drawer example.&quot;>
-        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;>
-    
-        &lt;link href=&quot;https://fonts.googleapis.com/css?family=Droid+Sans:400,700&quot; rel=&quot;stylesheet&quot;>
-    &lt;/head>
-    &lt;body>
-        &lt;input id=&quot;example-input&quot; name=&quot;example-input&quot; />
-        &lt;canvas id=&quot;example-canvas&quot; width=&quot;500&quot; height=&quot;500&quot;>&lt;/canvas>
+  &lt;head>
+    &lt;meta charset=&quot;utf-8&quot; />
+    &lt;meta http-equiv=&quot;x-ua-compatible&quot; content=&quot;ie=edge&quot; />
+    &lt;title>Smiles Drawer Example&lt;/title>
+    &lt;meta name=&quot;description&quot; content=&quot;A minimal smiles drawer example.&quot; />
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; />
 
-        &lt;script src=&quot;https://unpkg.com/smiles-drawer@1.0.10/dist/smiles-drawer.min.js&quot;>&lt;/script>
-        &lt;script>
-            let input = document.getElementById('example-input');
-            let options = {};
-            
-            // Initialize the drawer
-            let smilesDrawer = new SmilesDrawer.Drawer(options);
-            
-            input.addEventListener('input', function() {
-                // Clean the input (remove unrecognized characters, such as spaces and tabs) and parse it
-                SmilesDrawer.parse(input.value, function(tree) {
-                    // Draw to the canvas
-                    smilesDrawer.draw(tree, 'example-canvas', 'light', false);
-                });
-            });
-        &lt;/script>
-    &lt;/body>
+    &lt;link
+      href=&quot;https://fonts.googleapis.com/css?family=Droid+Sans:400,700&quot;
+      rel=&quot;stylesheet&quot;
+    />
+  &lt;/head>
+  &lt;body>
+    &lt;input id=&quot;example-input&quot; name=&quot;example-input&quot; />
+    &lt;canvas id=&quot;example-canvas&quot; width=&quot;500&quot; height=&quot;500&quot;>&lt;/canvas>
+
+    &lt;script src=&quot;https://unpkg.com/smiles-drawer@1.0.10/dist/smiles-drawer.min.js&quot;>&lt;/script>
+    &lt;script>
+      let input = document.getElementById(&quot;example-input&quot;);
+      let options = {};
+
+      // Initialize the drawer to draw to canvas
+      let smilesDrawer = new SmilesDrawer.Drawer(options);
+      // Alternatively, initialize the SVG drawer:
+      // let svgDrawer = new SmilesDrawer.SvgDrawer(options);
+
+      input.addEventListener(&quot;input&quot;, function() {
+        // Clean the input (remove unrecognized characters, such as spaces and tabs) and parse it
+        SmilesDrawer.parse(input.value, function(tree) {
+          // Draw to the canvas
+          smilesDrawer.draw(tree, &quot;example-canvas&quot;, &quot;light&quot;, false);
+          // Alternatively, draw to SVG:
+          // svgDrawer.draw(tree, 'output-svg', 'dark', false);
+        });
+      });
+    &lt;/script>
+  &lt;/body>
 &lt;/html>
 </code></pre>
 <p>See the example folder for a more complete example.</p>
@@ -359,6 +367,7 @@ let smilesDrawer = new SmilesDrawer(options);
 <p>The documentation can be found in the docs folder. A markdown version is available <a href="/doc/all.md">here</a>.</p>
 <h3>Contributors</h3>
 <p>Thank you for contributing:
+SRI International's CSE group (For the excellent SVG support)
 <a href="https://github.com/ohardy">ohardy</a></p></article>
     </section>
 
@@ -374,7 +383,7 @@ let smilesDrawer = new SmilesDrawer(options);
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Fri Feb 14 2020 14:57:58 GMT+0100 (Central European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Fri Feb 14 2020 15:19:27 GMT+0100 (Central European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
