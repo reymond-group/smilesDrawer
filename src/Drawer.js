@@ -50,7 +50,7 @@ class Drawer {
       isomeric: true,
       debug: false,
       terminalCarbons: false,
-      explicitHydrogens: false,
+      explicitHydrogens: true,
       overlapSensitivity: 0.42,
       overlapResolutionIterations: 1,
       compactDrawing: true,
@@ -236,7 +236,7 @@ class Drawer {
 
                 let neighbourA = this.graph.vertices[neighboursB[0]];
                 let neighbourB = this.graph.vertices[neighboursB[1]];
-                
+
                 if (neighbourA.value.rings.length === 1 && neighbourB.value.rings.length === 1) {
                   // Both neighbours in same ring. TODO: does this create problems with wedges? (up = down and vice versa?)
                   if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
@@ -499,7 +499,7 @@ class Drawer {
   getMolecularFormula() {
     let molecularFormula = '';
     let counts = new Map();
-    
+
     // Initialize element count
     for (var i = 0; i < this.graph.vertices.length; i++) {
       let atom = this.graph.vertices[i].value;
@@ -1717,7 +1717,7 @@ class Drawer {
     // using a force based approach
     if (ring.isBridged) {
       this.graph.kkLayout(ring.members.slice(), center, startVertex.id, ring, this.opts.bondLength,
-        this.opts.kkThreshold, this.opts.kkInnerThreshold, this.opts.kkMaxIteration, 
+        this.opts.kkThreshold, this.opts.kkInnerThreshold, this.opts.kkMaxIteration,
         this.opts.kkMaxInnerIteration, this.opts.kkMaxEnergy);
       ring.positioned = true;
 
@@ -1995,7 +1995,7 @@ class Drawer {
           // Look for bonds coming out of joined rings to adjust the angle, an example is: C1=CC(=CC=C1)[C@]12SCCN1CC1=CC=CC=C21
           // where the angle has to be adjusted to account for fused ring
           let rings = Array();
-          
+
           for (var k = 0; k < vertex.value.rings.length; k++) {
             rings.push(vertex.value.rings[k]);
           }
@@ -2223,12 +2223,12 @@ class Drawer {
         let r = MathHelper.polyCircumradius(this.opts.bondLength, nextRing.members.length);
         nextCenter.multiplyScalar(r);
         nextCenter.add(vertex.position);
-      
+
         this.createRing(nextRing, nextCenter, vertex);
       }
     } else if (vertex.value.rings.length > 0) {
       let nextRing = this.getRing(vertex.value.rings[0]);
-      
+
       if (!nextRing.positioned) {
         let nextCenter = Vector2.subtract(vertex.previousPosition, vertex.position);
 
@@ -2239,7 +2239,7 @@ class Drawer {
 
         nextCenter.multiplyScalar(r);
         nextCenter.add(vertex.position);
-      
+
         this.createRing(nextRing, nextCenter, vertex);
       }
     } else {
@@ -2819,7 +2819,7 @@ class Drawer {
         wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
         wedgeOrder[j][1] = neighbours[order[j]];
       }
-      
+
 
       wedgeOrder.sort(function (a, b) {
         if (a[0] > b[0]) {
@@ -2835,9 +2835,9 @@ class Drawer {
         let wedgeId = wedgeOrder[0][1];
 
         if (vertex.value.hasHydrogen) {
-          this.graph.getEdge(vertex.id, wedgeId).wedge = wedgeB;          
+          this.graph.getEdge(vertex.id, wedgeId).wedge = wedgeB;
         } else {
-          let wedge = wedgeB;          
+          let wedge = wedgeB;
 
           for (var j = order.length - 1; j >= 0; j--) {
             if (wedge === wedgeA) {
