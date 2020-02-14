@@ -237,10 +237,6 @@ The SmilesDrawer object exposes methods that can be used for purposes other than
 
 Bridged rings are positioned using the Kamada–Kawai algorithm. If there is a bridged ring in the molecule, explicitly defined aromatic rings are not drawn with a circle inside the ring, but with dashed gray lines where double bonds would be.
 
-### [Documentation](/doc/all.md)
-
-The documentation can be found in the docs folder. A markdown version is available [here](/doc/all.md).
-
 ### Contributors
 
 Thank you for contributing:

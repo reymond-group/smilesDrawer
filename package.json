@@ -17,7 +17,6 @@
     "gulp-babel-minify": "^0.5.0",
     "gulp-concat": ">=2.6.1",
     "gulp-exit": "0.0.2",
-    "gulp-jsdoc-to-markdown": ">=1.2.2",
     "gulp-jsdoc3": ">=2.0.0",
     "gulp-rename": ">=1.4.0",
     "gulp-sourcemaps": "^2.6.5",
