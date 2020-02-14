@@ -4,6 +4,7 @@ const Vector2 = require('./Vector2')
 const Line = require('./Line')
 const Vertex = require('./Vertex')
 const Ring = require('./Ring')
+const { getChargeText } = require('./UtilityFunctions')
 
 /** 
  * A class wrapping a canvas element.
@@ -24,10 +25,10 @@ class CanvasWrapper {
      * The constructor for the class CanvasWrapper.
      *
      * @param {(String|HTMLElement)} target The canvas id or the canvas HTMLElement.
-     * @param {Object} theme A theme from the smiles drawer options.
+     * @param {ThemeManager} themeManager Theme manager for setting proper colors.
      * @param {Object} options The smiles drawer options object.
      */
-    constructor(target, theme, options) {
+    constructor(target, themeManager, options) {
         if (typeof target === 'string' || target instanceof String) {
             this.canvas = document.getElementById(target);
         } else {
@@ -35,7 +36,7 @@ class CanvasWrapper {
         }
 
         this.ctx = this.canvas.getContext('2d');
-        this.colors = theme;
+        this.themeManager = themeManager;
         this.opts = options;
         this.drawingWidth = 0.0;
         this.drawingHeight = 0.0;
@@ -243,7 +244,7 @@ class CanvasWrapper {
             ctx.lineTo(r.x, r.y);
             ctx.lineCap = 'round';
             ctx.lineWidth = this.opts.bondThickness + 1.2;
-            ctx.strokeStyle = this.getColor('BACKGROUND');
+            ctx.strokeStyle = this.themeManager.getColor('BACKGROUND');
             ctx.stroke();
             ctx.globalCompositeOperation = 'source-over';
             ctx.restore();
@@ -266,10 +267,10 @@ class CanvasWrapper {
         ctx.lineWidth = this.opts.bondThickness;
 
         let gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
-        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
-            this.getColor('C'));
-        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
-            this.getColor('C'));
+        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement()) ||
+            this.themeManager.getColor('C'));
+        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement()) ||
+            this.themeManager.getColor('C'));
 
         if (dashed) {
             ctx.setLineDash([1, 1.5]);
@@ -352,10 +353,10 @@ class CanvasWrapper {
         ctx.lineTo(w.x, w.y);
 
         let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
-        gradient.addColorStop(0.4, this.getColor(line.getLeftElement()) ||
-            this.getColor('C'));
-        gradient.addColorStop(0.6, this.getColor(line.getRightElement()) ||
-            this.getColor('C'));
+        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement()) ||
+            this.themeManager.getColor('C'));
+        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement()) ||
+            this.themeManager.getColor('C'));
 
         ctx.fillStyle = gradient;
 
@@ -428,7 +429,7 @@ class CanvasWrapper {
         sEnd.y += offsetY;
 
         let dir = Vector2.subtract(end, start).normalize();
-        ctx.strokeStyle = this.getColor('C');
+        ctx.strokeStyle = this.themeManager.getColor('C');
         ctx.lineCap = 'round';
         ctx.lineWidth = this.opts.bondThickness;
         ctx.beginPath();
@@ -445,8 +446,8 @@ class CanvasWrapper {
             if (!changed && t > 0.5) {
               ctx.stroke();
               ctx.beginPath();
-              ctx.strokeStyle = this.getColor(line.getRightElement()) || this.getColor('C');
-              changed = true;
+              ctx.strokeStyle = this.themeManager.getColor(line.getRightElement()) || this.themeManager.getColor('C');
+                changed = true;
             }
             
             startDash.subtract(dashOffset);
@@ -491,7 +492,7 @@ class CanvasWrapper {
         ctx.save();
         ctx.beginPath();
         ctx.arc(x + this.offsetX, y + this.offsetY, this.opts.bondLength / 4.5, 0, MathHelper.twoPI, false);
-        ctx.fillStyle = this.getColor(elementName);
+        ctx.fillStyle = this.themeManager.getColor(elementName);
         ctx.fill();
         ctx.restore();
     }
@@ -518,7 +519,7 @@ class CanvasWrapper {
 
         ctx.beginPath();
         ctx.arc(x + this.offsetX, y + this.offsetY, 0.75, 0, MathHelper.twoPI, false);
-        ctx.fillStyle = this.getColor(elementName);
+        ctx.fillStyle = this.themeManager.getColor(elementName);
         ctx.fill();
         ctx.restore();
     }
@@ -556,7 +557,7 @@ class CanvasWrapper {
         let chargeWidth = 0;
 
         if (charge) {
-            chargeText = this.getChargeText(charge);
+            chargeText = getChargeText(charge);
 
             ctx.font = this.fontSmall;
             chargeWidth = ctx.measureText(chargeText).width;
@@ -582,7 +583,7 @@ class CanvasWrapper {
 
 
         ctx.font = this.fontLarge;
-        ctx.fillStyle = this.getColor('BACKGROUND');
+        ctx.fillStyle = this.themeManager.getColor('BACKGROUND');
 
         let dim = ctx.measureText(elementName);
 
@@ -602,7 +603,7 @@ class CanvasWrapper {
         let cursorPos = -dim.width / 2.0;
         let cursorPosLeft = -dim.width / 2.0;
 
-        ctx.fillStyle = this.getColor(elementName);
+        ctx.fillStyle = this.themeManager.getColor(elementName);
         ctx.fillText(elementName, x + offsetX + cursorPos, y + this.opts.halfFontSizeLarge + offsetY);
         cursorPos += dim.width;
 
@@ -727,7 +728,7 @@ class CanvasWrapper {
             }
 
             if (elementCharge !== 0) {
-                elementChargeText = this.getChargeText(elementCharge);
+                elementChargeText = getChargeText(elementCharge);
                 elementChargeWidth = ctx.measureText(elementChargeText).width;
             }
 
@@ -742,7 +743,7 @@ class CanvasWrapper {
             let hx = x + offsetX;
             let hy = y + offsetY + this.opts.halfFontSizeLarge;
 
-            ctx.fillStyle = this.getColor(element);
+            ctx.fillStyle = this.themeManager.getColor(element);
 
             if (elementCount > 0) {
                 cursorPosLeft -= elementCountWidth;
@@ -868,7 +869,7 @@ class CanvasWrapper {
         let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
 
         ctx.save();
-        ctx.strokeStyle = this.getColor('C');
+        ctx.strokeStyle = this.themeManager.getColor('C');
         ctx.lineWidth = this.opts.bondThickness;
         ctx.beginPath();
         ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY,

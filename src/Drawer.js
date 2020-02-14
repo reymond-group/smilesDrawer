@@ -11,6 +11,7 @@ const RingConnection = require('./RingConnection')
 const CanvasWrapper = require('./CanvasWrapper')
 const Graph = require('./Graph')
 const SSSR = require('./SSSR')
+const ThemeManager = require('./ThemeManager')
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -153,134 +154,15 @@ class Drawer {
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
-    this.data = data;
-    this.infoOnly = infoOnly;
+    this.initDraw(data, themeName, infoOnly);
 
     if (!this.infoOnly) {
-      this.canvasWrapper = new CanvasWrapper(target, this.opts.themes[themeName], this.opts);
+      this.themeManager = new ThemeManager(this.opts.themes, themeName);
+      this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
     }
 
-    this.ringIdCounter = 0;
-    this.ringConnectionIdCounter = 0;
-
-    this.graph = new Graph(data, this.opts.isomeric);
-    this.rings = Array();
-    this.ringConnections = Array();
-
-    this.originalRings = Array();
-    this.originalRingConnections = Array();
-
-    this.bridgedRing = false;
-
-    // Reset those, in case the previous drawn SMILES had a dangling \ or /
-    this.doubleBondConfigCount = null;
-    this.doubleBondConfig = null;
-
-    this.initRings();
-    this.initHydrogens();
-
-    if (!this.infoOnly) {
-      this.position();
-
-      // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
-      this.restoreRingInformation();
-
-      // Atoms bonded to the same ring atom
-      this.resolvePrimaryOverlaps();
-
-      let overlapScore = this.getOverlapScore();
-
-      this.totalOverlapScore = this.getOverlapScore().total;
-
-      for (var o = 0; o < this.opts.overlapResolutionIterations; o++) {
-        for (var i = 0; i < this.graph.edges.length; i++) {
-          let edge = this.graph.edges[i];
-          if (this.isEdgeRotatable(edge)) {
-            let subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
-            let subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
-
-            // Only rotate the shorter subtree
-            let a = edge.targetId;
-            let b = edge.sourceId;
-
-            if (subTreeDepthA > subTreeDepthB) {
-              a = edge.sourceId;
-              b = edge.targetId;
-            }
-
-            let subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
-            if (subTreeOverlap.value > this.opts.overlapSensitivity) {
-              let vertexA = this.graph.vertices[a];
-              let vertexB = this.graph.vertices[b];
-              let neighboursB = vertexB.getNeighbours(a);
-
-              if (neighboursB.length === 1) {
-                let neighbour = this.graph.vertices[neighboursB[0]];
-                let angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
-
-                this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
-                // If the new overlap is bigger, undo change
-                let newTotalOverlapScore = this.getOverlapScore().total;
-
-                if (newTotalOverlapScore > this.totalOverlapScore) {
-                  this.rotateSubtree(neighbour.id, vertexB.id, -angle, vertexB.position);
-                } else {
-                  this.totalOverlapScore = newTotalOverlapScore;
-                }
-              } else if (neighboursB.length === 2) {
-                // Switch places / sides
-                // If vertex a is in a ring, do nothing
-                if (vertexB.value.rings.length !== 0 && vertexA.value.rings.length !== 0) {
-                  continue;
-                }
-
-                let neighbourA = this.graph.vertices[neighboursB[0]];
-                let neighbourB = this.graph.vertices[neighboursB[1]];
-
-                if (neighbourA.value.rings.length === 1 && neighbourB.value.rings.length === 1) {
-                  // Both neighbours in same ring. TODO: does this create problems with wedges? (up = down and vice versa?)
-                  if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
-                    continue;
-                  }
-                  // TODO: Rotate circle
-                } else if (neighbourA.value.rings.length !== 0 || neighbourB.value.rings.length !== 0) {
-                  continue;
-                } else {
-                  let angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
-                  let angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
-
-                  this.rotateSubtree(neighbourA.id, vertexB.id, angleA, vertexB.position);
-                  this.rotateSubtree(neighbourB.id, vertexB.id, angleB, vertexB.position);
-
-                  let newTotalOverlapScore = this.getOverlapScore().total;
-
-                  if (newTotalOverlapScore > this.totalOverlapScore) {
-                    this.rotateSubtree(neighbourA.id, vertexB.id, -angleA, vertexB.position);
-                    this.rotateSubtree(neighbourB.id, vertexB.id, -angleB, vertexB.position);
-                  } else {
-                    this.totalOverlapScore = newTotalOverlapScore;
-                  }
-                }
-              }
-
-              overlapScore = this.getOverlapScore();
-            }
-          }
-        }
-      }
-
-      this.resolveSecondaryOverlaps(overlapScore.scores);
-
-      if (this.opts.isomeric) {
-        this.annotateStereochemistry();
-      }
-
-      // Initialize pseudo elements or shortcuts
-      if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
-        this.initPseudoElements();
-      }
-
-      this.rotateDrawing();
+    if (!infoOnly) {
+      this.processGraph();
 
       // Set the canvas to the appropriate size
       this.canvasWrapper.scale(this.graph.vertices);
@@ -592,6 +474,134 @@ class Drawer {
     }
 
     return null;
+  }
+
+  initDraw(data, themeName, infoOnly) {
+    this.data = data;
+    this.infoOnly = infoOnly;
+
+    this.ringIdCounter = 0;
+    this.ringConnectionIdCounter = 0;
+
+    this.graph = new Graph(data, this.opts.isomeric);
+    this.rings = Array();
+    this.ringConnections = Array();
+
+    this.originalRings = Array();
+    this.originalRingConnections = Array();
+
+    this.bridgedRing = false;
+
+    // Reset those, in case the previous drawn SMILES had a dangling \ or /
+    this.doubleBondConfigCount = null;
+    this.doubleBondConfig = null;
+
+    this.initRings();
+    this.initHydrogens();
+  }
+
+  processGraph() {
+    this.position();
+
+    // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
+    this.restoreRingInformation();
+
+    // Atoms bonded to the same ring atom
+    this.resolvePrimaryOverlaps();
+
+    let overlapScore = this.getOverlapScore();
+
+    this.totalOverlapScore = this.getOverlapScore().total;
+
+    for (var o = 0; o < this.opts.overlapResolutionIterations; o++) {
+      for (var i = 0; i < this.graph.edges.length; i++) {
+        let edge = this.graph.edges[i];
+        if (this.isEdgeRotatable(edge)) {
+          let subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
+          let subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
+
+          // Only rotate the shorter subtree
+          let a = edge.targetId;
+          let b = edge.sourceId;
+
+          if (subTreeDepthA > subTreeDepthB) {
+            a = edge.sourceId;
+            b = edge.targetId;
+          }
+
+          let subTreeOverlap = this.getSubtreeOverlapScore(b, a, overlapScore.vertexScores);
+          if (subTreeOverlap.value > this.opts.overlapSensitivity) {
+            let vertexA = this.graph.vertices[a];
+            let vertexB = this.graph.vertices[b];
+            let neighboursB = vertexB.getNeighbours(a);
+
+            if (neighboursB.length === 1) {
+              let neighbour = this.graph.vertices[neighboursB[0]];
+              let angle = neighbour.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
+
+              this.rotateSubtree(neighbour.id, vertexB.id, angle, vertexB.position);
+              // If the new overlap is bigger, undo change
+              let newTotalOverlapScore = this.getOverlapScore().total;
+
+              if (newTotalOverlapScore > this.totalOverlapScore) {
+                this.rotateSubtree(neighbour.id, vertexB.id, -angle, vertexB.position);
+              } else {
+                this.totalOverlapScore = newTotalOverlapScore;
+              }
+            } else if (neighboursB.length === 2) {
+              // Switch places / sides
+              // If vertex a is in a ring, do nothing
+              if (vertexB.value.rings.length !== 0 && vertexA.value.rings.length !== 0) {
+                continue;
+              }
+
+              let neighbourA = this.graph.vertices[neighboursB[0]];
+              let neighbourB = this.graph.vertices[neighboursB[1]];
+
+              if (neighbourA.value.rings.length === 1 && neighbourB.value.rings.length === 1) {
+                // Both neighbours in same ring. TODO: does this create problems with wedges? (up = down and vice versa?)
+                if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
+                  continue;
+                }
+                // TODO: Rotate circle
+              } else if (neighbourA.value.rings.length !== 0 || neighbourB.value.rings.length !== 0) {
+                continue;
+              } else {
+                let angleA = neighbourA.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
+                let angleB = neighbourB.position.getRotateAwayFromAngle(vertexA.position, vertexB.position, MathHelper.toRad(120));
+
+                this.rotateSubtree(neighbourA.id, vertexB.id, angleA, vertexB.position);
+                this.rotateSubtree(neighbourB.id, vertexB.id, angleB, vertexB.position);
+
+                let newTotalOverlapScore = this.getOverlapScore().total;
+
+                if (newTotalOverlapScore > this.totalOverlapScore) {
+                  this.rotateSubtree(neighbourA.id, vertexB.id, -angleA, vertexB.position);
+                  this.rotateSubtree(neighbourB.id, vertexB.id, -angleB, vertexB.position);
+                } else {
+                  this.totalOverlapScore = newTotalOverlapScore;
+                }
+              }
+            }
+
+            overlapScore = this.getOverlapScore();
+          }
+        }
+      }
+    }
+
+    this.resolveSecondaryOverlaps(overlapScore.scores);
+
+    if (this.opts.isomeric) {
+      this.annotateStereochemistry();
+    }
+
+    // Initialize pseudo elements or shortcuts
+    if (this.opts.compactDrawing && this.opts.atomVisualization === 'default') {
+      this.initPseudoElements();
+    }
+
+    this.rotateDrawing();
   }
 
   /**

@@ -1,6 +1,7 @@
 //@ts-check
 const Drawer = require('./src/Drawer')
 const Parser = require('./src/Parser')
+const SvgDrawer = require('./src/SvgDrawer')
 
 
 // Detect SSR (server side rendering)
@@ -19,6 +20,7 @@ var SmilesDrawer = {
 
 SmilesDrawer.Drawer = Drawer;
 SmilesDrawer.Parser = Parser;
+SmilesDrawer.SvgDrawer = SvgDrawer;
 
 /**
 * Cleans a SMILES string (removes non-valid characters)
