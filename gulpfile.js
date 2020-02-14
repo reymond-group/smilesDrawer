@@ -23,9 +23,13 @@ function compile(watch) {
   var bundler = watchify(browserify('./app.js', {
     debug: true
   }).transform(babelify, {
-    presets: [['env', {
-      targets: { 'chrome': '65' }
-    }]],
+    presets: [
+      ['env', {
+        targets: {
+          'chrome': '65'
+        }
+      }]
+    ],
     sourceMaps: true
   }));
 
@@ -43,7 +47,9 @@ function compile(watch) {
         loadMaps: true
       }))
       .pipe(gulp.dest('./dist/'))
-      .pipe(minify())
+      .pipe(minify({
+        mangle: false
+      }))
       .pipe(rename('smiles-drawer.min.js'))
       .pipe(sourcemaps.write('./'))
       .pipe(gulp.dest('./dist'));
@@ -66,21 +72,21 @@ function watch() {
 }
 
 gulp.task('build', function () {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     compile();
     resolve();
   })
 });
 
 gulp.task('watch', function () {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     watch();
     resolve();
   });
 });
 
 gulp.task('doc', function (cb) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     var config = require('./jsdocConfig.json');
     gulp.src(['README.md', './src/*.js'], {
         read: false
@@ -91,7 +97,7 @@ gulp.task('doc', function (cb) {
 });
 
 gulp.task('md', function (cb) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     var config = require('./jsdocConfig.json');
     gulp.src('./src/*.js')
       .pipe(concat('all.md'))
