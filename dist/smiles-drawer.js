@@ -5469,14 +5469,14 @@ class Graph {
    * @param {Number} vertexId A vertex id.
    * @param {Number} parentVertexId A neighbouring vertex.
    * @param {Function} callback The callback function that is called with each visited as an argument.
-   * @param {Number} [maxDepth=Number.MAX_SAFE_INTEGER] The maximum depth of the recursion.
+   * @param {Number} [maxDepth=999999] The maximum depth of the recursion.
    * @param {Boolean} [ignoreFirst=false] Whether or not to ignore the starting vertex supplied as vertexId in the callback.
    * @param {Number} [depth=1] The current depth in the tree.
    * @param {Uint8Array} [visited=null] An array holding a flag on whether or not a node has been visited.
    */
 
 
-  traverseTree(vertexId, parentVertexId, callback, maxDepth = Number.MAX_SAFE_INTEGER, ignoreFirst = false, depth = 1, visited = null) {
+  traverseTree(vertexId, parentVertexId, callback, maxDepth = 999999, ignoreFirst = false, depth = 1, visited = null) {
     if (visited === null) {
       visited = new Uint8Array(this.vertices.length);
     }
