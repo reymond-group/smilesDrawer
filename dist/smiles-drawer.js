@@ -1976,7 +1976,7 @@ class Drawer {
       isomeric: true,
       debug: false,
       terminalCarbons: false,
-      explicitHydrogens: false,
+      explicitHydrogens: true,
       overlapSensitivity: 0.42,
       overlapResolutionIterations: 1,
       compactDrawing: true,
