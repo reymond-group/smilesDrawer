@@ -44,9 +44,9 @@ class SvgDrawer {
     this.drawVertices(preprocessor.opts.debug);
 
     if (preprocessor.opts.debug) {
-      console.log(preprocessor.graph);
-      console.log(preprocessor.rings);
-      console.log(preprocessor.ringConnections);
+      console.debug("SvgDrawer -> draw -> Graph:", preprocessor.graph);
+      console.debug("SvgDrawer -> draw -> Rings:", preprocessor.rings);
+      console.debug("SvgDrawer -> draw -> RingConnections", preprocessor.ringConnections);
     }
 
     return this.svgWrapper.constructSvg();

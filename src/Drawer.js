@@ -173,9 +173,9 @@ class Drawer {
       this.canvasWrapper.reset();
 
       if (this.opts.debug) {
-        console.log(this.graph);
-        console.log(this.rings);
-        console.log(this.ringConnections);
+        console.debug("Drawer -> draw -> Graph:", this.graph);
+        console.debug("Drawer -> draw -> Rings:", this.rings);
+        console.debug("Drawer -> draw -> RingConnections", this.ringConnections);
       }
     }
   }
