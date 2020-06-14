@@ -10,6 +10,7 @@ If you use this code or application, please cite the original paper published by
 
 <h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html">Demo (Canvas)</a></h3>
 <h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_svg.html">Demo (SVG)</a></h3>
+
 ### Compatibility
 
 All the current versions of the major browsers are supported and the application has been tested on the following browsers (versions):
@@ -213,7 +214,7 @@ An instance of SmilesDrawer is able to draw to multiple targets. Initialize Smil
 let smilesDrawer = new SmilesDrawer.Drawer({ width: 250, height: 250 });
 ```
 
-In order to depict a SMILES string it has to be parsed using SmilesDrawer's SMILES parser, which is encapsulated in the static function `SmilesDrawer.parse()` where the first argument is the SMILES string and the second argument a callback for a successfull parsing. The third argument provides a way to handle errors using a callback.
+In order to depict a SMILES string it has to be parsed using SmilesDrawer's SMILES parser, which is encapsulated in the static function `SmilesDrawer.parse()` where the first argument is the SMILES string and the second argument a callback for a successful parsing. The third argument provides a way to handle errors using a callback.
 
 ```javascript
 SmilesDrawer.parse('C1CCCCC1', function (tree) {
@@ -231,7 +232,7 @@ The SmilesDrawer object exposes methods that can be used for purposes other than
 
 | Method                  | Description                                                                      | Returns  |
 | ----------------------- | -------------------------------------------------------------------------------- | -------- |
-| `getMolecularFormula()` | Returns the molcular formula, eg. C22H30N6O4S, of the currently loaded molecule. | `String` |
+| `getMolecularFormula()` | Returns the molecular formula, eg. C22H30N6O4S, of the currently loaded molecule. | `String` |
 
 ### Bridged Rings
 
