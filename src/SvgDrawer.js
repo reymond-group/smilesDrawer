@@ -8,6 +8,7 @@ const Line = require('./Line');
 const SvgWrapper = require('./SvgWrapper');
 const ThemeManager = require('./ThemeManager');
 const Vector2 = require('./Vector2');
+const MathHelper = require('./MathHelper');
 
 class SvgDrawer {
   constructor(options) {
