@@ -4,11 +4,28 @@ const {
 
 const Line = require('./Line');
 const Vector2 = require('./Vector2');
+const MathHelper = require('./MathHelper');
+
+function makeid(length) { 
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
 
 class SvgWrapper {
   constructor(themeManager, target, options) {
+  if (typeof target === 'string' || target instanceof String) {
+      this.svg = document.getElementById(target);
+    } else {
+      this.svg = target;
+    }
     this.svg = document.getElementById(target);
     this.opts = options;
+    this.uid = makeid(5);
     this.gradientId = 0;
 
     // maintain a list of line elements and their corresponding gradients
@@ -57,7 +74,7 @@ class SvgWrapper {
       pathChildNodes = this.paths;
 
     // give the mask an id
-    masks.setAttributeNS(null, 'id', 'text-mask');
+    masks.setAttributeNS(null, 'id', this.uid+'-text-mask');
 
     // create the css styles
     style.appendChild(document.createTextNode(`
@@ -83,7 +100,7 @@ class SvgWrapper {
       defs.appendChild(gradient);
     }
 
-    paths.setAttributeNS(null, 'mask', 'url(#text-mask)');
+    paths.setAttributeNS(null, 'mask', 'url(#'+this.uid+'-text-mask)');
 
     if (this.svg) {
       this.svg.appendChild(defs);
@@ -111,7 +128,7 @@ class SvgWrapper {
   createGradient(line) {
     // create the gradient and add it
     let gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'),
-      gradientUrl = `line-${this.gradientId++}`,
+      gradientUrl = this.uid+`-line-${this.gradientId++}`,
       l = line.getLeftVector(),
       r = line.getRightVector(),
       fromX = l.x + this.offsetX,
@@ -320,6 +337,27 @@ class SvgWrapper {
 
     this.vertices.push(textElem);
   }
+
+
+  /**
+   * Draws a ring.
+   *
+   * @param {x} x The x coordinate of the ring.
+   * @param {y} r The y coordinate of the ring.
+   * @param {s} s The size of the ring.
+   */
+  drawRing(x, y, s) {
+	let circleElem = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+	let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, s);
+    circleElem.setAttributeNS(null, 'cx', x + this.offsetX);
+    circleElem.setAttributeNS(null, 'cy', y + this.offsetY);
+    circleElem.setAttributeNS(null, 'r', radius - this.opts.bondSpacing);
+    circleElem.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
+	circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness*1.5);
+	circleElem.setAttributeNS(null, 'fill', 'none');
+    this.paths.push(circleElem);
+  }
+
 
   /**
    * Draws a line.
