@@ -58,18 +58,8 @@ class SvgDrawer {
    * @param {Ring} ring A ring.
    */
   drawAromaticityRing(ring) {
-    let ctx = this.ctx;
-    let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
-
-    ctx.save();
-    ctx.strokeStyle = this.getColor('C');
-    ctx.lineWidth = this.opts.bondThickness;
-    ctx.beginPath();
-    ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY,
-      radius - this.opts.bondSpacing, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
+	let svgWrapper = this.svgWrapper;
+    svgWrapper.drawRing(ring.center.x, ring.center.y, ring.getSize());
   }
 
   /**
@@ -101,6 +91,7 @@ class SvgDrawer {
       for (var i = 0; i < rings.length; i++) {
         let ring = rings[i];
 
+        //TODO: uses canvas ctx to draw... need to update this to SVG
         if (preprocessor.isRingAromatic(ring)) {
           this.drawAromaticityRing(ring);
         }
