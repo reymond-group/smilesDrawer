@@ -7,7 +7,11 @@ const Vector2 = require('./Vector2');
 
 class SvgWrapper {
   constructor(themeManager, target, options) {
-    this.svg = document.getElementById(target);
+    if (typeof target === 'string' || target instanceof String) {
+      this.svg = document.getElementById(svg);
+    } else {
+      this.svg = target;
+    }
     this.opts = options;
     this.gradientId = 0;
 
