@@ -45,6 +45,7 @@ class Drawer {
       height: 500,
       bondThickness: 0.6,
       bondLength: 15,
+      absoluteScale: 0,
       shortBondLength: 0.85,
       bondSpacing: 0.18 * 15,
       atomVisualization: 'default',
@@ -99,6 +100,17 @@ class Drawer {
     };
 
     this.opts = this.extend(true, this.defaultOptions, options);
+
+    // Scale all sizes in case of absoluteScale
+    if (this.opts.absoluteScale) {
+      this.opts.bondSpacing *= this.opts.absoluteScale;
+      this.opts.fontSizeLarge *= this.opts.absoluteScale;
+      this.opts.fontSizeSmall *= this.opts.absoluteScale;
+      this.opts.bondThickness *= this.opts.absoluteScale;
+      this.opts.bondLength *= this.opts.absoluteScale;
+      this.opts.shortBondLength *= this.opts.absoluteScale;
+    }
+
     this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;
     this.opts.bondLengthSq = this.opts.bondLength * this.opts.bondLength;
     this.opts.halfFontSizeLarge = this.opts.fontSizeLarge / 2.0;
@@ -165,7 +177,11 @@ class Drawer {
       this.processGraph();
 
       // Set the canvas to the appropriate size
-      this.canvasWrapper.scale(this.graph.vertices);
+      if (this.opts.absoluteScale <= 0) {
+        this.canvasWrapper.scale(this.graph.vertices);
+      } else {
+        this.canvasWrapper.scaleCanvas(this.graph.vertices);
+      }
 
       // Do the actual drawing
       this.drawEdges(this.opts.debug);

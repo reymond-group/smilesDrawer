@@ -145,6 +145,62 @@ class CanvasWrapper {
     }
 
     /**
+     * Scale the canvas based on vertex positions.
+     *
+     * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+     */
+    scaleCanvas(vertices) {
+        // Figure out the final size of the image
+        let maxX = -Number.MAX_VALUE;
+        let maxY = -Number.MAX_VALUE;
+        let minX = Number.MAX_VALUE;
+        let minY = Number.MAX_VALUE;
+
+        for (var i = 0; i < vertices.length; i++) {
+            if (!vertices[i].value.isDrawn) {
+                continue;
+            }
+
+            let p = vertices[i].position;
+
+            if (maxX < p.x) maxX = p.x;
+            if (maxY < p.y) maxY = p.y;
+            if (minX > p.x) minX = p.x;
+            if (minY > p.y) minY = p.y;
+        }
+
+        // Add padding
+        var padding = this.opts.padding;
+        maxX += padding;
+        maxY += padding;
+        minX -= padding;
+        minY -= padding;
+
+        this.canvas.width = maxX - minX;
+        this.canvas.height = maxY - minY;
+
+        this.drawingWidth = maxX - minX;
+        this.drawingHeight = maxY - minY;
+
+        // var scaleX = this.canvas.offsetWidth / this.drawingWidth;
+        // var scaleY = this.canvas.offsetHeight / this.drawingHeight;
+
+        // var scale = (scaleX < scaleY) ? scaleX : scaleY;
+
+        // this.ctx.scale(scale, scale);
+
+        this.offsetX = -minX;
+        this.offsetY = -minY;
+
+        // // Center
+        // if (scaleX < scaleY) {
+        //     this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+        // } else {
+        //     this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+        // }
+    }
+
+    /**
      * Resets the transform of the canvas.
      */
     reset() {
@@ -444,12 +500,12 @@ class CanvasWrapper {
             let dashOffset = Vector2.multiplyScalar(normals[0], width);
 
             if (!changed && t > 0.5) {
-              ctx.stroke();
-              ctx.beginPath();
-              ctx.strokeStyle = this.themeManager.getColor(line.getRightElement()) || this.themeManager.getColor('C');
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.strokeStyle = this.themeManager.getColor(line.getRightElement()) || this.themeManager.getColor('C');
                 changed = true;
             }
-            
+
             startDash.subtract(dashOffset);
             ctx.moveTo(startDash.x, startDash.y);
             startDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
@@ -575,7 +631,7 @@ class CanvasWrapper {
 
         // TODO: Better handle exceptions
         // Exception for nitro (draw nitro as NO2 instead of N+O-O)
-        if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') && 
+        if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') &&
             attachedPseudoElement.hasOwnProperty('0O-1')) {
             attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
             charge = 0;

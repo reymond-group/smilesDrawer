@@ -1232,6 +1232,54 @@ class CanvasWrapper {
     }
   }
   /**
+   * Scale the canvas based on vertex positions.
+   *
+   * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+   */
+
+
+  scaleCanvas(vertices) {
+    // Figure out the final size of the image
+    let maxX = -Number.MAX_VALUE;
+    let maxY = -Number.MAX_VALUE;
+    let minX = Number.MAX_VALUE;
+    let minY = Number.MAX_VALUE;
+
+    for (var i = 0; i < vertices.length; i++) {
+      if (!vertices[i].value.isDrawn) {
+        continue;
+      }
+
+      let p = vertices[i].position;
+      if (maxX < p.x) maxX = p.x;
+      if (maxY < p.y) maxY = p.y;
+      if (minX > p.x) minX = p.x;
+      if (minY > p.y) minY = p.y;
+    } // Add padding
+
+
+    var padding = this.opts.padding;
+    maxX += padding;
+    maxY += padding;
+    minX -= padding;
+    minY -= padding;
+    this.canvas.width = maxX - minX;
+    this.canvas.height = maxY - minY;
+    this.drawingWidth = maxX - minX;
+    this.drawingHeight = maxY - minY; // var scaleX = this.canvas.offsetWidth / this.drawingWidth;
+    // var scaleY = this.canvas.offsetHeight / this.drawingHeight;
+    // var scale = (scaleX < scaleY) ? scaleX : scaleY;
+    // this.ctx.scale(scale, scale);
+
+    this.offsetX = -minX;
+    this.offsetY = -minY; // // Center
+    // if (scaleX < scaleY) {
+    //     this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+    // } else {
+    //     this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+    // }
+  }
+  /**
    * Resets the transform of the canvas.
    */
 
@@ -1979,6 +2027,7 @@ class Drawer {
       height: 500,
       bondThickness: 0.6,
       bondLength: 15,
+      absoluteScale: 0,
       shortBondLength: 0.85,
       bondSpacing: 0.18 * 15,
       atomVisualization: 'default',
@@ -2031,7 +2080,17 @@ class Drawer {
         }
       }
     };
-    this.opts = this.extend(true, this.defaultOptions, options);
+    this.opts = this.extend(true, this.defaultOptions, options); // Scale all sizes in case of absoluteScale
+
+    if (this.opts.absoluteScale) {
+      this.opts.bondSpacing *= this.opts.absoluteScale;
+      this.opts.fontSizeLarge *= this.opts.absoluteScale;
+      this.opts.fontSizeSmall *= this.opts.absoluteScale;
+      this.opts.bondThickness *= this.opts.absoluteScale;
+      this.opts.bondLength *= this.opts.absoluteScale;
+      this.opts.shortBondLength *= this.opts.absoluteScale;
+    }
+
     this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;
     this.opts.bondLengthSq = this.opts.bondLength * this.opts.bondLength;
     this.opts.halfFontSizeLarge = this.opts.fontSizeLarge / 2.0;
@@ -2096,7 +2155,12 @@ class Drawer {
     if (!infoOnly) {
       this.processGraph(); // Set the canvas to the appropriate size
 
-      this.canvasWrapper.scale(this.graph.vertices); // Do the actual drawing
+      if (this.opts.absoluteScale <= 0) {
+        this.canvasWrapper.scale(this.graph.vertices);
+      } else {
+        this.canvasWrapper.scaleCanvas(this.graph.vertices);
+      } // Do the actual drawing
+
 
       this.drawEdges(this.opts.debug);
       this.drawVertices(this.opts.debug);
