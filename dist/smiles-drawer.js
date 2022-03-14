@@ -4,7 +4,11 @@
 //@ts-check
 const Drawer = require('./src/Drawer');
 
+const ReactionDrawer = require('./src/ReactionDrawer');
+
 const Parser = require('./src/Parser');
+
+const ReactionParser = require('./src/ReactionParser');
 
 const SvgDrawer = require('./src/SvgDrawer'); // Detect SSR (server side rendering)
 
@@ -20,6 +24,7 @@ var SmilesDrawer = {
 };
 SmilesDrawer.Drawer = Drawer;
 SmilesDrawer.Parser = Parser;
+SmilesDrawer.ReactionParser = ReactionParser;
 SmilesDrawer.SvgDrawer = SvgDrawer;
 /**
 * Cleans a SMILES string (removes non-valid characters)
@@ -79,6 +84,27 @@ SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
     }
   }
 };
+/**
+* Parses the entered reaction smiles string.
+* 
+* @static
+* @param {String} reactionSmiles A reaction SMILES string.
+* @param {Function} successCallback A callback that is called on success with the parse tree.
+* @param {Function} errorCallback A callback that is called with the error object on error.
+*/
+
+
+SmilesDrawer.parseReaction = function (reactionSmiles, successCallback, errorCallback) {
+  try {
+    if (successCallback) {
+      successCallback(ReactionParser.parse(reactionSmiles));
+    }
+  } catch (err) {
+    if (errorCallback) {
+      errorCallback(err);
+    }
+  }
+};
 
 if (canUseDOM) {
   window.SmilesDrawer = SmilesDrawer;
@@ -120,7 +146,7 @@ if (!Array.prototype.fill) {
 
 module.exports = SmilesDrawer;
 
-},{"./src/Drawer":5,"./src/Parser":10,"./src/SvgDrawer":14}],2:[function(require,module,exports){
+},{"./src/Drawer":5,"./src/Parser":10,"./src/ReactionDrawer":12,"./src/ReactionParser":13,"./src/SvgDrawer":17}],2:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1086,7 +1112,7 @@ class Atom {
 
 module.exports = Atom;
 
-},{"./ArrayHelper":2,"./Ring":11,"./Vertex":19}],4:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Ring":14,"./Vertex":22}],4:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1965,7 +1991,7 @@ class CanvasWrapper {
 
 module.exports = CanvasWrapper;
 
-},{"./Line":8,"./MathHelper":9,"./Ring":11,"./UtilityFunctions":17,"./Vector2":18,"./Vertex":19}],5:[function(require,module,exports){
+},{"./Line":8,"./MathHelper":9,"./Ring":14,"./UtilityFunctions":20,"./Vector2":21,"./Vertex":22}],5:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -4938,7 +4964,7 @@ class Drawer {
 
 module.exports = Drawer;
 
-},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":6,"./Graph":7,"./Line":8,"./MathHelper":9,"./Ring":11,"./RingConnection":12,"./SSSR":13,"./ThemeManager":16,"./Vector2":18,"./Vertex":19}],6:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":6,"./Graph":7,"./Line":8,"./MathHelper":9,"./Ring":14,"./RingConnection":15,"./SSSR":16,"./ThemeManager":19,"./Vector2":21,"./Vertex":22}],6:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5951,7 +5977,7 @@ class Graph {
 
 module.exports = Graph;
 
-},{"./Atom":3,"./Edge":6,"./MathHelper":9,"./Ring":11,"./Vector2":18,"./Vertex":19}],8:[function(require,module,exports){
+},{"./Atom":3,"./Edge":6,"./MathHelper":9,"./Ring":14,"./Vector2":21,"./Vertex":22}],8:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -6260,7 +6286,7 @@ class Line {
 
 module.exports = Line;
 
-},{"./Vector2":18}],9:[function(require,module,exports){
+},{"./Vector2":21}],9:[function(require,module,exports){
 "use strict";
 
 /** 
@@ -8337,6 +8363,97 @@ module.exports = function () {
 "use strict";
 
 //@ts-check
+const Parser = require('./Parser');
+
+class Reaction {
+  /**
+   * The constructor for the class Reaction.
+   *
+   * @param {string} reactionSmiles A reaction SMILES.
+   */
+  constructor(reactionSmiles) {
+    this.reactantsSmiles = [];
+    this.reagentsSmiles = [];
+    this.productsSmiles = [];
+    this.reactants = [];
+    this.reagents = [];
+    this.products = [];
+    let parts = reactionSmiles.split(">");
+
+    if (parts.length !== 3) {
+      throw new Error("Invalid reaction SMILES. Did you add fewer than or more than two '>'?");
+    }
+
+    if (parts[0] !== "") {
+      this.reactantsSmiles = parts[0].split(".");
+    }
+
+    if (parts[1] !== "") {
+      this.reagentsSmiles = parts[1].split(".");
+    }
+
+    if (parts[2] !== "") {
+      this.productsSmiles = parts[2].split(".");
+    }
+
+    for (var i = 0; i < this.reactantsSmiles.length; i++) {
+      this.reactants.push(Parser.parse(this.reactantsSmiles[i]));
+    }
+
+    for (var i = 0; i < this.reagentsSmiles.length; i++) {
+      this.reagents.push(Parser.parse(this.reagentsSmiles[i]));
+    }
+
+    for (var i = 0; i < this.productsSmiles.length; i++) {
+      this.products.push(Parser.parse(this.productsSmiles[i]));
+    }
+  }
+
+}
+
+module.exports = Reaction;
+
+},{"./Parser":10}],12:[function(require,module,exports){
+"use strict";
+
+class ReactionDrawer {
+  /**
+   * The constructor for the class ReactionDrawer.
+   *
+   * @param {Object} options An object containing custom values for different options. It is merged with the default options.
+   */
+  constructor(options) {}
+
+}
+
+module.exports = ReactionDrawer;
+
+},{}],13:[function(require,module,exports){
+"use strict";
+
+//@ts-check
+const Reaction = require('./Reaction');
+
+class ReactionParser {
+  /**
+   * Returns the hex code of a color associated with a key from the current theme.
+   *
+   * @param {String} reactionSmiles A reaction SMILES.
+   * @returns {Reaction} A reaction object.
+   */
+  static parse(reactionSmiles) {
+    let reaction = new Reaction(reactionSmiles);
+    return reaction;
+  }
+
+}
+
+module.exports = ReactionParser;
+
+},{"./Reaction":11}],14:[function(require,module,exports){
+"use strict";
+
+//@ts-check
 const ArrayHelper = require('./ArrayHelper');
 
 const Vector2 = require('./Vector2');
@@ -8555,7 +8672,7 @@ class Ring {
 
 module.exports = Ring;
 
-},{"./ArrayHelper":2,"./RingConnection":12,"./Vector2":18,"./Vertex":19}],12:[function(require,module,exports){
+},{"./ArrayHelper":2,"./RingConnection":15,"./Vector2":21,"./Vertex":22}],15:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8729,7 +8846,7 @@ class RingConnection {
 
 module.exports = RingConnection;
 
-},{"./Ring":11,"./Vertex":19}],13:[function(require,module,exports){
+},{"./Ring":14,"./Vertex":22}],16:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -9340,7 +9457,7 @@ class SSSR {
 
 module.exports = SSSR;
 
-},{"./Graph":7}],14:[function(require,module,exports){
+},{"./Graph":7}],17:[function(require,module,exports){
 "use strict";
 
 // we use the drawer to do all the preprocessing. then we take over the drawing
@@ -9672,7 +9789,7 @@ class SvgDrawer {
 
 module.exports = SvgDrawer;
 
-},{"./ArrayHelper":2,"./Atom":3,"./Drawer":5,"./Graph":7,"./Line":8,"./SvgWrapper":15,"./ThemeManager":16,"./Vector2":18}],15:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./Drawer":5,"./Graph":7,"./Line":8,"./SvgWrapper":18,"./ThemeManager":19,"./Vector2":21}],18:[function(require,module,exports){
 "use strict";
 
 const {
@@ -10243,7 +10360,7 @@ class SvgWrapper {
 
 module.exports = SvgWrapper;
 
-},{"./Line":8,"./UtilityFunctions":17,"./Vector2":18}],16:[function(require,module,exports){
+},{"./Line":8,"./UtilityFunctions":20,"./Vector2":21}],19:[function(require,module,exports){
 "use strict";
 
 class ThemeManager {
@@ -10291,7 +10408,7 @@ class ThemeManager {
 
 module.exports = ThemeManager;
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 /**
@@ -10319,7 +10436,7 @@ module.exports = {
   getChargeText
 };
 
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -10946,7 +11063,7 @@ class Vector2 {
 
 module.exports = Vector2;
 
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -11309,5 +11426,5 @@ class Vertex {
 
 module.exports = Vertex;
 
-},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":9,"./Vector2":18}]},{},[1])
+},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":9,"./Vector2":21}]},{},[1])
 
