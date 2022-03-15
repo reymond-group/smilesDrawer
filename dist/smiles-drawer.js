@@ -1258,7 +1258,7 @@ class CanvasWrapper {
     }
   }
   /**
-   * Scale the canvas based on vertex positions.
+   * Scale the canvas rather than the content based on vertex positions.
    *
    * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
    */
@@ -1289,10 +1289,11 @@ class CanvasWrapper {
     maxY += padding;
     minX -= padding;
     minY -= padding;
-    this.canvas.width = maxX - minX;
-    this.canvas.height = maxY - minY;
-    this.drawingWidth = maxX - minX;
-    this.drawingHeight = maxY - minY; // var scaleX = this.canvas.offsetWidth / this.drawingWidth;
+    let newWidth = maxX - minX;
+    let newHeight = maxY - minY;
+    this.updateSize(newWidth, newHeight);
+    this.drawingWidth = newWidth;
+    this.drawingHeight = newHeight; // var scaleX = this.canvas.offsetWidth / this.drawingWidth;
     // var scaleY = this.canvas.offsetHeight / this.drawingHeight;
     // var scale = (scaleX < scaleY) ? scaleX : scaleY;
     // this.ctx.scale(scale, scale);
