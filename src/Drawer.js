@@ -166,34 +166,42 @@ class Drawer {
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
+    this.themeManager = new ThemeManager(this.opts.themes, themeName);
+    this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
+
     this.initDraw(data, themeName, infoOnly);
+    this.processGraph();
 
-    if (!this.infoOnly) {
-      this.themeManager = new ThemeManager(this.opts.themes, themeName);
-      this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
+    // Set the canvas to the appropriate size
+    if (this.opts.absoluteScale <= 0) {
+      this.canvasWrapper.scale(this.graph.vertices);
+    } else {
+      this.canvasWrapper.scaleCanvas(this.graph.vertices);
     }
 
-    if (!infoOnly) {
-      this.processGraph();
+    // Do the actual drawing
+    this.drawEdges(this.opts.debug);
+    this.drawVertices(this.opts.debug);
+    this.canvasWrapper.reset();
 
-      // Set the canvas to the appropriate size
-      if (this.opts.absoluteScale <= 0) {
-        this.canvasWrapper.scale(this.graph.vertices);
-      } else {
-        this.canvasWrapper.scaleCanvas(this.graph.vertices);
-      }
-
-      // Do the actual drawing
-      this.drawEdges(this.opts.debug);
-      this.drawVertices(this.opts.debug);
-      this.canvasWrapper.reset();
-
-      if (this.opts.debug) {
-        console.log(this.graph);
-        console.log(this.rings);
-        console.log(this.ringConnections);
-      }
+    if (this.opts.debug) {
+      console.log(this.graph);
+      console.log(this.rings);
+      console.log(this.ringConnections);
     }
+  }
+
+  /**
+   * Returns the image data of the canvas. If called before draw() returns null.
+   * 
+   * @returns {ImageData|null} The image data of the canvas.
+   */
+  getImageData() {
+    if (this.canvasWrapper) {
+      return this.canvasWrapper.getImageData();
+    }
+
+    return null;
   }
 
   /**

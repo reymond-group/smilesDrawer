@@ -9,11 +9,10 @@ const { getChargeText } = require('./UtilityFunctions')
 /** 
  * A class wrapping a canvas element.
  * 
- * @property {HTMLElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
+ * @property {HTMLCanvasElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
  * @property {CanvasRenderingContext2D} ctx The CanvasRenderingContext2D of the canvas associated with this CanvasWrapper instance.
  * @property {Object} colors The colors object as defined in the SmilesDrawer options.
  * @property {Object} opts The SmilesDrawer options.
- * @property {Number} drawingWidth The width of the canvas.
  * @property {Number} drawingHeight The height of the canvas.
  * @property {Number} offsetX The horizontal offset required for centering the drawing.
  * @property {Number} offsetY The vertical offset required for centering the drawing.
@@ -29,6 +28,11 @@ class CanvasWrapper {
      * @param {Object} options The smiles drawer options object.
      */
     constructor(target, themeManager, options) {
+        /**
+         * @type {HTMLCanvasElement}
+         */
+        this.canvas = null;
+
         if (typeof target === 'string' || target instanceof String) {
             this.canvas = document.getElementById(target);
         } else {
@@ -38,8 +42,6 @@ class CanvasWrapper {
         this.ctx = this.canvas.getContext('2d');
         this.themeManager = themeManager;
         this.opts = options;
-        this.drawingWidth = 0.0;
-        this.drawingHeight = 0.0;
         this.offsetX = 0.0;
         this.offsetY = 0.0;
 
@@ -123,11 +125,11 @@ class CanvasWrapper {
         minX -= padding;
         minY -= padding;
 
-        this.drawingWidth = maxX - minX;
-        this.drawingHeight = maxY - minY;
+        let drawingWidth = maxX - minX;
+        let drawingHeight = maxY - minY;
 
-        var scaleX = this.canvas.offsetWidth / this.drawingWidth;
-        var scaleY = this.canvas.offsetHeight / this.drawingHeight;
+        var scaleX = this.canvas.offsetWidth / drawingWidth;
+        var scaleY = this.canvas.offsetHeight / drawingHeight;
 
         var scale = (scaleX < scaleY) ? scaleX : scaleY;
 
@@ -138,9 +140,9 @@ class CanvasWrapper {
 
         // Center
         if (scaleX < scaleY) {
-            this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+            this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - drawingHeight / 2.0;
         } else {
-            this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+            this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - drawingWidth / 2.0;
         }
     }
 
@@ -181,25 +183,8 @@ class CanvasWrapper {
 
         this.updateSize(newWidth, newHeight);
 
-        this.drawingWidth = newWidth;
-        this.drawingHeight = newHeight;
-
-        // var scaleX = this.canvas.offsetWidth / this.drawingWidth;
-        // var scaleY = this.canvas.offsetHeight / this.drawingHeight;
-
-        // var scale = (scaleX < scaleY) ? scaleX : scaleY;
-
-        // this.ctx.scale(scale, scale);
-
         this.offsetX = -minX;
         this.offsetY = -minY;
-
-        // // Center
-        // if (scaleX < scaleY) {
-        //     this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
-        // } else {
-        //     this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
-        // }
     }
 
     /**
@@ -207,6 +192,15 @@ class CanvasWrapper {
      */
     reset() {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
+    /**
+     * Returns the image data of the canvas.
+     * 
+     * @returns {ImageData} The image data of the canvas.
+     */
+    getImageData() {
+        return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     }
 
     /**

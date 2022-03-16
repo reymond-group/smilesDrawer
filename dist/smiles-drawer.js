@@ -1132,11 +1132,10 @@ const {
 /** 
  * A class wrapping a canvas element.
  * 
- * @property {HTMLElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
+ * @property {HTMLCanvasElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
  * @property {CanvasRenderingContext2D} ctx The CanvasRenderingContext2D of the canvas associated with this CanvasWrapper instance.
  * @property {Object} colors The colors object as defined in the SmilesDrawer options.
  * @property {Object} opts The SmilesDrawer options.
- * @property {Number} drawingWidth The width of the canvas.
  * @property {Number} drawingHeight The height of the canvas.
  * @property {Number} offsetX The horizontal offset required for centering the drawing.
  * @property {Number} offsetY The vertical offset required for centering the drawing.
@@ -1154,6 +1153,11 @@ class CanvasWrapper {
    * @param {Object} options The smiles drawer options object.
    */
   constructor(target, themeManager, options) {
+    /**
+     * @type {HTMLCanvasElement}
+     */
+    this.canvas = null;
+
     if (typeof target === 'string' || target instanceof String) {
       this.canvas = document.getElementById(target);
     } else {
@@ -1163,8 +1167,6 @@ class CanvasWrapper {
     this.ctx = this.canvas.getContext('2d');
     this.themeManager = themeManager;
     this.opts = options;
-    this.drawingWidth = 0.0;
-    this.drawingHeight = 0.0;
     this.offsetX = 0.0;
     this.offsetY = 0.0;
     this.fontLarge = this.opts.fontSizeLarge + 'pt Helvetica, Arial, sans-serif';
@@ -1242,19 +1244,19 @@ class CanvasWrapper {
     maxY += padding;
     minX -= padding;
     minY -= padding;
-    this.drawingWidth = maxX - minX;
-    this.drawingHeight = maxY - minY;
-    var scaleX = this.canvas.offsetWidth / this.drawingWidth;
-    var scaleY = this.canvas.offsetHeight / this.drawingHeight;
+    let drawingWidth = maxX - minX;
+    let drawingHeight = maxY - minY;
+    var scaleX = this.canvas.offsetWidth / drawingWidth;
+    var scaleY = this.canvas.offsetHeight / drawingHeight;
     var scale = scaleX < scaleY ? scaleX : scaleY;
     this.ctx.scale(scale, scale);
     this.offsetX = -minX;
     this.offsetY = -minY; // Center
 
     if (scaleX < scaleY) {
-      this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+      this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - drawingHeight / 2.0;
     } else {
-      this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+      this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - drawingWidth / 2.0;
     }
   }
   /**
@@ -1292,19 +1294,8 @@ class CanvasWrapper {
     let newWidth = maxX - minX;
     let newHeight = maxY - minY;
     this.updateSize(newWidth, newHeight);
-    this.drawingWidth = newWidth;
-    this.drawingHeight = newHeight; // var scaleX = this.canvas.offsetWidth / this.drawingWidth;
-    // var scaleY = this.canvas.offsetHeight / this.drawingHeight;
-    // var scale = (scaleX < scaleY) ? scaleX : scaleY;
-    // this.ctx.scale(scale, scale);
-
     this.offsetX = -minX;
-    this.offsetY = -minY; // // Center
-    // if (scaleX < scaleY) {
-    //     this.offsetY += this.canvas.offsetHeight / (2.0 * scale) - this.drawingHeight / 2.0;
-    // } else {
-    //     this.offsetX += this.canvas.offsetWidth / (2.0 * scale) - this.drawingWidth / 2.0;
-    // }
+    this.offsetY = -minY;
   }
   /**
    * Resets the transform of the canvas.
@@ -1313,6 +1304,16 @@ class CanvasWrapper {
 
   reset() {
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  /**
+   * Returns the image data of the canvas.
+   * 
+   * @returns {ImageData} The image data of the canvas.
+   */
+
+
+  getImageData() {
+    return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
   }
   /**
    * Returns the hex code of a color associated with a key from the current theme.
@@ -2172,33 +2173,41 @@ class Drawer {
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
+    this.themeManager = new ThemeManager(this.opts.themes, themeName);
+    this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
     this.initDraw(data, themeName, infoOnly);
+    this.processGraph(); // Set the canvas to the appropriate size
 
-    if (!this.infoOnly) {
-      this.themeManager = new ThemeManager(this.opts.themes, themeName);
-      this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
+    if (this.opts.absoluteScale <= 0) {
+      this.canvasWrapper.scale(this.graph.vertices);
+    } else {
+      this.canvasWrapper.scaleCanvas(this.graph.vertices);
+    } // Do the actual drawing
+
+
+    this.drawEdges(this.opts.debug);
+    this.drawVertices(this.opts.debug);
+    this.canvasWrapper.reset();
+
+    if (this.opts.debug) {
+      console.log(this.graph);
+      console.log(this.rings);
+      console.log(this.ringConnections);
+    }
+  }
+  /**
+   * Returns the image data of the canvas. If called before draw() returns null.
+   * 
+   * @returns {ImageData|null} The image data of the canvas.
+   */
+
+
+  getImageData() {
+    if (this.canvasWrapper) {
+      return this.canvasWrapper.getImageData();
     }
 
-    if (!infoOnly) {
-      this.processGraph(); // Set the canvas to the appropriate size
-
-      if (this.opts.absoluteScale <= 0) {
-        this.canvasWrapper.scale(this.graph.vertices);
-      } else {
-        this.canvasWrapper.scaleCanvas(this.graph.vertices);
-      } // Do the actual drawing
-
-
-      this.drawEdges(this.opts.debug);
-      this.drawVertices(this.opts.debug);
-      this.canvasWrapper.reset();
-
-      if (this.opts.debug) {
-        console.log(this.graph);
-        console.log(this.rings);
-        console.log(this.ringConnections);
-      }
-    }
+    return null;
   }
   /**
    * Returns the number of rings this edge is a part of.

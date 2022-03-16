@@ -219,12 +219,11 @@
       let t = performance.now();
 
       SmilesDrawer.parseReaction(input.value, function (reaction) {
-        console.log(reaction)
-
-        // for (var i = 0; i < reaction.reactants.length; i++) {
-        //   smilesDrawer.draw(reaction.reactants[i], 'output-canvas', 'dark', false);
-        // }
-        smilesDrawer.draw(reaction.reactants[0], 'output-canvas', 'dark', false);
+        for (var i = 0; i < reaction.reactants.length; i++) {
+          smilesDrawer.draw(reaction.reactants[i], 'output-canvas', 'dark', false);
+          console.log(smilesDrawer.getImageData())
+        }
+        // smilesDrawer.draw(reaction.reactants[0], 'output-canvas', 'dark', false);
         // let td = performance.now() - t;
         log.innerHTML = '&nbsp;';
         log.style.visibility = 'hidden';
