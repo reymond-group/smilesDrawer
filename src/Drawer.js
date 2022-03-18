@@ -109,7 +109,6 @@ class Drawer {
       this.opts.fontSizeSmall *= this.opts.absoluteScale;
       this.opts.bondThickness *= this.opts.absoluteScale;
       this.opts.bondLength *= this.opts.absoluteScale;
-      this.opts.shortBondLength *= this.opts.absoluteScale;
     }
 
     this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;

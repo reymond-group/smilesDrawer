@@ -2212,8 +2212,7 @@ class Drawer {
       this.opts.fontSizeLarge *= this.opts.absoluteScale;
       this.opts.fontSizeSmall *= this.opts.absoluteScale;
       this.opts.bondThickness *= this.opts.absoluteScale;
-      this.opts.bondLength *= this.opts.absoluteScale;
-      this.opts.shortBondLength *= this.opts.absoluteScale;
+      this.opts.bondLength *= this.opts.absoluteScale; // this.opts.shortBondLength *= this.opts.absoluteScale;
     }
 
     this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;
@@ -8730,19 +8729,11 @@ class ReactionDrawer {
       canvasWidth += cv.width;
     }
 
-    console.log(canvases);
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     drawingData.forEach(d => {
       ctx.drawImage(d[0], d[1], canvasHeight / 2.0 - d[0].height / 2.0, d[0].width, d[0].height);
     });
-  }
-
-  drawArrow(from, to) {
-    var startRadians = Math.atan((this.y2 - this.y1) / (this.x2 - this.x1));
-    startRadians += (this.x2 >= this.x1 ? -90 : 90) * Math.PI / 180;
-    var endRadians = Math.atan((this.y2 - this.y1) / (this.x2 - this.x1));
-    endRadians += (this.x2 >= this.x1 ? 90 : -90) * Math.PI / 180;
   }
 
 }
