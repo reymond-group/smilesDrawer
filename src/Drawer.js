@@ -12,6 +12,7 @@ const CanvasWrapper = require('./CanvasWrapper')
 const Graph = require('./Graph')
 const SSSR = require('./SSSR')
 const ThemeManager = require('./ThemeManager')
+const Options = require('./Options')
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -99,7 +100,7 @@ class Drawer {
       }
     };
 
-    this.opts = this.extend(true, this.defaultOptions, options);
+    this.opts = Options.extend(true, this.defaultOptions, options);
 
     // Scale all sizes in case of absoluteScale
     if (this.opts.absoluteScale) {
@@ -122,42 +123,6 @@ class Drawer {
   }
 
   /**
-   * A helper method to extend the default options with user supplied ones.
-   */
-  extend() {
-    let that = this;
-    let extended = {};
-    let deep = false;
-    let i = 0;
-    let length = arguments.length;
-
-    if (Object.prototype.toString.call(arguments[0]) === '[object Boolean]') {
-      deep = arguments[0];
-      i++;
-    }
-
-    let merge = function (obj) {
-      for (var prop in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-          if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
-            extended[prop] = that.extend(true, extended[prop], obj[prop]);
-          } else {
-            extended[prop] = obj[prop];
-          }
-        }
-      }
-    };
-
-    for (; i < length; i++) {
-      let obj = arguments[i];
-      merge(obj);
-    }
-
-    return extended;
-  };
-
-
-  /**
    * Draws the parsed smiles data to a canvas element.
    *
    * @param {Object} data The tree returned by the smiles parser.
@@ -167,7 +132,12 @@ class Drawer {
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
     this.themeManager = new ThemeManager(this.opts.themes, themeName);
-    this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
+
+    if (target) {
+      this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
+    } else {
+      this.canvasWrapper = new CanvasWrapper(document.createElement("canvas"), this.themeManager, this.opts);
+    }
 
     this.initDraw(data, themeName, infoOnly);
     this.processGraph();

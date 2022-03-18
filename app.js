@@ -21,6 +21,7 @@ var SmilesDrawer = {
 };
 
 SmilesDrawer.Drawer = Drawer;
+SmilesDrawer.ReactionDrawer = ReactionDrawer;
 SmilesDrawer.Parser = Parser;
 SmilesDrawer.ReactionParser = ReactionParser;
 SmilesDrawer.SvgDrawer = SvgDrawer;

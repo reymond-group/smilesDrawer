@@ -20,7 +20,6 @@
     }
 
     body {
-      background: linear-gradient(330deg, #00323D, #004C42);
       overflow-y: auto;
     }
 
@@ -29,7 +28,7 @@
       font-family: 'Megrim';
       font-weight: 400;
       font-size: 2.0em;
-      color: #50C5A9;
+      color: #000000;
       text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.25);
 
       margin: 0;
@@ -75,12 +74,12 @@
       display: block;
       box-sizing: border-box;
       width: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.15);
       padding: 10px;
       margin-bottom: 5px;
       border-radius: 2px;
-      color: #fff;
+      color: #000;
       font-size: 1.00em;
       outline: none;
     }
@@ -208,10 +207,18 @@
     var options = {
       debug: false,
       absoluteScale: 2,
-      atomVisualization: 'default'
+      atomVisualization: 'default',
+      padding: 100
     }
 
-    var smilesDrawer = new SmilesDrawer.Drawer(options);
+    var reactionOptions = {
+      plus: {
+      },
+      arrow: {
+      }
+    }
+
+    var reactionDrawer = new SmilesDrawer.ReactionDrawer(reactionOptions, options);
     var input = document.getElementById('input');
     var log = document.getElementById('log');
 
@@ -219,26 +226,11 @@
       let t = performance.now();
 
       SmilesDrawer.parseReaction(input.value, function (reaction) {
-        for (var i = 0; i < reaction.reactants.length; i++) {
-          smilesDrawer.draw(reaction.reactants[i], 'output-canvas', 'dark', false);
-          console.log(smilesDrawer.getImageData())
-        }
-        // smilesDrawer.draw(reaction.reactants[0], 'output-canvas', 'dark', false);
-        // let td = performance.now() - t;
+        reactionDrawer.draw(reaction, 'output-canvas', 'light')
+
         log.innerHTML = '&nbsp;';
         log.style.visibility = 'hidden';
 
-        // new Noty({
-        //   text: 'Drawing took ' + td.toFixed(3) + 'ms with a total overlap score of ' + smilesDrawer.getTotalOverlapScore().toFixed(3) + '.',
-        //   killer: true,
-        //   timeout: 2000,
-        //   animation: {
-        //     open: null,
-        //     close: null
-        //   }
-        // }).show();
-
-        // console.log(smilesDrawer.getMolecularFormula());
       }, function (err) {
         log.innerHTML = err;
         log.style.visibility = 'visible';
@@ -247,7 +239,7 @@
     }
 
     function updateOptions() {
-      smilesDrawer = new SmilesDrawer.Drawer(options);
+      reactionDrawer = new SmilesDrawer.ReactionDrawer({}, options);
       draw();
     }
 

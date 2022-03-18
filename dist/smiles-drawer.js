@@ -23,6 +23,7 @@ var SmilesDrawer = {
   Version: '1.0.0'
 };
 SmilesDrawer.Drawer = Drawer;
+SmilesDrawer.ReactionDrawer = ReactionDrawer;
 SmilesDrawer.Parser = Parser;
 SmilesDrawer.ReactionParser = ReactionParser;
 SmilesDrawer.SvgDrawer = SvgDrawer;
@@ -146,7 +147,7 @@ if (!Array.prototype.fill) {
 
 module.exports = SmilesDrawer;
 
-},{"./src/Drawer":5,"./src/Parser":10,"./src/ReactionDrawer":12,"./src/ReactionParser":13,"./src/SvgDrawer":17}],2:[function(require,module,exports){
+},{"./src/Drawer":5,"./src/Parser":11,"./src/ReactionDrawer":14,"./src/ReactionParser":15,"./src/SvgDrawer":20}],2:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1112,7 +1113,7 @@ class Atom {
 
 module.exports = Atom;
 
-},{"./ArrayHelper":2,"./Ring":14,"./Vertex":22}],4:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Ring":17,"./Vertex":25}],4:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1989,11 +1990,105 @@ class CanvasWrapper {
     this.ctx.clearRect(0, 0, this.canvas.offsetWidth, this.canvas.offsetHeight);
   }
 
+  trim() {
+    CanvasWrapper.trimCanvas(this.canvas);
+  }
+
+  static trimCanvas(canvas) {
+    // Adapted from:
+    // https://stackoverflow.com/questions/45866873/cropping-an-html-canvas-to-the-width-height-of-its-visible-pixels-content
+    let ctx = canvas.getContext('2d');
+    let x, y, w, h, top, left, right, bottom, data, idx1, idx2, found, imgData;
+    w = ctx.canvas.width;
+    h = ctx.canvas.height;
+    imgData = ctx.getImageData(0, 0, w, h);
+    data = new Uint32Array(imgData.data.buffer);
+    idx1 = 0;
+    idx2 = w * h - 1;
+    found = false; // search from top and bottom to find first rows containing a non transparent pixel.
+
+    for (y = 0; y < h && !found; y += 1) {
+      for (x = 0; x < w; x += 1) {
+        if (data[idx1++] && !top) {
+          top = y + 1;
+
+          if (bottom) {
+            // top and bottom found then stop the search
+            found = true;
+            break;
+          }
+        }
+
+        if (data[idx2--] && !bottom) {
+          bottom = h - y - 1;
+
+          if (top) {
+            // top and bottom found then stop the search
+            found = true;
+            break;
+          }
+        }
+      }
+
+      if (y > h - y && !top && !bottom) {
+        return false;
+      } // image is completely blank so do nothing
+
+    }
+
+    top -= 1; // correct top 
+
+    found = false; // search from left and right to find first column containing a non transparent pixel.
+
+    for (x = 0; x < w && !found; x += 1) {
+      idx1 = top * w + x;
+      idx2 = top * w + (w - x - 1);
+
+      for (y = top; y <= bottom; y += 1) {
+        if (data[idx1] && !left) {
+          left = x + 1;
+
+          if (right) {
+            // if left and right found then stop the search
+            found = true;
+            break;
+          }
+        }
+
+        if (data[idx2] && !right) {
+          right = w - x - 1;
+
+          if (left) {
+            // if left and right found then stop the search
+            found = true;
+            break;
+          }
+        }
+
+        idx1 += w;
+        idx2 += w;
+      }
+    }
+
+    left -= 1; // correct left
+
+    if (w === right - left + 1 && h === bottom - top + 1) {
+      return true;
+    } // no need to crop if no change in size
+
+
+    w = right - left + 1;
+    h = bottom - top + 1;
+    ctx.canvas.width = w;
+    ctx.canvas.height = h;
+    ctx.putImageData(imgData, -left, -top);
+  }
+
 }
 
 module.exports = CanvasWrapper;
 
-},{"./Line":8,"./MathHelper":9,"./Ring":14,"./UtilityFunctions":20,"./Vector2":21,"./Vertex":22}],5:[function(require,module,exports){
+},{"./Line":8,"./MathHelper":9,"./Ring":17,"./UtilityFunctions":23,"./Vector2":24,"./Vertex":25}],5:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -2022,6 +2117,8 @@ const Graph = require('./Graph');
 const SSSR = require('./SSSR');
 
 const ThemeManager = require('./ThemeManager');
+
+const Options = require('./Options');
 /** 
  * The main class of the application representing the smiles drawer 
  * 
@@ -2108,7 +2205,7 @@ class Drawer {
         }
       }
     };
-    this.opts = this.extend(true, this.defaultOptions, options); // Scale all sizes in case of absoluteScale
+    this.opts = Options.extend(true, this.defaultOptions, options); // Scale all sizes in case of absoluteScale
 
     if (this.opts.absoluteScale) {
       this.opts.bondSpacing *= this.opts.absoluteScale;
@@ -2128,43 +2225,6 @@ class Drawer {
     this.theme = this.opts.themes.dark;
   }
   /**
-   * A helper method to extend the default options with user supplied ones.
-   */
-
-
-  extend() {
-    let that = this;
-    let extended = {};
-    let deep = false;
-    let i = 0;
-    let length = arguments.length;
-
-    if (Object.prototype.toString.call(arguments[0]) === '[object Boolean]') {
-      deep = arguments[0];
-      i++;
-    }
-
-    let merge = function (obj) {
-      for (var prop in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-          if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
-            extended[prop] = that.extend(true, extended[prop], obj[prop]);
-          } else {
-            extended[prop] = obj[prop];
-          }
-        }
-      }
-    };
-
-    for (; i < length; i++) {
-      let obj = arguments[i];
-      merge(obj);
-    }
-
-    return extended;
-  }
-
-  /**
    * Draws the parsed smiles data to a canvas element.
    *
    * @param {Object} data The tree returned by the smiles parser.
@@ -2172,9 +2232,17 @@ class Drawer {
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
+
+
   draw(data, target, themeName = 'light', infoOnly = false) {
     this.themeManager = new ThemeManager(this.opts.themes, themeName);
-    this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
+
+    if (target) {
+      this.canvasWrapper = new CanvasWrapper(target, this.themeManager, this.opts);
+    } else {
+      this.canvasWrapper = new CanvasWrapper(document.createElement("canvas"), this.themeManager, this.opts);
+    }
+
     this.initDraw(data, themeName, infoOnly);
     this.processGraph(); // Set the canvas to the appropriate size
 
@@ -4974,7 +5042,7 @@ class Drawer {
 
 module.exports = Drawer;
 
-},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":6,"./Graph":7,"./Line":8,"./MathHelper":9,"./Ring":14,"./RingConnection":15,"./SSSR":16,"./ThemeManager":19,"./Vector2":21,"./Vertex":22}],6:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":6,"./Graph":7,"./Line":8,"./MathHelper":9,"./Options":10,"./Ring":17,"./RingConnection":18,"./SSSR":19,"./ThemeManager":22,"./Vector2":24,"./Vertex":25}],6:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5987,7 +6055,7 @@ class Graph {
 
 module.exports = Graph;
 
-},{"./Atom":3,"./Edge":6,"./MathHelper":9,"./Ring":14,"./Vector2":21,"./Vertex":22}],8:[function(require,module,exports){
+},{"./Atom":3,"./Edge":6,"./MathHelper":9,"./Ring":17,"./Vector2":24,"./Vertex":25}],8:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -6296,7 +6364,7 @@ class Line {
 
 module.exports = Line;
 
-},{"./Vector2":21}],9:[function(require,module,exports){
+},{"./Vector2":24}],9:[function(require,module,exports){
 "use strict";
 
 /** 
@@ -6470,6 +6538,50 @@ class MathHelper {
 module.exports = MathHelper;
 
 },{}],10:[function(require,module,exports){
+"use strict";
+
+//@ts-check
+class Options {
+  /**
+   * A helper method to extend the default options with user supplied ones.
+   */
+  static extend() {
+    let that = this;
+    let extended = {};
+    let deep = false;
+    let i = 0;
+    let length = arguments.length;
+
+    if (Object.prototype.toString.call(arguments[0]) === '[object Boolean]') {
+      deep = arguments[0];
+      i++;
+    }
+
+    let merge = function (obj) {
+      for (var prop in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+          if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+            extended[prop] = that.extend(true, extended[prop], obj[prop]);
+          } else {
+            extended[prop] = obj[prop];
+          }
+        }
+      }
+    };
+
+    for (; i < length; i++) {
+      let obj = arguments[i];
+      merge(obj);
+    }
+
+    return extended;
+  }
+
+}
+
+module.exports = Options;
+
+},{}],11:[function(require,module,exports){
 "use strict";
 
 // WHEN REPLACING, CHECK FOR:
@@ -8369,7 +8481,7 @@ module.exports = function () {
   };
 }();
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8423,22 +8535,221 @@ class Reaction {
 
 module.exports = Reaction;
 
-},{"./Parser":10}],12:[function(require,module,exports){
+},{"./Parser":11}],13:[function(require,module,exports){
 "use strict";
+
+//@ts-check
+const Vector2 = require('./Vector2');
+
+const Options = require('./Options');
+
+const CanvasWrapper = require('./CanvasWrapper');
+
+class ReactionArrow {
+  /**
+   * 
+   * @param {Vector2} from The starting point of the line.
+   * @param {Vector2} to The end point of the line.
+   */
+  constructor(from, to, textAbove, textBelow, options) {
+    this.from = from;
+    this.to = to;
+    this.textAbove = textAbove;
+    this.textBelow = textBelow;
+    this.defaultOptions = {
+      color: 'black',
+      lineWidth: 2.0,
+      fromArrowhead: {
+        show: false,
+        color: 'black',
+        width: 10.0,
+        length: 10.0
+      },
+      toArrowhead: {
+        show: true,
+        color: 'black',
+        width: 10.0,
+        length: 10.0
+      }
+    };
+    this.opts = Options.extend(true, this.defaultOptions, options);
+    this.canvas = document.createElement("canvas");
+    let arrowheadSize = Math.max(this.opts.fromArrowhead.width, this.opts.fromArrowhead.length, this.opts.toArrowhead.width, this.opts.toArrowhead.length);
+    let padding = new Vector2(arrowheadSize, arrowheadSize).multiplyScalar(2);
+    this.from.add(padding);
+    this.to.add(padding);
+    this.canvas.width = Math.max(this.from.x, this.to.x) + arrowheadSize;
+    this.canvas.height = Math.max(this.from.y, this.to.y) + arrowheadSize;
+    this.ctx = this.canvas.getContext('2d');
+    this.angle = Math.atan((this.to.y - this.from.y) / (this.to.x - this.from.x));
+    this.drawLine(this.opts.color, this.opts.lineWidth);
+
+    if (this.opts.fromArrowhead.show) {
+      this.drawFromArrowhead(this.opts.fromArrowhead.color, this.opts.fromArrowhead.width, this.opts.fromArrowhead.length);
+    }
+
+    if (this.opts.toArrowhead.show) {
+      this.drawToArrowhead(this.opts.toArrowhead.color, this.opts.toArrowhead.width, this.opts.toArrowhead.length);
+    }
+
+    CanvasWrapper.trimCanvas(this.canvas);
+  }
+
+  drawLine(color = "black", lineWidth = 1.0) {
+    this.ctx.strokeStyle = color;
+    this.ctx.fillStyle = color;
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.from.x, this.from.y);
+    this.ctx.lineTo(this.to.x, this.to.y);
+    this.ctx.stroke();
+  }
+
+  drawFromArrowhead(color = "black", width = 5.0, length = 5.0) {
+    let rad = this.angle + (this.to.x > this.from.x ? -90 : 90) * Math.PI / 180;
+    this.drawArrowhead(this.from.x - length, this.from.y, rad, color, width, length);
+  }
+
+  drawToArrowhead(color = "black", width = 5.0, length = 5.0) {
+    let rad = this.angle + (this.to.x > this.from.x ? 90 : -90) * Math.PI / 180;
+    this.drawArrowhead(this.to.x + length, this.to.y, rad, color, width, length);
+  }
+
+  drawArrowhead(x, y, rad, color = "black", width = 5.0, length = 5.0) {
+    width = width / 2.0;
+    this.ctx.strokeStyle = color;
+    this.ctx.fillStyle = color;
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.translate(x, y);
+    this.ctx.rotate(rad);
+    this.ctx.moveTo(0, 0);
+    this.ctx.lineTo(width, length);
+    this.ctx.lineTo(-width, length);
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.restore();
+  }
+
+}
+
+module.exports = ReactionArrow;
+
+},{"./CanvasWrapper":4,"./Options":10,"./Vector2":24}],14:[function(require,module,exports){
+"use strict";
+
+const Drawer = require('./Drawer');
+
+const ReactionArrow = require('./ReactionArrow');
+
+const ReactionText = require('./ReactionText');
+
+const Vector2 = require('./Vector2');
+
+const Options = require('./Options');
 
 class ReactionDrawer {
   /**
    * The constructor for the class ReactionDrawer.
    *
-   * @param {Object} options An object containing custom values for different options. It is merged with the default options.
+   * @param {Object} options An object containing reaction drawing specitic options.
+   * @param {Object} moleculeOptions An object containing molecule drawing specific options.
    */
-  constructor(options) {}
+  constructor(options, moleculeOptions) {
+    this.drawer = new Drawer(moleculeOptions);
+    this.defaultOptions = {
+      spacing: 10,
+      plus: {},
+      arrow: {}
+    };
+    this.opts = Options.extend(true, this.defaultOptions, options);
+  }
+  /**
+  * Draws the parsed reaction smiles data to a canvas element.
+  *
+  * @param {Object} reaction The reaction object returned by the reaction smiles parser.
+  * @param {(String|HTMLElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+  * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+  * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+  */
+
+
+  draw(reaction, target, themeName = 'light', infoOnly = false) {
+    let canvas = null;
+
+    if (typeof target === 'string' || target instanceof String) {
+      canvas = document.getElementById(target);
+    } else {
+      canvas = target;
+    }
+
+    let ctx = canvas.getContext('2d');
+    let canvases = [];
+
+    for (var i = 0; i < reaction.reactants.length; i++) {
+      if (i > 0) {
+        let text = new ReactionText("+", this.opts.plus);
+        canvases.push(text.canvas);
+      }
+
+      this.drawer.draw(reaction.reactants[i], null, themeName, infoOnly);
+      this.drawer.canvasWrapper.trim();
+      canvases.push(this.drawer.canvasWrapper.canvas);
+    }
+
+    let rxnArrow = new ReactionArrow(new Vector2(0, 0), new Vector2(100, 0), "Some bla bla 😍\n", "100%", this.opts.arrow);
+    canvases.push(rxnArrow.canvas);
+
+    for (var i = 0; i < reaction.products.length; i++) {
+      if (i > 0) {
+        let text = new ReactionText("+", this.opts.plus);
+        canvases.push(text.canvas);
+      }
+
+      this.drawer.draw(reaction.products[i], null, themeName, infoOnly);
+      this.drawer.canvasWrapper.trim();
+      canvases.push(this.drawer.canvasWrapper.canvas);
+    }
+
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+    let drawingData = [];
+
+    for (var i = 0; i < canvases.length; i++) {
+      let cv = canvases[i];
+
+      if (canvasHeight < cv.height) {
+        canvasHeight = cv.height;
+      }
+
+      if (i > 0) {
+        canvasWidth += this.opts.spacing;
+      }
+
+      drawingData.push([cv, canvasWidth]);
+      canvasWidth += cv.width;
+    }
+
+    console.log(canvases);
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    drawingData.forEach(d => {
+      ctx.drawImage(d[0], d[1], canvasHeight / 2.0 - d[0].height / 2.0, d[0].width, d[0].height);
+    });
+  }
+
+  drawArrow(from, to) {
+    var startRadians = Math.atan((this.y2 - this.y1) / (this.x2 - this.x1));
+    startRadians += (this.x2 >= this.x1 ? -90 : 90) * Math.PI / 180;
+    var endRadians = Math.atan((this.y2 - this.y1) / (this.x2 - this.x1));
+    endRadians += (this.x2 >= this.x1 ? 90 : -90) * Math.PI / 180;
+  }
 
 }
 
 module.exports = ReactionDrawer;
 
-},{}],13:[function(require,module,exports){
+},{"./Drawer":5,"./Options":10,"./ReactionArrow":13,"./ReactionText":16,"./Vector2":24}],15:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8460,7 +8771,55 @@ class ReactionParser {
 
 module.exports = ReactionParser;
 
-},{"./Reaction":11}],14:[function(require,module,exports){
+},{"./Reaction":12}],16:[function(require,module,exports){
+"use strict";
+
+//@ts-check
+const Vector2 = require('./Vector2');
+
+const Options = require('./Options');
+
+const CanvasWrapper = require('./CanvasWrapper');
+
+class ReactionText {
+  /**
+   * 
+   * @param {string} text The text to be drawn.
+   * @param {Object} options The options for this text.
+   */
+  constructor(text, options) {
+    this.text = text;
+    this.defaultOptions = {
+      color: 'black',
+      textAlign: 'left',
+      font: {
+        fontStyle: 'normal',
+        fontVariant: 'normal',
+        fontWeight: 'normal',
+        fontSize: '16px',
+        fontFamily: 'Arial'
+      }
+    };
+    this.opts = Options.extend(true, this.defaultOptions, options);
+    this.canvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.drawText(text);
+    CanvasWrapper.trimCanvas(this.canvas);
+  }
+
+  drawText(text) {
+    let o = this.opts.font;
+    this.ctx.font = `${o.fontStyle} ${o.fontVariant} ${o.fontWeight} ${o.fontSize} ${o.fontFamily}`;
+    this.ctx.fillStyle = this.opts.color;
+    this.ctx.textAlign = this.opts.textAlign;
+    this.ctx.fillText(text, 20, 20);
+  }
+
+}
+
+module.exports = ReactionText;
+
+},{"./CanvasWrapper":4,"./Options":10,"./Vector2":24}],17:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8682,7 +9041,7 @@ class Ring {
 
 module.exports = Ring;
 
-},{"./ArrayHelper":2,"./RingConnection":15,"./Vector2":21,"./Vertex":22}],15:[function(require,module,exports){
+},{"./ArrayHelper":2,"./RingConnection":18,"./Vector2":24,"./Vertex":25}],18:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8856,7 +9215,7 @@ class RingConnection {
 
 module.exports = RingConnection;
 
-},{"./Ring":14,"./Vertex":22}],16:[function(require,module,exports){
+},{"./Ring":17,"./Vertex":25}],19:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -9467,7 +9826,7 @@ class SSSR {
 
 module.exports = SSSR;
 
-},{"./Graph":7}],17:[function(require,module,exports){
+},{"./Graph":7}],20:[function(require,module,exports){
 "use strict";
 
 // we use the drawer to do all the preprocessing. then we take over the drawing
@@ -9799,7 +10158,7 @@ class SvgDrawer {
 
 module.exports = SvgDrawer;
 
-},{"./ArrayHelper":2,"./Atom":3,"./Drawer":5,"./Graph":7,"./Line":8,"./SvgWrapper":18,"./ThemeManager":19,"./Vector2":21}],18:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./Drawer":5,"./Graph":7,"./Line":8,"./SvgWrapper":21,"./ThemeManager":22,"./Vector2":24}],21:[function(require,module,exports){
 "use strict";
 
 const {
@@ -10370,7 +10729,7 @@ class SvgWrapper {
 
 module.exports = SvgWrapper;
 
-},{"./Line":8,"./UtilityFunctions":20,"./Vector2":21}],19:[function(require,module,exports){
+},{"./Line":8,"./UtilityFunctions":23,"./Vector2":24}],22:[function(require,module,exports){
 "use strict";
 
 class ThemeManager {
@@ -10418,7 +10777,7 @@ class ThemeManager {
 
 module.exports = ThemeManager;
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 /**
@@ -10446,7 +10805,7 @@ module.exports = {
   getChargeText
 };
 
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -11073,7 +11432,7 @@ class Vector2 {
 
 module.exports = Vector2;
 
-},{}],22:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -11436,5 +11795,5 @@ class Vertex {
 
 module.exports = Vertex;
 
-},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":9,"./Vector2":21}]},{},[1])
+},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":9,"./Vector2":24}]},{},[1])
 
