@@ -1176,8 +1176,18 @@ class CanvasWrapper {
     this.ctx.font = this.fontLarge;
     this.hydrogenWidth = this.ctx.measureText('H').width;
     this.halfHydrogenWidth = this.hydrogenWidth / 2.0;
-    this.halfBondThickness = this.opts.bondThickness / 2.0; // TODO: Find out why clear was here.
+    this.halfBondThickness = this.opts.bondThickness / 2.0; // this.elementMap = { 'H': '😎', 'N': '🥶', 'O': '😡', 'Cl': '👽' };
+
+    this.elementMap = {}; // TODO: Find out why clear was here.
     // this.clear();
+  }
+
+  getElement(element) {
+    if (element in this.elementMap) {
+      return this.elementMap[element];
+    }
+
+    return element;
   }
   /**
    * Update the width and height of the canvas
@@ -1188,20 +1198,7 @@ class CanvasWrapper {
 
 
   updateSize(width, height) {
-    this.devicePixelRatio = window.devicePixelRatio || 1;
-    this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio || this.ctx.mozBackingStorePixelRatio || this.ctx.msBackingStorePixelRatio || this.ctx.oBackingStorePixelRatio || this.ctx.backingStorePixelRatio || 1;
-    this.ratio = this.devicePixelRatio / this.backingStoreRatio;
-
-    if (this.ratio !== 1) {
-      this.canvas.width = width * this.ratio;
-      this.canvas.height = height * this.ratio;
-      this.canvas.style.width = width + 'px';
-      this.canvas.style.height = height + 'px';
-      this.ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
-    } else {
-      this.canvas.width = width * this.ratio;
-      this.canvas.height = height * this.ratio;
-    }
+    CanvasWrapper.dpiAdjust(this.canvas, width, height);
   }
   /**
    * Sets a provided theme.
@@ -1721,7 +1718,7 @@ class CanvasWrapper {
     let cursorPos = -dim.width / 2.0;
     let cursorPosLeft = -dim.width / 2.0;
     ctx.fillStyle = this.themeManager.getColor(elementName);
-    ctx.fillText(elementName, x + offsetX + cursorPos, y + this.opts.halfFontSizeLarge + offsetY);
+    ctx.fillText(this.getElement(elementName), x + offsetX + cursorPos, y + this.opts.halfFontSizeLarge + offsetY);
     cursorPos += dim.width;
 
     if (charge) {
@@ -1762,7 +1759,7 @@ class CanvasWrapper {
         hx -= this.halfHydrogenWidth;
       }
 
-      ctx.fillText('H', hx, hy);
+      ctx.fillText(this.getElement('H'), hx, hy);
       cursorPos += hydrogenWidth;
     } else if (hydrogens > 1) {
       let hx = x + offsetX;
@@ -1789,7 +1786,7 @@ class CanvasWrapper {
       }
 
       ctx.font = this.fontLarge;
-      ctx.fillText('H', hx, hy);
+      ctx.fillText(this.getElement('H'), hx, hy);
       ctx.font = this.fontSmall;
       ctx.fillText(hydrogens, hx + this.halfHydrogenWidth + hydrogenCountWidth, hy + this.opts.fifthFontSizeSmall);
       cursorPos += hydrogenWidth + this.halfHydrogenWidth + hydrogenCountWidth;
@@ -1866,23 +1863,23 @@ class CanvasWrapper {
 
       if (direction === 'left') {
         cursorPosLeft -= elementWidth;
-        ctx.fillText(element, hx + cursorPosLeft, hy);
+        ctx.fillText(this.getElement(element), hx + cursorPosLeft, hy);
       } else {
-        ctx.fillText(element, hx + cursorPos, hy);
+        ctx.fillText(this.getElement(element), hx + cursorPos, hy);
         cursorPos += elementWidth;
       }
 
       if (hydrogenCount > 0) {
         if (direction === 'left') {
           cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
-          ctx.fillText('H', hx + cursorPosLeft, hy);
+          ctx.fillText(this.getElement('H'), hx + cursorPosLeft, hy);
 
           if (hydrogenCount > 1) {
             ctx.font = this.fontSmall;
             ctx.fillText(hydrogenCount, hx + cursorPosLeft + hydrogenWidth, hy + this.opts.fifthFontSizeSmall);
           }
         } else {
-          ctx.fillText('H', hx + cursorPos, hy);
+          ctx.fillText(this.getElement('H'), hx + cursorPos, hy);
           cursorPos += hydrogenWidth;
 
           if (hydrogenCount > 1) {
@@ -2084,6 +2081,75 @@ class CanvasWrapper {
     ctx.putImageData(imgData, -left, -top);
   }
 
+  static dpiAdjust(canvas, width, height) {
+    let ratio = window.devicePixelRatio || 1;
+    let ctx = canvas.getContext('2d');
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.scale(ratio, ratio);
+  }
+
+  static combine(target, canvases, spacing = 0.0, direction = 'horizontal') {
+    let canvas = null;
+
+    if (typeof target === 'string' || target instanceof String) {
+      canvas = document.getElementById(target);
+    } else {
+      canvas = target;
+    }
+
+    let ctx = canvas.getContext('2d');
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+    let drawingData = [];
+
+    if (direction === 'horizontal') {
+      for (var i = 0; i < canvases.length; i++) {
+        let cv = canvases[i];
+
+        if (canvasHeight < cv.height) {
+          canvasHeight = cv.height;
+        }
+
+        if (i > 0) {
+          canvasWidth += spacing;
+        }
+
+        drawingData.push([cv, canvasWidth]);
+        canvasWidth += cv.width;
+      }
+
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      drawingData.forEach(d => {
+        ctx.drawImage(d[0], d[1], canvasHeight / 2.0 - d[0].height / 2.0, d[0].width, d[0].height);
+      });
+    } else {
+      for (var i = 0; i < canvases.length; i++) {
+        let cv = canvases[i];
+
+        if (canvasWidth < cv.width) {
+          canvasWidth = cv.width;
+        }
+
+        if (i > 0) {
+          canvasHeight += spacing;
+        }
+
+        drawingData.push([cv, canvasHeight]);
+        canvasHeight += cv.height;
+      }
+
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      drawingData.forEach(d => {
+        ctx.drawImage(d[0], canvasWidth / 2.0 - d[0].width / 2.0, d[1], d[0].width, d[0].height);
+      });
+    }
+  }
+
 }
 
 module.exports = CanvasWrapper;
@@ -2212,7 +2278,7 @@ class Drawer {
       this.opts.fontSizeLarge *= this.opts.absoluteScale;
       this.opts.fontSizeSmall *= this.opts.absoluteScale;
       this.opts.bondThickness *= this.opts.absoluteScale;
-      this.opts.bondLength *= this.opts.absoluteScale; // this.opts.shortBondLength *= this.opts.absoluteScale;
+      this.opts.bondLength *= this.opts.absoluteScale;
     }
 
     this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;
@@ -8544,20 +8610,23 @@ const Options = require('./Options');
 
 const CanvasWrapper = require('./CanvasWrapper');
 
+const ReactionText = require('./ReactionText');
+
 class ReactionArrow {
   /**
    * 
    * @param {Vector2} from The starting point of the line.
    * @param {Vector2} to The end point of the line.
    */
-  constructor(from, to, textAbove, textBelow, options) {
+  constructor(from, to, options, textAbove, textBelow) {
     this.from = from;
     this.to = to;
-    this.textAbove = textAbove;
-    this.textBelow = textBelow;
     this.defaultOptions = {
       color: 'black',
       lineWidth: 2.0,
+      spacing: 5.0,
+      textAbove: {},
+      textBelow: {},
       fromArrowhead: {
         show: false,
         color: 'black',
@@ -8572,14 +8641,17 @@ class ReactionArrow {
       }
     };
     this.opts = Options.extend(true, this.defaultOptions, options);
-    this.canvas = document.createElement("canvas");
+    this.textAbove = textAbove ? new ReactionText(textAbove, this.opts.textAbove) : null;
+    this.textBelow = textBelow ? new ReactionText(textBelow, this.opts.textBelow) : null;
+    this.canvas = document.createElement('canvas');
+    this.arrowCanvas = document.createElement('canvas');
     let arrowheadSize = Math.max(this.opts.fromArrowhead.width, this.opts.fromArrowhead.length, this.opts.toArrowhead.width, this.opts.toArrowhead.length);
     let padding = new Vector2(arrowheadSize, arrowheadSize).multiplyScalar(2);
     this.from.add(padding);
     this.to.add(padding);
-    this.canvas.width = Math.max(this.from.x, this.to.x) + arrowheadSize;
-    this.canvas.height = Math.max(this.from.y, this.to.y) + arrowheadSize;
-    this.ctx = this.canvas.getContext('2d');
+    this.arrowCanvas.width = Math.max(this.from.x, this.to.x) + arrowheadSize;
+    this.arrowCanvas.height = Math.max(this.from.y, this.to.y) + arrowheadSize;
+    this.arrowCtx = this.arrowCanvas.getContext('2d');
     this.angle = Math.atan((this.to.y - this.from.y) / (this.to.x - this.from.x));
     this.drawLine(this.opts.color, this.opts.lineWidth);
 
@@ -8591,17 +8663,30 @@ class ReactionArrow {
       this.drawToArrowhead(this.opts.toArrowhead.color, this.opts.toArrowhead.width, this.opts.toArrowhead.length);
     }
 
-    CanvasWrapper.trimCanvas(this.canvas);
+    CanvasWrapper.trimCanvas(this.arrowCanvas);
+    let canvases = [];
+
+    if (this.textAbove) {
+      canvases.push(this.textAbove.canvas);
+    }
+
+    canvases.push(this.arrowCanvas);
+
+    if (this.textBelow) {
+      canvases.push(this.textBelow.canvas);
+    }
+
+    CanvasWrapper.combine(this.canvas, canvases, this.opts.spacing, 'vertical');
   }
 
   drawLine(color = "black", lineWidth = 1.0) {
-    this.ctx.strokeStyle = color;
-    this.ctx.fillStyle = color;
-    this.ctx.lineWidth = lineWidth;
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.from.x, this.from.y);
-    this.ctx.lineTo(this.to.x, this.to.y);
-    this.ctx.stroke();
+    this.arrowCtx.strokeStyle = color;
+    this.arrowCtx.fillStyle = color;
+    this.arrowCtx.lineWidth = lineWidth;
+    this.arrowCtx.beginPath();
+    this.arrowCtx.moveTo(this.from.x, this.from.y);
+    this.arrowCtx.lineTo(this.to.x, this.to.y);
+    this.arrowCtx.stroke();
   }
 
   drawFromArrowhead(color = "black", width = 5.0, length = 5.0) {
@@ -8616,25 +8701,25 @@ class ReactionArrow {
 
   drawArrowhead(x, y, rad, color = "black", width = 5.0, length = 5.0) {
     width = width / 2.0;
-    this.ctx.strokeStyle = color;
-    this.ctx.fillStyle = color;
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.translate(x, y);
-    this.ctx.rotate(rad);
-    this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(width, length);
-    this.ctx.lineTo(-width, length);
-    this.ctx.closePath();
-    this.ctx.fill();
-    this.ctx.restore();
+    this.arrowCtx.strokeStyle = color;
+    this.arrowCtx.fillStyle = color;
+    this.arrowCtx.save();
+    this.arrowCtx.beginPath();
+    this.arrowCtx.translate(x, y);
+    this.arrowCtx.rotate(rad);
+    this.arrowCtx.moveTo(0, 0);
+    this.arrowCtx.lineTo(width, length);
+    this.arrowCtx.lineTo(-width, length);
+    this.arrowCtx.closePath();
+    this.arrowCtx.fill();
+    this.arrowCtx.restore();
   }
 
 }
 
 module.exports = ReactionArrow;
 
-},{"./CanvasWrapper":4,"./Options":10,"./Vector2":24}],14:[function(require,module,exports){
+},{"./CanvasWrapper":4,"./Options":10,"./ReactionText":16,"./Vector2":24}],14:[function(require,module,exports){
 "use strict";
 
 const Drawer = require('./Drawer');
@@ -8647,6 +8732,8 @@ const Vector2 = require('./Vector2');
 
 const Options = require('./Options');
 
+const CanvasWrapper = require('./CanvasWrapper');
+
 class ReactionDrawer {
   /**
    * The constructor for the class ReactionDrawer.
@@ -8657,7 +8744,7 @@ class ReactionDrawer {
   constructor(options, moleculeOptions) {
     this.drawer = new Drawer(moleculeOptions);
     this.defaultOptions = {
-      spacing: 10,
+      spacing: 15,
       plus: {},
       arrow: {}
     };
@@ -8673,7 +8760,7 @@ class ReactionDrawer {
   */
 
 
-  draw(reaction, target, themeName = 'light', infoOnly = false) {
+  draw(reaction, target, textAbove = '{reagents}', textBelow = '', themeName = 'light', infoOnly = false) {
     let canvas = null;
 
     if (typeof target === 'string' || target instanceof String) {
@@ -8696,7 +8783,13 @@ class ReactionDrawer {
       canvases.push(this.drawer.canvasWrapper.canvas);
     }
 
-    let rxnArrow = new ReactionArrow(new Vector2(0, 0), new Vector2(100, 0), "Some bla bla 😍\n", "100%", this.opts.arrow);
+    let reagents = [];
+
+    for (var i = 0; i < reaction.reagents.length; i++) {
+      reagents.push();
+    }
+
+    let rxnArrow = new ReactionArrow(new Vector2(0, 0), new Vector2(100, 0), this.opts.arrow, textAbove, textBelow);
     canvases.push(rxnArrow.canvas);
 
     for (var i = 0; i < reaction.products.length; i++) {
@@ -8710,37 +8803,14 @@ class ReactionDrawer {
       canvases.push(this.drawer.canvasWrapper.canvas);
     }
 
-    let canvasWidth = 0;
-    let canvasHeight = 0;
-    let drawingData = [];
-
-    for (var i = 0; i < canvases.length; i++) {
-      let cv = canvases[i];
-
-      if (canvasHeight < cv.height) {
-        canvasHeight = cv.height;
-      }
-
-      if (i > 0) {
-        canvasWidth += this.opts.spacing;
-      }
-
-      drawingData.push([cv, canvasWidth]);
-      canvasWidth += cv.width;
-    }
-
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    drawingData.forEach(d => {
-      ctx.drawImage(d[0], d[1], canvasHeight / 2.0 - d[0].height / 2.0, d[0].width, d[0].height);
-    });
+    CanvasWrapper.combine(canvas, canvases, this.opts.spacing);
   }
 
 }
 
 module.exports = ReactionDrawer;
 
-},{"./Drawer":5,"./Options":10,"./ReactionArrow":13,"./ReactionText":16,"./Vector2":24}],15:[function(require,module,exports){
+},{"./CanvasWrapper":4,"./Drawer":5,"./Options":10,"./ReactionArrow":13,"./ReactionText":16,"./Vector2":24}],15:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8779,7 +8849,12 @@ class ReactionText {
    * @param {Object} options The options for this text.
    */
   constructor(text, options) {
-    this.text = text;
+    this.text = text.split('\n');
+
+    for (var i = 0; i < this.text.length; i++) {
+      this.text[i] = this.text[i].trim();
+    }
+
     this.defaultOptions = {
       color: 'black',
       textAlign: 'left',
@@ -8787,23 +8862,51 @@ class ReactionText {
         fontStyle: 'normal',
         fontVariant: 'normal',
         fontWeight: 'normal',
-        fontSize: '16px',
-        fontFamily: 'Arial'
+        fontSize: 14,
+        fontFamily: 'Arial',
+        lineHeight: 1.2
       }
     };
     this.opts = Options.extend(true, this.defaultOptions, options);
     this.canvas = document.createElement('canvas');
     this.ctx = this.canvas.getContext('2d');
-    this.drawText(text);
-    CanvasWrapper.trimCanvas(this.canvas);
+    this.textDims = this.getTextDimensions(this.text);
+    this.canvas.width = this.textDims.x;
+    this.canvas.height = this.textDims.y; // CanvasWrapper.dpiAdjust(this.canvas, this.textDims.x, this.textDims.y);
+
+    this.drawText(this.text); // CanvasWrapper.trimCanvas(this.canvas);
   }
 
   drawText(text) {
-    let o = this.opts.font;
-    this.ctx.font = `${o.fontStyle} ${o.fontVariant} ${o.fontWeight} ${o.fontSize} ${o.fontFamily}`;
-    this.ctx.fillStyle = this.opts.color;
-    this.ctx.textAlign = this.opts.textAlign;
-    this.ctx.fillText(text, 20, 20);
+    this.ctx.moveTo(0.0, 0.0);
+
+    for (var i = 0; i < text.length; i++) {
+      let o = this.opts.font;
+      this.ctx.font = `${o.fontStyle} ${o.fontVariant} ${o.fontWeight} ${o.fontSize}px ${o.fontFamily}`;
+      this.ctx.fillStyle = this.opts.color;
+      this.ctx.textAlign = this.opts.textAlign;
+      this.ctx.textBaseline = 'top';
+      this.ctx.fillText(text[i], 0, this.opts.font.lineHeight * this.opts.font.fontSize * i);
+    }
+  }
+
+  getTextDimensions(text) {
+    let dims = new Vector2(0.0, 0.0);
+    let maxWidth = 0.0;
+    let totalHeight = 0.0;
+    text.forEach(t => {
+      let o = this.opts.font;
+      this.ctx.font = `${o.fontStyle} ${o.fontVariant} ${o.fontWeight} ${o.fontSize}px ${o.fontFamily}`;
+      const metrics = this.ctx.measureText(t);
+      let width = Math.abs(metrics.actualBoundingBoxLeft) + Math.abs(metrics.actualBoundingBoxRight);
+
+      if (width > maxWidth) {
+        maxWidth = width;
+      }
+
+      totalHeight += this.opts.font.lineHeight * this.opts.font.fontSize;
+    });
+    return new Vector2(maxWidth, totalHeight);
   }
 
 }
@@ -10777,8 +10880,6 @@ module.exports = ThemeManager;
  * @returns {String} A string representing a charge.
  */
 function getChargeText(charge) {
-  console.log('in the utility version of getChargeText');
-
   if (charge === 1) {
     return '+';
   } else if (charge === 2) {

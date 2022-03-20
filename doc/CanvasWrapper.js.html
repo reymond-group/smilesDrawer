@@ -99,8 +99,19 @@ class CanvasWrapper {
         this.halfHydrogenWidth = this.hydrogenWidth / 2.0;
         this.halfBondThickness = this.opts.bondThickness / 2.0;
 
+        // this.elementMap = { 'H': '😎', 'N': '🥶', 'O': '😡', 'Cl': '👽' };
+        this.elementMap = {};
+
         // TODO: Find out why clear was here.
         // this.clear();
+    }
+
+    getElement(element) {
+        if (element in this.elementMap) {
+            return this.elementMap[element];
+        }
+
+        return element;
     }
 
     /**
@@ -110,22 +121,7 @@ class CanvasWrapper {
      * @param {Number} height 
      */
     updateSize(width, height) {
-        this.devicePixelRatio = window.devicePixelRatio || 1;
-        this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio || this.ctx.mozBackingStorePixelRatio ||
-            this.ctx.msBackingStorePixelRatio || this.ctx.oBackingStorePixelRatio ||
-            this.ctx.backingStorePixelRatio || 1;
-        this.ratio = this.devicePixelRatio / this.backingStoreRatio;
-
-        if (this.ratio !== 1) {
-            this.canvas.width = width * this.ratio;
-            this.canvas.height = height * this.ratio;
-            this.canvas.style.width = width + 'px';
-            this.canvas.style.height = height + 'px';
-            this.ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
-        } else {
-            this.canvas.width = width * this.ratio;
-            this.canvas.height = height * this.ratio;
-        }
+        CanvasWrapper.dpiAdjust(this.canvas, width, height);
     }
 
     /**
@@ -700,7 +696,7 @@ class CanvasWrapper {
         let cursorPosLeft = -dim.width / 2.0;
 
         ctx.fillStyle = this.themeManager.getColor(elementName);
-        ctx.fillText(elementName, x + offsetX + cursorPos, y + this.opts.halfFontSizeLarge + offsetY);
+        ctx.fillText(this.getElement(elementName), x + offsetX + cursorPos, y + this.opts.halfFontSizeLarge + offsetY);
         cursorPos += dim.width;
 
         if (charge) {
@@ -743,7 +739,7 @@ class CanvasWrapper {
                 hx -= this.halfHydrogenWidth;
             }
 
-            ctx.fillText('H', hx, hy);
+            ctx.fillText(this.getElement('H'), hx, hy);
 
             cursorPos += hydrogenWidth;
         } else if (hydrogens > 1) {
@@ -772,7 +768,7 @@ class CanvasWrapper {
             }
 
             ctx.font = this.fontLarge;
-            ctx.fillText('H', hx, hy)
+            ctx.fillText(this.getElement('H'), hx, hy)
 
             ctx.font = this.fontSmall;
             ctx.fillText(hydrogens, hx + this.halfHydrogenWidth + hydrogenCountWidth, hy + this.opts.fifthFontSizeSmall);
@@ -857,23 +853,23 @@ class CanvasWrapper {
 
             if (direction === 'left') {
                 cursorPosLeft -= elementWidth;
-                ctx.fillText(element, hx + cursorPosLeft, hy)
+                ctx.fillText(this.getElement(element), hx + cursorPosLeft, hy)
             } else {
-                ctx.fillText(element, hx + cursorPos, hy)
+                ctx.fillText(this.getElement(element), hx + cursorPos, hy)
                 cursorPos += elementWidth;
             }
 
             if (hydrogenCount > 0) {
                 if (direction === 'left') {
                     cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
-                    ctx.fillText('H', hx + cursorPosLeft, hy)
+                    ctx.fillText(this.getElement('H'), hx + cursorPosLeft, hy)
 
                     if (hydrogenCount > 1) {
                         ctx.font = this.fontSmall;
                         ctx.fillText(hydrogenCount, hx + cursorPosLeft + hydrogenWidth, hy + this.opts.fifthFontSizeSmall);
                     }
                 } else {
-                    ctx.fillText('H', hx + cursorPos, hy)
+                    ctx.fillText(this.getElement('H'), hx + cursorPos, hy)
                     cursorPos += hydrogenWidth;
 
                     if (hydrogenCount > 1) {
@@ -1054,6 +1050,79 @@ class CanvasWrapper {
         ctx.putImageData(imgData, -left, -top);
     }
 
+    static dpiAdjust(canvas, width, height) {
+        let ratio = window.devicePixelRatio || 1;
+        let ctx = canvas.getContext('2d');
+
+        canvas.width = width * ratio;
+        canvas.height = height * ratio;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        ctx.scale(ratio, ratio);
+    }
+
+    static combine(target, canvases, spacing = 0.0, direction = 'horizontal') {
+        let canvas = null;
+
+        if (typeof target === 'string' || target instanceof String) {
+            canvas = document.getElementById(target);
+        } else {
+            canvas = target;
+        }
+
+        let ctx = canvas.getContext('2d');
+
+        let canvasWidth = 0;
+        let canvasHeight = 0;
+        let drawingData = []
+
+        if (direction === 'horizontal') {
+            for (var i = 0; i &lt; canvases.length; i++) {
+                let cv = canvases[i];
+
+                if (canvasHeight &lt; cv.height) {
+                    canvasHeight = cv.height;
+                }
+
+                if (i > 0) {
+                    canvasWidth += spacing;
+                }
+
+                drawingData.push([cv, canvasWidth])
+                canvasWidth += cv.width;
+            }
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            drawingData.forEach(d => {
+                ctx.drawImage(d[0], d[1], (canvasHeight / 2.0) - (d[0].height / 2.0), d[0].width, d[0].height);
+            });
+        } else {
+            for (var i = 0; i &lt; canvases.length; i++) {
+                let cv = canvases[i];
+
+                if (canvasWidth &lt; cv.width) {
+                    canvasWidth = cv.width;
+                }
+
+                if (i > 0) {
+                    canvasHeight += spacing;
+                }
+
+                drawingData.push([cv, canvasHeight])
+                canvasHeight += cv.height;
+            }
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            drawingData.forEach(d => {
+                ctx.drawImage(d[0], (canvasWidth / 2.0) - (d[0].width / 2.0), d[1], d[0].width, d[0].height);
+            });
+        }
+    }
 }
 
 module.exports = CanvasWrapper;</code></pre>
@@ -1070,7 +1139,7 @@ module.exports = CanvasWrapper;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Fri Mar 18 2022 21:45:08 GMT+0100 (Central European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Sun Mar 20 2022 22:39:15 GMT+0100 (Central European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

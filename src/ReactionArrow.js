@@ -2,6 +2,7 @@
 const Vector2 = require('./Vector2')
 const Options = require('./Options')
 const CanvasWrapper = require('./CanvasWrapper')
+const ReactionText = require('./ReactionText')
 
 class ReactionArrow {
     /**
@@ -9,15 +10,16 @@ class ReactionArrow {
      * @param {Vector2} from The starting point of the line.
      * @param {Vector2} to The end point of the line.
      */
-    constructor(from, to, textAbove, textBelow, options) {
+    constructor(from, to, options, textAbove, textBelow) {
         this.from = from;
         this.to = to;
-        this.textAbove = textAbove;
-        this.textBelow = textBelow;
 
         this.defaultOptions = {
             color: 'black',
             lineWidth: 2.0,
+            spacing: 5.0,
+            textAbove: {},
+            textBelow: {},
             fromArrowhead: {
                 show: false,
                 color: 'black',
@@ -34,7 +36,12 @@ class ReactionArrow {
 
         this.opts = Options.extend(true, this.defaultOptions, options);
 
-        this.canvas = document.createElement("canvas");
+        this.textAbove = textAbove ? new ReactionText(textAbove, this.opts.textAbove) : null;
+        this.textBelow = textBelow ? new ReactionText(textBelow, this.opts.textBelow) : null;
+
+        this.canvas = document.createElement('canvas');
+        this.arrowCanvas = document.createElement('canvas');
+
         let arrowheadSize = Math.max(
             this.opts.fromArrowhead.width,
             this.opts.fromArrowhead.length,
@@ -42,12 +49,14 @@ class ReactionArrow {
             this.opts.toArrowhead.length
         );
         let padding = new Vector2(arrowheadSize, arrowheadSize).multiplyScalar(2);
+
         this.from.add(padding);
         this.to.add(padding);
 
-        this.canvas.width = Math.max(this.from.x, this.to.x) + arrowheadSize;
-        this.canvas.height = Math.max(this.from.y, this.to.y) + arrowheadSize;
-        this.ctx = this.canvas.getContext('2d');
+        this.arrowCanvas.width = Math.max(this.from.x, this.to.x) + arrowheadSize
+        this.arrowCanvas.height = Math.max(this.from.y, this.to.y) + arrowheadSize
+
+        this.arrowCtx = this.arrowCanvas.getContext('2d');
         this.angle = Math.atan((this.to.y - this.from.y) / (this.to.x - this.from.x));
 
         this.drawLine(this.opts.color, this.opts.lineWidth)
@@ -67,18 +76,32 @@ class ReactionArrow {
             );
         }
 
-        CanvasWrapper.trimCanvas(this.canvas);
+        CanvasWrapper.trimCanvas(this.arrowCanvas);
+
+        let canvases = [];
+
+        if (this.textAbove) {
+            canvases.push(this.textAbove.canvas);
+        }
+
+        canvases.push(this.arrowCanvas);
+
+        if (this.textBelow) {
+            canvases.push(this.textBelow.canvas);
+        }
+
+        CanvasWrapper.combine(this.canvas, canvases, this.opts.spacing, 'vertical');
     }
 
     drawLine(color = "black", lineWidth = 1.0) {
-        this.ctx.strokeStyle = color;
-        this.ctx.fillStyle = color;
-        this.ctx.lineWidth = lineWidth;
+        this.arrowCtx.strokeStyle = color;
+        this.arrowCtx.fillStyle = color;
+        this.arrowCtx.lineWidth = lineWidth;
 
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.from.x, this.from.y);
-        this.ctx.lineTo(this.to.x, this.to.y);
-        this.ctx.stroke();
+        this.arrowCtx.beginPath();
+        this.arrowCtx.moveTo(this.from.x, this.from.y);
+        this.arrowCtx.lineTo(this.to.x, this.to.y);
+        this.arrowCtx.stroke();
     }
 
     drawFromArrowhead(color = "black", width = 5.0, length = 5.0) {
@@ -93,18 +116,18 @@ class ReactionArrow {
 
     drawArrowhead(x, y, rad, color = "black", width = 5.0, length = 5.0) {
         width = width / 2.0
-        this.ctx.strokeStyle = color;
-        this.ctx.fillStyle = color;
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.translate(x, y);
-        this.ctx.rotate(rad);
-        this.ctx.moveTo(0, 0);
-        this.ctx.lineTo(width, length);
-        this.ctx.lineTo(-width, length);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.restore();
+        this.arrowCtx.strokeStyle = color;
+        this.arrowCtx.fillStyle = color;
+        this.arrowCtx.save();
+        this.arrowCtx.beginPath();
+        this.arrowCtx.translate(x, y);
+        this.arrowCtx.rotate(rad);
+        this.arrowCtx.moveTo(0, 0);
+        this.arrowCtx.lineTo(width, length);
+        this.arrowCtx.lineTo(-width, length);
+        this.arrowCtx.closePath();
+        this.arrowCtx.fill();
+        this.arrowCtx.restore();
     }
 }
 

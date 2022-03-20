@@ -20,6 +20,7 @@
     }
 
     body {
+      background: linear-gradient(330deg, #ccc, #fff);
       overflow-y: auto;
     }
 
@@ -28,8 +29,8 @@
       font-family: 'Megrim';
       font-weight: 400;
       font-size: 2.0em;
-      color: #000000;
-      text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.25);
+      color: #50C5A9;
+      text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
 
       margin: 0;
       padding: 0;
@@ -56,7 +57,7 @@
       left: 5%;
       right: 5%;
       padding: 5px;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(255, 255, 255, 0.8);
     }
 
     .canvas-container {
@@ -85,13 +86,13 @@
     }
 
     input[type=text]::placeholder {
-      color: rgba(255, 255, 255, 0.25);
+      color: rgba(0, 0, 0, 0.25);
     }
 
     label {
       font-family: Lato;
       font-size: 0.75em;
-      color: #fff;
+      color: #000;
       display: block;
     }
 
@@ -110,7 +111,7 @@
       width: 100%;
       height: 2px;
       border-radius: 5px;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(0, 0, 0, 0.75);
       outline: none;
       -webkit-transition: .2s;
       transition: opacity .2s;
@@ -122,16 +123,16 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: #fff;
+      background: #000;
       cursor: pointer;
-      border: 4px solid #000;
+      border: 4px solid #fff;
     }
 
     .slider::-moz-range-thumb {
       width: 25px;
       height: 25px;
       border-radius: 50%;
-      background: #fff;
+      background: #000;
       cursor: pointer;
     }
   </style>
@@ -206,31 +207,32 @@
 
     var options = {
       debug: false,
-      absoluteScale: 2,
       atomVisualization: 'default',
-      padding: 100
+      absoluteScale: 2.0
     }
 
-    var reactionOptions = {
-      plus: {
-      },
-      arrow: {
-      }
-    }
-
-    var reactionDrawer = new SmilesDrawer.ReactionDrawer(reactionOptions, options);
+    var smilesDrawer = new SmilesDrawer.Drawer(options);
     var input = document.getElementById('input');
     var log = document.getElementById('log');
 
     function draw() {
       let t = performance.now();
 
-      SmilesDrawer.parseReaction(input.value, function (reaction) {
-        reactionDrawer.draw(reaction, 'output-canvas', 'hello world\nhow are you?', 'this is a test', 'light');
-
+      SmilesDrawer.parse(input.value, function (tree) {
+        smilesDrawer.draw(tree, 'output-canvas', 'light', false);
+        let td = performance.now() - t;
         log.innerHTML = '&nbsp;';
         log.style.visibility = 'hidden';
 
+        new Noty({
+          text: 'Drawing took ' + td.toFixed(3) + 'ms with a total overlap score of ' + smilesDrawer.getTotalOverlapScore().toFixed(3) + '.',
+          killer: true,
+          timeout: 2000,
+          animation: {
+            open: null,
+            close: null
+          }
+        }).show();
       }, function (err) {
         log.innerHTML = err;
         log.style.visibility = 'visible';
@@ -239,7 +241,7 @@
     }
 
     function updateOptions() {
-      reactionDrawer = new SmilesDrawer.ReactionDrawer({}, options);
+      smilesDrawer = new SmilesDrawer.Drawer(options);
       draw();
     }
 

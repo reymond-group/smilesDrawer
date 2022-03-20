@@ -2,7 +2,8 @@ const Drawer = require('./Drawer')
 const ReactionArrow = require('./ReactionArrow');
 const ReactionText = require('./ReactionText');
 const Vector2 = require('./Vector2');
-const Options = require('./Options')
+const Options = require('./Options');
+const CanvasWrapper = require('./CanvasWrapper');
 
 class ReactionDrawer {
     /**
@@ -15,7 +16,7 @@ class ReactionDrawer {
         this.drawer = new Drawer(moleculeOptions);
 
         this.defaultOptions = {
-            spacing: 10,
+            spacing: 15,
             plus: {},
             arrow: {}
         }
@@ -31,7 +32,7 @@ class ReactionDrawer {
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
-    draw(reaction, target, themeName = 'light', infoOnly = false) {
+    draw(reaction, target, textAbove = '{reagents}', textBelow = '', themeName = 'light', infoOnly = false) {
         let canvas = null;
 
         if (typeof target === 'string' || target instanceof String) {
@@ -53,12 +54,18 @@ class ReactionDrawer {
             canvases.push(this.drawer.canvasWrapper.canvas);
         }
 
+        let reagents = [];
+
+        for (var i = 0; i < reaction.reagents.length; i++) {
+            reagents.push()
+        }
+
         let rxnArrow = new ReactionArrow(
             new Vector2(0, 0),
             new Vector2(100, 0),
-            "Some bla bla 😍\n",
-            "100%",
-            this.opts.arrow
+            this.opts.arrow,
+            textAbove,
+            textBelow
         );
         canvases.push(rxnArrow.canvas);
 
@@ -72,31 +79,7 @@ class ReactionDrawer {
             canvases.push(this.drawer.canvasWrapper.canvas);
         }
 
-        let canvasWidth = 0;
-        let canvasHeight = 0;
-        let drawingData = []
-
-        for (var i = 0; i < canvases.length; i++) {
-            let cv = canvases[i];
-
-            if (canvasHeight < cv.height) {
-                canvasHeight = cv.height;
-            }
-
-            if (i > 0) {
-                canvasWidth += this.opts.spacing;
-            }
-
-            drawingData.push([cv, canvasWidth])
-            canvasWidth += cv.width;
-        }
-
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-
-        drawingData.forEach(d => {
-            ctx.drawImage(d[0], d[1], (canvasHeight / 2.0) - (d[0].height / 2.0), d[0].width, d[0].height);
-        });
+        CanvasWrapper.combine(canvas, canvases, this.opts.spacing);
     }
 }
 
