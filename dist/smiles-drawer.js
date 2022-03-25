@@ -9633,7 +9633,6 @@ class SvgWrapper {
       this.svg = target;
     }
 
-    this.svg = document.getElementById(target);
     this.opts = options;
     this.uid = makeid(5);
     this.gradientId = 0; // maintain a list of line elements and their corresponding gradients
@@ -9711,7 +9710,6 @@ class SvgWrapper {
       this.svg.appendChild(style);
       this.svg.appendChild(paths);
       this.svg.appendChild(vertices);
-      return this.svg;
     } else {
       let container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       container.appendChild(defs);
@@ -9806,8 +9804,10 @@ class SvgWrapper {
     minY -= padding;
     this.drawingWidth = maxX - minX;
     this.drawingHeight = maxY - minY;
-    let scaleX = this.svg.clientWidth / this.drawingWidth;
-    let scaleY = this.svg.clientHeight / this.drawingHeight;
+    let w = this.svg.clientWidth > 0 ? this.svg.clientWidth : this.svg.viewBox.baseVal.width;
+    let h = this.svg.clientHeight > 0 ? this.svg.clientHeight : this.svg.viewBox.baseVal.height;
+    let scaleX = w / this.drawingWidth;
+    let scaleY = h / this.drawingHeight;
     let scale = scaleX < scaleY ? scaleX : scaleY;
     let viewBoxDim = Math.round(this.drawingWidth > this.drawingHeight ? this.drawingWidth : this.drawingHeight);
     this.svg.setAttributeNS(null, 'viewBox', `0 0 ${viewBoxDim} ${viewBoxDim}`);
@@ -9815,9 +9815,9 @@ class SvgWrapper {
     this.offsetY = -minY; // Center
 
     if (scaleX < scaleY) {
-      this.offsetY += this.svg.clientHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+      this.offsetY += h / (2.0 * scale) - this.drawingHeight / 2.0;
     } else {
-      this.offsetX += this.svg.clientWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+      this.offsetX += w / (2.0 * scale) - this.drawingWidth / 2.0;
     }
   }
   /**
@@ -10206,6 +10206,28 @@ class SvgWrapper {
     polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
     polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
     this.paths.push(polygon);
+  }
+  /**
+   * 
+   * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
+   */
+
+
+  toCanvas(canvas) {
+    if (typeof canvas === 'string' || canvas instanceof String) {
+      canvas = document.getElementById(canvas);
+    }
+
+    var ctx = canvas.getContext('2d');
+    var image = new Image();
+
+    image.onload = function load() {
+      canvas.height = image.height;
+      canvas.width = image.width;
+      ctx.drawImage(image, 0, 0);
+    };
+
+    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);
   }
 
 }

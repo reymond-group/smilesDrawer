@@ -6,20 +6,20 @@ const Line = require('./Line');
 const Vector2 = require('./Vector2');
 const MathHelper = require('./MathHelper');
 
-function makeid(length) { 
-   var result           = '';
-   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   var charactersLength = characters.length;
-   for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
+function makeid(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 class SvgWrapper {
   constructor(themeManager, target, options) {
     if (typeof target === 'string' || target instanceof String) {
-      this.svg = document.getElementById(svg);
+      this.svg = document.getElementById(target);
     } else {
       this.svg = target;
     }
@@ -73,7 +73,7 @@ class SvgWrapper {
       pathChildNodes = this.paths;
 
     // give the mask an id
-    masks.setAttributeNS(null, 'id', this.uid+'-text-mask');
+    masks.setAttributeNS(null, 'id', this.uid + '-text-mask');
 
     // create the css styles
     style.appendChild(document.createTextNode(`
@@ -99,7 +99,7 @@ class SvgWrapper {
       defs.appendChild(gradient);
     }
 
-    paths.setAttributeNS(null, 'mask', 'url(#'+this.uid+'-text-mask)');
+    paths.setAttributeNS(null, 'mask', 'url(#' + this.uid + '-text-mask)');
 
     if (this.svg) {
       this.svg.appendChild(defs);
@@ -107,7 +107,6 @@ class SvgWrapper {
       this.svg.appendChild(style);
       this.svg.appendChild(paths);
       this.svg.appendChild(vertices);
-      return this.svg;
     } else {
       let container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       container.appendChild(defs);
@@ -127,7 +126,7 @@ class SvgWrapper {
   createGradient(line) {
     // create the gradient and add it
     let gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'),
-      gradientUrl = this.uid+`-line-${this.gradientId++}`,
+      gradientUrl = this.uid + `-line-${this.gradientId++}`,
       l = line.getLeftVector(),
       r = line.getRightVector(),
       fromX = l.x + this.offsetX,
@@ -209,8 +208,11 @@ class SvgWrapper {
     this.drawingWidth = maxX - minX;
     this.drawingHeight = maxY - minY;
 
-    let scaleX = this.svg.clientWidth / this.drawingWidth;
-    let scaleY = this.svg.clientHeight / this.drawingHeight;
+    let w = this.svg.clientWidth > 0 ? this.svg.clientWidth : this.svg.viewBox.baseVal.width;
+    let h = this.svg.clientHeight > 0 ? this.svg.clientHeight : this.svg.viewBox.baseVal.height;
+
+    let scaleX = w / this.drawingWidth;
+    let scaleY = h / this.drawingHeight;
 
     let scale = (scaleX < scaleY) ? scaleX : scaleY;
     let viewBoxDim = Math.round(this.drawingWidth > this.drawingHeight ? this.drawingWidth : this.drawingHeight);
@@ -222,9 +224,9 @@ class SvgWrapper {
 
     // Center
     if (scaleX < scaleY) {
-      this.offsetY += this.svg.clientHeight / (2.0 * scale) - this.drawingHeight / 2.0;
+      this.offsetY += h / (2.0 * scale) - this.drawingHeight / 2.0;
     } else {
-      this.offsetX += this.svg.clientWidth / (2.0 * scale) - this.drawingWidth / 2.0;
+      this.offsetX += w / (2.0 * scale) - this.drawingWidth / 2.0;
     }
   }
 
@@ -346,14 +348,14 @@ class SvgWrapper {
    * @param {s} s The size of the ring.
    */
   drawRing(x, y, s) {
-	let circleElem = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-	let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, s);
+    let circleElem = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, s);
     circleElem.setAttributeNS(null, 'cx', x + this.offsetX);
     circleElem.setAttributeNS(null, 'cy', y + this.offsetY);
     circleElem.setAttributeNS(null, 'r', radius - this.opts.bondSpacing);
     circleElem.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
-	circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness*1.5);
-	circleElem.setAttributeNS(null, 'fill', 'none');
+    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness * 1.5);
+    circleElem.setAttributeNS(null, 'fill', 'none');
     this.paths.push(circleElem);
   }
 
@@ -368,9 +370,9 @@ class SvgWrapper {
   drawLine(line, dashed = false, gradient = null) {
     let opts = this.opts,
       stylesArr = [
-                ['stroke-linecap', 'round'],
-                ['stroke-dasharray', dashed ? '5, 5' : 'none'],
-            ],
+        ['stroke-linecap', 'round'],
+        ['stroke-dasharray', dashed ? '5, 5' : 'none'],
+      ],
       l = line.getLeftVector(),
       r = line.getRightVector(),
       fromX = l.x + this.offsetX,
@@ -635,6 +637,27 @@ class SvgWrapper {
     polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
     polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
     this.paths.push(polygon);
+  }
+
+  /**
+   * 
+   * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
+   */
+  toCanvas(canvas) {
+    if (typeof canvas === 'string' || canvas instanceof String) {
+      canvas = document.getElementById(canvas);
+    }
+
+    var ctx = canvas.getContext('2d');
+    var image = new Image();
+
+    image.onload = function load() {
+      canvas.height = image.height;
+      canvas.width = image.width;
+      ctx.drawImage(image, 0, 0);
+    };
+
+    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);
   }
 }
 
