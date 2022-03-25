@@ -9344,16 +9344,8 @@ class SvgDrawer {
 
 
   drawAromaticityRing(ring) {
-    let ctx = this.ctx;
-    let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, ring.getSize());
-    ctx.save();
-    ctx.strokeStyle = this.getColor('C');
-    ctx.lineWidth = this.opts.bondThickness;
-    ctx.beginPath();
-    ctx.arc(ring.center.x + this.offsetX, ring.center.y + this.offsetY, radius - this.opts.bondSpacing, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
+    let svgWrapper = this.svgWrapper;
+    svgWrapper.drawRing(ring.center.x, ring.center.y, ring.getSize());
   }
   /**
    * Draw the actual edges as bonds.
@@ -9383,7 +9375,7 @@ class SvgDrawer {
 
     if (!this.bridgedRing) {
       for (var i = 0; i < rings.length; i++) {
-        let ring = rings[i];
+        let ring = rings[i]; //TODO: uses canvas ctx to draw... need to update this to SVG
 
         if (preprocessor.isRingAromatic(ring)) {
           this.drawAromaticityRing(ring);
@@ -9619,10 +9611,31 @@ const Line = require('./Line');
 
 const Vector2 = require('./Vector2');
 
+const MathHelper = require('./MathHelper');
+
+function makeid(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
+}
+
 class SvgWrapper {
   constructor(themeManager, target, options) {
+    if (typeof target === 'string' || target instanceof String) {
+      this.svg = document.getElementById(target);
+    } else {
+      this.svg = target;
+    }
+
     this.svg = document.getElementById(target);
     this.opts = options;
+    this.uid = makeid(5);
     this.gradientId = 0; // maintain a list of line elements and their corresponding gradients
     // maintain a list of vertex elements
 
@@ -9662,7 +9675,7 @@ class SvgWrapper {
         vertices = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         pathChildNodes = this.paths; // give the mask an id
 
-    masks.setAttributeNS(null, 'id', 'text-mask'); // create the css styles
+    masks.setAttributeNS(null, 'id', this.uid + '-text-mask'); // create the css styles
 
     style.appendChild(document.createTextNode(`
                 .element {
@@ -9690,7 +9703,7 @@ class SvgWrapper {
       defs.appendChild(gradient);
     }
 
-    paths.setAttributeNS(null, 'mask', 'url(#text-mask)');
+    paths.setAttributeNS(null, 'mask', 'url(#' + this.uid + '-text-mask)');
 
     if (this.svg) {
       this.svg.appendChild(defs);
@@ -9719,7 +9732,7 @@ class SvgWrapper {
   createGradient(line) {
     // create the gradient and add it
     let gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'),
-        gradientUrl = `line-${this.gradientId++}`,
+        gradientUrl = this.uid + `-line-${this.gradientId++}`,
         l = line.getLeftVector(),
         r = line.getRightVector(),
         fromX = l.x + this.offsetX,
@@ -9911,6 +9924,26 @@ class SvgWrapper {
             `);
     textElem.appendChild(document.createTextNode(text));
     this.vertices.push(textElem);
+  }
+  /**
+   * Draws a ring.
+   *
+   * @param {x} x The x coordinate of the ring.
+   * @param {y} r The y coordinate of the ring.
+   * @param {s} s The size of the ring.
+   */
+
+
+  drawRing(x, y, s) {
+    let circleElem = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, s);
+    circleElem.setAttributeNS(null, 'cx', x + this.offsetX);
+    circleElem.setAttributeNS(null, 'cy', y + this.offsetY);
+    circleElem.setAttributeNS(null, 'r', radius - this.opts.bondSpacing);
+    circleElem.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
+    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness * 1.5);
+    circleElem.setAttributeNS(null, 'fill', 'none');
+    this.paths.push(circleElem);
   }
   /**
    * Draws a line.
@@ -10179,7 +10212,7 @@ class SvgWrapper {
 
 module.exports = SvgWrapper;
 
-},{"./Line":8,"./UtilityFunctions":17,"./Vector2":18}],16:[function(require,module,exports){
+},{"./Line":8,"./MathHelper":9,"./UtilityFunctions":17,"./Vector2":18}],16:[function(require,module,exports){
 "use strict";
 
 class ThemeManager {
