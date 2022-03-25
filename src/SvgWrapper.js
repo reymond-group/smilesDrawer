@@ -18,12 +18,11 @@ function makeid(length) {
 
 class SvgWrapper {
   constructor(themeManager, target, options) {
-  if (typeof target === 'string' || target instanceof String) {
-      this.svg = document.getElementById(target);
+    if (typeof target === 'string' || target instanceof String) {
+      this.svg = document.getElementById(svg);
     } else {
       this.svg = target;
     }
-    this.svg = document.getElementById(target);
     this.opts = options;
     this.uid = makeid(5);
     this.gradientId = 0;
