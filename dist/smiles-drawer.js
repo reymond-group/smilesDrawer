@@ -120,7 +120,7 @@ if (!Array.prototype.fill) {
 
 module.exports = SmilesDrawer;
 
-},{"./src/Drawer":5,"./src/Parser":10,"./src/SvgDrawer":14}],2:[function(require,module,exports){
+},{"./src/Drawer":5,"./src/Parser":11,"./src/SvgDrawer":15}],2:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1086,7 +1086,7 @@ class Atom {
 
 module.exports = Atom;
 
-},{"./ArrayHelper":2,"./Ring":11,"./Vertex":19}],4:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Ring":12,"./Vertex":20}],4:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1917,7 +1917,111 @@ class CanvasWrapper {
 
 module.exports = CanvasWrapper;
 
-},{"./Line":8,"./MathHelper":9,"./Ring":11,"./UtilityFunctions":17,"./Vector2":18,"./Vertex":19}],5:[function(require,module,exports){
+},{"./Line":9,"./MathHelper":10,"./Ring":12,"./UtilityFunctions":18,"./Vector2":19,"./Vertex":20}],5:[function(require,module,exports){
+"use strict";
+
+//@ts-check
+const MathHelper = require('./MathHelper');
+
+const ArrayHelper = require('./ArrayHelper');
+
+const Vector2 = require('./Vector2');
+
+const Line = require('./Line');
+
+const Vertex = require('./Vertex');
+
+const Edge = require('./Edge');
+
+const Atom = require('./Atom');
+
+const Ring = require('./Ring');
+
+const RingConnection = require('./RingConnection');
+
+const SvgDrawer = require('./SvgDrawer');
+
+const Graph = require('./Graph');
+
+const SSSR = require('./SSSR');
+
+const ThemeManager = require('./ThemeManager');
+/** 
+ * The main class of the application representing the smiles drawer 
+ * 
+ * @property {Graph} graph The graph associated with this SmilesDrawer.Drawer instance.
+ * @property {Number} ringIdCounter An internal counter to keep track of ring ids.
+ * @property {Number} ringConnectionIdCounter An internal counter to keep track of ring connection ids.
+ * @property {CanvasWrapper} canvasWrapper The CanvasWrapper associated with this SmilesDrawer.Drawer instance.
+ * @property {Number} totalOverlapScore The current internal total overlap score.
+ * @property {Object} defaultOptions The default options.
+ * @property {Object} opts The merged options.
+ * @property {Object} theme The current theme.
+ */
+
+
+class Drawer {
+  /**
+   * The constructor for the class SmilesDrawer.
+   *
+   * @param {Object} options An object containing custom values for different options. It is merged with the default options.
+   */
+  constructor(options) {
+    this.svgDrawer = new SvgDrawer(options);
+  }
+  /**
+   * Draws the parsed smiles data to a canvas element.
+   *
+   * @param {Object} data The tree returned by the smiles parser.
+   * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+   */
+
+
+  draw(data, target, themeName = 'light', infoOnly = false) {
+    let canvas = null;
+
+    if (typeof target === 'string' || target instanceof String) {
+      canvas = document.getElementById(target);
+    } else {
+      canvas = target;
+    }
+
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + canvas.width + ' ' + canvas.height);
+    svg.setAttributeNS(null, 'width', canvas.width + '');
+    svg.setAttributeNS(null, 'height', canvas.height + '');
+    this.svgDrawer.draw(data, svg, themeName, infoOnly);
+    this.svgDrawer.svgWrapper.toCanvas(canvas);
+  }
+  /**
+   * Returns the total overlap score of the current molecule.
+   *
+   * @returns {Number} The overlap score.
+   */
+
+
+  getTotalOverlapScore() {
+    return this.svgDrawer.getTotalOverlapScore();
+  }
+  /**
+   * Returns the molecular formula of the loaded molecule as a string.
+   * 
+   * @returns {String} The molecular formula.
+   */
+
+
+  getMolecularFormula() {
+    this.svgDrawer.getMolecularFormula();
+  }
+
+}
+
+module.exports = Drawer;
+
+},{"./ArrayHelper":2,"./Atom":3,"./Edge":7,"./Graph":8,"./Line":9,"./MathHelper":10,"./Ring":12,"./RingConnection":13,"./SSSR":14,"./SvgDrawer":15,"./ThemeManager":17,"./Vector2":19,"./Vertex":20}],6:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1960,7 +2064,7 @@ const ThemeManager = require('./ThemeManager');
  */
 
 
-class Drawer {
+class DrawerBase {
   /**
    * The constructor for the class SmilesDrawer.
    *
@@ -2081,7 +2185,7 @@ class Drawer {
    * Draws the parsed smiles data to a canvas element.
    *
    * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|HTMLElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+   * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
@@ -4872,9 +4976,9 @@ class Drawer {
 
 }
 
-module.exports = Drawer;
+module.exports = DrawerBase;
 
-},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":6,"./Graph":7,"./Line":8,"./MathHelper":9,"./Ring":11,"./RingConnection":12,"./SSSR":13,"./ThemeManager":16,"./Vector2":18,"./Vertex":19}],6:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":7,"./Graph":8,"./Line":9,"./MathHelper":10,"./Ring":12,"./RingConnection":13,"./SSSR":14,"./ThemeManager":17,"./Vector2":19,"./Vertex":20}],7:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -4941,7 +5045,7 @@ class Edge {
 
 module.exports = Edge;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5887,7 +5991,7 @@ class Graph {
 
 module.exports = Graph;
 
-},{"./Atom":3,"./Edge":6,"./MathHelper":9,"./Ring":11,"./Vector2":18,"./Vertex":19}],8:[function(require,module,exports){
+},{"./Atom":3,"./Edge":7,"./MathHelper":10,"./Ring":12,"./Vector2":19,"./Vertex":20}],9:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -6196,7 +6300,7 @@ class Line {
 
 module.exports = Line;
 
-},{"./Vector2":18}],9:[function(require,module,exports){
+},{"./Vector2":19}],10:[function(require,module,exports){
 "use strict";
 
 /** 
@@ -6369,7 +6473,7 @@ class MathHelper {
 
 module.exports = MathHelper;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 // WHEN REPLACING, CHECK FOR:
@@ -8269,7 +8373,7 @@ module.exports = function () {
   };
 }();
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8491,7 +8595,7 @@ class Ring {
 
 module.exports = Ring;
 
-},{"./ArrayHelper":2,"./RingConnection":12,"./Vector2":18,"./Vertex":19}],12:[function(require,module,exports){
+},{"./ArrayHelper":2,"./RingConnection":13,"./Vector2":19,"./Vertex":20}],13:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8665,7 +8769,7 @@ class RingConnection {
 
 module.exports = RingConnection;
 
-},{"./Ring":11,"./Vertex":19}],13:[function(require,module,exports){
+},{"./Ring":12,"./Vertex":20}],14:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -9276,7 +9380,7 @@ class SSSR {
 
 module.exports = SSSR;
 
-},{"./Graph":7}],14:[function(require,module,exports){
+},{"./Graph":8}],15:[function(require,module,exports){
 "use strict";
 
 // we use the drawer to do all the preprocessing. then we take over the drawing
@@ -9285,7 +9389,7 @@ const ArrayHelper = require('./ArrayHelper');
 
 const Atom = require('./Atom');
 
-const Drawer = require('./Drawer');
+const DrawerBase = require('./DrawerBase');
 
 const Graph = require('./Graph');
 
@@ -9299,7 +9403,7 @@ const Vector2 = require('./Vector2');
 
 class SvgDrawer {
   constructor(options) {
-    this.preprocessor = new Drawer(options);
+    this.preprocessor = new DrawerBase(options);
   }
   /**
    * Draws the parsed smiles data to an svg element.
@@ -9600,7 +9704,7 @@ class SvgDrawer {
 
 module.exports = SvgDrawer;
 
-},{"./ArrayHelper":2,"./Atom":3,"./Drawer":5,"./Graph":7,"./Line":8,"./SvgWrapper":15,"./ThemeManager":16,"./Vector2":18}],15:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./DrawerBase":6,"./Graph":8,"./Line":9,"./SvgWrapper":16,"./ThemeManager":17,"./Vector2":19}],16:[function(require,module,exports){
 "use strict";
 
 const {
@@ -10234,7 +10338,7 @@ class SvgWrapper {
 
 module.exports = SvgWrapper;
 
-},{"./Line":8,"./MathHelper":9,"./UtilityFunctions":17,"./Vector2":18}],16:[function(require,module,exports){
+},{"./Line":9,"./MathHelper":10,"./UtilityFunctions":18,"./Vector2":19}],17:[function(require,module,exports){
 "use strict";
 
 class ThemeManager {
@@ -10282,7 +10386,7 @@ class ThemeManager {
 
 module.exports = ThemeManager;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 /**
@@ -10310,7 +10414,7 @@ module.exports = {
   getChargeText
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -10937,7 +11041,7 @@ class Vector2 {
 
 module.exports = Vector2;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -11300,5 +11404,5 @@ class Vertex {
 
 module.exports = Vertex;
 
-},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":9,"./Vector2":18}]},{},[1])
+},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":10,"./Vector2":19}]},{},[1])
 

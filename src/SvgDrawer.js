@@ -2,7 +2,7 @@
 // portion to output to svg
 const ArrayHelper = require('./ArrayHelper');
 const Atom = require('./Atom');
-const Drawer = require('./Drawer');
+const DrawerBase = require('./DrawerBase');
 const Graph = require('./Graph');
 const Line = require('./Line');
 const SvgWrapper = require('./SvgWrapper');
@@ -11,7 +11,7 @@ const Vector2 = require('./Vector2');
 
 class SvgDrawer {
   constructor(options) {
-    this.preprocessor = new Drawer(options);
+    this.preprocessor = new DrawerBase(options);
   }
 
   /**
@@ -58,7 +58,7 @@ class SvgDrawer {
    * @param {Ring} ring A ring.
    */
   drawAromaticityRing(ring) {
-	let svgWrapper = this.svgWrapper;
+    let svgWrapper = this.svgWrapper;
     svgWrapper.drawRing(ring.center.x, ring.center.y, ring.getSize());
   }
 
