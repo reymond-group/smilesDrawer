@@ -56,8 +56,11 @@ class Drawer {
     svg.setAttributeNS(null, 'viewBox', '0 0 ' + canvas.width + ' ' + canvas.height);
     svg.setAttributeNS(null, 'width', canvas.width + '');
     svg.setAttributeNS(null, 'height', canvas.height + '');
+    svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
+    document.body.appendChild(svg);
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
     this.svgDrawer.svgWrapper.toCanvas(canvas);
+    document.body.removeChild(svg);
   }
 
   /**

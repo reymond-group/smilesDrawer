@@ -1993,8 +1993,11 @@ class Drawer {
     svg.setAttributeNS(null, 'viewBox', '0 0 ' + canvas.width + ' ' + canvas.height);
     svg.setAttributeNS(null, 'width', canvas.width + '');
     svg.setAttributeNS(null, 'height', canvas.height + '');
+    svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
+    document.body.appendChild(svg);
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
     this.svgDrawer.svgWrapper.toCanvas(canvas);
+    document.body.removeChild(svg);
   }
   /**
    * Returns the total overlap score of the current molecule.
@@ -9737,6 +9740,7 @@ class SvgWrapper {
       this.svg = target;
     }
 
+    this.container = null;
     this.opts = options;
     this.uid = makeid(5);
     this.gradientId = 0; // maintain a list of line elements and their corresponding gradients
@@ -9766,6 +9770,25 @@ class SvgWrapper {
 
     while (this.svg.firstChild) {
       this.svg.removeChild(this.svg.firstChild);
+    } // Create styles here as text measurement is done before constructSvg
+
+
+    let style = document.createElementNS('http://www.w3.org/2000/svg', 'style'); // create the css styles
+
+    style.appendChild(document.createTextNode(`
+                .element {
+                    font: ${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif;
+                }
+                .sub {
+                    font: ${this.opts.fontSizeSmall}pt Helvetica, Arial, sans-serif;
+                }
+            `));
+
+    if (this.svg) {
+      this.svg.appendChild(style);
+    } else {
+      this.container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      container.appendChild(style);
     }
   }
 
@@ -9773,22 +9796,11 @@ class SvgWrapper {
     // TODO: add the defs element to put gradients in
     let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
         masks = document.createElementNS('http://www.w3.org/2000/svg', 'mask'),
-        style = document.createElementNS('http://www.w3.org/2000/svg', 'style'),
         paths = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         vertices = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         pathChildNodes = this.paths; // give the mask an id
 
-    masks.setAttributeNS(null, 'id', this.uid + '-text-mask'); // create the css styles
-
-    style.appendChild(document.createTextNode(`
-                .element {
-                    font: ${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif;
-                    alignment-baseline: 'middle';
-                }
-                .sub {
-                    font: ${this.opts.fontSizeSmall}pt Helvetica, Arial, sans-serif;
-                }
-            `));
+    masks.setAttributeNS(null, 'id', this.uid + '-text-mask');
 
     for (let path of pathChildNodes) {
       paths.appendChild(path);
@@ -9811,17 +9823,14 @@ class SvgWrapper {
     if (this.svg) {
       this.svg.appendChild(defs);
       this.svg.appendChild(masks);
-      this.svg.appendChild(style);
       this.svg.appendChild(paths);
       this.svg.appendChild(vertices);
     } else {
-      let container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      container.appendChild(defs);
-      container.appendChild(masks);
-      container.appendChild(style);
-      container.appendChild(paths);
-      container.appendChild(vertices);
-      return container;
+      this.container.appendChild(defs);
+      this.container.appendChild(masks);
+      this.container.appendChild(paths);
+      this.container.appendChild(vertices);
+      return this.container;
     }
   }
   /**
@@ -9873,6 +9882,42 @@ class SvgWrapper {
     elem.appendChild(document.createTextNode(text));
     elem.setAttributeNS(null, 'class', 'sub');
     return elem;
+  }
+
+  createUnicodeSubscript(n) {
+    let result = '';
+    n.toString().split('').forEach(d => {
+      result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
+    });
+    return result;
+  }
+
+  createUnicodeSuperscript(n) {
+    let result = '';
+    n.toString().split('').forEach(d => {
+      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
+    });
+    return result;
+  }
+
+  createUnicodeCharge(n) {
+    if (n === 1) {
+      return '⁺';
+    }
+
+    if (n === -1) {
+      return '⁻';
+    }
+
+    if (n > 1) {
+      return this.createUnicodeSuperscript(n) + '⁺';
+    }
+
+    if (n < -1) {
+      return this.createUnicodeSuperscript(n) + '⁻';
+    }
+
+    return '';
   }
   /**
    * Determine drawing dimensiosn based on vertex positions.
@@ -10129,151 +10174,154 @@ class SvgWrapper {
 
 
   drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
-    let offsetX = this.offsetX,
-        offsetY = this.offsetY,
-        pos = {
-      x: x + offsetX,
-      y: y + offsetY
-    },
-        textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text'),
-        writingMode = 'horizontal-tb',
-        letterSpacing = 'normal',
-        textOrientation = 'mixed',
-        textDirection = 'direction: ltr;',
-        xShift = -2,
-        yShift = 2.5;
-    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    mask.setAttributeNS(null, 'cx', pos.x);
-    mask.setAttributeNS(null, 'cy', pos.y);
-    mask.setAttributeNS(null, 'r', '3.5');
-    mask.setAttributeNS(null, 'fill', 'black');
-    this.maskElements.push(mask); // determine writing mode
+    let text = [];
+    let display = elementName;
 
-    if (/up|down/.test(direction) && !isTerminal) {
-      writingMode = 'vertical-rl';
-      textOrientation = 'upright';
-      letterSpacing = '-1px';
+    if (charge !== 0 && charge !== null) {
+      display += this.createUnicodeCharge(charge);
     }
 
-    if (direction === 'down' && !isTerminal) {
-      xShift = 0;
-      yShift = -2;
-    } else if (direction === 'up' && !isTerminal) {
-      xShift = 0.5;
-    } else if (direction === 'left') {
-      xShift = 2;
+    if (isotope !== 0 && isotope !== null) {
+      display = this.createUnicodeSuperscript(isotope) + display;
     }
 
-    if (direction === 'left' || direction === 'up' && !isTerminal) {
-      textDirection = 'direction: rtl; unicode-bidi: bidi-override;';
-    } // now the text element
+    text.push([display, elementName]);
 
-
-    textElem.setAttributeNS(null, 'x', pos.x + xShift);
-    textElem.setAttributeNS(null, 'y', pos.y + yShift);
-    textElem.setAttributeNS(null, 'class', 'element');
-    textElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
-    textElem.setAttributeNS(null, 'style', `
-                text-anchor: start;
-                writing-mode: ${writingMode};
-                text-orientation: ${textOrientation};
-                letter-spacing: ${letterSpacing};
-                ${textDirection}
-            `);
-    let textNode = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); // special case for element names that are 2 letters
-
-    if (elementName.length > 1) {
-      let textAnchor = /up|down/.test(direction) ? 'middle' : 'start';
-      textNode.setAttributeNS(null, 'style', `
-                unicode-bidi: plaintext;
-                writing-mode: lr-tb;
-                letter-spacing: normal;
-                text-anchor: ${textAnchor};
-            `);
+    if (hydrogens === 1) {
+      text.push(['H', 'H']);
+    } else if (hydrogens > 1) {
+      text.push(['H' + this.createUnicodeSubscript(hydrogens), 'H']);
     }
 
-    textNode.appendChild(document.createTextNode(elementName));
-    textElem.appendChild(textNode); // Charge
-
-    if (charge) {
-      let chargeElem = this.createSubSuperScripts(getChargeText(charge), 'super');
-      textNode.appendChild(chargeElem);
-    }
-
-    let isotopeText = '0';
-
-    if (isotope > 0) {
-      let isotopeElem = this.createSubSuperScripts(isotope.toString(), 'super');
-      textNode.appendChild(isotopeElem);
-    } // TODO: Better handle exceptions
-    // Exception for nitro (draw nitro as NO2 instead of N+O-O)
-
-
-    if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') && attachedPseudoElement.hasOwnProperty('0O-1')) {
-      attachedPseudoElement = {
-        '0O': {
-          element: 'O',
-          count: 2,
-          hydrogenCount: 0,
-          previousElement: 'C',
-          charge: ''
-        }
-      };
-      charge = 0;
-    }
-
-    if (hydrogens > 0) {
-      let hydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-      hydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
-      hydrogenElem.appendChild(document.createTextNode('H'));
-      textElem.appendChild(hydrogenElem);
-
-      if (hydrogens > 1) {
-        let hydrogenCountElem = this.createSubSuperScripts(hydrogens, 'sub');
-        hydrogenElem.appendChild(hydrogenCountElem);
-      }
-    }
-
-    for (let key in attachedPseudoElement) {
-      if (!attachedPseudoElement.hasOwnProperty(key)) {
-        continue;
-      }
-
-      let element = attachedPseudoElement[key].element,
-          elementCount = attachedPseudoElement[key].count,
-          hydrogenCount = attachedPseudoElement[key].hydrogenCount,
-          elementCharge = attachedPseudoElement[key].charge,
-          pseudoElementElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-      pseudoElementElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
-      pseudoElementElem.appendChild(document.createTextNode(element));
-      pseudoElementElem.setAttributeNS(null, 'fill', this.themeManager.getColor(element));
-
-      if (elementCharge !== 0) {
-        let elementChargeElem = this.createSubSuperScripts(getChargeText(elementCharge), 'super');
-        pseudoElementElem.appendChild(elementChargeElem);
-      }
-
-      if (hydrogenCount > 0) {
-        let pseudoHydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-        pseudoHydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
-        pseudoHydrogenElem.appendChild(document.createTextNode('H'));
-        pseudoElementElem.appendChild(pseudoHydrogenElem);
-
-        if (hydrogenCount > 1) {
-          let hydrogenCountElem = this.createSubSuperScripts(hydrogenCount, 'sub');
-          pseudoHydrogenElem.appendChild(hydrogenCountElem);
-        }
-      }
-
-      if (elementCount > 1) {
-        let elementCountElem = this.createSubSuperScripts(elementCount, 'sub');
-        pseudoElementElem.appendChild(elementCountElem);
-      }
-
-      textElem.appendChild(pseudoElementElem);
-    }
-
-    this.vertices.push(textElem);
+    this.write(text, direction, x, y); // let offsetX = this.offsetX,
+    //   offsetY = this.offsetY,
+    //   pos = {
+    //     x: x + offsetX,
+    //     y: y + offsetY,
+    //   },
+    //   textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+    //   writingMode = 'horizontal-tb',
+    //   letterSpacing = 'normal',
+    //   textOrientation = 'mixed',
+    //   textDirection = 'direction: ltr;',
+    //   xShift = -2,
+    //   yShift = 2.5;
+    // let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    // mask.setAttributeNS(null, 'cx', pos.x);
+    // mask.setAttributeNS(null, 'cy', pos.y);
+    // mask.setAttributeNS(null, 'r', '3.5');
+    // mask.setAttributeNS(null, 'fill', 'black');
+    // this.maskElements.push(mask);
+    // // determine writing mode
+    // if (/up|down/.test(direction) && !isTerminal) {
+    //   writingMode = 'vertical-rl';
+    //   textOrientation = 'upright';
+    //   letterSpacing = '-1px';
+    // }
+    // if (direction === 'down' && !isTerminal) {
+    //   xShift = 0;
+    //   yShift = -2;
+    // } else if (direction === 'up' && !isTerminal) {
+    //   xShift = 0.5;
+    // } else if (direction === 'left') {
+    //   xShift = 2;
+    // }
+    // if (direction === 'left' || (direction === 'up' && !isTerminal)) {
+    //   textDirection = 'direction: rtl; unicode-bidi: bidi-override;'
+    // }
+    // // now the text element
+    // textElem.setAttributeNS(null, 'x', pos.x + xShift);
+    // textElem.setAttributeNS(null, 'y', pos.y + yShift);
+    // textElem.setAttributeNS(null, 'class', 'element');
+    // textElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
+    // textElem.setAttributeNS(null, 'style', `
+    //             text-anchor: start;
+    //             writing-mode: ${writingMode};
+    //             text-orientation: ${textOrientation};
+    //             letter-spacing: ${letterSpacing};
+    //             ${textDirection}
+    //         `);
+    // let textNode = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    // // special case for element names that are 2 letters
+    // if (elementName.length > 1) {
+    //   let textAnchor = /up|down/.test(direction) ? 'middle' : 'start';
+    //   textNode.setAttributeNS(null, 'style', `
+    //             unicode-bidi: plaintext;
+    //             writing-mode: lr-tb;
+    //             letter-spacing: normal;
+    //             text-anchor: ${textAnchor};
+    //         `);
+    // }
+    // textNode.appendChild(document.createTextNode(elementName));
+    // textElem.appendChild(textNode);
+    // // Charge
+    // if (charge) {
+    //   let chargeElem = this.createSubSuperScripts(getChargeText(charge), 'super');
+    //   textNode.appendChild(chargeElem);
+    // }
+    // let isotopeText = '0';
+    // if (isotope > 0) {
+    //   let isotopeElem = this.createSubSuperScripts(isotope.toString(), 'super');
+    //   textNode.appendChild(isotopeElem);
+    // }
+    // // TODO: Better handle exceptions
+    // // Exception for nitro (draw nitro as NO2 instead of N+O-O)
+    // if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') &&
+    //   attachedPseudoElement.hasOwnProperty('0O-1')) {
+    //   attachedPseudoElement = {
+    //     '0O': {
+    //       element: 'O',
+    //       count: 2,
+    //       hydrogenCount: 0,
+    //       previousElement: 'C',
+    //       charge: ''
+    //     }
+    //   }
+    //   charge = 0;
+    // }
+    // if (hydrogens > 0) {
+    //   let hydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    //   hydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
+    //   hydrogenElem.appendChild(document.createTextNode('H'));
+    //   textElem.appendChild(hydrogenElem);
+    //   if (hydrogens > 1) {
+    //     let hydrogenCountElem = this.createSubSuperScripts(hydrogens, 'sub');
+    //     hydrogenElem.appendChild(hydrogenCountElem);
+    //   }
+    // }
+    // for (let key in attachedPseudoElement) {
+    //   if (!attachedPseudoElement.hasOwnProperty(key)) {
+    //     continue;
+    //   }
+    //   let element = attachedPseudoElement[key].element,
+    //     elementCount = attachedPseudoElement[key].count,
+    //     hydrogenCount = attachedPseudoElement[key].hydrogenCount,
+    //     elementCharge = attachedPseudoElement[key].charge,
+    //     pseudoElementElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    //   pseudoElementElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
+    //   pseudoElementElem.appendChild(document.createTextNode(element));
+    //   pseudoElementElem.setAttributeNS(null, 'fill', this.themeManager.getColor(element));
+    //   if (elementCharge !== 0) {
+    //     let elementChargeElem = this.createSubSuperScripts(getChargeText(elementCharge), 'super');
+    //     pseudoElementElem.appendChild(elementChargeElem);
+    //   }
+    //   if (hydrogenCount > 0) {
+    //     let pseudoHydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    //     pseudoHydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
+    //     pseudoHydrogenElem.appendChild(document.createTextNode('H'));
+    //     pseudoElementElem.appendChild(pseudoHydrogenElem);
+    //     if (hydrogenCount > 1) {
+    //       let hydrogenCountElem = this.createSubSuperScripts(hydrogenCount, 'sub');
+    //       pseudoHydrogenElem.appendChild(hydrogenCountElem);
+    //     }
+    //   }
+    //   if (elementCount > 1) {
+    //     let elementCountElem = this.createSubSuperScripts(elementCount, 'sub');
+    //     pseudoElementElem.appendChild(elementCountElem);
+    //   }
+    //   textElem.appendChild(pseudoElementElem);
+    // }
+    // this.vertices.push(textElem);
   }
   /**
    * @param {Line} line the line object to create the wedge from
@@ -10310,6 +10358,104 @@ class SvgWrapper {
     polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
     polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
     this.paths.push(polygon);
+  }
+
+  write(text, direction, x, y) {
+    x += this.offsetX;
+    y += this.offsetY;
+    let cx = x;
+    let cy = y; // Measure element name only, without charge or isotope
+
+    let bbox = this.measureText(text[0][1], 'element');
+    let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElem.setAttributeNS(null, 'class', 'element');
+    let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    textElem.setAttributeNS(null, 'fill', '#ffffff');
+
+    if (direction === 'left' || direction === 'up') {
+      text = text.reverse();
+    }
+
+    if (direction === 'right' || direction === 'down' || direction === 'up') {
+      x -= bbox.width / 2.0;
+    }
+
+    if (direction === 'left') {
+      x += bbox.width / 2.0;
+    }
+
+    if (direction === 'down') {
+      y -= bbox.height / 2.0;
+    }
+
+    if (direction === 'up') {
+      y -= bbox.height / 2.0 + bbox.height * (text.length - 1);
+    }
+
+    text.forEach(part => {
+      const display = part[0];
+      const elementName = part[1];
+      let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspanElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
+      tspanElem.textContent = display;
+
+      if (direction === 'down' || direction === 'up') {
+        tspanElem.setAttributeNS(null, 'dy', '0.9em');
+        tspanElem.setAttributeNS(null, 'x', '0px');
+      }
+
+      textElem.appendChild(tspanElem);
+    });
+    g.appendChild(textElem);
+    g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
+
+    if (direction === 'left' || direction === 'right') {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'central');
+    } // This is hacky and relies on dy setting above
+
+
+    if (direction === 'down') {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'alphabetic');
+    }
+
+    if (direction === 'up') {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'text-bottom');
+    }
+
+    if (direction === 'left') {
+      textElem.setAttributeNS(null, 'text-anchor', 'end');
+    } // let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    // circle.setAttributeNS(null, 'cx', cx);
+    // circle.setAttributeNS(null, 'cy', cy);
+    // circle.setAttributeNS(null, 'r', 2);
+    // circle.setAttributeNS(null, 'fill', '#ff0000');
+    // this.vertices.push(circle)
+
+
+    let maskRadius = 3.5;
+
+    if (text[0][1].length > 1) {
+      maskRadius = 5.0;
+    }
+
+    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    mask.setAttributeNS(null, 'cx', cx);
+    mask.setAttributeNS(null, 'cy', cy);
+    mask.setAttributeNS(null, 'r', maskRadius);
+    mask.setAttributeNS(null, 'fill', 'black');
+    this.maskElements.push(mask);
+    this.vertices.push(g);
+  }
+
+  measureText(text, className) {
+    let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElem.setAttributeNS(null, 'class', className);
+    textElem.setAttributeNS(null, 'x', -9999);
+    textElem.textContent = text;
+    this.svg.appendChild(textElem);
+    let bbox = textElem.getBBox();
+    this.svg.removeChild(textElem);
+    return bbox;
   }
   /**
    * 
@@ -10395,8 +10541,6 @@ module.exports = ThemeManager;
  * @returns {String} A string representing a charge.
  */
 function getChargeText(charge) {
-  console.log('in the utility version of getChargeText');
-
   if (charge === 1) {
     return '+';
   } else if (charge === 2) {
