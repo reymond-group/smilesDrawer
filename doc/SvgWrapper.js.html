@@ -460,6 +460,7 @@ class SvgWrapper {
   drawLine(line, dashed = false, gradient = null) {
     let opts = this.opts,
       stylesArr = [
+        ['stroke-width', this.opts.bondThickness],
         ['stroke-linecap', 'round'],
         ['stroke-dasharray', dashed ? '5, 5' : 'none'],
       ],
@@ -551,119 +552,40 @@ class SvgWrapper {
       text.push(['H' + this.createUnicodeSubscript(hydrogens), 'H'])
     }
 
+    // TODO: Better handle exceptions
+    // Exception for nitro (draw nitro as NO2 instead of N+O-O)
+    if (charge === 1 &amp;&amp; elementName === 'N' &amp;&amp; attachedPseudoElement.hasOwnProperty('0O') &amp;&amp;
+      attachedPseudoElement.hasOwnProperty('0O-1')) {
+      attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
+      charge = 0;
+    }
+
+    for (let key in attachedPseudoElement) {
+      if (!attachedPseudoElement.hasOwnProperty(key)) {
+        continue;
+      }
+
+      let pe = attachedPseudoElement[key];
+      let display = pe.element;
+
+      if (pe.count > 1) {
+        display += this.createUnicodeSubscript(pe.count);
+      }
+
+      if (pe.charge !== '') {
+        display += this.createUnicodeCharge(charge);
+      }
+
+      text.push([pe.element, pe.element]);
+
+      if (pe.hydrogenCount === 1) {
+        text.push(['H', 'H'])
+      } else if (pe.hydrogenCount > 1) {
+        text.push(['H' + this.createUnicodeSubscript(pe.hydrogenCount), 'H'])
+      }
+    }
+
     this.write(text, direction, x, y);
-
-
-    // let offsetX = this.offsetX,
-    //   offsetY = this.offsetY,
-    //   pos = {
-    //     x: x + offsetX,
-    //     y: y + offsetY,
-    //   },
-    //   textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text'),
-    //   writingMode = 'horizontal-tb',
-    //   letterSpacing = 'normal',
-    //   textOrientation = 'mixed',
-    //   textDirection = 'direction: ltr;',
-    //   xShift = -2,
-    //   yShift = 2.5;
-
-    // let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    // mask.setAttributeNS(null, 'cx', pos.x);
-    // mask.setAttributeNS(null, 'cy', pos.y);
-    // mask.setAttributeNS(null, 'r', '3.5');
-    // mask.setAttributeNS(null, 'fill', 'black');
-    // this.maskElements.push(mask);
-
-    // // determine writing mode
-    // if (/up|down/.test(direction) &amp;&amp; !isTerminal) {
-    //   writingMode = 'vertical-rl';
-    //   textOrientation = 'upright';
-    //   letterSpacing = '-1px';
-    // }
-
-    // if (direction === 'down' &amp;&amp; !isTerminal) {
-    //   xShift = 0;
-    //   yShift = -2;
-    // } else if (direction === 'up' &amp;&amp; !isTerminal) {
-    //   xShift = 0.5;
-    // } else if (direction === 'left') {
-    //   xShift = 2;
-    // }
-
-    // if (direction === 'left' || (direction === 'up' &amp;&amp; !isTerminal)) {
-    //   textDirection = 'direction: rtl; unicode-bidi: bidi-override;'
-    // }
-
-    // // now the text element
-    // textElem.setAttributeNS(null, 'x', pos.x + xShift);
-    // textElem.setAttributeNS(null, 'y', pos.y + yShift);
-    // textElem.setAttributeNS(null, 'class', 'element');
-    // textElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
-    // textElem.setAttributeNS(null, 'style', `
-    //             text-anchor: start;
-    //             writing-mode: ${writingMode};
-    //             text-orientation: ${textOrientation};
-    //             letter-spacing: ${letterSpacing};
-    //             ${textDirection}
-    //         `);
-
-    // let textNode = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    // // special case for element names that are 2 letters
-    // if (elementName.length > 1) {
-    //   let textAnchor = /up|down/.test(direction) ? 'middle' : 'start';
-
-    //   textNode.setAttributeNS(null, 'style', `
-    //             unicode-bidi: plaintext;
-    //             writing-mode: lr-tb;
-    //             letter-spacing: normal;
-    //             text-anchor: ${textAnchor};
-    //         `);
-    // }
-    // textNode.appendChild(document.createTextNode(elementName));
-    // textElem.appendChild(textNode);
-
-    // // Charge
-    // if (charge) {
-    //   let chargeElem = this.createSubSuperScripts(getChargeText(charge), 'super');
-    //   textNode.appendChild(chargeElem);
-    // }
-
-    // let isotopeText = '0';
-
-    // if (isotope > 0) {
-    //   let isotopeElem = this.createSubSuperScripts(isotope.toString(), 'super');
-    //   textNode.appendChild(isotopeElem);
-    // }
-
-
-    // // TODO: Better handle exceptions
-    // // Exception for nitro (draw nitro as NO2 instead of N+O-O)
-    // if (charge === 1 &amp;&amp; elementName === 'N' &amp;&amp; attachedPseudoElement.hasOwnProperty('0O') &amp;&amp;
-    //   attachedPseudoElement.hasOwnProperty('0O-1')) {
-    //   attachedPseudoElement = {
-    //     '0O': {
-    //       element: 'O',
-    //       count: 2,
-    //       hydrogenCount: 0,
-    //       previousElement: 'C',
-    //       charge: ''
-    //     }
-    //   }
-    //   charge = 0;
-    // }
-
-    // if (hydrogens > 0) {
-    //   let hydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    //   hydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
-    //   hydrogenElem.appendChild(document.createTextNode('H'));
-    //   textElem.appendChild(hydrogenElem);
-
-    //   if (hydrogens > 1) {
-    //     let hydrogenCountElem = this.createSubSuperScripts(hydrogens, 'sub');
-    //     hydrogenElem.appendChild(hydrogenCountElem);
-    //   }
-    // }
 
     // for (let key in attachedPseudoElement) {
     //   if (!attachedPseudoElement.hasOwnProperty(key)) {
@@ -894,7 +816,7 @@ module.exports = SvgWrapper;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Sun Mar 27 2022 22:53:42 GMT+0200 (Central European Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Mon Mar 28 2022 21:25:22 GMT+0200 (Central European Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

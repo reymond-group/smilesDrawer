@@ -77,7 +77,7 @@ class DrawerBase {
           S: '#f1c40f',
           B: '#e67e22',
           SI: '#e67e22',
-          H: '#fff',
+          H: '#aaa',
           BACKGROUND: '#141414'
         },
         light: {
@@ -92,7 +92,7 @@ class DrawerBase {
           S: '#f1c40f',
           B: '#e67e22',
           SI: '#e67e22',
-          H: '#222',
+          H: '#666',
           BACKGROUND: '#fff'
         }
       }
