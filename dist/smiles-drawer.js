@@ -9659,9 +9659,10 @@ class SvgDrawer {
       if (debug) {
         let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
         svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
-      } else {
-        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
-      }
+      } // else {
+      //   svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
+      // }
+
     } // Draw the ring centers for debug purposes
 
 
@@ -10332,10 +10333,6 @@ class SvgWrapper {
       y -= bbox.height / 2.0;
     }
 
-    if (direction === 'up') {
-      y -= bbox.height / 2.0 + bbox.height * (text.length - 1);
-    }
-
     text.forEach(part => {
       const display = part[0];
       const elementName = part[1];
@@ -10350,8 +10347,6 @@ class SvgWrapper {
 
       textElem.appendChild(tspanElem);
     });
-    g.appendChild(textElem);
-    g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
 
     if (direction === 'left' || direction === 'right') {
       textElem.setAttributeNS(null, 'dominant-baseline', 'central');
@@ -10363,19 +10358,21 @@ class SvgWrapper {
     }
 
     if (direction === 'up') {
-      textElem.setAttributeNS(null, 'dominant-baseline', 'text-bottom');
+      textElem.setAttributeNS(null, 'dominant-baseline', 'mathematical');
     }
 
     if (direction === 'left') {
       textElem.setAttributeNS(null, 'text-anchor', 'end');
-    } // let circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    // circle.setAttributeNS(null, 'cx', cx);
-    // circle.setAttributeNS(null, 'cy', cy);
-    // circle.setAttributeNS(null, 'r', 2);
-    // circle.setAttributeNS(null, 'fill', '#ff0000');
-    // this.vertices.push(circle)
+    }
 
+    g.appendChild(textElem);
 
+    if (direction === 'up') {
+      let gbbox = this.measureElement(g);
+      y -= gbbox.height;
+    }
+
+    g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
     let maskRadius = 3.5;
 
     if (text[0][1].length > 1) {
@@ -10399,6 +10396,13 @@ class SvgWrapper {
     this.svg.appendChild(textElem);
     let bbox = textElem.getBBox();
     this.svg.removeChild(textElem);
+    return bbox;
+  }
+
+  measureElement(element) {
+    this.svg.appendChild(element);
+    let bbox = element.getBBox();
+    this.svg.removeChild(element);
     return bbox;
   }
   /**

@@ -285,9 +285,10 @@ class SvgDrawer {
       if (debug) {
         let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
         svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
-      } else {
-        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
       }
+      // else {
+      //   svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
+      // }
     }
 
     // Draw the ring centers for debug purposes
