@@ -4,7 +4,6 @@
  * @returns {String} A string representing a charge.
  */
 function getChargeText(charge) {
-  console.log('in the utility version of getChargeText');
   if (charge === 1) {
     return '+'
   } else if (charge === 2) {
