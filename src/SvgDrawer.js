@@ -2,7 +2,7 @@
 // portion to output to svg
 const ArrayHelper = require('./ArrayHelper');
 const Atom = require('./Atom');
-const Drawer = require('./Drawer');
+const DrawerBase = require('./DrawerBase');
 const Graph = require('./Graph');
 const Line = require('./Line');
 const SvgWrapper = require('./SvgWrapper');
@@ -11,7 +11,8 @@ const Vector2 = require('./Vector2');
 
 class SvgDrawer {
   constructor(options) {
-    this.preprocessor = new Drawer(options);
+    this.preprocessor = new DrawerBase(options);
+    this.opts = this.preprocessor.opts;
   }
 
   /**
@@ -30,8 +31,8 @@ class SvgDrawer {
     preprocessor.initDraw(data, themeName, infoOnly);
 
     if (!infoOnly) {
-      this.themeManager = new ThemeManager(this.preprocessor.opts.themes, themeName);
-      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.preprocessor.opts);
+      this.themeManager = new ThemeManager(this.opts.themes, themeName);
+      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts);
     }
 
     preprocessor.processGraph();
@@ -58,7 +59,7 @@ class SvgDrawer {
    * @param {Ring} ring A ring.
    */
   drawAromaticityRing(ring) {
-	let svgWrapper = this.svgWrapper;
+    let svgWrapper = this.svgWrapper;
     svgWrapper.drawRing(ring.center.x, ring.center.y, ring.getSize());
   }
 
@@ -285,9 +286,10 @@ class SvgDrawer {
       if (debug) {
         let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
         svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
-      } else {
-        svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
       }
+      // else {
+      //   svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
+      // }
     }
 
     // Draw the ring centers for debug purposes
