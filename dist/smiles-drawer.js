@@ -1990,9 +1990,9 @@ class Drawer {
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + canvas.width + ' ' + canvas.height);
-    svg.setAttributeNS(null, 'width', canvas.width + '');
-    svg.setAttributeNS(null, 'height', canvas.height + '');
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
+    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
+    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
     svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
     document.body.appendChild(svg);
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
@@ -9407,6 +9407,7 @@ const Vector2 = require('./Vector2');
 class SvgDrawer {
   constructor(options) {
     this.preprocessor = new DrawerBase(options);
+    this.opts = this.preprocessor.opts;
   }
   /**
    * Draws the parsed smiles data to an svg element.
@@ -9424,8 +9425,8 @@ class SvgDrawer {
     preprocessor.initDraw(data, themeName, infoOnly);
 
     if (!infoOnly) {
-      this.themeManager = new ThemeManager(this.preprocessor.opts.themes, themeName);
-      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.preprocessor.opts);
+      this.themeManager = new ThemeManager(this.opts.themes, themeName);
+      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts);
     }
 
     preprocessor.processGraph(); // Set the canvas to the appropriate size

@@ -53,9 +53,9 @@ class Drawer {
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + canvas.width + ' ' + canvas.height);
-    svg.setAttributeNS(null, 'width', canvas.width + '');
-    svg.setAttributeNS(null, 'height', canvas.height + '');
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
+    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
+    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
     svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
     document.body.appendChild(svg);
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
