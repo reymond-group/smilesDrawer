@@ -58,7 +58,7 @@ class SvgDrawer {
    * @param {Ring} ring A ring.
    */
   drawAromaticityRing(ring) {
-	let svgWrapper = this.svgWrapper;
+    let svgWrapper = this.svgWrapper;
     svgWrapper.drawRing(ring.center.x, ring.center.y, ring.getSize());
   }
 
