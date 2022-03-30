@@ -202,8 +202,6 @@ module.exports = (function () {
           'next': s[5],
           'hasNext': s[5] ? true : false
         }
-
-        return s;
       },
       peg$c1 = "(",
       peg$c2 = peg$literalExpectation("(", false),
@@ -1755,8 +1753,8 @@ module.exports = (function () {
         peg$maxFailExpected,
         peg$maxFailPos < input.length ? input.charAt(peg$maxFailPos) : null,
         peg$maxFailPos < input.length ?
-        peg$computeLocation(peg$maxFailPos, peg$maxFailPos + 1) :
-        peg$computeLocation(peg$maxFailPos, peg$maxFailPos)
+          peg$computeLocation(peg$maxFailPos, peg$maxFailPos + 1) :
+          peg$computeLocation(peg$maxFailPos, peg$maxFailPos)
       );
     }
   }

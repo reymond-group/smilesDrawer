@@ -254,6 +254,9 @@ class SvgWrapper {
     this.drawingWidth = maxX - minX;
     this.drawingHeight = maxY - minY;
 
+    let viewBoxDim = Math.round(this.drawingWidth > this.drawingHeight ? this.drawingWidth : this.drawingHeight);
+    this.svg.setAttributeNS(null, 'viewBox', `0 0 ${viewBoxDim} ${viewBoxDim}`);
+
     let w = this.svg.clientWidth > 0 ? this.svg.clientWidth : this.svg.viewBox.baseVal.width;
     let h = this.svg.clientHeight > 0 ? this.svg.clientHeight : this.svg.viewBox.baseVal.height;
 
@@ -261,9 +264,6 @@ class SvgWrapper {
     let scaleY = h / this.drawingHeight;
 
     let scale = (scaleX < scaleY) ? scaleX : scaleY;
-    let viewBoxDim = Math.round(this.drawingWidth > this.drawingHeight ? this.drawingWidth : this.drawingHeight);
-
-    this.svg.setAttributeNS(null, 'viewBox', `0 0 ${viewBoxDim} ${viewBoxDim}`);
 
     this.offsetX = -minX;
     this.offsetY = -minY;

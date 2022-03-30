@@ -11,7 +11,7 @@ class ReactionDrawer {
      * @param {Object} moleculeOptions An object containing molecule drawing specific options.
      */
     constructor(options, moleculeOptions) {
-        this.drawer = new Drawer(moleculeOptions);
+        this.drawer = new SvgDrawer(moleculeOptions);
 
         this.defaultOptions = {
             spacing: 15,
@@ -32,26 +32,22 @@ class ReactionDrawer {
    */
     draw(reaction, target, textAbove = '{reagents}', textBelow = '', themeName = 'light', infoOnly = false) {
         console.log(reaction);
-        // let canvas = null;
+        let svg = null;
 
-        // if (typeof target === 'string' || target instanceof String) {
-        //     canvas = document.getElementById(target);
-        // } else {
-        //     canvas = target;
-        // }
+        if (typeof target === 'string' || target instanceof String) {
+            svg = document.getElementById(target);
+        } else {
+            svg = target;
+        }
 
-        // let ctx = canvas.getContext('2d');
-        // let canvases = [];
+        let svgs = [];
 
-        // for (var i = 0; i < reaction.reactants.length; i++) {
-        //     if (i > 0) {
-        //         let text = new ReactionText("+", this.opts.plus);
-        //         canvases.push(text.canvas);
-        //     }
-        //     this.drawer.draw(reaction.reactants[i], null, themeName, infoOnly);
-        //     this.drawer.canvasWrapper.trim();
-        //     canvases.push(this.drawer.canvasWrapper.canvas);
-        // }
+        for (var i = 0; i < reaction.reactants.length; i++) {
+            let g = this.drawer.draw(reaction.reactants[i], null, themeName, infoOnly);
+            console.log(g)
+            // this.drawer.canvasWrapper.trim();
+            // canvases.push(this.drawer.canvasWrapper.canvas);
+        }
 
         // let reagents = [];
 

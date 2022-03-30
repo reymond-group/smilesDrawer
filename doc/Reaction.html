@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>UtilityFunctions.js - Documentation</title>
+    <title>Reaction - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,40 +32,190 @@
 
 <div id="main">
     
-    <h1 class="page-title">UtilityFunctions.js</h1>
+    <h1 class="page-title">Reaction</h1>
     
 
     
 
 
 
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Translate the integer indicating the charge to the appropriate text.
- * @param {Number} charge The integer indicating the charge.
- * @returns {String} A string representing a charge.
- */
-function getChargeText(charge) {
-  if (charge === 1) {
-    return '+'
-  } else if (charge === 2) {
-    return '2+';
-  } else if (charge === -1) {
-    return '-';
-  } else if (charge === -2) {
-    return '2-';
-  } else {
-    return '';
-  }
-}
 
-module.exports = {
-  getChargeText,
-}</code></pre>
-        </article>
-    </section>
+<section>
+
+<header>
+    
+        <h2>
+        Reaction
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+    
+
+    <h4 class="name" id="Reaction"><span class="type-signature"></span>new Reaction<span class="signature">(reactionSmiles)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Reaction.js.html">Reaction.js</a>, <a href="Reaction.js.html#line10">line 10</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>The constructor for the class Reaction.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>reactionSmiles</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A reaction SMILES.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

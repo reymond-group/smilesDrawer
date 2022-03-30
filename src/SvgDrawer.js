@@ -26,6 +26,12 @@ class SvgDrawer {
    * @returns {Oject} The dimensions of the drawing in { width, height }
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
+    if (typeof target === 'string' || target instanceof String) {
+      target = document.getElementById(target);
+    } else if (target === null) {
+      target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    }
+
     let preprocessor = this.preprocessor;
 
     preprocessor.initDraw(data, themeName, infoOnly);
@@ -50,7 +56,8 @@ class SvgDrawer {
       console.log(preprocessor.ringConnections);
     }
 
-    return this.svgWrapper.constructSvg();
+    this.svgWrapper.constructSvg();
+    return target;
   }
 
   /**

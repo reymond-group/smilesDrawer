@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>UtilityFunctions.js - Documentation</title>
+    <title>ReactionParser.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">UtilityFunctions.js</h1>
+    <h1 class="page-title">ReactionParser.js</h1>
     
 
     
@@ -42,28 +42,24 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Translate the integer indicating the charge to the appropriate text.
- * @param {Number} charge The integer indicating the charge.
- * @returns {String} A string representing a charge.
- */
-function getChargeText(charge) {
-  if (charge === 1) {
-    return '+'
-  } else if (charge === 2) {
-    return '2+';
-  } else if (charge === -1) {
-    return '-';
-  } else if (charge === -2) {
-    return '2-';
-  } else {
-    return '';
-  }
+            <pre class="prettyprint source linenums"><code>//@ts-check
+const Reaction = require('./Reaction')
+
+class ReactionParser {
+    /**
+     * Returns the hex code of a color associated with a key from the current theme.
+     *
+     * @param {String} reactionSmiles A reaction SMILES.
+     * @returns {Reaction} A reaction object.
+     */
+    static parse(reactionSmiles) {
+        let reaction = new Reaction(reactionSmiles);
+
+        return reaction;
+    }
 }
 
-module.exports = {
-  getChargeText,
-}</code></pre>
+module.exports = ReactionParser;</code></pre>
         </article>
     </section>
 

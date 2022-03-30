@@ -12,6 +12,7 @@ const CanvasWrapper = require('./CanvasWrapper')
 const Graph = require('./Graph')
 const SSSR = require('./SSSR')
 const ThemeManager = require('./ThemeManager')
+const Options = require('./Options')
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -98,7 +99,7 @@ class DrawerBase {
       }
     };
 
-    this.opts = this.extend(true, this.defaultOptions, options);
+    this.opts = Options.extend(true, this.defaultOptions, options);
     this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;
     this.opts.bondLengthSq = this.opts.bondLength * this.opts.bondLength;
     this.opts.halfFontSizeLarge = this.opts.fontSizeLarge / 2.0;
@@ -108,42 +109,6 @@ class DrawerBase {
     // Set the default theme.
     this.theme = this.opts.themes.dark;
   }
-
-  /**
-   * A helper method to extend the default options with user supplied ones.
-   */
-  extend() {
-    let that = this;
-    let extended = {};
-    let deep = false;
-    let i = 0;
-    let length = arguments.length;
-
-    if (Object.prototype.toString.call(arguments[0]) === '[object Boolean]') {
-      deep = arguments[0];
-      i++;
-    }
-
-    let merge = function (obj) {
-      for (var prop in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-          if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
-            extended[prop] = that.extend(true, extended[prop], obj[prop]);
-          } else {
-            extended[prop] = obj[prop];
-          }
-        }
-      }
-    };
-
-    for (; i < length; i++) {
-      let obj = arguments[i];
-      merge(obj);
-    }
-
-    return extended;
-  };
-
 
   /**
    * Draws the parsed smiles data to a canvas element.

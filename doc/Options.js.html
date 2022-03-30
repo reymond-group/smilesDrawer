@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>UtilityFunctions.js - Documentation</title>
+    <title>Options.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">UtilityFunctions.js</h1>
+    <h1 class="page-title">Options.js</h1>
     
 
     
@@ -42,28 +42,46 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Translate the integer indicating the charge to the appropriate text.
- * @param {Number} charge The integer indicating the charge.
- * @returns {String} A string representing a charge.
- */
-function getChargeText(charge) {
-  if (charge === 1) {
-    return '+'
-  } else if (charge === 2) {
-    return '2+';
-  } else if (charge === -1) {
-    return '-';
-  } else if (charge === -2) {
-    return '2-';
-  } else {
-    return '';
-  }
+            <pre class="prettyprint source linenums"><code>//@ts-check
+
+class Options {
+    /**
+     * A helper method to extend the default options with user supplied ones.
+     */
+    static extend() {
+        let that = this;
+        let extended = {};
+        let deep = false;
+        let i = 0;
+        let length = arguments.length;
+
+        if (Object.prototype.toString.call(arguments[0]) === '[object Boolean]') {
+            deep = arguments[0];
+            i++;
+        }
+
+        let merge = function (obj) {
+            for (var prop in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                    if (deep &amp;&amp; Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+                        extended[prop] = that.extend(true, extended[prop], obj[prop]);
+                    } else {
+                        extended[prop] = obj[prop];
+                    }
+                }
+            }
+        };
+
+        for (; i &lt; length; i++) {
+            let obj = arguments[i];
+            merge(obj);
+        }
+
+        return extended;
+    }
 }
 
-module.exports = {
-  getChargeText,
-}</code></pre>
+module.exports = Options;</code></pre>
         </article>
     </section>
 
