@@ -742,18 +742,17 @@ class SvgWrapper {
    * 
    * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
    */
-  toCanvas(canvas) {
+  toCanvas(canvas, width, height) {
     if (typeof canvas === 'string' || canvas instanceof String) {
       canvas = document.getElementById(canvas);
     }
 
-    var ctx = canvas.getContext('2d');
-    var image = new Image();
+    let image = new Image();
 
-    image.onload = function load() {
-      canvas.height = image.height;
-      canvas.width = image.width;
-      ctx.drawImage(image, 0, 0);
+    image.onload = function () {
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(image, 0, 0, width, height);
     };
 
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);

@@ -2017,13 +2017,13 @@ class Drawer {
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
-    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
-    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
+    svg.setAttributeNS(null, 'width', 500 + '');
+    svg.setAttributeNS(null, 'height', 500 + '');
     svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
     document.body.appendChild(svg);
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
-    this.svgDrawer.svgWrapper.toCanvas(canvas);
+    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
     document.body.removeChild(svg);
   }
   /**
@@ -10615,18 +10615,17 @@ class SvgWrapper {
    */
 
 
-  toCanvas(canvas) {
+  toCanvas(canvas, width, height) {
     if (typeof canvas === 'string' || canvas instanceof String) {
       canvas = document.getElementById(canvas);
     }
 
-    var ctx = canvas.getContext('2d');
-    var image = new Image();
+    let image = new Image();
 
-    image.onload = function load() {
-      canvas.height = image.height;
-      canvas.width = image.width;
-      ctx.drawImage(image, 0, 0);
+    image.onload = function () {
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(image, 0, 0, width, height);
     };
 
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);
