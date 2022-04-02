@@ -1,4 +1,5 @@
 {
     "vsicons.presets.angular": false,
-    "restructuredtext.confPath": ""
+    "restructuredtext.confPath": "",
+    "svg.preview.background": "custom"
 }

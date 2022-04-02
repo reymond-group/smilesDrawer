@@ -1,17 +1,5 @@
 //@ts-check
-const MathHelper = require('./MathHelper')
-const ArrayHelper = require('./ArrayHelper')
-const Vector2 = require('./Vector2')
-const Line = require('./Line')
-const Vertex = require('./Vertex')
-const Edge = require('./Edge')
-const Atom = require('./Atom')
-const Ring = require('./Ring')
-const RingConnection = require('./RingConnection')
 const SvgDrawer = require('./SvgDrawer')
-const Graph = require('./Graph')
-const SSSR = require('./SSSR')
-const ThemeManager = require('./ThemeManager')
 
 /** 
  * The main class of the application representing the smiles drawer 
