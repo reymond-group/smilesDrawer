@@ -5,7 +5,6 @@ const {
 const Line = require('./Line');
 const Vector2 = require('./Vector2');
 const MathHelper = require('./MathHelper');
-const Glyphs = require('./Glyphs')
 
 function makeid(length) {
   var result = '';
@@ -656,13 +655,6 @@ class SvgWrapper {
     mask.setAttributeNS(null, 'cy', cy);
     mask.setAttributeNS(null, 'r', maskRadius);
     mask.setAttributeNS(null, 'fill', 'black');
-
-    let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    point.setAttributeNS(null, 'cx', cx);
-    point.setAttributeNS(null, 'cy', cy);
-    point.setAttributeNS(null, 'r', 0.5);
-    point.setAttributeNS(null, 'fill', 'red');
-    this.vertices.push(point);
 
     this.maskElements.push(mask);
 
