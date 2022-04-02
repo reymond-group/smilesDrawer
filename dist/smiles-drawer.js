@@ -1948,31 +1948,7 @@ module.exports = CanvasWrapper;
 "use strict";
 
 //@ts-check
-const MathHelper = require('./MathHelper');
-
-const ArrayHelper = require('./ArrayHelper');
-
-const Vector2 = require('./Vector2');
-
-const Line = require('./Line');
-
-const Vertex = require('./Vertex');
-
-const Edge = require('./Edge');
-
-const Atom = require('./Atom');
-
-const Ring = require('./Ring');
-
-const RingConnection = require('./RingConnection');
-
 const SvgDrawer = require('./SvgDrawer');
-
-const Graph = require('./Graph');
-
-const SSSR = require('./SSSR');
-
-const ThemeManager = require('./ThemeManager');
 /** 
  * The main class of the application representing the smiles drawer 
  * 
@@ -2016,14 +1992,15 @@ class Drawer {
     }
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
-    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
-    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
+
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
+    svg.setAttributeNS(null, 'width', 500 + '');
+    svg.setAttributeNS(null, 'height', 500 + '');
     svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
     document.body.appendChild(svg);
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
-    this.svgDrawer.svgWrapper.toCanvas(canvas);
+    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
     document.body.removeChild(svg);
   }
   /**
@@ -2051,7 +2028,7 @@ class Drawer {
 
 module.exports = Drawer;
 
-},{"./ArrayHelper":2,"./Atom":3,"./Edge":7,"./Graph":8,"./Line":9,"./MathHelper":10,"./Ring":16,"./RingConnection":17,"./SSSR":18,"./SvgDrawer":19,"./ThemeManager":21,"./Vector2":23,"./Vertex":24}],6:[function(require,module,exports){
+},{"./SvgDrawer":19}],6:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -9978,9 +9955,9 @@ class SvgWrapper {
     } // Create styles here as text measurement is done before constructSvg
 
 
-    let style = document.createElementNS('http://www.w3.org/2000/svg', 'style'); // create the css styles
+    this.style = document.createElementNS('http://www.w3.org/2000/svg', 'style'); // create the css styles
 
-    style.appendChild(document.createTextNode(`
+    this.style.appendChild(document.createTextNode(`
                 .element {
                     font: ${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif;
                 }
@@ -9990,10 +9967,10 @@ class SvgWrapper {
             `));
 
     if (this.svg) {
-      this.svg.appendChild(style);
+      this.svg.appendChild(this.style);
     } else {
       this.container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      container.appendChild(style);
+      container.appendChild(this.style);
     }
   }
 
@@ -10438,39 +10415,7 @@ class SvgWrapper {
       }
     }
 
-    this.write(text, direction, x, y); // for (let key in attachedPseudoElement) {
-    //   if (!attachedPseudoElement.hasOwnProperty(key)) {
-    //     continue;
-    //   }
-    //   let element = attachedPseudoElement[key].element,
-    //     elementCount = attachedPseudoElement[key].count,
-    //     hydrogenCount = attachedPseudoElement[key].hydrogenCount,
-    //     elementCharge = attachedPseudoElement[key].charge,
-    //     pseudoElementElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    //   pseudoElementElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
-    //   pseudoElementElem.appendChild(document.createTextNode(element));
-    //   pseudoElementElem.setAttributeNS(null, 'fill', this.themeManager.getColor(element));
-    //   if (elementCharge !== 0) {
-    //     let elementChargeElem = this.createSubSuperScripts(getChargeText(elementCharge), 'super');
-    //     pseudoElementElem.appendChild(elementChargeElem);
-    //   }
-    //   if (hydrogenCount > 0) {
-    //     let pseudoHydrogenElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-    //     pseudoHydrogenElem.setAttributeNS(null, 'style', 'unicode-bidi: plaintext;');
-    //     pseudoHydrogenElem.appendChild(document.createTextNode('H'));
-    //     pseudoElementElem.appendChild(pseudoHydrogenElem);
-    //     if (hydrogenCount > 1) {
-    //       let hydrogenCountElem = this.createSubSuperScripts(hydrogenCount, 'sub');
-    //       pseudoHydrogenElem.appendChild(hydrogenCountElem);
-    //     }
-    //   }
-    //   if (elementCount > 1) {
-    //     let elementCountElem = this.createSubSuperScripts(elementCount, 'sub');
-    //     pseudoElementElem.appendChild(elementCountElem);
-    //   }
-    //   textElem.appendChild(pseudoElementElem);
-    // }
-    // this.vertices.push(textElem);
+    this.write(text, direction, x, y);
   }
   /**
    * @param {Line} line the line object to create the wedge from
@@ -10515,13 +10460,14 @@ class SvgWrapper {
     let cx = x;
     let cy = y; // Measure element name only, without charge or isotope
 
-    let bbox = this.measureText(text[0][1], 'element');
+    let bbox = this.measureText(text[0][1]);
+    console.log(bbox);
     let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     textElem.setAttributeNS(null, 'class', 'element');
     let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     textElem.setAttributeNS(null, 'fill', '#ffffff');
 
-    if (direction === 'left' || direction === 'up') {
+    if (direction === 'left') {
       text = text.reverse();
     }
 
@@ -10533,49 +10479,33 @@ class SvgWrapper {
       x += bbox.width / 2.0;
     }
 
-    if (direction === 'down') {
-      y -= bbox.height / 2.0;
-    }
-
-    text.forEach(part => {
+    text.forEach((part, i) => {
       const display = part[0];
       const elementName = part[1];
       let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
       tspanElem.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
       tspanElem.textContent = display;
 
-      if (direction === 'down' || direction === 'up') {
-        tspanElem.setAttributeNS(null, 'dy', '0.9em');
+      if (direction === 'up' || direction === 'down') {
         tspanElem.setAttributeNS(null, 'x', '0px');
+
+        if (direction === 'up') {
+          tspanElem.setAttributeNS(null, 'y', `-${0.9 * i}em`);
+        } else {
+          tspanElem.setAttributeNS(null, 'y', `${0.9 * i}em`);
+        }
       }
 
       textElem.appendChild(tspanElem);
     });
-
-    if (direction === 'left' || direction === 'right') {
-      textElem.setAttributeNS(null, 'dominant-baseline', 'central');
-    } // This is hacky and relies on dy setting above
-
-
-    if (direction === 'down') {
-      textElem.setAttributeNS(null, 'dominant-baseline', 'alphabetic');
-    }
-
-    if (direction === 'up') {
-      textElem.setAttributeNS(null, 'dominant-baseline', 'mathematical');
-    }
+    textElem.setAttributeNS(null, 'data-direction', direction);
+    textElem.setAttributeNS(null, 'dominant-baseline', 'central');
 
     if (direction === 'left') {
       textElem.setAttributeNS(null, 'text-anchor', 'end');
     }
 
     g.appendChild(textElem);
-
-    if (direction === 'up') {
-      let gbbox = this.measureElement(g);
-      y -= gbbox.height;
-    }
-
     g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
     let maskRadius = 3.5;
 
@@ -10592,22 +10522,17 @@ class SvgWrapper {
     this.vertices.push(g);
   }
 
-  measureText(text, className) {
-    let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    textElem.setAttributeNS(null, 'class', className);
-    textElem.setAttributeNS(null, 'x', -9999);
-    textElem.textContent = text;
-    this.svg.appendChild(textElem);
-    let bbox = textElem.getBBox();
-    this.svg.removeChild(textElem);
-    return bbox;
-  }
-
-  measureElement(element) {
-    this.svg.appendChild(element);
-    let bbox = element.getBBox();
-    this.svg.removeChild(element);
-    return bbox;
+  measureText(text) {
+    const element = document.createElement('canvas');
+    const ctx = element.getContext("2d");
+    ctx.font = `${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif`;
+    let textMetrics = ctx.measureText(text);
+    console.log(textMetrics);
+    return {
+      'width': textMetrics.width,
+      // Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight),
+      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * 0.9
+    };
   }
   /**
    * 
@@ -10615,18 +10540,17 @@ class SvgWrapper {
    */
 
 
-  toCanvas(canvas) {
+  toCanvas(canvas, width, height) {
     if (typeof canvas === 'string' || canvas instanceof String) {
       canvas = document.getElementById(canvas);
     }
 
-    var ctx = canvas.getContext('2d');
-    var image = new Image();
+    let image = new Image();
 
-    image.onload = function load() {
-      canvas.height = image.height;
-      canvas.width = image.width;
-      ctx.drawImage(image, 0, 0);
+    image.onload = function () {
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(image, 0, 0, width, height);
     };
 
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);

@@ -1,17 +1,5 @@
 //@ts-check
-const MathHelper = require('./MathHelper')
-const ArrayHelper = require('./ArrayHelper')
-const Vector2 = require('./Vector2')
-const Line = require('./Line')
-const Vertex = require('./Vertex')
-const Edge = require('./Edge')
-const Atom = require('./Atom')
-const Ring = require('./Ring')
-const RingConnection = require('./RingConnection')
 const SvgDrawer = require('./SvgDrawer')
-const Graph = require('./Graph')
-const SSSR = require('./SSSR')
-const ThemeManager = require('./ThemeManager')
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -53,13 +41,14 @@ class Drawer {
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
-    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
-    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
+    // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
+    svg.setAttributeNS(null, 'width', 500 + '');
+    svg.setAttributeNS(null, 'height', 500 + '');
     svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
     document.body.appendChild(svg);
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
-    this.svgDrawer.svgWrapper.toCanvas(canvas);
+    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
     document.body.removeChild(svg);
   }
 
