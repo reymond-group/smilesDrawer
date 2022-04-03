@@ -10461,7 +10461,6 @@ class SvgWrapper {
     let cy = y; // Measure element name only, without charge or isotope
 
     let bbox = this.measureText(text[0][1]);
-    console.log(bbox);
     let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     textElem.setAttributeNS(null, 'class', 'element');
     let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -10527,7 +10526,6 @@ class SvgWrapper {
     const ctx = element.getContext("2d");
     ctx.font = `${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif`;
     let textMetrics = ctx.measureText(text);
-    console.log(textMetrics);
     return {
       'width': textMetrics.width,
       // Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight),
