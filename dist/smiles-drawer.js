@@ -2104,7 +2104,7 @@ class DrawerBase {
       compactDrawing: true,
       fontSizeLarge: 5,
       fontSizeSmall: 3,
-      padding: 20.0,
+      padding: 5.0,
       experimentalSSSR: false,
       kkThreshold: 0.1,
       kkInnerThreshold: 0.1,
@@ -9935,10 +9935,7 @@ class SvgWrapper {
 
     this.paths = [];
     this.vertices = [];
-    this.gradients = []; // maintain the offset for drawing purposes
-
-    this.offsetX = 0.0;
-    this.offsetY = 0.0; // maintain the dimensions
+    this.gradients = []; // maintain the dimensions
 
     this.drawingWidth = 0;
     this.drawingHeight = 0;
@@ -9946,14 +9943,12 @@ class SvgWrapper {
 
     this.themeManager = themeManager; // create the mask
 
-    this.maskElements = [];
-    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    mask.setAttributeNS(null, 'x', 0);
-    mask.setAttributeNS(null, 'y', 0);
-    mask.setAttributeNS(null, 'width', '100%');
-    mask.setAttributeNS(null, 'height', '100%');
-    mask.setAttributeNS(null, 'fill', 'white');
-    this.maskElements.push(mask); // clear the svg element
+    this.maskElements = []; // min and max values of the coordinates
+
+    this.maxX = -Number.MAX_VALUE;
+    this.maxY = -Number.MAX_VALUE;
+    this.minX = Number.MAX_VALUE;
+    this.minY = Number.MAX_VALUE; // clear the svg element
 
     if (clear) {
       while (this.svg.firstChild) {
@@ -9987,7 +9982,14 @@ class SvgWrapper {
         masks = document.createElementNS('http://www.w3.org/2000/svg', 'mask'),
         paths = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         vertices = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
-        pathChildNodes = this.paths; // give the mask an id
+        pathChildNodes = this.paths;
+    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    mask.setAttributeNS(null, 'x', this.minX);
+    mask.setAttributeNS(null, 'y', this.minY);
+    mask.setAttributeNS(null, 'width', this.maxX - this.minX);
+    mask.setAttributeNS(null, 'height', this.maxY - this.minY);
+    mask.setAttributeNS(null, 'fill', 'white');
+    masks.appendChild(mask); // give the mask an id
 
     masks.setAttributeNS(null, 'id', this.uid + '-text-mask');
 
@@ -10008,6 +10010,7 @@ class SvgWrapper {
     }
 
     paths.setAttributeNS(null, 'mask', 'url(#' + this.uid + '-text-mask)');
+    this.updateViewbox(this.opts.scale);
 
     if (this.svg) {
       this.svg.appendChild(defs);
@@ -10035,10 +10038,10 @@ class SvgWrapper {
         gradientUrl = this.uid + `-line-${this.gradientId++}`,
         l = line.getLeftVector(),
         r = line.getRightVector(),
-        fromX = l.x + this.offsetX,
-        fromY = l.y + this.offsetY,
-        toX = r.x + this.offsetX,
-        toY = r.y + this.offsetY;
+        fromX = l.x,
+        fromY = l.y,
+        toX = r.x,
+        toY = r.y;
     gradient.setAttributeNS(null, 'id', gradientUrl);
     gradient.setAttributeNS(null, 'gradientUnits', 'userSpaceOnUse');
     gradient.setAttributeNS(null, 'x1', fromX);
@@ -10116,47 +10119,53 @@ class SvgWrapper {
 
 
   determineDimensions(vertices) {
-    // Figure out the final size of the image
-    let maxX = -Number.MAX_VALUE;
-    let maxY = -Number.MAX_VALUE;
-    let minX = Number.MAX_VALUE;
-    let minY = Number.MAX_VALUE;
-
     for (var i = 0; i < vertices.length; i++) {
       if (!vertices[i].value.isDrawn) {
         continue;
       }
 
       let p = vertices[i].position;
-      if (maxX < p.x) maxX = p.x;
-      if (maxY < p.y) maxY = p.y;
-      if (minX > p.x) minX = p.x;
-      if (minY > p.y) minY = p.y;
+      if (this.maxX < p.x) this.maxX = p.x;
+      if (this.maxY < p.y) this.maxY = p.y;
+      if (this.minX > p.x) this.minX = p.x;
+      if (this.minY > p.y) this.minY = p.y;
     } // Add padding
 
 
     let padding = this.opts.padding;
-    maxX += padding;
-    maxY += padding;
-    minX -= padding;
-    minY -= padding;
-    this.drawingWidth = maxX - minX;
-    this.drawingHeight = maxY - minY;
-    let viewBoxDim = Math.round(this.drawingWidth > this.drawingHeight ? this.drawingWidth : this.drawingHeight);
-    this.svg.setAttributeNS(null, 'viewBox', `0 0 ${viewBoxDim} ${viewBoxDim}`);
-    let w = this.svg.clientWidth > 0 ? this.svg.clientWidth : this.svg.viewBox.baseVal.width;
-    let h = this.svg.clientHeight > 0 ? this.svg.clientHeight : this.svg.viewBox.baseVal.height;
-    let scaleX = w / this.drawingWidth;
-    let scaleY = h / this.drawingHeight;
-    let scale = scaleX < scaleY ? scaleX : scaleY;
-    this.offsetX = -minX;
-    this.offsetY = -minY; // Center
+    this.maxX += padding;
+    this.maxY += padding;
+    this.minX -= padding;
+    this.minY -= padding;
+    this.drawingWidth = this.maxX - this.minX;
+    this.drawingHeight = this.maxY - this.minY;
+  }
 
-    if (scaleX < scaleY) {
-      this.offsetY += h / (2.0 * scale) - this.drawingHeight / 2.0;
+  updateViewbox(scale = true) {
+    let x = this.minX;
+    let y = this.minY;
+    let width = this.maxX - this.minX;
+    let height = this.maxY - this.minY;
+
+    if (scale <= 0.0) {
+      if (width > height) {
+        let diff = width - height;
+        height = width;
+        y -= diff / 2.0;
+      } else {
+        let diff = height - width;
+        width = height;
+        x -= diff / 2.0;
+      }
     } else {
-      this.offsetX += w / (2.0 * scale) - this.drawingWidth / 2.0;
+      if (this.svg) {
+        this.svg.style.width = scale * width + 'px';
+      } else {
+        this.svg.style.height = scale * height + 'px';
+      }
     }
+
+    this.svg.setAttributeNS(null, 'viewBox', `${x} ${y} ${width} ${height}`);
   }
   /**
    * Draw an svg ellipse as a ball.
@@ -10169,8 +10178,8 @@ class SvgWrapper {
 
   drawBall(x, y, elementName) {
     let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    ball.setAttributeNS(null, 'cx', x + this.offsetX);
-    ball.setAttributeNS(null, 'cy', y + this.offsetY);
+    ball.setAttributeNS(null, 'cx', x);
+    ball.setAttributeNS(null, 'cy', y);
     ball.setAttributeNS(null, 'r', this.opts.bondLength / 4.5);
     ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(ball);
@@ -10187,9 +10196,7 @@ class SvgWrapper {
       return;
     }
 
-    let offsetX = this.offsetX,
-        offsetY = this.offsetY,
-        l = line.getLeftVector().clone(),
+    let l = line.getLeftVector().clone(),
         r = line.getRightVector().clone(),
         normals = Vector2.normals(l, r);
     normals[0].normalize();
@@ -10235,8 +10242,8 @@ class SvgWrapper {
 
   drawDebugPoint(x, y, debugText = '', color = '#f00') {
     let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    point.setAttributeNS(null, 'cx', x + this.offsetX);
-    point.setAttributeNS(null, 'cy', y + this.offsetY);
+    point.setAttributeNS(null, 'cx', x);
+    point.setAttributeNS(null, 'cy', y);
     point.setAttributeNS(null, 'r', '2');
     point.setAttributeNS(null, 'fill', '#f00');
     this.vertices.push(point);
@@ -10253,8 +10260,8 @@ class SvgWrapper {
 
   drawDebugText(x, y, text) {
     let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    textElem.setAttributeNS(null, 'x', x + this.offsetX);
-    textElem.setAttributeNS(null, 'y', y + this.offsetY);
+    textElem.setAttributeNS(null, 'x', x);
+    textElem.setAttributeNS(null, 'y', y);
     textElem.setAttributeNS(null, 'class', 'debug');
     textElem.setAttributeNS(null, 'fill', '#ff0000');
     textElem.setAttributeNS(null, 'style', `
@@ -10275,8 +10282,8 @@ class SvgWrapper {
   drawRing(x, y, s) {
     let circleElem = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, s);
-    circleElem.setAttributeNS(null, 'cx', x + this.offsetX);
-    circleElem.setAttributeNS(null, 'cy', y + this.offsetY);
+    circleElem.setAttributeNS(null, 'cx', x);
+    circleElem.setAttributeNS(null, 'cy', y);
     circleElem.setAttributeNS(null, 'r', radius - this.opts.bondSpacing);
     circleElem.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
     circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness * 1.5);
@@ -10297,10 +10304,10 @@ class SvgWrapper {
         stylesArr = [['stroke-width', this.opts.bondThickness], ['stroke-linecap', 'round'], ['stroke-dasharray', dashed ? '5, 5' : 'none']],
         l = line.getLeftVector(),
         r = line.getRightVector(),
-        fromX = l.x + this.offsetX,
-        fromY = l.y + this.offsetY,
-        toX = r.x + this.offsetX,
-        toY = r.y + this.offsetY;
+        fromX = l.x,
+        fromY = l.y,
+        toX = r.x,
+        toY = r.y;
     let styles = stylesArr.map(sub => sub.join(':')).join(';'),
         lineElem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     lineElem.setAttributeNS(null, 'x1', fromX);
@@ -10326,20 +10333,18 @@ class SvgWrapper {
 
 
   drawPoint(x, y, elementName) {
-    let ctx = this.ctx;
-    let offsetX = this.offsetX;
-    let offsetY = this.offsetY; // first create a mask
+    let ctx = this.ctx; // first create a mask
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    mask.setAttributeNS(null, 'cx', x + offsetX);
-    mask.setAttributeNS(null, 'cy', y + offsetY);
+    mask.setAttributeNS(null, 'cx', x);
+    mask.setAttributeNS(null, 'cy', y);
     mask.setAttributeNS(null, 'r', '1.5');
     mask.setAttributeNS(null, 'fill', 'black');
     this.maskElements.push(mask); // now create the point
 
     let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    point.setAttributeNS(null, 'cx', x + offsetX);
-    point.setAttributeNS(null, 'cy', y + offsetY);
+    point.setAttributeNS(null, 'cx', x);
+    point.setAttributeNS(null, 'cy', y);
     point.setAttributeNS(null, 'r', '0.75');
     point.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(point);
@@ -10430,14 +10435,8 @@ class SvgWrapper {
 
 
   drawWedge(line) {
-    let offsetX = this.offsetX,
-        offsetY = this.offsetY,
-        l = line.getLeftVector().clone(),
+    let l = line.getLeftVector().clone(),
         r = line.getRightVector().clone();
-    l.x += offsetX;
-    l.y += offsetY;
-    r.x += offsetX;
-    r.y += offsetY;
     let normals = Vector2.normals(l, r);
     normals[0].normalize();
     normals[1].normalize();
@@ -10462,12 +10461,47 @@ class SvgWrapper {
   }
 
   write(text, direction, x, y) {
-    x += this.offsetX;
-    y += this.offsetY;
-    let cx = x;
-    let cy = y; // Measure element name only, without charge or isotope
+    // Measure element name only, without charge or isotope
+    let bbox = this.measureText(text[0][1]); // Get the approximate width and height of text and add update max/min
+    // to allow for narrower paddings
 
-    let bbox = this.measureText(text[0][1]);
+    if (direction === 'left') {
+      if (x - bbox.width * text.length < this.minX) {
+        this.minX = x - bbox.width * text.length;
+      }
+
+      if (y - bbox.height < this.minY) {
+        this.minY = y - bbox.height;
+      }
+
+      if (y + bbox.height > this.maxY) {
+        this.maxY = y + bbox.height;
+      }
+    } else if (direction === 'up') {
+      if (y - 0.8 * bbox.height * text.length < this.minY) {
+        this.minY = y - 0.8 * bbox.height * text.length;
+      }
+    } else if (direction === 'right') {
+      if (x + bbox.width * text.length > this.maxX) {
+        this.maxX = x + bbox.width * text.length;
+      }
+
+      if (y - bbox.height < this.minY) {
+        this.minY = y - bbox.height;
+      }
+
+      if (y + bbox.height > this.maxY) {
+        this.maxY = y + bbox.height;
+      }
+    } else if (direction === 'down') {
+      if (y + 0.8 * bbox.height * text.length > this.maxY) {
+        this.maxY = y + 0.8 * bbox.height * text.length;
+      }
+    }
+
+    let cx = x;
+    let cy = y; // Draw the text
+
     let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     textElem.setAttributeNS(null, 'class', 'element');
     let g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
