@@ -8464,7 +8464,7 @@ class ReactionDrawer {
    * @param {Object} moleculeOptions An object containing molecule drawing specific options.
    */
   constructor(options, moleculeOptions) {
-    this.drawer = new SvgDrawer(moleculeOptions);
+    this.drawer = new SvgDrawer(moleculeOptions, false);
     this.defaultOptions = {
       spacing: 15,
       plus: {},
@@ -8492,10 +8492,14 @@ class ReactionDrawer {
       svg = target;
     }
 
+    while (svg.firstChild) {
+      svg.removeChild(svg.firstChild);
+    }
+
     let svgs = [];
 
     for (var i = 0; i < reaction.reactants.length; i++) {
-      let g = this.drawer.draw(reaction.reactants[i], null, themeName, infoOnly);
+      let g = this.drawer.draw(reaction.reactants[i], svg, themeName, infoOnly);
       console.log(g); // this.drawer.canvasWrapper.trim();
       // canvases.push(this.drawer.canvasWrapper.canvas);
     } // let reagents = [];
@@ -9578,9 +9582,10 @@ const ThemeManager = require('./ThemeManager');
 const Vector2 = require('./Vector2');
 
 class SvgDrawer {
-  constructor(options) {
+  constructor(options, clear = true) {
     this.preprocessor = new DrawerBase(options);
     this.opts = this.preprocessor.opts;
+    this.clear = clear;
   }
   /**
    * Draws the parsed smiles data to an svg element.
@@ -9605,7 +9610,7 @@ class SvgDrawer {
 
     if (!infoOnly) {
       this.themeManager = new ThemeManager(this.opts.themes, themeName);
-      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts);
+      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
     }
 
     preprocessor.processGraph(); // Set the canvas to the appropriate size
@@ -9915,7 +9920,7 @@ function makeid(length) {
 }
 
 class SvgWrapper {
-  constructor(themeManager, target, options) {
+  constructor(themeManager, target, options, clear = true) {
     if (typeof target === 'string' || target instanceof String) {
       this.svg = document.getElementById(target);
     } else {
@@ -9950,8 +9955,10 @@ class SvgWrapper {
     mask.setAttributeNS(null, 'fill', 'white');
     this.maskElements.push(mask); // clear the svg element
 
-    while (this.svg.firstChild) {
-      this.svg.removeChild(this.svg.firstChild);
+    if (clear) {
+      while (this.svg.firstChild) {
+        this.svg.removeChild(this.svg.firstChild);
+      }
     } // Create styles here as text measurement is done before constructSvg
 
 

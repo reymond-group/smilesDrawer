@@ -11,7 +11,7 @@ class ReactionDrawer {
      * @param {Object} moleculeOptions An object containing molecule drawing specific options.
      */
     constructor(options, moleculeOptions) {
-        this.drawer = new SvgDrawer(moleculeOptions);
+        this.drawer = new SvgDrawer(moleculeOptions, false);
 
         this.defaultOptions = {
             spacing: 15,
@@ -40,10 +40,14 @@ class ReactionDrawer {
             svg = target;
         }
 
+        while (svg.firstChild) {
+            svg.removeChild(svg.firstChild);
+        }
+
         let svgs = [];
 
         for (var i = 0; i < reaction.reactants.length; i++) {
-            let g = this.drawer.draw(reaction.reactants[i], null, themeName, infoOnly);
+            let g = this.drawer.draw(reaction.reactants[i], svg, themeName, infoOnly);
             console.log(g)
             // this.drawer.canvasWrapper.trim();
             // canvases.push(this.drawer.canvasWrapper.canvas);

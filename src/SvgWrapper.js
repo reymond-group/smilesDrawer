@@ -17,7 +17,7 @@ function makeid(length) {
 }
 
 class SvgWrapper {
-  constructor(themeManager, target, options) {
+  constructor(themeManager, target, options, clear = true) {
     if (typeof target === 'string' || target instanceof String) {
       this.svg = document.getElementById(target);
     } else {
@@ -60,8 +60,10 @@ class SvgWrapper {
     this.maskElements.push(mask);
 
     // clear the svg element
-    while (this.svg.firstChild) {
-      this.svg.removeChild(this.svg.firstChild);
+    if (clear) {
+      while (this.svg.firstChild) {
+        this.svg.removeChild(this.svg.firstChild);
+      }
     }
 
     // Create styles here as text measurement is done before constructSvg

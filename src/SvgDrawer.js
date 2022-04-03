@@ -10,9 +10,10 @@ const ThemeManager = require('./ThemeManager');
 const Vector2 = require('./Vector2');
 
 class SvgDrawer {
-  constructor(options) {
+  constructor(options, clear = true) {
     this.preprocessor = new DrawerBase(options);
     this.opts = this.preprocessor.opts;
+    this.clear = clear;
   }
 
   /**
@@ -38,7 +39,7 @@ class SvgDrawer {
 
     if (!infoOnly) {
       this.themeManager = new ThemeManager(this.opts.themes, themeName);
-      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts);
+      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
     }
 
     preprocessor.processGraph();
