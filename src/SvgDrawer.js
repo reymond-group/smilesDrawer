@@ -14,6 +14,7 @@ class SvgDrawer {
     this.preprocessor = new DrawerBase(options);
     this.opts = this.preprocessor.opts;
     this.clear = clear;
+    this.svgWrapper = null;
   }
 
   /**
@@ -39,7 +40,9 @@ class SvgDrawer {
 
     if (!infoOnly) {
       this.themeManager = new ThemeManager(this.opts.themes, themeName);
-      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+      if (this.svgWrapper === null || this.clear) {
+        this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+      }
     }
 
     preprocessor.processGraph();

@@ -257,7 +257,7 @@ class SvgWrapper {
     this.drawingHeight = this.maxY - this.minY;
   }
 
-  updateViewbox(scale = true) {
+  updateViewbox(scale) {
     let x = this.minX;
     let y = this.minY;
     let width = this.maxX - this.minX;
