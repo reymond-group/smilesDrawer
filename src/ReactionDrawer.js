@@ -57,8 +57,8 @@ class ReactionDrawer {
 
 
         let maxHeight = 0.0
+        // Reactants
         for (var i = 0; i < reaction.reactants.length; i++) {
-            // Add a plus in front if this is not the first reactant
             if (i > 0) {
                 elements.push({
                     id: "plus",
@@ -92,6 +92,36 @@ class ReactionDrawer {
             width: this.opts.arrow.length * this.opts.scale,
             height: this.molOpts.fontSizeLarge * 0.9 * this.opts.scale
         });
+
+        // Products
+        for (var i = 0; i < reaction.products.length; i++) {
+            if (i > 0) {
+                elements.push({
+                    id: "plus",
+                    width: this.molOpts.fontSizeLarge * this.opts.scale,
+                    height: this.molOpts.fontSizeLarge * this.opts.scale
+                });
+            }
+
+            let id = `product-${i}`;
+            let prodcutSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+            prodcutSvg.setAttributeNS(null, 'id', id);
+            this.drawer.draw(reaction.products[i], prodcutSvg, themeName, infoOnly);
+
+            let element = {
+                id: id,
+                width: prodcutSvg.viewBox.baseVal.width * this.opts.scale,
+                height: prodcutSvg.viewBox.baseVal.height * this.opts.scale
+            };
+
+            elements.push(element);
+            defs.appendChild(prodcutSvg);
+
+            if (element.height > maxHeight) {
+                maxHeight = element.height;
+            }
+        }
 
         svg.appendChild(defs);
 
@@ -148,12 +178,14 @@ class ReactionDrawer {
         let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
         marker.setAttributeNS(null, 'id', 'arrowhead');
-
+        marker.setAttributeNS(null, 'viewBox', `0 0 ${s} ${s}`);
+        marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
         marker.setAttributeNS(null, 'markerWidth', s);
         marker.setAttributeNS(null, 'markerHeight', s);
         marker.setAttributeNS(null, 'refX', 0);
         marker.setAttributeNS(null, 'refY', s / 2);
         marker.setAttributeNS(null, 'orient', 'auto');
+        marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
 
         polygon.setAttributeNS(null, 'points', `0 0, ${s} ${s / 2}, 0 ${s}`)
 
@@ -185,7 +217,7 @@ class ReactionDrawer {
         line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
 
         svg.appendChild(line);
-        svg.setAttributeNS(null, 'viewBox', `0 0 ${l} ${w}`);
+        svg.setAttributeNS(null, 'viewBox', `0 ${-s / 2.0} ${l + s} ${s}`);
 
         return svg;
     }
