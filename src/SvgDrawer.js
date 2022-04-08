@@ -28,10 +28,10 @@ class SvgDrawer {
    * @returns {Oject} The dimensions of the drawing in { width, height }
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
-    if (typeof target === 'string' || target instanceof String) {
-      target = document.getElementById(target);
-    } else if (target === null) {
+    if (target === null || target == 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    } else {
+      target = document.getElementById(target);
     }
 
     let preprocessor = this.preprocessor;
@@ -61,6 +61,36 @@ class SvgDrawer {
     }
 
     this.svgWrapper.constructSvg();
+    return target;
+  }
+
+  /**
+ * Draws the parsed smiles data to a canvas element.
+ *
+ * @param {Object} data The tree returned by the smiles parser.
+ * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+ * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+ * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+ */
+  drawCanvas(data, target, themeName = 'light', infoOnly = false) {
+    let canvas = null;
+    if (typeof target === 'string' || target instanceof String) {
+      canvas = document.getElementById(target);
+    } else {
+      canvas = target;
+    }
+
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
+    svg.setAttributeNS(null, 'width', 500 + '');
+    svg.setAttributeNS(null, 'height', 500 + '');
+    svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
+    document.body.appendChild(svg);
+    this.svgDrawer.draw(data, svg, themeName, infoOnly);
+    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
+    document.body.removeChild(svg);
     return target;
   }
 
