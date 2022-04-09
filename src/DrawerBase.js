@@ -44,6 +44,7 @@ class DrawerBase {
     this.defaultOptions = {
       width: 500,
       height: 500,
+      scale: 0.0,
       bondThickness: 0.6,
       bondLength: 15,
       shortBondLength: 0.85,

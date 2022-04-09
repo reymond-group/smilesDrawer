@@ -38,7 +38,12 @@ class ReactionDrawer {
         this.themeManager = new ThemeManager(this.molOpts.themes, themeName);
         let svg = null;
 
-        if (typeof target === 'string' || target instanceof String) {
+        if (target === null || target === 'svg') {
+            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            svg.setAttributeNS(null, 'width', 500 + '');
+            svg.setAttributeNS(null, 'height', 500 + '');
+        } else if (typeof target === 'string' || target instanceof String) {
             svg = document.getElementById(target);
         } else {
             svg = target;
@@ -142,6 +147,8 @@ class ReactionDrawer {
         });
 
         svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
+
+        return svg;
     }
 
     getPlus() {

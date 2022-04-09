@@ -21,16 +21,19 @@ class SvgDrawer {
    * Draws the parsed smiles data to an svg element.
    *
    * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|HTMLElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+   * @param {(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
 
    * @returns {Oject} The dimensions of the drawing in { width, height }
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
-    if (target === null || target == 'svg') {
+    if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    } else {
+      target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      target.setAttributeNS(null, 'width', this.opts.width);
+      target.setAttributeNS(null, 'height', this.opts.height);
+    } else if (target instanceof String) {
       target = document.getElementById(target);
     }
 

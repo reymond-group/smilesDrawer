@@ -4,7 +4,7 @@ const Parser = require('./src/Parser')
 const ReactionParser = require('./src/ReactionParser')
 const SvgDrawer = require('./src/SvgDrawer')
 const ReactionDrawer = require('./src/ReactionDrawer')
-
+const SmiDrawer = require('./src/SmilesDrawer')
 
 // Detect SSR (server side rendering)
 var canUseDOM = !!(
@@ -107,6 +107,7 @@ SmilesDrawer.parseReaction = function (reactionSmiles, successCallback, errorCal
 
 if (canUseDOM) {
   window.SmilesDrawer = SmilesDrawer;
+  window.SmiDrawer = SmiDrawer;
 }
 
 // There be dragons (polyfills)
