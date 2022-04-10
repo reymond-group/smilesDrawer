@@ -80,8 +80,8 @@ class SmilesDrawer {
                     this.svgToCanvas(this.reactionDrawer.draw(reaction, null, '', '', theme), element);
                     callback(element);
                 } else if (tag === 'img') {
-                    // this.svgToImg(this.drawer.draw(parseTree, null, theme), element);
-                    // callback(element);
+                    this.svgToImg(this.reactionDrawer.draw(reaction, null, '', '', theme), element);
+                    callback(element);
                 }
             });
         }

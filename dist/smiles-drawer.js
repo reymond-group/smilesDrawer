@@ -8505,33 +8505,26 @@ class ReactionDrawer {
       svg.removeChild(svg.firstChild);
     }
 
-    let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    let elements = []; // Append non structure elements to defs
-
-    defs.appendChild(this.getPlus());
-    defs.appendChild(this.getArrow());
+    let elements = [];
     let maxHeight = 0.0; // Reactants
 
     for (var i = 0; i < reaction.reactants.length; i++) {
       if (i > 0) {
         elements.push({
-          id: "plus",
           width: this.molOpts.fontSizeLarge * this.opts.scale,
-          height: this.molOpts.fontSizeLarge * this.opts.scale
+          height: this.molOpts.fontSizeLarge * this.opts.scale,
+          svg: this.getPlus()
         });
       }
 
-      let id = `reactant-${i}`;
       let reactantSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      reactantSvg.setAttributeNS(null, 'id', id);
       this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, infoOnly);
       let element = {
-        id: id,
         width: reactantSvg.viewBox.baseVal.width * this.opts.scale,
-        height: reactantSvg.viewBox.baseVal.height * this.opts.scale
+        height: reactantSvg.viewBox.baseVal.height * this.opts.scale,
+        svg: reactantSvg
       };
       elements.push(element);
-      defs.appendChild(reactantSvg);
 
       if (element.height > maxHeight) {
         maxHeight = element.height;
@@ -8539,47 +8532,41 @@ class ReactionDrawer {
     }
 
     elements.push({
-      id: "arrow",
       width: this.opts.arrow.length * this.opts.scale,
-      height: this.molOpts.fontSizeLarge * 0.9 * this.opts.scale
+      height: this.molOpts.fontSizeLarge * 0.9 * this.opts.scale,
+      svg: this.getArrow()
     }); // Products
 
     for (var i = 0; i < reaction.products.length; i++) {
       if (i > 0) {
         elements.push({
-          id: "plus",
           width: this.molOpts.fontSizeLarge * this.opts.scale,
-          height: this.molOpts.fontSizeLarge * this.opts.scale
+          height: this.molOpts.fontSizeLarge * this.opts.scale,
+          svg: this.getPlus()
         });
       }
 
-      let id = `product-${i}`;
-      let prodcutSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      prodcutSvg.setAttributeNS(null, 'id', id);
-      this.drawer.draw(reaction.products[i], prodcutSvg, themeName, infoOnly);
+      let productSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      this.drawer.draw(reaction.products[i], productSvg, themeName, infoOnly);
       let element = {
-        id: id,
-        width: prodcutSvg.viewBox.baseVal.width * this.opts.scale,
-        height: prodcutSvg.viewBox.baseVal.height * this.opts.scale
+        width: productSvg.viewBox.baseVal.width * this.opts.scale,
+        height: productSvg.viewBox.baseVal.height * this.opts.scale,
+        svg: productSvg
       };
       elements.push(element);
-      defs.appendChild(prodcutSvg);
 
       if (element.height > maxHeight) {
         maxHeight = element.height;
       }
     }
 
-    svg.appendChild(defs);
     let totalWidth = 0.0;
     elements.forEach(element => {
-      let use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-      use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', '#' + element.id);
-      use.setAttributeNS(null, 'x', totalWidth);
-      use.setAttributeNS(null, 'y', (maxHeight - element.height) / 2.0);
-      use.setAttributeNS(null, 'width', element.width);
-      use.setAttributeNS(null, 'height', element.height);
-      svg.appendChild(use);
+      element.svg.setAttributeNS(null, 'x', totalWidth);
+      element.svg.setAttributeNS(null, 'y', (maxHeight - element.height) / 2.0);
+      element.svg.setAttributeNS(null, 'width', element.width);
+      element.svg.setAttributeNS(null, 'height', element.height);
+      svg.appendChild(element.svg);
       totalWidth += element.width + this.opts.spacing;
     });
     svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
@@ -9770,8 +9757,9 @@ class SmilesDrawer {
         } else if (tag === 'canvas') {
           this.svgToCanvas(this.reactionDrawer.draw(reaction, null, '', '', theme), element);
           callback(element);
-        } else if (tag === 'img') {// this.svgToImg(this.drawer.draw(parseTree, null, theme), element);
-          // callback(element);
+        } else if (tag === 'img') {
+          this.svgToImg(this.reactionDrawer.draw(reaction, null, '', '', theme), element);
+          callback(element);
         }
       });
     }
@@ -9882,6 +9870,7 @@ class SvgDrawer {
     if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      target.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
       target.setAttributeNS(null, 'width', this.opts.width);
       target.setAttributeNS(null, 'height', this.opts.height);
     } else if (target instanceof String) {

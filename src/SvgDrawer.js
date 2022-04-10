@@ -31,6 +31,7 @@ class SvgDrawer {
     if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      target.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
       target.setAttributeNS(null, 'width', this.opts.width);
       target.setAttributeNS(null, 'height', this.opts.height);
     } else if (target instanceof String) {
