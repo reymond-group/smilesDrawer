@@ -8570,6 +8570,8 @@ class ReactionDrawer {
       totalWidth += element.width + this.opts.spacing;
     });
     svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
+    svg.style.width = totalWidth + 'px';
+    svg.style.height = maxHeight + 'px';
     return svg;
   }
 
@@ -9741,11 +9743,14 @@ class SmilesDrawer {
   drawReaction(smiles, target, theme, callback) {
     let reaction = ReactionParser.parse(smiles);
 
-    if (target === null || target === 'svg') {// callback(this.drawer.draw(parseTree, null, theme));
-    } else if (target === 'canvas') {// let canvas = this.svgToCanvas(this.drawer.draw(parseTree, null, theme));
-      // callback(canvas);
-    } else if (target === 'img') {// let img = this.svgToImg(this.drawer.draw(parseTree, null, theme));
-      // callback(img);
+    if (target === null || target === 'svg') {
+      callback(this.reactionDrawer.draw(reaction, null, '', '', theme));
+    } else if (target === 'canvas') {
+      let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, '', '', theme));
+      callback(canvas);
+    } else if (target === 'img') {
+      let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, '', '', theme));
+      callback(img);
     } else {
       let elements = document.querySelectorAll(target);
       elements.forEach(element => {
@@ -9813,8 +9818,8 @@ class SmilesDrawer {
         h = parseInt(element.style.height);
       }
     } else {
-      w = parseFloat(svg.style.width) * this.drawer.opts.scale;
-      h = parseFloat(svg.style.height) * this.drawer.opts.scale;
+      w = parseFloat(svg.style.width);
+      h = parseFloat(svg.style.height);
     }
 
     return {

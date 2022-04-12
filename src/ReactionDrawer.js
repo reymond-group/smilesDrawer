@@ -130,6 +130,8 @@ class ReactionDrawer {
         });
 
         svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
+        svg.style.width = totalWidth + 'px';
+        svg.style.height = maxHeight + 'px';
 
         return svg;
     }

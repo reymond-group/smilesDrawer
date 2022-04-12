@@ -147,11 +147,11 @@
     </div>
 
     <div class="canvas-container">
-        <canvas id="output-canvas"></canvas>
+        <canvas id="output-canvas" class="output"></canvas>
         <br />
-        <svg id="output-svg"></svg>
+        <svg id="output-svg" class="output"></svg>
         <br />
-        <img id="output-img"></img>
+        <img id="output-img" class="output"></img>
     </div>
 
     <div class="settings-container">
@@ -218,7 +218,7 @@
             atomVisualization: 'default',
             width: 500,
             height: 500,
-            // scale: 2.0,
+            scale: 1.0,
         }
 
         var smiDrawer = new SmiDrawer(options);
@@ -228,7 +228,7 @@
         function draw() {
             let t = performance.now();
 
-            smiDrawer.draw(input.value, '#output-canvas', 'dark', result => {
+            smiDrawer.draw(input.value, '.output', 'dark', result => {
                 let td = performance.now() - t;
                 log.innerHTML = '&nbsp;';
                 log.style.visibility = 'hidden';
