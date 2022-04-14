@@ -2142,6 +2142,21 @@ class DrawerBase {
           SI: '#e67e22',
           H: '#666',
           BACKGROUND: '#fff'
+        },
+        oldschool: {
+          C: '#000',
+          O: '#000',
+          N: '#000',
+          F: '#000',
+          CL: '#000',
+          BR: '#000',
+          I: '#000',
+          P: '#000',
+          S: '#000',
+          B: '#000',
+          SI: '#000',
+          H: '#000',
+          BACKGROUND: '#fff'
         }
       }
     };
@@ -10242,7 +10257,8 @@ class SvgWrapper {
     this.container = null;
     this.opts = options;
     this.uid = makeid(5);
-    this.gradientId = 0; // maintain a list of line elements and their corresponding gradients
+    this.gradientId = 0;
+    this.fontFamily = 'Helvetica, Arial, sans-serif'; // maintain a list of line elements and their corresponding gradients
     // maintain a list of vertex elements
 
     this.paths = [];
@@ -10273,10 +10289,10 @@ class SvgWrapper {
 
     this.style.appendChild(document.createTextNode(`
                 .element {
-                    font: ${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif;
+                    font: ${this.opts.fontSizeLarge}pt ${this.fontFamily};
                 }
                 .sub {
-                    font: ${this.opts.fontSizeSmall}pt Helvetica, Arial, sans-serif;
+                    font: ${this.opts.fontSizeSmall}pt ${this.fontFamily};
                 }
             `));
 
@@ -10850,7 +10866,13 @@ class SvgWrapper {
       textElem.appendChild(tspanElem);
     });
     textElem.setAttributeNS(null, 'data-direction', direction);
-    textElem.setAttributeNS(null, 'dominant-baseline', 'central');
+
+    if (direction === 'left' || direction === 'right') {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'alphabetic');
+      textElem.setAttributeNS(null, 'y', '0.36em');
+    } else {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'central');
+    }
 
     if (direction === 'left') {
       textElem.setAttributeNS(null, 'text-anchor', 'end');
@@ -10858,10 +10880,10 @@ class SvgWrapper {
 
     g.appendChild(textElem);
     g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
-    let maskRadius = 3.5;
+    let maskRadius = 4.0;
 
     if (text[0][1].length > 1) {
-      maskRadius = 5.0;
+      maskRadius = 5.5;
     }
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -10876,7 +10898,7 @@ class SvgWrapper {
   measureText(text) {
     const element = document.createElement('canvas');
     const ctx = element.getContext("2d");
-    ctx.font = `${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif`;
+    ctx.font = `${this.opts.fontSizeLarge}pt ${this.fontFamily}`;
     let textMetrics = ctx.measureText(text);
     return {
       'width': textMetrics.width,

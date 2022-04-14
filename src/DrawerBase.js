@@ -96,6 +96,21 @@ class DrawerBase {
           SI: '#e67e22',
           H: '#666',
           BACKGROUND: '#fff'
+        },
+        oldschool: {
+          C: '#000',
+          O: '#000',
+          N: '#000',
+          F: '#000',
+          CL: '#000',
+          BR: '#000',
+          I: '#000',
+          P: '#000',
+          S: '#000',
+          B: '#000',
+          SI: '#000',
+          H: '#000',
+          BACKGROUND: '#fff'
         }
       }
     };
