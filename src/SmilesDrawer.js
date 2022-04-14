@@ -33,7 +33,11 @@ class SmilesDrawer {
         let parseTree = Parser.parse(smiles);
 
         if (target === null || target === 'svg') {
-            callback(this.drawer.draw(parseTree, null, theme));
+            let svg = this.drawer.draw(parseTree, null, theme);
+            let dims = this.getDimensions(svg);
+            svg.setAttributeNS(null, 'width', '' + dims.w);
+            svg.setAttributeNS(null, 'height', '' + dims.h);
+            callback(svg);
         } else if (target === 'canvas') {
             let canvas = this.svgToCanvas(this.drawer.draw(parseTree, null, theme));
             callback(canvas);
@@ -46,6 +50,9 @@ class SmilesDrawer {
                 let tag = element.nodeName.toLowerCase();
                 if (tag === 'svg') {
                     this.drawer.draw(parseTree, element, theme);
+                    let dims = this.getDimensions(element);
+                    element.setAttributeNS(null, 'width', '' + dims.w);
+                    element.setAttributeNS(null, 'height', '' + dims.h);
                     callback(element);
                 } else if (tag === 'canvas') {
                     this.svgToCanvas(this.drawer.draw(parseTree, null, theme), element);
@@ -62,7 +69,11 @@ class SmilesDrawer {
         let reaction = ReactionParser.parse(smiles);
 
         if (target === null || target === 'svg') {
-            callback(this.reactionDrawer.draw(reaction, null, '', '', theme));
+            let svg = this.reactionDrawer.draw(reaction, null, '', '', theme);
+            let dims = this.getDimensions(svg);
+            svg.setAttributeNS(null, 'width', '' + dims.w);
+            svg.setAttributeNS(null, 'height', '' + dims.h);
+            callback(svg);
         } else if (target === 'canvas') {
             let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, '', '', theme));
             callback(canvas);
@@ -74,7 +85,16 @@ class SmilesDrawer {
             elements.forEach(element => {
                 let tag = element.nodeName.toLowerCase();
                 if (tag === 'svg') {
+                    let dims = this.getDimensions(element);
                     this.reactionDrawer.draw(reaction, element, '', '', theme);
+                    // The svg has to have a css width and height set for the other
+                    // tags, however, here it would overwrite the chosen width and height
+                    if (this.drawer.opts.scale <= 0) {
+                        element.style.width = null;
+                        element.style.height = null;
+                    }
+                    element.setAttributeNS(null, 'width', '' + dims.w);
+                    element.setAttributeNS(null, 'height', '' + dims.h);
                     callback(element);
                 } else if (tag === 'canvas') {
                     this.svgToCanvas(this.reactionDrawer.draw(reaction, null, '', '', theme), element);
@@ -111,11 +131,11 @@ class SmilesDrawer {
 
     /**
      * 
-     * @param {HTMLImageElement|HTMLCanvasElement} element 
+     * @param {HTMLImageElement|HTMLCanvasElement|SVGElement} element 
      * @param {SVGElement} svg 
      * @returns {{w: Number, h: Number}} The width and height.
      */
-    getDimensions(element, svg) {
+    getDimensions(element, svg = null) {
         let w = this.drawer.opts.width;
         let h = this.drawer.opts.height;
 
@@ -135,7 +155,7 @@ class SmilesDrawer {
             if (element.style.height !== "") {
                 h = parseInt(element.style.height);
             }
-        } else {
+        } else if (svg) {
             w = parseFloat(svg.style.width);
             h = parseFloat(svg.style.height);
         }

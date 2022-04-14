@@ -11,7 +11,7 @@ class ReactionDrawer {
      */
     constructor(options, moleculeOptions) {
         this.defaultOptions = {
-            scale: 2.0,
+            scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
             spacing: 15,
             plus: {},
             arrow: {
@@ -21,7 +21,6 @@ class ReactionDrawer {
 
         this.opts = Options.extend(true, this.defaultOptions, options);
 
-        moleculeOptions.scale = this.opts.scale;
         this.drawer = new SvgDrawer(moleculeOptions);
         this.molOpts = this.drawer.opts;
     }
