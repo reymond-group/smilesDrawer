@@ -69,16 +69,16 @@ class SmilesDrawer {
         let reaction = ReactionParser.parse(smiles);
 
         if (target === null || target === 'svg') {
-            let svg = this.reactionDrawer.draw(reaction, null, '', '', theme);
+            let svg = this.reactionDrawer.draw(reaction, null, theme);
             let dims = this.getDimensions(svg);
             svg.setAttributeNS(null, 'width', '' + dims.w);
             svg.setAttributeNS(null, 'height', '' + dims.h);
             callback(svg);
         } else if (target === 'canvas') {
-            let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, '', '', theme));
+            let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme));
             callback(canvas);
         } else if (target === 'img') {
-            let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, '', '', theme));
+            let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, theme));
             callback(img);
         } else {
             let elements = document.querySelectorAll(target);
@@ -86,7 +86,7 @@ class SmilesDrawer {
                 let tag = element.nodeName.toLowerCase();
                 if (tag === 'svg') {
                     let dims = this.getDimensions(element);
-                    this.reactionDrawer.draw(reaction, element, '', '', theme);
+                    this.reactionDrawer.draw(reaction, element, theme);
                     // The svg has to have a css width and height set for the other
                     // tags, however, here it would overwrite the chosen width and height
                     if (this.drawer.opts.scale <= 0) {
@@ -97,10 +97,10 @@ class SmilesDrawer {
                     element.setAttributeNS(null, 'height', '' + dims.h);
                     callback(element);
                 } else if (tag === 'canvas') {
-                    this.svgToCanvas(this.reactionDrawer.draw(reaction, null, '', '', theme), element);
+                    this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme), element);
                     callback(element);
                 } else if (tag === 'img') {
-                    this.svgToImg(this.reactionDrawer.draw(reaction, null, '', '', theme), element);
+                    this.svgToImg(this.reactionDrawer.draw(reaction, null, theme), element);
                     callback(element);
                 }
             });

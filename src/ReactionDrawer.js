@@ -1,6 +1,8 @@
-const SvgDrawer = require('./SvgDrawer')
+const SvgDrawer = require('./SvgDrawer');
+const SvgWrapper = require('./SvgWrapper');
 const Options = require('./Options');
 const ThemeManager = require('./ThemeManager');
+const formulaToCommonName = require('./FormulaToCommonName');
 
 class ReactionDrawer {
     /**
@@ -12,6 +14,8 @@ class ReactionDrawer {
     constructor(options, moleculeOptions) {
         this.defaultOptions = {
             scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
+            fontSize: 3.5,
+            fontFamily: 'Helvetica, Arial, sans-serif',
             spacing: 15,
             plus: {},
             arrow: {
@@ -32,8 +36,10 @@ class ReactionDrawer {
    * @param {(String|HTMLElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+   * 
+   * @returns {SVGElement} The svg element
    */
-    draw(reaction, target, textAbove = '{reagents}', textBelow = '', themeName = 'light', infoOnly = false) {
+    draw(reaction, target, themeName = 'light', textAbove = '{reagents}', textBelow = '', infoOnly = false) {
         this.themeManager = new ThemeManager(this.molOpts.themes, themeName);
         let svg = null;
 
@@ -83,10 +89,44 @@ class ReactionDrawer {
             }
         }
 
+        // Arrow
         elements.push({
             width: this.opts.arrow.length * this.opts.scale,
             height: this.molOpts.fontSizeLarge * 0.9 * this.opts.scale,
             svg: this.getArrow()
+        });
+
+        // Text above the arrow / reagents
+        let reagentsText = "";
+        for (var i = 0; i < reaction.reagents.length; i++) {
+            if (i > 0) {
+                reagentsText += ", "
+            }
+
+            let text = this.drawer.getMolecularFormula(reaction.reagents[i]);
+            if (text in formulaToCommonName) {
+                text = formulaToCommonName[text];
+            }
+
+            reagentsText += SvgWrapper.replaceNumbersWithSubscript(text);
+        }
+
+        textAbove = textAbove.replace('{reagents}', reagentsText);
+
+        const topText = SvgWrapper.writeText(
+            textAbove,
+            this.themeManager,
+            this.opts.fontSize,
+            this.opts.fontFamily,
+            this.opts.arrow.length
+        )
+
+        elements.push({
+            svg: topText.svg,
+            height: topText.height,
+            width: this.opts.arrow.length * this.opts.scale,
+            offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing),
+            offsetY: -(topText.height / 2.0)
         });
 
         // Products
@@ -119,13 +159,16 @@ class ReactionDrawer {
         let totalWidth = 0.0;
 
         elements.forEach(element => {
-            element.svg.setAttributeNS(null, 'x', totalWidth);
-            element.svg.setAttributeNS(null, 'y', (maxHeight - element.height) / 2.0);
+            let offsetX = element.offsetX ?? 0.0;
+            let offsetY = element.offsetY ?? 0.0;
+
+            element.svg.setAttributeNS(null, 'x', totalWidth + offsetX);
+            element.svg.setAttributeNS(null, 'y', ((maxHeight - element.height) / 2.0) + offsetY);
             element.svg.setAttributeNS(null, 'width', element.width);
             element.svg.setAttributeNS(null, 'height', element.height);
             svg.appendChild(element.svg);
 
-            totalWidth += element.width + this.opts.spacing;
+            totalWidth += element.width + this.opts.spacing + offsetX;
         });
 
         svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);

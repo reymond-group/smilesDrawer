@@ -57,6 +57,7 @@ class DrawerBase {
       overlapSensitivity: 0.42,
       overlapResolutionIterations: 1,
       compactDrawing: true,
+      fontFamily: 'Helvetica, Arial, sans-serif',
       fontSizeLarge: 5,
       fontSizeSmall: 3,
       padding: 5.0,
@@ -359,13 +360,15 @@ class DrawerBase {
    * 
    * @returns {String} The molecular formula.
    */
-  getMolecularFormula() {
+  getMolecularFormula(data = null) {
     let molecularFormula = '';
     let counts = new Map();
 
+    let graph = data === null ? this.graph : new Graph(data, this.opts.isomeric);
+
     // Initialize element count
-    for (var i = 0; i < this.graph.vertices.length; i++) {
-      let atom = this.graph.vertices[i].value;
+    for (var i = 0; i < graph.vertices.length; i++) {
+      let atom = graph.vertices[i].value;
 
       if (counts.has(atom.element)) {
         counts.set(atom.element, counts.get(atom.element) + 1);

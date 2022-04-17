@@ -24,8 +24,8 @@ class SvgDrawer {
    * @param {(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
-
-   * @returns {Oject} The dimensions of the drawing in { width, height }
+   *
+   * @returns {SVGElement} The svg element
    */
   draw(data, target, themeName = 'light', infoOnly = false) {
     if (target === null || target === 'svg') {
@@ -360,8 +360,8 @@ class SvgDrawer {
    *
    * @returns {String} The molecular formula.
    */
-  getMolecularFormula() {
-    return this.preprocessor.getMolecularFormula();
+  getMolecularFormula(graph = null) {
+    return this.preprocessor.getMolecularFormula(graph);
   }
 
   /**

@@ -28,7 +28,6 @@ class SvgWrapper {
     this.opts = options;
     this.uid = makeid(5);
     this.gradientId = 0;
-    this.fontFamily = 'Helvetica, Arial, sans-serif';
 
     // maintain a list of line elements and their corresponding gradients
     // maintain a list of vertex elements
@@ -66,10 +65,10 @@ class SvgWrapper {
     // create the css styles
     this.style.appendChild(document.createTextNode(`
                 .element {
-                    font: ${this.opts.fontSizeLarge}pt ${this.fontFamily};
+                    font: ${this.opts.fontSizeLarge}pt ${this.opts.fontFamily};
                 }
                 .sub {
-                    font: ${this.opts.fontSizeSmall}pt ${this.fontFamily};
+                    font: ${this.opts.fontSizeSmall}pt ${this.opts.fontFamily};
                 }
             `));
 
@@ -188,26 +187,6 @@ class SvgWrapper {
     return elem;
   }
 
-  createUnicodeSubscript(n) {
-    let result = '';
-
-    n.toString().split('').forEach(d => {
-      result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
-    });
-
-    return result
-  }
-
-  createUnicodeSuperscript(n) {
-    let result = '';
-
-    n.toString().split('').forEach(d => {
-      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
-    });
-
-    return result
-  }
-
   createUnicodeCharge(n) {
     if (n === 1) {
       return '⁺';
@@ -218,11 +197,11 @@ class SvgWrapper {
     }
 
     if (n > 1) {
-      return this.createUnicodeSuperscript(n) + '⁺';
+      return SvgWrapper.createUnicodeSuperscript(n) + '⁺';
     }
 
     if (n < -1) {
-      return this.createUnicodeSuperscript(n) + '⁻';
+      return SvgWrapper.createUnicodeSuperscript(n) + '⁻';
     }
 
     return ''
@@ -497,11 +476,11 @@ class SvgWrapper {
     let display = elementName;
 
     if (charge !== 0 && charge !== null) {
-      display += this.createUnicodeCharge(charge);
+      display += SvgWrapper.createUnicodeCharge(charge);
     }
 
     if (isotope !== 0 && isotope !== null) {
-      display = this.createUnicodeSuperscript(isotope) + display;
+      display = SvgWrapper.createUnicodeSuperscript(isotope) + display;
     }
 
     text.push([display, elementName]);
@@ -509,7 +488,7 @@ class SvgWrapper {
     if (hydrogens === 1) {
       text.push(['H', 'H'])
     } else if (hydrogens > 1) {
-      text.push(['H' + this.createUnicodeSubscript(hydrogens), 'H'])
+      text.push(['H' + SvgWrapper.createUnicodeSubscript(hydrogens), 'H'])
     }
 
     // TODO: Better handle exceptions
@@ -529,11 +508,11 @@ class SvgWrapper {
       let display = pe.element;
 
       if (pe.count > 1) {
-        display += this.createUnicodeSubscript(pe.count);
+        display += SvgWrapper.createUnicodeSubscript(pe.count);
       }
 
       if (pe.charge !== '') {
-        display += this.createUnicodeCharge(charge);
+        display += SvgWrapper.createUnicodeCharge(charge);
       }
 
       text.push([pe.element, pe.element]);
@@ -541,7 +520,7 @@ class SvgWrapper {
       if (pe.hydrogenCount === 1) {
         text.push(['H', 'H'])
       } else if (pe.hydrogenCount > 1) {
-        text.push(['H' + this.createUnicodeSubscript(pe.hydrogenCount), 'H'])
+        text.push(['H' + SvgWrapper.createUnicodeSubscript(pe.hydrogenCount), 'H'])
       }
     }
 
@@ -584,7 +563,7 @@ class SvgWrapper {
 
   write(text, direction, x, y) {
     // Measure element name only, without charge or isotope
-    let bbox = this.measureText(text[0][1]);
+    let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
 
     // Get the approximate width and height of text and add update max/min
     // to allow for narrower paddings
@@ -692,18 +671,6 @@ class SvgWrapper {
     this.vertices.push(g);
   }
 
-  measureText(text) {
-    const element = document.createElement('canvas');
-    const ctx = element.getContext("2d");
-    ctx.font = `${this.opts.fontSizeLarge}pt ${this.fontFamily}`
-    let textMetrics = ctx.measureText(text)
-
-    return {
-      'width': textMetrics.width, // Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight),
-      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * 0.9
-    };
-  }
-
   /**
    * Draw the wrapped SVG to a canvas.
    * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
@@ -722,6 +689,52 @@ class SvgWrapper {
     };
 
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);
+  }
+
+  static createUnicodeSubscript(n) {
+    let result = '';
+
+    n.toString().split('').forEach(d => {
+      result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
+    });
+
+    return result
+  }
+
+  static createUnicodeSuperscript(n) {
+    let result = '';
+
+    n.toString().split('').forEach(d => {
+      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
+    });
+
+    return result
+  }
+
+  static replaceNumbersWithSubscript(text) {
+    let subscriptNumbers = {
+      '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄',
+      '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉'
+    };
+
+    for (const [key, value] of Object.entries(subscriptNumbers)) {
+      text = text.replaceAll(key, value);
+    }
+
+    return text;
+  }
+
+  static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
+    const element = document.createElement('canvas');
+    const ctx = element.getContext("2d");
+    ctx.font = `${fontSize}pt ${fontFamily}`
+    let textMetrics = ctx.measureText(text)
+
+    let compWidth = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
+    return {
+      'width': textMetrics.width > compWidth ? textMetrics.width : compWidth,
+      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight
+    };
   }
 
   /**
@@ -773,6 +786,97 @@ class SvgWrapper {
     this.svgToCanvas(svg, canvas, width, height, result => {
       img.src = canvas.toDataURL("image/png");
     });
+  }
+
+  /**
+   * Create an SVG element containing text.
+   * @param {String} text 
+   * @param {*} themeManager 
+   * @param {*} options 
+   * @returns {{svg: SVGElement, width: Number, height: Number}} The SVG element containing the text and its dimensions.
+   */
+  static writeText(text, themeManager, fontSize, fontFamily, maxWidth = Number.MAX_SAFE_INTEGER) {
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    let style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.appendChild(document.createTextNode(`
+        .text {
+            font: ${fontSize}pt ${fontFamily};
+        }
+    `));
+    svg.appendChild(style);
+
+    let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElem.setAttributeNS(null, 'class', 'text');
+
+    let maxLineWidth = 0.0;
+    let totalHeight = 0.0;
+
+    let lines = [];
+
+    text.split("\n").forEach(line => {
+      let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.1);
+      if (dims.width >= maxWidth) {
+        let totalWordsWidth = 0.0;
+        let maxWordsHeight = 0.0;
+        let words = line.split(" ");
+        let offset = 0;
+
+        for (let i = 0; i < words.length; i++) {
+          let wordDims = SvgWrapper.measureText(words[i], fontSize, fontFamily, 1.1);
+
+          if (wordDims.height > maxWordsHeight) {
+            maxWordsHeight = wordDims.height;
+          }
+
+          if (totalWordsWidth + wordDims.width > maxWidth) {
+            lines.push({
+              text: words.slice(offset, i).join(' '),
+              width: totalWordsWidth,
+              height: maxWordsHeight
+            });
+
+            totalWordsWidth = 0.0;
+            maxWordsHeight = 0.0;
+            offset = i
+          }
+
+          totalWordsWidth += wordDims.width;
+        }
+
+        if (offset < words.length) {
+          lines.push({
+            text: words.slice(offset, words.length).join(' '),
+            width: totalWordsWidth,
+            height: maxWordsHeight
+          });
+        }
+      } else {
+        lines.push({
+          text: line,
+          width: dims.width,
+          height: dims.height
+        });
+      }
+    });
+
+    lines.forEach((line, i) => {
+      let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspanElem.setAttributeNS(null, 'fill', themeManager.getColor("C"));
+      tspanElem.textContent = line.text;
+      tspanElem.setAttributeNS(null, 'x', '0px')
+      tspanElem.setAttributeNS(null, 'y', `${1.1 * (i + 1)}em`);
+      textElem.appendChild(tspanElem);
+
+      if (line.width > maxLineWidth) {
+        maxLineWidth = line.width;
+      }
+
+      totalHeight += line.height
+    });
+
+    svg.appendChild(textElem);
+
+    return { svg: svg, width: maxLineWidth, height: totalHeight };
   }
 }
 
