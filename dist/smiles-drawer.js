@@ -8527,10 +8527,11 @@ class ReactionDrawer {
       scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
       fontSize: 3.5,
       fontFamily: 'Helvetica, Arial, sans-serif',
-      spacing: 15,
+      spacing: 5,
       plus: {},
       arrow: {
-        length: 50
+        length: 50,
+        margin: 3
       }
     };
     this.opts = Options.extend(true, this.defaultOptions, options);
@@ -8618,13 +8619,26 @@ class ReactionDrawer {
     }
 
     textAbove = textAbove.replace('{reagents}', reagentsText);
-    const topText = SvgWrapper.writeText(textAbove, this.themeManager, this.opts.fontSize, this.opts.fontFamily, this.opts.arrow.length);
+    const topText = SvgWrapper.writeText(textAbove, this.themeManager, this.opts.fontSize * this.opts.scale, this.opts.fontFamily, this.opts.arrow.length * this.opts.scale);
+    let centerOffsetX = (this.opts.arrow.length * this.opts.scale - topText.width) / 2.0;
     elements.push({
       svg: topText.svg,
       height: topText.height,
-      width: topText.width,
-      offsetX: -(topText.width + this.opts.spacing),
-      offsetY: -(topText.height / 2.0)
+      width: this.opts.arrow.length * this.opts.scale,
+      offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
+      offsetY: -(topText.height / 2.0) - this.opts.arrow.margin,
+      position: 'relative'
+    }); // Text below arrow
+
+    const bottomText = SvgWrapper.writeText('100%', this.themeManager, this.opts.fontSize * this.opts.scale, this.opts.fontFamily, this.opts.arrow.length * this.opts.scale);
+    centerOffsetX = (this.opts.arrow.length * this.opts.scale - bottomText.width) / 2.0;
+    elements.push({
+      svg: bottomText.svg,
+      height: bottomText.height,
+      width: this.opts.arrow.length * this.opts.scale,
+      offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
+      offsetY: bottomText.height / 2.0 + this.opts.arrow.margin,
+      position: 'relative'
     }); // Products
 
     for (var i = 0; i < reaction.products.length; i++) {
@@ -8659,7 +8673,10 @@ class ReactionDrawer {
       element.svg.setAttributeNS(null, 'width', element.width);
       element.svg.setAttributeNS(null, 'height', element.height);
       svg.appendChild(element.svg);
-      totalWidth += element.width + this.opts.spacing + offsetX;
+
+      if (element.position !== 'relative') {
+        totalWidth += element.width + this.opts.spacing + offsetX;
+      }
     });
     svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
     svg.style.width = totalWidth + 'px';
@@ -8708,6 +8725,26 @@ class ReactionDrawer {
     return marker;
   }
 
+  getCDArrowhead() {
+    let s = this.molOpts.fontSizeLarge * 0.9;
+    let sw = s * (7 / 4.5);
+    let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    marker.setAttributeNS(null, 'id', 'arrowhead');
+    marker.setAttributeNS(null, 'viewBox', `0 0 ${sw} ${s}`);
+    marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
+    marker.setAttributeNS(null, 'markerWidth', sw);
+    marker.setAttributeNS(null, 'markerHeight', s);
+    marker.setAttributeNS(null, 'refX', 2.2);
+    marker.setAttributeNS(null, 'refY', s / 2);
+    marker.setAttributeNS(null, 'orient', 'auto');
+    marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+    path.setAttributeNS(null, 'style', 'fill-rule:nonzero;');
+    path.setAttributeNS(null, 'd', 'M0,0L7.0,2.25L0,4.5C0,4.5 0.735,3.416 0.735,2.22C0.735,1.024 0,0 0,0Z');
+    marker.appendChild(path);
+    return marker;
+  }
+
   getArrow() {
     let s = this.molOpts.fontSizeLarge * 0.9;
     let w = s / 10.0;
@@ -8715,7 +8752,7 @@ class ReactionDrawer {
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    defs.appendChild(this.getArrowhead());
+    defs.appendChild(this.getCDArrowhead());
     svg.appendChild(defs);
     svg.setAttributeNS(null, 'id', 'arrow');
     line.setAttributeNS(null, 'x1', 0);
@@ -9787,6 +9824,16 @@ class SmilesDrawer {
   }
 
   draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null) {
+    // get the settings
+    let rest = [];
+    [smiles, ...rest] = smiles.split(' ');
+    let info = rest.join(' ');
+    let settings = {};
+
+    if (info.includes('__')) {
+      let settingsString = info.substring(info.indexOf('__') + 2, info.lastIndexOf('__'));
+    }
+
     if (smiles.includes('>')) {
       try {
         this.drawReaction(smiles, target, theme, successCallback);
@@ -11113,6 +11160,7 @@ class SvgWrapper {
     style.appendChild(document.createTextNode(`
         .text {
             font: ${fontSize}pt ${fontFamily};
+            dominant-baseline: ideographic;
         }
     `));
     svg.appendChild(style);
@@ -11122,7 +11170,7 @@ class SvgWrapper {
     let totalHeight = 0.0;
     let lines = [];
     text.split("\n").forEach(line => {
-      let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.1);
+      let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.0);
 
       if (dims.width >= maxWidth) {
         let totalWordsWidth = 0.0;
@@ -11131,11 +11179,7 @@ class SvgWrapper {
         let offset = 0;
 
         for (let i = 0; i < words.length; i++) {
-          let wordDims = SvgWrapper.measureText(words[i], fontSize, fontFamily, 1.1);
-
-          if (wordDims.height > maxWordsHeight) {
-            maxWordsHeight = wordDims.height;
-          }
+          let wordDims = SvgWrapper.measureText(words[i], fontSize, fontFamily, 1.0);
 
           if (totalWordsWidth + wordDims.width > maxWidth) {
             lines.push({
@@ -11146,6 +11190,10 @@ class SvgWrapper {
             totalWordsWidth = 0.0;
             maxWordsHeight = 0.0;
             offset = i;
+          }
+
+          if (wordDims.height > maxWordsHeight) {
+            maxWordsHeight = wordDims.height;
           }
 
           totalWordsWidth += wordDims.width;
@@ -11167,18 +11215,17 @@ class SvgWrapper {
       }
     });
     lines.forEach((line, i) => {
+      totalHeight += line.height;
       let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
       tspanElem.setAttributeNS(null, 'fill', themeManager.getColor("C"));
       tspanElem.textContent = line.text;
       tspanElem.setAttributeNS(null, 'x', '0px');
-      tspanElem.setAttributeNS(null, 'y', `${1.1 * (i + 1)}em`);
+      tspanElem.setAttributeNS(null, 'y', `${totalHeight}px`);
       textElem.appendChild(tspanElem);
 
       if (line.width > maxLineWidth) {
         maxLineWidth = line.width;
       }
-
-      totalHeight += line.height;
     });
     svg.appendChild(textElem);
     return {

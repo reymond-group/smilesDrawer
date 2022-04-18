@@ -801,6 +801,7 @@ class SvgWrapper {
     style.appendChild(document.createTextNode(`
         .text {
             font: ${fontSize}pt ${fontFamily};
+            dominant-baseline: ideographic;
         }
     `));
     svg.appendChild(style);
@@ -814,7 +815,7 @@ class SvgWrapper {
     let lines = [];
 
     text.split("\n").forEach(line => {
-      let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.1);
+      let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.0);
       if (dims.width >= maxWidth) {
         let totalWordsWidth = 0.0;
         let maxWordsHeight = 0.0;
@@ -822,11 +823,7 @@ class SvgWrapper {
         let offset = 0;
 
         for (let i = 0; i < words.length; i++) {
-          let wordDims = SvgWrapper.measureText(words[i], fontSize, fontFamily, 1.1);
-
-          if (wordDims.height > maxWordsHeight) {
-            maxWordsHeight = wordDims.height;
-          }
+          let wordDims = SvgWrapper.measureText(words[i], fontSize, fontFamily, 1.0);
 
           if (totalWordsWidth + wordDims.width > maxWidth) {
             lines.push({
@@ -838,6 +835,10 @@ class SvgWrapper {
             totalWordsWidth = 0.0;
             maxWordsHeight = 0.0;
             offset = i
+          }
+
+          if (wordDims.height > maxWordsHeight) {
+            maxWordsHeight = wordDims.height;
           }
 
           totalWordsWidth += wordDims.width;
@@ -860,18 +861,17 @@ class SvgWrapper {
     });
 
     lines.forEach((line, i) => {
+      totalHeight += line.height;
       let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
       tspanElem.setAttributeNS(null, 'fill', themeManager.getColor("C"));
       tspanElem.textContent = line.text;
       tspanElem.setAttributeNS(null, 'x', '0px')
-      tspanElem.setAttributeNS(null, 'y', `${1.1 * (i + 1)}em`);
+      tspanElem.setAttributeNS(null, 'y', `${totalHeight}px`);
       textElem.appendChild(tspanElem);
 
       if (line.width > maxLineWidth) {
         maxLineWidth = line.width;
       }
-
-      totalHeight += line.height
     });
 
     svg.appendChild(textElem);

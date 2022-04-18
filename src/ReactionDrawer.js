@@ -16,10 +16,11 @@ class ReactionDrawer {
             scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
             fontSize: 3.5,
             fontFamily: 'Helvetica, Arial, sans-serif',
-            spacing: 15,
+            spacing: 5,
             plus: {},
             arrow: {
-                length: 50
+                length: 50,
+                margin: 3
             }
         }
 
@@ -116,17 +117,40 @@ class ReactionDrawer {
         const topText = SvgWrapper.writeText(
             textAbove,
             this.themeManager,
-            this.opts.fontSize,
+            this.opts.fontSize * this.opts.scale,
             this.opts.fontFamily,
-            this.opts.arrow.length
-        )
+            this.opts.arrow.length * this.opts.scale
+        );
+
+        let centerOffsetX = (this.opts.arrow.length * this.opts.scale - topText.width) / 2.0;
 
         elements.push({
             svg: topText.svg,
             height: topText.height,
             width: this.opts.arrow.length * this.opts.scale,
-            offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing),
-            offsetY: -(topText.height / 2.0)
+            offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
+            offsetY: -(topText.height / 2.0) - this.opts.arrow.margin,
+            position: 'relative'
+        });
+
+        // Text below arrow
+        const bottomText = SvgWrapper.writeText(
+            '100%',
+            this.themeManager,
+            this.opts.fontSize * this.opts.scale,
+            this.opts.fontFamily,
+            this.opts.arrow.length * this.opts.scale
+        );
+
+        centerOffsetX = (this.opts.arrow.length * this.opts.scale - bottomText.width) / 2.0;
+
+        elements.push({
+            svg: bottomText.svg,
+            height: bottomText.height,
+            width: this.opts.arrow.length * this.opts.scale,
+            offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
+            offsetY: bottomText.height / 2.0 + this.opts.arrow.margin,
+            position: 'relative'
         });
 
         // Products
@@ -168,7 +192,9 @@ class ReactionDrawer {
             element.svg.setAttributeNS(null, 'height', element.height);
             svg.appendChild(element.svg);
 
-            totalWidth += element.width + this.opts.spacing + offsetX;
+            if (element.position !== 'relative') {
+                totalWidth += element.width + this.opts.spacing + offsetX;
+            }
         });
 
         svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
@@ -228,6 +254,30 @@ class ReactionDrawer {
         return marker;
     }
 
+    getCDArrowhead() {
+        let s = this.molOpts.fontSizeLarge * 0.9;
+        let sw = s * (7 / 4.5);
+        let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+        marker.setAttributeNS(null, 'id', 'arrowhead');
+        marker.setAttributeNS(null, 'viewBox', `0 0 ${sw} ${s}`);
+        marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
+        marker.setAttributeNS(null, 'markerWidth', sw);
+        marker.setAttributeNS(null, 'markerHeight', s);
+        marker.setAttributeNS(null, 'refX', 2.2);
+        marker.setAttributeNS(null, 'refY', s / 2);
+        marker.setAttributeNS(null, 'orient', 'auto');
+        marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+
+        path.setAttributeNS(null, 'style', 'fill-rule:nonzero;');
+        path.setAttributeNS(null, 'd', 'M0,0L7.0,2.25L0,4.5C0,4.5 0.735,3.416 0.735,2.22C0.735,1.024 0,0 0,0Z');
+
+        marker.appendChild(path);
+
+        return marker;
+    }
+
     getArrow() {
         let s = this.molOpts.fontSizeLarge * 0.9;
         let w = s / 10.0;
@@ -237,7 +287,7 @@ class ReactionDrawer {
         let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 
-        defs.appendChild(this.getArrowhead());
+        defs.appendChild(this.getCDArrowhead());
         svg.appendChild(defs);
 
         svg.setAttributeNS(null, 'id', 'arrow');

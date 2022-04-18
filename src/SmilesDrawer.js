@@ -14,6 +14,20 @@ class SmilesDrawer {
     }
 
     draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null) {
+        // get the settings
+        let rest = [];
+        [smiles, ...rest] = smiles.split(' ');
+        let info = rest.join(' ');
+
+        let settings = {};
+
+        if (info.includes('__')) {
+            let settingsString = info.substring(
+                info.indexOf('__') + 2,
+                info.lastIndexOf('__')
+            );
+        }
+
         if (smiles.includes('>')) {
             try {
                 this.drawReaction(smiles, target, theme, successCallback);
