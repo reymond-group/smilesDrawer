@@ -57,7 +57,7 @@ class DrawerBase {
       overlapSensitivity: 0.42,
       overlapResolutionIterations: 1,
       compactDrawing: true,
-      fontFamily: 'Helvetica, Arial, sans-serif',
+      fontFamily: 'Arial, Helvetica, sans-serif',
       fontSizeLarge: 5,
       fontSizeSmall: 3,
       padding: 5.0,

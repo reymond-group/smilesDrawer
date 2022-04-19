@@ -385,7 +385,7 @@ class SvgWrapper {
     circleElem.setAttributeNS(null, 'cy', y);
     circleElem.setAttributeNS(null, 'r', radius - this.opts.bondSpacing);
     circleElem.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
-    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness * 1.5);
+    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness);
     circleElem.setAttributeNS(null, 'fill', 'none');
     this.paths.push(circleElem);
   }
@@ -655,9 +655,9 @@ class SvgWrapper {
 
     g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
 
-    let maskRadius = 4.0;
+    let maskRadius = this.opts.fontSizeLarge * 0.75;
     if (text[0][1].length > 1) {
-      maskRadius = 5.5;
+      maskRadius = this.opts.fontSizeLarge * 1.1;
     }
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');

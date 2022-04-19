@@ -14,12 +14,12 @@ class ReactionDrawer {
     constructor(options, moleculeOptions) {
         this.defaultOptions = {
             scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
-            fontSize: 3.5,
-            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontSize: moleculeOptions.fontSizeLarge * 0.75,
+            fontFamily: 'Arial, Helvetica, sans-serif',
             spacing: 5,
             plus: {},
             arrow: {
-                length: 50,
+                length: moleculeOptions.bondLength * 4.0,
                 margin: 3
             }
         }
@@ -292,11 +292,11 @@ class ReactionDrawer {
 
         svg.setAttributeNS(null, 'id', 'arrow');
 
-        line.setAttributeNS(null, 'x1', 0);
-        line.setAttributeNS(null, 'y1', w / 2.0);
+        line.setAttributeNS(null, 'x1', 0.0);
+        line.setAttributeNS(null, 'y1', 0.0);
         line.setAttributeNS(null, 'x2', l);
-        line.setAttributeNS(null, 'y2', w / 2.0);
-        line.setAttributeNS(null, 'stroke-width', w);
+        line.setAttributeNS(null, 'y2', 0.0);
+        line.setAttributeNS(null, 'stroke-width', this.molOpts.bondThickness);
         line.setAttributeNS(null, 'stroke', this.themeManager.getColor("C"));
         line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
 

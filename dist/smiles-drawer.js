@@ -2103,7 +2103,7 @@ class DrawerBase {
       overlapSensitivity: 0.42,
       overlapResolutionIterations: 1,
       compactDrawing: true,
-      fontFamily: 'Helvetica, Arial, sans-serif',
+      fontFamily: 'Arial, Helvetica, sans-serif',
       fontSizeLarge: 5,
       fontSizeSmall: 3,
       padding: 5.0,
@@ -8525,12 +8525,12 @@ class ReactionDrawer {
   constructor(options, moleculeOptions) {
     this.defaultOptions = {
       scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
-      fontSize: 3.5,
-      fontFamily: 'Helvetica, Arial, sans-serif',
+      fontSize: moleculeOptions.fontSizeLarge * 0.75,
+      fontFamily: 'Arial, Helvetica, sans-serif',
       spacing: 5,
       plus: {},
       arrow: {
-        length: 50,
+        length: moleculeOptions.bondLength * 4.0,
         margin: 3
       }
     };
@@ -8736,7 +8736,7 @@ class ReactionDrawer {
     marker.setAttributeNS(null, 'markerWidth', sw);
     marker.setAttributeNS(null, 'markerHeight', s);
     marker.setAttributeNS(null, 'refX', 2.2);
-    marker.setAttributeNS(null, 'refY', s / 2);
+    marker.setAttributeNS(null, 'refY', 0);
     marker.setAttributeNS(null, 'orient', 'auto');
     marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
     path.setAttributeNS(null, 'style', 'fill-rule:nonzero;');
@@ -8755,11 +8755,11 @@ class ReactionDrawer {
     defs.appendChild(this.getCDArrowhead());
     svg.appendChild(defs);
     svg.setAttributeNS(null, 'id', 'arrow');
-    line.setAttributeNS(null, 'x1', 0);
-    line.setAttributeNS(null, 'y1', w / 2.0);
+    line.setAttributeNS(null, 'x1', 0.0);
+    line.setAttributeNS(null, 'y1', 0.0);
     line.setAttributeNS(null, 'x2', l);
-    line.setAttributeNS(null, 'y2', w / 2.0);
-    line.setAttributeNS(null, 'stroke-width', w);
+    line.setAttributeNS(null, 'y2', 0.0);
+    line.setAttributeNS(null, 'stroke-width', this.molOpts.bondThickness);
     line.setAttributeNS(null, 'stroke', this.themeManager.getColor("C"));
     line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
     svg.appendChild(line);
@@ -10742,7 +10742,7 @@ class SvgWrapper {
     circleElem.setAttributeNS(null, 'cy', y);
     circleElem.setAttributeNS(null, 'r', radius - this.opts.bondSpacing);
     circleElem.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
-    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness * 1.5);
+    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness);
     circleElem.setAttributeNS(null, 'fill', 'none');
     this.paths.push(circleElem);
   }
@@ -11009,10 +11009,10 @@ class SvgWrapper {
 
     g.appendChild(textElem);
     g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
-    let maskRadius = 4.0;
+    let maskRadius = this.opts.fontSizeLarge * 0.75;
 
     if (text[0][1].length > 1) {
-      maskRadius = 5.5;
+      maskRadius = this.opts.fontSizeLarge * 1.1;
     }
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
