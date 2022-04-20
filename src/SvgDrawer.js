@@ -312,8 +312,15 @@ class SvgDrawer {
         svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
+          let attachedPseudoElements = atom.getAttachedPseudoElements();
+
+          // Draw to the right if the whole molecule is concatenated into one string
+          if (atom.hasAttachedPseudoElements && graph.vertices.length === Object.keys(attachedPseudoElements).length + 1) {
+            dir = 'right';
+          }
+
           svgWrapper.drawText(vertex.position.x, vertex.position.y,
-            element, hydrogens, dir, isTerminal, charge, isotope, graph.vertices.length, atom.getAttachedPseudoElements());
+            element, hydrogens, dir, isTerminal, charge, isotope, attachedPseudoElements);
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }

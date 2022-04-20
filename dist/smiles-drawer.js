@@ -10301,7 +10301,13 @@ class SvgDrawer {
         svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
-          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, graph.vertices.length, atom.getAttachedPseudoElements());
+          let attachedPseudoElements = atom.getAttachedPseudoElements(); // Draw to the right if the whole molecule is concatenated into one string
+
+          if (atom.hasAttachedPseudoElements && graph.vertices.length === Object.keys(attachedPseudoElements).length + 1) {
+            dir = 'right';
+          }
+
+          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, attachedPseudoElements);
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
@@ -10817,7 +10823,6 @@ class SvgWrapper {
    * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
    * @param {Number} charge The charge of the atom.
    * @param {Number} isotope The isotope number.
-   * @param {Number} vertexCount The number of vertices in the molecular graph.
    * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
    * @param {String} attachedPseudoElement.element The element symbol.
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
@@ -10825,7 +10830,7 @@ class SvgWrapper {
    */
 
 
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, vertexCount, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
     let text = [];
     let display = elementName;
 
