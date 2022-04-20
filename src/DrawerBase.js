@@ -1552,7 +1552,7 @@ class DrawerBase {
       } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || this.graph.vertices.length === 1) {
         if (this.opts.atomVisualization === 'default') {
           this.canvasWrapper.drawText(vertex.position.x, vertex.position.y,
-            element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+            element, hydrogens, dir, isTerminal, charge, isotope, this.graph.vertices.length, atom.getAttachedPseudoElements());
         } else if (this.opts.atomVisualization === 'balls') {
           this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }

@@ -313,7 +313,7 @@ class SvgDrawer {
       } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
           svgWrapper.drawText(vertex.position.x, vertex.position.y,
-            element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+            element, hydrogens, dir, isTerminal, charge, isotope, graph.vertices.length, atom.getAttachedPseudoElements());
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }

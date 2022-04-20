@@ -1609,6 +1609,7 @@ class CanvasWrapper {
    * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
    * @param {Number} charge The charge of the atom.
    * @param {Number} isotope The isotope number.
+   * @param {Number} vertexCount The number of vertices in the molecular graph.
    * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
    * @param {String} attachedPseudoElement.element The element symbol.
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
@@ -1616,7 +1617,7 @@ class CanvasWrapper {
    */
 
 
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, vertexCount, attachedPseudoElement = {}) {
     let ctx = this.ctx;
     let offsetX = this.offsetX;
     let offsetY = this.offsetY;
@@ -3564,7 +3565,7 @@ class DrawerBase {
         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements) || this.graph.vertices.length === 1) {
         if (this.opts.atomVisualization === 'default') {
-          this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+          this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, this.graph.vertices.length, atom.getAttachedPseudoElements());
         } else if (this.opts.atomVisualization === 'balls') {
           this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
@@ -8525,7 +8526,7 @@ class ReactionDrawer {
   constructor(options, moleculeOptions) {
     this.defaultOptions = {
       scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
-      fontSize: moleculeOptions.fontSizeLarge * 0.75,
+      fontSize: moleculeOptions.fontSizeLarge * 0.8,
       fontFamily: 'Arial, Helvetica, sans-serif',
       spacing: 5,
       plus: {},
@@ -8733,14 +8734,14 @@ class ReactionDrawer {
     marker.setAttributeNS(null, 'id', 'arrowhead');
     marker.setAttributeNS(null, 'viewBox', `0 0 ${sw} ${s}`);
     marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
-    marker.setAttributeNS(null, 'markerWidth', sw);
-    marker.setAttributeNS(null, 'markerHeight', s);
+    marker.setAttributeNS(null, 'markerWidth', sw * 2);
+    marker.setAttributeNS(null, 'markerHeight', s * 2);
     marker.setAttributeNS(null, 'refX', 2.2);
-    marker.setAttributeNS(null, 'refY', 0);
+    marker.setAttributeNS(null, 'refY', 2.2);
     marker.setAttributeNS(null, 'orient', 'auto');
     marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
     path.setAttributeNS(null, 'style', 'fill-rule:nonzero;');
-    path.setAttributeNS(null, 'd', 'M0,0L7.0,2.25L0,4.5C0,4.5 0.735,3.416 0.735,2.22C0.735,1.024 0,0 0,0Z');
+    path.setAttributeNS(null, 'd', 'm 0 0 l 7 2.25 l -7 2.25 c 0 0 0.735 -1.084 0.735 -2.28 c 0 -1.196 -0.735 -2.22 -0.735 -2.22 z');
     marker.appendChild(path);
     return marker;
   }
@@ -10300,7 +10301,7 @@ class SvgDrawer {
         svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
-          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, graph.vertices.length, atom.getAttachedPseudoElements());
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
@@ -10816,6 +10817,7 @@ class SvgWrapper {
    * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
    * @param {Number} charge The charge of the atom.
    * @param {Number} isotope The isotope number.
+   * @param {Number} vertexCount The number of vertices in the molecular graph.
    * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
    * @param {String} attachedPseudoElement.element The element symbol.
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
@@ -10823,7 +10825,7 @@ class SvgWrapper {
    */
 
 
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, vertexCount, attachedPseudoElement = {}) {
     let text = [];
     let display = elementName;
 
@@ -12175,7 +12177,11 @@ class Vertex {
 
   getTextDirection(vertices) {
     let neighbours = this.getDrawnNeighbours(vertices);
-    let angles = Array();
+    let angles = Array(); // If there is only one vertex in the graph, always draw to the right
+
+    if (vertices.length === 1) {
+      return 'right';
+    }
 
     for (let i = 0; i < neighbours.length; i++) {
       angles.push(this.getAngle(vertices[neighbours[i]].position));

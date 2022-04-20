@@ -14,7 +14,7 @@ class ReactionDrawer {
     constructor(options, moleculeOptions) {
         this.defaultOptions = {
             scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
-            fontSize: moleculeOptions.fontSizeLarge * 0.75,
+            fontSize: moleculeOptions.fontSizeLarge * 0.8,
             fontFamily: 'Arial, Helvetica, sans-serif',
             spacing: 5,
             plus: {},
@@ -263,15 +263,15 @@ class ReactionDrawer {
         marker.setAttributeNS(null, 'id', 'arrowhead');
         marker.setAttributeNS(null, 'viewBox', `0 0 ${sw} ${s}`);
         marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
-        marker.setAttributeNS(null, 'markerWidth', sw);
-        marker.setAttributeNS(null, 'markerHeight', s);
+        marker.setAttributeNS(null, 'markerWidth', sw * 2);
+        marker.setAttributeNS(null, 'markerHeight', s * 2);
         marker.setAttributeNS(null, 'refX', 2.2);
-        marker.setAttributeNS(null, 'refY', s / 2);
+        marker.setAttributeNS(null, 'refY', 2.2);
         marker.setAttributeNS(null, 'orient', 'auto');
         marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
 
         path.setAttributeNS(null, 'style', 'fill-rule:nonzero;');
-        path.setAttributeNS(null, 'd', 'M0,0L7.0,2.25L0,4.5C0,4.5 0.735,3.416 0.735,2.22C0.735,1.024 0,0 0,0Z');
+        path.setAttributeNS(null, 'd', 'm 0 0 l 7 2.25 l -7 2.25 c 0 0 0.735 -1.084 0.735 -2.28 c 0 -1.196 -0.735 -2.22 -0.735 -2.22 z');
 
         marker.appendChild(path);
 
