@@ -2107,7 +2107,7 @@ class DrawerBase {
       fontFamily: 'Arial, Helvetica, sans-serif',
       fontSizeLarge: 5,
       fontSizeSmall: 3,
-      padding: 5.0,
+      padding: 2.0,
       experimentalSSSR: false,
       kkThreshold: 0.1,
       kkInnerThreshold: 0.1,
@@ -10928,7 +10928,13 @@ class SvgWrapper {
     let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily); // Get the approximate width and height of text and add update max/min
     // to allow for narrower paddings
 
+    console.log(direction, text, text[0][1], x, bbox.width, text.length, this.maxX);
+
     if (direction === 'left') {
+      if (x + bbox.width * text.length > this.maxX) {
+        this.maxX = x + bbox.width * text.length;
+      }
+
       if (x - bbox.width * text.length < this.minX) {
         this.minX = x - bbox.width * text.length;
       }
@@ -10947,6 +10953,10 @@ class SvgWrapper {
     } else if (direction === 'right') {
       if (x + bbox.width * text.length > this.maxX) {
         this.maxX = x + bbox.width * text.length;
+      }
+
+      if (x - bbox.width * text.length < this.minX) {
+        this.minX = x - bbox.width * text.length;
       }
 
       if (y - bbox.height < this.minY) {

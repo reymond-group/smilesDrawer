@@ -567,7 +567,11 @@ class SvgWrapper {
 
     // Get the approximate width and height of text and add update max/min
     // to allow for narrower paddings
+    console.log(direction, text, text[0][1], x, bbox.width, text.length, this.maxX)
     if (direction === 'left') {
+      if (x + bbox.width * text.length > this.maxX) {
+        this.maxX = x + bbox.width * text.length;
+      }
       if (x - bbox.width * text.length < this.minX) {
         this.minX = x - bbox.width * text.length;
       }
@@ -584,6 +588,9 @@ class SvgWrapper {
     } else if (direction === 'right') {
       if (x + bbox.width * text.length > this.maxX) {
         this.maxX = x + bbox.width * text.length;
+      }
+      if (x - bbox.width * text.length < this.minX) {
+        this.minX = x - bbox.width * text.length;
       }
       if (y - bbox.height < this.minY) {
         this.minY = y - bbox.height;
