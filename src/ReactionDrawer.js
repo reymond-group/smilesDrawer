@@ -16,8 +16,11 @@ class ReactionDrawer {
             scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
             fontSize: moleculeOptions.fontSizeLarge * 0.8,
             fontFamily: 'Arial, Helvetica, sans-serif',
-            spacing: 5,
-            plus: {},
+            spacing: 10,
+            plus: {
+                size: 9,
+                thickness: 1
+            },
             arrow: {
                 length: moleculeOptions.bondLength * 4.0,
                 margin: 3
@@ -34,7 +37,7 @@ class ReactionDrawer {
    * Draws the parsed reaction smiles data to a canvas element.
    *
    * @param {Object} reaction The reaction object returned by the reaction smiles parser.
-   * @param {(String|HTMLElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+   * @param {(String|SVGElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    * 
@@ -67,8 +70,8 @@ class ReactionDrawer {
         for (var i = 0; i < reaction.reactants.length; i++) {
             if (i > 0) {
                 elements.push({
-                    width: this.molOpts.fontSizeLarge * this.opts.scale,
-                    height: this.molOpts.fontSizeLarge * this.opts.scale,
+                    width: this.opts.plus.size,
+                    height: this.opts.plus.size,
                     svg: this.getPlus()
                 });
             }
@@ -135,7 +138,7 @@ class ReactionDrawer {
 
         // Text below arrow
         const bottomText = SvgWrapper.writeText(
-            '100%',
+            textBelow,
             this.themeManager,
             this.opts.fontSize * this.opts.scale,
             this.opts.fontFamily,
@@ -157,8 +160,8 @@ class ReactionDrawer {
         for (var i = 0; i < reaction.products.length; i++) {
             if (i > 0) {
                 elements.push({
-                    width: this.molOpts.fontSizeLarge * this.opts.scale,
-                    height: this.molOpts.fontSizeLarge * this.opts.scale,
+                    width: this.opts.plus.size,
+                    height: this.opts.plus.size,
                     svg: this.getPlus()
                 });
             }
@@ -186,14 +189,14 @@ class ReactionDrawer {
             let offsetX = element.offsetX ?? 0.0;
             let offsetY = element.offsetY ?? 0.0;
 
-            element.svg.setAttributeNS(null, 'x', totalWidth + offsetX);
-            element.svg.setAttributeNS(null, 'y', ((maxHeight - element.height) / 2.0) + offsetY);
-            element.svg.setAttributeNS(null, 'width', element.width);
-            element.svg.setAttributeNS(null, 'height', element.height);
+            element.svg.setAttributeNS(null, 'x', Math.round(totalWidth + offsetX));
+            element.svg.setAttributeNS(null, 'y', Math.round(((maxHeight - element.height) / 2.0) + offsetY));
+            element.svg.setAttributeNS(null, 'width', Math.round(element.width));
+            element.svg.setAttributeNS(null, 'height', Math.round(element.height));
             svg.appendChild(element.svg);
 
             if (element.position !== 'relative') {
-                totalWidth += element.width + this.opts.spacing + offsetX;
+                totalWidth += Math.round(element.width + this.opts.spacing + offsetX);
             }
         });
 
@@ -205,8 +208,8 @@ class ReactionDrawer {
     }
 
     getPlus() {
-        let s = this.molOpts.fontSizeLarge * 0.9;
-        let w = s / 10.0;
+        let s = this.opts.plus.size;
+        let w = this.opts.plus.thickness;
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         let rect_h = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         let rect_v = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -293,9 +296,9 @@ class ReactionDrawer {
         svg.setAttributeNS(null, 'id', 'arrow');
 
         line.setAttributeNS(null, 'x1', 0.0);
-        line.setAttributeNS(null, 'y1', 0.0);
+        line.setAttributeNS(null, 'y1', -this.molOpts.bondThickness / 2.0);
         line.setAttributeNS(null, 'x2', l);
-        line.setAttributeNS(null, 'y2', 0.0);
+        line.setAttributeNS(null, 'y2', -this.molOpts.bondThickness / 2.0);
         line.setAttributeNS(null, 'stroke-width', this.molOpts.bondThickness);
         line.setAttributeNS(null, 'stroke', this.themeManager.getColor("C"));
         line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');

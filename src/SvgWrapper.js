@@ -187,7 +187,7 @@ class SvgWrapper {
     return elem;
   }
 
-  createUnicodeCharge(n) {
+  static createUnicodeCharge(n) {
     if (n === 1) {
       return '⁺';
     }
@@ -271,13 +271,65 @@ class SvgWrapper {
    * @param {String} elementName The name of the element (single-letter).
    */
   drawBall(x, y, elementName) {
+    let r = this.opts.bondLength / 4.5;
+
+    if (x - r < this.minX) {
+      this.minX = x - r;
+    }
+
+    if (x + r > this.maxX) {
+      this.maxX = x + r;
+    }
+
+    if (y - r < this.minY) {
+      this.minY = y - r;
+    }
+
+    if (y + r > this.maxY) {
+      this.maxY = y + r;
+    }
+
     let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     ball.setAttributeNS(null, 'cx', x);
     ball.setAttributeNS(null, 'cy', y);
-    ball.setAttributeNS(null, 'r', this.opts.bondLength / 4.5);
+    ball.setAttributeNS(null, 'r', r);
     ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
 
     this.vertices.push(ball);
+  }
+
+  /**
+   * @param {Line} line the line object to create the wedge from
+   */
+  drawWedge(line) {
+    let l = line.getLeftVector().clone(),
+      r = line.getRightVector().clone();
+
+    let normals = Vector2.normals(l, r);
+
+    normals[0].normalize();
+    normals[1].normalize();
+
+    let isRightChiralCenter = line.getRightChiral();
+
+    let start = l,
+      end = r;
+
+    if (isRightChiralCenter) {
+      start = r;
+      end = l;
+    }
+
+    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
+      u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 3.0 + this.halfBondThickness)),
+      v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.halfBondThickness)),
+      w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
+
+    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
+      gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
+    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
+    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
+    this.paths.push(polygon);
   }
 
   /**
@@ -320,7 +372,7 @@ class SvgWrapper {
     for (let t = 0.0; t < 1.0; t += step) {
       let to = Vector2.multiplyScalar(dir, t * length),
         startDash = Vector2.add(start, to),
-        width = 1.5 * t,
+        width = this.opts.bondThickness * 3.0 * t,
         dashOffset = Vector2.multiplyScalar(normals[0], width);
 
       startDash.subtract(dashOffset);
@@ -398,11 +450,11 @@ class SvgWrapper {
    * @param {Boolean} dashed defaults to false.
    * @param {String} gradient gradient url. Defaults to null.
    */
-  drawLine(line, dashed = false, gradient = null) {
+  drawLine(line, dashed = false, gradient = null, linecap = 'round') {
     let opts = this.opts,
       stylesArr = [
         ['stroke-width', this.opts.bondThickness],
-        ['stroke-linecap', 'round'],
+        ['stroke-linecap', linecap],
         ['stroke-dasharray', dashed ? '5, 5' : 'none'],
       ],
       l = line.getLeftVector(),
@@ -436,7 +488,23 @@ class SvgWrapper {
    * @param {String} elementName The name of the element (single-letter).
    */
   drawPoint(x, y, elementName) {
-    let ctx = this.ctx;
+    let r = 0.75;
+
+    if (x - r < this.minX) {
+      this.minX = x - r;
+    }
+
+    if (x + r > this.maxX) {
+      this.maxX = x + r;
+    }
+
+    if (y - r < this.minY) {
+      this.minY = y - r;
+    }
+
+    if (y + r > this.maxY) {
+      this.maxY = y + r;
+    }
 
     // first create a mask
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -450,7 +518,7 @@ class SvgWrapper {
     let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     point.setAttributeNS(null, 'cx', x);
     point.setAttributeNS(null, 'cy', y);
-    point.setAttributeNS(null, 'r', '0.75');
+    point.setAttributeNS(null, 'r', r);
     point.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(point);
   }
@@ -515,7 +583,7 @@ class SvgWrapper {
         display += SvgWrapper.createUnicodeCharge(charge);
       }
 
-      text.push([pe.element, pe.element]);
+      text.push([display, pe.element]);
 
       if (pe.hydrogenCount === 1) {
         text.push(['H', 'H'])
@@ -527,47 +595,17 @@ class SvgWrapper {
     this.write(text, direction, x, y);
   }
 
-  /**
-   * @param {Line} line the line object to create the wedge from
-   */
-  drawWedge(line) {
-    let l = line.getLeftVector().clone(),
-      r = line.getRightVector().clone();
-
-    let normals = Vector2.normals(l, r);
-
-    normals[0].normalize();
-    normals[1].normalize();
-
-    let isRightChiralCenter = line.getRightChiral();
-
-    let start = l,
-      end = r;
-
-    if (isRightChiralCenter) {
-      start = r;
-      end = l;
-    }
-
-    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
-      u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 1.5 + this.halfBondThickness)),
-      v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 1.5 + this.halfBondThickness)),
-      w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
-
-    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
-      gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
-    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
-    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
-    this.paths.push(polygon);
-  }
-
   write(text, direction, x, y) {
-    // Measure element name only, without charge or isotope
+    // Measure element name only, without charge or isotope ...
     let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
+
+    // ... but for direction left move to the right to 
+    if (direction === 'left' && text[0][0] !== text[0][1]) {
+      bbox.width *= 2.0;
+    }
 
     // Get the approximate width and height of text and add update max/min
     // to allow for narrower paddings
-    console.log(direction, text, text[0][1], x, bbox.width, text.length, this.maxX)
     if (direction === 'left') {
       if (x + bbox.width * text.length > this.maxX) {
         this.maxX = x + bbox.width * text.length;

@@ -1996,11 +1996,10 @@ class Drawer {
     }
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
-
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
-    svg.setAttributeNS(null, 'width', 500 + '');
-    svg.setAttributeNS(null, 'height', 500 + '');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
+    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
+    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
     this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
   }
@@ -2092,10 +2091,10 @@ class DrawerBase {
       width: 500,
       height: 500,
       scale: 0.0,
-      bondThickness: 0.6,
-      bondLength: 15,
-      shortBondLength: 0.85,
-      bondSpacing: 0.18 * 15,
+      bondThickness: 1.0,
+      bondLength: 30,
+      shortBondLength: 0.8,
+      bondSpacing: 0.17 * 30,
       atomVisualization: 'default',
       isomeric: true,
       debug: false,
@@ -2105,7 +2104,7 @@ class DrawerBase {
       overlapResolutionIterations: 1,
       compactDrawing: true,
       fontFamily: 'Arial, Helvetica, sans-serif',
-      fontSizeLarge: 5,
+      fontSizeLarge: 11,
       fontSizeSmall: 3,
       padding: 2.0,
       experimentalSSSR: false,
@@ -8528,8 +8527,11 @@ class ReactionDrawer {
       scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
       fontSize: moleculeOptions.fontSizeLarge * 0.8,
       fontFamily: 'Arial, Helvetica, sans-serif',
-      spacing: 5,
-      plus: {},
+      spacing: 10,
+      plus: {
+        size: 9,
+        thickness: 1
+      },
       arrow: {
         length: moleculeOptions.bondLength * 4.0,
         margin: 3
@@ -8543,7 +8545,7 @@ class ReactionDrawer {
   * Draws the parsed reaction smiles data to a canvas element.
   *
   * @param {Object} reaction The reaction object returned by the reaction smiles parser.
-  * @param {(String|HTMLElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+  * @param {(String|SVGElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
   * 
@@ -8576,8 +8578,8 @@ class ReactionDrawer {
     for (var i = 0; i < reaction.reactants.length; i++) {
       if (i > 0) {
         elements.push({
-          width: this.molOpts.fontSizeLarge * this.opts.scale,
-          height: this.molOpts.fontSizeLarge * this.opts.scale,
+          width: this.opts.plus.size,
+          height: this.opts.plus.size,
           svg: this.getPlus()
         });
       }
@@ -8631,7 +8633,7 @@ class ReactionDrawer {
       position: 'relative'
     }); // Text below arrow
 
-    const bottomText = SvgWrapper.writeText('100%', this.themeManager, this.opts.fontSize * this.opts.scale, this.opts.fontFamily, this.opts.arrow.length * this.opts.scale);
+    const bottomText = SvgWrapper.writeText(textBelow, this.themeManager, this.opts.fontSize * this.opts.scale, this.opts.fontFamily, this.opts.arrow.length * this.opts.scale);
     centerOffsetX = (this.opts.arrow.length * this.opts.scale - bottomText.width) / 2.0;
     elements.push({
       svg: bottomText.svg,
@@ -8645,8 +8647,8 @@ class ReactionDrawer {
     for (var i = 0; i < reaction.products.length; i++) {
       if (i > 0) {
         elements.push({
-          width: this.molOpts.fontSizeLarge * this.opts.scale,
-          height: this.molOpts.fontSizeLarge * this.opts.scale,
+          width: this.opts.plus.size,
+          height: this.opts.plus.size,
           svg: this.getPlus()
         });
       }
@@ -8669,14 +8671,14 @@ class ReactionDrawer {
     elements.forEach(element => {
       let offsetX = element.offsetX ?? 0.0;
       let offsetY = element.offsetY ?? 0.0;
-      element.svg.setAttributeNS(null, 'x', totalWidth + offsetX);
-      element.svg.setAttributeNS(null, 'y', (maxHeight - element.height) / 2.0 + offsetY);
-      element.svg.setAttributeNS(null, 'width', element.width);
-      element.svg.setAttributeNS(null, 'height', element.height);
+      element.svg.setAttributeNS(null, 'x', Math.round(totalWidth + offsetX));
+      element.svg.setAttributeNS(null, 'y', Math.round((maxHeight - element.height) / 2.0 + offsetY));
+      element.svg.setAttributeNS(null, 'width', Math.round(element.width));
+      element.svg.setAttributeNS(null, 'height', Math.round(element.height));
       svg.appendChild(element.svg);
 
       if (element.position !== 'relative') {
-        totalWidth += element.width + this.opts.spacing + offsetX;
+        totalWidth += Math.round(element.width + this.opts.spacing + offsetX);
       }
     });
     svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
@@ -8686,8 +8688,8 @@ class ReactionDrawer {
   }
 
   getPlus() {
-    let s = this.molOpts.fontSizeLarge * 0.9;
-    let w = s / 10.0;
+    let s = this.opts.plus.size;
+    let w = this.opts.plus.thickness;
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     let rect_h = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     let rect_v = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -8757,9 +8759,9 @@ class ReactionDrawer {
     svg.appendChild(defs);
     svg.setAttributeNS(null, 'id', 'arrow');
     line.setAttributeNS(null, 'x1', 0.0);
-    line.setAttributeNS(null, 'y1', 0.0);
+    line.setAttributeNS(null, 'y1', -this.molOpts.bondThickness / 2.0);
     line.setAttributeNS(null, 'x2', l);
-    line.setAttributeNS(null, 'y2', 0.0);
+    line.setAttributeNS(null, 'y2', -this.molOpts.bondThickness / 2.0);
     line.setAttributeNS(null, 'stroke-width', this.molOpts.bondThickness);
     line.setAttributeNS(null, 'stroke', this.themeManager.getColor("C"));
     line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
@@ -9817,11 +9819,49 @@ const ReactionDrawer = require('./ReactionDrawer');
 
 const SvgWrapper = require('./SvgWrapper');
 
+const Options = require('./Options');
+
 class SmilesDrawer {
   constructor(moleculeOptions = {}, reactionOptions = {}) {
     this.drawer = new SvgDrawer(moleculeOptions); // moleculeOptions gets edited in reactionOptions, so clone
 
-    this.reactionDrawer = new ReactionDrawer(reactionOptions, JSON.parse(JSON.stringify(moleculeOptions)));
+    this.reactionDrawer = new ReactionDrawer(reactionOptions, JSON.parse(JSON.stringify(this.drawer.opts)));
+  }
+
+  static apply(moleculeOptions = {}, reactionOptions = {}, attribute = 'data-smiles', theme = 'light', successCallback = null, errorCallback = null) {
+    const drawer = new SmilesDrawer(moleculeOptions, reactionOptions);
+    drawer.apply(attribute, theme, successCallback, errorCallback);
+  }
+
+  apply(attribute = 'data-smiles', theme = 'light', successCallback = null, errorCallback = null) {
+    let elements = document.querySelectorAll(`[${attribute}]`);
+    elements.forEach(element => {
+      let smiles = element.getAttribute(attribute);
+      let currentTheme = theme;
+
+      if (element.hasAttribute('data-smiles-theme')) {
+        currentTheme = element.getAttribute('data-smiles-theme');
+      }
+
+      if (element.hasAttribute('data-smiles-options') || element.hasAttribute('data-smiles-reaction-options')) {
+        let moleculeOptions = {};
+
+        if (element.hasAttribute('data-smiles-options')) {
+          moleculeOptions = JSON.parse(element.getAttribute('data-smiles-options').replaceAll('\'', '"'));
+        }
+
+        let reactionOptions = {};
+
+        if (element.hasAttribute('data-smiles-reaction-options')) {
+          reactionOptions = JSON.parse(element.getAttribute('data-smiles-reaction-options').replaceAll('\'', '"'));
+        }
+
+        let smilesDrawer = new SmilesDrawer(moleculeOptions, reactionOptions);
+        smilesDrawer.draw(smiles, element, currentTheme, successCallback = null, errorCallback = null);
+      } else {
+        this.draw(smiles, element, currentTheme, successCallback = null, errorCallback = null);
+      }
+    });
   }
 
   draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null) {
@@ -9833,19 +9873,34 @@ class SmilesDrawer {
 
     if (info.includes('__')) {
       let settingsString = info.substring(info.indexOf('__') + 2, info.lastIndexOf('__'));
+      settings = JSON.parse(settingsString.replaceAll('\'', '"'));
     }
+
+    let defaultSettings = {
+      textAboveArrow: '{reagents}',
+      textBelowArrow: ''
+    };
+    settings = Options.extend(true, defaultSettings, settings);
 
     if (smiles.includes('>')) {
       try {
-        this.drawReaction(smiles, target, theme, successCallback);
+        this.drawReaction(smiles, target, theme, settings, successCallback);
       } catch (err) {
-        errorCallback(err);
+        if (errorCallback) {
+          errorCallback(err);
+        } else {
+          console.error(err);
+        }
       }
     } else {
       try {
         this.drawMolecule(smiles, target, theme, successCallback);
       } catch (err) {
-        errorCallback(err);
+        if (errorCallback) {
+          errorCallback(err);
+        } else {
+          console.error(err);
+        }
       }
     }
   }
@@ -9858,13 +9913,34 @@ class SmilesDrawer {
       let dims = this.getDimensions(svg);
       svg.setAttributeNS(null, 'width', '' + dims.w);
       svg.setAttributeNS(null, 'height', '' + dims.h);
-      callback(svg);
+
+      if (callback) {
+        callback(svg);
+      }
     } else if (target === 'canvas') {
       let canvas = this.svgToCanvas(this.drawer.draw(parseTree, null, theme));
-      callback(canvas);
+
+      if (callback) {
+        callback(canvas);
+      }
     } else if (target === 'img') {
       let img = this.svgToImg(this.drawer.draw(parseTree, null, theme));
-      callback(img);
+
+      if (callback) {
+        callback(img);
+      }
+    } else if (target instanceof HTMLImageElement) {
+      this.svgToImg(this.drawer.draw(parseTree, null, theme), target);
+
+      if (callback) {
+        callback(target);
+      }
+    } else if (target instanceof SVGElement) {
+      this.drawer.draw(parseTree, target, theme);
+
+      if (callback) {
+        callback(target);
+      }
     } else {
       let elements = document.querySelectorAll(target);
       elements.forEach(element => {
@@ -9875,19 +9951,28 @@ class SmilesDrawer {
           let dims = this.getDimensions(element);
           element.setAttributeNS(null, 'width', '' + dims.w);
           element.setAttributeNS(null, 'height', '' + dims.h);
-          callback(element);
+
+          if (callback) {
+            callback(element);
+          }
         } else if (tag === 'canvas') {
           this.svgToCanvas(this.drawer.draw(parseTree, null, theme), element);
-          callback(element);
+
+          if (callback) {
+            callback(element);
+          }
         } else if (tag === 'img') {
           this.svgToImg(this.drawer.draw(parseTree, null, theme), element);
-          callback(element);
+
+          if (callback) {
+            callback(element);
+          }
         }
       });
     }
   }
 
-  drawReaction(smiles, target, theme, callback) {
+  drawReaction(smiles, target, theme, settings, callback) {
     let reaction = ReactionParser.parse(smiles);
 
     if (target === null || target === 'svg') {
@@ -9895,13 +9980,34 @@ class SmilesDrawer {
       let dims = this.getDimensions(svg);
       svg.setAttributeNS(null, 'width', '' + dims.w);
       svg.setAttributeNS(null, 'height', '' + dims.h);
-      callback(svg);
+
+      if (callback) {
+        callback(svg);
+      }
     } else if (target === 'canvas') {
-      let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme));
-      callback(canvas);
+      let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow));
+
+      if (callback) {
+        callback(canvas);
+      }
     } else if (target === 'img') {
-      let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, theme));
-      callback(img);
+      let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow));
+
+      if (callback) {
+        callback(img);
+      }
+    } else if (target instanceof HTMLImageElement) {
+      this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), target);
+
+      if (callback) {
+        callback(target);
+      }
+    } else if (target instanceof SVGElement) {
+      this.reactionDrawer.draw(reaction, target, theme, settings.textAboveArrow, settings.textBelowArrow);
+
+      if (callback) {
+        callback(target);
+      }
     } else {
       let elements = document.querySelectorAll(target);
       elements.forEach(element => {
@@ -9909,7 +10015,7 @@ class SmilesDrawer {
 
         if (tag === 'svg') {
           let dims = this.getDimensions(element);
-          this.reactionDrawer.draw(reaction, element, theme); // The svg has to have a css width and height set for the other
+          this.reactionDrawer.draw(reaction, element, theme, settings.textAboveArrow, settings.textBelowArrow); // The svg has to have a css width and height set for the other
           // tags, however, here it would overwrite the chosen width and height
 
           if (this.drawer.opts.scale <= 0) {
@@ -9919,13 +10025,22 @@ class SmilesDrawer {
 
           element.setAttributeNS(null, 'width', '' + dims.w);
           element.setAttributeNS(null, 'height', '' + dims.h);
-          callback(element);
+
+          if (callback) {
+            callback(element);
+          }
         } else if (tag === 'canvas') {
-          this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme), element);
-          callback(element);
+          this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), element);
+
+          if (callback) {
+            callback(element);
+          }
         } else if (tag === 'img') {
-          this.svgToImg(this.reactionDrawer.draw(reaction, null, theme), element);
-          callback(element);
+          this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), element);
+
+          if (callback) {
+            callback(element);
+          }
         }
       });
     }
@@ -9993,7 +10108,7 @@ class SmilesDrawer {
 
 module.exports = SmilesDrawer;
 
-},{"./Drawer":5,"./Parser":13,"./ReactionDrawer":15,"./ReactionParser":16,"./SvgDrawer":21,"./SvgWrapper":22}],21:[function(require,module,exports){
+},{"./Drawer":5,"./Options":12,"./Parser":13,"./ReactionDrawer":15,"./ReactionParser":16,"./SvgDrawer":21,"./SvgWrapper":22}],21:[function(require,module,exports){
 "use strict";
 
 // we use the drawer to do all the preprocessing. then we take over the drawing
@@ -10556,7 +10671,7 @@ class SvgWrapper {
     return elem;
   }
 
-  createUnicodeCharge(n) {
+  static createUnicodeCharge(n) {
     if (n === 1) {
       return '⁺';
     }
@@ -10640,12 +10755,60 @@ class SvgWrapper {
 
 
   drawBall(x, y, elementName) {
+    let r = this.opts.bondLength / 4.5;
+
+    if (x - r < this.minX) {
+      this.minX = x - r;
+    }
+
+    if (x + r > this.maxX) {
+      this.maxX = x + r;
+    }
+
+    if (y - r < this.minY) {
+      this.minY = y - r;
+    }
+
+    if (y + r > this.maxY) {
+      this.maxY = y + r;
+    }
+
     let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     ball.setAttributeNS(null, 'cx', x);
     ball.setAttributeNS(null, 'cy', y);
-    ball.setAttributeNS(null, 'r', this.opts.bondLength / 4.5);
+    ball.setAttributeNS(null, 'r', r);
     ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(ball);
+  }
+  /**
+   * @param {Line} line the line object to create the wedge from
+   */
+
+
+  drawWedge(line) {
+    let l = line.getLeftVector().clone(),
+        r = line.getRightVector().clone();
+    let normals = Vector2.normals(l, r);
+    normals[0].normalize();
+    normals[1].normalize();
+    let isRightChiralCenter = line.getRightChiral();
+    let start = l,
+        end = r;
+
+    if (isRightChiralCenter) {
+      start = r;
+      end = l;
+    }
+
+    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
+        u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 3.0 + this.halfBondThickness)),
+        v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.halfBondThickness)),
+        w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
+    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
+        gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
+    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
+    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
+    this.paths.push(polygon);
   }
   /**
    * Draw a dashed wedge on the canvas.
@@ -10685,7 +10848,7 @@ class SvgWrapper {
     for (let t = 0.0; t < 1.0; t += step) {
       let to = Vector2.multiplyScalar(dir, t * length),
           startDash = Vector2.add(start, to),
-          width = 1.5 * t,
+          width = this.opts.bondThickness * 3.0 * t,
           dashOffset = Vector2.multiplyScalar(normals[0], width);
       startDash.subtract(dashOffset);
       let endDash = startDash.clone();
@@ -10762,9 +10925,9 @@ class SvgWrapper {
    */
 
 
-  drawLine(line, dashed = false, gradient = null) {
+  drawLine(line, dashed = false, gradient = null, linecap = 'round') {
     let opts = this.opts,
-        stylesArr = [['stroke-width', this.opts.bondThickness], ['stroke-linecap', 'round'], ['stroke-dasharray', dashed ? '5, 5' : 'none']],
+        stylesArr = [['stroke-width', this.opts.bondThickness], ['stroke-linecap', linecap], ['stroke-dasharray', dashed ? '5, 5' : 'none']],
         l = line.getLeftVector(),
         r = line.getRightVector(),
         fromX = l.x,
@@ -10796,7 +10959,24 @@ class SvgWrapper {
 
 
   drawPoint(x, y, elementName) {
-    let ctx = this.ctx; // first create a mask
+    let r = 0.75;
+
+    if (x - r < this.minX) {
+      this.minX = x - r;
+    }
+
+    if (x + r > this.maxX) {
+      this.maxX = x + r;
+    }
+
+    if (y - r < this.minY) {
+      this.minY = y - r;
+    }
+
+    if (y + r > this.maxY) {
+      this.maxY = y + r;
+    } // first create a mask
+
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     mask.setAttributeNS(null, 'cx', x);
@@ -10808,7 +10988,7 @@ class SvgWrapper {
     let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     point.setAttributeNS(null, 'cx', x);
     point.setAttributeNS(null, 'cy', y);
-    point.setAttributeNS(null, 'r', '0.75');
+    point.setAttributeNS(null, 'r', r);
     point.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(point);
   }
@@ -10881,7 +11061,7 @@ class SvgWrapper {
         display += SvgWrapper.createUnicodeCharge(charge);
       }
 
-      text.push([pe.element, pe.element]);
+      text.push([display, pe.element]);
 
       if (pe.hydrogenCount === 1) {
         text.push(['H', 'H']);
@@ -10892,43 +11072,16 @@ class SvgWrapper {
 
     this.write(text, direction, x, y);
   }
-  /**
-   * @param {Line} line the line object to create the wedge from
-   */
-
-
-  drawWedge(line) {
-    let l = line.getLeftVector().clone(),
-        r = line.getRightVector().clone();
-    let normals = Vector2.normals(l, r);
-    normals[0].normalize();
-    normals[1].normalize();
-    let isRightChiralCenter = line.getRightChiral();
-    let start = l,
-        end = r;
-
-    if (isRightChiralCenter) {
-      start = r;
-      end = l;
-    }
-
-    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
-        u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 1.5 + this.halfBondThickness)),
-        v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 1.5 + this.halfBondThickness)),
-        w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
-    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
-        gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
-    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
-    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
-    this.paths.push(polygon);
-  }
 
   write(text, direction, x, y) {
-    // Measure element name only, without charge or isotope
-    let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily); // Get the approximate width and height of text and add update max/min
+    // Measure element name only, without charge or isotope ...
+    let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily); // ... but for direction left move to the right to 
+
+    if (direction === 'left' && text[0][0] !== text[0][1]) {
+      bbox.width *= 2.0;
+    } // Get the approximate width and height of text and add update max/min
     // to allow for narrower paddings
 
-    console.log(direction, text, text[0][1], x, bbox.width, text.length, this.maxX);
 
     if (direction === 'left') {
       if (x + bbox.width * text.length > this.maxX) {

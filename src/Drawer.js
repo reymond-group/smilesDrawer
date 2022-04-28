@@ -41,10 +41,9 @@ class Drawer {
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-    // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
-    svg.setAttributeNS(null, 'width', 500 + '');
-    svg.setAttributeNS(null, 'height', 500 + '');
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
+    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
+    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
     this.svgDrawer.draw(data, svg, themeName, infoOnly);
     this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
   }
