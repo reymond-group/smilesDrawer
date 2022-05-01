@@ -19,10 +19,12 @@ class ReactionDrawer {
             spacing: 10,
             plus: {
                 size: 9,
-                thickness: 1
+                thickness: 1.0
             },
             arrow: {
                 length: moleculeOptions.bondLength * 4.0,
+                headSize: 6.0,
+                thickness: 1.0,
                 margin: 3
             }
         }
@@ -96,7 +98,7 @@ class ReactionDrawer {
         // Arrow
         elements.push({
             width: this.opts.arrow.length * this.opts.scale,
-            height: this.molOpts.fontSizeLarge * 0.9 * this.opts.scale,
+            height: this.opts.arrow.headSize * 2.0 * this.opts.scale,
             svg: this.getArrow()
         });
 
@@ -236,7 +238,7 @@ class ReactionDrawer {
     }
 
     getArrowhead() {
-        let s = this.molOpts.fontSizeLarge * 0.9;
+        let s = this.opts.arrow.headSize;
         let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
         let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
@@ -258,7 +260,7 @@ class ReactionDrawer {
     }
 
     getCDArrowhead() {
-        let s = this.molOpts.fontSizeLarge * 0.9;
+        let s = this.opts.arrow.headSize;
         let sw = s * (7 / 4.5);
         let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
         let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -282,8 +284,7 @@ class ReactionDrawer {
     }
 
     getArrow() {
-        let s = this.molOpts.fontSizeLarge * 0.9;
-        let w = s / 10.0;
+        let s = this.opts.arrow.headSize;
         let l = this.opts.arrow.length;
 
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -296,15 +297,15 @@ class ReactionDrawer {
         svg.setAttributeNS(null, 'id', 'arrow');
 
         line.setAttributeNS(null, 'x1', 0.0);
-        line.setAttributeNS(null, 'y1', -this.molOpts.bondThickness / 2.0);
+        line.setAttributeNS(null, 'y1', -this.opts.arrow.thickness / 2.0);
         line.setAttributeNS(null, 'x2', l);
-        line.setAttributeNS(null, 'y2', -this.molOpts.bondThickness / 2.0);
-        line.setAttributeNS(null, 'stroke-width', this.molOpts.bondThickness);
+        line.setAttributeNS(null, 'y2', -this.opts.arrow.thickness / 2.0);
+        line.setAttributeNS(null, 'stroke-width', this.opts.arrow.thickness);
         line.setAttributeNS(null, 'stroke', this.themeManager.getColor("C"));
         line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
 
         svg.appendChild(line);
-        svg.setAttributeNS(null, 'viewBox', `0 ${-s / 2.0} ${l + s} ${s}`);
+        svg.setAttributeNS(null, 'viewBox', `0 ${-s / 2.0} ${l + s * (7 / 4.5)} ${s}`);
 
         return svg;
     }

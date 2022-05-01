@@ -60,7 +60,7 @@ class DrawerBase {
       fontFamily: 'Arial, Helvetica, sans-serif',
       fontSizeLarge: 11,
       fontSizeSmall: 3,
-      padding: 2.0,
+      padding: 10.0,
       experimentalSSSR: false,
       kkThreshold: 0.1,
       kkInnerThreshold: 0.1,

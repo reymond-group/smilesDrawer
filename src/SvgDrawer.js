@@ -320,7 +320,7 @@ class SvgDrawer {
           }
 
           svgWrapper.drawText(vertex.position.x, vertex.position.y,
-            element, hydrogens, dir, isTerminal, charge, isotope, attachedPseudoElements);
+            element, hydrogens, dir, isTerminal, charge, isotope, graph.vertices.length, attachedPseudoElements);
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }

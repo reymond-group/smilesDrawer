@@ -2106,7 +2106,7 @@ class DrawerBase {
       fontFamily: 'Arial, Helvetica, sans-serif',
       fontSizeLarge: 11,
       fontSizeSmall: 3,
-      padding: 2.0,
+      padding: 10.0,
       experimentalSSSR: false,
       kkThreshold: 0.1,
       kkInnerThreshold: 0.1,
@@ -8530,10 +8530,12 @@ class ReactionDrawer {
       spacing: 10,
       plus: {
         size: 9,
-        thickness: 1
+        thickness: 1.0
       },
       arrow: {
         length: moleculeOptions.bondLength * 4.0,
+        headSize: 6.0,
+        thickness: 1.0,
         margin: 3
       }
     };
@@ -8601,7 +8603,7 @@ class ReactionDrawer {
 
     elements.push({
       width: this.opts.arrow.length * this.opts.scale,
-      height: this.molOpts.fontSizeLarge * 0.9 * this.opts.scale,
+      height: this.opts.arrow.headSize * 2.0 * this.opts.scale,
       svg: this.getArrow()
     }); // Text above the arrow / reagents
 
@@ -8711,7 +8713,7 @@ class ReactionDrawer {
   }
 
   getArrowhead() {
-    let s = this.molOpts.fontSizeLarge * 0.9;
+    let s = this.opts.arrow.headSize;
     let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
     let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
     marker.setAttributeNS(null, 'id', 'arrowhead');
@@ -8729,7 +8731,7 @@ class ReactionDrawer {
   }
 
   getCDArrowhead() {
-    let s = this.molOpts.fontSizeLarge * 0.9;
+    let s = this.opts.arrow.headSize;
     let sw = s * (7 / 4.5);
     let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
     let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -8749,8 +8751,7 @@ class ReactionDrawer {
   }
 
   getArrow() {
-    let s = this.molOpts.fontSizeLarge * 0.9;
-    let w = s / 10.0;
+    let s = this.opts.arrow.headSize;
     let l = this.opts.arrow.length;
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -8759,14 +8760,14 @@ class ReactionDrawer {
     svg.appendChild(defs);
     svg.setAttributeNS(null, 'id', 'arrow');
     line.setAttributeNS(null, 'x1', 0.0);
-    line.setAttributeNS(null, 'y1', -this.molOpts.bondThickness / 2.0);
+    line.setAttributeNS(null, 'y1', -this.opts.arrow.thickness / 2.0);
     line.setAttributeNS(null, 'x2', l);
-    line.setAttributeNS(null, 'y2', -this.molOpts.bondThickness / 2.0);
-    line.setAttributeNS(null, 'stroke-width', this.molOpts.bondThickness);
+    line.setAttributeNS(null, 'y2', -this.opts.arrow.thickness / 2.0);
+    line.setAttributeNS(null, 'stroke-width', this.opts.arrow.thickness);
     line.setAttributeNS(null, 'stroke', this.themeManager.getColor("C"));
     line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
     svg.appendChild(line);
-    svg.setAttributeNS(null, 'viewBox', `0 ${-s / 2.0} ${l + s} ${s}`);
+    svg.setAttributeNS(null, 'viewBox', `0 ${-s / 2.0} ${l + s * (7 / 4.5)} ${s}`);
     return svg;
   }
 
@@ -9947,10 +9948,9 @@ class SmilesDrawer {
         let tag = element.nodeName.toLowerCase();
 
         if (tag === 'svg') {
-          this.drawer.draw(parseTree, element, theme);
-          let dims = this.getDimensions(element);
-          element.setAttributeNS(null, 'width', '' + dims.w);
-          element.setAttributeNS(null, 'height', '' + dims.h);
+          this.drawer.draw(parseTree, element, theme); // let dims = this.getDimensions(element);
+          // element.setAttributeNS(null, 'width', '' + dims.w);
+          // element.setAttributeNS(null, 'height', '' + dims.h);
 
           if (callback) {
             callback(element);
@@ -10014,17 +10014,16 @@ class SmilesDrawer {
         let tag = element.nodeName.toLowerCase();
 
         if (tag === 'svg') {
-          let dims = this.getDimensions(element);
           this.reactionDrawer.draw(reaction, element, theme, settings.textAboveArrow, settings.textBelowArrow); // The svg has to have a css width and height set for the other
           // tags, however, here it would overwrite the chosen width and height
 
-          if (this.drawer.opts.scale <= 0) {
+          if (this.reactionDrawer.opts.scale <= 0) {
             element.style.width = null;
             element.style.height = null;
-          }
+          } // let dims = this.getDimensions(element);
+          // element.setAttributeNS(null, 'width', '' + dims.w);
+          // element.setAttributeNS(null, 'height', '' + dims.h);
 
-          element.setAttributeNS(null, 'width', '' + dims.w);
-          element.setAttributeNS(null, 'height', '' + dims.h);
 
           if (callback) {
             callback(element);
@@ -10422,7 +10421,7 @@ class SvgDrawer {
             dir = 'right';
           }
 
-          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, attachedPseudoElements);
+          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, graph.vertices.length, attachedPseudoElements);
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
@@ -10801,8 +10800,8 @@ class SvgWrapper {
     }
 
     let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
-        u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 3.0 + this.halfBondThickness)),
-        v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.halfBondThickness)),
+        u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 3.0 + this.opts.fontSizeLarge / 4.0)),
+        v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.opts.fontSizeLarge / 4.0)),
         w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
     let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
         gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
@@ -10841,14 +10840,14 @@ class SvgWrapper {
 
     let dir = Vector2.subtract(end, start).normalize(),
         length = line.getLength(),
-        step = 1.25 / (length / (this.opts.bondThickness * 3.0)),
+        step = 1.25 / (length / (this.opts.bondLength / 10.0)),
         changed = false;
     let gradient = this.createGradient(line);
 
     for (let t = 0.0; t < 1.0; t += step) {
       let to = Vector2.multiplyScalar(dir, t * length),
           startDash = Vector2.add(start, to),
-          width = this.opts.bondThickness * 3.0 * t,
+          width = this.opts.fontSizeLarge / 2.0 * t,
           dashOffset = Vector2.multiplyScalar(normals[0], width);
       startDash.subtract(dashOffset);
       let endDash = startDash.clone();
@@ -11003,6 +11002,7 @@ class SvgWrapper {
    * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
    * @param {Number} charge The charge of the atom.
    * @param {Number} isotope The isotope number.
+   * @param {Number} totalVertices The total number of vertices in the graph.
    * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
    * @param {String} attachedPseudoElement.element The element symbol.
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
@@ -11010,7 +11010,7 @@ class SvgWrapper {
    */
 
 
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, totalVertices, attachedPseudoElement = {}) {
     let text = [];
     let display = elementName;
 
@@ -11070,10 +11070,10 @@ class SvgWrapper {
       }
     }
 
-    this.write(text, direction, x, y);
+    this.write(text, direction, x, y, totalVertices === 1);
   }
 
-  write(text, direction, x, y) {
+  write(text, direction, x, y, singleVertex) {
     // Measure element name only, without charge or isotope ...
     let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily); // ... but for direction left move to the right to 
 
@@ -11083,13 +11083,13 @@ class SvgWrapper {
     // to allow for narrower paddings
 
 
-    if (direction === 'left') {
+    if (singleVertex) {
       if (x + bbox.width * text.length > this.maxX) {
         this.maxX = x + bbox.width * text.length;
       }
 
       if (x - bbox.width * text.length < this.minX) {
-        this.minX = x - bbox.width * text.length;
+        this.minX = x - bbox.width / 2.0;
       }
 
       if (y - bbox.height < this.minY) {
@@ -11099,29 +11099,47 @@ class SvgWrapper {
       if (y + bbox.height > this.maxY) {
         this.maxY = y + bbox.height;
       }
-    } else if (direction === 'up') {
-      if (y - 0.8 * bbox.height * text.length < this.minY) {
-        this.minY = y - 0.8 * bbox.height * text.length;
-      }
-    } else if (direction === 'right') {
-      if (x + bbox.width * text.length > this.maxX) {
-        this.maxX = x + bbox.width * text.length;
-      }
+    } else {
+      if (direction === 'left') {
+        if (x + bbox.width * text.length > this.maxX) {
+          this.maxX = x + bbox.width * text.length;
+        }
 
-      if (x - bbox.width * text.length < this.minX) {
-        this.minX = x - bbox.width * text.length;
-      }
+        if (x - bbox.width * text.length < this.minX) {
+          this.minX = x - bbox.width * text.length;
+        }
 
-      if (y - bbox.height < this.minY) {
-        this.minY = y - bbox.height;
-      }
+        if (y - bbox.height < this.minY) {
+          this.minY = y - bbox.height;
+        }
 
-      if (y + bbox.height > this.maxY) {
-        this.maxY = y + bbox.height;
-      }
-    } else if (direction === 'down') {
-      if (y + 0.8 * bbox.height * text.length > this.maxY) {
-        this.maxY = y + 0.8 * bbox.height * text.length;
+        if (y + bbox.height > this.maxY) {
+          this.maxY = y + bbox.height;
+        }
+      } else if (direction === 'up') {
+        if (y - 0.8 * bbox.height * text.length < this.minY) {
+          this.minY = y - 0.8 * bbox.height * text.length;
+        }
+      } else if (direction === 'right') {
+        if (x + bbox.width * text.length > this.maxX) {
+          this.maxX = x + bbox.width * text.length;
+        }
+
+        if (x - bbox.width * text.length < this.minX) {
+          this.minX = x - bbox.width / 2.0;
+        }
+
+        if (y - bbox.height < this.minY) {
+          this.minY = y - bbox.height;
+        }
+
+        if (y + bbox.height > this.maxY) {
+          this.maxY = y + bbox.height;
+        }
+      } else if (direction === 'down') {
+        if (y + 0.8 * bbox.height * text.length > this.maxY) {
+          this.maxY = y + 0.8 * bbox.height * text.length;
+        }
       }
     }
 

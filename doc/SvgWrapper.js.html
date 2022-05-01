@@ -365,8 +365,8 @@ class SvgWrapper {
     }
 
     let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
-      u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 3.0 + this.halfBondThickness)),
-      v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.halfBondThickness)),
+      u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 3.0 + this.opts.fontSizeLarge / 4.0)),
+      v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.opts.fontSizeLarge / 4.0)),
       w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
 
     let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
@@ -408,7 +408,7 @@ class SvgWrapper {
 
     let dir = Vector2.subtract(end, start).normalize(),
       length = line.getLength(),
-      step = 1.25 / (length / (this.opts.bondThickness * 3.0)),
+      step = 1.25 / (length / (this.opts.bondLength / 10.0)),
       changed = false;
 
     let gradient = this.createGradient(line);
@@ -416,7 +416,7 @@ class SvgWrapper {
     for (let t = 0.0; t &lt; 1.0; t += step) {
       let to = Vector2.multiplyScalar(dir, t * length),
         startDash = Vector2.add(start, to),
-        width = this.opts.bondThickness * 3.0 * t,
+        width = this.opts.fontSizeLarge / 2.0 * t,
         dashOffset = Vector2.multiplyScalar(normals[0], width);
 
       startDash.subtract(dashOffset);
@@ -578,12 +578,13 @@ class SvgWrapper {
    * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
    * @param {Number} charge The charge of the atom.
    * @param {Number} isotope The isotope number.
+   * @param {Number} totalVertices The total number of vertices in the graph.
    * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
    * @param {String} attachedPseudoElement.element The element symbol.
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
    * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
    */
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, totalVertices, attachedPseudoElement = {}) {
     let text = [];
     let display = elementName;
 
@@ -636,10 +637,10 @@ class SvgWrapper {
       }
     }
 
-    this.write(text, direction, x, y);
+    this.write(text, direction, x, y, totalVertices === 1);
   }
 
-  write(text, direction, x, y) {
+  write(text, direction, x, y, singleVertex) {
     // Measure element name only, without charge or isotope ...
     let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
 
@@ -650,12 +651,12 @@ class SvgWrapper {
 
     // Get the approximate width and height of text and add update max/min
     // to allow for narrower paddings
-    if (direction === 'left') {
+    if (singleVertex) {
       if (x + bbox.width * text.length > this.maxX) {
         this.maxX = x + bbox.width * text.length;
       }
       if (x - bbox.width * text.length &lt; this.minX) {
-        this.minX = x - bbox.width * text.length;
+        this.minX = x - bbox.width / 2.0;
       }
       if (y - bbox.height &lt; this.minY) {
         this.minY = y - bbox.height;
@@ -663,26 +664,41 @@ class SvgWrapper {
       if (y + bbox.height > this.maxY) {
         this.maxY = y + bbox.height;
       }
-    } else if (direction === 'up') {
-      if (y - 0.8 * bbox.height * text.length &lt; this.minY) {
-        this.minY = y - 0.8 * bbox.height * text.length;
-      }
-    } else if (direction === 'right') {
-      if (x + bbox.width * text.length > this.maxX) {
-        this.maxX = x + bbox.width * text.length;
-      }
-      if (x - bbox.width * text.length &lt; this.minX) {
-        this.minX = x - bbox.width * text.length;
-      }
-      if (y - bbox.height &lt; this.minY) {
-        this.minY = y - bbox.height;
-      }
-      if (y + bbox.height > this.maxY) {
-        this.maxY = y + bbox.height;
-      }
-    } else if (direction === 'down') {
-      if (y + 0.8 * bbox.height * text.length > this.maxY) {
-        this.maxY = y + 0.8 * bbox.height * text.length;
+    } else {
+      if (direction === 'left') {
+        if (x + bbox.width * text.length > this.maxX) {
+          this.maxX = x + bbox.width * text.length;
+        }
+        if (x - bbox.width * text.length &lt; this.minX) {
+          this.minX = x - bbox.width * text.length;
+        }
+        if (y - bbox.height &lt; this.minY) {
+          this.minY = y - bbox.height;
+        }
+        if (y + bbox.height > this.maxY) {
+          this.maxY = y + bbox.height;
+        }
+      } else if (direction === 'up') {
+        if (y - 0.8 * bbox.height * text.length &lt; this.minY) {
+          this.minY = y - 0.8 * bbox.height * text.length;
+        }
+      } else if (direction === 'right') {
+        if (x + bbox.width * text.length > this.maxX) {
+          this.maxX = x + bbox.width * text.length;
+        }
+        if (x - bbox.width * text.length &lt; this.minX) {
+          this.minX = x - bbox.width / 2.0;
+        }
+        if (y - bbox.height &lt; this.minY) {
+          this.minY = y - bbox.height;
+        }
+        if (y + bbox.height > this.maxY) {
+          this.maxY = y + bbox.height;
+        }
+      } else if (direction === 'down') {
+        if (y + 0.8 * bbox.height * text.length > this.maxY) {
+          this.maxY = y + 0.8 * bbox.height * text.length;
+        }
       }
     }
 
@@ -984,7 +1000,7 @@ module.exports = SvgWrapper;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Thu Apr 28 2022 20:11:55 GMT+0200 (Central European Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Sun May 01 2022 22:03:23 GMT+0200 (Central European Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

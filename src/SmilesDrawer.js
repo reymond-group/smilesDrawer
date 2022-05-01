@@ -132,9 +132,9 @@ class SmilesDrawer {
                 let tag = element.nodeName.toLowerCase();
                 if (tag === 'svg') {
                     this.drawer.draw(parseTree, element, theme);
-                    let dims = this.getDimensions(element);
-                    element.setAttributeNS(null, 'width', '' + dims.w);
-                    element.setAttributeNS(null, 'height', '' + dims.h);
+                    // let dims = this.getDimensions(element);
+                    // element.setAttributeNS(null, 'width', '' + dims.w);
+                    // element.setAttributeNS(null, 'height', '' + dims.h);
                     if (callback) {
                         callback(element);
                     }
@@ -189,16 +189,16 @@ class SmilesDrawer {
             elements.forEach(element => {
                 let tag = element.nodeName.toLowerCase();
                 if (tag === 'svg') {
-                    let dims = this.getDimensions(element);
                     this.reactionDrawer.draw(reaction, element, theme, settings.textAboveArrow, settings.textBelowArrow);
                     // The svg has to have a css width and height set for the other
                     // tags, however, here it would overwrite the chosen width and height
-                    if (this.drawer.opts.scale <= 0) {
+                    if (this.reactionDrawer.opts.scale <= 0) {
                         element.style.width = null;
                         element.style.height = null;
                     }
-                    element.setAttributeNS(null, 'width', '' + dims.w);
-                    element.setAttributeNS(null, 'height', '' + dims.h);
+                    // let dims = this.getDimensions(element);
+                    // element.setAttributeNS(null, 'width', '' + dims.w);
+                    // element.setAttributeNS(null, 'height', '' + dims.h);
                     if (callback) {
                         callback(element);
                     }
