@@ -8580,8 +8580,8 @@ class ReactionDrawer {
     for (var i = 0; i < reaction.reactants.length; i++) {
       if (i > 0) {
         elements.push({
-          width: this.opts.plus.size,
-          height: this.opts.plus.size,
+          width: this.opts.plus.size * this.opts.scale,
+          height: this.opts.plus.size * this.opts.scale,
           svg: this.getPlus()
         });
       }
@@ -11088,7 +11088,7 @@ class SvgWrapper {
         this.maxX = x + bbox.width * text.length;
       }
 
-      if (x - bbox.width * text.length < this.minX) {
+      if (x - bbox.width / 2.0 < this.minX) {
         this.minX = x - bbox.width / 2.0;
       }
 
@@ -11100,7 +11100,7 @@ class SvgWrapper {
         this.maxY = y + bbox.height;
       }
     } else {
-      if (direction === 'left') {
+      if (direction !== 'right') {
         if (x + bbox.width * text.length > this.maxX) {
           this.maxX = x + bbox.width * text.length;
         }
@@ -11108,37 +11108,33 @@ class SvgWrapper {
         if (x - bbox.width * text.length < this.minX) {
           this.minX = x - bbox.width * text.length;
         }
-
-        if (y - bbox.height < this.minY) {
-          this.minY = y - bbox.height;
-        }
-
-        if (y + bbox.height > this.maxY) {
-          this.maxY = y + bbox.height;
-        }
-      } else if (direction === 'up') {
-        if (y - 0.8 * bbox.height * text.length < this.minY) {
-          this.minY = y - 0.8 * bbox.height * text.length;
-        }
-      } else if (direction === 'right') {
+      } else if (direction !== 'left') {
         if (x + bbox.width * text.length > this.maxX) {
           this.maxX = x + bbox.width * text.length;
         }
 
-        if (x - bbox.width * text.length < this.minX) {
+        if (x - bbox.width / 2.0 < this.minX) {
           this.minX = x - bbox.width / 2.0;
         }
+      }
 
-        if (y - bbox.height < this.minY) {
-          this.minY = y - bbox.height;
-        }
+      if (y - bbox.height < this.minY) {
+        this.minY = y - bbox.height;
+      }
 
-        if (y + bbox.height > this.maxY) {
-          this.maxY = y + bbox.height;
-        }
-      } else if (direction === 'down') {
+      if (y + bbox.height > this.maxY) {
+        this.maxY = y + bbox.height;
+      }
+
+      if (direction === 'down') {
         if (y + 0.8 * bbox.height * text.length > this.maxY) {
           this.maxY = y + 0.8 * bbox.height * text.length;
+        }
+      }
+
+      if (direction === 'up') {
+        if (y - 0.8 * bbox.height * text.length < this.minY) {
+          this.minY = y - 0.8 * bbox.height * text.length;
         }
       }
     }

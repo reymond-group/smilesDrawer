@@ -72,8 +72,8 @@ class ReactionDrawer {
         for (var i = 0; i < reaction.reactants.length; i++) {
             if (i > 0) {
                 elements.push({
-                    width: this.opts.plus.size,
-                    height: this.opts.plus.size,
+                    width: this.opts.plus.size * this.opts.scale,
+                    height: this.opts.plus.size * this.opts.scale,
                     svg: this.getPlus()
                 });
             }
