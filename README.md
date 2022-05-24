@@ -2,9 +2,14 @@
 
 # Smiles Drawer
 
-Current Version: 1.2.0 ([Rumble](https://www.youtube.com/watch?v=ucTg6rZJCu4))
+Current Version: 2.0.1
 
 If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: [10.1021/acs.jcim.7b00425](http://dx.doi.org/10.1021/acs.jcim.7b00425)
+
+## SmilesDrawer 2.0 is out!
+And it now also draws reactions, comes with many new teams and has a cool new website:
+
+[smilesdrawer.rocks](https://www.smilesdrawer.rocks)
 
 <img src="http://doc.gdb.tools/smilesDrawer/structures.png"></img>
 
