@@ -112,8 +112,10 @@ SmilesDrawer.parseReaction = function (reactionSmiles, successCallback, errorCal
 if (canUseDOM) {
   window.SmilesDrawer = SmilesDrawer;
   window.SmiDrawer = SmiDrawer;
-} // There be dragons (polyfills)
+} // Attach SmiDrawer to SmilesDrawer for npm imports
 
+
+SmilesDrawer.SmiDrawer = SmiDrawer; // There be dragons (polyfills)
 
 if (!Array.prototype.fill) {
   Object.defineProperty(Array.prototype, 'fill', {

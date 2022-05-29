@@ -104,11 +104,13 @@ SmilesDrawer.parseReaction = function (reactionSmiles, successCallback, errorCal
   }
 }
 
-
 if (canUseDOM) {
   window.SmilesDrawer = SmilesDrawer;
   window.SmiDrawer = SmiDrawer;
 }
+
+// Attach SmiDrawer to SmilesDrawer for npm imports
+SmilesDrawer.SmiDrawer = SmiDrawer;
 
 // There be dragons (polyfills)
 
