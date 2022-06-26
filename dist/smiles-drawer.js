@@ -592,6 +592,7 @@ const Ring = require('./Ring');
  * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
  * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
+ * @property {Number} class
  */
 
 
@@ -630,6 +631,7 @@ class Atom {
     this.hydrogenDirection = 'down';
     this.subtreeDepth = 1;
     this.hasHydrogen = false;
+    this.class = -1;
   }
   /**
    * Adds a neighbouring element to this atom.
@@ -5076,6 +5078,7 @@ class Graph {
     atom.branchBond = node.branchBond;
     atom.ringbonds = node.ringbonds;
     atom.bracket = node.atom.element ? node.atom : null;
+    atom.class = node.atom.class;
     let vertex = new Vertex(atom);
     let parentVertex = this.vertices[parentVertexId];
     this.addVertex(vertex); // Add the id of this node to the parent as child
@@ -9807,7 +9810,7 @@ class SvgDrawer {
       let dir = vertex.getTextDirection(graph.vertices);
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
-      console.log(`Vertex ${i}, ${vertex}, with element ${element}`); // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
+      console.log(`Vertex ${i}, with element ${element} wtih class ${atom.class}`); // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization
 
       if (atom.element === 'N' && atom.isPartOfAromaticRing) {

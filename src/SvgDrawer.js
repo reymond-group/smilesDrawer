@@ -259,7 +259,7 @@ class SvgDrawer {
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
 
-      console.log(`Vertex ${i}, with element ${element}`)
+      console.log(`Vertex ${i}, with element ${element} wtih class ${atom.class}`)
 
       // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization
