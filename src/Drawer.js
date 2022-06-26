@@ -31,7 +31,7 @@ class Drawer {
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
-  draw(data, target, themeName = 'light', infoOnly = false) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = {}) {
     let canvas = null;
     if (typeof target === 'string' || target instanceof String) {
       canvas = document.getElementById(target);
@@ -47,7 +47,7 @@ class Drawer {
     svg.setAttributeNS(null, 'height', 500 + '');
     svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
     document.body.appendChild(svg);
-    this.svgDrawer.draw(data, svg, themeName, infoOnly);
+    this.svgDrawer.draw(data, svg, themeName, infoOnly, highlight_atoms);
     this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
     document.body.removeChild(svg);
   }

@@ -1982,7 +1982,7 @@ class Drawer {
    */
 
 
-  draw(data, target, themeName = 'light', infoOnly = false) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = {}) {
     let canvas = null;
 
     if (typeof target === 'string' || target instanceof String) {
@@ -1999,7 +1999,7 @@ class Drawer {
     svg.setAttributeNS(null, 'height', 500 + '');
     svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
     document.body.appendChild(svg);
-    this.svgDrawer.draw(data, svg, themeName, infoOnly);
+    this.svgDrawer.draw(data, svg, themeName, infoOnly, highlight_atoms);
     this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
     document.body.removeChild(svg);
   }
@@ -9593,7 +9593,7 @@ class SvgDrawer {
    */
 
 
-  draw(data, target, themeName = 'light', infoOnly = false) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = {}) {
     if (typeof target === 'string' || target instanceof String) {
       target = document.getElementById(target);
     } else if (target === null) {
@@ -9601,7 +9601,7 @@ class SvgDrawer {
     }
 
     let preprocessor = this.preprocessor;
-    preprocessor.initDraw(data, themeName, infoOnly);
+    preprocessor.initDraw(data, themeName, infoOnly, highlight_atoms);
 
     if (!infoOnly) {
       this.themeManager = new ThemeManager(this.opts.themes, themeName);
@@ -9788,6 +9788,7 @@ class SvgDrawer {
 
 
   drawVertices(debug) {
+    console.log("drawVertices");
     let preprocessor = this.preprocessor,
         opts = preprocessor.opts,
         graph = preprocessor.graph,
@@ -9805,7 +9806,8 @@ class SvgDrawer {
       let hydrogens = Atom.maxBonds[element] - bondCount;
       let dir = vertex.getTextDirection(graph.vertices);
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
-      let isCarbon = atom.element === 'C'; // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
+      let isCarbon = atom.element === 'C';
+      console.log(`Vertex ${i}, ${vertex}, with element ${element}`); // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization
 
       if (atom.element === 'N' && atom.isPartOfAromaticRing) {

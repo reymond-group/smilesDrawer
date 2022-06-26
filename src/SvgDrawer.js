@@ -25,7 +25,7 @@ class SvgDrawer {
 
    * @returns {Oject} The dimensions of the drawing in { width, height }
    */
-  draw(data, target, themeName = 'light', infoOnly = false) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = {}) {
     if (typeof target === 'string' || target instanceof String) {
       target = document.getElementById(target);
     } else if (target === null) {
@@ -34,7 +34,7 @@ class SvgDrawer {
 
     let preprocessor = this.preprocessor;
 
-    preprocessor.initDraw(data, themeName, infoOnly);
+    preprocessor.initDraw(data, themeName, infoOnly, highlight_atoms);
 
     if (!infoOnly) {
       this.themeManager = new ThemeManager(this.opts.themes, themeName);
@@ -239,6 +239,7 @@ class SvgDrawer {
    * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
    */
   drawVertices(debug) {
+    console.log("drawVertices")
     let preprocessor = this.preprocessor,
       opts = preprocessor.opts,
       graph = preprocessor.graph,
@@ -257,6 +258,8 @@ class SvgDrawer {
       let dir = vertex.getTextDirection(graph.vertices);
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
+
+      console.log(`Vertex ${i}, with element ${element}`)
 
       // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization
