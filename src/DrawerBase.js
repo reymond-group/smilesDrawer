@@ -441,7 +441,7 @@ class DrawerBase {
     return null;
   }
 
-  initDraw(data, themeName, infoOnly) {
+  initDraw(data, themeName, infoOnly, highlight_atoms) {
     this.data = data;
     this.infoOnly = infoOnly;
 
@@ -460,6 +460,8 @@ class DrawerBase {
     // Reset those, in case the previous drawn SMILES had a dangling \ or /
     this.doubleBondConfigCount = null;
     this.doubleBondConfig = null;
+
+    this.highlight_atoms = highlight_atoms
 
     this.initRings();
     this.initHydrogens();

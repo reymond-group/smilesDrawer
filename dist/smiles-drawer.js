@@ -631,7 +631,7 @@ class Atom {
     this.hydrogenDirection = 'down';
     this.subtreeDepth = 1;
     this.hasHydrogen = false;
-    this.class = -1;
+    this.class = undefined;
   }
   /**
    * Adds a neighbouring element to this atom.
@@ -1984,7 +1984,7 @@ class Drawer {
    */
 
 
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = {}) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = [[10, "#03fc9d"]]) {
     let canvas = null;
 
     if (typeof target === 'string' || target instanceof String) {
@@ -2494,7 +2494,7 @@ class DrawerBase {
     return null;
   }
 
-  initDraw(data, themeName, infoOnly) {
+  initDraw(data, themeName, infoOnly, highlight_atoms) {
     this.data = data;
     this.infoOnly = infoOnly;
     this.ringIdCounter = 0;
@@ -2508,6 +2508,7 @@ class DrawerBase {
 
     this.doubleBondConfigCount = null;
     this.doubleBondConfig = null;
+    this.highlight_atoms = highlight_atoms;
     this.initRings();
     this.initHydrogens();
   }
@@ -9596,7 +9597,7 @@ class SvgDrawer {
    */
 
 
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = {}) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
     if (typeof target === 'string' || target instanceof String) {
       target = document.getElementById(target);
     } else if (target === null) {
@@ -9615,6 +9616,7 @@ class SvgDrawer {
 
     this.svgWrapper.determineDimensions(preprocessor.graph.vertices); // Do the actual drawing
 
+    this.drawAtomHighlights(preprocessor.opts.debug);
     this.drawEdges(preprocessor.opts.debug);
     this.drawVertices(preprocessor.opts.debug);
 
@@ -9784,6 +9786,35 @@ class SvgDrawer {
     }
   }
   /**
+   * Draw the highlights for atoms to the canvas.
+   * 
+   * @param {Boolean} debug 
+   */
+
+
+  drawAtomHighlights(debug) {
+    let preprocessor = this.preprocessor,
+        opts = preprocessor.opts,
+        graph = preprocessor.graph,
+        rings = preprocessor.rings,
+        svgWrapper = this.svgWrapper;
+    console.log(preprocessor.highlight_atoms);
+    console.log(graph.vertices.length);
+
+    for (var i = 0; i < graph.vertices.length; i++) {
+      let vertex = graph.vertices[i];
+      let atom = vertex.value;
+
+      for (var j = 0; j < preprocessor.highlight_atoms.length; j++) {
+        let highlight = preprocessor.highlight_atoms[j];
+
+        if (atom.class == highlight[0]) {
+          svgWrapper.drawAtomHighlight(vertex.position.x, vertex.position.y, highlight[1]);
+        }
+      }
+    }
+  }
+  /**
    * Draws the vertices representing atoms to the canvas.
    *
    * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
@@ -9932,10 +9963,12 @@ class SvgWrapper {
     this.uid = makeid(5);
     this.gradientId = 0; // maintain a list of line elements and their corresponding gradients
     // maintain a list of vertex elements
+    // maintain a list of highlighting elements
 
     this.paths = [];
     this.vertices = [];
-    this.gradients = []; // maintain the dimensions
+    this.gradients = [];
+    this.highlights = []; // maintain the dimensions
 
     this.drawingWidth = 0;
     this.drawingHeight = 0;
@@ -9978,6 +10011,7 @@ class SvgWrapper {
     // TODO: add the defs element to put gradients in
     let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
         masks = document.createElementNS('http://www.w3.org/2000/svg', 'mask'),
+        highlights = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         paths = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         vertices = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         pathChildNodes = this.paths;
@@ -9993,6 +10027,10 @@ class SvgWrapper {
 
     for (let path of pathChildNodes) {
       paths.appendChild(path);
+    }
+
+    for (let highlight of this.highlights) {
+      highlights.appendChild(highlight);
     }
 
     for (let vertex of this.vertices) {
@@ -10013,6 +10051,7 @@ class SvgWrapper {
     if (this.svg) {
       this.svg.appendChild(defs);
       this.svg.appendChild(masks);
+      this.svg.appendChild(highlights);
       this.svg.appendChild(paths);
       this.svg.appendChild(vertices);
     } else {
@@ -10181,6 +10220,23 @@ class SvgWrapper {
     ball.setAttributeNS(null, 'r', this.opts.bondLength / 4.5);
     ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(ball);
+  }
+  /**
+   * Draw a highlight for an atom
+   * 
+   *  @param {Number} x The x position of the highlight
+   *  @param {Number} y The y position of the highlight
+   *  @param {string} color The color of the highlight, default #03fc9d
+   */
+
+
+  drawAtomHighlight(x, y, color = "#03fc9d") {
+    let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ball.setAttributeNS(null, 'cx', x);
+    ball.setAttributeNS(null, 'cy', y);
+    ball.setAttributeNS(null, 'r', this.opts.bondLength / 3);
+    ball.setAttributeNS(null, 'fill', color);
+    this.highlights.push(ball);
   }
   /**
    * Draw a dashed wedge on the canvas.

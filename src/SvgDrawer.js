@@ -25,7 +25,7 @@ class SvgDrawer {
 
    * @returns {Oject} The dimensions of the drawing in { width, height }
    */
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = {}) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
     if (typeof target === 'string' || target instanceof String) {
       target = document.getElementById(target);
     } else if (target === null) {
@@ -47,6 +47,7 @@ class SvgDrawer {
     this.svgWrapper.determineDimensions(preprocessor.graph.vertices);
 
     // Do the actual drawing
+    this.drawAtomHighlights(preprocessor.opts.debug);
     this.drawEdges(preprocessor.opts.debug);
     this.drawVertices(preprocessor.opts.debug);
 
@@ -230,6 +231,34 @@ class SvgDrawer {
     if (debug) {
       let midpoint = Vector2.midpoint(a, b);
       svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
+    }
+  }
+
+  /**
+   * Draw the highlights for atoms to the canvas.
+   * 
+   * @param {Boolean} debug 
+   */
+  drawAtomHighlights(debug){
+    let preprocessor = this.preprocessor,
+      opts = preprocessor.opts,
+      graph = preprocessor.graph,
+      rings = preprocessor.rings,
+      svgWrapper = this.svgWrapper;
+    
+    console.log(preprocessor.highlight_atoms)
+    console.log(graph.vertices.length)
+
+    for (var i = 0; i < graph.vertices.length; i++) {
+      let vertex = graph.vertices[i];
+      let atom = vertex.value;
+
+      for (var j = 0; j < preprocessor.highlight_atoms.length; j++){
+        let highlight = preprocessor.highlight_atoms[j]
+        if (atom.class == highlight[0]){
+          svgWrapper.drawAtomHighlight(vertex.position.x, vertex.position.y, highlight[1]);
+        }
+      }
     }
   }
 
