@@ -268,7 +268,6 @@ class SvgDrawer {
    * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
    */
   drawVertices(debug) {
-    console.log("drawVertices")
     let preprocessor = this.preprocessor,
       opts = preprocessor.opts,
       graph = preprocessor.graph,
@@ -287,8 +286,6 @@ class SvgDrawer {
       let dir = vertex.getTextDirection(graph.vertices);
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
-
-      console.log(`Vertex ${i}, with element ${element} wtih class ${atom.class}`)
 
       // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization

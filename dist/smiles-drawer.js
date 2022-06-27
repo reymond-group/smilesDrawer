@@ -3540,7 +3540,10 @@ class DrawerBase {
       }
 
       if (atom.bracket) {
-        hydrogens = atom.bracket.hcount;
+        if (atom.bracket.hcount != null) {
+          hydrogens = atom.bracket.hcount;
+        }
+
         charge = atom.bracket.charge;
         isotope = atom.bracket.isotope;
       }
@@ -5112,12 +5115,14 @@ class Graph {
     let offset = node.ringbondCount + 1;
 
     if (atom.bracket) {
+      console.log("hcount");
       offset += atom.bracket.hcount;
     }
 
     let stereoHydrogens = 0;
 
     if (atom.bracket && atom.bracket.chirality) {
+      console.log("hcount");
       atom.isStereoCenter = true;
       stereoHydrogens = atom.bracket.hcount;
 
@@ -9822,7 +9827,6 @@ class SvgDrawer {
 
 
   drawVertices(debug) {
-    console.log("drawVertices");
     let preprocessor = this.preprocessor,
         opts = preprocessor.opts,
         graph = preprocessor.graph,
@@ -9840,8 +9844,7 @@ class SvgDrawer {
       let hydrogens = Atom.maxBonds[element] - bondCount;
       let dir = vertex.getTextDirection(graph.vertices);
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
-      let isCarbon = atom.element === 'C';
-      console.log(`Vertex ${i}, with element ${element} wtih class ${atom.class}`); // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
+      let isCarbon = atom.element === 'C'; // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization
 
       if (atom.element === 'N' && atom.isPartOfAromaticRing) {
@@ -9849,7 +9852,10 @@ class SvgDrawer {
       }
 
       if (atom.bracket) {
-        hydrogens = atom.bracket.hcount;
+        if (atom.bracket.hcount != null) {
+          hydrogens = atom.bracket.hcount;
+        }
+
         charge = atom.bracket.charge;
         isotope = atom.bracket.isotope;
       }
