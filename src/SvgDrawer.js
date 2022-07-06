@@ -10,26 +10,32 @@ const ThemeManager = require('./ThemeManager');
 const Vector2 = require('./Vector2');
 
 class SvgDrawer {
-  constructor(options) {
+  constructor(options, clear = true) {
     this.preprocessor = new DrawerBase(options);
     this.opts = this.preprocessor.opts;
+    this.clear = clear;
+    this.svgWrapper = null;
   }
 
   /**
    * Draws the parsed smiles data to an svg element.
    *
    * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|HTMLElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+   * @param {(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
-
-   * @returns {Oject} The dimensions of the drawing in { width, height }
+   *
+   * @returns {SVGElement} The svg element
    */
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
-    if (typeof target === 'string' || target instanceof String) {
-      target = document.getElementById(target);
-    } else if (target === null) {
+  draw(data, target, themeName = 'light', infoOnly = false) {
+    if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      target.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      target.setAttributeNS(null, 'width', this.opts.width);
+      target.setAttributeNS(null, 'height', this.opts.height);
+    } else if (target instanceof String) {
+      target = document.getElementById(target);
     }
 
     let preprocessor = this.preprocessor;
@@ -38,7 +44,9 @@ class SvgDrawer {
 
     if (!infoOnly) {
       this.themeManager = new ThemeManager(this.opts.themes, themeName);
-      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts);
+      if (this.svgWrapper === null || this.clear) {
+        this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+      }
     }
 
     preprocessor.processGraph();
@@ -58,6 +66,36 @@ class SvgDrawer {
     }
 
     this.svgWrapper.constructSvg();
+    return target;
+  }
+
+  /**
+ * Draws the parsed smiles data to a canvas element.
+ *
+ * @param {Object} data The tree returned by the smiles parser.
+ * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+ * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+ * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+ */
+  drawCanvas(data, target, themeName = 'light', infoOnly = false) {
+    let canvas = null;
+    if (typeof target === 'string' || target instanceof String) {
+      canvas = document.getElementById(target);
+    } else {
+      canvas = target;
+    }
+
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
+    svg.setAttributeNS(null, 'width', 500 + '');
+    svg.setAttributeNS(null, 'height', 500 + '');
+    svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
+    document.body.appendChild(svg);
+    this.svgDrawer.draw(data, svg, themeName, infoOnly);
+    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
+    document.body.removeChild(svg);
     return target;
   }
 
@@ -303,8 +341,15 @@ class SvgDrawer {
         svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
+          let attachedPseudoElements = atom.getAttachedPseudoElements();
+
+          // Draw to the right if the whole molecule is concatenated into one string
+          if (atom.hasAttachedPseudoElements && graph.vertices.length === Object.keys(attachedPseudoElements).length + 1) {
+            dir = 'right';
+          }
+
           svgWrapper.drawText(vertex.position.x, vertex.position.y,
-            element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+            element, hydrogens, dir, isTerminal, charge, isotope, graph.vertices.length, attachedPseudoElements);
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
@@ -351,8 +396,8 @@ class SvgDrawer {
    *
    * @returns {String} The molecular formula.
    */
-  getMolecularFormula() {
-    return this.preprocessor.getMolecularFormula();
+  getMolecularFormula(graph = null) {
+    return this.preprocessor.getMolecularFormula(graph);
   }
 
   /**

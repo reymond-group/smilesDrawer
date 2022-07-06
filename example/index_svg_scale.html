@@ -150,7 +150,7 @@
 
   <div class="drawing-container">
     <div class="svg-container">
-      <svg id="output-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <svg id="output-svg" viewbox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
   </div>
 
@@ -209,32 +209,37 @@
     var sizeInput = document.getElementById('size');
     var overlapInput = document.getElementById('overlap');
 
-    var reactionOptions = {
-      scale: 2.0,
-      plus: {
-      },
-      arrow: {
-      }
-    }
-
     var options = {
+      scale: 2.0,
       debug: false,
       atomVisualization: 'default'
     }
 
-    var reactionDrawer = new SmilesDrawer.ReactionDrawer(reactionOptions, options);
+    var smilesDrawer = new SmilesDrawer.Drawer(options);
+    var svgDrawer = new SmilesDrawer.SvgDrawer(options);
     var input = document.getElementById('input');
     var log = document.getElementById('log');
 
     function draw() {
       let t = performance.now();
 
-      SmilesDrawer.parseReaction(input.value, function (reaction) {
-        reactionDrawer.draw(reaction, 'output-svg', 'hello world\nhow are you?', 'this is a test', 'dark');
-
+      SmilesDrawer.parse(input.value, function (tree) {
+        svgDrawer.draw(tree, 'output-svg', 'dark', false);
+        let td = performance.now() - t;
         log.innerHTML = '&nbsp;';
         log.style.visibility = 'hidden';
 
+        new Noty({
+          text: 'Drawing took ' + td.toFixed(3) + 'ms with a total overlap score of ' + svgDrawer.getTotalOverlapScore().toFixed(3) + '.',
+          killer: true,
+          timeout: 2000,
+          animation: {
+            open: null,
+            close: null
+          }
+        }).show();
+
+        console.log(svgDrawer.getMolecularFormula());
       }, function (err) {
         log.innerHTML = err;
         log.style.visibility = 'visible';

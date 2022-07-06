@@ -101,7 +101,7 @@ class Vertex {
       if (this.id === 0 && this.value.bracket.hcount === 0) {
         index = 0;
       }
-      
+
       if (this.value.bracket.hcount === 1 && ringbondIndex === 0) {
         index = 2;
       }
@@ -125,7 +125,7 @@ class Vertex {
           index = 2;
         }
       }
-      
+
       this.neighbours.splice(index, 0, vertexId);
     } else {
       this.neighbours.push(vertexId);
@@ -219,6 +219,11 @@ class Vertex {
   getTextDirection(vertices) {
     let neighbours = this.getDrawnNeighbours(vertices);
     let angles = Array();
+
+    // If there is only one vertex in the graph, always draw to the right
+    if (vertices.length === 1) {
+      return 'right';
+    }
 
     for (let i = 0; i < neighbours.length; i++) {
       angles.push(this.getAngle(vertices[neighbours[i]].position));
@@ -329,8 +334,8 @@ class Vertex {
 
     for (let i = 0; i < neighbours.length; i++) {
       if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, {
-          value: ringId
-        }) &&
+        value: ringId
+      }) &&
         neighbours[i] != previousVertexId) {
         return neighbours[i];
       }

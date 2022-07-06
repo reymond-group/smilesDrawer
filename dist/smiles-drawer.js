@@ -10,7 +10,9 @@ const ReactionParser = require('./src/ReactionParser');
 
 const SvgDrawer = require('./src/SvgDrawer');
 
-const ReactionDrawer = require('./src/ReactionDrawer'); // Detect SSR (server side rendering)
+const ReactionDrawer = require('./src/ReactionDrawer');
+
+const SmiDrawer = require('./src/SmilesDrawer'); // Detect SSR (server side rendering)
 
 
 var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
@@ -109,8 +111,11 @@ SmilesDrawer.parseReaction = function (reactionSmiles, successCallback, errorCal
 
 if (canUseDOM) {
   window.SmilesDrawer = SmilesDrawer;
-} // There be dragons (polyfills)
+  window.SmiDrawer = SmiDrawer;
+} // Attach SmiDrawer to SmilesDrawer for npm imports
 
+
+SmilesDrawer.SmiDrawer = SmiDrawer; // There be dragons (polyfills)
 
 if (!Array.prototype.fill) {
   Object.defineProperty(Array.prototype, 'fill', {
@@ -147,7 +152,7 @@ if (!Array.prototype.fill) {
 
 module.exports = SmilesDrawer;
 
-},{"./src/Drawer":5,"./src/Parser":12,"./src/ReactionDrawer":14,"./src/ReactionParser":15,"./src/SvgDrawer":19}],2:[function(require,module,exports){
+},{"./src/Drawer":5,"./src/Parser":13,"./src/ReactionDrawer":15,"./src/ReactionParser":16,"./src/SmilesDrawer":20,"./src/SvgDrawer":21}],2:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1115,7 +1120,7 @@ class Atom {
 
 module.exports = Atom;
 
-},{"./ArrayHelper":2,"./Ring":16,"./Vertex":24}],4:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Ring":17,"./Vertex":26}],4:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1608,6 +1613,7 @@ class CanvasWrapper {
    * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
    * @param {Number} charge The charge of the atom.
    * @param {Number} isotope The isotope number.
+   * @param {Number} vertexCount The number of vertices in the molecular graph.
    * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
    * @param {String} attachedPseudoElement.element The element symbol.
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
@@ -1615,7 +1621,7 @@ class CanvasWrapper {
    */
 
 
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, vertexCount, attachedPseudoElement = {}) {
     let ctx = this.ctx;
     let offsetX = this.offsetX;
     let offsetY = this.offsetY;
@@ -1946,7 +1952,7 @@ class CanvasWrapper {
 
 module.exports = CanvasWrapper;
 
-},{"./Line":9,"./MathHelper":10,"./Ring":16,"./UtilityFunctions":22,"./Vector2":23,"./Vertex":24}],5:[function(require,module,exports){
+},{"./Line":10,"./MathHelper":11,"./Ring":17,"./UtilityFunctions":24,"./Vector2":25,"./Vertex":26}],5:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -1994,16 +2000,12 @@ class Drawer {
     }
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
-
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
-    svg.setAttributeNS(null, 'width', 500 + '');
-    svg.setAttributeNS(null, 'height', 500 + '');
-    svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
-    document.body.appendChild(svg);
-    this.svgDrawer.draw(data, svg, themeName, infoOnly, highlight_atoms);
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
+    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
+    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
+    this.svgDrawer.draw(data, svg, themeName, infoOnly);
     this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
-    document.body.removeChild(svg);
   }
   /**
    * Returns the total overlap score of the current molecule.
@@ -2030,7 +2032,7 @@ class Drawer {
 
 module.exports = Drawer;
 
-},{"./SvgDrawer":19}],6:[function(require,module,exports){
+},{"./SvgDrawer":21}],6:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -2092,10 +2094,11 @@ class DrawerBase {
     this.defaultOptions = {
       width: 500,
       height: 500,
-      bondThickness: 0.6,
-      bondLength: 15,
-      shortBondLength: 0.85,
-      bondSpacing: 0.18 * 15,
+      scale: 0.0,
+      bondThickness: 1.0,
+      bondLength: 30,
+      shortBondLength: 0.8,
+      bondSpacing: 0.17 * 30,
       atomVisualization: 'default',
       isomeric: true,
       debug: false,
@@ -2104,9 +2107,10 @@ class DrawerBase {
       overlapSensitivity: 0.42,
       overlapResolutionIterations: 1,
       compactDrawing: true,
-      fontSizeLarge: 5,
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      fontSizeLarge: 11,
       fontSizeSmall: 3,
-      padding: 5.0,
+      padding: 10.0,
       experimentalSSSR: false,
       kkThreshold: 0.1,
       kkInnerThreshold: 0.1,
@@ -2130,6 +2134,156 @@ class DrawerBase {
           BACKGROUND: '#141414'
         },
         light: {
+          C: '#222',
+          O: '#e74c3c',
+          N: '#3498db',
+          F: '#27ae60',
+          CL: '#16a085',
+          BR: '#d35400',
+          I: '#8e44ad',
+          P: '#d35400',
+          S: '#f1c40f',
+          B: '#e67e22',
+          SI: '#e67e22',
+          H: '#666',
+          BACKGROUND: '#fff'
+        },
+        oldschool: {
+          C: '#000',
+          O: '#000',
+          N: '#000',
+          F: '#000',
+          CL: '#000',
+          BR: '#000',
+          I: '#000',
+          P: '#000',
+          S: '#000',
+          B: '#000',
+          SI: '#000',
+          H: '#000',
+          BACKGROUND: '#fff'
+        },
+        "solarized": {
+          C: "#586e75",
+          O: "#dc322f",
+          N: "#268bd2",
+          F: "#859900",
+          CL: "#16a085",
+          BR: "#cb4b16",
+          I: "#6c71c4",
+          P: "#d33682",
+          S: "#b58900",
+          B: "#2aa198",
+          SI: "#2aa198",
+          H: "#657b83",
+          BACKGROUND: "#fff"
+        },
+        "solarized-dark": {
+          C: "#93a1a1",
+          O: "#dc322f",
+          N: "#268bd2",
+          F: "#859900",
+          CL: "#16a085",
+          BR: "#cb4b16",
+          I: "#6c71c4",
+          P: "#d33682",
+          S: "#b58900",
+          B: "#2aa198",
+          SI: "#2aa198",
+          H: "#839496",
+          BACKGROUND: "#fff"
+        },
+        "matrix": {
+          C: "#678c61",
+          O: "#2fc079",
+          N: "#4f7e7e",
+          F: "#90d762",
+          CL: "#82d967",
+          BR: "#23755a",
+          I: "#409931",
+          P: "#c1ff8a",
+          S: "#faff00",
+          B: "#50b45a",
+          SI: "#409931",
+          H: "#426644",
+          BACKGROUND: "#fff"
+        },
+        "github": {
+          C: "#24292f",
+          O: "#cf222e",
+          N: "#0969da",
+          F: "#2da44e",
+          CL: "#6fdd8b",
+          BR: "#bc4c00",
+          I: "#8250df",
+          P: "#bf3989",
+          S: "#d4a72c",
+          B: "#fb8f44",
+          SI: "#bc4c00",
+          H: "#57606a",
+          BACKGROUND: "#fff"
+        },
+        "carbon": {
+          C: "#161616",
+          O: "#da1e28",
+          N: "#0f62fe",
+          F: "#198038",
+          CL: "#007d79",
+          BR: "#fa4d56",
+          I: "#8a3ffc",
+          P: "#ff832b",
+          S: "#f1c21b",
+          B: "#8a3800",
+          SI: "#e67e22",
+          H: "#525252",
+          BACKGROUND: "#fff"
+        },
+        "cyberpunk": {
+          C: "#ea00d9",
+          O: "#ff3131",
+          N: "#0abdc6",
+          F: "#00ff9f",
+          CL: "#00fe00",
+          BR: "#fe9f20",
+          I: "#ff00ff",
+          P: "#fe7f00",
+          S: "#fcee0c",
+          B: "#ff00ff",
+          SI: "#ffffff",
+          H: "#913cb1",
+          BACKGROUND: "#fff"
+        },
+        "gruvbox": {
+          C: "#665c54",
+          O: "#cc241d",
+          N: "#458588",
+          F: "#98971a",
+          CL: "#79740e",
+          BR: "#d65d0e",
+          I: "#b16286",
+          P: "#af3a03",
+          S: "#d79921",
+          B: "#689d6a",
+          SI: "#427b58",
+          H: "#7c6f64",
+          BACKGROUND: "#fbf1c7"
+        },
+        "gruvbox-dark": {
+          C: "#ebdbb2",
+          O: "#cc241d",
+          N: "#458588",
+          F: "#98971a",
+          CL: "#b8bb26",
+          BR: "#d65d0e",
+          I: "#b16286",
+          P: "#fe8019",
+          S: "#d79921",
+          B: "#8ec07c",
+          SI: "#83a598",
+          H: "#bdae93",
+          BACKGROUND: "#282828"
+        },
+        custom: {
           C: '#222',
           O: '#e74c3c',
           N: '#3498db',
@@ -2398,12 +2552,13 @@ class DrawerBase {
    */
 
 
-  getMolecularFormula() {
+  getMolecularFormula(data = null) {
     let molecularFormula = '';
-    let counts = new Map(); // Initialize element count
+    let counts = new Map();
+    let graph = data === null ? this.graph : new Graph(data, this.opts.isomeric); // Initialize element count
 
-    for (var i = 0; i < this.graph.vertices.length; i++) {
-      let atom = this.graph.vertices[i].value;
+    for (var i = 0; i < graph.vertices.length; i++) {
+      let atom = graph.vertices[i].value;
 
       if (counts.has(atom.element)) {
         counts.set(atom.element, counts.get(atom.element) + 1);
@@ -3552,7 +3707,7 @@ class DrawerBase {
         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements) || this.graph.vertices.length === 1) {
         if (this.opts.atomVisualization === 'default') {
-          this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+          this.canvasWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, this.graph.vertices.length, atom.getAttachedPseudoElements());
         } else if (this.opts.atomVisualization === 'balls') {
           this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
@@ -4958,7 +5113,7 @@ class DrawerBase {
 
 module.exports = DrawerBase;
 
-},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":7,"./Graph":8,"./Line":9,"./MathHelper":10,"./Options":11,"./Ring":16,"./RingConnection":17,"./SSSR":18,"./ThemeManager":21,"./Vector2":23,"./Vertex":24}],7:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./CanvasWrapper":4,"./Edge":7,"./Graph":9,"./Line":10,"./MathHelper":11,"./Options":12,"./Ring":17,"./RingConnection":18,"./SSSR":19,"./ThemeManager":23,"./Vector2":25,"./Vertex":26}],7:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5026,6 +5181,45 @@ class Edge {
 module.exports = Edge;
 
 },{}],8:[function(require,module,exports){
+"use strict";
+
+//@ts-check
+const formulaToCommonName = {
+  'C2H4O2': 'acetic acid',
+  'C3H6O': 'acetone',
+  'C2H3N': 'acetonitrile',
+  'C6H6': 'benzene',
+  'CCl4': 'carbon tetrachloride',
+  'C6H5Cl': 'chlorobenzene',
+  'CHCl3': 'chloroform',
+  'C6H12': 'cyclohexane',
+  'C2H4Cl2': '1,2-dichloroethane',
+  'C4H10O3': 'diethylene glycol',
+  'C6H14O3': 'diglyme',
+  'C4H10O2': 'DME',
+  'C3H7NO': 'DMF',
+  'C2H6OS': 'DMSO',
+  'C2H6O': 'ethanol',
+  'C2H6O2': 'ethylene glycol',
+  'C3H8O3': 'glycerin',
+  'C7H16': 'heptane',
+  'C6H18N3OP': 'HMPA',
+  'C6H18N3P': 'HMPT',
+  'C6H14': 'hexane',
+  'CH4O': 'methanol',
+  'C5H12O': 'MTBE',
+  'CH2Cl2': 'methylene chloride',
+  'CH5H9NO': 'NMP',
+  'CH3NO2': 'nitromethane',
+  'C5H12': 'pentane',
+  'C5H5N': 'pyridine',
+  'C7H8': 'toluene',
+  'C6H15N': 'triethyl amine',
+  'H2O': 'water'
+};
+module.exports = formulaToCommonName;
+
+},{}],9:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5974,7 +6168,7 @@ class Graph {
 
 module.exports = Graph;
 
-},{"./Atom":3,"./Edge":7,"./MathHelper":10,"./Ring":16,"./Vector2":23,"./Vertex":24}],9:[function(require,module,exports){
+},{"./Atom":3,"./Edge":7,"./MathHelper":11,"./Ring":17,"./Vector2":25,"./Vertex":26}],10:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -6283,7 +6477,7 @@ class Line {
 
 module.exports = Line;
 
-},{"./Vector2":23}],10:[function(require,module,exports){
+},{"./Vector2":25}],11:[function(require,module,exports){
 "use strict";
 
 /** 
@@ -6456,7 +6650,7 @@ class MathHelper {
 
 module.exports = MathHelper;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -6500,7 +6694,7 @@ class Options {
 
 module.exports = Options;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 // WHEN REPLACING, CHECK FOR:
@@ -8399,7 +8593,7 @@ module.exports = function () {
   };
 }();
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 4; //@ts-check
@@ -8454,16 +8648,18 @@ class Reaction {
 
 module.exports = Reaction;
 
-},{"./Parser":12}],14:[function(require,module,exports){
+},{"./Parser":13}],15:[function(require,module,exports){
 "use strict";
 
 const SvgDrawer = require('./SvgDrawer');
 
-const Vector2 = require('./Vector2');
+const SvgWrapper = require('./SvgWrapper');
 
 const Options = require('./Options');
 
-const SvgWrapper = require('./SvgWrapper');
+const ThemeManager = require('./ThemeManager');
+
+const formulaToCommonName = require('./FormulaToCommonName');
 
 class ReactionDrawer {
   /**
@@ -8473,70 +8669,259 @@ class ReactionDrawer {
    * @param {Object} moleculeOptions An object containing molecule drawing specific options.
    */
   constructor(options, moleculeOptions) {
-    this.drawer = new SvgDrawer(moleculeOptions);
     this.defaultOptions = {
-      spacing: 15,
-      plus: {},
-      arrow: {}
+      scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
+      fontSize: moleculeOptions.fontSizeLarge * 0.8,
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      spacing: 10,
+      plus: {
+        size: 9,
+        thickness: 1.0
+      },
+      arrow: {
+        length: moleculeOptions.bondLength * 4.0,
+        headSize: 6.0,
+        thickness: 1.0,
+        margin: 3
+      }
     };
     this.opts = Options.extend(true, this.defaultOptions, options);
+    this.drawer = new SvgDrawer(moleculeOptions);
+    this.molOpts = this.drawer.opts;
   }
   /**
   * Draws the parsed reaction smiles data to a canvas element.
   *
   * @param {Object} reaction The reaction object returned by the reaction smiles parser.
-  * @param {(String|HTMLElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+  * @param {(String|SVGElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+  * 
+  * @returns {SVGElement} The svg element
   */
 
 
-  draw(reaction, target, textAbove = '{reagents}', textBelow = '', themeName = 'light', infoOnly = false) {
-    console.log(reaction);
+  draw(reaction, target, themeName = 'light', textAbove = '{reagents}', textBelow = '', infoOnly = false) {
+    this.themeManager = new ThemeManager(this.molOpts.themes, themeName);
     let svg = null;
 
-    if (typeof target === 'string' || target instanceof String) {
+    if (target === null || target === 'svg') {
+      svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      svg.setAttributeNS(null, 'width', 500 + '');
+      svg.setAttributeNS(null, 'height', 500 + '');
+    } else if (typeof target === 'string' || target instanceof String) {
       svg = document.getElementById(target);
     } else {
       svg = target;
     }
 
-    let svgs = [];
+    while (svg.firstChild) {
+      svg.removeChild(svg.firstChild);
+    }
+
+    let elements = [];
+    let maxHeight = 0.0; // Reactants
 
     for (var i = 0; i < reaction.reactants.length; i++) {
-      let g = this.drawer.draw(reaction.reactants[i], null, themeName, infoOnly);
-      console.log(g); // this.drawer.canvasWrapper.trim();
-      // canvases.push(this.drawer.canvasWrapper.canvas);
-    } // let reagents = [];
-    // for (var i = 0; i < reaction.reagents.length; i++) {
-    //     reagents.push()
-    // }
-    // let rxnArrow = new ReactionArrow(
-    //     new Vector2(0, 0),
-    //     new Vector2(100, 0),
-    //     this.opts.arrow,
-    //     textAbove,
-    //     textBelow
-    // );
-    // canvases.push(rxnArrow.canvas);
-    // for (var i = 0; i < reaction.products.length; i++) {
-    //     if (i > 0) {
-    //         let text = new ReactionText("+", this.opts.plus);
-    //         canvases.push(text.canvas);
-    //     }
-    //     this.drawer.draw(reaction.products[i], null, themeName, infoOnly);
-    //     this.drawer.canvasWrapper.trim();
-    //     canvases.push(this.drawer.canvasWrapper.canvas);
-    // }
-    // CanvasWrapper.combine(canvas, canvases, this.opts.spacing);
+      if (i > 0) {
+        elements.push({
+          width: this.opts.plus.size * this.opts.scale,
+          height: this.opts.plus.size * this.opts.scale,
+          svg: this.getPlus()
+        });
+      }
 
+      let reactantSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, infoOnly);
+      let element = {
+        width: reactantSvg.viewBox.baseVal.width * this.opts.scale,
+        height: reactantSvg.viewBox.baseVal.height * this.opts.scale,
+        svg: reactantSvg
+      };
+      elements.push(element);
+
+      if (element.height > maxHeight) {
+        maxHeight = element.height;
+      }
+    } // Arrow
+
+
+    elements.push({
+      width: this.opts.arrow.length * this.opts.scale,
+      height: this.opts.arrow.headSize * 2.0 * this.opts.scale,
+      svg: this.getArrow()
+    }); // Text above the arrow / reagents
+
+    let reagentsText = "";
+
+    for (var i = 0; i < reaction.reagents.length; i++) {
+      if (i > 0) {
+        reagentsText += ", ";
+      }
+
+      let text = this.drawer.getMolecularFormula(reaction.reagents[i]);
+
+      if (text in formulaToCommonName) {
+        text = formulaToCommonName[text];
+      }
+
+      reagentsText += SvgWrapper.replaceNumbersWithSubscript(text);
+    }
+
+    textAbove = textAbove.replace('{reagents}', reagentsText);
+    const topText = SvgWrapper.writeText(textAbove, this.themeManager, this.opts.fontSize * this.opts.scale, this.opts.fontFamily, this.opts.arrow.length * this.opts.scale);
+    let centerOffsetX = (this.opts.arrow.length * this.opts.scale - topText.width) / 2.0;
+    elements.push({
+      svg: topText.svg,
+      height: topText.height,
+      width: this.opts.arrow.length * this.opts.scale,
+      offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
+      offsetY: -(topText.height / 2.0) - this.opts.arrow.margin,
+      position: 'relative'
+    }); // Text below arrow
+
+    const bottomText = SvgWrapper.writeText(textBelow, this.themeManager, this.opts.fontSize * this.opts.scale, this.opts.fontFamily, this.opts.arrow.length * this.opts.scale);
+    centerOffsetX = (this.opts.arrow.length * this.opts.scale - bottomText.width) / 2.0;
+    elements.push({
+      svg: bottomText.svg,
+      height: bottomText.height,
+      width: this.opts.arrow.length * this.opts.scale,
+      offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
+      offsetY: bottomText.height / 2.0 + this.opts.arrow.margin,
+      position: 'relative'
+    }); // Products
+
+    for (var i = 0; i < reaction.products.length; i++) {
+      if (i > 0) {
+        elements.push({
+          width: this.opts.plus.size,
+          height: this.opts.plus.size,
+          svg: this.getPlus()
+        });
+      }
+
+      let productSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      this.drawer.draw(reaction.products[i], productSvg, themeName, infoOnly);
+      let element = {
+        width: productSvg.viewBox.baseVal.width * this.opts.scale,
+        height: productSvg.viewBox.baseVal.height * this.opts.scale,
+        svg: productSvg
+      };
+      elements.push(element);
+
+      if (element.height > maxHeight) {
+        maxHeight = element.height;
+      }
+    }
+
+    let totalWidth = 0.0;
+    elements.forEach(element => {
+      let offsetX = element.offsetX ?? 0.0;
+      let offsetY = element.offsetY ?? 0.0;
+      element.svg.setAttributeNS(null, 'x', Math.round(totalWidth + offsetX));
+      element.svg.setAttributeNS(null, 'y', Math.round((maxHeight - element.height) / 2.0 + offsetY));
+      element.svg.setAttributeNS(null, 'width', Math.round(element.width));
+      element.svg.setAttributeNS(null, 'height', Math.round(element.height));
+      svg.appendChild(element.svg);
+
+      if (element.position !== 'relative') {
+        totalWidth += Math.round(element.width + this.opts.spacing + offsetX);
+      }
+    });
+    svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
+    svg.style.width = totalWidth + 'px';
+    svg.style.height = maxHeight + 'px';
+    return svg;
+  }
+
+  getPlus() {
+    let s = this.opts.plus.size;
+    let w = this.opts.plus.thickness;
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    let rect_h = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    let rect_v = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    svg.setAttributeNS(null, 'id', 'plus');
+    rect_h.setAttributeNS(null, 'x', 0);
+    rect_h.setAttributeNS(null, 'y', s / 2.0 - w / 2.0);
+    rect_h.setAttributeNS(null, 'width', s);
+    rect_h.setAttributeNS(null, 'height', w);
+    rect_h.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+    rect_v.setAttributeNS(null, 'x', s / 2.0 - w / 2.0);
+    rect_v.setAttributeNS(null, 'y', 0);
+    rect_v.setAttributeNS(null, 'width', w);
+    rect_v.setAttributeNS(null, 'height', s);
+    rect_v.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+    svg.appendChild(rect_h);
+    svg.appendChild(rect_v);
+    svg.setAttributeNS(null, 'viewBox', `0 0 ${s} ${s}`);
+    return svg;
+  }
+
+  getArrowhead() {
+    let s = this.opts.arrow.headSize;
+    let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    marker.setAttributeNS(null, 'id', 'arrowhead');
+    marker.setAttributeNS(null, 'viewBox', `0 0 ${s} ${s}`);
+    marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
+    marker.setAttributeNS(null, 'markerWidth', s);
+    marker.setAttributeNS(null, 'markerHeight', s);
+    marker.setAttributeNS(null, 'refX', 0);
+    marker.setAttributeNS(null, 'refY', s / 2);
+    marker.setAttributeNS(null, 'orient', 'auto');
+    marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+    polygon.setAttributeNS(null, 'points', `0 0, ${s} ${s / 2}, 0 ${s}`);
+    marker.appendChild(polygon);
+    return marker;
+  }
+
+  getCDArrowhead() {
+    let s = this.opts.arrow.headSize;
+    let sw = s * (7 / 4.5);
+    let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    marker.setAttributeNS(null, 'id', 'arrowhead');
+    marker.setAttributeNS(null, 'viewBox', `0 0 ${sw} ${s}`);
+    marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
+    marker.setAttributeNS(null, 'markerWidth', sw * 2);
+    marker.setAttributeNS(null, 'markerHeight', s * 2);
+    marker.setAttributeNS(null, 'refX', 2.2);
+    marker.setAttributeNS(null, 'refY', 2.2);
+    marker.setAttributeNS(null, 'orient', 'auto');
+    marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+    path.setAttributeNS(null, 'style', 'fill-rule:nonzero;');
+    path.setAttributeNS(null, 'd', 'm 0 0 l 7 2.25 l -7 2.25 c 0 0 0.735 -1.084 0.735 -2.28 c 0 -1.196 -0.735 -2.22 -0.735 -2.22 z');
+    marker.appendChild(path);
+    return marker;
+  }
+
+  getArrow() {
+    let s = this.opts.arrow.headSize;
+    let l = this.opts.arrow.length;
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    defs.appendChild(this.getCDArrowhead());
+    svg.appendChild(defs);
+    svg.setAttributeNS(null, 'id', 'arrow');
+    line.setAttributeNS(null, 'x1', 0.0);
+    line.setAttributeNS(null, 'y1', -this.opts.arrow.thickness / 2.0);
+    line.setAttributeNS(null, 'x2', l);
+    line.setAttributeNS(null, 'y2', -this.opts.arrow.thickness / 2.0);
+    line.setAttributeNS(null, 'stroke-width', this.opts.arrow.thickness);
+    line.setAttributeNS(null, 'stroke', this.themeManager.getColor("C"));
+    line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
+    svg.appendChild(line);
+    svg.setAttributeNS(null, 'viewBox', `0 ${-s / 2.0} ${l + s * (7 / 4.5)} ${s}`);
+    return svg;
   }
 
 }
 
 module.exports = ReactionDrawer;
 
-},{"./Options":11,"./SvgDrawer":19,"./SvgWrapper":20,"./Vector2":23}],15:[function(require,module,exports){
+},{"./FormulaToCommonName":8,"./Options":12,"./SvgDrawer":21,"./SvgWrapper":22,"./ThemeManager":23}],16:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8558,7 +8943,7 @@ class ReactionParser {
 
 module.exports = ReactionParser;
 
-},{"./Reaction":13}],16:[function(require,module,exports){
+},{"./Reaction":14}],17:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8780,7 +9165,7 @@ class Ring {
 
 module.exports = Ring;
 
-},{"./ArrayHelper":2,"./RingConnection":17,"./Vector2":23,"./Vertex":24}],17:[function(require,module,exports){
+},{"./ArrayHelper":2,"./RingConnection":18,"./Vector2":25,"./Vertex":26}],18:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8954,7 +9339,7 @@ class RingConnection {
 
 module.exports = RingConnection;
 
-},{"./Ring":16,"./Vertex":24}],18:[function(require,module,exports){
+},{"./Ring":17,"./Vertex":26}],19:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -9565,7 +9950,310 @@ class SSSR {
 
 module.exports = SSSR;
 
-},{"./Graph":8}],19:[function(require,module,exports){
+},{"./Graph":9}],20:[function(require,module,exports){
+"use strict";
+
+//@ts-check
+const Drawer = require('./Drawer');
+
+const Parser = require('./Parser');
+
+const ReactionParser = require('./ReactionParser');
+
+const SvgDrawer = require('./SvgDrawer');
+
+const ReactionDrawer = require('./ReactionDrawer');
+
+const SvgWrapper = require('./SvgWrapper');
+
+const Options = require('./Options');
+
+class SmilesDrawer {
+  constructor(moleculeOptions = {}, reactionOptions = {}) {
+    this.drawer = new SvgDrawer(moleculeOptions); // moleculeOptions gets edited in reactionOptions, so clone
+
+    this.reactionDrawer = new ReactionDrawer(reactionOptions, JSON.parse(JSON.stringify(this.drawer.opts)));
+  }
+
+  static apply(moleculeOptions = {}, reactionOptions = {}, attribute = 'data-smiles', theme = 'light', successCallback = null, errorCallback = null) {
+    const drawer = new SmilesDrawer(moleculeOptions, reactionOptions);
+    drawer.apply(attribute, theme, successCallback, errorCallback);
+  }
+
+  apply(attribute = 'data-smiles', theme = 'light', successCallback = null, errorCallback = null) {
+    let elements = document.querySelectorAll(`[${attribute}]`);
+    elements.forEach(element => {
+      let smiles = element.getAttribute(attribute);
+      let currentTheme = theme;
+
+      if (element.hasAttribute('data-smiles-theme')) {
+        currentTheme = element.getAttribute('data-smiles-theme');
+      }
+
+      if (element.hasAttribute('data-smiles-options') || element.hasAttribute('data-smiles-reaction-options')) {
+        let moleculeOptions = {};
+
+        if (element.hasAttribute('data-smiles-options')) {
+          moleculeOptions = JSON.parse(element.getAttribute('data-smiles-options').replaceAll('\'', '"'));
+        }
+
+        let reactionOptions = {};
+
+        if (element.hasAttribute('data-smiles-reaction-options')) {
+          reactionOptions = JSON.parse(element.getAttribute('data-smiles-reaction-options').replaceAll('\'', '"'));
+        }
+
+        let smilesDrawer = new SmilesDrawer(moleculeOptions, reactionOptions);
+        smilesDrawer.draw(smiles, element, currentTheme, successCallback = null, errorCallback = null);
+      } else {
+        this.draw(smiles, element, currentTheme, successCallback = null, errorCallback = null);
+      }
+    });
+  }
+
+  draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null) {
+    // get the settings
+    let rest = [];
+    [smiles, ...rest] = smiles.split(' ');
+    let info = rest.join(' ');
+    let settings = {};
+
+    if (info.includes('__')) {
+      let settingsString = info.substring(info.indexOf('__') + 2, info.lastIndexOf('__'));
+      settings = JSON.parse(settingsString.replaceAll('\'', '"'));
+    }
+
+    let defaultSettings = {
+      textAboveArrow: '{reagents}',
+      textBelowArrow: ''
+    };
+    settings = Options.extend(true, defaultSettings, settings);
+
+    if (smiles.includes('>')) {
+      try {
+        this.drawReaction(smiles, target, theme, settings, successCallback);
+      } catch (err) {
+        if (errorCallback) {
+          errorCallback(err);
+        } else {
+          console.error(err);
+        }
+      }
+    } else {
+      try {
+        this.drawMolecule(smiles, target, theme, successCallback);
+      } catch (err) {
+        if (errorCallback) {
+          errorCallback(err);
+        } else {
+          console.error(err);
+        }
+      }
+    }
+  }
+
+  drawMolecule(smiles, target, theme, callback) {
+    let parseTree = Parser.parse(smiles);
+
+    if (target === null || target === 'svg') {
+      let svg = this.drawer.draw(parseTree, null, theme);
+      let dims = this.getDimensions(svg);
+      svg.setAttributeNS(null, 'width', '' + dims.w);
+      svg.setAttributeNS(null, 'height', '' + dims.h);
+
+      if (callback) {
+        callback(svg);
+      }
+    } else if (target === 'canvas') {
+      let canvas = this.svgToCanvas(this.drawer.draw(parseTree, null, theme));
+
+      if (callback) {
+        callback(canvas);
+      }
+    } else if (target === 'img') {
+      let img = this.svgToImg(this.drawer.draw(parseTree, null, theme));
+
+      if (callback) {
+        callback(img);
+      }
+    } else if (target instanceof HTMLImageElement) {
+      this.svgToImg(this.drawer.draw(parseTree, null, theme), target);
+
+      if (callback) {
+        callback(target);
+      }
+    } else if (target instanceof SVGElement) {
+      this.drawer.draw(parseTree, target, theme);
+
+      if (callback) {
+        callback(target);
+      }
+    } else {
+      let elements = document.querySelectorAll(target);
+      elements.forEach(element => {
+        let tag = element.nodeName.toLowerCase();
+
+        if (tag === 'svg') {
+          this.drawer.draw(parseTree, element, theme); // let dims = this.getDimensions(element);
+          // element.setAttributeNS(null, 'width', '' + dims.w);
+          // element.setAttributeNS(null, 'height', '' + dims.h);
+
+          if (callback) {
+            callback(element);
+          }
+        } else if (tag === 'canvas') {
+          this.svgToCanvas(this.drawer.draw(parseTree, null, theme), element);
+
+          if (callback) {
+            callback(element);
+          }
+        } else if (tag === 'img') {
+          this.svgToImg(this.drawer.draw(parseTree, null, theme), element);
+
+          if (callback) {
+            callback(element);
+          }
+        }
+      });
+    }
+  }
+
+  drawReaction(smiles, target, theme, settings, callback) {
+    let reaction = ReactionParser.parse(smiles);
+
+    if (target === null || target === 'svg') {
+      let svg = this.reactionDrawer.draw(reaction, null, theme);
+      let dims = this.getDimensions(svg);
+      svg.setAttributeNS(null, 'width', '' + dims.w);
+      svg.setAttributeNS(null, 'height', '' + dims.h);
+
+      if (callback) {
+        callback(svg);
+      }
+    } else if (target === 'canvas') {
+      let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow));
+
+      if (callback) {
+        callback(canvas);
+      }
+    } else if (target === 'img') {
+      let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow));
+
+      if (callback) {
+        callback(img);
+      }
+    } else if (target instanceof HTMLImageElement) {
+      this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), target);
+
+      if (callback) {
+        callback(target);
+      }
+    } else if (target instanceof SVGElement) {
+      this.reactionDrawer.draw(reaction, target, theme, settings.textAboveArrow, settings.textBelowArrow);
+
+      if (callback) {
+        callback(target);
+      }
+    } else {
+      let elements = document.querySelectorAll(target);
+      elements.forEach(element => {
+        let tag = element.nodeName.toLowerCase();
+
+        if (tag === 'svg') {
+          this.reactionDrawer.draw(reaction, element, theme, settings.textAboveArrow, settings.textBelowArrow); // The svg has to have a css width and height set for the other
+          // tags, however, here it would overwrite the chosen width and height
+
+          if (this.reactionDrawer.opts.scale <= 0) {
+            element.style.width = null;
+            element.style.height = null;
+          } // let dims = this.getDimensions(element);
+          // element.setAttributeNS(null, 'width', '' + dims.w);
+          // element.setAttributeNS(null, 'height', '' + dims.h);
+
+
+          if (callback) {
+            callback(element);
+          }
+        } else if (tag === 'canvas') {
+          this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), element);
+
+          if (callback) {
+            callback(element);
+          }
+        } else if (tag === 'img') {
+          this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), element);
+
+          if (callback) {
+            callback(element);
+          }
+        }
+      });
+    }
+  }
+
+  svgToCanvas(svg, canvas = null) {
+    if (canvas === null) {
+      canvas = document.createElement('canvas');
+    }
+
+    let dims = this.getDimensions(canvas, svg);
+    SvgWrapper.svgToCanvas(svg, canvas, dims.w, dims.h);
+    return canvas;
+  }
+
+  svgToImg(svg, img = null) {
+    if (img === null) {
+      img = document.createElement('img');
+    }
+
+    let dims = this.getDimensions(img, svg);
+    SvgWrapper.svgToImg(svg, img, dims.w, dims.h);
+    return img;
+  }
+  /**
+   * 
+   * @param {HTMLImageElement|HTMLCanvasElement|SVGElement} element 
+   * @param {SVGElement} svg 
+   * @returns {{w: Number, h: Number}} The width and height.
+   */
+
+
+  getDimensions(element, svg = null) {
+    let w = this.drawer.opts.width;
+    let h = this.drawer.opts.height;
+
+    if (this.drawer.opts.scale <= 0) {
+      if (w === null) {
+        w = element.width;
+      }
+
+      if (h === null) {
+        h = element.height;
+      }
+
+      if (element.style.width !== "") {
+        w = parseInt(element.style.width);
+      }
+
+      if (element.style.height !== "") {
+        h = parseInt(element.style.height);
+      }
+    } else if (svg) {
+      w = parseFloat(svg.style.width);
+      h = parseFloat(svg.style.height);
+    }
+
+    return {
+      w: w,
+      h: h
+    };
+  }
+
+}
+
+module.exports = SmilesDrawer;
+
+},{"./Drawer":5,"./Options":12,"./Parser":13,"./ReactionDrawer":15,"./ReactionParser":16,"./SvgDrawer":21,"./SvgWrapper":22}],21:[function(require,module,exports){
 "use strict";
 
 // we use the drawer to do all the preprocessing. then we take over the drawing
@@ -9587,26 +10275,33 @@ const ThemeManager = require('./ThemeManager');
 const Vector2 = require('./Vector2');
 
 class SvgDrawer {
-  constructor(options) {
+  constructor(options, clear = true) {
     this.preprocessor = new DrawerBase(options);
     this.opts = this.preprocessor.opts;
+    this.clear = clear;
+    this.svgWrapper = null;
   }
   /**
    * Draws the parsed smiles data to an svg element.
    *
    * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|HTMLElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+   * @param {(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
-     * @returns {Oject} The dimensions of the drawing in { width, height }
+   *
+   * @returns {SVGElement} The svg element
    */
 
 
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
-    if (typeof target === 'string' || target instanceof String) {
-      target = document.getElementById(target);
-    } else if (target === null) {
+  draw(data, target, themeName = 'light', infoOnly = false) {
+    if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      target.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      target.setAttributeNS(null, 'width', this.opts.width);
+      target.setAttributeNS(null, 'height', this.opts.height);
+    } else if (target instanceof String) {
+      target = document.getElementById(target);
     }
 
     let preprocessor = this.preprocessor;
@@ -9614,7 +10309,10 @@ class SvgDrawer {
 
     if (!infoOnly) {
       this.themeManager = new ThemeManager(this.opts.themes, themeName);
-      this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts);
+
+      if (this.svgWrapper === null || this.clear) {
+        this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+      }
     }
 
     preprocessor.processGraph(); // Set the canvas to the appropriate size
@@ -9632,6 +10330,38 @@ class SvgDrawer {
     }
 
     this.svgWrapper.constructSvg();
+    return target;
+  }
+  /**
+  * Draws the parsed smiles data to a canvas element.
+  *
+  * @param {Object} data The tree returned by the smiles parser.
+  * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+  * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+  * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+  */
+
+
+  drawCanvas(data, target, themeName = 'light', infoOnly = false) {
+    let canvas = null;
+
+    if (typeof target === 'string' || target instanceof String) {
+      canvas = document.getElementById(target);
+    } else {
+      canvas = target;
+    }
+
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
+
+    svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
+    svg.setAttributeNS(null, 'width', 500 + '');
+    svg.setAttributeNS(null, 'height', 500 + '');
+    svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
+    document.body.appendChild(svg);
+    this.svgDrawer.draw(data, svg, themeName, infoOnly);
+    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
+    document.body.removeChild(svg);
     return target;
   }
   /**
@@ -9864,7 +10594,13 @@ class SvgDrawer {
         svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if (atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements) || graph.vertices.length === 1) {
         if (opts.atomVisualization === 'default') {
-          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, atom.getAttachedPseudoElements());
+          let attachedPseudoElements = atom.getAttachedPseudoElements(); // Draw to the right if the whole molecule is concatenated into one string
+
+          if (atom.hasAttachedPseudoElements && graph.vertices.length === Object.keys(attachedPseudoElements).length + 1) {
+            dir = 'right';
+          }
+
+          svgWrapper.drawText(vertex.position.x, vertex.position.y, element, hydrogens, dir, isTerminal, charge, isotope, graph.vertices.length, attachedPseudoElements);
         } else if (opts.atomVisualization === 'balls') {
           svgWrapper.drawBall(vertex.position.x, vertex.position.y, element);
         }
@@ -9913,8 +10649,8 @@ class SvgDrawer {
    */
 
 
-  getMolecularFormula() {
-    return this.preprocessor.getMolecularFormula();
+  getMolecularFormula(graph = null) {
+    return this.preprocessor.getMolecularFormula(graph);
   }
   /**
    * @param {Array} normals list of normals to multiply
@@ -9931,7 +10667,7 @@ class SvgDrawer {
 
 module.exports = SvgDrawer;
 
-},{"./ArrayHelper":2,"./Atom":3,"./DrawerBase":6,"./Graph":8,"./Line":9,"./SvgWrapper":20,"./ThemeManager":21,"./Vector2":23}],20:[function(require,module,exports){
+},{"./ArrayHelper":2,"./Atom":3,"./DrawerBase":6,"./Graph":9,"./Line":10,"./SvgWrapper":22,"./ThemeManager":23,"./Vector2":25}],22:[function(require,module,exports){
 "use strict";
 
 const {
@@ -9957,7 +10693,7 @@ function makeid(length) {
 }
 
 class SvgWrapper {
-  constructor(themeManager, target, options) {
+  constructor(themeManager, target, options, clear = true) {
     if (typeof target === 'string' || target instanceof String) {
       this.svg = document.getElementById(target);
     } else {
@@ -9989,8 +10725,10 @@ class SvgWrapper {
     this.minX = Number.MAX_VALUE;
     this.minY = Number.MAX_VALUE; // clear the svg element
 
-    while (this.svg.firstChild) {
-      this.svg.removeChild(this.svg.firstChild);
+    if (clear) {
+      while (this.svg.firstChild) {
+        this.svg.removeChild(this.svg.firstChild);
+      }
     } // Create styles here as text measurement is done before constructSvg
 
 
@@ -9998,10 +10736,10 @@ class SvgWrapper {
 
     this.style.appendChild(document.createTextNode(`
                 .element {
-                    font: ${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif;
+                    font: ${this.opts.fontSizeLarge}pt ${this.opts.fontFamily};
                 }
                 .sub {
-                    font: ${this.opts.fontSizeSmall}pt Helvetica, Arial, sans-serif;
+                    font: ${this.opts.fontSizeSmall}pt ${this.opts.fontFamily};
                 }
             `));
 
@@ -10119,23 +10857,7 @@ class SvgWrapper {
     return elem;
   }
 
-  createUnicodeSubscript(n) {
-    let result = '';
-    n.toString().split('').forEach(d => {
-      result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
-    });
-    return result;
-  }
-
-  createUnicodeSuperscript(n) {
-    let result = '';
-    n.toString().split('').forEach(d => {
-      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
-    });
-    return result;
-  }
-
-  createUnicodeCharge(n) {
+  static createUnicodeCharge(n) {
     if (n === 1) {
       return '⁺';
     }
@@ -10145,11 +10867,11 @@ class SvgWrapper {
     }
 
     if (n > 1) {
-      return this.createUnicodeSuperscript(n) + '⁺';
+      return SvgWrapper.createUnicodeSuperscript(n) + '⁺';
     }
 
     if (n < -1) {
-      return this.createUnicodeSuperscript(n) + '⁻';
+      return SvgWrapper.createUnicodeSuperscript(n) + '⁻';
     }
 
     return '';
@@ -10184,7 +10906,7 @@ class SvgWrapper {
     this.drawingHeight = this.maxY - this.minY;
   }
 
-  updateViewbox(scale = true) {
+  updateViewbox(scale) {
     let x = this.minX;
     let y = this.minY;
     let width = this.maxX - this.minX;
@@ -10203,7 +10925,6 @@ class SvgWrapper {
     } else {
       if (this.svg) {
         this.svg.style.width = scale * width + 'px';
-      } else {
         this.svg.style.height = scale * height + 'px';
       }
     }
@@ -10220,29 +10941,60 @@ class SvgWrapper {
 
 
   drawBall(x, y, elementName) {
+    let r = this.opts.bondLength / 4.5;
+
+    if (x - r < this.minX) {
+      this.minX = x - r;
+    }
+
+    if (x + r > this.maxX) {
+      this.maxX = x + r;
+    }
+
+    if (y - r < this.minY) {
+      this.minY = y - r;
+    }
+
+    if (y + r > this.maxY) {
+      this.maxY = y + r;
+    }
+
     let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     ball.setAttributeNS(null, 'cx', x);
     ball.setAttributeNS(null, 'cy', y);
-    ball.setAttributeNS(null, 'r', this.opts.bondLength / 4.5);
+    ball.setAttributeNS(null, 'r', r);
     ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(ball);
   }
   /**
-   * Draw a highlight for an atom
-   * 
-   *  @param {Number} x The x position of the highlight
-   *  @param {Number} y The y position of the highlight
-   *  @param {string} color The color of the highlight, default #03fc9d
+   * @param {Line} line the line object to create the wedge from
    */
 
 
-  drawAtomHighlight(x, y, color = "#03fc9d") {
-    let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    ball.setAttributeNS(null, 'cx', x);
-    ball.setAttributeNS(null, 'cy', y);
-    ball.setAttributeNS(null, 'r', this.opts.bondLength / 3);
-    ball.setAttributeNS(null, 'fill', color);
-    this.highlights.push(ball);
+  drawWedge(line) {
+    let l = line.getLeftVector().clone(),
+        r = line.getRightVector().clone();
+    let normals = Vector2.normals(l, r);
+    normals[0].normalize();
+    normals[1].normalize();
+    let isRightChiralCenter = line.getRightChiral();
+    let start = l,
+        end = r;
+
+    if (isRightChiralCenter) {
+      start = r;
+      end = l;
+    }
+
+    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
+        u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 3.0 + this.opts.fontSizeLarge / 4.0)),
+        v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.opts.fontSizeLarge / 4.0)),
+        w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
+    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
+        gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
+    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
+    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
+    this.paths.push(polygon);
   }
   /**
    * Draw a dashed wedge on the canvas.
@@ -10275,14 +11027,14 @@ class SvgWrapper {
 
     let dir = Vector2.subtract(end, start).normalize(),
         length = line.getLength(),
-        step = 1.25 / (length / (this.opts.bondThickness * 3.0)),
+        step = 1.25 / (length / (this.opts.bondLength / 10.0)),
         changed = false;
     let gradient = this.createGradient(line);
 
     for (let t = 0.0; t < 1.0; t += step) {
       let to = Vector2.multiplyScalar(dir, t * length),
           startDash = Vector2.add(start, to),
-          width = 1.5 * t,
+          width = this.opts.fontSizeLarge / 2.0 * t,
           dashOffset = Vector2.multiplyScalar(normals[0], width);
       startDash.subtract(dashOffset);
       let endDash = startDash.clone();
@@ -10346,7 +11098,7 @@ class SvgWrapper {
     circleElem.setAttributeNS(null, 'cy', y);
     circleElem.setAttributeNS(null, 'r', radius - this.opts.bondSpacing);
     circleElem.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
-    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness * 1.5);
+    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness);
     circleElem.setAttributeNS(null, 'fill', 'none');
     this.paths.push(circleElem);
   }
@@ -10359,9 +11111,9 @@ class SvgWrapper {
    */
 
 
-  drawLine(line, dashed = false, gradient = null) {
+  drawLine(line, dashed = false, gradient = null, linecap = 'round') {
     let opts = this.opts,
-        stylesArr = [['stroke-width', this.opts.bondThickness], ['stroke-linecap', 'round'], ['stroke-dasharray', dashed ? '5, 5' : 'none']],
+        stylesArr = [['stroke-width', this.opts.bondThickness], ['stroke-linecap', linecap], ['stroke-dasharray', dashed ? '5, 5' : 'none']],
         l = line.getLeftVector(),
         r = line.getRightVector(),
         fromX = l.x,
@@ -10393,7 +11145,24 @@ class SvgWrapper {
 
 
   drawPoint(x, y, elementName) {
-    let ctx = this.ctx; // first create a mask
+    let r = 0.75;
+
+    if (x - r < this.minX) {
+      this.minX = x - r;
+    }
+
+    if (x + r > this.maxX) {
+      this.maxX = x + r;
+    }
+
+    if (y - r < this.minY) {
+      this.minY = y - r;
+    }
+
+    if (y + r > this.maxY) {
+      this.maxY = y + r;
+    } // first create a mask
+
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     mask.setAttributeNS(null, 'cx', x);
@@ -10405,7 +11174,7 @@ class SvgWrapper {
     let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     point.setAttributeNS(null, 'cx', x);
     point.setAttributeNS(null, 'cy', y);
-    point.setAttributeNS(null, 'r', '0.75');
+    point.setAttributeNS(null, 'r', r);
     point.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(point);
   }
@@ -10420,6 +11189,7 @@ class SvgWrapper {
    * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
    * @param {Number} charge The charge of the atom.
    * @param {Number} isotope The isotope number.
+   * @param {Number} totalVertices The total number of vertices in the graph.
    * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
    * @param {String} attachedPseudoElement.element The element symbol.
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
@@ -10427,16 +11197,16 @@ class SvgWrapper {
    */
 
 
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, totalVertices, attachedPseudoElement = {}) {
     let text = [];
     let display = elementName;
 
     if (charge !== 0 && charge !== null) {
-      display += this.createUnicodeCharge(charge);
+      display += SvgWrapper.createUnicodeCharge(charge);
     }
 
     if (isotope !== 0 && isotope !== null) {
-      display = this.createUnicodeSuperscript(isotope) + display;
+      display = SvgWrapper.createUnicodeSuperscript(isotope) + display;
     }
 
     text.push([display, elementName]);
@@ -10444,7 +11214,7 @@ class SvgWrapper {
     if (hydrogens === 1) {
       text.push(['H', 'H']);
     } else if (hydrogens > 1) {
-      text.push(['H' + this.createUnicodeSubscript(hydrogens), 'H']);
+      text.push(['H' + SvgWrapper.createUnicodeSubscript(hydrogens), 'H']);
     } // TODO: Better handle exceptions
     // Exception for nitro (draw nitro as NO2 instead of N+O-O)
 
@@ -10471,81 +11241,44 @@ class SvgWrapper {
       let display = pe.element;
 
       if (pe.count > 1) {
-        display += this.createUnicodeSubscript(pe.count);
+        display += SvgWrapper.createUnicodeSubscript(pe.count);
       }
 
       if (pe.charge !== '') {
-        display += this.createUnicodeCharge(charge);
+        display += SvgWrapper.createUnicodeCharge(charge);
       }
 
-      text.push([pe.element, pe.element]);
+      text.push([display, pe.element]);
 
       if (pe.hydrogenCount === 1) {
         text.push(['H', 'H']);
       } else if (pe.hydrogenCount > 1) {
-        text.push(['H' + this.createUnicodeSubscript(pe.hydrogenCount), 'H']);
+        text.push(['H' + SvgWrapper.createUnicodeSubscript(pe.hydrogenCount), 'H']);
       }
     }
 
-    this.write(text, direction, x, y);
-  }
-  /**
-   * @param {Line} line the line object to create the wedge from
-   */
-
-
-  drawWedge(line) {
-    let l = line.getLeftVector().clone(),
-        r = line.getRightVector().clone();
-    let normals = Vector2.normals(l, r);
-    normals[0].normalize();
-    normals[1].normalize();
-    let isRightChiralCenter = line.getRightChiral();
-    let start = l,
-        end = r;
-
-    if (isRightChiralCenter) {
-      start = r;
-      end = l;
-    }
-
-    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
-        u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 1.5 + this.halfBondThickness)),
-        v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 1.5 + this.halfBondThickness)),
-        w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
-    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
-        gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
-    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
-    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
-    this.paths.push(polygon);
+    this.write(text, direction, x, y, totalVertices === 1);
   }
 
-  write(text, direction, x, y) {
-    // Measure element name only, without charge or isotope
-    let bbox = this.measureText(text[0][1]); // Get the approximate width and height of text and add update max/min
+  write(text, direction, x, y, singleVertex) {
+    // Measure element name only, without charge or isotope ...
+    let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily); // ... but for direction left move to the right to 
+
+    if (direction === 'left' && text[0][0] !== text[0][1]) {
+      bbox.width *= 2.0;
+    } // Get the approximate width and height of text and add update max/min
     // to allow for narrower paddings
 
-    if (direction === 'left') {
-      if (x - bbox.width * text.length < this.minX) {
-        this.minX = x - bbox.width * text.length;
-      }
 
-      if (y - bbox.height < this.minY) {
-        this.minY = y - bbox.height;
-      }
-
-      if (y + bbox.height > this.maxY) {
-        this.maxY = y + bbox.height;
-      }
-    } else if (direction === 'up') {
-      if (y - 0.8 * bbox.height * text.length < this.minY) {
-        this.minY = y - 0.8 * bbox.height * text.length;
-      }
-    } else if (direction === 'right') {
+    if (singleVertex) {
       if (x + bbox.width * text.length > this.maxX) {
         this.maxX = x + bbox.width * text.length;
       }
 
+      if (x - bbox.width / 2.0 < this.minX) {
+        this.minX = x - bbox.width / 2.0;
+      }
+
       if (y - bbox.height < this.minY) {
         this.minY = y - bbox.height;
       }
@@ -10553,9 +11286,43 @@ class SvgWrapper {
       if (y + bbox.height > this.maxY) {
         this.maxY = y + bbox.height;
       }
-    } else if (direction === 'down') {
-      if (y + 0.8 * bbox.height * text.length > this.maxY) {
-        this.maxY = y + 0.8 * bbox.height * text.length;
+    } else {
+      if (direction !== 'right') {
+        if (x + bbox.width * text.length > this.maxX) {
+          this.maxX = x + bbox.width * text.length;
+        }
+
+        if (x - bbox.width * text.length < this.minX) {
+          this.minX = x - bbox.width * text.length;
+        }
+      } else if (direction !== 'left') {
+        if (x + bbox.width * text.length > this.maxX) {
+          this.maxX = x + bbox.width * text.length;
+        }
+
+        if (x - bbox.width / 2.0 < this.minX) {
+          this.minX = x - bbox.width / 2.0;
+        }
+      }
+
+      if (y - bbox.height < this.minY) {
+        this.minY = y - bbox.height;
+      }
+
+      if (y + bbox.height > this.maxY) {
+        this.maxY = y + bbox.height;
+      }
+
+      if (direction === 'down') {
+        if (y + 0.8 * bbox.height * text.length > this.maxY) {
+          this.maxY = y + 0.8 * bbox.height * text.length;
+        }
+      }
+
+      if (direction === 'up') {
+        if (y - 0.8 * bbox.height * text.length < this.minY) {
+          this.minY = y - 0.8 * bbox.height * text.length;
+        }
       }
     }
 
@@ -10599,7 +11366,13 @@ class SvgWrapper {
       textElem.appendChild(tspanElem);
     });
     textElem.setAttributeNS(null, 'data-direction', direction);
-    textElem.setAttributeNS(null, 'dominant-baseline', 'central');
+
+    if (direction === 'left' || direction === 'right') {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'alphabetic');
+      textElem.setAttributeNS(null, 'y', '0.36em');
+    } else {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'central');
+    }
 
     if (direction === 'left') {
       textElem.setAttributeNS(null, 'text-anchor', 'end');
@@ -10607,10 +11380,10 @@ class SvgWrapper {
 
     g.appendChild(textElem);
     g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
-    let maskRadius = 3.5;
+    let maskRadius = this.opts.fontSizeLarge * 0.75;
 
     if (text[0][1].length > 1) {
-      maskRadius = 5.0;
+      maskRadius = this.opts.fontSizeLarge * 1.1;
     }
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -10621,20 +11394,8 @@ class SvgWrapper {
     this.maskElements.push(mask);
     this.vertices.push(g);
   }
-
-  measureText(text) {
-    const element = document.createElement('canvas');
-    const ctx = element.getContext("2d");
-    ctx.font = `${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif`;
-    let textMetrics = ctx.measureText(text);
-    return {
-      'width': textMetrics.width,
-      // Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight),
-      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * 0.9
-    };
-  }
   /**
-   * 
+   * Draw the wrapped SVG to a canvas.
    * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
    */
 
@@ -10655,11 +11416,201 @@ class SvgWrapper {
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);
   }
 
+  static createUnicodeSubscript(n) {
+    let result = '';
+    n.toString().split('').forEach(d => {
+      result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
+    });
+    return result;
+  }
+
+  static createUnicodeSuperscript(n) {
+    let result = '';
+    n.toString().split('').forEach(d => {
+      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
+    });
+    return result;
+  }
+
+  static replaceNumbersWithSubscript(text) {
+    let subscriptNumbers = {
+      '0': '₀',
+      '1': '₁',
+      '2': '₂',
+      '3': '₃',
+      '4': '₄',
+      '5': '₅',
+      '6': '₆',
+      '7': '₇',
+      '8': '₈',
+      '9': '₉'
+    };
+
+    for (const [key, value] of Object.entries(subscriptNumbers)) {
+      text = text.replaceAll(key, value);
+    }
+
+    return text;
+  }
+
+  static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
+    const element = document.createElement('canvas');
+    const ctx = element.getContext("2d");
+    ctx.font = `${fontSize}pt ${fontFamily}`;
+    let textMetrics = ctx.measureText(text);
+    let compWidth = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
+    return {
+      'width': textMetrics.width > compWidth ? textMetrics.width : compWidth,
+      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight
+    };
+  }
+  /**
+   * Convert an SVG to a canvas. Warning: This happens async!
+   * 
+   * @param {SVGElement} svg 
+   * @param {HTMLCanvasElement} canvas 
+   * @param {Number} width 
+   * @param {Number} height 
+   * @param {CallableFunction} callback
+   * @returns {HTMLCanvasElement} The input html canvas element after drawing to.
+   */
+
+
+  static svgToCanvas(svg, canvas, width, height, callback = null) {
+    svg.setAttributeNS(null, 'width', width);
+    svg.setAttributeNS(null, 'height', height);
+    let image = new Image();
+
+    image.onload = function () {
+      canvas.width = width;
+      canvas.height = height;
+      let context = canvas.getContext('2d');
+      context.imageSmoothingEnabled = false;
+      context.drawImage(image, 0, 0, width, height);
+
+      if (callback) {
+        callback(canvas);
+      }
+    };
+
+    image.onerror = function (err) {
+      console.log(err);
+    };
+
+    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(svg.outerHTML);
+    return canvas;
+  }
+  /**
+   * Convert an SVG to a canvas. Warning: This happens async!
+   * 
+   * @param {SVGElement} svg 
+   * @param {HTMLImageElement} canvas 
+   * @param {Number} width 
+   * @param {Number} height
+   */
+
+
+  static svgToImg(svg, img, width, height) {
+    let canvas = document.createElement('canvas');
+    this.svgToCanvas(svg, canvas, width, height, result => {
+      img.src = canvas.toDataURL("image/png");
+    });
+  }
+  /**
+   * Create an SVG element containing text.
+   * @param {String} text 
+   * @param {*} themeManager 
+   * @param {*} options 
+   * @returns {{svg: SVGElement, width: Number, height: Number}} The SVG element containing the text and its dimensions.
+   */
+
+
+  static writeText(text, themeManager, fontSize, fontFamily, maxWidth = Number.MAX_SAFE_INTEGER) {
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    let style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.appendChild(document.createTextNode(`
+        .text {
+            font: ${fontSize}pt ${fontFamily};
+            dominant-baseline: ideographic;
+        }
+    `));
+    svg.appendChild(style);
+    let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElem.setAttributeNS(null, 'class', 'text');
+    let maxLineWidth = 0.0;
+    let totalHeight = 0.0;
+    let lines = [];
+    text.split("\n").forEach(line => {
+      let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.0);
+
+      if (dims.width >= maxWidth) {
+        let totalWordsWidth = 0.0;
+        let maxWordsHeight = 0.0;
+        let words = line.split(" ");
+        let offset = 0;
+
+        for (let i = 0; i < words.length; i++) {
+          let wordDims = SvgWrapper.measureText(words[i], fontSize, fontFamily, 1.0);
+
+          if (totalWordsWidth + wordDims.width > maxWidth) {
+            lines.push({
+              text: words.slice(offset, i).join(' '),
+              width: totalWordsWidth,
+              height: maxWordsHeight
+            });
+            totalWordsWidth = 0.0;
+            maxWordsHeight = 0.0;
+            offset = i;
+          }
+
+          if (wordDims.height > maxWordsHeight) {
+            maxWordsHeight = wordDims.height;
+          }
+
+          totalWordsWidth += wordDims.width;
+        }
+
+        if (offset < words.length) {
+          lines.push({
+            text: words.slice(offset, words.length).join(' '),
+            width: totalWordsWidth,
+            height: maxWordsHeight
+          });
+        }
+      } else {
+        lines.push({
+          text: line,
+          width: dims.width,
+          height: dims.height
+        });
+      }
+    });
+    lines.forEach((line, i) => {
+      totalHeight += line.height;
+      let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspanElem.setAttributeNS(null, 'fill', themeManager.getColor("C"));
+      tspanElem.textContent = line.text;
+      tspanElem.setAttributeNS(null, 'x', '0px');
+      tspanElem.setAttributeNS(null, 'y', `${totalHeight}px`);
+      textElem.appendChild(tspanElem);
+
+      if (line.width > maxLineWidth) {
+        maxLineWidth = line.width;
+      }
+    });
+    svg.appendChild(textElem);
+    return {
+      svg: svg,
+      width: maxLineWidth,
+      height: totalHeight
+    };
+  }
+
 }
 
 module.exports = SvgWrapper;
 
-},{"./Line":9,"./MathHelper":10,"./UtilityFunctions":22,"./Vector2":23}],21:[function(require,module,exports){
+},{"./Line":10,"./MathHelper":11,"./UtilityFunctions":24,"./Vector2":25}],23:[function(require,module,exports){
 "use strict";
 
 class ThemeManager {
@@ -10707,7 +11658,7 @@ class ThemeManager {
 
 module.exports = ThemeManager;
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 /**
@@ -10733,7 +11684,7 @@ module.exports = {
   getChargeText
 };
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -11360,7 +12311,7 @@ class Vector2 {
 
 module.exports = Vector2;
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -11595,7 +12546,11 @@ class Vertex {
 
   getTextDirection(vertices) {
     let neighbours = this.getDrawnNeighbours(vertices);
-    let angles = Array();
+    let angles = Array(); // If there is only one vertex in the graph, always draw to the right
+
+    if (vertices.length === 1) {
+      return 'right';
+    }
 
     for (let i = 0; i < neighbours.length; i++) {
       angles.push(this.getAngle(vertices[neighbours[i]].position));
@@ -11723,5 +12678,5 @@ class Vertex {
 
 module.exports = Vertex;
 
-},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":10,"./Vector2":23}]},{},[1])
+},{"./ArrayHelper":2,"./Atom":3,"./MathHelper":11,"./Vector2":25}]},{},[1])
 

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>SMILES Parser Demo</title>
+    <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Megrim" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.3/noty.css" rel="stylesheet">
+    <script src="../dist/smiles-drawer.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.3/noty.min.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background: #fff;
+            overflow-y: auto;
+        }
+
+        h1 {
+            display: inline-block;
+            font-family: 'Megrim';
+            font-weight: 400;
+            font-size: 2.0em;
+            color: #50C5A9;
+            text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.25);
+
+            margin: 0;
+            padding: 0;
+            padding-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table tbody tr td {
+            padding: 3px;
+            vertical-align: bottom;
+            text-align: center;
+        }
+
+        .input-container {
+            padding: 10px;
+        }
+
+        .settings-container {
+            position: absolute;
+            bottom: 0;
+            left: 5%;
+            right: 5%;
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .canvas-container {
+            margin: 10px;
+            text-align: center;
+        }
+
+        .logo {
+            display: none;
+            width: 1.3em;
+            height: 1.3em;
+        }
+
+        input[type=text] {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 2px;
+            color: #222;
+            font-size: 1.00em;
+            outline: none;
+        }
+
+        input[type=text]::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        label {
+            font-family: Lato;
+            font-size: 0.75em;
+            color: #fff;
+            display: block;
+        }
+
+        #log {
+            visibility: hidden;
+            padding: 5px;
+            font-family: Consolas, Courier New, Courier, monospace;
+            font-weight: bold;
+            color: rgba(255, 38, 0, 0.8)
+        }
+
+        /* Slider */
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 2px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.75);
+            outline: none;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            border: 4px solid #000;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="input-container">
+        <img src="logo.png" class="logo" />
+        <h1>SmilesDrawer</h1>
+        <input id="input" type="text" class="parser" placeholder="Enter a valid SMILES ..." />
+        <div id="log">&nbsp;</div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="output-canvas" class="output"></canvas>
+        <br />
+        <svg id="output-svg" class="output"></svg>
+        <br />
+        <img id="output-img" class="output"></img>
+    </div>
+
+    <div class="settings-container">
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <label for="scale-input">Scale</label>
+                        <input class="slider" type="range" id="scale-input" name="scale-input" value="2" min="1"
+                            max="10" step="1" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div>
+            <label><input id="debug" name="debug" type="checkbox">Debug</label>
+        </div>
+    </div>
+
+    <script>
+        var input = document.getElementById('input');
+        var scaleInput = document.getElementById('scale-input');
+
+        var options = {
+            debug: false,
+            atomVisualization: 'default',
+            scale: 1.0
+        }
+
+        var smiDrawer = new SmiDrawer(options);
+        var input = document.getElementById('input');
+        var log = document.getElementById('log');
+
+        function draw() {
+            let t = performance.now();
+
+            smiDrawer.draw(input.value, '.output', 'oldschool', result => {
+                let td = performance.now() - t;
+                log.innerHTML = '&nbsp;';
+                log.style.visibility = 'hidden';
+
+                new Noty({
+                    text: 'Drawing took ' + td.toFixed(3) + 'ms with a total overlap score of ' + smiDrawer.drawer.getTotalOverlapScore().toFixed(3) + '.',
+                    killer: true,
+                    timeout: 2000,
+                    animation: {
+                        open: null,
+                        close: null
+                    }
+                }).show();
+            }, err => {
+                log.innerHTML = err;
+                log.style.visibility = 'visible';
+            });
+        }
+
+        function updateOptions() {
+            smiDrawer = new SmiDrawer(options);
+            draw();
+        }
+
+        document.addEventListener('DOMContentLoaded', function (event) {
+            input.addEventListener('input', function () {
+                draw();
+            });
+
+            scaleInput.addEventListener('input', function () {
+                options.scale = parseInt(scaleInput.value);
+                updateOptions();
+            });
+        });
+    </script>
+</body>
+
+</html>

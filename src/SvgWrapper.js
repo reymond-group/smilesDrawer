@@ -17,7 +17,7 @@ function makeid(length) {
 }
 
 class SvgWrapper {
-  constructor(themeManager, target, options) {
+  constructor(themeManager, target, options, clear = true) {
     if (typeof target === 'string' || target instanceof String) {
       this.svg = document.getElementById(target);
     } else {
@@ -55,8 +55,10 @@ class SvgWrapper {
     this.minY = Number.MAX_VALUE;
 
     // clear the svg element
-    while (this.svg.firstChild) {
-      this.svg.removeChild(this.svg.firstChild);
+    if (clear) {
+      while (this.svg.firstChild) {
+        this.svg.removeChild(this.svg.firstChild);
+      }
     }
 
     // Create styles here as text measurement is done before constructSvg
@@ -65,10 +67,10 @@ class SvgWrapper {
     // create the css styles
     this.style.appendChild(document.createTextNode(`
                 .element {
-                    font: ${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif;
+                    font: ${this.opts.fontSizeLarge}pt ${this.opts.fontFamily};
                 }
                 .sub {
-                    font: ${this.opts.fontSizeSmall}pt Helvetica, Arial, sans-serif;
+                    font: ${this.opts.fontSizeSmall}pt ${this.opts.fontFamily};
                 }
             `));
 
@@ -193,27 +195,7 @@ class SvgWrapper {
     return elem;
   }
 
-  createUnicodeSubscript(n) {
-    let result = '';
-
-    n.toString().split('').forEach(d => {
-      result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
-    });
-
-    return result
-  }
-
-  createUnicodeSuperscript(n) {
-    let result = '';
-
-    n.toString().split('').forEach(d => {
-      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
-    });
-
-    return result
-  }
-
-  createUnicodeCharge(n) {
+  static createUnicodeCharge(n) {
     if (n === 1) {
       return '⁺';
     }
@@ -223,11 +205,11 @@ class SvgWrapper {
     }
 
     if (n > 1) {
-      return this.createUnicodeSuperscript(n) + '⁺';
+      return SvgWrapper.createUnicodeSuperscript(n) + '⁺';
     }
 
     if (n < -1) {
-      return this.createUnicodeSuperscript(n) + '⁻';
+      return SvgWrapper.createUnicodeSuperscript(n) + '⁻';
     }
 
     return ''
@@ -263,7 +245,7 @@ class SvgWrapper {
     this.drawingHeight = this.maxY - this.minY;
   }
 
-  updateViewbox(scale = true) {
+  updateViewbox(scale) {
     let x = this.minX;
     let y = this.minY;
     let width = this.maxX - this.minX;
@@ -282,7 +264,6 @@ class SvgWrapper {
     } else {
       if (this.svg) {
         this.svg.style.width = scale * width + 'px';
-      } else {
         this.svg.style.height = scale * height + 'px';
       }
     }
@@ -298,17 +279,68 @@ class SvgWrapper {
    * @param {String} elementName The name of the element (single-letter).
    */
   drawBall(x, y, elementName) {
+    let r = this.opts.bondLength / 4.5;
+
+    if (x - r < this.minX) {
+      this.minX = x - r;
+    }
+
+    if (x + r > this.maxX) {
+      this.maxX = x + r;
+    }
+
+    if (y - r < this.minY) {
+      this.minY = y - r;
+    }
+
+    if (y + r > this.maxY) {
+      this.maxY = y + r;
+    }
+
     let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     ball.setAttributeNS(null, 'cx', x);
     ball.setAttributeNS(null, 'cy', y);
-    ball.setAttributeNS(null, 'r', this.opts.bondLength / 4.5);
+    ball.setAttributeNS(null, 'r', r);
     ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
 
     this.vertices.push(ball);
   }
 
   /**
-   * Draw a highlight for an atom
+   * @param {Line} line the line object to create the wedge from
+   */
+  drawWedge(line) {
+    let l = line.getLeftVector().clone(),
+      r = line.getRightVector().clone();
+
+    let normals = Vector2.normals(l, r);
+
+    normals[0].normalize();
+    normals[1].normalize();
+
+    let isRightChiralCenter = line.getRightChiral();
+
+    let start = l,
+      end = r;
+
+    if (isRightChiralCenter) {
+      start = r;
+      end = l;
+    }
+
+    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
+      u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 3.0 + this.opts.fontSizeLarge / 4.0)),
+      v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.opts.fontSizeLarge / 4.0)),
+      w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
+
+    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
+      gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
+    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
+    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
+    this.paths.push(polygon);
+  }
+  
+  /* Draw a highlight for an atom
    * 
    *  @param {Number} x The x position of the highlight
    *  @param {Number} y The y position of the highlight
@@ -356,7 +388,7 @@ class SvgWrapper {
 
     let dir = Vector2.subtract(end, start).normalize(),
       length = line.getLength(),
-      step = 1.25 / (length / (this.opts.bondThickness * 3.0)),
+      step = 1.25 / (length / (this.opts.bondLength / 10.0)),
       changed = false;
 
     let gradient = this.createGradient(line);
@@ -364,7 +396,7 @@ class SvgWrapper {
     for (let t = 0.0; t < 1.0; t += step) {
       let to = Vector2.multiplyScalar(dir, t * length),
         startDash = Vector2.add(start, to),
-        width = 1.5 * t,
+        width = this.opts.fontSizeLarge / 2.0 * t,
         dashOffset = Vector2.multiplyScalar(normals[0], width);
 
       startDash.subtract(dashOffset);
@@ -429,7 +461,7 @@ class SvgWrapper {
     circleElem.setAttributeNS(null, 'cy', y);
     circleElem.setAttributeNS(null, 'r', radius - this.opts.bondSpacing);
     circleElem.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
-    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness * 1.5);
+    circleElem.setAttributeNS(null, 'stroke-width', this.opts.bondThickness);
     circleElem.setAttributeNS(null, 'fill', 'none');
     this.paths.push(circleElem);
   }
@@ -442,11 +474,11 @@ class SvgWrapper {
    * @param {Boolean} dashed defaults to false.
    * @param {String} gradient gradient url. Defaults to null.
    */
-  drawLine(line, dashed = false, gradient = null) {
+  drawLine(line, dashed = false, gradient = null, linecap = 'round') {
     let opts = this.opts,
       stylesArr = [
         ['stroke-width', this.opts.bondThickness],
-        ['stroke-linecap', 'round'],
+        ['stroke-linecap', linecap],
         ['stroke-dasharray', dashed ? '5, 5' : 'none'],
       ],
       l = line.getLeftVector(),
@@ -480,7 +512,23 @@ class SvgWrapper {
    * @param {String} elementName The name of the element (single-letter).
    */
   drawPoint(x, y, elementName) {
-    let ctx = this.ctx;
+    let r = 0.75;
+
+    if (x - r < this.minX) {
+      this.minX = x - r;
+    }
+
+    if (x + r > this.maxX) {
+      this.maxX = x + r;
+    }
+
+    if (y - r < this.minY) {
+      this.minY = y - r;
+    }
+
+    if (y + r > this.maxY) {
+      this.maxY = y + r;
+    }
 
     // first create a mask
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -494,7 +542,7 @@ class SvgWrapper {
     let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     point.setAttributeNS(null, 'cx', x);
     point.setAttributeNS(null, 'cy', y);
-    point.setAttributeNS(null, 'r', '0.75');
+    point.setAttributeNS(null, 'r', r);
     point.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
     this.vertices.push(point);
   }
@@ -510,21 +558,22 @@ class SvgWrapper {
    * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
    * @param {Number} charge The charge of the atom.
    * @param {Number} isotope The isotope number.
+   * @param {Number} totalVertices The total number of vertices in the graph.
    * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
    * @param {String} attachedPseudoElement.element The element symbol.
    * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
    * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
    */
-  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, attachedPseudoElement = {}) {
+  drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, totalVertices, attachedPseudoElement = {}) {
     let text = [];
     let display = elementName;
 
     if (charge !== 0 && charge !== null) {
-      display += this.createUnicodeCharge(charge);
+      display += SvgWrapper.createUnicodeCharge(charge);
     }
 
     if (isotope !== 0 && isotope !== null) {
-      display = this.createUnicodeSuperscript(isotope) + display;
+      display = SvgWrapper.createUnicodeSuperscript(isotope) + display;
     }
 
     text.push([display, elementName]);
@@ -532,7 +581,7 @@ class SvgWrapper {
     if (hydrogens === 1) {
       text.push(['H', 'H'])
     } else if (hydrogens > 1) {
-      text.push(['H' + this.createUnicodeSubscript(hydrogens), 'H'])
+      text.push(['H' + SvgWrapper.createUnicodeSubscript(hydrogens), 'H'])
     }
 
     // TODO: Better handle exceptions
@@ -552,92 +601,84 @@ class SvgWrapper {
       let display = pe.element;
 
       if (pe.count > 1) {
-        display += this.createUnicodeSubscript(pe.count);
+        display += SvgWrapper.createUnicodeSubscript(pe.count);
       }
 
       if (pe.charge !== '') {
-        display += this.createUnicodeCharge(charge);
+        display += SvgWrapper.createUnicodeCharge(charge);
       }
 
-      text.push([pe.element, pe.element]);
+      text.push([display, pe.element]);
 
       if (pe.hydrogenCount === 1) {
         text.push(['H', 'H'])
       } else if (pe.hydrogenCount > 1) {
-        text.push(['H' + this.createUnicodeSubscript(pe.hydrogenCount), 'H'])
+        text.push(['H' + SvgWrapper.createUnicodeSubscript(pe.hydrogenCount), 'H'])
       }
     }
 
-    this.write(text, direction, x, y);
+    this.write(text, direction, x, y, totalVertices === 1);
   }
 
-  /**
-   * @param {Line} line the line object to create the wedge from
-   */
-  drawWedge(line) {
-    let l = line.getLeftVector().clone(),
-      r = line.getRightVector().clone();
+  write(text, direction, x, y, singleVertex) {
+    // Measure element name only, without charge or isotope ...
+    let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
 
-    let normals = Vector2.normals(l, r);
-
-    normals[0].normalize();
-    normals[1].normalize();
-
-    let isRightChiralCenter = line.getRightChiral();
-
-    let start = l,
-      end = r;
-
-    if (isRightChiralCenter) {
-      start = r;
-      end = l;
+    // ... but for direction left move to the right to 
+    if (direction === 'left' && text[0][0] !== text[0][1]) {
+      bbox.width *= 2.0;
     }
-
-    let t = Vector2.add(start, Vector2.multiplyScalar(normals[0], this.halfBondThickness)),
-      u = Vector2.add(end, Vector2.multiplyScalar(normals[0], 1.5 + this.halfBondThickness)),
-      v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 1.5 + this.halfBondThickness)),
-      w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
-
-    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
-      gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
-    polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
-    polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
-    this.paths.push(polygon);
-  }
-
-  write(text, direction, x, y) {
-    // Measure element name only, without charge or isotope
-    let bbox = this.measureText(text[0][1]);
 
     // Get the approximate width and height of text and add update max/min
     // to allow for narrower paddings
-    if (direction === 'left') {
-      if (x - bbox.width * text.length < this.minX) {
-        this.minX = x - bbox.width * text.length;
-      }
-      if (y - bbox.height < this.minY) {
-        this.minY = y - bbox.height;
-      }
-      if (y + bbox.height > this.maxY) {
-        this.maxY = y + bbox.height;
-      }
-    } else if (direction === 'up') {
-      if (y - 0.8 * bbox.height * text.length < this.minY) {
-        this.minY = y - 0.8 * bbox.height * text.length;
-      }
-    } else if (direction === 'right') {
+    if (singleVertex) {
       if (x + bbox.width * text.length > this.maxX) {
         this.maxX = x + bbox.width * text.length;
       }
+      if (x - bbox.width / 2.0 < this.minX) {
+        this.minX = x - bbox.width / 2.0;
+      }
       if (y - bbox.height < this.minY) {
         this.minY = y - bbox.height;
       }
       if (y + bbox.height > this.maxY) {
         this.maxY = y + bbox.height;
       }
-    } else if (direction === 'down') {
-      if (y + 0.8 * bbox.height * text.length > this.maxY) {
-        this.maxY = y + 0.8 * bbox.height * text.length;
+    } else {
+      if (direction !== 'right') {
+        if (x + bbox.width * text.length > this.maxX) {
+          this.maxX = x + bbox.width * text.length;
+        }
+        if (x - bbox.width * text.length < this.minX) {
+          this.minX = x - bbox.width * text.length;
+        }
+      } else if (direction !== 'left') {
+        if (x + bbox.width * text.length > this.maxX) {
+          this.maxX = x + bbox.width * text.length;
+        }
+        if (x - bbox.width / 2.0 < this.minX) {
+          this.minX = x - bbox.width / 2.0;
+        }
+      }
+
+      if (y - bbox.height < this.minY) {
+        this.minY = y - bbox.height;
+      }
+
+      if (y + bbox.height > this.maxY) {
+        this.maxY = y + bbox.height;
+      }
+
+      if (direction === 'down') {
+        if (y + 0.8 * bbox.height * text.length > this.maxY) {
+          this.maxY = y + 0.8 * bbox.height * text.length;
+        }
+      }
+
+      if (direction === 'up') {
+        if (y - 0.8 * bbox.height * text.length < this.minY) {
+          this.minY = y - 0.8 * bbox.height * text.length;
+        }
       }
     }
 
@@ -683,7 +724,13 @@ class SvgWrapper {
     })
 
     textElem.setAttributeNS(null, 'data-direction', direction);
-    textElem.setAttributeNS(null, 'dominant-baseline', 'central');
+
+    if (direction === 'left' || direction === 'right') {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'alphabetic');
+      textElem.setAttributeNS(null, 'y', '0.36em');
+    } else {
+      textElem.setAttributeNS(null, 'dominant-baseline', 'central');
+    }
 
     if (direction === 'left') {
       textElem.setAttributeNS(null, 'text-anchor', 'end');
@@ -693,9 +740,9 @@ class SvgWrapper {
 
     g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
 
-    let maskRadius = 3.5;
+    let maskRadius = this.opts.fontSizeLarge * 0.75;
     if (text[0][1].length > 1) {
-      maskRadius = 5.0;
+      maskRadius = this.opts.fontSizeLarge * 1.1;
     }
 
     let mask = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -709,20 +756,8 @@ class SvgWrapper {
     this.vertices.push(g);
   }
 
-  measureText(text) {
-    const element = document.createElement('canvas');
-    const ctx = element.getContext("2d");
-    ctx.font = `${this.opts.fontSizeLarge}pt Helvetica, Arial, sans-serif`
-    let textMetrics = ctx.measureText(text)
-
-    return {
-      'width': textMetrics.width, // Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight),
-      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * 0.9
-    };
-  }
-
   /**
-   * 
+   * Draw the wrapped SVG to a canvas.
    * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
    */
   toCanvas(canvas, width, height) {
@@ -739,6 +774,194 @@ class SvgWrapper {
     };
 
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);
+  }
+
+  static createUnicodeSubscript(n) {
+    let result = '';
+
+    n.toString().split('').forEach(d => {
+      result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
+    });
+
+    return result
+  }
+
+  static createUnicodeSuperscript(n) {
+    let result = '';
+
+    n.toString().split('').forEach(d => {
+      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
+    });
+
+    return result
+  }
+
+  static replaceNumbersWithSubscript(text) {
+    let subscriptNumbers = {
+      '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄',
+      '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉'
+    };
+
+    for (const [key, value] of Object.entries(subscriptNumbers)) {
+      text = text.replaceAll(key, value);
+    }
+
+    return text;
+  }
+
+  static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
+    const element = document.createElement('canvas');
+    const ctx = element.getContext("2d");
+    ctx.font = `${fontSize}pt ${fontFamily}`
+    let textMetrics = ctx.measureText(text)
+
+    let compWidth = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
+    return {
+      'width': textMetrics.width > compWidth ? textMetrics.width : compWidth,
+      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight
+    };
+  }
+
+  /**
+   * Convert an SVG to a canvas. Warning: This happens async!
+   * 
+   * @param {SVGElement} svg 
+   * @param {HTMLCanvasElement} canvas 
+   * @param {Number} width 
+   * @param {Number} height 
+   * @param {CallableFunction} callback
+   * @returns {HTMLCanvasElement} The input html canvas element after drawing to.
+   */
+  static svgToCanvas(svg, canvas, width, height, callback = null) {
+    svg.setAttributeNS(null, 'width', width);
+    svg.setAttributeNS(null, 'height', height);
+
+    let image = new Image();
+    image.onload = function () {
+      canvas.width = width;
+      canvas.height = height;
+
+      let context = canvas.getContext('2d');
+      context.imageSmoothingEnabled = false;
+      context.drawImage(image, 0, 0, width, height);
+
+      if (callback) {
+        callback(canvas);
+      }
+    };
+
+    image.onerror = function (err) {
+      console.log(err);
+    }
+
+    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(svg.outerHTML);
+    return canvas;
+  }
+
+  /**
+   * Convert an SVG to a canvas. Warning: This happens async!
+   * 
+   * @param {SVGElement} svg 
+   * @param {HTMLImageElement} canvas 
+   * @param {Number} width 
+   * @param {Number} height
+   */
+  static svgToImg(svg, img, width, height) {
+    let canvas = document.createElement('canvas');
+    this.svgToCanvas(svg, canvas, width, height, result => {
+      img.src = canvas.toDataURL("image/png");
+    });
+  }
+
+  /**
+   * Create an SVG element containing text.
+   * @param {String} text 
+   * @param {*} themeManager 
+   * @param {*} options 
+   * @returns {{svg: SVGElement, width: Number, height: Number}} The SVG element containing the text and its dimensions.
+   */
+  static writeText(text, themeManager, fontSize, fontFamily, maxWidth = Number.MAX_SAFE_INTEGER) {
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    let style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.appendChild(document.createTextNode(`
+        .text {
+            font: ${fontSize}pt ${fontFamily};
+            dominant-baseline: ideographic;
+        }
+    `));
+    svg.appendChild(style);
+
+    let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textElem.setAttributeNS(null, 'class', 'text');
+
+    let maxLineWidth = 0.0;
+    let totalHeight = 0.0;
+
+    let lines = [];
+
+    text.split("\n").forEach(line => {
+      let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.0);
+      if (dims.width >= maxWidth) {
+        let totalWordsWidth = 0.0;
+        let maxWordsHeight = 0.0;
+        let words = line.split(" ");
+        let offset = 0;
+
+        for (let i = 0; i < words.length; i++) {
+          let wordDims = SvgWrapper.measureText(words[i], fontSize, fontFamily, 1.0);
+
+          if (totalWordsWidth + wordDims.width > maxWidth) {
+            lines.push({
+              text: words.slice(offset, i).join(' '),
+              width: totalWordsWidth,
+              height: maxWordsHeight
+            });
+
+            totalWordsWidth = 0.0;
+            maxWordsHeight = 0.0;
+            offset = i
+          }
+
+          if (wordDims.height > maxWordsHeight) {
+            maxWordsHeight = wordDims.height;
+          }
+
+          totalWordsWidth += wordDims.width;
+        }
+
+        if (offset < words.length) {
+          lines.push({
+            text: words.slice(offset, words.length).join(' '),
+            width: totalWordsWidth,
+            height: maxWordsHeight
+          });
+        }
+      } else {
+        lines.push({
+          text: line,
+          width: dims.width,
+          height: dims.height
+        });
+      }
+    });
+
+    lines.forEach((line, i) => {
+      totalHeight += line.height;
+      let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspanElem.setAttributeNS(null, 'fill', themeManager.getColor("C"));
+      tspanElem.textContent = line.text;
+      tspanElem.setAttributeNS(null, 'x', '0px')
+      tspanElem.setAttributeNS(null, 'y', `${totalHeight}px`);
+      textElem.appendChild(tspanElem);
+
+      if (line.width > maxLineWidth) {
+        maxLineWidth = line.width;
+      }
+    });
+
+    svg.appendChild(textElem);
+
+    return { svg: svg, width: maxLineWidth, height: totalHeight };
   }
 }
 
