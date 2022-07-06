@@ -31,9 +31,11 @@ class SvgWrapper {
 
     // maintain a list of line elements and their corresponding gradients
     // maintain a list of vertex elements
+    // maintain a list of highlighting elements
     this.paths = [];
     this.vertices = [];
     this.gradients = [];
+    this.highlights = [];
 
     // maintain the dimensions
     this.drawingWidth = 0;
@@ -82,6 +84,7 @@ class SvgWrapper {
     // TODO: add the defs element to put gradients in
     let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
       masks = document.createElementNS('http://www.w3.org/2000/svg', 'mask'),
+      highlights = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
       paths = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
       vertices = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
       pathChildNodes = this.paths;
@@ -102,6 +105,10 @@ class SvgWrapper {
     for (let path of pathChildNodes) {
       paths.appendChild(path);
     }
+
+    for (let highlight of this.highlights){
+      highlights.appendChild(highlight)
+    }
     for (let vertex of this.vertices) {
       vertices.appendChild(vertex);
     }
@@ -119,6 +126,7 @@ class SvgWrapper {
     if (this.svg) {
       this.svg.appendChild(defs);
       this.svg.appendChild(masks);
+      this.svg.appendChild(highlights)
       this.svg.appendChild(paths);
       this.svg.appendChild(vertices);
     } else {
@@ -297,6 +305,23 @@ class SvgWrapper {
     ball.setAttributeNS(null, 'fill', this.themeManager.getColor(elementName));
 
     this.vertices.push(ball);
+  }
+
+  /**
+   * Draw a highlight for an atom
+   * 
+   *  @param {Number} x The x position of the highlight
+   *  @param {Number} y The y position of the highlight
+   *  @param {string} color The color of the highlight, default #03fc9d
+   */
+  drawAtomHighlight(x, y, color = "#03fc9d") {
+    let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ball.setAttributeNS(null, 'cx', x);
+    ball.setAttributeNS(null, 'cy', y);
+    ball.setAttributeNS(null, 'r', this.opts.bondLength / 3);
+    ball.setAttributeNS(null, 'fill', color);
+
+    this.highlights.push(ball);
   }
 
   /**

@@ -441,7 +441,7 @@ class DrawerBase {
     return null;
   }
 
-  initDraw(data, themeName, infoOnly) {
+  initDraw(data, themeName, infoOnly, highlight_atoms) {
     this.data = data;
     this.infoOnly = infoOnly;
 
@@ -460,6 +460,8 @@ class DrawerBase {
     // Reset those, in case the previous drawn SMILES had a dangling \ or /
     this.doubleBondConfigCount = null;
     this.doubleBondConfig = null;
+
+    this.highlight_atoms = highlight_atoms
 
     this.initRings();
     this.initHydrogens();
@@ -1515,7 +1517,6 @@ class DrawerBase {
       let dir = vertex.getTextDirection(this.graph.vertices);
       let isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
-
       // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization
       if (atom.element === 'N' && atom.isPartOfAromaticRing) {

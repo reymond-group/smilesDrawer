@@ -46,6 +46,7 @@ class Graph {
     atom.branchBond = node.branchBond;
     atom.ringbonds = node.ringbonds;
     atom.bracket = node.atom.element ? node.atom : null;
+    atom.class = node.atom.class
 
     let vertex = new Vertex(atom);
     let parentVertex = this.vertices[parentVertexId];
