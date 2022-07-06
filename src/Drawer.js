@@ -31,7 +31,7 @@ class Drawer {
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
-  draw(data, target, themeName = 'light', infoOnly = false) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = [[10, "#03fc9d"]]) {
     let canvas = null;
     if (typeof target === 'string' || target instanceof String) {
       canvas = document.getElementById(target);
