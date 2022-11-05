@@ -15,6 +15,7 @@ And it now also draws reactions, comes with many new teams and has a cool new we
 
 <h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html">Demo (Canvas)</a></h3>
 <h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_svg.html">Demo (SVG)</a></h3>
+
 ### Compatibility
 
 All the current versions of the major browsers are supported and the application has been tested on the following browsers (versions):
