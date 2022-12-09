@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <svg id="svgExample" style="width:400px" />
+    <br>
+    <script src=" ../dist/smiles-drawer.min.js"></script>
+    <script>
+        let gd = new SmilesDrawer.GaussDrawer([], [], 200, 200, 20);
+        gd.setFromArray([[65, 65], [95, 95], [125, 125]], [0.5, 1, 0.5]);
+        gd.draw();
+        gd.getImage(img => document.body.append(img));
+
+        let sd = new SmiDrawer();
+        sd.draw('OC(C(=O)O[C@H]1C[N+]2(CCCOC3=CC=CC=C3)CCC1CC2)(C1=CC=CS1)C1=CC=CS1', '#svgExample')
+    </script>
+</body>
+
+</html>

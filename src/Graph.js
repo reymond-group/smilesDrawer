@@ -11,6 +11,7 @@ const Atom = require('./Atom')
  * 
  * @property {Vertex[]} vertices The vertices of the graph.
  * @property {Edge[]} edges The edges of this graph.
+ * @property {Number[]} atomIdxToVertexId A map mapping atom indices to vertex ids.
  * @property {Object} vertexIdsToEdgeId A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId.
  * @property {Boolean} isometric A boolean indicating whether or not the SMILES associated with this graph is isometric.
  */
@@ -24,8 +25,12 @@ class Graph {
   constructor(parseTree, isomeric = false) {
     this.vertices = Array();
     this.edges = Array();
+    this.atomIdxToVertexId = Array();
     this.vertexIdsToEdgeId = {};
     this.isomeric = isomeric;
+
+    // Used to assign indices to the heavy atoms.
+    this._atomIdx = 0;
 
     // Used for the bridge detection algorithm
     this._time = 0;
@@ -36,12 +41,18 @@ class Graph {
    * PRIVATE FUNCTION. Initializing the graph from the parse tree.
    *
    * @param {Object} node The current node in the parse tree.
-   * @param {Number} parentVertexId=null The id of the previous vertex.
+   * @param {?Number} parentVertexId=null The id of the previous vertex.
    * @param {Boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
    */
   _init(node, order = 0, parentVertexId = null, isBranch = false) {
     // Create a new vertex object
-    let atom = new Atom(node.atom.element ? node.atom.element : node.atom, node.bond);
+    const element = node.atom.element ? node.atom.element : node.atom;
+    let atom = new Atom(element, node.bond);
+
+    if (element !== 'H') {
+      atom.idx = this._atomIdx;
+      this._atomIdx++;
+    }
 
     atom.branchBond = node.branchBond;
     atom.ringbonds = node.ringbonds;
@@ -50,6 +61,10 @@ class Graph {
 
     let vertex = new Vertex(atom);
     let parentVertex = this.vertices[parentVertexId];
+
+    if (atom.idx !== null) {
+      this.atomIdxToVertexId.push(vertex.id);
+    }
 
     this.addVertex(vertex);
 

@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Drawer.js - Documentation</title>
+    <title>GaussDrawer.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,7 +32,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Drawer.js</h1>
+    <h1 class="page-title">GaussDrawer.js</h1>
     
 
     
@@ -42,77 +42,149 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>//@ts-check
-const SvgDrawer = require('./SvgDrawer')
+            <pre class="prettyprint source linenums"><code>const Vector2 = require('./Vector2')
 
-/** 
- * The main class of the application representing the smiles drawer 
- * 
- * @property {Graph} graph The graph associated with this SmilesDrawer.Drawer instance.
- * @property {Number} ringIdCounter An internal counter to keep track of ring ids.
- * @property {Number} ringConnectionIdCounter An internal counter to keep track of ring connection ids.
- * @property {CanvasWrapper} canvasWrapper The CanvasWrapper associated with this SmilesDrawer.Drawer instance.
- * @property {Number} totalOverlapScore The current internal total overlap score.
- * @property {Object} defaultOptions The default options.
- * @property {Object} opts The merged options.
- * @property {Object} theme The current theme.
- */
-class Drawer {
-  /**
-   * The constructor for the class SmilesDrawer.
-   *
-   * @param {Object} options An object containing custom values for different options. It is merged with the default options.
-   */
-  constructor(options) {
-    this.svgDrawer = new SvgDrawer(options);
-  }
+import chroma from "chroma-js"
 
-  /**
-   * Draws the parsed smiles data to a canvas element.
-   *
-   * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
-   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
-   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+class GaussDrawer {
+    /**
+   * The constructor of the class Graph.
+   * 
+   * @param {Vector2[]} points The centres of the gaussians.
+   * @param {Number[]} weights The weights / amplitudes for each gaussian.
    */
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
-    let canvas = null;
-    if (typeof target === 'string' || target instanceof String) {
-      canvas = document.getElementById(target);
-    } else {
-      canvas = target;
+    constructor(points, weights, width, height, sigma = 0.3, colormap = null) {
+        this.points = points;
+        this.weights = weights;
+        this.width = width;
+        this.height = height;
+        this.sigma = sigma;
+
+        if (colormap === null) {
+            colormap = [
+                '#00876c', '#469b83', '#6eaf9a', '#93c3b3', '#b7d7cc',
+                '#dbebe5', '#ffffff', '#fde0e0', '#f9c2c1', '#f3a3a4',
+                '#eb8387', '#e0636b', '#d43d51'
+            ].reverse()
+        }
+        this.colormap = colormap;
+
+        this.canvas = document.createElement('canvas');
+        this.context = this.canvas.getContext('2d');
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
     }
 
-    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
-    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
-    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
-    this.svgDrawer.draw(data, svg, themeName, infoOnly, highlight_atoms);
-    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
-  }
+    setFromArray(arr_points, arr_weights) {
+        this.points = [];
+        arr_points.forEach(a => {
+            this.points.push(new Vector2(a[0], a[1]));
+        });
 
-  /**
-   * Returns the total overlap score of the current molecule.
-   *
-   * @returns {Number} The overlap score.
-   */
-  getTotalOverlapScore() {
-    return this.svgDrawer.getTotalOverlapScore();
-  }
+        arr_weights.forEach(w => {
+            this.weights.push(w);
+        });
+    }
 
-  /**
-   * Returns the molecular formula of the loaded molecule as a string.
-   * 
-   * @returns {String} The molecular formula.
-   */
-  getMolecularFormula() {
-    this.svgDrawer.getMolecularFormula();
-  }
+    /**
+     * Compute and draw the gaussians.
+     */
+    draw() {
+
+
+        let m = [];
+        for (let x = 0; x &lt; this.width; x++) {
+            let row = [];
+            for (let y = 0; y &lt; this.height; y++) {
+                row.push(0.0);
+            }
+            m.push(row);
+        }
+
+        for (let i = 0; i &lt; this.points.length; i++) {
+            let v = this.points[i];
+            let a = this.weights[i];
+
+            for (let x = 0; x &lt; this.width; x++) {
+                for (let y = 0; y &lt; this.height; y++) {
+                    let v_x = (x - v.x) ** 2 / (2 * this.sigma ** 2);
+                    let v_y = (y - v.y) ** 2 / (2 * this.sigma ** 2);
+                    let val = a * Math.exp(-(v_x + v_y));
+
+                    m[x][y] += val;
+                }
+            }
+        }
+
+        let max = -Number.MAX_SAFE_INTEGER;
+        let min = Number.MAX_SAFE_INTEGER;
+
+        for (let x = 0; x &lt; this.width; x++) {
+            for (let y = 0; y &lt; this.height; y++) {
+                if (m[x][y] &lt; min) {
+                    min = m[x][y];
+                }
+
+                if (m[x][y] > max) {
+                    max = m[x][y];
+                }
+            }
+        }
+
+        console.log(min, max);
+
+        let abs_max = Math.max(Math.abs(min), Math.abs(max));
+        const scale = chroma.scale(this.colormap).domain([-abs_max, abs_max]);
+
+        for (let x = 0; x &lt; this.width; x++) {
+            for (let y = 0; y &lt; this.height; y++) {
+                // m[x][y] = (m[x][y] - min) / (max - min);
+                m[x][y] = m[x][y] / abs_max;
+                let [r, g, b] = scale(m[x][y]).rgb();
+                this.setPixel(new Vector2(x, y), r, g, b, 255);
+            }
+        }
+    }
+
+    /**
+     * Get the canvas as an HTML image.
+     * 
+     * @param {CallableFunction} callback
+     */
+    getImage(callback) {
+        let image = new Image();
+        image.onload = () => {
+            this.context.imageSmoothingEnabled = false;
+            this.context.drawImage(image, 0, 0, this.width, this.height);
+
+            if (callback) {
+                callback(image);
+            }
+        };
+
+        image.onerror = function (err) {
+            console.log(err);
+        }
+
+        image.src = this.canvas.toDataURL();
+    }
+
+    /**
+     * Set the colour at a specific point on the canvas.
+     * 
+     * @param {Vector2} vec The pixel position on the canvas.
+     * @param {Number} r The red colour-component.
+     * @param {Number} g The green colour-component.
+     * @param {Number} b The blue colour-component.
+     * @param {Number} a The alpha colour-component.
+     */
+    setPixel(vec, r, g, b, a) {
+        this.context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + (a / 255) + ")";
+        this.context.fillRect(vec.x, vec.y, 1, 1);
+    }
 }
 
-module.exports = Drawer;
-</code></pre>
+module.exports = GaussDrawer</code></pre>
         </article>
     </section>
 

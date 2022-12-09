@@ -46,6 +46,7 @@ class Atom {
    * @param {String} [bondType='-'] The type of the bond associated with this atom.
    */
   constructor(element, bondType = '-') {
+    this.idx = null;
     this.element = element.length === 1 ? element.toUpperCase() : element;
     this.drawExplicit = false;
     this.ringbonds = Array();
@@ -159,8 +160,8 @@ class Atom {
    */
   addAnchoredRing(ringId) {
     if (!ArrayHelper.contains(this.anchoredRings, {
-        value: ringId
-      })) {
+      value: ringId
+    })) {
       this.anchoredRings.push(ringId);
     }
   }

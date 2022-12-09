@@ -5,6 +5,7 @@ const ReactionParser = require('./src/ReactionParser')
 const SvgDrawer = require('./src/SvgDrawer')
 const ReactionDrawer = require('./src/ReactionDrawer')
 const SmiDrawer = require('./src/SmilesDrawer')
+const GaussDrawer = require('./src/GaussDrawer')
 
 // Detect SSR (server side rendering)
 var canUseDOM = !!(
@@ -26,6 +27,7 @@ SmilesDrawer.SvgDrawer = SvgDrawer;
 
 SmilesDrawer.ReactionDrawer = ReactionDrawer;
 SmilesDrawer.ReactionParser = ReactionParser;
+SmilesDrawer.GaussDrawer = GaussDrawer;
 
 /**
 * Cleans a SMILES string (removes non-valid characters)

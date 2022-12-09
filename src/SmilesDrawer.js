@@ -48,7 +48,7 @@ class SmilesDrawer {
         });
     }
 
-    draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null) {
+    draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null, weights = []) {
         // get the settings
         let rest = [];
         [smiles, ...rest] = smiles.split(' ');
@@ -84,7 +84,7 @@ class SmilesDrawer {
             }
         } else {
             try {
-                this.drawMolecule(smiles, target, theme, successCallback);
+                this.drawMolecule(smiles, target, theme, weights, successCallback);
             } catch (err) {
                 if (errorCallback) {
                     errorCallback(err);
@@ -95,7 +95,7 @@ class SmilesDrawer {
         }
     }
 
-    drawMolecule(smiles, target, theme, callback) {
+    drawMolecule(smiles, target, theme, weights, callback) {
         let parseTree = Parser.parse(smiles);
 
         if (target === null || target === 'svg') {

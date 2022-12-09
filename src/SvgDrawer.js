@@ -27,7 +27,7 @@ class SvgDrawer {
    *
    * @returns {SVGElement} The svg element
    */
-  draw(data, target, themeName = 'light', infoOnly = false) {
+  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
     if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -278,14 +278,11 @@ class SvgDrawer {
    * @param {Boolean} debug 
    */
   drawAtomHighlights(debug){
-    let preprocessor = this.preprocessor,
-      opts = preprocessor.opts,
-      graph = preprocessor.graph,
-      rings = preprocessor.rings,
-      svgWrapper = this.svgWrapper;
-    
-    console.log(preprocessor.highlight_atoms)
-    console.log(graph.vertices.length)
+    let preprocessor = this.preprocessor;
+    let opts = preprocessor.opts;
+    let graph = preprocessor.graph;
+    let rings = preprocessor.rings;
+    let svgWrapper = this.svgWrapper;
 
     for (var i = 0; i < graph.vertices.length; i++) {
       let vertex = graph.vertices[i];
@@ -293,7 +290,7 @@ class SvgDrawer {
 
       for (var j = 0; j < preprocessor.highlight_atoms.length; j++){
         let highlight = preprocessor.highlight_atoms[j]
-        if (atom.class == highlight[0]){
+        if (atom.class === highlight[0]){
           svgWrapper.drawAtomHighlight(vertex.position.x, vertex.position.y, highlight[1]);
         }
       }

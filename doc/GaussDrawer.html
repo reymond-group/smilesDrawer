@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Drawer.js - Documentation</title>
+    <title>GaussDrawer - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -32,89 +32,668 @@
 
 <div id="main">
     
-    <h1 class="page-title">Drawer.js</h1>
+    <h1 class="page-title">GaussDrawer</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>//@ts-check
-const SvgDrawer = require('./SvgDrawer')
+        <h2>
+        GaussDrawer
+        </h2>
+        
+    
+</header>
 
-/** 
- * The main class of the application representing the smiles drawer 
- * 
- * @property {Graph} graph The graph associated with this SmilesDrawer.Drawer instance.
- * @property {Number} ringIdCounter An internal counter to keep track of ring ids.
- * @property {Number} ringConnectionIdCounter An internal counter to keep track of ring connection ids.
- * @property {CanvasWrapper} canvasWrapper The CanvasWrapper associated with this SmilesDrawer.Drawer instance.
- * @property {Number} totalOverlapScore The current internal total overlap score.
- * @property {Object} defaultOptions The default options.
- * @property {Object} opts The merged options.
- * @property {Object} theme The current theme.
- */
-class Drawer {
-  /**
-   * The constructor for the class SmilesDrawer.
-   *
-   * @param {Object} options An object containing custom values for different options. It is merged with the default options.
-   */
-  constructor(options) {
-    this.svgDrawer = new SvgDrawer(options);
-  }
+<article>
+    
+        <div class="container-overview">
+        
+            
 
-  /**
-   * Draws the parsed smiles data to a canvas element.
-   *
-   * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
-   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
-   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
-   */
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
-    let canvas = null;
-    if (typeof target === 'string' || target instanceof String) {
-      canvas = document.getElementById(target);
-    } else {
-      canvas = target;
-    }
+    
 
-    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-    svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
-    svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
-    svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
-    this.svgDrawer.draw(data, svg, themeName, infoOnly, highlight_atoms);
-    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
-  }
+    <h4 class="name" id="GaussDrawer"><span class="type-signature"></span>new GaussDrawer<span class="signature">(points, weights)</span><span class="type-signature"></span></h4>
 
-  /**
-   * Returns the total overlap score of the current molecule.
-   *
-   * @returns {Number} The overlap score.
-   */
-  getTotalOverlapScore() {
-    return this.svgDrawer.getTotalOverlapScore();
-  }
+    
 
-  /**
-   * Returns the molecular formula of the loaded molecule as a string.
-   * 
-   * @returns {String} The molecular formula.
-   */
-  getMolecularFormula() {
-    this.svgDrawer.getMolecularFormula();
-  }
-}
 
-module.exports = Drawer;
-</code></pre>
-        </article>
-    </section>
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="GaussDrawer.js.html">GaussDrawer.js</a>, <a href="GaussDrawer.js.html#line12">line 12</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>The constructor of the class Graph.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>points</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="Vector2.html">Vector2</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The centres of the gaussians.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>weights</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The weights / amplitudes for each gaussian.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="draw"><span class="type-signature"></span>draw<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="GaussDrawer.js.html">GaussDrawer.js</a>, <a href="GaussDrawer.js.html#line48">line 48</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Compute and draw the gaussians.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getImage"><span class="type-signature"></span>getImage<span class="signature">(callback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="GaussDrawer.js.html">GaussDrawer.js</a>, <a href="GaussDrawer.js.html#line110">line 110</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Get the canvas as an HTML image.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">CallableFunction</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setPixel"><span class="type-signature"></span>setPixel<span class="signature">(vec, r, g, b, a)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="GaussDrawer.js.html">GaussDrawer.js</a>, <a href="GaussDrawer.js.html#line137">line 137</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Set the colour at a specific point on the canvas.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>vec</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Vector2.html">Vector2</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The pixel position on the canvas.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>r</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The red colour-component.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>g</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The green colour-component.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>b</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The blue colour-component.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>a</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The alpha colour-component.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
