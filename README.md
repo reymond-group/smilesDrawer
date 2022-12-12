@@ -4,7 +4,7 @@ No server, no images, no templates, just a SMILES 😊
 
 Current Version: **2.1.2**
 
-<table style="width=100%">
+<table style="width: 100%; table-layout: fixed">
     <tbody>
         <tr>
             <td><a href="https://smilesdrawer.rocks">Molecules</a></td>
@@ -13,10 +13,10 @@ Current Version: **2.1.2**
             <td><a href="https://smilesdrawer.surge.sh/playground.html">Style & Customize</a></td>
         </tr>
         <tr>
-            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/main.png"></img></td>
-            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/rxn_highlight.png"></img></td>
-            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/learn.png"></img></td>
-            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/style.png"></img></td>
+            <td><a href="https://smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/main.png"></img></a></td>
+            <td><a href="https://smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/rxn_highlight.png"></img></a></td>
+            <td><a href="https://smilesdrawer.surge.sh/use.html"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/learn.png"></img></a></td>
+            <td><a href="https://smilesdrawer.surge.sh/playground.html"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/style.png"></img></a></td>
         </tr>
     </tbody>
 </table>
