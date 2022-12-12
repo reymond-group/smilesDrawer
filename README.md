@@ -1,17 +1,13 @@
-![Smiles Drawer](https://github.com/reymond-group/smilesDrawer/blob/master/logo.png?raw=true)
+# SmilesDrawer 2.0
 
-# Smiles Drawer
+## No server, no images, no templates, just a SMILES 😊
 
-Current Version: 2.0.1
+Current Version: **2.1.2**
+[smilesdrawer.rocks](https://smilesdrawer.rocks)
 
 If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: [10.1021/acs.jcim.7b00425](http://dx.doi.org/10.1021/acs.jcim.7b00425)
 
-## SmilesDrawer 2.0 is out!
-And it now also draws reactions, comes with many new teams and has a cool new website:
-
-[smilesdrawer.rocks](https://smilesdrawer.rocks)
-
-<img src="http://doc.gdb.tools/smilesDrawer/structures.png"></img>
+And it now also draws reactions, comes with many new themes and has a new website:
 
 <h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html">Demo (Canvas)</a></h3>
 <h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_svg.html">Demo (SVG)</a></h3>

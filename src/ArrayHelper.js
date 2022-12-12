@@ -1,5 +1,4 @@
 //@ts-check
-
 /** 
  * A static class containing helper functions for array-related tasks. 
  */
@@ -13,10 +12,10 @@ class ArrayHelper {
      */
     static clone(arr) {
         let out = Array.isArray(arr) ? Array() : {};
-        
+
         for (let key in arr) {
             let value = arr[key];
-            
+
             if (typeof value.clone === 'function') {
                 out[key] = value.clone();
             }
@@ -24,7 +23,7 @@ class ArrayHelper {
                 out[key] = (typeof value === 'object') ? ArrayHelper.clone(value) : value;
             }
         }
-        
+
         return out;
     }
 
@@ -153,7 +152,7 @@ class ArrayHelper {
      */
     static intersection(arrA, arrB) {
         let intersection = new Array();
-        
+
         for (let i = 0; i < arrA.length; i++) {
             for (let j = 0; j < arrB.length; j++) {
                 if (arrA[i] === arrB[j]) {
@@ -326,7 +325,7 @@ class ArrayHelper {
 
         return containing === arrB.length;
     }
-    
+
     /**
      * Sort an array of atomic number information. Where the number is indicated as x, x.y, x.y.z, ...
      *
@@ -336,22 +335,22 @@ class ArrayHelper {
      * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
      */
     static sortByAtomicNumberDesc(arr) {
-        let map = arr.map(function(e, i) {
+        let map = arr.map(function (e, i) {
             return { index: i, value: e.atomicNumber.split('.').map(Number) };
         });
 
-        map.sort(function(a, b) {
+        map.sort(function (a, b) {
             let min = Math.min(b.value.length, a.value.length);
             let i = 0;
-            
-            while(i < min && b.value[i] === a.value[i]) {
+
+            while (i < min && b.value[i] === a.value[i]) {
                 i++;
             }
 
             return i === min ? b.value.length - a.value.length : b.value[i] - a.value[i];
         });
 
-        return map.map(function(e) {
+        return map.map(function (e) {
             return arr[e.index];
         });
     }

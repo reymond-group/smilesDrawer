@@ -3745,6 +3745,11 @@ module.exports = SmilesDrawer;
 
 //@ts-check
 
+/**
+ * (Static) helper functions used to deal with arrays.
+ * @module array-helper
+ */
+
 /** 
  * A static class containing helper functions for array-related tasks. 
  */
