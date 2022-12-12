@@ -12725,7 +12725,7 @@ class ReactionDrawer {
 
       let reactantWeights = null;
 
-      if (weights.hasOwnProperty('reactants') && weights.reactants.length > i) {
+      if (weights && weights.hasOwnProperty('reactants') && weights.reactants.length > i) {
         reactantWeights = weights.reactants[i];
       }
 
@@ -12800,7 +12800,7 @@ class ReactionDrawer {
 
       let productWeights = null;
 
-      if (weights.hasOwnProperty('products') && weights.products.length > i) {
+      if (weights && weights.hasOwnProperty('products') && weights.products.length > i) {
         productWeights = weights.products[i];
       }
 
