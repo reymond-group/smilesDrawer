@@ -4,14 +4,8 @@ No server, no images, no templates, just a SMILES 😊
 
 Current Version: **2.1.2**
 
-<table style="width=100%">
-    <tbody>
-        <tr>
-            <td><h2>New!</h2><br /><a href="smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/blob/master/readme/rxn_highlight.png?raw=true"></img></a></td>
-            <td><a href="https://smilesdrawer.surge.sh/playground.html"><img src="https://github.com/reymond-group/smilesDrawer/blob/e2517224f728ee4acf04ac5dc222b560ac26639c/readme/themes.png?raw=true"></img></a></td>
-        </tr>
-    </tbody>
-</table>
+<a href="https://smilesdrawer.surge.sh/playground.html"><img style="width:500px" src="https://github.com/reymond-group/smilesDrawer/blob/e2517224f728ee4acf04ac5dc222b560ac26639c/readme/themes.png?raw=true"></img></a>
+<a href="smilesdrawer.rocks"><img style="width:500px" src="https://github.com/reymond-group/smilesDrawer/blob/master/readme/rxn_highlight.png?raw=true"></img></a>
 
 ### Please cite
 
