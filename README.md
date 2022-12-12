@@ -9,12 +9,16 @@ Current Version: **2.1.2**
         <tr>
             <td><a href="https://smilesdrawer.rocks">Molecules</a></td>
             <td><a href="https://smilesdrawer.rocks">Reactions & Highlights</a></td>
-            <td><a href="https://smilesdrawer.surge.sh/use.html">Learn & Copy-Paste</a></td>
-            <td><a href="https://smilesdrawer.surge.sh/playground.html">Style & Customize</a></td>
         </tr>
         <tr>
             <td><a href="https://smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/main.png"></img></a></td>
             <td><a href="https://smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/rxn_highlight.png"></img></a></td>
+        </tr>
+        <tr>
+            <td><a href="https://smilesdrawer.surge.sh/use.html">Learn & Copy-Paste</a></td>
+            <td><a href="https://smilesdrawer.surge.sh/playground.html">Style & Customize</a></td>
+        </tr>
+        <tr>
             <td><a href="https://smilesdrawer.surge.sh/use.html"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/learn.png"></img></a></td>
             <td><a href="https://smilesdrawer.surge.sh/playground.html"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/style.png"></img></a></td>
         </tr>
