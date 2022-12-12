@@ -26,6 +26,9 @@ class ReactionDrawer {
                 headSize: 6.0,
                 thickness: 1.0,
                 margin: 3
+            },
+            weights: {
+                normalize: false
             }
         }
 
@@ -51,6 +54,78 @@ class ReactionDrawer {
    */
     draw(reaction, target, themeName = 'light', weights = null, textAbove = '{reagents}', textBelow = '', infoOnly = false) {
         this.themeManager = new ThemeManager(this.molOpts.themes, themeName);
+
+        // Normalize the weights over the reaction molecules
+        if (this.opts.weights.normalize) {
+            let max = -Number.MAX_SAFE_INTEGER;
+            let min = Number.MAX_SAFE_INTEGER;
+
+            if (weights.hasOwnProperty('reactants')) {
+                for (let i = 0; i < weights.reactants.length; i++) {
+                    for (let j = 0; j < weights.reactants[i].length; j++) {
+                        if (weights.reactants[i][j] < min) {
+                            min = weights.reactants[i][j];
+                        }
+                        if (weights.reactants[i][j] > max) {
+                            max = weights.reactants[i][j];
+                        }
+                    }
+                }
+            }
+
+            if (weights.hasOwnProperty('reagents')) {
+                for (let i = 0; i < weights.reagents.length; i++) {
+                    for (let j = 0; j < weights.reagents[i].length; j++) {
+                        if (weights.reagents[i][j] < min) {
+                            min = weights.reagents[i][j];
+                        }
+                        if (weights.reagents[i][j] > max) {
+                            max = weights.reagents[i][j];
+                        }
+                    }
+                }
+            }
+
+            if (weights.hasOwnProperty('products')) {
+                for (let i = 0; i < weights.products.length; i++) {
+                    for (let j = 0; j < weights.products[i].length; j++) {
+                        if (weights.products[i][j] < min) {
+                            min = weights.products[i][j];
+                        }
+                        if (weights.products[i][j] > max) {
+                            max = weights.products[i][j];
+                        }
+                    }
+                }
+            }
+
+            let abs_max = Math.max(Math.abs(min), Math.abs(max));
+
+            if (weights.hasOwnProperty('reactants')) {
+                for (let i = 0; i < weights.reactants.length; i++) {
+                    for (let j = 0; j < weights.reactants[i].length; j++) {
+                        weights.reactants[i][j] /= abs_max;
+                    }
+                }
+            }
+
+            if (weights.hasOwnProperty('reagents')) {
+                for (let i = 0; i < weights.reagents.length; i++) {
+                    for (let j = 0; j < weights.reagents[i].length; j++) {
+                        weights.reagents[i][j] /= abs_max;
+                    }
+                }
+            }
+
+            if (weights.hasOwnProperty('products')) {
+                for (let i = 0; i < weights.products.length; i++) {
+                    for (let j = 0; j < weights.products[i].length; j++) {
+                        weights.products[i][j] /= abs_max;
+                    }
+                }
+            }
+        }
+
         let svg = null;
 
         if (target === null || target === 'svg') {
@@ -89,7 +164,7 @@ class ReactionDrawer {
 
             let reactantSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-            this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, reactantWeights, infoOnly);
+            this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, reactantWeights, infoOnly, [], this.opts.weights.normalize);
 
             let element = {
                 width: reactantSvg.viewBox.baseVal.width * this.opts.scale,
@@ -171,8 +246,8 @@ class ReactionDrawer {
         for (var i = 0; i < reaction.products.length; i++) {
             if (i > 0) {
                 elements.push({
-                    width: this.opts.plus.size,
-                    height: this.opts.plus.size,
+                    width: this.opts.plus.size * this.opts.scale,
+                    height: this.opts.plus.size * this.opts.scale,
                     svg: this.getPlus()
                 });
             }
@@ -184,7 +259,7 @@ class ReactionDrawer {
 
             let productSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-            this.drawer.draw(reaction.products[i], productSvg, themeName, productWeights, infoOnly);
+            this.drawer.draw(reaction.products[i], productSvg, themeName, productWeights, infoOnly, [], this.opts.weights.normalize);
 
             let element = {
                 width: productSvg.viewBox.baseVal.width * this.opts.scale,

@@ -70,9 +70,9 @@ class DrawerBase {
       weights: {
         colormap: null,
         additionalPadding: 20.0,
-        sigma: 10.0,
+        sigma: 10,
         interval: 0.0,
-        opacity: 0.5,
+        opacity: 1.0,
       },
       themes: {
         dark: {

@@ -154,7 +154,6 @@ class SvgWrapper {
    * Add a background to the svg.
    */
   addLayer(svg) {
-    console.log(svg.firstChild);
     this.backgroundItems.push(svg.firstChild);
   }
 

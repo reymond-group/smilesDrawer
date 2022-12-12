@@ -5709,9 +5709,9 @@ class DrawerBase {
       weights: {
         colormap: null,
         additionalPadding: 20.0,
-        sigma: 10.0,
+        sigma: 10,
         interval: 0.0,
-        opacity: 0.5
+        opacity: 1.0
       },
       themes: {
         dark: {
@@ -8832,7 +8832,7 @@ class GaussDrawer {
   * @param {Vector2[]} points The centres of the gaussians.
   * @param {Number[]} weights The weights / amplitudes for each gaussian.
   */
-  constructor(points, weights, width, height, sigma = 0.3, interval = 0, colormap = null, opacity = 1.0) {
+  constructor(points, weights, width, height, sigma = 0.3, interval = 0, colormap = null, opacity = 1.0, normalized = false) {
     this.points = points;
     this.weights = weights;
     this.width = width;
@@ -8840,6 +8840,7 @@ class GaussDrawer {
     this.sigma = sigma;
     this.interval = interval;
     this.opacity = opacity;
+    this.normalized = normalized;
 
     if (colormap === null) {
       let piyg11 = ["#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#ffffff", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"];
@@ -8895,28 +8896,34 @@ class GaussDrawer {
       }
     }
 
-    let max = -Number.MAX_SAFE_INTEGER;
-    let min = Number.MAX_SAFE_INTEGER;
+    let abs_max = 1.0;
 
-    for (let x = 0; x < this.width; x++) {
-      for (let y = 0; y < this.height; y++) {
-        if (m[x][y] < min) {
-          min = m[x][y];
-        }
+    if (!this.normalized) {
+      let max = -Number.MAX_SAFE_INTEGER;
+      let min = Number.MAX_SAFE_INTEGER;
 
-        if (m[x][y] > max) {
-          max = m[x][y];
+      for (let x = 0; x < this.width; x++) {
+        for (let y = 0; y < this.height; y++) {
+          if (m[x][y] < min) {
+            min = m[x][y];
+          }
+
+          if (m[x][y] > max) {
+            max = m[x][y];
+          }
         }
       }
+
+      abs_max = Math.max(Math.abs(min), Math.abs(max));
     }
 
-    let abs_max = Math.max(Math.abs(min), Math.abs(max));
-
-    const scale = _chromaJs2.default.scale(this.colormap).domain([-abs_max, abs_max]);
+    const scale = _chromaJs2.default.scale(this.colormap).domain([-1.0, 1.0]);
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        m[x][y] = m[x][y] / abs_max;
+        if (!this.normalized) {
+          m[x][y] = m[x][y] / abs_max;
+        }
 
         if (this.interval !== 0) {
           m[x][y] = Math.round(m[x][y] / this.interval) * this.interval;
@@ -12586,6 +12593,9 @@ class ReactionDrawer {
         headSize: 6.0,
         thickness: 1.0,
         margin: 3
+      },
+      weights: {
+        normalize: false
       }
     };
     this.opts = Options.extend(true, this.defaultOptions, options);
@@ -12609,7 +12619,81 @@ class ReactionDrawer {
 
 
   draw(reaction, target, themeName = 'light', weights = null, textAbove = '{reagents}', textBelow = '', infoOnly = false) {
-    this.themeManager = new ThemeManager(this.molOpts.themes, themeName);
+    this.themeManager = new ThemeManager(this.molOpts.themes, themeName); // Normalize the weights over the reaction molecules
+
+    if (this.opts.weights.normalize) {
+      let max = -Number.MAX_SAFE_INTEGER;
+      let min = Number.MAX_SAFE_INTEGER;
+
+      if (weights.hasOwnProperty('reactants')) {
+        for (let i = 0; i < weights.reactants.length; i++) {
+          for (let j = 0; j < weights.reactants[i].length; j++) {
+            if (weights.reactants[i][j] < min) {
+              min = weights.reactants[i][j];
+            }
+
+            if (weights.reactants[i][j] > max) {
+              max = weights.reactants[i][j];
+            }
+          }
+        }
+      }
+
+      if (weights.hasOwnProperty('reagents')) {
+        for (let i = 0; i < weights.reagents.length; i++) {
+          for (let j = 0; j < weights.reagents[i].length; j++) {
+            if (weights.reagents[i][j] < min) {
+              min = weights.reagents[i][j];
+            }
+
+            if (weights.reagents[i][j] > max) {
+              max = weights.reagents[i][j];
+            }
+          }
+        }
+      }
+
+      if (weights.hasOwnProperty('products')) {
+        for (let i = 0; i < weights.products.length; i++) {
+          for (let j = 0; j < weights.products[i].length; j++) {
+            if (weights.products[i][j] < min) {
+              min = weights.products[i][j];
+            }
+
+            if (weights.products[i][j] > max) {
+              max = weights.products[i][j];
+            }
+          }
+        }
+      }
+
+      let abs_max = Math.max(Math.abs(min), Math.abs(max));
+
+      if (weights.hasOwnProperty('reactants')) {
+        for (let i = 0; i < weights.reactants.length; i++) {
+          for (let j = 0; j < weights.reactants[i].length; j++) {
+            weights.reactants[i][j] /= abs_max;
+          }
+        }
+      }
+
+      if (weights.hasOwnProperty('reagents')) {
+        for (let i = 0; i < weights.reagents.length; i++) {
+          for (let j = 0; j < weights.reagents[i].length; j++) {
+            weights.reagents[i][j] /= abs_max;
+          }
+        }
+      }
+
+      if (weights.hasOwnProperty('products')) {
+        for (let i = 0; i < weights.products.length; i++) {
+          for (let j = 0; j < weights.products[i].length; j++) {
+            weights.products[i][j] /= abs_max;
+          }
+        }
+      }
+    }
+
     let svg = null;
 
     if (target === null || target === 'svg') {
@@ -12646,7 +12730,7 @@ class ReactionDrawer {
       }
 
       let reactantSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, reactantWeights, infoOnly);
+      this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, reactantWeights, infoOnly, [], this.opts.weights.normalize);
       let element = {
         width: reactantSvg.viewBox.baseVal.width * this.opts.scale,
         height: reactantSvg.viewBox.baseVal.height * this.opts.scale,
@@ -12708,8 +12792,8 @@ class ReactionDrawer {
     for (var i = 0; i < reaction.products.length; i++) {
       if (i > 0) {
         elements.push({
-          width: this.opts.plus.size,
-          height: this.opts.plus.size,
+          width: this.opts.plus.size * this.opts.scale,
+          height: this.opts.plus.size * this.opts.scale,
           svg: this.getPlus()
         });
       }
@@ -12721,7 +12805,7 @@ class ReactionDrawer {
       }
 
       let productSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      this.drawer.draw(reaction.products[i], productSvg, themeName, productWeights, infoOnly);
+      this.drawer.draw(reaction.products[i], productSvg, themeName, productWeights, infoOnly, [], this.opts.weights.normalize);
       let element = {
         width: productSvg.viewBox.baseVal.width * this.opts.scale,
         height: productSvg.viewBox.baseVal.height * this.opts.scale,
@@ -14260,7 +14344,7 @@ class SvgDrawer {
    */
 
 
-  draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = []) {
+  draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
     if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -14301,7 +14385,7 @@ class SvgDrawer {
     this.drawVertices(preprocessor.opts.debug);
 
     if (weights !== null) {
-      this.drawWeights(weights);
+      this.drawWeights(weights, weightsNormalized);
     }
 
     if (preprocessor.opts.debug) {
@@ -14620,7 +14704,7 @@ class SvgDrawer {
    */
 
 
-  drawWeights(weights) {
+  drawWeights(weights, weightsNormalized) {
     if (weights.every(w => w === 0)) {
       return;
     }
@@ -14636,7 +14720,7 @@ class SvgDrawer {
       points.push(new Vector2(vertex.position.x - this.svgWrapper.minX, vertex.position.y - this.svgWrapper.minY));
     }
 
-    let gd = new GaussDrawer(points, weights, this.svgWrapper.drawingWidth, this.svgWrapper.drawingHeight, this.opts.weights.sigma, this.opts.weights.interval, this.opts.weights.colormap, this.opts.weights.opacity);
+    let gd = new GaussDrawer(points, weights, this.svgWrapper.drawingWidth, this.svgWrapper.drawingHeight, this.opts.weights.sigma, this.opts.weights.interval, this.opts.weights.colormap, this.opts.weights.opacity, weightsNormalized);
     gd.draw();
     this.svgWrapper.addLayer(gd.getSVG());
   }
@@ -14830,7 +14914,6 @@ class SvgWrapper {
 
 
   addLayer(svg) {
-    console.log(svg.firstChild);
     this.backgroundItems.push(svg.firstChild);
   }
   /**

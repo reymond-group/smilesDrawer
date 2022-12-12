@@ -28,7 +28,7 @@ class SvgDrawer {
    *
    * @returns {SVGElement} The svg element
    */
-  draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = []) {
+  draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
     if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -72,7 +72,7 @@ class SvgDrawer {
     this.drawVertices(preprocessor.opts.debug);
 
     if (weights !== null) {
-      this.drawWeights(weights);
+      this.drawWeights(weights, weightsNormalized);
     }
 
     if (preprocessor.opts.debug) {
@@ -406,7 +406,7 @@ class SvgDrawer {
    * Draw the weights on a background image.
    * @param {Number[]} weights The weights assigned to each atom.
    */
-  drawWeights(weights) {
+  drawWeights(weights, weightsNormalized) {
     if (weights.every(w => w === 0)) {
       return;
     }
@@ -428,7 +428,7 @@ class SvgDrawer {
     let gd = new GaussDrawer(
       points, weights, this.svgWrapper.drawingWidth, this.svgWrapper.drawingHeight,
       this.opts.weights.sigma, this.opts.weights.interval, this.opts.weights.colormap,
-      this.opts.weights.opacity
+      this.opts.weights.opacity, weightsNormalized
     );
 
     gd.draw();

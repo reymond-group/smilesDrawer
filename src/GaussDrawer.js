@@ -10,7 +10,7 @@ class GaussDrawer {
    * @param {Vector2[]} points The centres of the gaussians.
    * @param {Number[]} weights The weights / amplitudes for each gaussian.
    */
-    constructor(points, weights, width, height, sigma = 0.3, interval = 0, colormap = null, opacity = 1.0) {
+    constructor(points, weights, width, height, sigma = 0.3, interval = 0, colormap = null, opacity = 1.0, normalized = false) {
         this.points = points;
         this.weights = weights;
         this.width = width;
@@ -18,6 +18,7 @@ class GaussDrawer {
         this.sigma = sigma;
         this.interval = interval;
         this.opacity = opacity;
+        this.normalized = normalized;
 
         if (colormap === null) {
             let piyg11 = [
@@ -51,6 +52,7 @@ class GaussDrawer {
      */
     draw() {
         let m = [];
+
         for (let x = 0; x < this.width; x++) {
             let row = [];
             for (let y = 0; y < this.height; y++) {
@@ -74,27 +76,34 @@ class GaussDrawer {
             }
         }
 
-        let max = -Number.MAX_SAFE_INTEGER;
-        let min = Number.MAX_SAFE_INTEGER;
+        let abs_max = 1.0;
 
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                if (m[x][y] < min) {
-                    min = m[x][y];
-                }
+        if (!this.normalized) {
+            let max = -Number.MAX_SAFE_INTEGER;
+            let min = Number.MAX_SAFE_INTEGER;
 
-                if (m[x][y] > max) {
-                    max = m[x][y];
+            for (let x = 0; x < this.width; x++) {
+                for (let y = 0; y < this.height; y++) {
+                    if (m[x][y] < min) {
+                        min = m[x][y];
+                    }
+
+                    if (m[x][y] > max) {
+                        max = m[x][y];
+                    }
                 }
             }
+
+            abs_max = Math.max(Math.abs(min), Math.abs(max));
         }
 
-        let abs_max = Math.max(Math.abs(min), Math.abs(max));
-        const scale = chroma.scale(this.colormap).domain([-abs_max, abs_max]);
+        const scale = chroma.scale(this.colormap).domain([-1.0, 1.0]);
 
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                m[x][y] = m[x][y] / abs_max;
+                if (!this.normalized) {
+                    m[x][y] = m[x][y] / abs_max;
+                }
 
                 if (this.interval !== 0) {
                     m[x][y] = Math.round(m[x][y] / this.interval) * this.interval;
