@@ -9,7 +9,7 @@ If you use this code or application, please cite the original paper published by
 ## SmilesDrawer 2.0 is out!
 And it now also draws reactions, comes with many new teams and has a cool new website:
 
-[smilesdrawer.rocks](https://www.smilesdrawer.rocks)
+[smilesdrawer.rocks](https://smilesdrawer.rocks)
 
 <img src="http://doc.gdb.tools/smilesDrawer/structures.png"></img>
 
