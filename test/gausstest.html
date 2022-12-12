@@ -7,17 +7,19 @@
 </head>
 
 <body>
-    <svg id="svgExample" style="width:400px" />
+    <!--<canvas id="example" style="width:400px" />
+    <br>-->
+    <img data-smiles="CNO" data-smiles-options="{ 'width': 800, 'height': 800 }" data-smiles-weights="-1.0,0.5,1.0" />
     <br>
+    <svg data-smiles="C=CCBr.[Na+].[I-]>CC(=O)C>C=CCI.[Na+].[Br-]  __{'textBelowArrow': '90%'}__"
+        data-smiles-reactant-weights="0,0,0,1;0.5;0" />
     <script src=" ../dist/smiles-drawer.min.js"></script>
     <script>
-        let gd = new SmilesDrawer.GaussDrawer([], [], 200, 200, 20);
-        gd.setFromArray([[65, 65], [95, 95], [125, 125]], [0.5, 1, 0.5]);
-        gd.draw();
-        gd.getImage(img => document.body.append(img));
-
-        let sd = new SmiDrawer();
-        sd.draw('OC(C(=O)O[C@H]1C[N+]2(CCCOC3=CC=CC=C3)CCC1CC2)(C1=CC=CS1)C1=CC=CS1', '#svgExample')
+        {
+            {/*  let sd = new SmiDrawer();
+        sd.draw('OC(C(=O)O[C@H]1C[N+]2(CCCOC3=CC=CC=C3)CCC1CC2)(C1=CC=CS1)C1=CC=CS1', '#example', 'light', null, null, [1, 1, 1, 1, 1, 1])  */}
+        }
+        SmiDrawer.apply();
     </script>
 </body>
 

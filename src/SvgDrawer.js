@@ -8,6 +8,7 @@ const Line = require('./Line');
 const SvgWrapper = require('./SvgWrapper');
 const ThemeManager = require('./ThemeManager');
 const Vector2 = require('./Vector2');
+const GaussDrawer = require('./GaussDrawer')
 
 class SvgDrawer {
   constructor(options, clear = true) {
@@ -21,13 +22,13 @@ class SvgDrawer {
    * Draws the parsed smiles data to an svg element.
    *
    * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+   * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    *
    * @returns {SVGElement} The svg element
    */
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
+  draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = []) {
     if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -36,6 +37,17 @@ class SvgDrawer {
       target.setAttributeNS(null, 'height', this.opts.height);
     } else if (target instanceof String) {
       target = document.getElementById(target);
+    }
+
+    let optionBackup = {
+      padding: this.opts.padding,
+      compactDrawing: this.opts.compactDrawing
+    };
+
+    // Overwrite options when weights are added
+    if (weights !== null) {
+      this.opts.padding += this.opts.weights.additionalPadding;
+      this.opts.compactDrawing = false;
     }
 
     let preprocessor = this.preprocessor;
@@ -59,6 +71,10 @@ class SvgDrawer {
     this.drawEdges(preprocessor.opts.debug);
     this.drawVertices(preprocessor.opts.debug);
 
+    if (weights !== null) {
+      this.drawWeights(weights);
+    }
+
     if (preprocessor.opts.debug) {
       console.log(preprocessor.graph);
       console.log(preprocessor.rings);
@@ -66,6 +82,13 @@ class SvgDrawer {
     }
 
     this.svgWrapper.constructSvg();
+
+    // Reset options in case weights were added.
+    if (weights !== null) {
+      this.opts.padding = optionBackup.padding;
+      this.opts.compactDrawing = optionBackup.padding;
+    }
+
     return target;
   }
 
@@ -277,7 +300,7 @@ class SvgDrawer {
    * 
    * @param {Boolean} debug 
    */
-  drawAtomHighlights(debug){
+  drawAtomHighlights(debug) {
     let preprocessor = this.preprocessor;
     let opts = preprocessor.opts;
     let graph = preprocessor.graph;
@@ -288,9 +311,9 @@ class SvgDrawer {
       let vertex = graph.vertices[i];
       let atom = vertex.value;
 
-      for (var j = 0; j < preprocessor.highlight_atoms.length; j++){
+      for (var j = 0; j < preprocessor.highlight_atoms.length; j++) {
         let highlight = preprocessor.highlight_atoms[j]
-        if (atom.class === highlight[0]){
+        if (atom.class === highlight[0]) {
           svgWrapper.drawAtomHighlight(vertex.position.x, vertex.position.y, highlight[1]);
         }
       }
@@ -377,6 +400,39 @@ class SvgDrawer {
         svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
       }
     }
+  }
+
+  /**
+   * Draw the weights on a background image.
+   * @param {Number[]} weights The weights assigned to each atom.
+   */
+  drawWeights(weights) {
+    if (weights.every(w => w === 0)) {
+      return;
+    }
+
+    if (weights.length !== this.preprocessor.graph.atomIdxToVertexId.length) {
+      throw new Error('The number of weights supplied must be equal to the number of (heavy) atoms in the molecule.');
+    }
+
+    let points = [];
+
+    for (const atomIdx of this.preprocessor.graph.atomIdxToVertexId) {
+      let vertex = this.preprocessor.graph.vertices[atomIdx];
+      points.push(new Vector2(
+        vertex.position.x - this.svgWrapper.minX,
+        vertex.position.y - this.svgWrapper.minY)
+      );
+    }
+
+    let gd = new GaussDrawer(
+      points, weights, this.svgWrapper.drawingWidth, this.svgWrapper.drawingHeight,
+      this.opts.weights.sigma, this.opts.weights.interval, this.opts.weights.colormap,
+      this.opts.weights.opacity
+    );
+
+    gd.draw();
+    this.svgWrapper.addLayer(gd.getSVG());
   }
 
   /**

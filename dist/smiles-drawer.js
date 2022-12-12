@@ -155,7 +155,7 @@ if (!Array.prototype.fill) {
 
 module.exports = SmilesDrawer;
 
-},{"./src/Drawer":6,"./src/GaussDrawer":10,"./src/Parser":15,"./src/ReactionDrawer":17,"./src/ReactionParser":18,"./src/SmilesDrawer":22,"./src/SvgDrawer":23}],2:[function(require,module,exports){
+},{"./src/Drawer":6,"./src/GaussDrawer":10,"./src/Parser":15,"./src/ReactionDrawer":18,"./src/ReactionParser":19,"./src/SmilesDrawer":23,"./src/SvgDrawer":24}],2:[function(require,module,exports){
 /**
  * chroma.js - JavaScript library for color conversions
  *
@@ -4709,7 +4709,7 @@ class Atom {
 
 module.exports = Atom;
 
-},{"./ArrayHelper":3,"./Ring":19,"./Vertex":28}],5:[function(require,module,exports){
+},{"./ArrayHelper":3,"./Ring":20,"./Vertex":29}],5:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5541,7 +5541,7 @@ class CanvasWrapper {
 
 module.exports = CanvasWrapper;
 
-},{"./Line":12,"./MathHelper":13,"./Ring":19,"./UtilityFunctions":26,"./Vector2":27,"./Vertex":28}],6:[function(require,module,exports){
+},{"./Line":12,"./MathHelper":13,"./Ring":20,"./UtilityFunctions":27,"./Vector2":28,"./Vertex":29}],6:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5621,7 +5621,7 @@ class Drawer {
 
 module.exports = Drawer;
 
-},{"./SvgDrawer":23}],7:[function(require,module,exports){
+},{"./SvgDrawer":24}],7:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -5706,6 +5706,13 @@ class DrawerBase {
       kkMaxIteration: 20000,
       kkMaxInnerIteration: 50,
       kkMaxEnergy: 1e9,
+      weights: {
+        colormap: null,
+        additionalPadding: 20.0,
+        sigma: 10.0,
+        interval: 0.0,
+        opacity: 0.5
+      },
       themes: {
         dark: {
           C: '#fff',
@@ -8699,7 +8706,7 @@ class DrawerBase {
 
 module.exports = DrawerBase;
 
-},{"./ArrayHelper":3,"./Atom":4,"./CanvasWrapper":5,"./Edge":8,"./Graph":11,"./Line":12,"./MathHelper":13,"./Options":14,"./Ring":19,"./RingConnection":20,"./SSSR":21,"./ThemeManager":25,"./Vector2":27,"./Vertex":28}],8:[function(require,module,exports){
+},{"./ArrayHelper":3,"./Atom":4,"./CanvasWrapper":5,"./Edge":8,"./Graph":11,"./Line":12,"./MathHelper":13,"./Options":14,"./Ring":20,"./RingConnection":21,"./SSSR":22,"./ThemeManager":26,"./Vector2":28,"./Vertex":29}],8:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -8816,6 +8823,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 const Vector2 = require('./Vector2');
 
+const convertImage = require('./PixelsToSvg');
+
 class GaussDrawer {
   /**
   * The constructor of the class Graph.
@@ -8823,15 +8832,18 @@ class GaussDrawer {
   * @param {Vector2[]} points The centres of the gaussians.
   * @param {Number[]} weights The weights / amplitudes for each gaussian.
   */
-  constructor(points, weights, width, height, sigma = 0.3, colormap = null) {
+  constructor(points, weights, width, height, sigma = 0.3, interval = 0, colormap = null, opacity = 1.0) {
     this.points = points;
     this.weights = weights;
     this.width = width;
     this.height = height;
     this.sigma = sigma;
+    this.interval = interval;
+    this.opacity = opacity;
 
     if (colormap === null) {
-      colormap = ['#00876c', '#469b83', '#6eaf9a', '#93c3b3', '#b7d7cc', '#dbebe5', '#ffffff', '#fde0e0', '#f9c2c1', '#f3a3a4', '#eb8387', '#e0636b', '#d43d51'].reverse();
+      let piyg11 = ["#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#ffffff", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"];
+      colormap = piyg11;
     }
 
     this.colormap = colormap;
@@ -8846,6 +8858,7 @@ class GaussDrawer {
     arr_points.forEach(a => {
       this.points.push(new Vector2(a[0], a[1]));
     });
+    this.weights = [];
     arr_weights.forEach(w => {
       this.weights.push(w);
     });
@@ -8897,17 +8910,20 @@ class GaussDrawer {
       }
     }
 
-    console.log(min, max);
     let abs_max = Math.max(Math.abs(min), Math.abs(max));
 
     const scale = _chromaJs2.default.scale(this.colormap).domain([-abs_max, abs_max]);
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
-        // m[x][y] = (m[x][y] - min) / (max - min);
         m[x][y] = m[x][y] / abs_max;
+
+        if (this.interval !== 0) {
+          m[x][y] = Math.round(m[x][y] / this.interval) * this.interval;
+        }
+
         let [r, g, b] = scale(m[x][y]).rgb();
-        this.setPixel(new Vector2(x, y), r, g, b, 255);
+        this.setPixel(new Vector2(x, y), r, g, b);
       }
     }
   }
@@ -8937,6 +8953,16 @@ class GaussDrawer {
     image.src = this.canvas.toDataURL();
   }
   /**
+   * Get the canvas as an SVG element.
+   * 
+   * @param {CallableFunction} callback
+   */
+
+
+  getSVG() {
+    return convertImage(this.context.getImageData(0, 0, this.width, this.height));
+  }
+  /**
    * Set the colour at a specific point on the canvas.
    * 
    * @param {Vector2} vec The pixel position on the canvas.
@@ -8947,8 +8973,8 @@ class GaussDrawer {
    */
 
 
-  setPixel(vec, r, g, b, a) {
-    this.context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + a / 255 + ")";
+  setPixel(vec, r, g, b) {
+    this.context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + this.opacity + ")";
     this.context.fillRect(vec.x, vec.y, 1, 1);
   }
 
@@ -8956,7 +8982,7 @@ class GaussDrawer {
 
 module.exports = GaussDrawer;
 
-},{"./Vector2":27,"chroma-js":2}],11:[function(require,module,exports){
+},{"./PixelsToSvg":16,"./Vector2":28,"chroma-js":2}],11:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -9027,12 +9053,12 @@ class Graph {
     atom.class = node.atom.class;
     let vertex = new Vertex(atom);
     let parentVertex = this.vertices[parentVertexId];
+    this.addVertex(vertex);
 
     if (atom.idx !== null) {
       this.atomIdxToVertexId.push(vertex.id);
-    }
+    } // Add the id of this node to the parent as child
 
-    this.addVertex(vertex); // Add the id of this node to the parent as child
 
     if (parentVertexId !== null) {
       vertex.setParentVertexId(parentVertexId);
@@ -9919,7 +9945,7 @@ class Graph {
 
 module.exports = Graph;
 
-},{"./Atom":4,"./Edge":8,"./MathHelper":13,"./Ring":19,"./Vector2":27,"./Vertex":28}],12:[function(require,module,exports){
+},{"./Atom":4,"./Edge":8,"./MathHelper":13,"./Ring":20,"./Vector2":28,"./Vertex":29}],12:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -10228,7 +10254,7 @@ class Line {
 
 module.exports = Line;
 
-},{"./Vector2":27}],13:[function(require,module,exports){
+},{"./Vector2":28}],13:[function(require,module,exports){
 "use strict";
 
 /** 
@@ -12347,6 +12373,129 @@ module.exports = function () {
 },{}],16:[function(require,module,exports){
 "use strict";
 
+// Adapted from https://codepen.io/shshaw/pen/XbxvNj by 
+function convertImage(img) {
+  "use strict";
+
+  function each(obj, fn) {
+    var length = obj.length,
+        likeArray = length === 0 || length > 0 && length - 1 in obj,
+        i = 0;
+
+    if (likeArray) {
+      for (; i < length; i++) {
+        if (fn.call(obj[i], i, obj[i]) === false) {
+          break;
+        }
+      }
+    } else {
+      for (i in obj) {
+        if (fn.call(obj[i], i, obj[i]) === false) {
+          break;
+        }
+      }
+    }
+  }
+
+  function componentToHex(c) {
+    var hex = parseInt(c).toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+
+  function getColor(r, g, b, a) {
+    a = parseInt(a);
+
+    if (a === undefined || a === 255) {
+      return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
+
+    if (a === 0) {
+      return false;
+    }
+
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a / 255 + ')';
+  } // Optimized for horizontal lines
+
+
+  function makePathData(x, y, w) {
+    return 'M' + x + ' ' + y + 'h' + w + '';
+  }
+
+  function makePath(color, data) {
+    return '<path stroke="' + color + '" d="' + data + '" />\n';
+  }
+
+  function colorsToPaths(colors) {
+    var output = ""; // Loop through each color to build paths
+
+    each(colors, function (color, values) {
+      var orig = color;
+      color = getColor.apply(null, color.split(','));
+
+      if (color === false) {
+        return;
+      }
+
+      var paths = [];
+      var curPath;
+      var w = 1; // Loops through each color's pixels to optimize paths
+
+      each(values, function () {
+        if (curPath && this[1] === curPath[1] && this[0] === curPath[0] + w) {
+          w++;
+        } else {
+          if (curPath) {
+            paths.push(makePathData(curPath[0], curPath[1], w));
+            w = 1;
+          }
+
+          curPath = this;
+        }
+      });
+      paths.push(makePathData(curPath[0], curPath[1], w)); // Finish last path
+
+      output += makePath(color, paths.join(''));
+    });
+    return output;
+  }
+
+  var getColors = function (img) {
+    var colors = {},
+        data = img.data,
+        len = data.length,
+        w = img.width,
+        h = img.height,
+        x = 0,
+        y = 0,
+        i = 0,
+        color;
+
+    for (; i < len; i += 4) {
+      if (data[i + 3] > 0) {
+        color = data[i] + ',' + data[i + 1] + ',' + data[i + 2] + ',' + data[i + 3];
+        colors[color] = colors[color] || [];
+        x = i / 4 % w;
+        y = Math.floor(i / 4 / w);
+        colors[color].push([x, y]);
+      }
+    }
+
+    return colors;
+  };
+
+  let colors = getColors(img);
+  let paths = colorsToPaths(colors);
+  let output = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 ' + img.width + ' ' + img.height + '" shape-rendering="crispEdges"><g shape-rendering="crispEdges">' + paths + '</g></svg>';
+  var dummyDiv = document.createElement('div');
+  dummyDiv.innerHTML = output;
+  return dummyDiv.firstChild;
+}
+
+module.exports = convertImage;
+
+},{}],17:[function(require,module,exports){
+"use strict";
+
 4; //@ts-check
 
 const Parser = require('./Parser');
@@ -12361,6 +12510,9 @@ class Reaction {
     this.reactantsSmiles = [];
     this.reagentsSmiles = [];
     this.productsSmiles = [];
+    this.reactantsWeights = [];
+    this.reagentsWeights = [];
+    this.productsWeights = [];
     this.reactants = [];
     this.reagents = [];
     this.products = [];
@@ -12399,7 +12551,7 @@ class Reaction {
 
 module.exports = Reaction;
 
-},{"./Parser":15}],17:[function(require,module,exports){
+},{"./Parser":15}],18:[function(require,module,exports){
 "use strict";
 
 const SvgDrawer = require('./SvgDrawer');
@@ -12446,13 +12598,17 @@ class ReactionDrawer {
   * @param {Object} reaction The reaction object returned by the reaction smiles parser.
   * @param {(String|SVGElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+  * @param {?Object} weights=null The weights for reactants, agents, and products.
+  * @param {String} textAbove='{reagents}' The text above the arrow.
+  * @param {String} textBelow='' The text below the arrow.
+  * @param {?Object} weights=null The weights for reactants, agents, and products.
   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
   * 
   * @returns {SVGElement} The svg element
   */
 
 
-  draw(reaction, target, themeName = 'light', textAbove = '{reagents}', textBelow = '', infoOnly = false) {
+  draw(reaction, target, themeName = 'light', weights = null, textAbove = '{reagents}', textBelow = '', infoOnly = false) {
     this.themeManager = new ThemeManager(this.molOpts.themes, themeName);
     let svg = null;
 
@@ -12483,8 +12639,14 @@ class ReactionDrawer {
         });
       }
 
+      let reactantWeights = null;
+
+      if (weights.hasOwnProperty('reactants') && weights.reactants.length > i) {
+        reactantWeights = weights.reactants[i];
+      }
+
       let reactantSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, infoOnly);
+      this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, reactantWeights, infoOnly);
       let element = {
         width: reactantSvg.viewBox.baseVal.width * this.opts.scale,
         height: reactantSvg.viewBox.baseVal.height * this.opts.scale,
@@ -12552,8 +12714,14 @@ class ReactionDrawer {
         });
       }
 
+      let productWeights = null;
+
+      if (weights.hasOwnProperty('products') && weights.products.length > i) {
+        productWeights = weights.products[i];
+      }
+
       let productSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      this.drawer.draw(reaction.products[i], productSvg, themeName, infoOnly);
+      this.drawer.draw(reaction.products[i], productSvg, themeName, productWeights, infoOnly);
       let element = {
         width: productSvg.viewBox.baseVal.width * this.opts.scale,
         height: productSvg.viewBox.baseVal.height * this.opts.scale,
@@ -12672,7 +12840,7 @@ class ReactionDrawer {
 
 module.exports = ReactionDrawer;
 
-},{"./FormulaToCommonName":9,"./Options":14,"./SvgDrawer":23,"./SvgWrapper":24,"./ThemeManager":25}],18:[function(require,module,exports){
+},{"./FormulaToCommonName":9,"./Options":14,"./SvgDrawer":24,"./SvgWrapper":25,"./ThemeManager":26}],19:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -12694,7 +12862,7 @@ class ReactionParser {
 
 module.exports = ReactionParser;
 
-},{"./Reaction":16}],19:[function(require,module,exports){
+},{"./Reaction":17}],20:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -12916,7 +13084,7 @@ class Ring {
 
 module.exports = Ring;
 
-},{"./ArrayHelper":3,"./RingConnection":20,"./Vector2":27,"./Vertex":28}],20:[function(require,module,exports){
+},{"./ArrayHelper":3,"./RingConnection":21,"./Vector2":28,"./Vertex":29}],21:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -13090,7 +13258,7 @@ class RingConnection {
 
 module.exports = RingConnection;
 
-},{"./Ring":19,"./Vertex":28}],21:[function(require,module,exports){
+},{"./Ring":20,"./Vertex":29}],22:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -13701,7 +13869,7 @@ class SSSR {
 
 module.exports = SSSR;
 
-},{"./Graph":11}],22:[function(require,module,exports){
+},{"./Graph":11}],23:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -13735,10 +13903,46 @@ class SmilesDrawer {
     let elements = document.querySelectorAll(`[${attribute}]`);
     elements.forEach(element => {
       let smiles = element.getAttribute(attribute);
+
+      if (smiles === null) {
+        throw Error('No SMILES provided.');
+      }
+
       let currentTheme = theme;
+      let weights = null;
 
       if (element.hasAttribute('data-smiles-theme')) {
         currentTheme = element.getAttribute('data-smiles-theme');
+      }
+
+      if (element.hasAttribute('data-smiles-weights')) {
+        weights = element.getAttribute('data-smiles-weights').split(",").map(parseFloat);
+      }
+
+      if (element.hasAttribute('data-smiles-reactant-weights') || element.hasAttribute('data-smiles-reagent-weights') || element.hasAttribute('data-smiles-product-weights')) {
+        weights = {
+          reactants: [],
+          reagents: [],
+          products: []
+        };
+
+        if (element.hasAttribute('data-smiles-reactant-weights')) {
+          weights.reactants = element.getAttribute('data-smiles-reactant-weights').split(';').map(v => {
+            return v.split(',').map(parseFloat);
+          });
+        }
+
+        if (element.hasAttribute('data-smiles-reagent-weights')) {
+          weights.reagents = element.getAttribute('data-smiles-reagent-weights').split(';').map(v => {
+            return v.split(',').map(parseFloat);
+          });
+        }
+
+        if (element.hasAttribute('data-smiles-product-weights')) {
+          weights.products = element.getAttribute('data-smiles-product-weights').split(';').map(v => {
+            return v.split(',').map(parseFloat);
+          });
+        }
       }
 
       if (element.hasAttribute('data-smiles-options') || element.hasAttribute('data-smiles-reaction-options')) {
@@ -13755,14 +13959,24 @@ class SmilesDrawer {
         }
 
         let smilesDrawer = new SmilesDrawer(moleculeOptions, reactionOptions);
-        smilesDrawer.draw(smiles, element, currentTheme, successCallback = null, errorCallback = null);
+        smilesDrawer.draw(smiles, element, currentTheme, successCallback, errorCallback, weights);
       } else {
-        this.draw(smiles, element, currentTheme, successCallback = null, errorCallback = null);
+        this.draw(smiles, element, currentTheme, successCallback, errorCallback, weights);
       }
     });
   }
+  /**
+   * Draw the smiles to the target.
+   * @param {String} smiles The SMILES to be depicted.
+   * @param {*} target The target element.
+   * @param {String} theme The theme.
+   * @param {?CallableFunction} successCallback The function called on success.
+   * @param {?CallableFunction} errorCallback The function called on error.
+   * @param {?Number[]|Object} weights The weights for the gaussians.
+   */
 
-  draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null, weights = []) {
+
+  draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null, weights = null) {
     // get the settings
     let rest = [];
     [smiles, ...rest] = smiles.split(' ');
@@ -13782,7 +13996,7 @@ class SmilesDrawer {
 
     if (smiles.includes('>')) {
       try {
-        this.drawReaction(smiles, target, theme, settings, successCallback);
+        this.drawReaction(smiles, target, theme, settings, weights, successCallback);
       } catch (err) {
         if (errorCallback) {
           errorCallback(err);
@@ -13807,7 +14021,7 @@ class SmilesDrawer {
     let parseTree = Parser.parse(smiles);
 
     if (target === null || target === 'svg') {
-      let svg = this.drawer.draw(parseTree, null, theme);
+      let svg = this.drawer.draw(parseTree, null, theme, weights);
       let dims = this.getDimensions(svg);
       svg.setAttributeNS(null, 'width', '' + dims.w);
       svg.setAttributeNS(null, 'height', '' + dims.h);
@@ -13816,25 +14030,25 @@ class SmilesDrawer {
         callback(svg);
       }
     } else if (target === 'canvas') {
-      let canvas = this.svgToCanvas(this.drawer.draw(parseTree, null, theme));
+      let canvas = this.svgToCanvas(this.drawer.draw(parseTree, null, theme, weights));
 
       if (callback) {
         callback(canvas);
       }
     } else if (target === 'img') {
-      let img = this.svgToImg(this.drawer.draw(parseTree, null, theme));
+      let img = this.svgToImg(this.drawer.draw(parseTree, null, theme, weights));
 
       if (callback) {
         callback(img);
       }
     } else if (target instanceof HTMLImageElement) {
-      this.svgToImg(this.drawer.draw(parseTree, null, theme), target);
+      this.svgToImg(this.drawer.draw(parseTree, null, theme, weights), target);
 
       if (callback) {
         callback(target);
       }
     } else if (target instanceof SVGElement) {
-      this.drawer.draw(parseTree, target, theme);
+      this.drawer.draw(parseTree, target, theme, weights);
 
       if (callback) {
         callback(target);
@@ -13845,7 +14059,7 @@ class SmilesDrawer {
         let tag = element.nodeName.toLowerCase();
 
         if (tag === 'svg') {
-          this.drawer.draw(parseTree, element, theme); // let dims = this.getDimensions(element);
+          this.drawer.draw(parseTree, element, theme, weights); // let dims = this.getDimensions(element);
           // element.setAttributeNS(null, 'width', '' + dims.w);
           // element.setAttributeNS(null, 'height', '' + dims.h);
 
@@ -13853,13 +14067,13 @@ class SmilesDrawer {
             callback(element);
           }
         } else if (tag === 'canvas') {
-          this.svgToCanvas(this.drawer.draw(parseTree, null, theme), element);
+          this.svgToCanvas(this.drawer.draw(parseTree, null, theme, weights), element);
 
           if (callback) {
             callback(element);
           }
         } else if (tag === 'img') {
-          this.svgToImg(this.drawer.draw(parseTree, null, theme), element);
+          this.svgToImg(this.drawer.draw(parseTree, null, theme, weights), element);
 
           if (callback) {
             callback(element);
@@ -13869,7 +14083,7 @@ class SmilesDrawer {
     }
   }
 
-  drawReaction(smiles, target, theme, settings, callback) {
+  drawReaction(smiles, target, theme, settings, weights, callback) {
     let reaction = ReactionParser.parse(smiles);
 
     if (target === null || target === 'svg') {
@@ -13882,25 +14096,25 @@ class SmilesDrawer {
         callback(svg);
       }
     } else if (target === 'canvas') {
-      let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow));
+      let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow));
 
       if (callback) {
         callback(canvas);
       }
     } else if (target === 'img') {
-      let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow));
+      let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow));
 
       if (callback) {
         callback(img);
       }
     } else if (target instanceof HTMLImageElement) {
-      this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), target);
+      this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), target);
 
       if (callback) {
         callback(target);
       }
     } else if (target instanceof SVGElement) {
-      this.reactionDrawer.draw(reaction, target, theme, settings.textAboveArrow, settings.textBelowArrow);
+      this.reactionDrawer.draw(reaction, target, theme, weights, settings.textAboveArrow, settings.textBelowArrow);
 
       if (callback) {
         callback(target);
@@ -13911,7 +14125,7 @@ class SmilesDrawer {
         let tag = element.nodeName.toLowerCase();
 
         if (tag === 'svg') {
-          this.reactionDrawer.draw(reaction, element, theme, settings.textAboveArrow, settings.textBelowArrow); // The svg has to have a css width and height set for the other
+          this.reactionDrawer.draw(reaction, element, theme, weights, settings.textAboveArrow, settings.textBelowArrow); // The svg has to have a css width and height set for the other
           // tags, however, here it would overwrite the chosen width and height
 
           if (this.reactionDrawer.opts.scale <= 0) {
@@ -13926,13 +14140,13 @@ class SmilesDrawer {
             callback(element);
           }
         } else if (tag === 'canvas') {
-          this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), element);
+          this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), element);
 
           if (callback) {
             callback(element);
           }
         } else if (tag === 'img') {
-          this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, settings.textAboveArrow, settings.textBelowArrow), element);
+          this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), element);
 
           if (callback) {
             callback(element);
@@ -14004,7 +14218,7 @@ class SmilesDrawer {
 
 module.exports = SmilesDrawer;
 
-},{"./Drawer":6,"./Options":14,"./Parser":15,"./ReactionDrawer":17,"./ReactionParser":18,"./SvgDrawer":23,"./SvgWrapper":24}],23:[function(require,module,exports){
+},{"./Drawer":6,"./Options":14,"./Parser":15,"./ReactionDrawer":18,"./ReactionParser":19,"./SvgDrawer":24,"./SvgWrapper":25}],24:[function(require,module,exports){
 "use strict";
 
 // we use the drawer to do all the preprocessing. then we take over the drawing
@@ -14025,6 +14239,8 @@ const ThemeManager = require('./ThemeManager');
 
 const Vector2 = require('./Vector2');
 
+const GaussDrawer = require('./GaussDrawer');
+
 class SvgDrawer {
   constructor(options, clear = true) {
     this.preprocessor = new DrawerBase(options);
@@ -14036,7 +14252,7 @@ class SvgDrawer {
    * Draws the parsed smiles data to an svg element.
    *
    * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+   * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    *
@@ -14044,7 +14260,7 @@ class SvgDrawer {
    */
 
 
-  draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
+  draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = []) {
     if (target === null || target === 'svg') {
       target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -14053,6 +14269,16 @@ class SvgDrawer {
       target.setAttributeNS(null, 'height', this.opts.height);
     } else if (target instanceof String) {
       target = document.getElementById(target);
+    }
+
+    let optionBackup = {
+      padding: this.opts.padding,
+      compactDrawing: this.opts.compactDrawing
+    }; // Overwrite options when weights are added
+
+    if (weights !== null) {
+      this.opts.padding += this.opts.weights.additionalPadding;
+      this.opts.compactDrawing = false;
     }
 
     let preprocessor = this.preprocessor;
@@ -14074,13 +14300,23 @@ class SvgDrawer {
     this.drawEdges(preprocessor.opts.debug);
     this.drawVertices(preprocessor.opts.debug);
 
+    if (weights !== null) {
+      this.drawWeights(weights);
+    }
+
     if (preprocessor.opts.debug) {
       console.log(preprocessor.graph);
       console.log(preprocessor.rings);
       console.log(preprocessor.ringConnections);
     }
 
-    this.svgWrapper.constructSvg();
+    this.svgWrapper.constructSvg(); // Reset options in case weights were added.
+
+    if (weights !== null) {
+      this.opts.padding = optionBackup.padding;
+      this.opts.compactDrawing = optionBackup.padding;
+    }
+
     return target;
   }
   /**
@@ -14379,6 +14615,32 @@ class SvgDrawer {
     }
   }
   /**
+   * Draw the weights on a background image.
+   * @param {Number[]} weights The weights assigned to each atom.
+   */
+
+
+  drawWeights(weights) {
+    if (weights.every(w => w === 0)) {
+      return;
+    }
+
+    if (weights.length !== this.preprocessor.graph.atomIdxToVertexId.length) {
+      throw new Error('The number of weights supplied must be equal to the number of (heavy) atoms in the molecule.');
+    }
+
+    let points = [];
+
+    for (const atomIdx of this.preprocessor.graph.atomIdxToVertexId) {
+      let vertex = this.preprocessor.graph.vertices[atomIdx];
+      points.push(new Vector2(vertex.position.x - this.svgWrapper.minX, vertex.position.y - this.svgWrapper.minY));
+    }
+
+    let gd = new GaussDrawer(points, weights, this.svgWrapper.drawingWidth, this.svgWrapper.drawingHeight, this.opts.weights.sigma, this.opts.weights.interval, this.opts.weights.colormap, this.opts.weights.opacity);
+    gd.draw();
+    this.svgWrapper.addLayer(gd.getSVG());
+  }
+  /**
    * Returns the total overlap score of the current molecule.
    *
    * @returns {Number} The overlap score.
@@ -14413,7 +14675,7 @@ class SvgDrawer {
 
 module.exports = SvgDrawer;
 
-},{"./ArrayHelper":3,"./Atom":4,"./DrawerBase":7,"./Graph":11,"./Line":12,"./SvgWrapper":24,"./ThemeManager":25,"./Vector2":27}],24:[function(require,module,exports){
+},{"./ArrayHelper":3,"./Atom":4,"./DrawerBase":7,"./GaussDrawer":10,"./Graph":11,"./Line":12,"./SvgWrapper":25,"./ThemeManager":26,"./Vector2":28}],25:[function(require,module,exports){
 "use strict";
 
 const {
@@ -14453,6 +14715,7 @@ class SvgWrapper {
     // maintain a list of vertex elements
     // maintain a list of highlighting elements
 
+    this.backgroundItems = [];
     this.paths = [];
     this.vertices = [];
     this.gradients = [];
@@ -14501,6 +14764,7 @@ class SvgWrapper {
     // TODO: add the defs element to put gradients in
     let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
         masks = document.createElementNS('http://www.w3.org/2000/svg', 'mask'),
+        background = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         highlights = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         paths = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
         vertices = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
@@ -14517,6 +14781,10 @@ class SvgWrapper {
 
     for (let path of pathChildNodes) {
       paths.appendChild(path);
+    }
+
+    for (let backgroundItem of this.backgroundItems) {
+      background.appendChild(backgroundItem);
     }
 
     for (let highlight of this.highlights) {
@@ -14536,21 +14804,34 @@ class SvgWrapper {
     }
 
     paths.setAttributeNS(null, 'mask', 'url(#' + this.uid + '-text-mask)');
-    this.updateViewbox(this.opts.scale);
+    this.updateViewbox(this.opts.scale); // Position the background
+
+    background.setAttributeNS(null, 'style', `transform: translateX(${this.minX}px) translateY(${this.minY}px)`);
 
     if (this.svg) {
       this.svg.appendChild(defs);
       this.svg.appendChild(masks);
+      this.svg.appendChild(background);
       this.svg.appendChild(highlights);
       this.svg.appendChild(paths);
       this.svg.appendChild(vertices);
     } else {
       this.container.appendChild(defs);
       this.container.appendChild(masks);
+      this.container.appendChild(background);
       this.container.appendChild(paths);
       this.container.appendChild(vertices);
       return this.container;
     }
+  }
+  /**
+   * Add a background to the svg.
+   */
+
+
+  addLayer(svg) {
+    console.log(svg.firstChild);
+    this.backgroundItems.push(svg.firstChild);
   }
   /**
    * Create a linear gradient to apply to a line
@@ -15372,7 +15653,7 @@ class SvgWrapper {
 
 module.exports = SvgWrapper;
 
-},{"./Line":12,"./MathHelper":13,"./UtilityFunctions":26,"./Vector2":27}],25:[function(require,module,exports){
+},{"./Line":12,"./MathHelper":13,"./UtilityFunctions":27,"./Vector2":28}],26:[function(require,module,exports){
 "use strict";
 
 class ThemeManager {
@@ -15420,7 +15701,7 @@ class ThemeManager {
 
 module.exports = ThemeManager;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 /**
@@ -15446,7 +15727,7 @@ module.exports = {
   getChargeText
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -16073,7 +16354,7 @@ class Vector2 {
 
 module.exports = Vector2;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 //@ts-check
@@ -16440,5 +16721,5 @@ class Vertex {
 
 module.exports = Vertex;
 
-},{"./ArrayHelper":3,"./Atom":4,"./MathHelper":13,"./Vector2":27}]},{},[1])
+},{"./ArrayHelper":3,"./Atom":4,"./MathHelper":13,"./Vector2":28}]},{},[1])
 

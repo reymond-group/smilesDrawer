@@ -32,6 +32,7 @@ class SvgWrapper {
     // maintain a list of line elements and their corresponding gradients
     // maintain a list of vertex elements
     // maintain a list of highlighting elements
+    this.backgroundItems = []
     this.paths = [];
     this.vertices = [];
     this.gradients = [];
@@ -86,6 +87,7 @@ class SvgWrapper {
     // TODO: add the defs element to put gradients in
     let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'),
       masks = document.createElementNS('http://www.w3.org/2000/svg', 'mask'),
+      background = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
       highlights = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
       paths = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
       vertices = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
@@ -108,7 +110,10 @@ class SvgWrapper {
       paths.appendChild(path);
     }
 
-    for (let highlight of this.highlights){
+    for (let backgroundItem of this.backgroundItems) {
+      background.appendChild(backgroundItem)
+    }
+    for (let highlight of this.highlights) {
       highlights.appendChild(highlight)
     }
     for (let vertex of this.vertices) {
@@ -125,19 +130,32 @@ class SvgWrapper {
 
     this.updateViewbox(this.opts.scale);
 
+    // Position the background
+    background.setAttributeNS(null, 'style', `transform: translateX(${this.minX}px) translateY(${this.minY}px)`);
+
     if (this.svg) {
       this.svg.appendChild(defs);
       this.svg.appendChild(masks);
-      this.svg.appendChild(highlights)
+      this.svg.appendChild(background);
+      this.svg.appendChild(highlights);
       this.svg.appendChild(paths);
       this.svg.appendChild(vertices);
     } else {
       this.container.appendChild(defs);
       this.container.appendChild(masks);
+      this.container.appendChild(background);
       this.container.appendChild(paths);
       this.container.appendChild(vertices);
       return this.container;
     }
+  }
+
+  /**
+   * Add a background to the svg.
+   */
+  addLayer(svg) {
+    console.log(svg.firstChild);
+    this.backgroundItems.push(svg.firstChild);
   }
 
   /**
@@ -339,7 +357,7 @@ class SvgWrapper {
     polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
     this.paths.push(polygon);
   }
-  
+
   /* Draw a highlight for an atom
    * 
    *  @param {Number} x The x position of the highlight

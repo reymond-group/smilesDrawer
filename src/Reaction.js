@@ -12,6 +12,10 @@ class Reaction {
         this.reagentsSmiles = [];
         this.productsSmiles = [];
 
+        this.reactantsWeights = [];
+        this.reagentsWeights = [];
+        this.productsWeights = [];
+
         this.reactants = [];
         this.reagents = [];
         this.products = [];

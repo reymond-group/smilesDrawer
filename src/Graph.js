@@ -62,11 +62,11 @@ class Graph {
     let vertex = new Vertex(atom);
     let parentVertex = this.vertices[parentVertexId];
 
+    this.addVertex(vertex);
+
     if (atom.idx !== null) {
       this.atomIdxToVertexId.push(vertex.id);
     }
-
-    this.addVertex(vertex);
 
     // Add the id of this node to the parent as child
     if (parentVertexId !== null) {

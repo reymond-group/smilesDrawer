@@ -41,11 +41,15 @@ class ReactionDrawer {
    * @param {Object} reaction The reaction object returned by the reaction smiles parser.
    * @param {(String|SVGElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+   * @param {?Object} weights=null The weights for reactants, agents, and products.
+   * @param {String} textAbove='{reagents}' The text above the arrow.
+   * @param {String} textBelow='' The text below the arrow.
+   * @param {?Object} weights=null The weights for reactants, agents, and products.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    * 
    * @returns {SVGElement} The svg element
    */
-    draw(reaction, target, themeName = 'light', textAbove = '{reagents}', textBelow = '', infoOnly = false) {
+    draw(reaction, target, themeName = 'light', weights = null, textAbove = '{reagents}', textBelow = '', infoOnly = false) {
         this.themeManager = new ThemeManager(this.molOpts.themes, themeName);
         let svg = null;
 
@@ -78,9 +82,14 @@ class ReactionDrawer {
                 });
             }
 
+            let reactantWeights = null;
+            if (weights.hasOwnProperty('reactants') && weights.reactants.length > i) {
+                reactantWeights = weights.reactants[i];
+            }
+
             let reactantSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-            this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, infoOnly);
+            this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, reactantWeights, infoOnly);
 
             let element = {
                 width: reactantSvg.viewBox.baseVal.width * this.opts.scale,
@@ -168,9 +177,14 @@ class ReactionDrawer {
                 });
             }
 
+            let productWeights = null;
+            if (weights.hasOwnProperty('products') && weights.products.length > i) {
+                productWeights = weights.products[i];
+            }
+
             let productSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-            this.drawer.draw(reaction.products[i], productSvg, themeName, infoOnly);
+            this.drawer.draw(reaction.products[i], productSvg, themeName, productWeights, infoOnly);
 
             let element = {
                 width: productSvg.viewBox.baseVal.width * this.opts.scale,

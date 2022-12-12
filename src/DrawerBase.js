@@ -67,6 +67,13 @@ class DrawerBase {
       kkMaxIteration: 20000,
       kkMaxInnerIteration: 50,
       kkMaxEnergy: 1e9,
+      weights: {
+        colormap: null,
+        additionalPadding: 20.0,
+        sigma: 10.0,
+        interval: 0.0,
+        opacity: 0.5,
+      },
       themes: {
         dark: {
           C: '#fff',
