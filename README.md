@@ -1,27 +1,21 @@
 # SmilesDrawer 2.0
 
-## No server, no images, no templates, just a SMILES 😊
+No server, no images, no templates, just a SMILES 😊
 
 Current Version: **2.1.2**
-[smilesdrawer.rocks](https://smilesdrawer.rocks)
+
+<table style="width=100%">
+    <tbody>
+        <tr>
+            <td><h2>New!</h2><br /><a href="smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/blob/master/readme/rxn_highlight.png?raw=true"></img></a></td>
+            <td><a href="https://smilesdrawer.surge.sh/playground.html"><img src="https://github.com/reymond-group/smilesDrawer/blob/e2517224f728ee4acf04ac5dc222b560ac26639c/readme/themes.png?raw=true"></img></a></td>
+        </tr>
+    </tbody>
+</table>
+
+### Please cite
 
 If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: [10.1021/acs.jcim.7b00425](http://dx.doi.org/10.1021/acs.jcim.7b00425)
-
-And it now also draws reactions, comes with many new themes and has a new website:
-
-<h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html">Demo (Canvas)</a></h3>
-<h3><a href="http://doc.gdb.tools/smilesDrawer/sd/example/index_svg.html">Demo (SVG)</a></h3>
-### Compatibility
-
-All the current versions of the major browsers are supported and the application has been tested on the following browsers (versions):
-
-- Chrome (68.0.3440.106)
-- Firefox (61.0.1)
-- Edge (42.17134.167.0)
-- Internet Explorer 11
-- Safari (10.1.2)
-
-SmilesDrawer should also run on older versions of all of these browsers, if you experience any problems on older browsers, please open an issue and it will be tested.
 
 ### Examples
 
