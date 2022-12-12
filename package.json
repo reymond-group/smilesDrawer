@@ -20,6 +20,7 @@
     "gulp-jsdoc3": ">=2.0.0",
     "gulp-rename": ">=1.4.0",
     "gulp-sourcemaps": "^2.6.5",
+    "jsdoc": "^4.0.0",
     "vinyl-buffer": ">=1.0.1",
     "vinyl-source-stream": ">=2.0.0",
     "watchify": "^3.11.1",
