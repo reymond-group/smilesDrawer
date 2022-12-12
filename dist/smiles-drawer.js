@@ -9045,8 +9045,7 @@ class Graph {
 
 
   _init(node, order = 0, parentVertexId = null, isBranch = false) {
-    console.log(node); // Create a new vertex object
-
+    // Create a new vertex object
     const element = node.atom.element ? node.atom.element : node.atom;
     let atom = new Atom(element, node.bond);
 
