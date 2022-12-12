@@ -4,8 +4,22 @@ No server, no images, no templates, just a SMILES 😊
 
 Current Version: **2.1.2**
 
-<a href="https://smilesdrawer.surge.sh/playground.html"><img style="width:500px" src="https://github.com/reymond-group/smilesDrawer/blob/e2517224f728ee4acf04ac5dc222b560ac26639c/readme/themes.png?raw=true"></img></a>
-<a href="smilesdrawer.rocks"><img style="width:500px" src="https://github.com/reymond-group/smilesDrawer/blob/master/readme/rxn_highlight.png?raw=true"></img></a>
+<table style="width=100%">
+    <tbody>
+        <tr>
+            <td><a href="https://smilesdrawer.rocks">Molecules</a></td>
+            <td><a href="https://smilesdrawer.rocks">Reactions & Highlights</a></td>
+            <td><a href="https://smilesdrawer.surge.sh/use.html">Learn & Copy-Paste</a></td>
+            <td><a href="https://smilesdrawer.surge.sh/playground.html">Style & Customize</a></td>
+        </tr>
+        <tr>
+            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/main.png"></img></td>
+            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/rxn_highlight.png"></img></td>
+            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/learn.png"></img></td>
+            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/style.png"></img></td>
+        </tr>
+    </tbody>
+</table>
 
 ### Please cite
 
