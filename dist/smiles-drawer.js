@@ -9045,11 +9045,12 @@ class Graph {
 
 
   _init(node, order = 0, parentVertexId = null, isBranch = false) {
-    // Create a new vertex object
+    console.log(node); // Create a new vertex object
+
     const element = node.atom.element ? node.atom.element : node.atom;
     let atom = new Atom(element, node.bond);
 
-    if (element !== 'H') {
+    if (element !== 'H' || !node.hasNext && parentVertexId === null) {
       atom.idx = this._atomIdx;
       this._atomIdx++;
     }

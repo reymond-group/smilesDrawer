@@ -45,11 +45,12 @@ class Graph {
    * @param {Boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
    */
   _init(node, order = 0, parentVertexId = null, isBranch = false) {
+    console.log(node);
     // Create a new vertex object
     const element = node.atom.element ? node.atom.element : node.atom;
     let atom = new Atom(element, node.bond);
 
-    if (element !== 'H') {
+    if (element !== 'H' || (!node.hasNext && parentVertexId === null)) {
       atom.idx = this._atomIdx;
       this._atomIdx++;
     }
