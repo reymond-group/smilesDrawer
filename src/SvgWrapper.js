@@ -807,7 +807,10 @@ class SvgWrapper {
     let result = '';
 
     n.toString().split('').forEach(d => {
-      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
+      let parsed = parseInt(d);
+      if (parsed) {
+        result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
+      }
     });
 
     return result

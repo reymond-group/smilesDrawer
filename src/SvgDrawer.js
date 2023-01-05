@@ -341,9 +341,14 @@ class SvgDrawer {
       let bondCount = vertex.value.bondCount;
       let element = atom.element;
       let hydrogens = Atom.maxBonds[element] - bondCount;
-      let dir = vertex.getTextDirection(graph.vertices);
+      let dir = vertex.getTextDirection(graph.vertices, atom.hasAttachedPseudoElements);
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
+
+      // If the molecule has less than 3 elements, always write the "C" for carbon
+      if (graph.vertices.length < 3) {
+        isCarbon = false;
+      }
 
       // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization

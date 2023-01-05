@@ -214,9 +214,10 @@ class Vertex {
    * Returns the suggested text direction when text is added at the position of this vertex.
    *
    * @param {Vertex[]} vertices The array of vertices for the current molecule.
+   * @param {Boolean} onlyHorizontal In case the text direction should be limited to either left or right.
    * @returns {String} The suggested direction of the text.
    */
-  getTextDirection(vertices) {
+  getTextDirection(vertices, onlyHorizontal = false) {
     let neighbours = this.getDrawnNeighbours(vertices);
     let angles = Array();
 
@@ -231,9 +232,22 @@ class Vertex {
 
     let textAngle = MathHelper.meanAngle(angles);
 
-    // Round to 0, 90, 180 or 270 degree
-    let halfPi = Math.PI / 2.0;
-    textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi);
+    if (this.isTerminal() || onlyHorizontal) {
+      // Round to 0 or 180 if terminal or only horizontal allowed
+      // With only this, text is written to the left if the angle is 90°/1.5708 rad (straight down).
+      // So if angle is ~1.5708, force it a bit anti-clock-wise
+      if (Math.round(textAngle * 100) / 100 === 1.57) {
+        textAngle = textAngle - 0.2;
+      }
+      textAngle = Math.round(Math.round(textAngle / Math.PI) * Math.PI);
+    } else {
+      // Round to 0, 90, 180 or 270 degree if not terminal
+      let halfPi = Math.PI / 2.0;
+      textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi);
+    }
+
+
+
 
     if (textAngle === 2) {
       return 'down';

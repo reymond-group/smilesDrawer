@@ -100,6 +100,9 @@ class ReactionDrawer {
             }
 
             let abs_max = Math.max(Math.abs(min), Math.abs(max));
+            if (abs_max === 0.0) {
+                abs_max = 1;
+            }
 
             if (weights.hasOwnProperty('reactants')) {
                 for (let i = 0; i < weights.reactants.length; i++) {

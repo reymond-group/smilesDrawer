@@ -3745,11 +3745,6 @@ module.exports = SmilesDrawer;
 
 //@ts-check
 
-/**
- * (Static) helper functions used to deal with arrays.
- * @module array-helper
- */
-
 /** 
  * A static class containing helper functions for array-related tasks. 
  */
@@ -12674,6 +12669,10 @@ class ReactionDrawer {
 
       let abs_max = Math.max(Math.abs(min), Math.abs(max));
 
+      if (abs_max === 0.0) {
+        abs_max = 1;
+      }
+
       if (weights.hasOwnProperty('reactants')) {
         for (let i = 0; i < weights.reactants.length; i++) {
           for (let j = 0; j < weights.reactants[i].length; j++) {
@@ -14646,10 +14645,15 @@ class SvgDrawer {
       let bondCount = vertex.value.bondCount;
       let element = atom.element;
       let hydrogens = Atom.maxBonds[element] - bondCount;
-      let dir = vertex.getTextDirection(graph.vertices);
+      let dir = vertex.getTextDirection(graph.vertices, atom.hasAttachedPseudoElements);
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
-      let isCarbon = atom.element === 'C'; // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
+      let isCarbon = atom.element === 'C'; // If the molecule has less than 3 elements, always write the "C" for carbon
+
+      if (graph.vertices.length < 3) {
+        isCarbon = false;
+      } // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization
+
 
       if (atom.element === 'N' && atom.isPartOfAromaticRing) {
         hydrogens = 0;
@@ -15558,7 +15562,11 @@ class SvgWrapper {
   static createUnicodeSuperscript(n) {
     let result = '';
     n.toString().split('').forEach(d => {
-      result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
+      let parsed = parseInt(d);
+
+      if (parsed) {
+        result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parseInt(d)];
+      }
     });
     return result;
   }
@@ -16671,11 +16679,12 @@ class Vertex {
    * Returns the suggested text direction when text is added at the position of this vertex.
    *
    * @param {Vertex[]} vertices The array of vertices for the current molecule.
+   * @param {Boolean} onlyHorizontal In case the text direction should be limited to either left or right.
    * @returns {String} The suggested direction of the text.
    */
 
 
-  getTextDirection(vertices) {
+  getTextDirection(vertices, onlyHorizontal = false) {
     let neighbours = this.getDrawnNeighbours(vertices);
     let angles = Array(); // If there is only one vertex in the graph, always draw to the right
 
@@ -16687,10 +16696,22 @@ class Vertex {
       angles.push(this.getAngle(vertices[neighbours[i]].position));
     }
 
-    let textAngle = MathHelper.meanAngle(angles); // Round to 0, 90, 180 or 270 degree
+    let textAngle = MathHelper.meanAngle(angles);
 
-    let halfPi = Math.PI / 2.0;
-    textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi);
+    if (this.isTerminal() || onlyHorizontal) {
+      // Round to 0 or 180 if terminal or only horizontal allowed
+      // With only this, text is written to the left if the angle is 90°/1.5708 rad (straight down).
+      // So if angle is ~1.5708, force it a bit anti-clock-wise
+      if (Math.round(textAngle * 100) / 100 === 1.57) {
+        textAngle = textAngle - 0.2;
+      }
+
+      textAngle = Math.round(Math.round(textAngle / Math.PI) * Math.PI);
+    } else {
+      // Round to 0, 90, 180 or 270 degree if not terminal
+      let halfPi = Math.PI / 2.0;
+      textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi);
+    }
 
     if (textAngle === 2) {
       return 'down';
