@@ -2,7 +2,7 @@
 
 No server, no images, no templates, just a SMILES 😊
 
-Current Version: **2.1.4**
+Current Version: **2.1.5**
 
 <table style="width: 100%; table-layout: fixed">
     <tbody>
