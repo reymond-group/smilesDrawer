@@ -1,7 +1,7 @@
 const Vector2 = require('./Vector2')
 const convertImage = require('./PixelsToSvg')
 
-import chroma from "chroma-js"
+const chroma = require("chroma-js")
 
 class GaussDrawer {
     /**
@@ -167,4 +167,4 @@ class GaussDrawer {
     }
 }
 
-module.exports = GaussDrawer
+module.exports = GaussDrawer;

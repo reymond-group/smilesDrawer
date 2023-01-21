@@ -8815,15 +8815,11 @@ module.exports = formulaToCommonName;
 },{}],10:[function(require,module,exports){
 "use strict";
 
-var _chromaJs = require("chroma-js");
-
-var _chromaJs2 = _interopRequireDefault(_chromaJs);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const Vector2 = require('./Vector2');
 
 const convertImage = require('./PixelsToSvg');
+
+const chroma = require("chroma-js");
 
 class GaussDrawer {
   /**
@@ -8922,7 +8918,7 @@ class GaussDrawer {
       abs_max = Math.max(Math.abs(min), Math.abs(max));
     }
 
-    const scale = _chromaJs2.default.scale(this.colormap).domain([-1.0, 1.0]);
+    const scale = chroma.scale(this.colormap).domain([-1.0, 1.0]);
 
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
