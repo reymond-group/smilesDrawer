@@ -25,6 +25,52 @@ Current Version: **2.1.5**
     </tbody>
 </table>
 
+### Examples in Specific Frameworks
+
+<details>
+    <summary>Svelte </summary>
+    
+    
+```html
+<!--file:Molecule.svlete-->
+<!--Tested against v2.1.7 of smiles-drawer-->
+<script>
+    import { afterUpdate } from "svelte";
+    import SmilesDrawer from "smiles-drawer";
+
+    export let smiles = "";
+
+    const SETTINGS = {
+        width: 300,
+        height: 200,
+    };
+    let drawer = new SmilesDrawer.SvgDrawer(SETTINGS);
+    let svgElement;
+
+    afterUpdate(() => {
+        SmilesDrawer.parse(smiles, function (tree) {
+            drawer.draw(tree, svgElement, "light");
+        });
+    });
+</script>
+
+<div>
+    <svg bind:this={svgElement} data-smiles={smiles} />
+</div>
+
+<style>
+    svg {
+        width: 300px;
+        height: 200px;
+    }
+</style>
+
+<!--usage-->
+ <Molecule smiles="CCCO" />
+```
+
+</details>
+
 ### Please cite
 
 If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: [10.1021/acs.jcim.7b00425](http://dx.doi.org/10.1021/acs.jcim.7b00425)
