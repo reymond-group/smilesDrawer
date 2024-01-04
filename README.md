@@ -1,3 +1,8 @@
+Hey all, Daniel here. I'm looking for someone who has the time and motivation to maintain this repo.
+I wanted to get back to it but I won't be able to find the time this year. The best, of course, would be
+if it were someone who actually can do it as part of their work.
+You can let me know via E-Mail. You'll find the address here: https://people.epfl.ch/daniel.probst/?lang=en
+
 # SmilesDrawer 2.0
 
 No server, no images, no templates, just a SMILES 😊
