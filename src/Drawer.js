@@ -44,7 +44,7 @@ class Drawer {
     svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
     svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
     svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
-    this.svgDrawer.draw(data, svg, themeName, infoOnly, highlight_atoms);
+    this.svgDrawer.draw(data, svg, themeName, null, infoOnly, highlight_atoms);
     this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
   }
 
