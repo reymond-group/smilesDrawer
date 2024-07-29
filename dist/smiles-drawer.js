@@ -14715,6 +14715,10 @@ class SvgDrawer {
 
 
   drawWeights(weights, weightsNormalized) {
+    if (!weights) {
+      return;
+    }
+
     if (weights.every(w => w === 0)) {
       return;
     }
