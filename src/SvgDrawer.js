@@ -412,6 +412,11 @@ class SvgDrawer {
    * @param {Number[]} weights The weights assigned to each atom.
    */
   drawWeights(weights, weightsNormalized) {
+
+    if (!weights) {
+      return;
+    }
+
     if (weights.every(w => w === 0)) {
       return;
     }
