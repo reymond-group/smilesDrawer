@@ -34,8 +34,7 @@ Current Version: **2.1.8**
 
 <details>
     <summary>Svelte </summary>
-    
-    
+
 ```html
 <!--file:Molecule.svlete-->
 <!--Tested against v2.1.7 of smiles-drawer-->
@@ -71,7 +70,7 @@ Current Version: **2.1.8**
 </style>
 
 <!--usage-->
- <Molecule smiles="CCCO" />
+<Molecule smiles="CCCO" />
 ```
 
 </details>
@@ -275,7 +274,7 @@ An instance of SmilesDrawer is able to draw to multiple targets. Initialize Smil
 let smilesDrawer = new SmilesDrawer.Drawer({ width: 250, height: 250 });
 ```
 
-In order to depict a SMILES string it has to be parsed using SmilesDrawer's SMILES parser, which is encapsulated in the static function `SmilesDrawer.parse()` where the first argument is the SMILES string and the second argument a callback for a successfull parsing. The third argument provides a way to handle errors using a callback.
+In order to depict a SMILES string it has to be parsed using SmilesDrawer's SMILES parser, which is encapsulated in the static function `SmilesDrawer.parse()` where the first argument is the SMILES string and the second argument a callback for a successful parsing. The third argument provides a way to handle errors using a callback.
 
 ```javascript
 SmilesDrawer.parse('C1CCCCC1', function (tree) {
@@ -291,9 +290,9 @@ The function `smilesDrawer.draw()` requires two and accepts up to four arguments
 
 The SmilesDrawer object exposes methods that can be used for purposes other than drawing chemical structures.
 
-| Method                  | Description                                                                      | Returns  |
-| ----------------------- | -------------------------------------------------------------------------------- | -------- |
-| `getMolecularFormula()` | Returns the molcular formula, eg. C22H30N6O4S, of the currently loaded molecule. | `String` |
+| Method                  | Description                                                                       | Returns  |
+| ----------------------- | --------------------------------------------------------------------------------- | -------- |
+| `getMolecularFormula()` | Returns the molecular formula, eg. C22H30N6O4S, of the currently loaded molecule. | `String` |
 
 ### Bridged Rings
 
@@ -302,5 +301,5 @@ Bridged rings are positioned using the Kamada–Kawai algorithm. If there is a b
 ### Contributors
 
 Thank you for contributing:
-SRI International's CSE group (For the excellent SVG support)
-[ohardy](https://github.com/ohardy)
+- SRI International's CSE group (For the excellent SVG support)
+- [ohardy](https://github.com/ohardy)
