@@ -1,8 +1,8 @@
 //@ts-check
 
-/** 
- * A class representing an edge. 
- * 
+/**
+ * A class representing an edge.
+ *
  * @property {Number} id The id of this edge.
  * @property {Number} sourceId The id of the source vertex.
  * @property {Number} targetId The id of the target vertex.
@@ -33,7 +33,7 @@ class Edge {
 
     /**
      * Set the bond type of this edge. This also sets the edge weight.
-     * @param {String} bondType 
+     * @param {String} bondType
      */
     setBondType(bondType) {
       this.bondType = bondType;
@@ -47,6 +47,7 @@ class Edge {
      */
     static get bonds() {
         return {
+            '.': 0,
             '-': 1,
             '/': 1,
             '\\': 1,
