@@ -7,7 +7,7 @@ You can let me know via E-Mail. You'll find the address here: https://people.epf
 
 No server, no images, no templates, just a SMILES 😊
 
-Current Version: **2.1.8**
+Current Version: **2.1.9**
 
 <table style="width: 100%; table-layout: fixed">
     <tbody>
