@@ -1690,6 +1690,12 @@ class DrawerBase {
         isotope = atom.bracket.isotope;
       }
 
+      // If the molecule has less than 3 elements, always write the "C" for carbon
+      // Likewise, if the carbon has a charge or an isotope, always draw it
+      if (charge || isotope || graph.vertices.length < 3) {
+        isCarbon = false;
+      }
+
       if (this.opts.atomVisualization === 'allballs') {
         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || this.graph.vertices.length === 1) {
