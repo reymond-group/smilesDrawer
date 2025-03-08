@@ -2224,21 +2224,25 @@ class DrawerBase {
   }
 
   /**
-   * Get the last non-null or 0 angle vertex.
+   * Get the last non-null or 0 angle.
    * @param {Number} vertexId A vertex id.
-   * @returns {Vertex} The last vertex with an angle that was not 0 or null.
+   * @returns {Vertex} The last angle that was not 0 or null.
    */
-  getLastVertexWithAngle(vertexId) {
-    let angle = 0;
-    let vertex = null;
+  getLastAngle(vertexId) {
+    while (vertexId) {
+      let vertex = this.graph.vertices[vertexId];
+      if (vertex.value.rings.length > 0) {
+        // Angles from rings aren't useful to us...
+        return 0;
+      }
+      if (vertex.angle) {
+        return vertex.angle;
+      }
 
-    while (!angle && vertexId) {
-      vertex = this.graph.vertices[vertexId];
-      angle = vertex.angle;
       vertexId = vertex.parentVertexId;
     }
 
-    return vertex;
+    return 0;
   }
 
   /**
@@ -2457,9 +2461,7 @@ class DrawerBase {
               a = 1.0472;
             }
           } else if (!a) {
-            let v = this.getLastVertexWithAngle(vertex.id);
-            a = v.angle;
-
+            a = this.getLastAngle(vertex.id);
             if (!a) {
               a = 1.0472;
             }
@@ -2497,7 +2499,6 @@ class DrawerBase {
       } else if (neighbours.length === 2) {
         // If the previous vertex comes out of a ring, it doesn't have an angle set
         let a = vertex.angle;
-
         if (!a) {
           a = 1.0472;
         }
