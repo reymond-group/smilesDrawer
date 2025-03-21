@@ -2402,7 +2402,7 @@ class DrawerBase {
       if (neighbours.length === 1) {
         let nextVertex = this.graph.vertices[neighbours[0]];
 
-        let prevEdge = this.graph.getEdge(vertex.id, previousVertex.id);
+        let prevEdge = previousVertex ? this.graph.getEdge(vertex.id, previousVertex.id) : null;
         let nextEdge = this.graph.getEdge(vertex.id, nextVertex.id);
 
         // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
