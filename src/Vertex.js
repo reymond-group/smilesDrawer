@@ -246,15 +246,12 @@ class Vertex {
       textAngle = Math.round(Math.round(textAngle / halfPi) * halfPi);
     }
 
-
-
-
     if (textAngle === 2) {
       return 'down';
     } else if (textAngle === -2) {
       return 'up';
-    } else if (textAngle === 0 || textAngle === -0) {
-      return 'right'; // is checking for -0 necessary?
+    } else if (textAngle === 0) {
+      return 'right';
     } else if (textAngle === 3 || textAngle === -3) {
       return 'left';
     } else {

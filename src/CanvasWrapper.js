@@ -4,12 +4,13 @@ const Vector2 = require('./Vector2')
 const Line = require('./Line')
 const Vertex = require('./Vertex')
 const Ring = require('./Ring')
+const ThemeManager = require('./ThemeManager')
 const { getChargeText } = require('./UtilityFunctions')
 
 /** 
  * A class wrapping a canvas element.
  * 
- * @property {HTMLElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
+ * @property {HTMLCanvasElement} canvas The HTML element for the canvas associated with this CanvasWrapper instance.
  * @property {CanvasRenderingContext2D} ctx The CanvasRenderingContext2D of the canvas associated with this CanvasWrapper instance.
  * @property {Object} colors The colors object as defined in the SmilesDrawer options.
  * @property {Object} opts The SmilesDrawer options.
@@ -24,15 +25,27 @@ class CanvasWrapper {
     /**
      * The constructor for the class CanvasWrapper.
      *
-     * @param {(String|HTMLElement)} target The canvas id or the canvas HTMLElement.
+     * @param {string|String|HTMLCanvasElement} target The canvas id or the HTMLCanvasElement.
      * @param {ThemeManager} themeManager Theme manager for setting proper colors.
      * @param {Object} options The smiles drawer options object.
      */
     constructor(target, themeManager, options) {
-        if (typeof target === 'string' || target instanceof String) {
-            this.canvas = document.getElementById(target);
-        } else {
-            this.canvas = target;
+        let element = null;
+        if (target instanceof String) {
+            element = document.getElementById(target.valueOf());
+        }
+        else if (typeof target === 'string') {
+            element = document.getElementById(target);
+        }
+        else {
+            element = target;
+        }
+
+        if (element instanceof HTMLCanvasElement) {
+            this.canvas = element;
+        }
+        else {
+            throw Error("First argument was not a canvas or the ID of a canvas.");
         }
 
         this.ctx = this.canvas.getContext('2d');
@@ -657,7 +670,7 @@ class CanvasWrapper {
 
             hydrogenWidth = this.hydrogenWidth;
             ctx.font = this.fontSmall;
-            hydrogenCountWidth = ctx.measureText(hydrogens).width;
+            hydrogenCountWidth = ctx.measureText(hydrogens.toString()).width;
             cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
 
             if (direction === 'left') {
@@ -680,7 +693,7 @@ class CanvasWrapper {
             ctx.fillText('H', hx, hy)
 
             ctx.font = this.fontSmall;
-            ctx.fillText(hydrogens, hx + this.halfHydrogenWidth + hydrogenCountWidth, hy + this.opts.fifthFontSizeSmall);
+            ctx.fillText(hydrogens.toString(), hx + this.halfHydrogenWidth + hydrogenCountWidth, hy + this.opts.fifthFontSizeSmall);
 
             cursorPos += hydrogenWidth + this.halfHydrogenWidth + hydrogenCountWidth;
         }

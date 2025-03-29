@@ -17,7 +17,7 @@ class Vector2 {
         if (arguments.length == 0) {
             this.x = 0;
             this.y = 0;
-        } else if (arguments.length == 1) {
+        } else if (x instanceof Vector2) {
             this.x = x.x;
             this.y = x.y;
         } else {

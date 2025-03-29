@@ -145,8 +145,6 @@ class GaussDrawer {
 
     /**
      * Get the canvas as an SVG element.
-     * 
-     * @param {CallableFunction} callback
      */
     getSVG() {
         return convertImage(this.context.getImageData(0, 0, this.width, this.height));
@@ -159,7 +157,6 @@ class GaussDrawer {
      * @param {Number} r The red colour-component.
      * @param {Number} g The green colour-component.
      * @param {Number} b The blue colour-component.
-     * @param {Number} a The alpha colour-component.
      */
     setPixel(vec, r, g, b) {
         this.context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + this.opacity + ")";
