@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "lib": ["es6", "dom"],
+    "target": "es2015",
+    "allowJs": true
+  },
+  "files": [
+    "app.js"
+  ]
+}

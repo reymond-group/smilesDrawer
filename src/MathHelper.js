@@ -11,8 +11,13 @@ class MathHelper {
      * @returns {Number} A number rounded to a given number of decimals.
      */
     static round(value, decimals) {
-        decimals = decimals ? decimals : 1;
-        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+        if (decimals) {
+            const pow = Math.pow(10, decimals)
+            return Math.round(value * pow) / pow
+        }
+        else {
+            return Math.round(value)
+        }
     }
 
     /**

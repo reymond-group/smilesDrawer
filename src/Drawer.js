@@ -27,16 +27,28 @@ class Drawer {
    * Draws the parsed smiles data to a canvas element.
    *
    * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+   * @param {string|String|HTMLCanvasElement} target The id of the HTML canvas element the structure is drawn to - or the element itself.
    * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    */
   draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
-    let canvas = null;
-    if (typeof target === 'string' || target instanceof String) {
-      canvas = document.getElementById(target);
-    } else {
-      canvas = target;
+    let element = null;
+    let canvas  = null;
+    if (target instanceof String) {
+      element = document.getElementById(target.valueOf());
+    }
+    else if (typeof target === 'string') {
+      element = document.getElementById(target);
+    }
+    else {
+      element = target;
+    }
+
+    if (element instanceof HTMLCanvasElement) {
+      canvas = element;
+    }
+    else {
+      throw Error("First argument was not a canvas or the ID of a canvas.");
     }
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -63,7 +75,7 @@ class Drawer {
    * @returns {String} The molecular formula.
    */
   getMolecularFormula() {
-    this.svgDrawer.getMolecularFormula();
+    return this.svgDrawer.getMolecularFormula();
   }
 }
 

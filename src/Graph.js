@@ -596,7 +596,7 @@ class Graph {
     var i = vertexIds.length;
     while (i--) {
       let vertex = this.vertices[vertexIds[i]];
-      var j = vertex.neighbours.length;
+      let j = vertex.neighbours.length;
     }
 
     let matDist = this.getSubgraphDistanceMatrix(vertexIds);
@@ -629,7 +629,7 @@ class Graph {
     i = length;
     while (i--) {
       matLength[i] = new Array(length);
-      var j = length;
+      let j = length;
       while (j--) {
         matLength[i][j] = bondLength * matDist[i][j];
       }
@@ -640,7 +640,7 @@ class Graph {
     i = length;
     while (i--) {
       matStrength[i] = Array(length);
-      var j = length;
+      let j = length;
       while (j--) {
         matStrength[i][j] = edgeStrength * Math.pow(matDist[i][j], -2.0);
       }

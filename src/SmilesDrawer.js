@@ -65,12 +65,12 @@ class SmilesDrawer {
             if (element.hasAttribute('data-smiles-options') || element.hasAttribute('data-smiles-reaction-options')) {
                 let moleculeOptions = {};
                 if (element.hasAttribute('data-smiles-options')) {
-                    moleculeOptions = JSON.parse(element.getAttribute('data-smiles-options').replaceAll('\'', '"'));
+                    moleculeOptions = JSON.parse(element.getAttribute('data-smiles-options').replace(/'/g, '"'));
                 }
 
                 let reactionOptions = {};
                 if (element.hasAttribute('data-smiles-reaction-options')) {
-                    reactionOptions = JSON.parse(element.getAttribute('data-smiles-reaction-options').replaceAll('\'', '"'));
+                    reactionOptions = JSON.parse(element.getAttribute('data-smiles-reaction-options').replace(/'/g, '"'));
                 }
 
                 let smilesDrawer = new SmilesDrawer(moleculeOptions, reactionOptions);
@@ -104,7 +104,7 @@ class SmilesDrawer {
                 info.lastIndexOf('__')
             );
 
-            settings = JSON.parse(settingsString.replaceAll('\'', '"'));
+            settings = JSON.parse(settingsString.replace(/'/g, '"'));
         }
 
         let defaultSettings = {

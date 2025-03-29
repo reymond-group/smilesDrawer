@@ -127,17 +127,23 @@ class SSSR {
         let d = Array(length);
         let pe = Array(length);
         let pe_prime = Array(length);
+
+        // Dummy initializations to set the TypeScript type:
+        var i = 0;
+        var j = 0;
+        var k = 0;
+
         var l = 0;
         var m = 0;
         var n = 0;
 
-        var i = length;
+        i = length;
         while (i--) {
             d[i] = Array(length);
             pe[i] = Array(length);
             pe_prime[i] = Array(length);
 
-            var j = length;
+            j = length;
             while (j--) {
                 d[i][j] = (i === j || adjacencyMatrix[i][j] === 1) ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
 
@@ -151,8 +157,7 @@ class SSSR {
             }
         }
 
-        var k = length;
-        var j;
+        k = length;
         while (k--) {
             i = length;
             while (i--) {
@@ -162,7 +167,6 @@ class SSSR {
                     const newPathLength = d[i][k] + d[k][j];
 
                     if (previousPathLength > newPathLength) {
-                        var l, m, n;
                         if (previousPathLength === newPathLength + 1) {
                             pe_prime[i][j] = [pe[i][j].length];
                             l = pe[i][j].length
@@ -196,7 +200,6 @@ class SSSR {
                         }
                     } else if (previousPathLength === newPathLength) {
                         if (pe[i][k].length && pe[k][j].length) {
-                            var l;
                             if (pe[i][j].length) {
                                 let tmp = Array();
 
@@ -227,7 +230,6 @@ class SSSR {
                             }
                         }
                     } else if (previousPathLength === newPathLength - 1) {
-                        var l;
                         if (pe_prime[i][j].length) {
                             let tmp = Array();
 
