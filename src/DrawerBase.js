@@ -2408,26 +2408,19 @@ class DrawerBase {
       if (neighbours.length === 1) {
         let nextVertex = this.graph.vertices[neighbours[0]];
 
+        let prevEdge = previousVertex ? this.graph.getEdge(vertex.id, previousVertex.id) : null;
+        let nextEdge = this.graph.getEdge(vertex.id, nextVertex.id);
+
         // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
-        // or if there are successive double bonds. Added a ring check because if there is an aromatic ring the ring bond inside the ring counts as a double bond and leads to =-= being straight.
-        if ((vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) ||
-          vertex.value.bondType === '=' && previousVertex && previousVertex.value.rings.length === 0 &&
-          previousVertex.value.bondType === '=' && vertex.value.branchBond !== '-') {
+        // or if there are successive double bonds (or some other bond-heavy combo).
+        if (prevEdge && nextEdge && prevEdge.weight + nextEdge.weight >= 4) {
+          prevEdge.center = true;
+          nextEdge.center = true;
+
+          // TODO: One of these is on value, but the other isn't?
           vertex.value.drawExplicit = false;
-
-          if (previousVertex) {
-            let straightEdge1 = this.graph.getEdge(vertex.id, previousVertex.id);
-            straightEdge1.center = true;
-          }
-
-          let straightEdge2 = this.graph.getEdge(vertex.id, nextVertex.id);
-          straightEdge2.center = true;
-
-          if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#') {
-            nextVertex.angle = 0.0;
-          }
-
           nextVertex.drawExplicit = true;
+          nextVertex.angle = 0.0;
 
           this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
         } else if (previousVertex && previousVertex.value.rings.length > 0) {
