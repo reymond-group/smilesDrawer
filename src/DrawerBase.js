@@ -851,6 +851,7 @@ class DrawerBase {
 
       this.bridgedRing = true;
       this.createBridgedRing(involvedRings, ring.members[0]);
+      this.bridgedRing = false;
 
       // Remove the rings
       for (var i = 0; i < involvedRings.length; i++) {
