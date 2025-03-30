@@ -3136,7 +3136,7 @@ class DrawerBase {
         else if (neighbour.element === 'S' && pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
           if (pseudoElements['0O'].count === 2 && pseudoElements['3C'].count === 1) {
             neighbour.isDrawn = false;
-            vertex.value.attachPseudoElement('Me', '', 0);
+            vertex.value.attachPseudoElement('Ms', '', 0);
           }
         }
       }
