@@ -1750,18 +1750,22 @@ class DrawerBase {
       }
     }
 
-    for (var i = 0; i < this.rings.length; i++) {
-      if (this.rings[i].isBridged) {
-        startVertex = this.graph.vertices[this.rings[i].members[0]];
+    if (startVertex === null) {
+      for (var i = 0; i < this.rings.length; i++) {
+        if (this.rings[i].isBridged) {
+          startVertex = this.graph.vertices[this.rings[i].members[0]];
+          break;
+        }
       }
     }
 
-    if (this.rings.length > 0 && startVertex === null) {
-      startVertex = this.graph.vertices[this.rings[0].members[0]];
-    }
-
     if (startVertex === null) {
-      startVertex = this.graph.vertices[0];
+      if (this.rings.length > 0) {
+        startVertex = this.graph.vertices[this.rings[0].members[0]];
+      }
+      else {
+        startVertex = this.graph.vertices[0];
+      }
     }
 
     this.createNextBond(startVertex, null, 0.0);
