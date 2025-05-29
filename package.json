@@ -5,28 +5,23 @@
   "main": "./app.js",
   "repository": "https://github.com/nekomemepi/smilesDrawer.git",
   "author": "Daniel Probst, Reymond Group, University of Berne",
+  "maintainer": "Nekomemepi",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "build": "node esbuild.js"
+  },
   "devDependencies": {
-    "babel-core": ">=6.26.3",
-    "babel-preset-env": ">=1.7.0",
-    "babelify": "^10.0.0",
     "browserify": ">=16.2.3",
     "docdash": "^2.0.2",
-    "gulp": "^5.0.0",
-    "gulp-babel-minify": "^0.5.0",
-    "gulp-concat": ">=2.6.1",
-    "gulp-exit": "0.0.2",
-    "gulp-jsdoc3": ">=2.0.0",
-    "gulp-rename": ">=1.4.0",
-    "gulp-sourcemaps": "^3.0.0",
+    "esbuild": "0.25.5",
     "jsdoc": "^4.0.0",
     "vinyl-buffer": ">=1.0.1",
     "vinyl-source-stream": ">=2.0.0",
-    "watchify": "^4.0.0",
-    "webpack-stream": "^7.0.0"
+    "watchify": "^4.0.0"
   },
   "dependencies": {
-    "chroma-js": "^2.4.2"
+    "chroma-js": "^2.4.2",
+    "files-folder": "^1.2.4"
   }
 }
