@@ -3,10 +3,18 @@
   "version": "2.1.10",
   "description": "A SMILES drawer and parser. Generate molecular structure depictions in pure JavaScript.",
   "main": "./app.js",
-  "repository": "https://github.com/reymond-group/smilesDrawer.git",
+  "repository": "https://github.com/nekomemepi/smilesDrawer.git",
   "author": "Daniel Probst, Reymond Group, University of Berne",
   "license": "MIT",
   "private": false,
+   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --config webpack.dev.js --open",
+    "build:prod": "webpack --config webpack.prod.js",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "docs": "jsdoc -c jsdoc.json"
+  },
   "devDependencies": {
     "babel-core": ">=6.26.3",
     "babel-preset-env": ">=1.7.0",
