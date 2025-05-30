@@ -9,7 +9,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "node esbuild.js"
+    "build": "node esbuild.config.js"
   },
   "devDependencies": {
     "browserify": ">=16.2.3",
