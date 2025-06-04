@@ -7,9 +7,7 @@
     <link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Megrim" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.3/noty.css" rel="stylesheet">
     <script src="../dist/smiles-drawer.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.3/noty.min.js"></script>
     <style>
         html,
         body {
@@ -227,16 +225,7 @@
                 log.innerHTML = '&nbsp;';
                 log.style.visibility = 'hidden';
 
-                new Noty({
-                    text: 'Drawing took ' + td.toFixed(3) + 'ms with a total overlap score of ' +
-                        smilesDrawer.getTotalOverlapScore().toFixed(3) + '.',
-                    killer: true,
-                    timeout: 2000,
-                    animation: {
-                        open: null,
-                        close: null
-                    }
-                }).show();
+                // New notification method needed to replace deprecated Noty
             }, function (err) {
                 log.innerHTML = err;
                 log.style.visibility = 'visible';
