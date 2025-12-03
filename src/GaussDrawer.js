@@ -63,7 +63,7 @@ class GaussDrawer {
 
         // It looks like in some common js engines, multiplication by a 
         // fraction is faster than division ...
-        let divisor = 1.0 / (2 * this.sigma ** 2);
+        let divisor = 1.0 / (2 * this.sigma * this.sigma);
 
         for (let i = 0; i < this.points.length; i++) {
             let v = this.points[i];
@@ -73,7 +73,9 @@ class GaussDrawer {
                 for (let y = 0; y < this.height; y++) {
                     // let v_x = (x - v.x) ** 2 / (2 * this.sigma ** 2);
                     // let v_y = (y - v.y) ** 2 / (2 * this.sigma ** 2);
-                    let v_xy = ((x - v.x) ** 2 + (y - v.y) ** 2) * divisor;
+                    let dx = x - v.x;
+                    let dy = y - v.y;
+                    let v_xy = (dx * dx + dy * dy) * divisor;
                     let val = a * Math.exp(-v_xy);
 
                     m[x][y] += val;

@@ -1,5 +1,4 @@
 //@ts-check
-const Drawer = require('./Drawer')
 const Parser = require('./Parser')
 const ReactionParser = require('./ReactionParser')
 const SvgDrawer = require('./SvgDrawer')

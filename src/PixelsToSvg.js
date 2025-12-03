@@ -36,8 +36,7 @@ function convertImage(img) {
 
         // Loop through each color to build paths
         each(colors, function (color, values) {
-            var orig = color;
-            color = getColor.apply(null, color.split(','));
+            var color = getColor.apply(null, color.split(','));
 
             if (color === false) { return; }
 

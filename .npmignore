@@ -1,5 +1,5 @@
 test
 
 logo.png
-.eslintrc.json
+eslint.config.mjs
 .vscode

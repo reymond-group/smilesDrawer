@@ -978,7 +978,6 @@ class DrawerBase {
     // Vertices can also be part of multiple rings and lay on the bridged ring,
     // however, they have to have at least two neighbours that are not part of
     // two rings
-    let tmp = Array();
     let insideRing = Array();
 
     for (let id of leftovers) {
@@ -2381,7 +2380,6 @@ class DrawerBase {
       }
     } else {
       // Draw the non-ring vertices connected to this one  
-      let isStereoCenter = vertex.value.isStereoCenter;
       let tmpNeighbours = vertex.getNeighbours();
       let neighbours = Array();
 
@@ -2536,9 +2534,6 @@ class DrawerBase {
 
         let cisVertex = this.graph.vertices[neighbours[cis]];
         let transVertex = this.graph.vertices[neighbours[trans]];
-
-        let edgeCis = this.graph.getEdge(vertex.id, cisVertex.id);
-        let edgeTrans = this.graph.getEdge(vertex.id, transVertex.id);
 
         // If the origin tree is the shortest, make them the main chain
         let originShortest = false;
@@ -2908,10 +2903,8 @@ class DrawerBase {
       // TODO: OC(Cl)=[C@]=C(C)F currently fails here, however this is, IMHO, not a valid SMILES.
       let posA = this.graph.vertices[neighbours[order[0]]].position;
       let posB = this.graph.vertices[neighbours[order[1]]].position;
-      let posC = this.graph.vertices[neighbours[order[2]]].position;
 
       let cwA = posA.relativeClockwise(posB, vertex.position);
-      let cwB = posA.relativeClockwise(posC, vertex.position);
 
       // If the second priority is clockwise from the first, the ligands are drawn clockwise, since
       // The hydrogen can be drawn on either side
