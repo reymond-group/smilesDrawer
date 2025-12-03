@@ -9,6 +9,7 @@
   "private": false,
   "devDependencies": {
     "esbuild":    "^0.25.0",
+    "eslint":     "^9.39.1",
     "typescript": "^5.8.2"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
   },
   "scripts": {
     "build":     "node ./scripts/build.mjs",
+    "lint":      "npm exec eslint",
     "minify":    "node ./scripts/minify.mjs",
     "release":   "echo Not yet implemented...",
     "typecheck": "tsc --noEmit",

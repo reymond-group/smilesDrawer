@@ -1,9 +1,5 @@
 import * as esbuild from 'esbuild';
+import * as params  from './params.mjs';
 
-let context = await esbuild.context({
-  entryPoints: ['app.js'],
-  outfile: 'dist/smiles-drawer.js',
-  bundle: true
-})
-
+let context = await esbuild.context(params.BUILD)
 await context.watch()

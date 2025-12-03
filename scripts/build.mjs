@@ -1,9 +1,5 @@
 import * as esbuild from 'esbuild';
+import * as params  from './params.mjs';
 
-let result = await esbuild.build({
-  entryPoints: ['app.js'],
-  outfile: 'dist/smiles-drawer.js',
-  bundle: true
-})
-
+let result = await esbuild.build(params.BUILD)
 // console.log(result)
