@@ -851,6 +851,7 @@ class DrawerBase {
 
       this.bridgedRing = true;
       this.createBridgedRing(involvedRings, ring.members[0]);
+      this.bridgedRing = false;
 
       // Remove the rings
       for (var i = 0; i < involvedRings.length; i++) {
@@ -1689,6 +1690,12 @@ class DrawerBase {
         isotope = atom.bracket.isotope;
       }
 
+      // If the molecule has less than 3 elements, always write the "C" for carbon
+      // Likewise, if the carbon has a charge or an isotope, always draw it
+      if (charge || isotope || graph.vertices.length < 3) {
+        isCarbon = false;
+      }
+
       if (this.opts.atomVisualization === 'allballs') {
         this.canvasWrapper.drawBall(vertex.position.x, vertex.position.y, element);
       } else if ((atom.isDrawn && (!isCarbon || atom.drawExplicit || isTerminal || atom.hasAttachedPseudoElements)) || this.graph.vertices.length === 1) {
@@ -2223,21 +2230,25 @@ class DrawerBase {
   }
 
   /**
-   * Get the last non-null or 0 angle vertex.
+   * Get the last non-null or 0 angle.
    * @param {Number} vertexId A vertex id.
-   * @returns {Vertex} The last vertex with an angle that was not 0 or null.
+   * @returns {Vertex} The last angle that was not 0 or null.
    */
-  getLastVertexWithAngle(vertexId) {
-    let angle = 0;
-    let vertex = null;
+  getLastAngle(vertexId) {
+    while (vertexId) {
+      let vertex = this.graph.vertices[vertexId];
+      if (vertex.value.rings.length > 0) {
+        // Angles from rings aren't useful to us...
+        return 0;
+      }
+      if (vertex.angle) {
+        return vertex.angle;
+      }
 
-    while (!angle && vertexId) {
-      vertex = this.graph.vertices[vertexId];
-      angle = vertex.angle;
       vertexId = vertex.parentVertexId;
     }
 
-    return vertex;
+    return 0;
   }
 
   /**
@@ -2400,26 +2411,19 @@ class DrawerBase {
       if (neighbours.length === 1) {
         let nextVertex = this.graph.vertices[neighbours[0]];
 
+        let prevEdge = previousVertex ? this.graph.getEdge(vertex.id, previousVertex.id) : null;
+        let nextEdge = this.graph.getEdge(vertex.id, nextVertex.id);
+
         // Make a single chain always cis except when there's a tribble (yes, this is a Star Trek reference) bond
-        // or if there are successive double bonds. Added a ring check because if there is an aromatic ring the ring bond inside the ring counts as a double bond and leads to =-= being straight.
-        if ((vertex.value.bondType === '#' || (previousVertex && previousVertex.value.bondType === '#')) ||
-          vertex.value.bondType === '=' && previousVertex && previousVertex.value.rings.length === 0 &&
-          previousVertex.value.bondType === '=' && vertex.value.branchBond !== '-') {
+        // or if there are successive double bonds (or some other bond-heavy combo).
+        if (prevEdge && nextEdge && prevEdge.weight + nextEdge.weight >= 4) {
+          prevEdge.center = true;
+          nextEdge.center = true;
+
+          // TODO: One of these is on value, but the other isn't?
           vertex.value.drawExplicit = false;
-
-          if (previousVertex) {
-            let straightEdge1 = this.graph.getEdge(vertex.id, previousVertex.id);
-            straightEdge1.center = true;
-          }
-
-          let straightEdge2 = this.graph.getEdge(vertex.id, nextVertex.id);
-          straightEdge2.center = true;
-
-          if (vertex.value.bondType === '#' || previousVertex && previousVertex.value.bondType === '#') {
-            nextVertex.angle = 0.0;
-          }
-
           nextVertex.drawExplicit = true;
+          nextVertex.angle = 0.0;
 
           this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
         } else if (previousVertex && previousVertex.value.rings.length > 0) {
@@ -2455,9 +2459,7 @@ class DrawerBase {
               a = 1.0472;
             }
           } else if (!a) {
-            let v = this.getLastVertexWithAngle(vertex.id);
-            a = v.angle;
-
+            a = this.getLastAngle(vertex.id);
             if (!a) {
               a = 1.0472;
             }
@@ -2495,7 +2497,6 @@ class DrawerBase {
       } else if (neighbours.length === 2) {
         // If the previous vertex comes out of a ring, it doesn't have an angle set
         let a = vertex.angle;
-
         if (!a) {
           a = 1.0472;
         }
@@ -2558,105 +2559,71 @@ class DrawerBase {
 
         this.createNextBond(transVertex, vertex, previousAngle + transVertex.angle, originShortest);
         this.createNextBond(cisVertex, vertex, previousAngle + cisVertex.angle, originShortest);
-      } else if (neighbours.length === 3) {
-        // The vertex with the longest sub-tree should always go straight
-        let d1 = this.graph.getTreeDepth(neighbours[0], vertex.id);
-        let d2 = this.graph.getTreeDepth(neighbours[1], vertex.id);
-        let d3 = this.graph.getTreeDepth(neighbours[2], vertex.id);
+      }
+      else if (neighbours.length > 0) {
+        // Create vertices for all drawn neighbors...
+        const vertices = neighbours.map(neighbour => {
+          let newvertex    = this.graph.vertices[neighbour];
+          let subtreedepth = this.graph.getTreeDepth(neighbour, vertex.id);
+          newvertex.value.subtreeDepth = subtreedepth;
+          return newvertex;
+        })
 
-        let s = this.graph.vertices[neighbours[0]];
-        let l = this.graph.vertices[neighbours[1]];
-        let r = this.graph.vertices[neighbours[2]];
+        // This puts all the longest subtrees on the far side...
+        // TODO: Maybe try to balance this better?
+        vertices.sort((a, b) => (a.value.subtreeDepth < b.value.subtreeDepth))
 
-        s.value.subtreeDepth = d1;
-        l.value.subtreeDepth = d2;
-        r.value.subtreeDepth = d3;
-
-        if (d2 > d1 && d2 > d3) {
-          s = this.graph.vertices[neighbours[1]];
-          l = this.graph.vertices[neighbours[0]];
-          r = this.graph.vertices[neighbours[2]];
-        } else if (d3 > d1 && d3 > d2) {
-          s = this.graph.vertices[neighbours[2]];
-          l = this.graph.vertices[neighbours[0]];
-          r = this.graph.vertices[neighbours[1]];
-        }
-
-        // Create a cross if more than one subtree is of length > 1
-        // or the vertex is connected to a ring
-        if (previousVertex &&
+        if (neighbours.length === 3 &&
+          previousVertex &&
           previousVertex.value.rings.length < 1 &&
-          s.value.rings.length < 1 &&
-          l.value.rings.length < 1 &&
-          r.value.rings.length < 1 &&
-          this.graph.getTreeDepth(l.id, vertex.id) === 1 &&
-          this.graph.getTreeDepth(r.id, vertex.id) === 1 &&
-          this.graph.getTreeDepth(s.id, vertex.id) > 1) {
-
-          s.angle = -vertex.angle;
+          vertices[2].value.rings.length < 1 &&
+          vertices[1].value.rings.length < 1 &&
+          vertices[0].value.rings.length < 1 &&
+          vertices[2].value.subtreeDepth === 1 &&
+          vertices[1].value.subtreeDepth === 1 &&
+          vertices[0].value.subtreeDepth > 1)
+        {
+          // Special logic for adding pinched crosses...
+          vertices[0].angle = -vertex.angle;
           if (vertex.angle >= 0) {
-            l.angle = MathHelper.toRad(30);
-            r.angle = MathHelper.toRad(90);
+            vertices[1].angle = MathHelper.toRad(30);
+            vertices[2].angle = MathHelper.toRad(90);
           } else {
-            l.angle = -MathHelper.toRad(30);
-            r.angle = -MathHelper.toRad(90);
+            vertices[1].angle = -MathHelper.toRad(30);
+            vertices[2].angle = -MathHelper.toRad(90);
           }
 
-          this.createNextBond(s, vertex, previousAngle + s.angle);
-          this.createNextBond(l, vertex, previousAngle + l.angle);
-          this.createNextBond(r, vertex, previousAngle + r.angle);
-        } else {
-          s.angle = 0.0;
-          l.angle = MathHelper.toRad(90);
-          r.angle = -MathHelper.toRad(90);
-
-          this.createNextBond(s, vertex, previousAngle + s.angle);
-          this.createNextBond(l, vertex, previousAngle + l.angle);
-          this.createNextBond(r, vertex, previousAngle + r.angle);
+          this.createNextBond(vertices[0], vertex, previousAngle + vertices[0].angle);
+          this.createNextBond(vertices[1], vertex, previousAngle + vertices[1].angle);
+          this.createNextBond(vertices[2], vertex, previousAngle + vertices[2].angle);
         }
-      } else if (neighbours.length === 4) {
-        // The vertex with the longest sub-tree should always go to the reflected opposide direction
-        let d1 = this.graph.getTreeDepth(neighbours[0], vertex.id);
-        let d2 = this.graph.getTreeDepth(neighbours[1], vertex.id);
-        let d3 = this.graph.getTreeDepth(neighbours[2], vertex.id);
-        let d4 = this.graph.getTreeDepth(neighbours[3], vertex.id);
+        else {
+          // Divide the remaining space evenly among all neighbors...
+          const totalNeighbors = neighbours.length + (previousVertex? 1 : 0);
+          const angleDelta = 2 * Math.PI / totalNeighbors;
+          let angle = angleDelta;
+          let index = 0;
 
-        let w = this.graph.vertices[neighbours[0]];
-        let x = this.graph.vertices[neighbours[1]];
-        let y = this.graph.vertices[neighbours[2]];
-        let z = this.graph.vertices[neighbours[3]];
+          if (neighbours.length % 2 !== 0) {
+            // If there are an even number, the longest neighbor goes directly across.
+            vertices[0].angle = 0.0;
+            this.createNextBond(vertices[0], vertex, previousAngle);
+            index = 1;
+          }
+          else {
+            // Otherwise, the two longest neighbors split the difference.
+            angle /= 2;
+          }
 
-        w.value.subtreeDepth = d1;
-        x.value.subtreeDepth = d2;
-        y.value.subtreeDepth = d3;
-        z.value.subtreeDepth = d4;
-
-        if (d2 > d1 && d2 > d3 && d2 > d4) {
-          w = this.graph.vertices[neighbours[1]];
-          x = this.graph.vertices[neighbours[0]];
-          y = this.graph.vertices[neighbours[2]];
-          z = this.graph.vertices[neighbours[3]];
-        } else if (d3 > d1 && d3 > d2 && d3 > d4) {
-          w = this.graph.vertices[neighbours[2]];
-          x = this.graph.vertices[neighbours[0]];
-          y = this.graph.vertices[neighbours[1]];
-          z = this.graph.vertices[neighbours[3]];
-        } else if (d4 > d1 && d4 > d2 && d4 > d3) {
-          w = this.graph.vertices[neighbours[3]];
-          x = this.graph.vertices[neighbours[0]];
-          y = this.graph.vertices[neighbours[1]];
-          z = this.graph.vertices[neighbours[2]];
+          while (index < neighbours.length) {
+            vertices[index + 0].angle =  angle;
+            vertices[index + 1].angle = -angle;
+            this.createNextBond(vertices[index + 0], vertex, previousAngle + angle);
+            this.createNextBond(vertices[index + 1], vertex, previousAngle - angle);
+            angle += angleDelta;
+            index += 2;
+          }
         }
-
-        w.angle = -MathHelper.toRad(36);
-        x.angle = MathHelper.toRad(36);
-        y.angle = -MathHelper.toRad(108);
-        z.angle = MathHelper.toRad(108);
-
-        this.createNextBond(w, vertex, previousAngle + w.angle);
-        this.createNextBond(x, vertex, previousAngle + x.angle);
-        this.createNextBond(y, vertex, previousAngle + y.angle);
-        this.createNextBond(z, vertex, previousAngle + z.angle);
       }
     }
   }

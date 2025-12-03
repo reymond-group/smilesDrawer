@@ -342,11 +342,6 @@ class SvgDrawer {
       let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
       let isCarbon = atom.element === 'C';
 
-      // If the molecule has less than 3 elements, always write the "C" for carbon
-      if (graph.vertices.length < 3) {
-        isCarbon = false;
-      }
-
       // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
       // should be the most common state. This has to be fixed by kekulization
       if (atom.element === 'N' && atom.isPartOfAromaticRing) {
@@ -357,6 +352,12 @@ class SvgDrawer {
         hydrogens = atom.bracket.hcount;
         charge = atom.bracket.charge;
         isotope = atom.bracket.isotope;
+      }
+
+      // If the molecule has less than 3 elements, always write the "C" for carbon
+      // Likewise, if the carbon has a charge or an isotope, always draw it
+      if (charge || isotope || graph.vertices.length < 3) {
+        isCarbon = false;
       }
 
       if (opts.atomVisualization === 'allballs') {
