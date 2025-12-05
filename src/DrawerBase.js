@@ -2446,24 +2446,8 @@ class DrawerBase {
 
           this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
         } else {
-          let a = vertex.angle;
-          // Take the min and max if the previous angle was in a 4-neighbourhood (90° angles)
-          // TODO: If a is null or zero, it should be checked whether or not this one should go cis or trans, that is,
-          //       it should go into the oposite direction of the last non-null or 0 previous vertex / angle.
-          if (previousVertex && previousVertex.neighbours.length > 3) {
-            if (a > 0) {
-              a = Math.min(1.0472, a);
-            } else if (a < 0) {
-              a = Math.max(-1.0472, a);
-            } else {
-              a = 1.0472;
-            }
-          } else if (!a) {
-            a = this.getLastAngle(vertex.id);
-            if (!a) {
-              a = 1.0472;
-            }
-          }
+          let a = this.getLastAngle(vertex.id);
+          a = (a >= 0)? 1.0472 : -1.0472;
 
           // Handle configuration around double bonds
           if (previousVertex && !doubleBondConfigSet) {
@@ -2604,9 +2588,10 @@ class DrawerBase {
           let angle = angleDelta;
           let index = 0;
 
+          // We don't set vertices[x].angle here because these angles aren't useful
+          // when alternating between cis and trans in the main chain.
           if (neighbours.length % 2 !== 0) {
             // If there are an even number, the longest neighbor goes directly across.
-            vertices[0].angle = 0.0;
             this.createNextBond(vertices[0], vertex, previousAngle);
             index = 1;
           }
@@ -2616,8 +2601,6 @@ class DrawerBase {
           }
 
           while (index < neighbours.length) {
-            vertices[index + 0].angle =  angle;
-            vertices[index + 1].angle = -angle;
             this.createNextBond(vertices[index + 0], vertex, previousAngle + angle);
             this.createNextBond(vertices[index + 1], vertex, previousAngle - angle);
             angle += angleDelta;
