@@ -2568,11 +2568,12 @@ class DrawerBase {
           vertices[0].value.subtreeDepth > 1)
         {
           // Special logic for adding pinched crosses...
-          vertices[0].angle = -vertex.angle;
           if (vertex.angle >= 0) {
+            vertices[0].angle = -1.0472;
             vertices[1].angle = MathHelper.toRad(30);
             vertices[2].angle = MathHelper.toRad(90);
           } else {
+            vertices[0].angle = +1.0472;
             vertices[1].angle = -MathHelper.toRad(30);
             vertices[2].angle = -MathHelper.toRad(90);
           }
