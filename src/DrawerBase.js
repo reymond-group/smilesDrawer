@@ -3076,6 +3076,7 @@ class DrawerBase {
       }
     }
 
+    /*
     // The second pass
     for (var i = 0; i < this.graph.vertices.length; i++) {
       const vertex = this.graph.vertices[i];
@@ -3102,12 +3103,21 @@ class DrawerBase {
 
         const pseudoElements = neighbour.getAttachedPseudoElements();
 
-        if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
-          neighbour.isDrawn = false;
-          vertex.value.attachPseudoElement('Ac', '', 0);
+        if (neighbour.element === 'C' && pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
+          if (pseudoElements['0O'].count === 1 && pseudoElements['3C'].count === 1) {
+            neighbour.isDrawn = false;
+            vertex.value.attachPseudoElement('Ac', '', 0);
+          }
+        }
+        else if (neighbour.element === 'S' && pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
+          if (pseudoElements['0O'].count === 2 && pseudoElements['3C'].count === 1) {
+            neighbour.isDrawn = false;
+            vertex.value.attachPseudoElement('Ms', '', 0);
+          }
         }
       }
     }
+    */
   }
 }
 
