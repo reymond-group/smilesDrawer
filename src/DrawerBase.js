@@ -133,7 +133,7 @@ class DrawerBase {
           B: "#2aa198",
           SI: "#2aa198",
           H: "#657b83",
-          BACKGROUND: "#fff"
+          BACKGROUND: "#eee8d5"
         },
         "solarized-dark": {
           C: "#93a1a1",
@@ -148,7 +148,7 @@ class DrawerBase {
           B: "#2aa198",
           SI: "#2aa198",
           H: "#839496",
-          BACKGROUND: "#fff"
+          BACKGROUND: "#073642"
         },
         "matrix": {
           C: "#678c61",
@@ -979,7 +979,6 @@ class DrawerBase {
     // Vertices can also be part of multiple rings and lay on the bridged ring,
     // however, they have to have at least two neighbours that are not part of
     // two rings
-    let tmp = Array();
     let insideRing = Array();
 
     for (let id of leftovers) {
@@ -2392,7 +2391,6 @@ class DrawerBase {
       }
     } else {
       // Draw the non-ring vertices connected to this one  
-      let isStereoCenter = vertex.value.isStereoCenter;
       let tmpNeighbours = vertex.getNeighbours();
       let neighbours = Array();
 
@@ -2448,24 +2446,8 @@ class DrawerBase {
 
           this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
         } else {
-          let a = vertex.angle;
-          // Take the min and max if the previous angle was in a 4-neighbourhood (90° angles)
-          // TODO: If a is null or zero, it should be checked whether or not this one should go cis or trans, that is,
-          //       it should go into the oposite direction of the last non-null or 0 previous vertex / angle.
-          if (previousVertex && previousVertex.neighbours.length > 3) {
-            if (a > 0) {
-              a = Math.min(1.0472, a);
-            } else if (a < 0) {
-              a = Math.max(-1.0472, a);
-            } else {
-              a = 1.0472;
-            }
-          } else if (!a) {
-            a = this.getLastAngle(vertex.id);
-            if (!a) {
-              a = 1.0472;
-            }
-          }
+          let a = this.getLastAngle(vertex.id);
+          a = (a >= 0)? 1.0472 : -1.0472;
 
           // Handle configuration around double bonds
           if (previousVertex && !doubleBondConfigSet) {
@@ -2538,9 +2520,6 @@ class DrawerBase {
         let cisVertex = this.graph.vertices[neighbours[cis]];
         let transVertex = this.graph.vertices[neighbours[trans]];
 
-        let edgeCis = this.graph.getEdge(vertex.id, cisVertex.id);
-        let edgeTrans = this.graph.getEdge(vertex.id, transVertex.id);
-
         // If the origin tree is the shortest, make them the main chain
         let originShortest = false;
         if (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB) {
@@ -2589,11 +2568,12 @@ class DrawerBase {
           vertices[0].value.subtreeDepth > 1)
         {
           // Special logic for adding pinched crosses...
-          vertices[0].angle = -vertex.angle;
           if (vertex.angle >= 0) {
+            vertices[0].angle = -1.0472;
             vertices[1].angle = MathHelper.toRad(30);
             vertices[2].angle = MathHelper.toRad(90);
           } else {
+            vertices[0].angle = +1.0472;
             vertices[1].angle = -MathHelper.toRad(30);
             vertices[2].angle = -MathHelper.toRad(90);
           }
@@ -2609,9 +2589,10 @@ class DrawerBase {
           let angle = angleDelta;
           let index = 0;
 
+          // We don't set vertices[x].angle here because these angles aren't useful
+          // when alternating between cis and trans in the main chain.
           if (neighbours.length % 2 !== 0) {
             // If there are an even number, the longest neighbor goes directly across.
-            vertices[0].angle = 0.0;
             this.createNextBond(vertices[0], vertex, previousAngle);
             index = 1;
           }
@@ -2621,8 +2602,6 @@ class DrawerBase {
           }
 
           while (index < neighbours.length) {
-            vertices[index + 0].angle =  angle;
-            vertices[index + 1].angle = -angle;
             this.createNextBond(vertices[index + 0], vertex, previousAngle + angle);
             this.createNextBond(vertices[index + 1], vertex, previousAngle - angle);
             angle += angleDelta;
@@ -2875,10 +2854,8 @@ class DrawerBase {
       // TODO: OC(Cl)=[C@]=C(C)F currently fails here, however this is, IMHO, not a valid SMILES.
       let posA = this.graph.vertices[neighbours[order[0]]].position;
       let posB = this.graph.vertices[neighbours[order[1]]].position;
-      let posC = this.graph.vertices[neighbours[order[2]]].position;
 
       let cwA = posA.relativeClockwise(posB, vertex.position);
-      let cwB = posA.relativeClockwise(posC, vertex.position);
 
       // If the second priority is clockwise from the first, the ligands are drawn clockwise, since
       // The hydrogen can be drawn on either side
@@ -3100,6 +3077,7 @@ class DrawerBase {
       }
     }
 
+    /*
     // The second pass
     for (var i = 0; i < this.graph.vertices.length; i++) {
       const vertex = this.graph.vertices[i];
@@ -3126,12 +3104,21 @@ class DrawerBase {
 
         const pseudoElements = neighbour.getAttachedPseudoElements();
 
-        if (pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
-          neighbour.isDrawn = false;
-          vertex.value.attachPseudoElement('Ac', '', 0);
+        if (neighbour.element === 'C' && pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
+          if (pseudoElements['0O'].count === 1 && pseudoElements['3C'].count === 1) {
+            neighbour.isDrawn = false;
+            vertex.value.attachPseudoElement('Ac', '', 0);
+          }
+        }
+        else if (neighbour.element === 'S' && pseudoElements.hasOwnProperty('0O') && pseudoElements.hasOwnProperty('3C')) {
+          if (pseudoElements['0O'].count === 2 && pseudoElements['3C'].count === 1) {
+            neighbour.isDrawn = false;
+            vertex.value.attachPseudoElement('Ms', '', 0);
+          }
         }
       }
     }
+    */
   }
 }
 

@@ -280,8 +280,8 @@ class ReactionDrawer {
         let totalWidth = 0.0;
 
         elements.forEach(element => {
-            let offsetX = element.offsetX ?? 0.0;
-            let offsetY = element.offsetY ?? 0.0;
+            let offsetX = element.offsetX || 0.0;
+            let offsetY = element.offsetY || 0.0;
 
             element.svg.setAttributeNS(null, 'x', Math.round(totalWidth + offsetX));
             element.svg.setAttributeNS(null, 'y', Math.round(((maxHeight - element.height) / 2.0) + offsetY));

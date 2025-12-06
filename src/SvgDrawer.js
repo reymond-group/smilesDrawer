@@ -3,7 +3,6 @@
 const ArrayHelper = require('./ArrayHelper');
 const Atom = require('./Atom');
 const DrawerBase = require('./DrawerBase');
-const Graph = require('./Graph');
 const Line = require('./Line');
 const SvgWrapper = require('./SvgWrapper');
 const ThemeManager = require('./ThemeManager');
@@ -302,9 +301,7 @@ class SvgDrawer {
    */
   drawAtomHighlights(debug) {
     let preprocessor = this.preprocessor;
-    let opts = preprocessor.opts;
     let graph = preprocessor.graph;
-    let rings = preprocessor.rings;
     let svgWrapper = this.svgWrapper;
 
     for (var i = 0; i < graph.vertices.length; i++) {

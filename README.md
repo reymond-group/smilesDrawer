@@ -7,7 +7,7 @@ You can let me know via E-Mail. You'll find the address here: https://people.epf
 
 No server, no images, no templates, just a SMILES 😊
 
-Current Version: **2.1.10**
+Current Version: **2.2.0**
 
 <table style="width: 100%; table-layout: fixed">
     <tbody>
@@ -123,7 +123,7 @@ If you decide not to use the ready-to-go scripts in `dist`, you can (edit and) b
 
 ```bash
 npm install
-gulp
+npm run build
 ```
 
 ### Getting Started

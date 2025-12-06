@@ -1,7 +1,3 @@
-const {
-  getChargeText
-} = require('./UtilityFunctions');
-
 const Line = require('./Line');
 const Vector2 = require('./Vector2');
 const MathHelper = require('./MathHelper');
@@ -79,7 +75,7 @@ class SvgWrapper {
       this.svg.appendChild(this.style);
     } else {
       this.container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      container.appendChild(this.style);
+      this.container.appendChild(this.style);
     }
   }
 
@@ -405,8 +401,7 @@ class SvgWrapper {
 
     let dir = Vector2.subtract(end, start).normalize(),
       length = line.getLength(),
-      step = 1.25 / (length / (this.opts.bondLength / 10.0)),
-      changed = false;
+      step = 1.25 / (length / (this.opts.bondLength / 10.0));
 
     let gradient = this.createGradient(line);
 
@@ -437,7 +432,7 @@ class SvgWrapper {
     point.setAttributeNS(null, 'cx', x);
     point.setAttributeNS(null, 'cy', y);
     point.setAttributeNS(null, 'r', '2');
-    point.setAttributeNS(null, 'fill', '#f00');
+    point.setAttributeNS(null, 'fill', color);
     this.vertices.push(point);
     this.drawDebugText(x, y, debugText);
   }
@@ -492,8 +487,7 @@ class SvgWrapper {
    * @param {String} gradient gradient url. Defaults to null.
    */
   drawLine(line, dashed = false, gradient = null, linecap = 'round') {
-    let opts = this.opts,
-      stylesArr = [
+    let stylesArr = [
         ['stroke-width', this.opts.bondThickness],
         ['stroke-linecap', linecap],
         ['stroke-dasharray', dashed ? '5, 5' : 'none'],
@@ -888,7 +882,7 @@ class SvgWrapper {
    */
   static svgToImg(svg, img, width, height) {
     let canvas = document.createElement('canvas');
-    this.svgToCanvas(svg, canvas, width, height, result => {
+    this.svgToCanvas(svg, canvas, width, height, () => {
       img.src = canvas.toDataURL("image/png");
     });
   }
@@ -965,7 +959,7 @@ class SvgWrapper {
       }
     });
 
-    lines.forEach((line, i) => {
+    lines.forEach(line => {
       totalHeight += line.height;
       let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
       tspanElem.setAttributeNS(null, 'fill', themeManager.getColor("C"));

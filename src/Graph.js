@@ -81,19 +81,14 @@ class Graph {
 
       // Add edge between this node and its parent
       let edge = new Edge(parentVertexId, vertex.id, 1);
-      let vertexId = null;
 
       if (isBranch) {
         edge.setBondType(vertex.value.branchBond || '-');
-        vertexId = vertex.id;
-        edge.setBondType(vertex.value.branchBond || '-');
-        vertexId = vertex.id;
       } else {
         edge.setBondType(parentVertex.value.bondType || '-');
-        vertexId = parentVertex.id;
       }
 
-      let edgeId = this.addEdge(edge);
+      this.addEdge(edge);
     }
 
     let offset = node.ringbondCount + 1;
@@ -596,7 +591,6 @@ class Graph {
     var i = vertexIds.length;
     while (i--) {
       let vertex = this.vertices[vertexIds[i]];
-      var j = vertex.neighbours.length;
     }
 
     let matDist = this.getSubgraphDistanceMatrix(vertexIds);
@@ -629,7 +623,7 @@ class Graph {
     i = length;
     while (i--) {
       matLength[i] = new Array(length);
-      var j = length;
+      let j = length;
       while (j--) {
         matLength[i][j] = bondLength * matDist[i][j];
       }
@@ -640,7 +634,7 @@ class Graph {
     i = length;
     while (i--) {
       matStrength[i] = Array(length);
-      var j = length;
+      let j = length;
       while (j--) {
         matStrength[i][j] = edgeStrength * Math.pow(matDist[i][j], -2.0);
       }
@@ -858,7 +852,6 @@ class Graph {
     let length = adjacencyMatrix.length;
     let visited = new Array(length);
     let components = new Array();
-    let count = 0;
 
     visited.fill(false);
 
@@ -867,7 +860,6 @@ class Graph {
         let component = Array();
         visited[u] = true;
         component.push(u);
-        count++;
         Graph._ccGetDfs(u, visited, adjacencyMatrix, component);
         if (component.length > 1) {
           components.push(component);

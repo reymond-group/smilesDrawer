@@ -5,13 +5,12 @@ function convertImage(img) {
 
     function each(obj, fn) {
         var length = obj.length,
-            likeArray = (length === 0 || (length > 0 && (length - 1) in obj)),
-            i = 0;
+            likeArray = (length === 0 || (length > 0 && (length - 1) in obj));
 
         if (likeArray) {
-            for (; i < length; i++) { if (fn.call(obj[i], i, obj[i]) === false) { break; } }
+            for (let i = 0; i < length; i++) { if (fn.call(obj[i], i, obj[i]) === false) { break; } }
         } else {
-            for (i in obj) { if (fn.call(obj[i], i, obj[i]) === false) { break; } }
+            for (const i in obj) { if (fn.call(obj[i], i, obj[i]) === false) { break; } }
         }
     }
 
@@ -37,8 +36,7 @@ function convertImage(img) {
 
         // Loop through each color to build paths
         each(colors, function (color, values) {
-            var orig = color;
-            color = getColor.apply(null, color.split(','));
+            var color = getColor.apply(null, color.split(','));
 
             if (color === false) { return; }
 

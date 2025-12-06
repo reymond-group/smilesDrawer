@@ -1,0 +1,3 @@
+# Useful for local dev work, but not so much for production.
+# Real deployments will be using the minified bundle.
+smiles-drawer.js.map

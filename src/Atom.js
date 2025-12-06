@@ -1,7 +1,5 @@
 //@ts-check
 const ArrayHelper = require('./ArrayHelper')
-const Vertex = require('./Vertex')
-const Ring = require('./Ring')
 
 /** 
  * A class representing an atom.
