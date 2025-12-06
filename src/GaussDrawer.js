@@ -1,9 +1,9 @@
-const Vector2 = require('./Vector2')
-const convertImage = require('./PixelsToSvg')
+import convertImage from './PixelsToSvg'
+import Vector2      from './Vector2'
 
-const chroma = require("chroma-js")
+import chroma from 'chroma-js'
 
-class GaussDrawer {
+export default class GaussDrawer {
     /**
    * The constructor of the class Graph.
    * 
@@ -165,5 +165,3 @@ class GaussDrawer {
         this.context.fillRect(vec.x, vec.y, 1, 1);
     }
 }
-
-module.exports = GaussDrawer;

@@ -1,7 +1,7 @@
-4//@ts-check
-const Parser = require('./Parser')
+//@ts-check
+import Parser from './Parser'
 
-class Reaction {
+export default class Reaction {
     /**
      * The constructor for the class Reaction.
      *
@@ -51,5 +51,3 @@ class Reaction {
         }
     }
 }
-
-module.exports = Reaction;

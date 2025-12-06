@@ -1,4 +1,4 @@
-class ThemeManager {
+export default class ThemeManager {
   constructor(colors, theme) {
     this.colors = colors;
     this.theme = this.colors[theme];
@@ -38,5 +38,3 @@ class ThemeManager {
     // on the fly
   }
 }
-
-module.exports = ThemeManager;

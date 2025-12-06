@@ -1,10 +1,10 @@
-const SvgDrawer = require('./SvgDrawer');
-const SvgWrapper = require('./SvgWrapper');
-const Options = require('./Options');
-const ThemeManager = require('./ThemeManager');
-const formulaToCommonName = require('./FormulaToCommonName');
+import formulaToCommonName from './FormulaToCommonName'
+import Options             from './Options.js'
+import SvgDrawer           from './SvgDrawer'
+import SvgWrapper          from './SvgWrapper'
+import ThemeManager        from './ThemeManager'
 
-class ReactionDrawer {
+export default class ReactionDrawer {
     /**
      * The constructor for the class ReactionDrawer.
      *
@@ -402,5 +402,3 @@ class ReactionDrawer {
         return svg;
     }
 }
-
-module.exports = ReactionDrawer;

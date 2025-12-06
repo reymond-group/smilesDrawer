@@ -1,6 +1,6 @@
 // Adapted from https://codepen.io/shshaw/pen/XbxvNj by 
 
-function convertImage(img) {
+export default function convertImage(img) {
     "use strict";
 
     function each(obj, fn) {
@@ -100,5 +100,3 @@ function convertImage(img) {
     return dummyDiv.firstChild;
 
 }
-
-module.exports = convertImage

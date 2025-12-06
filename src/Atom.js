@@ -1,5 +1,5 @@
 //@ts-check
-const ArrayHelper = require('./ArrayHelper')
+import ArrayHelper from './ArrayHelper'
 
 /** 
  * A class representing an atom.
@@ -36,7 +36,7 @@ const ArrayHelper = require('./ArrayHelper')
  * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
  * @property {Number} class
  */
-class Atom {
+export default class Atom {
   /**
    * The constructor of the class Atom.
    *
@@ -538,5 +538,3 @@ class Atom {
     };
   }
 }
-
-module.exports = Atom;

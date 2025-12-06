@@ -1,18 +1,18 @@
 //@ts-check
-const MathHelper = require('./MathHelper')
-const ArrayHelper = require('./ArrayHelper')
-const Vector2 = require('./Vector2')
-const Line = require('./Line')
-const Vertex = require('./Vertex')
-const Edge = require('./Edge')
-const Atom = require('./Atom')
-const Ring = require('./Ring')
-const RingConnection = require('./RingConnection')
-const CanvasWrapper = require('./CanvasWrapper')
-const Graph = require('./Graph')
-const SSSR = require('./SSSR')
-const ThemeManager = require('./ThemeManager')
-const Options = require('./Options')
+import ArrayHelper    from './ArrayHelper'
+import Atom           from './Atom'
+import CanvasWrapper  from './CanvasWrapper'
+import Edge           from './Edge'
+import Graph          from './Graph'
+import Line           from './Line'
+import MathHelper     from './MathHelper'
+import Options        from './Options'
+import Ring           from './Ring'
+import RingConnection from './RingConnection'
+import SSSR           from './SSSR'
+import ThemeManager   from './ThemeManager'
+import Vector2        from './Vector2'
+import Vertex         from './Vertex'
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -26,7 +26,7 @@ const Options = require('./Options')
  * @property {Object} opts The merged options.
  * @property {Object} theme The current theme.
  */
-class DrawerBase {
+export default class DrawerBase {
   /**
    * The constructor for the class SmilesDrawer.
    *
@@ -3121,5 +3121,3 @@ class DrawerBase {
     */
   }
 }
-
-module.exports = DrawerBase;

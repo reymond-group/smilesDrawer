@@ -1,5 +1,5 @@
 //@ts-check
-const SvgDrawer = require('./SvgDrawer')
+import SvgDrawer from './SvgDrawer'
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -13,7 +13,7 @@ const SvgDrawer = require('./SvgDrawer')
  * @property {Object} opts The merged options.
  * @property {Object} theme The current theme.
  */
-class Drawer {
+export default class Drawer {
   /**
    * The constructor for the class SmilesDrawer.
    *
@@ -78,5 +78,3 @@ class Drawer {
     return this.svgDrawer.getMolecularFormula();
   }
 }
-
-module.exports = Drawer;

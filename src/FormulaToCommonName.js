@@ -1,6 +1,6 @@
 //@ts-check
 
-const formulaToCommonName = {
+export default formulaToCommonName = {
     'C2H4O2': 'acetic acid',
     'C3H6O': 'acetone',
     'C2H3N': 'acetonitrile',
@@ -33,7 +33,3 @@ const formulaToCommonName = {
     'C6H15N': 'triethyl amine',
     'H2O': 'water'
 };
-
-module.exports = formulaToCommonName
-
-

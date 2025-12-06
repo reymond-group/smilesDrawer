@@ -1,6 +1,6 @@
 //@ts-check
-const Vertex = require('./Vertex')
-const Ring = require('./Ring')
+import Ring   from './Ring'
+import Vertex from './Vertex'
 
 /** 
  * A class representing a ring connection.
@@ -10,7 +10,7 @@ const Ring = require('./Ring')
  * @property {Number} secondRingId A ring id.
  * @property {Set<Number>} vertices A set containing the vertex ids participating in the ring connection.
  */
-class RingConnection {
+export default class RingConnection {
     /**
      * The constructor for the class RingConnection.
      *
@@ -157,5 +157,3 @@ class RingConnection {
         }
     }
 }
-
-module.exports = RingConnection

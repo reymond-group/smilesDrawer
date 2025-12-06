@@ -1,11 +1,11 @@
 //@ts-check
-const Drawer = require('./src/Drawer')
-const Parser = require('./src/Parser')
-const ReactionParser = require('./src/ReactionParser')
-const SvgDrawer = require('./src/SvgDrawer')
-const ReactionDrawer = require('./src/ReactionDrawer')
-const SmiDrawer = require('./src/SmilesDrawer')
-const GaussDrawer = require('./src/GaussDrawer')
+import Drawer         from './src/Drawer'
+import GaussDrawer    from './src/GaussDrawer'
+import Parser         from './src/Parser'
+import ReactionDrawer from './src/ReactionDrawer'
+import ReactionParser from './src/ReactionParser'
+import SmiDrawer      from './src/SmilesDrawer'
+import SvgDrawer      from './src/SvgDrawer'
 
 // Detect SSR (server side rendering)
 var canUseDOM = !!(
@@ -17,7 +17,7 @@ var canUseDOM = !!(
  * The SmilesDrawer namespace.
  * @typicalname SmilesDrawer
  */
-var SmilesDrawer = {
+export default SmilesDrawer = {
   Version: '2.2.0'
 };
 
@@ -160,5 +160,3 @@ if (!Array.prototype.fill) {
     }
   });
 }
-
-module.exports = SmilesDrawer;
