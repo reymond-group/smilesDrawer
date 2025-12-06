@@ -133,7 +133,7 @@ class DrawerBase {
           B: "#2aa198",
           SI: "#2aa198",
           H: "#657b83",
-          BACKGROUND: "#fff"
+          BACKGROUND: "#eee8d5"
         },
         "solarized-dark": {
           C: "#93a1a1",
@@ -148,7 +148,7 @@ class DrawerBase {
           B: "#2aa198",
           SI: "#2aa198",
           H: "#839496",
-          BACKGROUND: "#fff"
+          BACKGROUND: "#073642"
         },
         "matrix": {
           C: "#678c61",
