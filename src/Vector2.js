@@ -617,7 +617,7 @@ export default class Vector2 {
     static averageDirection(vecs) {
         let avg = new Vector2(0.0, 0.0);
 
-        for (var i = 0; i < vecs.length; i++) {
+        for (let i = 0; i < vecs.length; i++) {
           let vec = vecs[i];
           avg.add(vec);
         }

@@ -1,7 +1,9 @@
 import { defineConfig } from "eslint/config";
+import js from "@eslint/js";
 import globals from "globals";
 
 export default defineConfig([
+    js.configs.recommended,
     {
         ignores: [
             "dist/",    // Automatically generated
@@ -24,6 +26,7 @@ export default defineConfig([
 
         rules: {
             "no-const-assign": "warn",
+            "no-shadow": "error",
             "no-this-before-super": "warn",
             "no-undef": "warn",
             "no-unreachable": "warn",

@@ -4,7 +4,7 @@ export default function convertImage(img) {
     "use strict";
 
     function each(obj, fn) {
-        var length = obj.length,
+        let length = obj.length,
             likeArray = (length === 0 || (length > 0 && (length - 1) in obj));
 
         if (likeArray) {
@@ -15,7 +15,7 @@ export default function convertImage(img) {
     }
 
     function componentToHex(c) {
-        var hex = parseInt(c).toString(16);
+        let hex = parseInt(c).toString(16);
         return hex.length == 1 ? "0" + hex : hex;
     }
 
@@ -32,17 +32,17 @@ export default function convertImage(img) {
 
     function colorsToPaths(colors) {
 
-        var output = "";
+        let output = "";
 
         // Loop through each color to build paths
         each(colors, function (color, values) {
-            var color = getColor.apply(null, color.split(','));
+            color = getColor.apply(null, color.split(','));
 
             if (color === false) { return; }
 
-            var paths = [];
-            var curPath;
-            var w = 1;
+            let paths = [];
+            let curPath;
+            let w = 1;
 
             // Loops through each color's pixels to optimize paths
             each(values, function () {
@@ -66,18 +66,16 @@ export default function convertImage(img) {
         return output;
     }
 
-    var getColors = function (img) {
-        var colors = {},
-            data = img.data,
+    function getColors(image) {
+        let colors = {},
+            data = image.data,
             len = data.length,
-            w = img.width,
-            h = img.height,
+            w = image.width,
             x = 0,
             y = 0,
-            i = 0,
             color;
 
-        for (; i < len; i += 4) {
+        for (let i = 0; i < len; i += 4) {
             if (data[i + 3] > 0) {
                 color = data[i] + ',' + data[i + 1] + ',' + data[i + 2] + ',' + data[i + 3];
                 colors[color] = colors[color] || [];
@@ -94,7 +92,7 @@ export default function convertImage(img) {
     let paths = colorsToPaths(colors);
     let output = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 ' + img.width + ' ' + img.height + '" shape-rendering="crispEdges"><g shape-rendering="crispEdges">' + paths + '</g></svg>';
 
-    var dummyDiv = document.createElement('div');
+    let dummyDiv = document.createElement('div');
     dummyDiv.innerHTML = output;
 
     return dummyDiv.firstChild;

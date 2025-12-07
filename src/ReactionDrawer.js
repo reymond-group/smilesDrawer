@@ -60,7 +60,7 @@ export default class ReactionDrawer {
             let max = -Number.MAX_SAFE_INTEGER;
             let min = Number.MAX_SAFE_INTEGER;
 
-            if (weights.hasOwnProperty('reactants')) {
+            if ('reactants' in weights) {
                 for (let i = 0; i < weights.reactants.length; i++) {
                     for (let j = 0; j < weights.reactants[i].length; j++) {
                         if (weights.reactants[i][j] < min) {
@@ -73,7 +73,7 @@ export default class ReactionDrawer {
                 }
             }
 
-            if (weights.hasOwnProperty('reagents')) {
+            if ('reagents' in weights) {
                 for (let i = 0; i < weights.reagents.length; i++) {
                     for (let j = 0; j < weights.reagents[i].length; j++) {
                         if (weights.reagents[i][j] < min) {
@@ -86,7 +86,7 @@ export default class ReactionDrawer {
                 }
             }
 
-            if (weights.hasOwnProperty('products')) {
+            if ('products' in weights) {
                 for (let i = 0; i < weights.products.length; i++) {
                     for (let j = 0; j < weights.products[i].length; j++) {
                         if (weights.products[i][j] < min) {
@@ -104,7 +104,7 @@ export default class ReactionDrawer {
                 abs_max = 1;
             }
 
-            if (weights.hasOwnProperty('reactants')) {
+            if ('reactants' in weights) {
                 for (let i = 0; i < weights.reactants.length; i++) {
                     for (let j = 0; j < weights.reactants[i].length; j++) {
                         weights.reactants[i][j] /= abs_max;
@@ -112,7 +112,7 @@ export default class ReactionDrawer {
                 }
             }
 
-            if (weights.hasOwnProperty('reagents')) {
+            if ('reagents' in weights) {
                 for (let i = 0; i < weights.reagents.length; i++) {
                     for (let j = 0; j < weights.reagents[i].length; j++) {
                         weights.reagents[i][j] /= abs_max;
@@ -120,7 +120,7 @@ export default class ReactionDrawer {
                 }
             }
 
-            if (weights.hasOwnProperty('products')) {
+            if ('products' in weights) {
                 for (let i = 0; i < weights.products.length; i++) {
                     for (let j = 0; j < weights.products[i].length; j++) {
                         weights.products[i][j] /= abs_max;
@@ -151,7 +151,7 @@ export default class ReactionDrawer {
         let maxHeight = 0.0
 
         // Reactants
-        for (var i = 0; i < reaction.reactants.length; i++) {
+        for (let i = 0; i < reaction.reactants.length; i++) {
             if (i > 0) {
                 elements.push({
                     width: this.opts.plus.size * this.opts.scale,
@@ -161,7 +161,7 @@ export default class ReactionDrawer {
             }
 
             let reactantWeights = null;
-            if (weights && weights.hasOwnProperty('reactants') && weights.reactants.length > i) {
+            if (weights && 'reactants' in weights && weights.reactants.length > i) {
                 reactantWeights = weights.reactants[i];
             }
 
@@ -191,7 +191,7 @@ export default class ReactionDrawer {
 
         // Text above the arrow / reagents
         let reagentsText = "";
-        for (var i = 0; i < reaction.reagents.length; i++) {
+        for (let i = 0; i < reaction.reagents.length; i++) {
             if (i > 0) {
                 reagentsText += ", "
             }
@@ -246,7 +246,7 @@ export default class ReactionDrawer {
         });
 
         // Products
-        for (var i = 0; i < reaction.products.length; i++) {
+        for (let i = 0; i < reaction.products.length; i++) {
             if (i > 0) {
                 elements.push({
                     width: this.opts.plus.size * this.opts.scale,
@@ -256,7 +256,7 @@ export default class ReactionDrawer {
             }
 
             let productWeights = null;
-            if (weights && weights.hasOwnProperty('products') && weights.products.length > i) {
+            if (weights && 'products' in weights && weights.products.length > i) {
                 productWeights = weights.products[i];
             }
 

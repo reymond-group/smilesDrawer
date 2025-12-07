@@ -23,7 +23,7 @@ export default class RingConnection {
         this.secondRingId = secondRing.id;
         this.vertices = new Set();
 
-        for (var m = 0; m < firstRing.members.length; m++) {
+        for (let m = 0; m < firstRing.members.length; m++) {
             let c = firstRing.members[m];
 
             for (let n = 0; n < secondRing.members.length; n++) {

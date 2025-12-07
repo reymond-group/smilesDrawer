@@ -17,7 +17,7 @@ export default class Options {
         }
 
         let merge = function (obj) {
-            for (var prop in obj) {
+            for (let prop in obj) {
                 if (Object.prototype.hasOwnProperty.call(obj, prop)) {
                     if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
                         extended[prop] = that.extend(true, extended[prop], obj[prop]);

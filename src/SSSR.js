@@ -19,18 +19,18 @@ export default class SSSR {
         let connectedComponents = Graph.getConnectedComponents(adjacencyMatrix);
         let rings = Array();
 
-        for (var i = 0; i < connectedComponents.length; i++) {
+        for (let i = 0; i < connectedComponents.length; i++) {
             let connectedComponent = connectedComponents[i];
             let ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix([...connectedComponent]);
 
             let arrBondCount = new Uint16Array(ccAdjacencyMatrix.length);
             let arrRingCount = new Uint16Array(ccAdjacencyMatrix.length);
 
-            for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
+            for (let j = 0; j < ccAdjacencyMatrix.length; j++) {
                 arrRingCount[j] = 0;
                 arrBondCount[j] = 0;
 
-                for (var k = 0; k < ccAdjacencyMatrix[j].length; k++) {
+                for (let k = 0; k < ccAdjacencyMatrix[j].length; k++) {
                     arrBondCount[j] += ccAdjacencyMatrix[j][k];
                 }
             }
@@ -38,8 +38,8 @@ export default class SSSR {
             // Get the edge number and the theoretical number of rings in SSSR
             let nEdges = 0;
 
-            for (var j = 0; j < ccAdjacencyMatrix.length; j++) {
-                for (var k = j + 1; k < ccAdjacencyMatrix.length; k++) {
+            for (let j = 0; j < ccAdjacencyMatrix.length; j++) {
+                for (let k = j + 1; k < ccAdjacencyMatrix.length; k++) {
                     nEdges += ccAdjacencyMatrix[j][k];
                 }
             }
@@ -52,7 +52,7 @@ export default class SSSR {
 
             // If all vertices have 3 incident edges, calculate with different formula (see Euler)
             let allThree = true;
-            for (var j = 0; j < arrBondCount.length; j++) {
+            for (let j = 0; j < arrBondCount.length; j++) {
                 if (arrBondCount[j] !== 3) {
                     allThree = false;
                 }
@@ -76,7 +76,7 @@ export default class SSSR {
             let c = SSSR.getRingCandidates(d, pe, pe_prime);
             let sssr = SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
 
-            for (var j = 0; j < sssr.length; j++) {
+            for (let j = 0; j < sssr.length; j++) {
                 let ring = Array(sssr[j].size);
                 let index = 0;
 
@@ -105,8 +105,8 @@ export default class SSSR {
     static matrixToString(matrix) {
         let str = '';
 
-        for (var i = 0; i < matrix.length; i++) {
-            for (var j = 0; j < matrix[i].length; j++) {
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[i].length; j++) {
                 str += matrix[i][j] + ' ';
             }
 
@@ -335,7 +335,7 @@ export default class SSSR {
                     // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
                     // TODO: This is a workaround, fix later. Probably should be a set rather than an array, however the computational overhead
                     //       is probably bigger compared to leaving it like this.
-                    for (var k = 0; k < bonds.length; k++) {
+                    for (let k = 0; k < bonds.length; k++) {
                         if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
                     }
 
@@ -356,7 +356,7 @@ export default class SSSR {
                     // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
                     // TODO: This is a workaround, fix later. Probably should be a set rather than an array, however the computational overhead
                     //       is probably bigger compared to leaving it like this.
-                    for (var k = 0; k < bonds.length; k++) {
+                    for (let k = 0; k < bonds.length; k++) {
                         if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
                     }
 
@@ -560,7 +560,7 @@ export default class SSSR {
      * @returns {Boolean} A boolean indicating whether or not setB is a superset of setA.
      */
     static isSupersetOf(setA, setB) {
-        for (var element of setB) {
+        for (let element of setB) {
             if (!setA.has(element)) {
                 return false;
             }

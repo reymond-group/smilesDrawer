@@ -31,7 +31,7 @@ export default class MathHelper {
         let sin = 0.0;
         let cos = 0.0;
         
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             sin += Math.sin(arr[i]);
             cos += Math.cos(arr[i]);
         }
@@ -133,7 +133,7 @@ export default class MathHelper {
             return traverseCycle(arr[i], cycleLength);
         }
 
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             if (visited[i] === 1) {
                 continue;
             }

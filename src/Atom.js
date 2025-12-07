@@ -228,7 +228,7 @@ export default class Atom {
     arr.sort();
     this.neighbouringElements.sort();
 
-    for (var i = 0; i < this.neighbouringElements.length; i++) {
+    for (let i = 0; i < this.neighbouringElements.length; i++) {
       if (arr[i] !== this.neighbouringElements[i]) {
         return false;
       }

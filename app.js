@@ -31,7 +31,7 @@ const SmilesDrawerNS = {
 * @returns {String} The clean SMILES string.
 */
 SmilesDrawerNS.clean = function (smiles) {
-  return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
+  return smiles.replace(/[^A-Za-z0-9@.+\-?!()[\]{}/\\=#$:*]/g, '');
 }
 
 /**

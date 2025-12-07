@@ -3,10 +3,10 @@ import MathHelper from './MathHelper'
 import Vector2    from './Vector2'
 
 function makeid(length) {
-  var result = '';
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
+  let result = '';
+  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
@@ -90,14 +90,16 @@ export default class SvgWrapper {
       pathChildNodes = this.paths;
 
 
-    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    mask.setAttributeNS(null, 'x', this.minX);
-    mask.setAttributeNS(null, 'y', this.minY);
-    mask.setAttributeNS(null, 'width', this.maxX - this.minX);
-    mask.setAttributeNS(null, 'height', this.maxY - this.minY);
-    mask.setAttributeNS(null, 'fill', 'white');
+    { // Set up the basic masking layer...
+      let mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      mask.setAttributeNS(null, 'x', this.minX);
+      mask.setAttributeNS(null, 'y', this.minY);
+      mask.setAttributeNS(null, 'width', this.maxX - this.minX);
+      mask.setAttributeNS(null, 'height', this.maxY - this.minY);
+      mask.setAttributeNS(null, 'fill', 'white');
 
-    masks.appendChild(mask);
+      masks.appendChild(mask);
+    }
 
     // give the mask an id
     masks.setAttributeNS(null, 'id', this.uid + '-text-mask');
@@ -234,7 +236,7 @@ export default class SvgWrapper {
    * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
    */
   determineDimensions(vertices) {
-    for (var i = 0; i < vertices.length; i++) {
+    for (let i = 0; i < vertices.length; i++) {
       if (!vertices[i].value.isDrawn) {
         continue;
       }
@@ -597,29 +599,24 @@ export default class SvgWrapper {
 
     // TODO: Better handle exceptions
     // Exception for nitro (draw nitro as NO2 instead of N+O-O)
-    if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') &&
-      attachedPseudoElement.hasOwnProperty('0O-1')) {
+    if (charge === 1 && elementName === 'N' && '0O' in attachedPseudoElement && '0O-1' in attachedPseudoElement) {
       attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
       charge = 0;
     }
 
-    for (let key in attachedPseudoElement) {
-      if (!attachedPseudoElement.hasOwnProperty(key)) {
-        continue;
-      }
-
+    for (let key in Object.keys(attachedPseudoElement)) {
       let pe = attachedPseudoElement[key];
-      let display = pe.element;
+      let pe_display = pe.element;
 
       if (pe.count > 1) {
-        display += SvgWrapper.createUnicodeSubscript(pe.count);
+        pe_display += SvgWrapper.createUnicodeSubscript(pe.count);
       }
 
       if (pe.charge !== '') {
-        display += SvgWrapper.createUnicodeCharge(charge);
+        pe_display += SvgWrapper.createUnicodeCharge(charge);
       }
 
-      text.push([display, pe.element]);
+      text.push([pe_display, pe.element]);
 
       if (pe.hydrogenCount === 1) {
         text.push(['H', 'H'])

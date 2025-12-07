@@ -44,7 +44,7 @@ export default class ArrayHelper {
         let tmpA = arrA.slice().sort();
         let tmpB = arrB.slice().sort();
 
-        for (var i = 0; i < tmpA.length; i++) {
+        for (let i = 0; i < tmpA.length; i++) {
             if (tmpA[i] !== tmpB[i]) {
                 return false;
             }

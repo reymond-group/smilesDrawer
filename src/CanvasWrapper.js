@@ -130,7 +130,7 @@ export default class CanvasWrapper {
         let minX = Number.MAX_VALUE;
         let minY = Number.MAX_VALUE;
 
-        for (var i = 0; i < vertices.length; i++) {
+        for (let i = 0; i < vertices.length; i++) {
             if (!vertices[i].value.isDrawn) {
                 continue;
             }
@@ -144,7 +144,7 @@ export default class CanvasWrapper {
         }
 
         // Add padding
-        var padding = this.opts.padding;
+        let padding = this.opts.padding;
         maxX += padding;
         maxY += padding;
         minX -= padding;
@@ -153,10 +153,10 @@ export default class CanvasWrapper {
         this.drawingWidth = maxX - minX;
         this.drawingHeight = maxY - minY;
 
-        var scaleX = this.canvas.offsetWidth / this.drawingWidth;
-        var scaleY = this.canvas.offsetHeight / this.drawingHeight;
+        let scaleX = this.canvas.offsetWidth / this.drawingWidth;
+        let scaleY = this.canvas.offsetHeight / this.drawingHeight;
 
-        var scale = (scaleX < scaleY) ? scaleX : scaleY;
+        let scale = (scaleX < scaleY) ? scaleX : scaleY;
 
         this.ctx.scale(scale, scale);
 
@@ -464,7 +464,7 @@ export default class CanvasWrapper {
         let step = 1.25 / (length / (this.opts.bondThickness * 3.0));
 
         let changed = false;
-        for (var t = 0.0; t < 1.0; t += step) {
+        for (let t = 0.0; t < 1.0; t += step) {
             let to = Vector2.multiplyScalar(dir, t * length);
             let startDash = Vector2.add(start, to);
             let width = 1.5 * t;
@@ -603,8 +603,7 @@ export default class CanvasWrapper {
 
         // TODO: Better handle exceptions
         // Exception for nitro (draw nitro as NO2 instead of N+O-O)
-        if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') &&
-            attachedPseudoElement.hasOwnProperty('0O-1')) {
+        if (charge === 1 && elementName === 'N' && '0O' in attachedPseudoElement && '0O-1' in attachedPseudoElement) {
             attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
             charge = 0;
         }
@@ -714,11 +713,7 @@ export default class CanvasWrapper {
             return;
         }
 
-        for (let key in attachedPseudoElement) {
-            if (!attachedPseudoElement.hasOwnProperty(key)) {
-                continue;
-            }
-
+        for (const key of Object.keys(attachedPseudoElement)) {
             let openParenthesisWidth = 0;
             let closeParenthesisWidth = 0;
 

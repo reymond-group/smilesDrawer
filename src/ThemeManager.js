@@ -29,7 +29,7 @@ export default class ThemeManager {
    * @param {String} theme the name of the theme to switch to
    */
   setTheme(theme) {
-    if (this.colors.hasOwnProperty(theme)) {
+    if (theme in this.colors) {
       this.theme = this.colors[theme];
     }
 

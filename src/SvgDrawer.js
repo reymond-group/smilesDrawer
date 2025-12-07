@@ -148,7 +148,7 @@ export default class SvgDrawer {
 
     graph.traverseBF(0, vertex => {
       let edges = graph.getEdges(vertex.id);
-      for (var i = 0; i < edges.length; i++) {
+      for (let i = 0; i < edges.length; i++) {
         let edgeId = edges[i];
         if (!drawn[edgeId]) {
           drawn[edgeId] = true;
@@ -159,7 +159,7 @@ export default class SvgDrawer {
 
     // Draw ring for implicitly defined aromatic rings
     if (!this.bridgedRing) {
-      for (var i = 0; i < rings.length; i++) {
+      for (let i = 0; i < rings.length; i++) {
         let ring = rings[i];
 
         //TODO: uses canvas ctx to draw... need to update this to SVG
@@ -306,11 +306,11 @@ export default class SvgDrawer {
     let graph = preprocessor.graph;
     let svgWrapper = this.svgWrapper;
 
-    for (var i = 0; i < graph.vertices.length; i++) {
+    for (let i = 0; i < graph.vertices.length; i++) {
       let vertex = graph.vertices[i];
       let atom = vertex.value;
 
-      for (var j = 0; j < preprocessor.highlight_atoms.length; j++) {
+      for (let j = 0; j < preprocessor.highlight_atoms.length; j++) {
         let highlight = preprocessor.highlight_atoms[j]
         if (atom.class === highlight[0]) {
           svgWrapper.drawAtomHighlight(vertex.position.x, vertex.position.y, highlight[1]);
@@ -331,8 +331,7 @@ export default class SvgDrawer {
       rings = preprocessor.rings,
       svgWrapper = this.svgWrapper;
 
-    var i = graph.vertices.length;
-    for (var i = 0; i < graph.vertices.length; i++) {
+    for (let i = 0; i < graph.vertices.length; i++) {
       let vertex = graph.vertices[i];
       let atom = vertex.value;
       let charge = 0;
@@ -400,7 +399,7 @@ export default class SvgDrawer {
 
     // Draw the ring centers for debug purposes
     if (opts.debug) {
-      for (var i = 0; i < rings.length; i++) {
+      for (let i = 0; i < rings.length; i++) {
         let center = rings[i].center;
         svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
       }
