@@ -1692,7 +1692,7 @@ export default class DrawerBase {
 
       // If the molecule has less than 3 elements, always write the "C" for carbon
       // Likewise, if the carbon has a charge or an isotope, always draw it
-      if (charge || isotope || graph.vertices.length < 3) {
+      if (charge || isotope || this.graph.vertices.length < 3) {
         isCarbon = false;
       }
 
@@ -2232,7 +2232,7 @@ export default class DrawerBase {
   /**
    * Get the last non-null or 0 angle.
    * @param {Number} vertexId A vertex id.
-   * @returns {Vertex} The last angle that was not 0 or null.
+   * @returns {Number} The last angle that was not 0 or null.
    */
   getLastAngle(vertexId) {
     while (vertexId) {
@@ -2555,7 +2555,7 @@ export default class DrawerBase {
 
         // This puts all the longest subtrees on the far side...
         // TODO: Maybe try to balance this better?
-        vertices.sort((a, b) => (a.value.subtreeDepth < b.value.subtreeDepth))
+        vertices.sort((a, b) => (b.value.subtreeDepth - a.value.subtreeDepth))
 
         if (neighbours.length === 3 &&
           previousVertex &&
@@ -2567,7 +2567,8 @@ export default class DrawerBase {
           vertices[1].value.subtreeDepth === 1 &&
           vertices[0].value.subtreeDepth > 1)
         {
-          // Special logic for adding pinched crosses...
+          // Special logic for adding pinched pairs...
+          // For example: CCS(=O)(=O)CC(F)(F)NC
           if (vertex.angle >= 0) {
             vertices[0].angle = -1.0472;
             vertices[1].angle = MathHelper.toRad(30);

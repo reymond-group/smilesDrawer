@@ -95,11 +95,7 @@ export default class CanvasWrapper {
      * @param {Number} height 
      */
     updateSize(width, height) {
-        this.devicePixelRatio = window.devicePixelRatio || 1;
-        this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio || this.ctx.mozBackingStorePixelRatio ||
-            this.ctx.msBackingStorePixelRatio || this.ctx.oBackingStorePixelRatio ||
-            this.ctx.backingStorePixelRatio || 1;
-        this.ratio = this.devicePixelRatio / this.backingStoreRatio;
+        this.ratio = window.devicePixelRatio || 1;
 
         if (this.ratio !== 1) {
             this.canvas.width = width * this.ratio;
@@ -618,9 +614,6 @@ export default class CanvasWrapper {
         ctx.fillStyle = this.themeManager.getColor('BACKGROUND');
 
         let dim = ctx.measureText(elementName);
-
-        dim.totalWidth = dim.width + chargeWidth;
-        dim.height = parseInt(this.fontLarge, 10);
 
         let r = (dim.width > this.opts.fontSizeLarge) ? dim.width : this.opts.fontSizeLarge;
         r /= 1.5;

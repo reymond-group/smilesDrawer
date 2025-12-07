@@ -1,6 +1,6 @@
 //@ts-check
 
-export default formulaToCommonName = {
+export default {
     'C2H4O2': 'acetic acid',
     'C3H6O': 'acetone',
     'C2H3N': 'acetonitrile',

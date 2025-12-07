@@ -6,6 +6,7 @@ import Atom         from './Atom'
 import DrawerBase   from './DrawerBase'
 import GaussDrawer  from './GaussDrawer'
 import Line         from './Line'
+import Ring         from './Ring'
 import SvgWrapper   from './SvgWrapper'
 import ThemeManager from './ThemeManager'
 import Vector2      from './Vector2'
@@ -116,8 +117,8 @@ export default class SvgDrawer {
     svg.setAttributeNS(null, 'height', 500 + '');
     svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
     document.body.appendChild(svg);
-    this.svgDrawer.draw(data, svg, themeName, infoOnly);
-    this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
+    this.draw(data, svg, themeName, infoOnly);
+    this.svgWrapper.toCanvas(canvas, this.opts.width, this.opts.height);
     document.body.removeChild(svg);
     return target;
   }

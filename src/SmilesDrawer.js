@@ -292,12 +292,9 @@ export default class SmilesDrawer {
         let h = this.drawer.opts.height;
 
         if (this.drawer.opts.scale <= 0) {
-            if (w === null) {
-                w = element.width;
-            }
-
-            if (h === null) {
-                h = element.height;
+            if (!(element instanceof SVGElement)) {
+                if (w === null) w = element.width;
+                if (h === null) h = element.height;
             }
 
             if (element.style.width !== "") {
