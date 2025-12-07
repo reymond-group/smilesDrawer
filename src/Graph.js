@@ -1,10 +1,10 @@
 //@ts-check
-const MathHelper = require('./MathHelper')
-const Vector2 = require('./Vector2')
-const Vertex = require('./Vertex')
-const Edge = require('./Edge')
-const Ring = require('./Ring')
-const Atom = require('./Atom')
+import Atom       from './Atom'
+import Edge       from './Edge'
+import MathHelper from './MathHelper'
+import Ring       from './Ring'
+import Vector2    from './Vector2'
+import Vertex     from './Vertex'
 
 /** 
  * A class representing the molecular graph. 
@@ -15,7 +15,7 @@ const Atom = require('./Atom')
  * @property {Object} vertexIdsToEdgeId A map mapping vertex ids to the edge between the two vertices. The key is defined as vertexAId + '_' + vertexBId.
  * @property {Boolean} isometric A boolean indicating whether or not the SMILES associated with this graph is isometric.
  */
-class Graph {
+export default class Graph {
   /**
    * The constructor of the class Graph.
    * 
@@ -927,5 +927,3 @@ class Graph {
     }
   }
 }
-
-module.exports = Graph

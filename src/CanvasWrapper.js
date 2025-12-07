@@ -1,11 +1,29 @@
 //@ts-check
-const MathHelper = require('./MathHelper')
-const Vector2 = require('./Vector2')
-const Line = require('./Line')
-const Vertex = require('./Vertex')
-const Ring = require('./Ring')
-const ThemeManager = require('./ThemeManager')
-const { getChargeText } = require('./UtilityFunctions')
+import Line         from './Line'
+import MathHelper   from './MathHelper'
+import Ring         from './Ring'
+import ThemeManager from './ThemeManager'
+import Vector2      from './Vector2'
+import Vertex       from './Vertex'
+
+/**
+ * Translate the integer indicating the charge to the appropriate text.
+ * @param {Number} charge The integer indicating the charge.
+ * @returns {String} A string representing a charge.
+ */
+function getChargeText(charge) {
+    if(!charge) {
+        return ''
+    } else if (charge === 1) {
+        return '+'
+    } else if (charge === -1) {
+        return '-';
+    } else if (charge > 0) {
+        return charge + '+';
+    } else {
+        return charge + '-';
+    }
+}
 
 /** 
  * A class wrapping a canvas element.
@@ -21,7 +39,7 @@ const { getChargeText } = require('./UtilityFunctions')
  * @property {Number} fontLarge The large font size in pt.
  * @property {Number} fontSmall The small font size in pt.
  */
-class CanvasWrapper {
+export default class CanvasWrapper {
     /**
      * The constructor for the class CanvasWrapper.
      *
@@ -77,11 +95,7 @@ class CanvasWrapper {
      * @param {Number} height 
      */
     updateSize(width, height) {
-        this.devicePixelRatio = window.devicePixelRatio || 1;
-        this.backingStoreRatio = this.ctx.webkitBackingStorePixelRatio || this.ctx.mozBackingStorePixelRatio ||
-            this.ctx.msBackingStorePixelRatio || this.ctx.oBackingStorePixelRatio ||
-            this.ctx.backingStorePixelRatio || 1;
-        this.ratio = this.devicePixelRatio / this.backingStoreRatio;
+        this.ratio = window.devicePixelRatio || 1;
 
         if (this.ratio !== 1) {
             this.canvas.width = width * this.ratio;
@@ -601,9 +615,6 @@ class CanvasWrapper {
 
         let dim = ctx.measureText(elementName);
 
-        dim.totalWidth = dim.width + chargeWidth;
-        dim.height = parseInt(this.fontLarge, 10);
-
         let r = (dim.width > this.opts.fontSizeLarge) ? dim.width : this.opts.fontSizeLarge;
         r /= 1.5;
 
@@ -843,25 +854,6 @@ class CanvasWrapper {
     }
 
     /**
-     * Translate the integer indicating the charge to the appropriate text.
-     * @param {Number} charge The integer indicating the charge.
-     * @returns {String} A string representing a charge.
-     */
-    getChargeText(charge) {
-        if (charge === 1) {
-            return '+'
-        } else if (charge === 2) {
-            return '2+';
-        } else if (charge === -1) {
-            return '-';
-        } else if (charge === -2) {
-            return '2-';
-        } else {
-            return '';
-        }
-    }
-
-    /**
      * Draws a dubug dot at a given coordinate and adds text.
      *
      * @param {Number} x The x coordinate.
@@ -902,5 +894,3 @@ class CanvasWrapper {
     }
 
 }
-
-module.exports = CanvasWrapper;

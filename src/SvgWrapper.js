@@ -1,6 +1,6 @@
-const Line = require('./Line');
-const Vector2 = require('./Vector2');
-const MathHelper = require('./MathHelper');
+import Line       from './Line'
+import MathHelper from './MathHelper'
+import Vector2    from './Vector2'
 
 function makeid(length) {
   var result = '';
@@ -12,7 +12,7 @@ function makeid(length) {
   return result;
 }
 
-class SvgWrapper {
+export default class SvgWrapper {
   constructor(themeManager, target, options, clear = true) {
     if (typeof target === 'string' || target instanceof String) {
       this.svg = document.getElementById(target);
@@ -978,5 +978,3 @@ class SvgWrapper {
     return { svg: svg, width: maxLineWidth, height: totalHeight };
   }
 }
-
-module.exports = SvgWrapper;

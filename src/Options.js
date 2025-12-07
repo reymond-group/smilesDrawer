@@ -1,6 +1,6 @@
 //@ts-check
 
-class Options {
+export default class Options {
     /**
      * A helper method to extend the default options with user supplied ones.
      */
@@ -36,5 +36,3 @@ class Options {
         return extended;
     }
 }
-
-module.exports = Options;

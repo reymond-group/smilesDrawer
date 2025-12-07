@@ -2,7 +2,7 @@
 /** 
  * A static class containing helper functions for array-related tasks. 
  */
-class ArrayHelper {
+export default class ArrayHelper {
     /**
      * Clone an array or an object. If an object is passed, a shallow clone will be created.
      *
@@ -378,5 +378,3 @@ class ArrayHelper {
     }
 
 }
-
-module.exports = ArrayHelper;

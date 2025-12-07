@@ -1,7 +1,7 @@
 /** 
  * A static class containing helper functions for math-related tasks. 
  */
-class MathHelper {
+export default class MathHelper {
     /**
      * Rounds a value to a given number of decimals.
      *
@@ -160,5 +160,3 @@ class MathHelper {
       return 2.0 * Math.PI;
     }
 }
-
-module.exports = MathHelper;

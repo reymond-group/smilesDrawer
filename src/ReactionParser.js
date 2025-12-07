@@ -1,7 +1,7 @@
 //@ts-check
-const Reaction = require('./Reaction')
+import Reaction from './Reaction'
 
-class ReactionParser {
+export default class ReactionParser {
     /**
      * Returns the hex code of a color associated with a key from the current theme.
      *
@@ -14,5 +14,3 @@ class ReactionParser {
         return reaction;
     }
 }
-
-module.exports = ReactionParser;

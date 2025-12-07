@@ -1,33 +1,27 @@
 //@ts-check
-const Drawer = require('./src/Drawer')
-const Parser = require('./src/Parser')
-const ReactionParser = require('./src/ReactionParser')
-const SvgDrawer = require('./src/SvgDrawer')
-const ReactionDrawer = require('./src/ReactionDrawer')
-const SmiDrawer = require('./src/SmilesDrawer')
-const GaussDrawer = require('./src/GaussDrawer')
-
-// Detect SSR (server side rendering)
-var canUseDOM = !!(
-  (typeof window !== 'undefined' &&
-    window.document && window.document.createElement)
-);
+import Drawer         from './src/Drawer'
+import GaussDrawer    from './src/GaussDrawer'
+import Parser         from './src/Parser'
+import ReactionDrawer from './src/ReactionDrawer'
+import ReactionParser from './src/ReactionParser'
+import SmiDrawer      from './src/SmilesDrawer'
+import SvgDrawer      from './src/SvgDrawer'
 
 /**
  * The SmilesDrawer namespace.
  * @typicalname SmilesDrawer
  */
-var SmilesDrawer = {
-  Version: '2.2.0'
+const SmilesDrawerNS = {
+  Version: '2.2.0',
+
+  Drawer:         Drawer,
+  GaussDrawer:    GaussDrawer,
+  Parser:         Parser,
+  ReactionDrawer: ReactionDrawer,
+  ReactionParser: ReactionParser,
+  SmiDrawer:      SmiDrawer,
+  SvgDrawer:      SvgDrawer,
 };
-
-SmilesDrawer.Drawer = Drawer;
-SmilesDrawer.Parser = Parser;
-SmilesDrawer.SvgDrawer = SvgDrawer;
-
-SmilesDrawer.ReactionDrawer = ReactionDrawer;
-SmilesDrawer.ReactionParser = ReactionParser;
-SmilesDrawer.GaussDrawer = GaussDrawer;
 
 /**
 * Cleans a SMILES string (removes non-valid characters)
@@ -36,7 +30,7 @@ SmilesDrawer.GaussDrawer = GaussDrawer;
 * @param {String} smiles A SMILES string.
 * @returns {String} The clean SMILES string.
 */
-SmilesDrawer.clean = function (smiles) {
+SmilesDrawerNS.clean = function (smiles) {
   return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
 }
 
@@ -49,14 +43,14 @@ SmilesDrawer.clean = function (smiles) {
 * @param {String} [themeName='light'] The theme to apply.
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
-SmilesDrawer.apply = function (options, selector = 'canvas[data-smiles]', themeName = 'light', onError = null) {
+SmilesDrawerNS.apply = function (options, selector = 'canvas[data-smiles]', themeName = 'light', onError = null) {
   let smilesDrawer = new Drawer(options);
   let elements = document.querySelectorAll(selector);
 
   for (var i = 0; i < elements.length; i++) {
     let element = elements[i];
 
-    SmilesDrawer.parse(element.getAttribute('data-smiles'), function (tree) {
+    SmilesDrawerNS.parse(element.getAttribute('data-smiles'), function (tree) {
       smilesDrawer.draw(tree, element, themeName, false);
     }, function (err) {
       if (onError) {
@@ -74,7 +68,7 @@ SmilesDrawer.apply = function (options, selector = 'canvas[data-smiles]', themeN
 * @param {Function} successCallback A callback that is called on success with the parse tree.
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
-SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
+SmilesDrawerNS.parse = function (smiles, successCallback, errorCallback) {
   try {
     if (successCallback) {
       successCallback(Parser.parse(smiles));
@@ -94,7 +88,7 @@ SmilesDrawer.parse = function (smiles, successCallback, errorCallback) {
 * @param {Function} successCallback A callback that is called on success with the parse tree.
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
-SmilesDrawer.parseReaction = function (reactionSmiles, successCallback, errorCallback) {
+SmilesDrawerNS.parseReaction = function (reactionSmiles, successCallback, errorCallback) {
   try {
     if (successCallback) {
       successCallback(ReactionParser.parse(reactionSmiles));
@@ -106,16 +100,8 @@ SmilesDrawer.parseReaction = function (reactionSmiles, successCallback, errorCal
   }
 }
 
-if (canUseDOM) {
-  window.SmilesDrawer = SmilesDrawer;
-  window.SmiDrawer = SmiDrawer;
-}
 
-// Attach SmiDrawer to SmilesDrawer for npm imports
-SmilesDrawer.SmiDrawer = SmiDrawer;
-
-// There be dragons (polyfills)
-
+// Here be dragons (polyfills)
 if (!Array.prototype.fill) {
   Object.defineProperty(Array.prototype, 'fill', {
     value: function (value) {
@@ -161,4 +147,12 @@ if (!Array.prototype.fill) {
   });
 }
 
-module.exports = SmilesDrawer;
+
+// If we're in a browser window, add the SmilesDrawer globals
+if (typeof window !== 'undefined' && window.document && window.document.createElement) {
+  window.SmilesDrawer = SmilesDrawerNS;
+  window.SmiDrawer    = SmiDrawer;
+}
+
+// Finally - export time!
+export default SmilesDrawerNS;

@@ -1,8 +1,8 @@
 //@ts-check
-const Graph = require('./Graph')
+import Graph from './Graph'
 
 /** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
-class SSSR {
+export default class SSSR {
     /**
      * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
      * 
@@ -569,5 +569,3 @@ class SSSR {
         return true;
     }
 }
-
-module.exports = SSSR;

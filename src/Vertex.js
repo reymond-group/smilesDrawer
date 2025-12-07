@@ -1,8 +1,8 @@
 //@ts-check
-const MathHelper = require('./MathHelper')
-const ArrayHelper = require('./ArrayHelper')
-const Vector2 = require('./Vector2')
-const Atom = require('./Atom')
+import ArrayHelper from './ArrayHelper'
+import Atom        from './Atom'
+import MathHelper  from './MathHelper'
+import Vector2     from './Vector2'
 
 /** 
  * A class representing a vertex.
@@ -24,7 +24,7 @@ const Atom = require('./Atom')
  * @property {Boolean} forcePositioned A boolean indicating whether or not this vertex was positioned using a force-based approach.
  */
 
-class Vertex {
+export default class Vertex {
   /**
    * The constructor for the class Vertex.
    *
@@ -355,5 +355,3 @@ class Vertex {
     return null;
   }
 }
-
-module.exports = Vertex;
