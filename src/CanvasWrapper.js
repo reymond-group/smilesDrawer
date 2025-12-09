@@ -63,7 +63,7 @@ export default class CanvasWrapper {
             this.canvas = element;
         }
         else {
-            throw Error("First argument was not a canvas or the ID of a canvas.");
+            throw Error('First argument was not a canvas or the ID of a canvas.');
         }
 
         this.ctx = this.canvas.getContext('2d');
@@ -294,10 +294,10 @@ export default class CanvasWrapper {
         ctx.lineWidth = this.opts.bondThickness;
 
         let gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
-        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement()) ||
-            this.themeManager.getColor('C'));
-        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement()) ||
-            this.themeManager.getColor('C'));
+        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement())
+            || this.themeManager.getColor('C'));
+        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement())
+            || this.themeManager.getColor('C'));
 
         if (dashed) {
             ctx.setLineDash([1, 1.5]);
@@ -321,8 +321,7 @@ export default class CanvasWrapper {
      * @param {Number} width The wedge width.
      */
     drawWedge(line, width = 1.0) {
-        if (isNaN(line.from.x) || isNaN(line.from.y) ||
-            isNaN(line.to.x) || isNaN(line.to.y)) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
 
@@ -380,10 +379,10 @@ export default class CanvasWrapper {
         ctx.lineTo(w.x, w.y);
 
         let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
-        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement()) ||
-            this.themeManager.getColor('C'));
-        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement()) ||
-            this.themeManager.getColor('C'));
+        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement())
+            || this.themeManager.getColor('C'));
+        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement())
+            || this.themeManager.getColor('C'));
 
         ctx.fillStyle = gradient;
 
@@ -397,8 +396,7 @@ export default class CanvasWrapper {
      * @param {Line} line A line.
      */
     drawDashedWedge(line) {
-        if (isNaN(line.from.x) || isNaN(line.from.y) ||
-            isNaN(line.to.x) || isNaN(line.to.y)) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
 
@@ -604,7 +602,7 @@ export default class CanvasWrapper {
         // TODO: Better handle exceptions
         // Exception for nitro (draw nitro as NO2 instead of N+O-O)
         if (charge === 1 && elementName === 'N' && '0O' in attachedPseudoElement && '0O-1' in attachedPseudoElement) {
-            attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
+            attachedPseudoElement = {'0O': {element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: ''}}
             charge = 0;
         }
 
@@ -824,9 +822,9 @@ export default class CanvasWrapper {
 
             if (elementCount > 1) {
                 if (direction === 'left') {
-                    ctx.fillText(elementCount, hx + cursorPosLeft +
-                        openParenthesisWidth + closeParenthesisWidth + hydrogenWidth +
-                        hydrogenCountWidth + elementWidth, hy + this.opts.fifthFontSizeSmall);
+                    ctx.fillText(elementCount, hx + cursorPosLeft
+                        + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth
+                        + hydrogenCountWidth + elementWidth, hy + this.opts.fifthFontSizeSmall);
                 } else {
                     ctx.fillText(elementCount, hx + cursorPos, hy + this.opts.fifthFontSizeSmall);
                     cursorPos += elementCountWidth;
@@ -835,9 +833,9 @@ export default class CanvasWrapper {
 
             if (elementCharge !== 0) {
                 if (direction === 'left') {
-                    ctx.fillText(elementChargeText, hx + cursorPosLeft +
-                        openParenthesisWidth + closeParenthesisWidth + hydrogenWidth +
-                        hydrogenCountWidth + elementWidth, y - this.opts.fifthFontSizeSmall + offsetY);
+                    ctx.fillText(elementChargeText, hx + cursorPosLeft
+                        + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth
+                        + hydrogenCountWidth + elementWidth, y - this.opts.fifthFontSizeSmall + offsetY);
                 } else {
                     ctx.fillText(elementChargeText, hx + cursorPos, y - this.opts.fifthFontSizeSmall + offsetY);
                     cursorPos += elementChargeWidth;

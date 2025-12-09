@@ -75,187 +75,187 @@ export default class DrawerBase {
         opacity: 1.0,
       },
       themes: {
-        dark: {
-          C: '#fff',
-          O: '#e74c3c',
-          N: '#3498db',
-          F: '#27ae60',
+        'dark': {
+          C:  '#ffffff',
+          O:  '#e74c3c',
+          N:  '#3498db',
+          F:  '#27ae60',
           CL: '#16a085',
           BR: '#d35400',
-          I: '#8e44ad',
-          P: '#d35400',
-          S: '#f1c40f',
-          B: '#e67e22',
+          I:  '#8e44ad',
+          P:  '#d35400',
+          S:  '#f1c40f',
+          B:  '#e67e22',
           SI: '#e67e22',
-          H: '#aaa',
-          BACKGROUND: '#141414'
+          H:  '#aaaaaa',
+          BACKGROUND: '#141414',
         },
-        light: {
-          C: '#222',
-          O: '#e74c3c',
-          N: '#3498db',
-          F: '#27ae60',
+        'light': {
+          C:  '#222222',
+          O:  '#e74c3c',
+          N:  '#3498db',
+          F:  '#27ae60',
           CL: '#16a085',
           BR: '#d35400',
-          I: '#8e44ad',
-          P: '#d35400',
-          S: '#f1c40f',
-          B: '#e67e22',
+          I:  '#8e44ad',
+          P:  '#d35400',
+          S:  '#f1c40f',
+          B:  '#e67e22',
           SI: '#e67e22',
-          H: '#666',
-          BACKGROUND: '#fff'
+          H:  '#666666',
+          BACKGROUND: '#ffffff',
         },
-        oldschool: {
-          C: '#000',
-          O: '#000',
-          N: '#000',
-          F: '#000',
-          CL: '#000',
-          BR: '#000',
-          I: '#000',
-          P: '#000',
-          S: '#000',
-          B: '#000',
-          SI: '#000',
-          H: '#000',
-          BACKGROUND: '#fff'
+        'oldschool': {
+          C:  '#000000',
+          O:  '#000000',
+          N:  '#000000',
+          F:  '#000000',
+          CL: '#000000',
+          BR: '#000000',
+          I:  '#000000',
+          P:  '#000000',
+          S:  '#000000',
+          B:  '#000000',
+          SI: '#000000',
+          H:  '#000000',
+          BACKGROUND: '#ffffff',
         },
-        "solarized": {
-          C: "#586e75",
-          O: "#dc322f",
-          N: "#268bd2",
-          F: "#859900",
-          CL: "#16a085",
-          BR: "#cb4b16",
-          I: "#6c71c4",
-          P: "#d33682",
-          S: "#b58900",
-          B: "#2aa198",
-          SI: "#2aa198",
-          H: "#657b83",
-          BACKGROUND: "#eee8d5"
+        'solarized': {
+          C:  '#586e75',
+          O:  '#dc322f',
+          N:  '#268bd2',
+          F:  '#859900',
+          CL: '#16a085',
+          BR: '#cb4b16',
+          I:  '#6c71c4',
+          P:  '#d33682',
+          S:  '#b58900',
+          B:  '#2aa198',
+          SI: '#2aa198',
+          H:  '#657b83',
+          BACKGROUND: '#eee8d5',
         },
-        "solarized-dark": {
-          C: "#93a1a1",
-          O: "#dc322f",
-          N: "#268bd2",
-          F: "#859900",
-          CL: "#16a085",
-          BR: "#cb4b16",
-          I: "#6c71c4",
-          P: "#d33682",
-          S: "#b58900",
-          B: "#2aa198",
-          SI: "#2aa198",
-          H: "#839496",
-          BACKGROUND: "#073642"
+        'solarized-dark': {
+          C:  '#93a1a1',
+          O:  '#dc322f',
+          N:  '#268bd2',
+          F:  '#859900',
+          CL: '#16a085',
+          BR: '#cb4b16',
+          I:  '#6c71c4',
+          P:  '#d33682',
+          S:  '#b58900',
+          B:  '#2aa198',
+          SI: '#2aa198',
+          H:  '#839496',
+          BACKGROUND: '#073642',
         },
-        "matrix": {
-          C: "#678c61",
-          O: "#2fc079",
-          N: "#4f7e7e",
-          F: "#90d762",
-          CL: "#82d967",
-          BR: "#23755a",
-          I: "#409931",
-          P: "#c1ff8a",
-          S: "#faff00",
-          B: "#50b45a",
-          SI: "#409931",
-          H: "#426644",
-          BACKGROUND: "#fff"
+        'matrix': {
+          C:  '#678c61',
+          O:  '#2fc079',
+          N:  '#4f7e7e',
+          F:  '#90d762',
+          CL: '#82d967',
+          BR: '#23755a',
+          I:  '#409931',
+          P:  '#c1ff8a',
+          S:  '#faff00',
+          B:  '#50b45a',
+          SI: '#409931',
+          H:  '#426644',
+          BACKGROUND: '#ffffff',
         },
-        "github": {
-          C: "#24292f",
-          O: "#cf222e",
-          N: "#0969da",
-          F: "#2da44e",
-          CL: "#6fdd8b",
-          BR: "#bc4c00",
-          I: "#8250df",
-          P: "#bf3989",
-          S: "#d4a72c",
-          B: "#fb8f44",
-          SI: "#bc4c00",
-          H: "#57606a",
-          BACKGROUND: "#fff"
+        'github': {
+          C:  '#24292f',
+          O:  '#cf222e',
+          N:  '#0969da',
+          F:  '#2da44e',
+          CL: '#6fdd8b',
+          BR: '#bc4c00',
+          I:  '#8250df',
+          P:  '#bf3989',
+          S:  '#d4a72c',
+          B:  '#fb8f44',
+          SI: '#bc4c00',
+          H:  '#57606a',
+          BACKGROUND: '#ffffff',
         },
-        "carbon": {
-          C: "#161616",
-          O: "#da1e28",
-          N: "#0f62fe",
-          F: "#198038",
-          CL: "#007d79",
-          BR: "#fa4d56",
-          I: "#8a3ffc",
-          P: "#ff832b",
-          S: "#f1c21b",
-          B: "#8a3800",
-          SI: "#e67e22",
-          H: "#525252",
-          BACKGROUND: "#fff"
+        'carbon': {
+          C:  '#161616',
+          O:  '#da1e28',
+          N:  '#0f62fe',
+          F:  '#198038',
+          CL: '#007d79',
+          BR: '#fa4d56',
+          I:  '#8a3ffc',
+          P:  '#ff832b',
+          S:  '#f1c21b',
+          B:  '#8a3800',
+          SI: '#e67e22',
+          H:  '#525252',
+          BACKGROUND: '#ffffff',
         },
-        "cyberpunk": {
-          C: "#ea00d9",
-          O: "#ff3131",
-          N: "#0abdc6",
-          F: "#00ff9f",
-          CL: "#00fe00",
-          BR: "#fe9f20",
-          I: "#ff00ff",
-          P: "#fe7f00",
-          S: "#fcee0c",
-          B: "#ff00ff",
-          SI: "#ffffff",
-          H: "#913cb1",
-          BACKGROUND: "#fff"
+        'cyberpunk': {
+          C:  '#ea00d9',
+          O:  '#ff3131',
+          N:  '#0abdc6',
+          F:  '#00ff9f',
+          CL: '#00fe00',
+          BR: '#fe9f20',
+          I:  '#ff00ff',
+          P:  '#fe7f00',
+          S:  '#fcee0c',
+          B:  '#ff00ff',
+          SI: '#ffffff',
+          H:  '#913cb1',
+          BACKGROUND: '#ffffff',
         },
-        "gruvbox": {
-          C: "#665c54",
-          O: "#cc241d",
-          N: "#458588",
-          F: "#98971a",
-          CL: "#79740e",
-          BR: "#d65d0e",
-          I: "#b16286",
-          P: "#af3a03",
-          S: "#d79921",
-          B: "#689d6a",
-          SI: "#427b58",
-          H: "#7c6f64",
-          BACKGROUND: "#fbf1c7"
+        'gruvbox': {
+          C:  '#665c54',
+          O:  '#cc241d',
+          N:  '#458588',
+          F:  '#98971a',
+          CL: '#79740e',
+          BR: '#d65d0e',
+          I:  '#b16286',
+          P:  '#af3a03',
+          S:  '#d79921',
+          B:  '#689d6a',
+          SI: '#427b58',
+          H:  '#7c6f64',
+          BACKGROUND: '#fbf1c7',
         },
-        "gruvbox-dark": {
-          C: "#ebdbb2",
-          O: "#cc241d",
-          N: "#458588",
-          F: "#98971a",
-          CL: "#b8bb26",
-          BR: "#d65d0e",
-          I: "#b16286",
-          P: "#fe8019",
-          S: "#d79921",
-          B: "#8ec07c",
-          SI: "#83a598",
-          H: "#bdae93",
-          BACKGROUND: "#282828"
+        'gruvbox-dark': {
+          C:  '#ebdbb2',
+          O:  '#cc241d',
+          N:  '#458588',
+          F:  '#98971a',
+          CL: '#b8bb26',
+          BR: '#d65d0e',
+          I:  '#b16286',
+          P:  '#fe8019',
+          S:  '#d79921',
+          B:  '#8ec07c',
+          SI: '#83a598',
+          H:  '#bdae93',
+          BACKGROUND: '#282828',
         },
-        custom: {
-          C: '#222',
-          O: '#e74c3c',
-          N: '#3498db',
-          F: '#27ae60',
+        'custom': {
+          C:  '#222222',
+          O:  '#e74c3c',
+          N:  '#3498db',
+          F:  '#27ae60',
           CL: '#16a085',
           BR: '#d35400',
-          I: '#8e44ad',
-          P: '#d35400',
-          S: '#f1c40f',
-          B: '#e67e22',
+          I:  '#8e44ad',
+          P:  '#d35400',
+          S:  '#f1c40f',
+          B:  '#e67e22',
           SI: '#e67e22',
-          H: '#666',
-          BACKGROUND: '#fff'
+          H:  '#666666',
+          BACKGROUND: '#ffffff',
         },
-      }
+      },
     };
 
     this.opts = Options.extend(true, this.defaultOptions, options);
@@ -324,15 +324,7 @@ export default class DrawerBase {
    * @returns {Ring[]} An array containing all bridged rings associated with this molecule.
    */
   getBridgedRings() {
-    let bridgedRings = Array();
-
-    for (let i = 0; i < this.rings.length; i++) {
-      if (this.rings[i].isBridged) {
-        bridgedRings.push(this.rings[i]);
-      }
-    }
-
-    return bridgedRings;
+    return this.rings.filter(ring => ring.isBridged)
   }
 
   /**
@@ -341,15 +333,7 @@ export default class DrawerBase {
    * @returns {Ring[]} An array containing all fused rings associated with this molecule.
    */
   getFusedRings() {
-    let fusedRings = Array();
-
-    for (let i = 0; i < this.rings.length; i++) {
-      if (this.rings[i].isFused) {
-        fusedRings.push(this.rings[i]);
-      }
-    }
-
-    return fusedRings;
+    return this.rings.filter(ring => ring.isFused)
   }
 
   /**
@@ -358,15 +342,7 @@ export default class DrawerBase {
    * @returns {Ring[]} An array containing all spiros associated with this molecule.
    */
   getSpiros() {
-    let spiros = Array();
-
-    for (let i = 0; i < this.rings.length; i++) {
-      if (this.rings[i].isSpiro) {
-        spiros.push(this.rings[i]);
-      }
-    }
-
-    return spiros;
+    return this.rings.filter(ring => ring.isSpiro)
   }
 
   /**
@@ -558,9 +534,10 @@ export default class DrawerBase {
       counts.delete('H');
     }
 
+    // TODO: Can we not get keys from counts instead?
     let elements = Object.keys(Atom.atomicNumbers).sort();
 
-    elements.map(e => {
+    elements.map((e) => {
       if (counts.has(e)) {
         let count = counts.get(e);
         molecularFormula += e + (count > 1 ? count : '');
@@ -589,7 +566,7 @@ export default class DrawerBase {
         // if(i != j) continue;
         if (vertexA.value.ringbonds[i].id === vertexB.value.ringbonds[j].id) {
           // If the bonds are equal, it doesn't matter which bond is returned.
-          // if they are not equal, return the one that is not the default ("-")
+          // if they are not equal, return the one that is not the default ('-')
           if (vertexA.value.ringbonds[i].bondType === '-') {
             return vertexB.value.ringbonds[j].bond;
           } else {
@@ -610,11 +587,11 @@ export default class DrawerBase {
     this.ringConnectionIdCounter = 0;
 
     this.graph = new Graph(data, this.opts.isomeric);
-    this.rings = Array();
-    this.ringConnections = Array();
+    this.rings = [];
+    this.ringConnections = [];
 
-    this.originalRings = Array();
-    this.originalRingConnections = Array();
+    this.originalRings = [];
+    this.originalRingConnections = [];
 
     this.bridgedRing = false;
 
@@ -875,8 +852,10 @@ export default class DrawerBase {
         let neighbour = this.graph.vertices[vertex.neighbours[0]];
         neighbour.value.hasHydrogen = true;
 
-        if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing ||
-          neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
+        if (!neighbour.value.isStereoCenter
+          || (neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing)
+          || (neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2)
+        ) {
           vertex.value.isDrawn = false;
         }
       }
@@ -890,20 +869,17 @@ export default class DrawerBase {
    * @returns {Number[]} An array containing all ring ids of rings part of a bridged ring system.
    */
   getBridgedRingRings(ringId) {
-    let involvedRings = Array();
-    let that = this;
+    let involvedRings = [];
 
-    let recurse = function (r) {
-      let ring = that.getRing(r);
+    let recurse = (r) => {
+      let ring = this.getRing(r);
 
       involvedRings.push(r);
 
       for (let i = 0; i < ring.neighbours.length; i++) {
         let n = ring.neighbours[i];
 
-        if (involvedRings.indexOf(n) === -1 &&
-          n !== r &&
-          RingConnection.isBridge(that.ringConnections, that.graph.vertices, r, n)) {
+        if (involvedRings.indexOf(n) === -1 && n !== r && RingConnection.isBridge(this.ringConnections, this.graph.vertices, r, n)) {
           recurse(n);
         }
       }
@@ -922,8 +898,7 @@ export default class DrawerBase {
    */
   isPartOfBridgedRing(ringId) {
     for (let i = 0; i < this.ringConnections.length; i++) {
-      if (this.ringConnections[i].containsRing(ringId) &&
-        this.ringConnections[i].isBridge(this.graph.vertices)) {
+      if (this.ringConnections[i].containsRing(ringId) && this.ringConnections[i].isBridge(this.graph.vertices)) {
         return true;
       }
     }
@@ -979,7 +954,7 @@ export default class DrawerBase {
     // Vertices can also be part of multiple rings and lay on the bridged ring,
     // however, they have to have at least two neighbours that are not part of
     // two rings
-    let insideRing = Array();
+    let insideRing = [];
 
     for (let id of leftovers) {
       let vertex = this.graph.vertices[id];
@@ -1019,7 +994,7 @@ export default class DrawerBase {
     // associated with the bridged ring
     for (let i = 0; i < insideRing.length; i++) {
       let vertex = this.graph.vertices[insideRing[i]];
-      vertex.value.rings = Array();
+      vertex.value.rings = [];
     }
 
     // Remove former rings from members of the bridged ring and add the bridged ring
@@ -1079,7 +1054,7 @@ export default class DrawerBase {
    * @returns {Number[]} An array of ids of rings shared by the two vertices.
    */
   getCommonRings(vertexA, vertexB) {
-    let commonRings = Array();
+    let commonRings = [];
 
     for (let i = 0; i < vertexA.value.rings.length; i++) {
       for (let j = 0; j < vertexB.value.rings.length; j++) {
@@ -1128,7 +1103,7 @@ export default class DrawerBase {
    * @returns {Number[]} An array containing vertex ids in a given location.
    */
   getVerticesAt(position, radius, excludeVertexId) {
-    let locals = Array();
+    let locals = [];
 
     for (let i = 0; i < this.graph.vertices.length; i++) {
       let vertex = this.graph.vertices[i];
@@ -1194,19 +1169,19 @@ export default class DrawerBase {
    * @param {Number} ringId A ring id.
    */
   removeRing(ringId) {
-    this.rings = this.rings.filter(function (item) {
+    this.rings = this.rings.filter(function(item) {
       return item.id !== ringId;
     });
 
     // Also remove ring connections involving this ring
-    this.ringConnections = this.ringConnections.filter(function (item) {
+    this.ringConnections = this.ringConnections.filter(function(item) {
       return item.firstRingId !== ringId && item.secondRingId !== ringId;
     });
 
     // Remove the ring as neighbour of other rings
     for (let i = 0; i < this.rings.length; i++) {
       let r = this.rings[i];
-      r.neighbours = r.neighbours.filter(function (item) {
+      r.neighbours = r.neighbours.filter(function(item) {
         return item !== ringId;
       });
     }
@@ -1245,7 +1220,7 @@ export default class DrawerBase {
    * @param {Number} ringConnectionId A ring connection id.
    */
   removeRingConnection(ringConnectionId) {
-    this.ringConnections = this.ringConnections.filter(function (item) {
+    this.ringConnections = this.ringConnections.filter(function(item) {
       return item.id !== ringConnectionId;
     });
   }
@@ -1257,12 +1232,13 @@ export default class DrawerBase {
    * @param {Number} vertexIdB A vertex id.
    */
   removeRingConnectionsBetween(vertexIdA, vertexIdB) {
-    let toRemove = Array();
+    let toRemove = [];
     for (let i = 0; i < this.ringConnections.length; i++) {
       let ringConnection = this.ringConnections[i];
 
-      if (ringConnection.firstRingId === vertexIdA && ringConnection.secondRingId === vertexIdB ||
-        ringConnection.firstRingId === vertexIdB && ringConnection.secondRingId === vertexIdA) {
+      if  ((ringConnection.firstRingId === vertexIdA && ringConnection.secondRingId === vertexIdB)
+        || (ringConnection.firstRingId === vertexIdB && ringConnection.secondRingId === vertexIdA)
+      ) {
         toRemove.push(ringConnection.id);
       }
     }
@@ -1294,7 +1270,7 @@ export default class DrawerBase {
    * @returns {Number[]} An array of ring connection ids.
    */
   getRingConnections(ringId, ringIds) {
-    let ringConnections = Array();
+    let ringConnections = [];
 
     for (let i = 0; i < this.ringConnections.length; i++) {
       let rc = this.ringConnections[i];
@@ -1302,8 +1278,7 @@ export default class DrawerBase {
       for (let j = 0; j < ringIds.length; j++) {
         let id = ringIds[j];
 
-        if (rc.firstRingId === ringId && rc.secondRingId === id ||
-          rc.firstRingId === id && rc.secondRingId === ringId) {
+        if ((rc.firstRingId === ringId && rc.secondRingId === id) || (rc.firstRingId === id && rc.secondRingId === ringId)) {
           ringConnections.push(rc.id);
         }
       }
@@ -1346,23 +1321,20 @@ export default class DrawerBase {
       }
     }
 
-    let sortable = Array();
+    let sortable = [];
 
     for (let i = 0; i < this.graph.vertices.length; i++) {
-      sortable.push({
-        id: i,
-        score: overlapScores[i]
-      });
+      sortable.push({id: i, score: overlapScores[i]});
     }
 
-    sortable.sort(function (a, b) {
+    sortable.sort(function(a, b) {
       return b.score - a.score;
     });
 
     return {
-      total: total,
-      scores: sortable,
-      vertexScores: overlapScores
+      total:        total,
+      scores:       sortable,
+      vertexScores: overlapScores,
     };
   }
 
@@ -1421,11 +1393,11 @@ export default class DrawerBase {
 
     return {
       totalSideCount: totalSideCount,
-      totalPosition: totalSideCount[0] > totalSideCount[1] ? 0 : 1,
-      sideCount: sideCount,
-      position: sideCount[0] > sideCount[1] ? 0 : 1,
-      anCount: anCount,
-      bnCount: bnCount
+      totalPosition:  totalSideCount[0] > totalSideCount[1] ? 0 : 1,
+      sideCount:      sideCount,
+      position:       sideCount[0] > sideCount[1] ? 0 : 1,
+      anCount:        anCount,
+      bnCount:        bnCount,
     };
   }
 
@@ -1478,17 +1450,16 @@ export default class DrawerBase {
    * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
    */
   drawEdges(debug) {
-    let that = this;
     let drawn = Array(this.graph.edges.length);
     drawn.fill(false);
 
-    this.graph.traverseBF(0, function (vertex) {
-      let edges = that.graph.getEdges(vertex.id);
+    this.graph.traverseBF(0, (vertex) => {
+      let edges = this.graph.getEdges(vertex.id);
       for (let i = 0; i < edges.length; i++) {
         let edgeId = edges[i];
         if (!drawn[edgeId]) {
           drawn[edgeId] = true;
-          that.drawEdge(edgeId, debug);
+          this.drawEdge(edgeId, debug);
         }
       }
     });
@@ -1512,7 +1483,6 @@ export default class DrawerBase {
    * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
    */
   drawEdge(edgeId, debug) {
-    let that = this;
     let edge = this.graph.edges[edgeId];
     let vertexA = this.graph.vertices[edge.sourceId];
     let vertexB = this.graph.vertices[edge.targetId];
@@ -1533,8 +1503,7 @@ export default class DrawerBase {
     sides[0].multiplyScalar(10).add(a);
     sides[1].multiplyScalar(10).add(a);
 
-    if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' ||
-      (edge.isPartOfAromaticRing && this.bridgedRing)) {
+    if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || (edge.isPartOfAromaticRing && this.bridgedRing)) {
       // Always draw double bonds inside the ring
       let inRing = this.areVerticesInSameRing(vertexA, vertexB);
       let s = this.chooseSide(vertexA, vertexB, sides);
@@ -1546,8 +1515,8 @@ export default class DrawerBase {
         let lcr = this.getLargestOrAromaticCommonRing(vertexA, vertexB);
         let center = lcr.center;
 
-        normals[0].multiplyScalar(that.opts.bondSpacing);
-        normals[1].multiplyScalar(that.opts.bondSpacing);
+        normals[0].multiplyScalar(this.opts.bondSpacing);
+        normals[1].multiplyScalar(this.opts.bondSpacing);
 
         // Choose the normal that is on the same side as the center
         let line = null;
@@ -1569,20 +1538,20 @@ export default class DrawerBase {
 
         // The normal edge
         this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
-      } else if (edge.center || vertexA.isTerminal() && vertexB.isTerminal()) {
-        normals[0].multiplyScalar(that.opts.halfBondSpacing);
-        normals[1].multiplyScalar(that.opts.halfBondSpacing);
+      } else if (edge.center || (vertexA.isTerminal() && vertexB.isTerminal())) {
+        normals[0].multiplyScalar(this.opts.halfBondSpacing);
+        normals[1].multiplyScalar(this.opts.halfBondSpacing);
 
         let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
         let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
         this.canvasWrapper.drawLine(lineA);
         this.canvasWrapper.drawLine(lineB);
-      } else if (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1) {
+      } else if ((s.anCount == 0 && s.bnCount > 1) || (s.bnCount == 0 && s.anCount > 1)) {
         // Both lines are the same length here
         // Add the spacing to the edges (which are of unit length)
-        normals[0].multiplyScalar(that.opts.halfBondSpacing);
-        normals[1].multiplyScalar(that.opts.halfBondSpacing);
+        normals[0].multiplyScalar(this.opts.halfBondSpacing);
+        normals[1].multiplyScalar(this.opts.halfBondSpacing);
 
         let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
         let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
@@ -1590,8 +1559,8 @@ export default class DrawerBase {
         this.canvasWrapper.drawLine(lineA);
         this.canvasWrapper.drawLine(lineB);
       } else if (s.sideCount[0] > s.sideCount[1]) {
-        normals[0].multiplyScalar(that.opts.bondSpacing);
-        normals[1].multiplyScalar(that.opts.bondSpacing);
+        normals[0].multiplyScalar(this.opts.bondSpacing);
+        normals[1].multiplyScalar(this.opts.bondSpacing);
 
         let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
 
@@ -1599,8 +1568,8 @@ export default class DrawerBase {
         this.canvasWrapper.drawLine(line);
         this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (s.sideCount[0] < s.sideCount[1]) {
-        normals[0].multiplyScalar(that.opts.bondSpacing);
-        normals[1].multiplyScalar(that.opts.bondSpacing);
+        normals[0].multiplyScalar(this.opts.bondSpacing);
+        normals[1].multiplyScalar(this.opts.bondSpacing);
 
         let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
@@ -1608,8 +1577,8 @@ export default class DrawerBase {
         this.canvasWrapper.drawLine(line);
         this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (s.totalSideCount[0] > s.totalSideCount[1]) {
-        normals[0].multiplyScalar(that.opts.bondSpacing);
-        normals[1].multiplyScalar(that.opts.bondSpacing);
+        normals[0].multiplyScalar(this.opts.bondSpacing);
+        normals[1].multiplyScalar(this.opts.bondSpacing);
 
         let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
 
@@ -1617,8 +1586,8 @@ export default class DrawerBase {
         this.canvasWrapper.drawLine(line);
         this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       } else if (s.totalSideCount[0] <= s.totalSideCount[1]) {
-        normals[0].multiplyScalar(that.opts.bondSpacing);
-        normals[1].multiplyScalar(that.opts.bondSpacing);
+        normals[0].multiplyScalar(this.opts.bondSpacing);
+        normals[1].multiplyScalar(this.opts.bondSpacing);
 
         let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
@@ -1627,8 +1596,8 @@ export default class DrawerBase {
         this.canvasWrapper.drawLine(new Line(a, b, elementA, elementB));
       }
     } else if (edge.bondType === '#') {
-      normals[0].multiplyScalar(that.opts.bondSpacing / 1.5);
-      normals[1].multiplyScalar(that.opts.bondSpacing / 1.5);
+      normals[0].multiplyScalar(this.opts.bondSpacing / 1.5);
+      normals[1].multiplyScalar(this.opts.bondSpacing / 1.5);
 
       let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
       let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
@@ -1687,7 +1656,7 @@ export default class DrawerBase {
         isotope = atom.bracket.isotope;
       }
 
-      // If the molecule has less than 3 elements, always write the "C" for carbon
+      // If the molecule has less than 3 elements, always write the 'C' for carbon
       // Likewise, if the carbon has a charge or an isotope, always draw it
       if (charge || isotope || this.graph.vertices.length < 3) {
         isCarbon = false;
@@ -1767,8 +1736,8 @@ export default class DrawerBase {
    * Stores the current information associated with rings.
    */
   backupRingInformation() {
-    this.originalRings = Array();
-    this.originalRingConnections = Array();
+    this.originalRings = [];
+    this.originalRingConnections = [];
 
     for (let i = 0; i < this.rings.length; i++) {
       this.originalRings.push(this.rings[i]);
@@ -1790,8 +1759,8 @@ export default class DrawerBase {
     // Get the subring centers from the bridged rings
     let bridgedRings = this.getBridgedRings();
 
-    this.rings = Array();
-    this.ringConnections = Array();
+    this.rings = [];
+    this.ringConnections = [];
 
     for (let i = 0; i < bridgedRings.length; i++) {
       let bridgedRing = bridgedRings[i];
@@ -1842,7 +1811,6 @@ export default class DrawerBase {
     ring.centralAngle = angle;
 
     let a = startingAngle;
-    let that = this;
     let startVertexId = (startVertex) ? startVertex.id : null;
 
     if (ring.members.indexOf(startVertexId) === -1) {
@@ -1870,8 +1838,8 @@ export default class DrawerBase {
         this.setRingCenter(ring.rings[i]);
       }
     } else {
-      ring.eachMember(this.graph.vertices, function (v) {
-        let vertex = that.graph.vertices[v];
+      ring.eachMember(this.graph.vertices, (v) => {
+        let vertex = this.graph.vertices[v];
 
         if (!vertex.positioned) {
           vertex.setPosition(center.x + Math.cos(a) * radius, center.y + Math.sin(a) * radius);
@@ -1997,13 +1965,11 @@ export default class DrawerBase {
    * @param {Vector2} center The rotational center.
    */
   rotateSubtree(vertexId, parentVertexId, angle, center) {
-    let that = this;
-
-    this.graph.traverseTree(vertexId, parentVertexId, function (vertex) {
+    this.graph.traverseTree(vertexId, parentVertexId, (vertex) => {
       vertex.position.rotateAround(angle, center);
 
       for (let i = 0; i < vertex.value.anchoredRings.length; i++) {
-        let ring = that.rings[vertex.value.anchoredRings[i]];
+        let ring = this.rings[vertex.value.anchoredRings[i]];
 
         if (ring) {
           ring.center.rotateAround(angle, center);
@@ -2021,23 +1987,22 @@ export default class DrawerBase {
    * @returns {Object} An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new Vector2() }.
    */
   getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores) {
-    let that = this;
     let score = 0;
     let center = new Vector2(0, 0);
     let count = 0;
 
-    this.graph.traverseTree(vertexId, parentVertexId, function (vertex) {
+    this.graph.traverseTree(vertexId, parentVertexId, (vertex) => {
       if (!vertex.value.isDrawn) {
         return;
       }
 
       let s = vertexOverlapScores[vertex.id];
-      if (s > that.opts.overlapSensitivity) {
+      if (s > this.opts.overlapSensitivity) {
         score += s;
         count++;
       }
 
-      let position = that.graph.vertices[vertex.id].position.clone();
+      let position = this.graph.vertices[vertex.id].position.clone();
       position.multiplyScalar(s)
       center.add(position);
     });
@@ -2045,8 +2010,8 @@ export default class DrawerBase {
     center.divide(score);
 
     return {
-      value: score / count,
-      center: center
+      value:  score / count,
+      center: center,
     };
   }
 
@@ -2099,7 +2064,7 @@ export default class DrawerBase {
    * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
    */
   resolvePrimaryOverlaps() {
-    let overlaps = Array();
+    let overlaps = [];
     let done = Array(this.graph.vertices.length);
 
     // Looking for overlaps created by two bonds coming out of a ring atom, which both point straight
@@ -2120,30 +2085,30 @@ export default class DrawerBase {
 
         if (nonRingNeighbours.length > 1) {
           // Look for rings where there are atoms with two bonds outside the ring (overlaps)
-          let rings = Array();
+          let rings = [];
 
           for (let k = 0; k < vertex.value.rings.length; k++) {
             rings.push(vertex.value.rings[k]);
           }
 
           overlaps.push({
-            common: vertex,
-            rings: rings,
-            vertices: nonRingNeighbours
+            common:   vertex,
+            rings:    rings,
+            vertices: nonRingNeighbours,
           });
         } else if (nonRingNeighbours.length === 1 && vertex.value.rings.length === 2) {
           // Look for bonds coming out of joined rings to adjust the angle, an example is: C1=CC(=CC=C1)[C@]12SCCN1CC1=CC=CC=C21
           // where the angle has to be adjusted to account for fused ring
-          let rings = Array();
+          let rings = [];
 
           for (let k = 0; k < vertex.value.rings.length; k++) {
             rings.push(vertex.value.rings[k]);
           }
 
           overlaps.push({
-            common: vertex,
-            rings: rings,
-            vertices: nonRingNeighbours
+            common:   vertex,
+            rings:    rings,
+            vertices: nonRingNeighbours,
           });
         }
       }
@@ -2389,7 +2354,7 @@ export default class DrawerBase {
     } else {
       // Draw the non-ring vertices connected to this one  
       let tmpNeighbours = vertex.getNeighbours();
-      let neighbours = Array();
+      let neighbours = [];
 
       // Remove neighbours that are not drawn
       for (let i = 0; i < tmpNeighbours.length; i++) {
@@ -2444,7 +2409,7 @@ export default class DrawerBase {
           this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
         } else {
           let a = this.getLastAngle(vertex.id);
-          a = (a >= 0)? 1.0472 : -1.0472;
+          a = (a >= 0) ? 1.0472 : -1.0472;
 
           // Handle configuration around double bonds
           if (previousVertex && !doubleBondConfigSet) {
@@ -2540,7 +2505,7 @@ export default class DrawerBase {
       }
       else if (neighbours.length > 0) {
         // Create vertices for all drawn neighbors...
-        const vertices = neighbours.map(neighbour => {
+        const vertices = neighbours.map((neighbour) => {
           let newvertex    = this.graph.vertices[neighbour];
           let subtreedepth = this.graph.getTreeDepth(neighbour, vertex.id);
           newvertex.value.subtreeDepth = subtreedepth;
@@ -2551,16 +2516,16 @@ export default class DrawerBase {
         // TODO: Maybe try to balance this better?
         vertices.sort((a, b) => (b.value.subtreeDepth - a.value.subtreeDepth))
 
-        if (neighbours.length === 3 &&
-          previousVertex &&
-          previousVertex.value.rings.length < 1 &&
-          vertices[2].value.rings.length < 1 &&
-          vertices[1].value.rings.length < 1 &&
-          vertices[0].value.rings.length < 1 &&
-          vertices[2].value.subtreeDepth === 1 &&
-          vertices[1].value.subtreeDepth === 1 &&
-          vertices[0].value.subtreeDepth > 1)
-        {
+        if (neighbours.length === 3
+          && previousVertex
+          && previousVertex.value.rings.length < 1
+          && vertices[2].value.rings.length < 1
+          && vertices[1].value.rings.length < 1
+          && vertices[0].value.rings.length < 1
+          && vertices[2].value.subtreeDepth === 1
+          && vertices[1].value.subtreeDepth === 1
+          && vertices[0].value.subtreeDepth > 1
+        ) {
           // Special logic for adding pinched pairs...
           // For example: CCS(=O)(=O)CC(F)(F)NC
           if (vertex.angle >= 0) {
@@ -2579,7 +2544,7 @@ export default class DrawerBase {
         }
         else {
           // Divide the remaining space evenly among all neighbors...
-          const totalNeighbors = neighbours.length + (previousVertex? 1 : 0);
+          const totalNeighbors = neighbours.length + (previousVertex ? 1 : 0);
           const angleDelta = 2 * Math.PI / totalNeighbors;
           let a = angleDelta; // Current angle
           let i = 0;          // Current index
@@ -2691,8 +2656,7 @@ export default class DrawerBase {
     }
 
     // Ringbonds are not rotatable
-    if (vertexA.value.rings.length > 0 && vertexB.value.rings.length > 0 &&
-      this.areVerticesInSameRing(vertexA, vertexB)) {
+    if (vertexA.value.rings.length > 0 && vertexB.value.rings.length > 0 && this.areVerticesInSameRing(vertexA, vertexB)) {
       return false;
     }
 
@@ -2740,7 +2704,7 @@ export default class DrawerBase {
    * @returns {Vertex[]} An array of vertices.
    */
   getNonRingNeighbours(vertexId) {
-    let nrneighbours = Array();
+    let nrneighbours = [];
     let vertex = this.graph.vertices[vertexId];
     let neighbours = vertex.neighbours;
 
@@ -2776,14 +2740,14 @@ export default class DrawerBase {
 
       for (let j = 0; j < nNeighbours; j++) {
         let visited = new Uint8Array(this.graph.vertices.length);
-        let priority = Array(Array());
+        let priority = Array([]);
         visited[vertex.id] = 1;
 
         this.visitStereochemistry(neighbours[j], vertex.id, visited, priority, maxDepth, 0);
 
         // Sort each level according to atomic number
         for (let k = 0; k < priority.length; k++) {
-          priority[k].sort(function (a, b) {
+          priority[k].sort(function(a, b) {
             return b - a
           });
         }
@@ -2824,7 +2788,7 @@ export default class DrawerBase {
         }
       }
 
-      priorities.sort(function (a, b) {
+      priorities.sort(function(a, b) {
         for (let j = 0; j < a[1].length; j++) {
           for (let k = 0; k < a[1][j].length; k++) {
             if (a[1][j][k] > b[1][j][k]) {
@@ -2862,7 +2826,7 @@ export default class DrawerBase {
       // Flip the hydrogen direction when the drawing doesn't match the chirality.
       let wedgeA = 'down';
       let wedgeB = 'up';
-      if (isCw && rs !== 'R' || !isCw && rs !== 'S') {
+      if ((isCw && rs !== 'R') || (!isCw && rs !== 'S')) {
         vertex.value.hydrogenDirection = 'up';
         wedgeA = 'up';
         wedgeB = 'down';
@@ -2897,7 +2861,7 @@ export default class DrawerBase {
       }
 
 
-      wedgeOrder.sort(function (a, b) {
+      wedgeOrder.sort(function(a, b) {
         if (a[0] > b[0]) {
           return -1;
         } else if (a[0] < b[0]) {
@@ -2950,7 +2914,7 @@ export default class DrawerBase {
     let atomicNumber = vertex.value.getAtomicNumber();
 
     if (priority.length <= depth) {
-      priority.push(Array());
+      priority.push([]);
     }
 
     for (let i = 0; i < this.graph.getEdge(vertexId, previousVertexId).weight; i++) {
@@ -2975,7 +2939,7 @@ export default class DrawerBase {
 
       for (let i = 0; i < vertex.value.getMaxBonds() - bonds; i++) {
         if (priority.length <= depth + 1) {
-          priority.push(Array());
+          priority.push([]);
         }
 
         priority[depth + 1].push(atomicNumber * 1000 + 1);
@@ -3011,8 +2975,12 @@ export default class DrawerBase {
       }
 
       // Ignore also guanidine
-      if (vertex.value.element === 'C' && neighbours.length === 3 &&
-        neighbours[0].value.element === 'N' && neighbours[1].value.element === 'N' && neighbours[2].value.element === 'N') {
+      if (vertex.value.element === 'C'
+        && neighbours.length === 3
+        && neighbours[0].value.element === 'N'
+        && neighbours[1].value.element === 'N'
+        && neighbours[2].value.element === 'N'
+      ) {
         continue;
       }
 
@@ -3026,8 +2994,7 @@ export default class DrawerBase {
         let neighbouringElement = neighbour.value.element;
         let neighbourCount = neighbour.getNeighbourCount();
 
-        if (neighbouringElement !== 'C' && neighbouringElement !== 'H' &&
-          neighbourCount === 1) {
+        if (neighbouringElement !== 'C' && neighbouringElement !== 'H' && neighbourCount === 1) {
           heteroAtomCount++;
         }
 

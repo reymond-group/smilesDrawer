@@ -76,17 +76,17 @@ export default class RingConnection {
      * @returns {Boolean} A boolean indicating whether or not this ring connection is a bridge.
      */
     isBridge(vertices) {
-      if (this.vertices.size > 2) {
+        if (this.vertices.size > 2) {
           return true;
-      }
+        }
 
-      for (let vertexId of this.vertices) {
-          if(vertices[vertexId].value.rings.length > 2) {
-              return true;
-          }
-      }
+        for (let vertexId of this.vertices) {
+            if(vertices[vertexId].value.rings.length > 2) {
+                return true;
+            }
+        }
 
-      return false;
+        return false;
     }
 
     /**
@@ -100,16 +100,17 @@ export default class RingConnection {
      * @returns {Boolean} A boolean indicating whether or not two rings ar connected by a bridged bond.
      */
     static isBridge(ringConnections, vertices, firstRingId, secondRingId) {
-      let ringConnection = null;
-      
-      for (let i = 0; i < ringConnections.length; i++) {
+        let ringConnection = null;
+
+        for (let i = 0; i < ringConnections.length; i++) {
           ringConnection = ringConnections[i];
 
-          if (ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId ||
-              ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId) {
+            if ((ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId)
+                || (ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId)
+            ) {
               return ringConnection.isBridge(vertices);
-          }
-      }
+            }
+        }
 
       return false;
     }
@@ -150,8 +151,9 @@ export default class RingConnection {
     static getVertices(ringConnections, firstRingId, secondRingId) {
         for (let i = 0; i < ringConnections.length; i++) {
             let ringConnection = ringConnections[i];
-            if (ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId ||
-                ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId) {
+            if ((ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId)
+              || (ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId)
+            ) {
                 return [...ringConnection.vertices];
             }
         }

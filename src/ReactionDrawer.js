@@ -19,17 +19,17 @@ export default class ReactionDrawer {
             spacing: 10,
             plus: {
                 size: 9,
-                thickness: 1.0
+                thickness: 1.0,
             },
             arrow: {
                 length: moleculeOptions.bondLength * 4.0,
                 headSize: 6.0,
                 thickness: 1.0,
-                margin: 3
+                margin: 3,
             },
             weights: {
-                normalize: false
-            }
+                normalize: false,
+            },
         }
 
         this.opts = Options.extend(true, this.defaultOptions, options);
@@ -154,9 +154,9 @@ export default class ReactionDrawer {
         for (let i = 0; i < reaction.reactants.length; i++) {
             if (i > 0) {
                 elements.push({
-                    width: this.opts.plus.size * this.opts.scale,
+                    width:  this.opts.plus.size * this.opts.scale,
                     height: this.opts.plus.size * this.opts.scale,
-                    svg: this.getPlus()
+                    svg:    this.getPlus(),
                 });
             }
 
@@ -170,9 +170,9 @@ export default class ReactionDrawer {
             this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, reactantWeights, infoOnly, [], this.opts.weights.normalize);
 
             let element = {
-                width: reactantSvg.viewBox.baseVal.width * this.opts.scale,
+                width:  reactantSvg.viewBox.baseVal.width  * this.opts.scale,
                 height: reactantSvg.viewBox.baseVal.height * this.opts.scale,
-                svg: reactantSvg
+                svg:    reactantSvg,
             };
 
             elements.push(element);
@@ -184,16 +184,16 @@ export default class ReactionDrawer {
 
         // Arrow
         elements.push({
-            width: this.opts.arrow.length * this.opts.scale,
-            height: this.opts.arrow.headSize * 2.0 * this.opts.scale,
-            svg: this.getArrow()
+            width:  this.opts.arrow.length   * this.opts.scale,
+            height: this.opts.arrow.headSize * this.opts.scale * 2.0,
+            svg:    this.getArrow(),
         });
 
         // Text above the arrow / reagents
-        let reagentsText = "";
+        let reagentsText = '';
         for (let i = 0; i < reaction.reagents.length; i++) {
             if (i > 0) {
-                reagentsText += ", "
+                reagentsText += ', '
             }
 
             let text = this.drawer.getMolecularFormula(reaction.reagents[i]);
@@ -222,7 +222,7 @@ export default class ReactionDrawer {
             width: this.opts.arrow.length * this.opts.scale,
             offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
             offsetY: -(topText.height / 2.0) - this.opts.arrow.margin,
-            position: 'relative'
+            position: 'relative',
         });
 
         // Text below arrow
@@ -242,16 +242,16 @@ export default class ReactionDrawer {
             width: this.opts.arrow.length * this.opts.scale,
             offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
             offsetY: bottomText.height / 2.0 + this.opts.arrow.margin,
-            position: 'relative'
+            position: 'relative',
         });
 
         // Products
         for (let i = 0; i < reaction.products.length; i++) {
             if (i > 0) {
                 elements.push({
-                    width: this.opts.plus.size * this.opts.scale,
+                    width:  this.opts.plus.size * this.opts.scale,
                     height: this.opts.plus.size * this.opts.scale,
-                    svg: this.getPlus()
+                    svg:    this.getPlus(),
                 });
             }
 
@@ -265,9 +265,9 @@ export default class ReactionDrawer {
             this.drawer.draw(reaction.products[i], productSvg, themeName, productWeights, infoOnly, [], this.opts.weights.normalize);
 
             let element = {
-                width: productSvg.viewBox.baseVal.width * this.opts.scale,
+                width:  productSvg.viewBox.baseVal.width  * this.opts.scale,
                 height: productSvg.viewBox.baseVal.height * this.opts.scale,
-                svg: productSvg
+                svg:    productSvg,
             };
 
             elements.push(element);
@@ -279,7 +279,7 @@ export default class ReactionDrawer {
 
         let totalWidth = 0.0;
 
-        elements.forEach(element => {
+        elements.forEach((element) => {
             let offsetX = element.offsetX || 0.0;
             let offsetY = element.offsetY || 0.0;
 
@@ -314,13 +314,13 @@ export default class ReactionDrawer {
         rect_h.setAttributeNS(null, 'y', s / 2.0 - w / 2.0);
         rect_h.setAttributeNS(null, 'width', s);
         rect_h.setAttributeNS(null, 'height', w);
-        rect_h.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+        rect_h.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
 
         rect_v.setAttributeNS(null, 'x', s / 2.0 - w / 2.0);
         rect_v.setAttributeNS(null, 'y', 0);
         rect_v.setAttributeNS(null, 'width', w);
         rect_v.setAttributeNS(null, 'height', s);
-        rect_v.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+        rect_v.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
 
         svg.appendChild(rect_h);
         svg.appendChild(rect_v);
@@ -342,7 +342,7 @@ export default class ReactionDrawer {
         marker.setAttributeNS(null, 'refX', 0);
         marker.setAttributeNS(null, 'refY', s / 2);
         marker.setAttributeNS(null, 'orient', 'auto');
-        marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+        marker.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
 
         polygon.setAttributeNS(null, 'points', `0 0, ${s} ${s / 2}, 0 ${s}`)
 
@@ -365,7 +365,7 @@ export default class ReactionDrawer {
         marker.setAttributeNS(null, 'refX', 2.2);
         marker.setAttributeNS(null, 'refY', 2.2);
         marker.setAttributeNS(null, 'orient', 'auto');
-        marker.setAttributeNS(null, 'fill', this.themeManager.getColor("C"));
+        marker.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
 
         path.setAttributeNS(null, 'style', 'fill-rule:nonzero;');
         path.setAttributeNS(null, 'd', 'm 0 0 l 7 2.25 l -7 2.25 c 0 0 0.735 -1.084 0.735 -2.28 c 0 -1.196 -0.735 -2.22 -0.735 -2.22 z');
@@ -393,7 +393,7 @@ export default class ReactionDrawer {
         line.setAttributeNS(null, 'x2', l);
         line.setAttributeNS(null, 'y2', -this.opts.arrow.thickness / 2.0);
         line.setAttributeNS(null, 'stroke-width', this.opts.arrow.thickness);
-        line.setAttributeNS(null, 'stroke', this.themeManager.getColor("C"));
+        line.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
         line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
 
         svg.appendChild(line);

@@ -23,9 +23,9 @@ export default class Graph {
    * @param {Boolean} [isomeric=false] A boolean specifying whether or not the SMILES is isomeric.
    */
   constructor(parseTree, isomeric = false) {
-    this.vertices = Array();
-    this.edges = Array();
-    this.atomIdxToVertexId = Array();
+    this.vertices = [];
+    this.edges = [];
+    this.atomIdxToVertexId = [];
     this.vertexIdsToEdgeId = {};
     this.isomeric = isomeric;
 
@@ -105,13 +105,13 @@ export default class Graph {
         this._init({
           atom: 'H',
           isBracket: 'false',
-          branches: Array(),
+          branches: [],
           branchCount: 0,
-          ringbonds: Array(),
+          ringbonds: [],
           ringbondCount: false,
           next: null,
           hasNext: false,
-          bond: '-'
+          bond: '-',
         }, i, vertex.id, true);
       }
     }
@@ -129,8 +129,8 @@ export default class Graph {
    * Clears all the elements in this graph (edges and vertices).
    */
   clear() {
-    this.vertices = Array();
-    this.edges = Array();
+    this.vertices = [];
+    this.edges = [];
     this.vertexIdsToEdgeId = {};
   }
 
@@ -193,7 +193,7 @@ export default class Graph {
    * @returns {Number[]} An array containing the ids of edges connected to the vertex.
    */
   getEdges(vertexId) {
-    let edgeIds = Array();
+    let edgeIds = [];
     let vertex = this.vertices[vertexId];
 
     for (let i = 0; i < vertex.neighbours.length; i++) {
@@ -437,7 +437,7 @@ export default class Graph {
     let adjacencyList = Array(length);
 
     for (let i = 0; i < length; i++) {
-      adjacencyList[i] = Array();
+      adjacencyList[i] = [];
 
       for (let j = 0; j < length; j++) {
         if (i === j) {
@@ -465,7 +465,7 @@ export default class Graph {
     let low = new Array(length);
     let parent = new Array(length);
     let adj = this.getAdjacencyList();
-    let outBridges = Array();
+    let outBridges = [];
 
     visited.fill(false);
     parent.fill(null);
@@ -660,7 +660,7 @@ export default class Graph {
         let denom = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
         matEnergy[i][j] = [
           matStrength[i][j] * ((ux - vx) - matLength[i][j] * (ux - vx) * denom),
-          matStrength[i][j] * ((uy - vy) - matLength[i][j] * (uy - vy) * denom)
+          matStrength[i][j] * ((uy - vy) - matLength[i][j] * (uy - vy) * denom),
         ]
         matEnergy[j][i] = matEnergy[i][j];
         dEx += matEnergy[i][j][0];
@@ -671,11 +671,11 @@ export default class Graph {
     }
 
     // Utility functions, maybe inline them later
-    let energy = function (index) {
+    let energy = function(index) {
       return [arrEnergySumX[index] * arrEnergySumX[index] + arrEnergySumY[index] * arrEnergySumY[index], arrEnergySumX[index], arrEnergySumY[index]];
     }
 
-    let highestEnergy = function () {
+    let highestEnergy = function() {
       let highEnergy = 0.0;
       let highEnergyId = 0;
       let highDEX = 0.0;
@@ -696,7 +696,7 @@ export default class Graph {
       return [highEnergyId, highEnergy, highDEX, highDEY];
     }
 
-    let update = function (index, dEX, dEY) {
+    let update = function(index, dEX, dEY) {
       let dxx = 0.0;
       let dyy = 0.0;
       let dxy = 0.0;
@@ -842,13 +842,13 @@ export default class Graph {
   static getConnectedComponents(adjacencyMatrix) {
     let length = adjacencyMatrix.length;
     let visited = new Array(length);
-    let components = new Array();
+    let components = [];
 
     visited.fill(false);
 
     for (let u = 0; u < length; u++) {
       if (!visited[u]) {
-        let component = Array();
+        let component = [];
         visited[u] = true;
         component.push(u);
         Graph._ccGetDfs(u, visited, adjacencyMatrix, component);

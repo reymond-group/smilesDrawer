@@ -21,7 +21,7 @@ export default class SmilesDrawer {
 
     apply(attribute = 'data-smiles', theme = 'light', successCallback = null, errorCallback = null) {
         let elements = document.querySelectorAll(`[${attribute}]`);
-        elements.forEach(element => {
+        elements.forEach((element) => {
             let smiles = element.getAttribute(attribute);
 
             if (smiles === null) {
@@ -36,27 +36,28 @@ export default class SmilesDrawer {
             }
 
             if (element.hasAttribute('data-smiles-weights')) {
-                weights = element.getAttribute('data-smiles-weights').split(",").map(parseFloat);
+                weights = element.getAttribute('data-smiles-weights').split(',').map(parseFloat);
             }
 
-            if (element.hasAttribute('data-smiles-reactant-weights') ||
-                element.hasAttribute('data-smiles-reagent-weights') ||
-                element.hasAttribute('data-smiles-product-weights')) {
-                weights = { reactants: [], reagents: [], products: [] };
+            if (element.hasAttribute('data-smiles-reactant-weights')
+                || element.hasAttribute('data-smiles-reagent-weights')
+                || element.hasAttribute('data-smiles-product-weights')
+            ) {
+                weights = {reactants: [], reagents: [], products: []};
                 if (element.hasAttribute('data-smiles-reactant-weights')) {
-                    weights.reactants = element.getAttribute('data-smiles-reactant-weights').split(';').map(v => {
+                    weights.reactants = element.getAttribute('data-smiles-reactant-weights').split(';').map((v) => {
                         return v.split(',').map(parseFloat)
                     });
                 }
 
                 if (element.hasAttribute('data-smiles-reagent-weights')) {
-                    weights.reagents = element.getAttribute('data-smiles-reagent-weights').split(';').map(v => {
+                    weights.reagents = element.getAttribute('data-smiles-reagent-weights').split(';').map((v) => {
                         return v.split(',').map(parseFloat)
                     });
                 }
 
                 if (element.hasAttribute('data-smiles-product-weights')) {
-                    weights.products = element.getAttribute('data-smiles-product-weights').split(';').map(v => {
+                    weights.products = element.getAttribute('data-smiles-product-weights').split(';').map((v) => {
                         return v.split(',').map(parseFloat)
                     });
                 }
@@ -109,7 +110,7 @@ export default class SmilesDrawer {
 
         let defaultSettings = {
             textAboveArrow: '{reagents}',
-            textBelowArrow: ''
+            textBelowArrow: '',
         }
 
         settings = Options.extend(true, defaultSettings, settings);
@@ -170,7 +171,7 @@ export default class SmilesDrawer {
             }
         } else {
             let elements = document.querySelectorAll(target);
-            elements.forEach(element => {
+            elements.forEach((element) => {
                 let tag = element.nodeName.toLowerCase();
                 if (tag === 'svg') {
                     this.drawer.draw(parseTree, element, theme, weights);
@@ -228,7 +229,7 @@ export default class SmilesDrawer {
             }
         } else {
             let elements = document.querySelectorAll(target);
-            elements.forEach(element => {
+            elements.forEach((element) => {
                 let tag = element.nodeName.toLowerCase();
                 if (tag === 'svg') {
                     this.reactionDrawer.draw(reaction, element, theme, weights, settings.textAboveArrow, settings.textBelowArrow);
@@ -297,11 +298,11 @@ export default class SmilesDrawer {
                 if (h === null) h = element.height;
             }
 
-            if (element.style.width !== "") {
+            if (element.style.width !== '') {
                 w = parseInt(element.style.width);
             }
 
-            if (element.style.height !== "") {
+            if (element.style.height !== '') {
                 h = parseInt(element.style.height);
             }
         } else if (svg) {
@@ -309,6 +310,6 @@ export default class SmilesDrawer {
             h = parseFloat(svg.style.height);
         }
 
-        return { w: w, h: h };
+        return {w: w, h: h};
     }
 }

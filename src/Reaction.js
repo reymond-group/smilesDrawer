@@ -9,33 +9,33 @@ export default class Reaction {
      */
     constructor(reactionSmiles) {
         this.reactantsSmiles = [];
-        this.reagentsSmiles = [];
-        this.productsSmiles = [];
+        this.reagentsSmiles  = [];
+        this.productsSmiles  = [];
 
         this.reactantsWeights = [];
-        this.reagentsWeights = [];
-        this.productsWeights = [];
+        this.reagentsWeights  = [];
+        this.productsWeights  = [];
 
         this.reactants = [];
-        this.reagents = [];
-        this.products = [];
+        this.reagents  = [];
+        this.products  = [];
 
-        let parts = reactionSmiles.split(">");
+        let parts = reactionSmiles.split('>');
 
         if (parts.length !== 3) {
-            throw new Error("Invalid reaction SMILES. Did you add fewer than or more than two '>'?");
+            throw new Error('Invalid reaction SMILES: Expected exactly two ">" symbols.');
         }
 
-        if (parts[0] !== "") {
-            this.reactantsSmiles = parts[0].split(".");
+        if (parts[0] !== '') {
+            this.reactantsSmiles = parts[0].split('.');
         }
 
-        if (parts[1] !== "") {
-            this.reagentsSmiles = parts[1].split(".");
+        if (parts[1] !== '') {
+            this.reagentsSmiles = parts[1].split('.');
         }
 
-        if (parts[2] !== "") {
-            this.productsSmiles = parts[2].split(".");
+        if (parts[2] !== '') {
+            this.productsSmiles = parts[2].split('.');
         }
 
         for (let i = 0; i < this.reactantsSmiles.length; i++) {

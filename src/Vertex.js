@@ -38,15 +38,15 @@ export default class Vertex {
     this.position = new Vector2(x ? x : 0, y ? y : 0);
     this.previousPosition = new Vector2(0, 0);
     this.parentVertexId = null;
-    this.children = Array();
-    this.spanningTreeChildren = Array();
-    this.edges = Array();
+    this.children = [];
+    this.spanningTreeChildren = [];
+    this.edges = [];
     this.positioned = false;
     this.angle = null;
     this.dir = 1.0;
     this.neighbourCount = 0;
-    this.neighbours = Array();
-    this.neighbouringElements = Array();
+    this.neighbours = [];
+    this.neighbouringElements = [];
     this.forcePositioned = false;
   }
 
@@ -219,7 +219,7 @@ export default class Vertex {
    */
   getTextDirection(vertices, onlyHorizontal = false) {
     let neighbours = this.getDrawnNeighbours(vertices);
-    let angles = Array();
+    let angles = [];
 
     // If there is only one vertex in the graph, always draw to the right
     if (vertices.length === 1) {
@@ -270,7 +270,7 @@ export default class Vertex {
       return this.neighbours.slice();
     }
 
-    let arr = Array();
+    let arr = [];
 
     for (let i = 0; i < this.neighbours.length; i++) {
       if (this.neighbours[i] !== vertexId) {
@@ -288,7 +288,7 @@ export default class Vertex {
    * @returns {Number[]} An array containing the ids of neighbouring vertices that will be drawn.
    */
   getDrawnNeighbours(vertices) {
-    let arr = Array();
+    let arr = [];
 
     for (let i = 0; i < this.neighbours.length; i++) {
       if (vertices[this.neighbours[i]].value.isDrawn) {
@@ -315,7 +315,7 @@ export default class Vertex {
    * @returns {Number[]} An array containing the ids of the neighbouring vertices.
    */
   getSpanningTreeNeighbours(vertexId = null) {
-    let neighbours = Array();
+    let neighbours = [];
 
     for (let i = 0; i < this.spanningTreeChildren.length; i++) {
       if (vertexId === undefined || vertexId != this.spanningTreeChildren[i]) {
@@ -344,10 +344,7 @@ export default class Vertex {
     let neighbours = this.getNeighbours();
 
     for (let i = 0; i < neighbours.length; i++) {
-      if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, {
-        value: ringId
-      }) &&
-        neighbours[i] != previousVertexId) {
+      if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, {value: ringId}) && neighbours[i] != previousVertexId) {
         return neighbours[i];
       }
     }

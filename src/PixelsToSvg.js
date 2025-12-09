@@ -1,60 +1,80 @@
 // Adapted from https://codepen.io/shshaw/pen/XbxvNj by 
 
 export default function convertImage(img) {
-    "use strict";
+    'use strict';
 
     function each(obj, fn) {
         let length = obj.length,
             likeArray = (length === 0 || (length > 0 && (length - 1) in obj));
 
         if (likeArray) {
-            for (let i = 0; i < length; i++) { if (fn.call(obj[i], i, obj[i]) === false) { break; } }
+            for (let i = 0; i < length; i++) {
+                if (fn.call(obj[i], i, obj[i]) === false) {
+                    break;
+                }
+            }
         } else {
-            for (const i in obj) { if (fn.call(obj[i], i, obj[i]) === false) { break; } }
+            for (const i in obj) {
+                if (fn.call(obj[i], i, obj[i]) === false) {
+                    break;
+                }
+            }
         }
     }
 
     function componentToHex(c) {
         let hex = parseInt(c).toString(16);
-        return hex.length == 1 ? "0" + hex : hex;
+        return hex.length == 1 ? '0' + hex : hex;
     }
 
     function getColor(r, g, b, a) {
         a = parseInt(a);
-        if (a === undefined || a === 255) { return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b); }
-        if (a === 0) { return false; }
+        if (a === undefined || a === 255) {
+            return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+        }
+        if (a === 0) {
+            return false;
+        }
+
         return 'rgba(' + r + ',' + g + ',' + b + ',' + (a / 255) + ')';
     }
 
     // Optimized for horizontal lines
-    function makePathData(x, y, w) { return ('M' + x + ' ' + y + 'h' + w + ''); }
-    function makePath(color, data) { return '<path stroke="' + color + '" d="' + data + '" />\n'; }
+    function makePathData(x, y, w) {
+        return ('M' + x + ' ' + y + 'h' + w + '');
+    }
+
+    function makePath(color, data) {
+        return '<path stroke="' + color + '" d="' + data + '" />\n';
+    }
 
     function colorsToPaths(colors) {
 
-        let output = "";
+        let output = '';
 
         // Loop through each color to build paths
-        each(colors, function (color, values) {
+        each(colors, function(color, values) {
             color = getColor.apply(null, color.split(','));
 
-            if (color === false) { return; }
+            if (color === false) {
+                return;
+            }
 
             let paths = [];
             let curPath;
             let w = 1;
 
             // Loops through each color's pixels to optimize paths
-            each(values, function () {
+            each(values, function(index, value) {
 
-                if (curPath && this[1] === curPath[1] && this[0] === (curPath[0] + w)) {
+                if (curPath && value[1] === curPath[1] && value[0] === (curPath[0] + w)) {
                     w++;
                 } else {
                     if (curPath) {
                         paths.push(makePathData(curPath[0], curPath[1], w));
                         w = 1;
                     }
-                    curPath = this;
+                    curPath = value;
                 }
 
             });

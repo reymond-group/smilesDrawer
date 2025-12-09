@@ -48,7 +48,7 @@ export default class Drawer {
       canvas = element;
     }
     else {
-      throw Error("First argument was not a canvas or the ID of a canvas.");
+      throw Error('First argument was not a canvas or the ID of a canvas.');
     }
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

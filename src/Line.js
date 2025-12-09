@@ -22,7 +22,7 @@ export default class Line {
      * @param {Boolean} [chiralFrom=false] Whether or not the from atom is a chiral center.
      * @param {Boolean} [chiralTo=false] Whether or not the to atom is a chiral center.
      */
-    constructor(from = new Vector2(0,0), to = new Vector2(0, 0), elementFrom = null, elementTo = null, chiralFrom = false, chiralTo = false) {
+    constructor(from = new Vector2(0, 0), to = new Vector2(0, 0), elementFrom = null, elementTo = null, chiralFrom = false, chiralTo = false) {
         this.from = from;
         this.to = to;
         this.elementFrom = elementFrom;
@@ -46,8 +46,9 @@ export default class Line {
      * @returns {Number} The length of this line.
      */
     getLength() {
-        return Math.sqrt(Math.pow(this.to.x - this.from.x, 2) + 
-                         Math.pow(this.to.y - this.from.y, 2));
+        const dx = this.to.x - this.from.x
+        const dy = this.to.y - this.from.y
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
 

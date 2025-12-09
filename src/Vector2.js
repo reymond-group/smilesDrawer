@@ -356,9 +356,9 @@ export default class Vector2 {
 
         // Its not always a given, that the polygon is convex (-> sugars)
         for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-            if (((polygon[i].y > this.y) != (polygon[j].y > this.y)) &&
-                (this.x < (polygon[j].x - polygon[i].x) * (this.y - polygon[i].y) /
-                (polygon[j].y - polygon[i].y) + polygon[i].x)) {
+            const a = polygon[i]
+            const b = polygon[j]
+            if (((a.y > this.y) != (b.y > this.y)) && (this.x < (b.x - a.x) * (this.y - a.y) / (b.y - a.y) + a.x)) {
                 inside = !inside;
             }
         }
@@ -425,10 +425,10 @@ export default class Vector2 {
      * @returns {Boolean} Returns a boolean indicating whether or not this vector is on the same side as another vector.
      */
     sameSideAs(vecA, vecB, vecC) {
-        let d = this.whichSide(vecA, vecB);
+        let d    = this.whichSide(vecA, vecB);
         let dRef = vecC.whichSide(vecA, vecB);
 
-        return d < 0 && dRef < 0 || d == 0 && dRef == 0 || d > 0 && dRef > 0;
+        return (d < 0 && dRef < 0) || (d == 0 && dRef == 0) || (d > 0 && dRef > 0);
     }
 
     /**
@@ -504,7 +504,7 @@ export default class Vector2 {
 
         return [
             new Vector2(-delta.y, delta.x),
-            new Vector2(delta.y, -delta.x)
+            new Vector2(delta.y, -delta.x),
         ];
     }
 
@@ -521,7 +521,7 @@ export default class Vector2 {
 
         return [
             (new Vector2(-delta.y, delta.x)).normalize(),
-            (new Vector2(delta.y, -delta.x)).normalize()
+            (new Vector2(delta.y, -delta.x)).normalize(),
         ];
     }
 

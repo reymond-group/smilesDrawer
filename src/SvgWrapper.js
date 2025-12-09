@@ -361,7 +361,7 @@ export default class SvgWrapper {
    *  @param {Number} y The y position of the highlight
    *  @param {string} color The color of the highlight, default #03fc9d
    */
-  drawAtomHighlight(x, y, color = "#03fc9d") {
+  drawAtomHighlight(x, y, color = '#03fc9d') {
     let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     ball.setAttributeNS(null, 'cx', x);
     ball.setAttributeNS(null, 'cy', y);
@@ -377,8 +377,7 @@ export default class SvgWrapper {
    * @param {Line} line A line.
    */
   drawDashedWedge(line) {
-    if (isNaN(line.from.x) || isNaN(line.from.y) ||
-      isNaN(line.to.x) || isNaN(line.to.y)) {
+    if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
       return;
     }
 
@@ -600,7 +599,7 @@ export default class SvgWrapper {
     // TODO: Better handle exceptions
     // Exception for nitro (draw nitro as NO2 instead of N+O-O)
     if (charge === 1 && elementName === 'N' && '0O' in attachedPseudoElement && '0O-1' in attachedPseudoElement) {
-      attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
+      attachedPseudoElement = {'0O': {element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: ''}}
       charge = 0;
     }
 
@@ -775,7 +774,7 @@ export default class SvgWrapper {
 
     let image = new Image();
 
-    image.onload = function () {
+    image.onload = function() {
       canvas.width = width;
       canvas.height = height;
       canvas.getContext('2d').drawImage(image, 0, 0, width, height);
@@ -787,7 +786,7 @@ export default class SvgWrapper {
   static createUnicodeSubscript(n) {
     let result = '';
 
-    n.toString().split('').forEach(d => {
+    n.toString().split('').forEach((d) => {
       result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
     });
 
@@ -797,7 +796,7 @@ export default class SvgWrapper {
   static createUnicodeSuperscript(n) {
     let result = '';
 
-    n.toString().split('').forEach(d => {
+    n.toString().split('').forEach((d) => {
       let parsed = parseInt(d);
       if (Number.isFinite(parsed)) {
         result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parsed];
@@ -808,10 +807,7 @@ export default class SvgWrapper {
   }
 
   static replaceNumbersWithSubscript(text) {
-    let subscriptNumbers = {
-      '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄',
-      '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉'
-    };
+    let subscriptNumbers = {0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉'};
 
     for (const [key, value] of Object.entries(subscriptNumbers)) {
       text = text.replaceAll(key, value);
@@ -822,14 +818,14 @@ export default class SvgWrapper {
 
   static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
     const element = document.createElement('canvas');
-    const ctx = element.getContext("2d");
+    const ctx = element.getContext('2d');
     ctx.font = `${fontSize}pt ${fontFamily}`
     let textMetrics = ctx.measureText(text)
 
     let compWidth = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
     return {
-      'width': textMetrics.width > compWidth ? textMetrics.width : compWidth,
-      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight
+      width:  textMetrics.width > compWidth ? textMetrics.width : compWidth,
+      height: (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight,
     };
   }
 
@@ -848,7 +844,7 @@ export default class SvgWrapper {
     svg.setAttributeNS(null, 'height', height);
 
     let image = new Image();
-    image.onload = function () {
+    image.onload = function() {
       canvas.width = width;
       canvas.height = height;
 
@@ -861,7 +857,7 @@ export default class SvgWrapper {
       }
     };
 
-    image.onerror = function (err) {
+    image.onerror = function(err) {
       console.log(err);
     }
 
@@ -880,7 +876,7 @@ export default class SvgWrapper {
   static svgToImg(svg, img, width, height) {
     let canvas = document.createElement('canvas');
     this.svgToCanvas(svg, canvas, width, height, () => {
-      img.src = canvas.toDataURL("image/png");
+      img.src = canvas.toDataURL('image/png');
     });
   }
 
@@ -910,12 +906,12 @@ export default class SvgWrapper {
 
     let lines = [];
 
-    text.split("\n").forEach(line => {
+    text.split('\n').forEach((line) => {
       let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.0);
       if (dims.width >= maxWidth) {
         let totalWordsWidth = 0.0;
         let maxWordsHeight = 0.0;
-        let words = line.split(" ");
+        let words = line.split(' ');
         let offset = 0;
 
         for (let i = 0; i < words.length; i++) {
@@ -923,9 +919,9 @@ export default class SvgWrapper {
 
           if (totalWordsWidth + wordDims.width > maxWidth) {
             lines.push({
-              text: words.slice(offset, i).join(' '),
-              width: totalWordsWidth,
-              height: maxWordsHeight
+              text:   words.slice(offset, i).join(' '),
+              width:  totalWordsWidth,
+              height: maxWordsHeight,
             });
 
             totalWordsWidth = 0.0;
@@ -942,24 +938,24 @@ export default class SvgWrapper {
 
         if (offset < words.length) {
           lines.push({
-            text: words.slice(offset, words.length).join(' '),
-            width: totalWordsWidth,
-            height: maxWordsHeight
+            text:   words.slice(offset, words.length).join(' '),
+            width:  totalWordsWidth,
+            height: maxWordsHeight,
           });
         }
       } else {
         lines.push({
-          text: line,
-          width: dims.width,
-          height: dims.height
+          text:   line,
+          width:  dims.width,
+          height: dims.height,
         });
       }
     });
 
-    lines.forEach(line => {
+    lines.forEach((line) => {
       totalHeight += line.height;
       let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-      tspanElem.setAttributeNS(null, 'fill', themeManager.getColor("C"));
+      tspanElem.setAttributeNS(null, 'fill', themeManager.getColor('C'));
       tspanElem.textContent = line.text;
       tspanElem.setAttributeNS(null, 'x', '0px')
       tspanElem.setAttributeNS(null, 'y', `${totalHeight}px`);
@@ -972,6 +968,6 @@ export default class SvgWrapper {
 
     svg.appendChild(textElem);
 
-    return { svg: svg, width: maxLineWidth, height: totalHeight };
+    return {svg: svg, width: maxLineWidth, height: totalHeight};
   }
 }
