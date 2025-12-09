@@ -1,8 +1,8 @@
-import formulaToCommonName from './FormulaToCommonName'
-import Options             from './Options.js'
-import SvgDrawer           from './SvgDrawer'
-import SvgWrapper          from './SvgWrapper'
-import ThemeManager        from './ThemeManager'
+import formulaToCommonName from './FormulaToCommonName';
+import Options             from './Options.js';
+import SvgDrawer           from './SvgDrawer';
+import SvgWrapper          from './SvgWrapper';
+import ThemeManager        from './ThemeManager';
 
 export default class ReactionDrawer {
     /**
@@ -30,7 +30,7 @@ export default class ReactionDrawer {
             weights: {
                 normalize: false,
             },
-        }
+        };
 
         this.opts = Options.extend(true, this.defaultOptions, options);
 
@@ -148,7 +148,7 @@ export default class ReactionDrawer {
 
         let elements = [];
 
-        let maxHeight = 0.0
+        let maxHeight = 0.0;
 
         // Reactants
         for (let i = 0; i < reaction.reactants.length; i++) {
@@ -193,7 +193,7 @@ export default class ReactionDrawer {
         let reagentsText = '';
         for (let i = 0; i < reaction.reagents.length; i++) {
             if (i > 0) {
-                reagentsText += ', '
+                reagentsText += ', ';
             }
 
             let text = this.drawer.getMolecularFormula(reaction.reagents[i]);
@@ -344,7 +344,7 @@ export default class ReactionDrawer {
         marker.setAttributeNS(null, 'orient', 'auto');
         marker.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
 
-        polygon.setAttributeNS(null, 'points', `0 0, ${s} ${s / 2}, 0 ${s}`)
+        polygon.setAttributeNS(null, 'points', `0 0, ${s} ${s / 2}, 0 ${s}`);
 
         marker.appendChild(polygon);
 

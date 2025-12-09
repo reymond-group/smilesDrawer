@@ -1,5 +1,5 @@
 //@ts-check
-import Vector2 from './Vector2'
+import Vector2 from './Vector2';
 
 /** 
  * A class representing a line.
@@ -46,8 +46,8 @@ export default class Line {
      * @returns {Number} The length of this line.
      */
     getLength() {
-        const dx = this.to.x - this.from.x
-        const dy = this.to.y - this.from.y
+        const dx = this.to.x - this.from.x;
+        const dy = this.to.y - this.from.y;
         return Math.sqrt(dx * dx + dy * dy);
     }
 

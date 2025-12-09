@@ -1,6 +1,6 @@
 //@ts-check
-import Ring   from './Ring'
-import Vertex from './Vertex'
+import Ring   from './Ring';
+import Vertex from './Vertex';
 
 /** 
  * A class representing a ring connection.

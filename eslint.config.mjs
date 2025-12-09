@@ -1,9 +1,9 @@
-import {defineConfig} from 'eslint/config'
+import {defineConfig} from 'eslint/config';
 
-// import eslint    from '@eslint/js'
-import stylistic from '@stylistic/eslint-plugin'
-import tslint    from 'typescript-eslint'
-import globals   from 'globals'
+// import eslint    from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
+import tslint    from 'typescript-eslint';
+import globals   from 'globals';
 
 export default defineConfig([
     // eslint.configs.recommended,
@@ -14,7 +14,6 @@ export default defineConfig([
             'dist/',         // Automatically generated
             'doc/',          // Automatically generated
             'docs/',         // Automatically generated
-            'scripts/',      // ESLint can't parse await at the top level...
             'src/Parser.js', // Automatically generated
         ],
     },
@@ -42,7 +41,8 @@ export default defineConfig([
             '@stylistic/no-multi-spaces': 'off',
 
             // These light up way too much for now...
-            '@stylistic/semi': 'off',
+            // '@stylistic/semi': 'off',
+            '@stylistic/semi': ['error', 'always'],
 
             // TODO: Re-enable these for the great whitespace revolution!
             '@stylistic/brace-style':             'off',
@@ -69,4 +69,4 @@ export default defineConfig([
             }],
         },
     },
-])
+]);

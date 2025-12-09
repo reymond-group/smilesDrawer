@@ -1,10 +1,10 @@
 //@ts-check
-import Options        from './Options'
-import Parser         from './Parser'
-import ReactionDrawer from './ReactionDrawer'
-import ReactionParser from './ReactionParser'
-import SvgDrawer      from './SvgDrawer'
-import SvgWrapper     from './SvgWrapper'
+import Options        from './Options';
+import Parser         from './Parser';
+import ReactionDrawer from './ReactionDrawer';
+import ReactionParser from './ReactionParser';
+import SvgDrawer      from './SvgDrawer';
+import SvgWrapper     from './SvgWrapper';
 
 export default class SmilesDrawer {
     constructor(moleculeOptions = {}, reactionOptions = {}) {
@@ -46,19 +46,19 @@ export default class SmilesDrawer {
                 weights = {reactants: [], reagents: [], products: []};
                 if (element.hasAttribute('data-smiles-reactant-weights')) {
                     weights.reactants = element.getAttribute('data-smiles-reactant-weights').split(';').map((v) => {
-                        return v.split(',').map(parseFloat)
+                        return v.split(',').map(parseFloat);
                     });
                 }
 
                 if (element.hasAttribute('data-smiles-reagent-weights')) {
                     weights.reagents = element.getAttribute('data-smiles-reagent-weights').split(';').map((v) => {
-                        return v.split(',').map(parseFloat)
+                        return v.split(',').map(parseFloat);
                     });
                 }
 
                 if (element.hasAttribute('data-smiles-product-weights')) {
                     weights.products = element.getAttribute('data-smiles-product-weights').split(';').map((v) => {
-                        return v.split(',').map(parseFloat)
+                        return v.split(',').map(parseFloat);
                     });
                 }
             }
@@ -111,7 +111,7 @@ export default class SmilesDrawer {
         let defaultSettings = {
             textAboveArrow: '{reagents}',
             textBelowArrow: '',
-        }
+        };
 
         settings = Options.extend(true, defaultSettings, settings);
 

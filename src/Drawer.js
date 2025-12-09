@@ -1,5 +1,5 @@
 //@ts-check
-import SvgDrawer from './SvgDrawer'
+import SvgDrawer from './SvgDrawer';
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -52,7 +52,7 @@ export default class Drawer {
     }
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
     svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
     svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');

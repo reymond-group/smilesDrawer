@@ -1,5 +1,5 @@
 //@ts-check
-import Graph from './Graph'
+import Graph from './Graph';
 
 /** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
 export default class SSSR {
@@ -169,10 +169,10 @@ export default class SSSR {
                     if (previousPathLength > newPathLength) {
                         if (previousPathLength === newPathLength + 1) {
                             pe_prime[i][j] = [pe[i][j].length];
-                            l = pe[i][j].length
+                            l = pe[i][j].length;
                             while (l--) {
                                 pe_prime[i][j][l] = [pe[i][j][l].length];
-                                m = pe[i][j][l].length
+                                m = pe[i][j][l].length;
                                 while (m--) {
                                     pe_prime[i][j][l][m] = [pe[i][j][l][m].length];
                                     n = pe[i][j][l][m].length;
@@ -226,7 +226,7 @@ export default class SSSR {
                                     tmp.push(pe[k][j][0][l]);
                                 }
 
-                                pe[i][j][0] = tmp
+                                pe[i][j][0] = tmp;
                             }
                         }
                     } else if (previousPathLength === newPathLength - 1) {
@@ -454,7 +454,7 @@ export default class SSSR {
                 if (u === v) {
                     continue;
                 }
-                count += adjacencyMatrix[u][v]
+                count += adjacencyMatrix[u][v];
             }
         }
 

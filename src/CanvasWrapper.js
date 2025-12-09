@@ -1,10 +1,10 @@
 //@ts-check
-import Line         from './Line'
-import MathHelper   from './MathHelper'
-import Ring         from './Ring'
-import ThemeManager from './ThemeManager'
-import Vector2      from './Vector2'
-import Vertex       from './Vertex'
+import Line         from './Line';
+import MathHelper   from './MathHelper';
+import Ring         from './Ring';
+import ThemeManager from './ThemeManager';
+import Vector2      from './Vector2';
+import Vertex       from './Vertex';
 
 /**
  * Translate the integer indicating the charge to the appropriate text.
@@ -13,9 +13,9 @@ import Vertex       from './Vertex'
  */
 function getChargeText(charge) {
     if(!charge) {
-        return ''
+        return '';
     } else if (charge === 1) {
-        return '+'
+        return '+';
     } else if (charge === -1) {
         return '-';
     } else if (charge > 0) {
@@ -579,7 +579,7 @@ export default class CanvasWrapper {
         let pseudoElementHandled = false;
 
         // Charge
-        let chargeText = ''
+        let chargeText = '';
         let chargeWidth = 0;
 
         if (charge) {
@@ -602,7 +602,7 @@ export default class CanvasWrapper {
         // TODO: Better handle exceptions
         // Exception for nitro (draw nitro as NO2 instead of N+O-O)
         if (charge === 1 && elementName === 'N' && '0O' in attachedPseudoElement && '0O-1' in attachedPseudoElement) {
-            attachedPseudoElement = {'0O': {element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: ''}}
+            attachedPseudoElement = {'0O': {element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: ''}};
             charge = 0;
         }
 
@@ -698,7 +698,7 @@ export default class CanvasWrapper {
             }
 
             ctx.font = this.fontLarge;
-            ctx.fillText('H', hx, hy)
+            ctx.fillText('H', hx, hy);
 
             ctx.font = this.fontSmall;
             ctx.fillText(hydrogens.toString(), hx + this.halfHydrogenWidth + hydrogenCountWidth, hy + this.opts.fifthFontSizeSmall);
@@ -779,23 +779,23 @@ export default class CanvasWrapper {
 
             if (direction === 'left') {
                 cursorPosLeft -= elementWidth;
-                ctx.fillText(element, hx + cursorPosLeft, hy)
+                ctx.fillText(element, hx + cursorPosLeft, hy);
             } else {
-                ctx.fillText(element, hx + cursorPos, hy)
+                ctx.fillText(element, hx + cursorPos, hy);
                 cursorPos += elementWidth;
             }
 
             if (hydrogenCount > 0) {
                 if (direction === 'left') {
                     cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
-                    ctx.fillText('H', hx + cursorPosLeft, hy)
+                    ctx.fillText('H', hx + cursorPosLeft, hy);
 
                     if (hydrogenCount > 1) {
                         ctx.font = this.fontSmall;
                         ctx.fillText(hydrogenCount, hx + cursorPosLeft + hydrogenWidth, hy + this.opts.fifthFontSizeSmall);
                     }
                 } else {
-                    ctx.fillText('H', hx + cursorPos, hy)
+                    ctx.fillText('H', hx + cursorPos, hy);
                     cursorPos += hydrogenWidth;
 
                     if (hydrogenCount > 1) {

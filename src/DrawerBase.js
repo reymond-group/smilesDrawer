@@ -1,18 +1,18 @@
 //@ts-check
-import ArrayHelper    from './ArrayHelper'
-import Atom           from './Atom'
-import CanvasWrapper  from './CanvasWrapper'
-import Edge           from './Edge'
-import Graph          from './Graph'
-import Line           from './Line'
-import MathHelper     from './MathHelper'
-import Options        from './Options'
-import Ring           from './Ring'
-import RingConnection from './RingConnection'
-import SSSR           from './SSSR'
-import ThemeManager   from './ThemeManager'
-import Vector2        from './Vector2'
-import Vertex         from './Vertex'
+import ArrayHelper    from './ArrayHelper';
+import Atom           from './Atom';
+import CanvasWrapper  from './CanvasWrapper';
+import Edge           from './Edge';
+import Graph          from './Graph';
+import Line           from './Line';
+import MathHelper     from './MathHelper';
+import Options        from './Options';
+import Ring           from './Ring';
+import RingConnection from './RingConnection';
+import SSSR           from './SSSR';
+import ThemeManager   from './ThemeManager';
+import Vector2        from './Vector2';
+import Vertex         from './Vertex';
 
 /** 
  * The main class of the application representing the smiles drawer 
@@ -301,7 +301,7 @@ export default class DrawerBase {
           graph:           this.graph,
           rings:           this.rings,
           ringConnections: this.ringConnections,
-        })
+        });
       }
     }
   }
@@ -326,7 +326,7 @@ export default class DrawerBase {
    * @returns {Ring[]} An array containing all bridged rings associated with this molecule.
    */
   getBridgedRings() {
-    return this.rings.filter(ring => ring.isBridged)
+    return this.rings.filter(ring => ring.isBridged);
   }
 
   /**
@@ -335,7 +335,7 @@ export default class DrawerBase {
    * @returns {Ring[]} An array containing all fused rings associated with this molecule.
    */
   getFusedRings() {
-    return this.rings.filter(ring => ring.isFused)
+    return this.rings.filter(ring => ring.isFused);
   }
 
   /**
@@ -344,7 +344,7 @@ export default class DrawerBase {
    * @returns {Ring[]} An array containing all spiros associated with this molecule.
    */
   getSpiros() {
-    return this.rings.filter(ring => ring.isSpiro)
+    return this.rings.filter(ring => ring.isSpiro);
   }
 
   /**
@@ -360,9 +360,9 @@ export default class DrawerBase {
       result += ring.id + ';';
       result += ring.members.length + ';';
       result += ring.neighbours.length + ';';
-      result += ring.isSpiro ? 'true;' : 'false;'
-      result += ring.isFused ? 'true;' : 'false;'
-      result += ring.isBridged ? 'true;' : 'false;'
+      result += ring.isSpiro ? 'true;' : 'false;';
+      result += ring.isFused ? 'true;' : 'false;';
+      result += ring.isBridged ? 'true;' : 'false;';
       result += ring.rings.length + ';';
       result += '\n';
     }
@@ -601,7 +601,7 @@ export default class DrawerBase {
     this.doubleBondConfigCount = null;
     this.doubleBondConfig = null;
 
-    this.highlight_atoms = highlight_atoms
+    this.highlight_atoms = highlight_atoms;
 
     this.initRings();
     this.initHydrogens();
@@ -2005,7 +2005,7 @@ export default class DrawerBase {
       }
 
       let position = this.graph.vertices[vertex.id].position.clone();
-      position.multiplyScalar(s)
+      position.multiplyScalar(s);
       center.add(position);
     });
 
@@ -2179,9 +2179,9 @@ export default class DrawerBase {
             let closestPosition = null;
 
             if (closest.isTerminal()) {
-              closestPosition = closest.id === 0 ? this.graph.vertices[1].position : closest.previousPosition
+              closestPosition = closest.id === 0 ? this.graph.vertices[1].position : closest.previousPosition;
             } else {
-              closestPosition = closest.id === 0 ? this.graph.vertices[1].position : closest.position
+              closestPosition = closest.id === 0 ? this.graph.vertices[1].position : closest.position;
             }
 
             let vertexPreviousPosition = vertex.id === 0 ? this.graph.vertices[1].position : vertex.previousPosition;
@@ -2485,7 +2485,7 @@ export default class DrawerBase {
         let transVertex = this.graph.vertices[neighbours[trans]];
 
         // If the origin tree (from the previous vertex) is the shortest, make them the main chain
-        let prevShortest = (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB)
+        let prevShortest = (subTreeDepthC < subTreeDepthA && subTreeDepthC < subTreeDepthB);
 
         transVertex.angle = a;
         cisVertex.angle = -a;
@@ -2512,11 +2512,11 @@ export default class DrawerBase {
           let subtreedepth = this.graph.getTreeDepth(neighbour, vertex.id);
           newvertex.value.subtreeDepth = subtreedepth;
           return newvertex;
-        })
+        });
 
         // This puts all the longest subtrees on the far side...
         // TODO: Maybe try to balance this better?
-        vertices.sort((a, b) => (b.value.subtreeDepth - a.value.subtreeDepth))
+        vertices.sort((a, b) => (b.value.subtreeDepth - a.value.subtreeDepth));
 
         if (neighbours.length === 3
           && previousVertex
@@ -2749,9 +2749,7 @@ export default class DrawerBase {
 
         // Sort each level according to atomic number
         for (let k = 0; k < priority.length; k++) {
-          priority[k].sort(function(a, b) {
-            return b - a
-          });
+          priority[k].sort((a, b) => b - a);
         }
 
         priorities[j] = [j, priority];

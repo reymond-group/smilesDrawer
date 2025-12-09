@@ -1,7 +1,7 @@
-import convertImage from './PixelsToSvg'
-import Vector2      from './Vector2'
+import convertImage from './PixelsToSvg';
+import Vector2      from './Vector2';
 
-import chroma from 'chroma-js'
+import chroma from 'chroma-js';
 
 export default class GaussDrawer {
     /**
@@ -140,7 +140,7 @@ export default class GaussDrawer {
 
         image.onerror = (err) => {
             console.log(err);
-        }
+        };
 
         image.src = this.canvas.toDataURL();
     }

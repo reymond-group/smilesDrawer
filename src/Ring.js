@@ -1,8 +1,8 @@
 //@ts-check
-import ArrayHelper    from './ArrayHelper'
-import RingConnection from './RingConnection'
-import Vector2        from './Vector2'
-import Vertex         from './Vertex'
+import ArrayHelper    from './ArrayHelper';
+import RingConnection from './RingConnection';
+import Vector2        from './Vector2';
+import Vertex         from './Vertex';
 
 /** 
  * A class representing a ring.

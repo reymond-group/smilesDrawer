@@ -12,11 +12,11 @@ export default class MathHelper {
      */
     static round(value, decimals) {
         if (decimals) {
-            const pow = Math.pow(10, decimals)
-            return Math.round(value * pow) / pow
+            const pow = Math.pow(10, decimals);
+            return Math.round(value * pow) / pow;
         }
         else {
-            return Math.round(value)
+            return Math.round(value);
         }
     }
 
@@ -131,7 +131,7 @@ export default class MathHelper {
 
             visited[i] = 1;
             return traverseCycle(arr[i], cycleLength);
-        }
+        };
 
         for (let i = 0; i < arr.length; i++) {
             if (visited[i] === 1) {

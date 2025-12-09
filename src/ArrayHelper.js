@@ -151,7 +151,7 @@ export default class ArrayHelper {
      * @returns {Array} The intersecting vlaues.
      */
     static intersection(arrA, arrB) {
-        let intersection = []
+        let intersection = [];
 
         for (let i = 0; i < arrA.length; i++) {
             for (let j = 0; j < arrB.length; j++) {
@@ -362,7 +362,7 @@ export default class ArrayHelper {
      * @returns {Array} The copy.
      */
     static deepCopy(arr) {
-        let newArr = []
+        let newArr = [];
 
         for (let i = 0; i < arr.length; i++) {
             let item = arr[i];

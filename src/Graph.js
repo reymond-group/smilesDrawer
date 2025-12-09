@@ -1,10 +1,10 @@
 //@ts-check
-import Atom       from './Atom'
-import Edge       from './Edge'
-import MathHelper from './MathHelper'
-import Ring       from './Ring'
-import Vector2    from './Vector2'
-import Vertex     from './Vertex'
+import Atom       from './Atom';
+import Edge       from './Edge';
+import MathHelper from './MathHelper';
+import Ring       from './Ring';
+import Vector2    from './Vector2';
+import Vertex     from './Vertex';
 
 /** 
  * A class representing the molecular graph. 
@@ -57,7 +57,7 @@ export default class Graph {
     atom.branchBond = node.branchBond;
     atom.ringbonds = node.ringbonds;
     atom.bracket = node.atom.element ? node.atom : null;
-    atom.class = node.atom.class
+    atom.class = node.atom.class;
 
     let vertex = new Vertex(atom);
     let parentVertex = this.vertices[parentVertexId];
@@ -212,7 +212,7 @@ export default class Graph {
    * @returns {Boolean} A boolean indicating whether or not two vertices are connected by an edge.
    */
   hasEdge(vertexIdA, vertexIdB) {
-    return this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB] !== undefined
+    return this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB] !== undefined;
   }
 
   /**
@@ -354,7 +354,7 @@ export default class Graph {
       for (let i = 0; i < length; i++) {
         for (let j = 0; j < length; j++) {
           if (dist[i][j] > dist[i][k] + dist[k][j]) {
-            dist[i][j] = dist[i][k] + dist[k][j]
+            dist[i][j] = dist[i][k] + dist[k][j];
           }
         }
       }
@@ -391,7 +391,7 @@ export default class Graph {
       for (let i = 0; i < length; i++) {
         for (let j = 0; j < length; j++) {
           if (dist[i][j] > dist[i][k] + dist[k][j]) {
-            dist[i][j] = dist[i][k] + dist[k][j]
+            dist[i][j] = dist[i][k] + dist[k][j];
           }
         }
       }
@@ -502,7 +502,7 @@ export default class Graph {
       callback(vertex);
 
       for (let i = 0; i < vertex.neighbours.length; i++) {
-        let v = vertex.neighbours[i]
+        let v = vertex.neighbours[i];
         if (!visited[v]) {
           visited[v] = true;
           queue.push(v);
@@ -661,7 +661,7 @@ export default class Graph {
         matEnergy[i][j] = [
           matStrength[i][j] * ((ux - vx) - matLength[i][j] * (ux - vx) * denom),
           matStrength[i][j] * ((uy - vy) - matLength[i][j] * (uy - vy) * denom),
-        ]
+        ];
         matEnergy[j][i] = matEnergy[i][j];
         dEx += matEnergy[i][j][0];
         dEy += matEnergy[i][j][1];
@@ -673,13 +673,13 @@ export default class Graph {
     // Utility functions, maybe inline them later
     let energy = function(index) {
       return [arrEnergySumX[index] * arrEnergySumX[index] + arrEnergySumY[index] * arrEnergySumY[index], arrEnergySumX[index], arrEnergySumY[index]];
-    }
+    };
 
     let highestEnergy = function() {
       let highEnergy = 0.0;
       let highEnergyId = 0;
       let highDEX = 0.0;
-      let highDEY = 0.0
+      let highDEY = 0.0;
 
       i = length;
       while (i--) {
@@ -694,7 +694,7 @@ export default class Graph {
       }
 
       return [highEnergyId, highEnergy, highDEX, highDEY];
-    }
+    };
 
     let update = function(index, dEX, dEY) {
       let dxx = 0.0;
@@ -773,7 +773,7 @@ export default class Graph {
       }
       arrEnergySumX[index] = dEX;
       arrEnergySumY[index] = dEY;
-    }
+    };
 
     // Setting up variables for the while loops
     let maxEnergyId = 0;

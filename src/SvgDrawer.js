@@ -1,15 +1,15 @@
 //@ts-check
 // we use the drawer to do all the preprocessing. then we take over the drawing
 // portion to output to svg
-import ArrayHelper  from './ArrayHelper'
-import Atom         from './Atom'
-import DrawerBase   from './DrawerBase'
-import GaussDrawer  from './GaussDrawer'
-import Line         from './Line'
-import Ring         from './Ring'
-import SvgWrapper   from './SvgWrapper'
-import ThemeManager from './ThemeManager'
-import Vector2      from './Vector2'
+import ArrayHelper  from './ArrayHelper';
+import Atom         from './Atom';
+import DrawerBase   from './DrawerBase';
+import GaussDrawer  from './GaussDrawer';
+import Line         from './Line';
+import Ring         from './Ring';
+import SvgWrapper   from './SvgWrapper';
+import ThemeManager from './ThemeManager';
+import Vector2      from './Vector2';
 
 export default class SvgDrawer {
   constructor(options, clear = true) {
@@ -81,7 +81,7 @@ export default class SvgDrawer {
         graph:           preprocessor.graph,
         rings:           preprocessor.rings,
         ringConnections: preprocessor.ringConnections,
-      })
+      });
     }
 
     this.svgWrapper.constructSvg();
@@ -112,7 +112,7 @@ export default class SvgDrawer {
     }
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
     svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
     svg.setAttributeNS(null, 'width', 500 + '');
@@ -316,7 +316,7 @@ export default class SvgDrawer {
       let atom = vertex.value;
 
       for (let j = 0; j < preprocessor.highlight_atoms.length; j++) {
-        let highlight = preprocessor.highlight_atoms[j]
+        let highlight = preprocessor.highlight_atoms[j];
         if (atom.class === highlight[0]) {
           svgWrapper.drawAtomHighlight(vertex.position.x, vertex.position.y, highlight[1]);
         }

@@ -356,8 +356,8 @@ export default class Vector2 {
 
         // Its not always a given, that the polygon is convex (-> sugars)
         for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-            const a = polygon[i]
-            const b = polygon[j]
+            const a = polygon[i];
+            const b = polygon[j];
             if (((a.y > this.y) != (b.y > this.y)) && (this.x < (b.x - a.x) * (this.y - a.y) / (b.y - a.y) + a.x)) {
                 inside = !inside;
             }

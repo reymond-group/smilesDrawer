@@ -1,8 +1,8 @@
 //@ts-check
-import ArrayHelper from './ArrayHelper'
-import Atom        from './Atom'
-import MathHelper  from './MathHelper'
-import Vector2     from './Vector2'
+import ArrayHelper from './ArrayHelper';
+import Atom        from './Atom';
+import MathHelper  from './MathHelper';
+import Vector2     from './Vector2';
 
 /** 
  * A class representing a vertex.

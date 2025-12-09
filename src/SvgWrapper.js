@@ -1,6 +1,6 @@
-import Line       from './Line'
-import MathHelper from './MathHelper'
-import Vector2    from './Vector2'
+import Line       from './Line';
+import MathHelper from './MathHelper';
+import Vector2    from './Vector2';
 
 function makeid(length) {
   let result = '';
@@ -28,7 +28,7 @@ export default class SvgWrapper {
     // maintain a list of line elements and their corresponding gradients
     // maintain a list of vertex elements
     // maintain a list of highlighting elements
-    this.backgroundItems = []
+    this.backgroundItems = [];
     this.paths = [];
     this.vertices = [];
     this.gradients = [];
@@ -109,10 +109,10 @@ export default class SvgWrapper {
     }
 
     for (let backgroundItem of this.backgroundItems) {
-      background.appendChild(backgroundItem)
+      background.appendChild(backgroundItem);
     }
     for (let highlight of this.highlights) {
-      highlights.appendChild(highlight)
+      highlights.appendChild(highlight);
     }
     for (let vertex of this.vertices) {
       vertices.appendChild(vertex);
@@ -227,7 +227,7 @@ export default class SvgWrapper {
       return SvgWrapper.createUnicodeSuperscript(n) + '⁻';
     }
 
-    return ''
+    return '';
   }
 
   /**
@@ -591,15 +591,15 @@ export default class SvgWrapper {
     text.push([display, elementName]);
 
     if (hydrogens === 1) {
-      text.push(['H', 'H'])
+      text.push(['H', 'H']);
     } else if (hydrogens > 1) {
-      text.push(['H' + SvgWrapper.createUnicodeSubscript(hydrogens), 'H'])
+      text.push(['H' + SvgWrapper.createUnicodeSubscript(hydrogens), 'H']);
     }
 
     // TODO: Better handle exceptions
     // Exception for nitro (draw nitro as NO2 instead of N+O-O)
     if (charge === 1 && elementName === 'N' && '0O' in attachedPseudoElement && '0O-1' in attachedPseudoElement) {
-      attachedPseudoElement = {'0O': {element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: ''}}
+      attachedPseudoElement = {'0O': {element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: ''}};
       charge = 0;
     }
 
@@ -618,9 +618,9 @@ export default class SvgWrapper {
       text.push([pe_display, pe.element]);
 
       if (pe.hydrogenCount === 1) {
-        text.push(['H', 'H'])
+        text.push(['H', 'H']);
       } else if (pe.hydrogenCount > 1) {
-        text.push(['H' + SvgWrapper.createUnicodeSubscript(pe.hydrogenCount), 'H'])
+        text.push(['H' + SvgWrapper.createUnicodeSubscript(pe.hydrogenCount), 'H']);
       }
     }
 
@@ -719,7 +719,7 @@ export default class SvgWrapper {
       tspanElem.textContent = display;
 
       if (direction === 'up' || direction === 'down') {
-        tspanElem.setAttributeNS(null, 'x', '0px')
+        tspanElem.setAttributeNS(null, 'x', '0px');
         if (direction === 'up') {
           tspanElem.setAttributeNS(null, 'y', `-${0.9 * i}em`);
         } else {
@@ -728,7 +728,7 @@ export default class SvgWrapper {
       }
 
       textElem.appendChild(tspanElem);
-    })
+    });
 
     textElem.setAttributeNS(null, 'data-direction', direction);
 
@@ -743,7 +743,7 @@ export default class SvgWrapper {
       textElem.setAttributeNS(null, 'text-anchor', 'end');
     }
 
-    g.appendChild(textElem)
+    g.appendChild(textElem);
 
     g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
 
@@ -790,7 +790,7 @@ export default class SvgWrapper {
       result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
     });
 
-    return result
+    return result;
   }
 
   static createUnicodeSuperscript(n) {
@@ -803,7 +803,7 @@ export default class SvgWrapper {
       }
     });
 
-    return result
+    return result;
   }
 
   static replaceNumbersWithSubscript(text) {
@@ -819,8 +819,8 @@ export default class SvgWrapper {
   static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
     const element = document.createElement('canvas');
     const ctx = element.getContext('2d');
-    ctx.font = `${fontSize}pt ${fontFamily}`
-    let textMetrics = ctx.measureText(text)
+    ctx.font = `${fontSize}pt ${fontFamily}`;
+    let textMetrics = ctx.measureText(text);
 
     let compWidth = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
     return {
@@ -859,7 +859,7 @@ export default class SvgWrapper {
 
     image.onerror = function(err) {
       console.log(err);
-    }
+    };
 
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(svg.outerHTML);
     return canvas;
@@ -926,7 +926,7 @@ export default class SvgWrapper {
 
             totalWordsWidth = 0.0;
             maxWordsHeight = 0.0;
-            offset = i
+            offset = i;
           }
 
           if (wordDims.height > maxWordsHeight) {
@@ -957,7 +957,7 @@ export default class SvgWrapper {
       let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
       tspanElem.setAttributeNS(null, 'fill', themeManager.getColor('C'));
       tspanElem.textContent = line.text;
-      tspanElem.setAttributeNS(null, 'x', '0px')
+      tspanElem.setAttributeNS(null, 'x', '0px');
       tspanElem.setAttributeNS(null, 'y', `${totalHeight}px`);
       textElem.appendChild(tspanElem);
 

@@ -1,11 +1,11 @@
 //@ts-check
-import Drawer         from './src/Drawer'
-import GaussDrawer    from './src/GaussDrawer'
-import Parser         from './src/Parser'
-import ReactionDrawer from './src/ReactionDrawer'
-import ReactionParser from './src/ReactionParser'
-import SmiDrawer      from './src/SmilesDrawer'
-import SvgDrawer      from './src/SvgDrawer'
+import Drawer         from './src/Drawer';
+import GaussDrawer    from './src/GaussDrawer';
+import Parser         from './src/Parser';
+import ReactionDrawer from './src/ReactionDrawer';
+import ReactionParser from './src/ReactionParser';
+import SmiDrawer      from './src/SmilesDrawer';
+import SvgDrawer      from './src/SvgDrawer';
 
 /**
  * The SmilesDrawer namespace.
@@ -32,7 +32,7 @@ const SmilesDrawerNS = {
 */
 SmilesDrawerNS.clean = function(smiles) {
   return smiles.replace(/[^A-Za-z0-9@.+\-?!()[\]{}/\\=#$:*]/g, '');
-}
+};
 
 /**
 * Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
@@ -58,7 +58,7 @@ SmilesDrawerNS.apply = function(options, selector = 'canvas[data-smiles]', theme
       }
     });
   }
-}
+};
 
 /**
 * Parses the entered smiles string.
@@ -78,7 +78,7 @@ SmilesDrawerNS.parse = function(smiles, successCallback, errorCallback) {
       errorCallback(err);
     }
   }
-}
+};
 
 /**
 * Parses the entered reaction smiles string.
@@ -98,7 +98,7 @@ SmilesDrawerNS.parseReaction = function(reactionSmiles, successCallback, errorCa
       errorCallback(err);
     }
   }
-}
+};
 
 
 // Here be dragons (polyfills)
@@ -140,7 +140,7 @@ if (!Array.prototype.fill) {
 
       // Step 13.
       return O;
-    }
+    };
 
   Object.defineProperty(Array.prototype, 'fill', {
     value:     fill,

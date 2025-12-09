@@ -1,5 +1,5 @@
 //@ts-check
-import ArrayHelper from './ArrayHelper'
+import ArrayHelper from './ArrayHelper';
 
 /** 
  * A class representing an atom.
