@@ -77,9 +77,11 @@ export default class SvgDrawer {
     }
 
     if (preprocessor.opts.debug) {
-      console.log(preprocessor.graph);
-      console.log(preprocessor.rings);
-      console.log(preprocessor.ringConnections);
+      console.debug('SvgDrawer::draw()', {
+        graph:           preprocessor.graph,
+        rings:           preprocessor.rings,
+        ringConnections: preprocessor.ringConnections,
+      })
     }
 
     this.svgWrapper.constructSvg();

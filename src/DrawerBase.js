@@ -297,9 +297,11 @@ export default class DrawerBase {
       this.canvasWrapper.reset();
 
       if (this.opts.debug) {
-        console.log(this.graph);
-        console.log(this.rings);
-        console.log(this.ringConnections);
+        console.debug('DrawerBase::draw()', {
+          graph:           this.graph,
+          rings:           this.rings,
+          ringConnections: this.ringConnections,
+        })
       }
     }
   }
