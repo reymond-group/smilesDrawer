@@ -1,40 +1,40 @@
 export default class ThemeManager {
-  constructor(colors, theme) {
-    this.colors = colors;
-    this.theme = this.colors[theme];
-  }
+    constructor(colors, theme) {
+        this.colors = colors;
+        this.theme = this.colors[theme];
+    }
 
-  /**
+    /**
    * Returns the hex code of a color associated with a key from the current theme.
    *
    * @param {String} key The color key in the theme (e.g. C, N, BACKGROUND, ...).
    * @returns {String} A color hex value.
    */
-  getColor(key) {
-    if (key) {
-      key = key.toUpperCase();
+    getColor(key) {
+        if (key) {
+            key = key.toUpperCase();
 
-      if (key in this.theme) {
-        return this.theme[key];
-      }
+            if (key in this.theme) {
+                return this.theme[key];
+            }
+        }
+
+        return this.theme['C'];
     }
 
-    return this.theme['C'];
-  }
-
-  /**
+    /**
    * Sets the theme to the specified string if it exists. If it does not, this
    * does nothing.
    *
    * @param {String} theme the name of the theme to switch to
    */
-  setTheme(theme) {
-    if (theme in this.colors) {
-      this.theme = this.colors[theme];
-    }
+    setTheme(theme) {
+        if (theme in this.colors) {
+            this.theme = this.colors[theme];
+        }
 
     // TODO: this probably should notify those who are watching this theme
     // manager that the theme has changed so that colors can be changed
     // on the fly
-  }
+    }
 }

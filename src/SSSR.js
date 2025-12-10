@@ -1,11 +1,11 @@
-//@ts-check
+// @ts-check
 import Graph from './Graph';
 
 /** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
 export default class SSSR {
     /**
      * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
-     * 
+     *
      * @param {Graph} graph A Graph object.
      * @param {Boolean} [experimental=false] Whether or not to use experimental SSSR.
      * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
@@ -67,7 +67,7 @@ export default class SSSR {
                 rings.push([...connectedComponent]);
                 continue;
             }
-            
+
             if (experimental) {
                 nSssr = 999;
             }
@@ -88,7 +88,6 @@ export default class SSSR {
                 rings.push(ring);
             }
         }
-        
 
         // So, for some reason, this would return three rings for C1CCCC2CC1CCCC2, which is wrong
         // As I don't have time to fix this properly, it will stay in. I'm sorry next person who works
@@ -98,7 +97,7 @@ export default class SSSR {
 
     /**
      * Creates a printable string from a matrix (2D array).
-     * 
+     *
      * @param {Array[]} matrix A 2D array.
      * @returns {String} A string representing the matrix.
      */
@@ -118,7 +117,7 @@ export default class SSSR {
 
     /**
      * Returnes the two path-included distance matrices used to find the sssr.
-     * 
+     *
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @returns {Object} The path-included distance matrices. { p1, p2 }
      */
@@ -149,7 +148,8 @@ export default class SSSR {
 
                 if (d[i][j] === 1) {
                     pe[i][j] = [[[i, j]]];
-                } else {
+                }
+                else {
                     pe[i][j] = [];
                 }
 
@@ -181,7 +181,8 @@ export default class SSSR {
                                     }
                                 }
                             }
-                        } else {
+                        }
+                        else {
                             pe_prime[i][j] = [];
                         }
 
@@ -198,7 +199,8 @@ export default class SSSR {
                         while (l--) {
                             pe[i][j][0].push(pe[k][j][0][l]);
                         }
-                    } else if (previousPathLength === newPathLength) {
+                    }
+                    else if (previousPathLength === newPathLength) {
                         if (pe[i][k].length && pe[k][j].length) {
                             if (pe[i][j].length) {
                                 let tmp = [];
@@ -214,7 +216,8 @@ export default class SSSR {
                                 }
 
                                 pe[i][j].push(tmp);
-                            } else {
+                            }
+                            else {
                                 let tmp = [];
                                 l = pe[i][k][0].length;
                                 while (l--) {
@@ -229,7 +232,8 @@ export default class SSSR {
                                 pe[i][j][0] = tmp;
                             }
                         }
-                    } else if (previousPathLength === newPathLength - 1) {
+                    }
+                    else if (previousPathLength === newPathLength - 1) {
                         if (pe_prime[i][j].length) {
                             let tmp = [];
 
@@ -244,7 +248,8 @@ export default class SSSR {
                             }
 
                             pe_prime[i][j].push(tmp);
-                        } else {
+                        }
+                        else {
                             let tmp = [];
 
                             l = pe[i][k][0].length;
@@ -265,15 +270,15 @@ export default class SSSR {
         }
 
         return {
-            d: d,
-            pe: pe,
+            d:        d,
+            pe:       pe,
             pe_prime: pe_prime,
         };
     }
 
     /**
      * Get the ring candidates from the path-included distance matrices.
-     * 
+     *
      * @param {Array[]} d The distance matrix.
      * @param {Array[]} pe A matrix containing the shortest paths.
      * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
@@ -288,11 +293,13 @@ export default class SSSR {
             for (let j = 0; j < length; j++) {
                 if (d[i][j] === 0 || (pe[i][j].length === 1 && pe_prime[i][j] === 0)) {
                     continue;
-                } else {
+                }
+                else {
                     // c is the number of vertices in the cycle.
                     if (pe_prime[i][j].length !== 0) {
                         c = 2 * (d[i][j] + 0.5);
-                    } else {
+                    }
+                    else {
                         c = 2 * d[i][j];
                     }
 
@@ -313,7 +320,7 @@ export default class SSSR {
 
     /**
      * Searches the candidates for the smallest set of smallest rings.
-     * 
+     *
      * @param {Array[]} c The candidates.
      * @param {Array[]} d The distance matrix.
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
@@ -350,7 +357,8 @@ export default class SSSR {
                         return cSssr;
                     }
                 }
-            } else {
+            }
+            else {
                 for (let j = 0; j < c[i][1].length - 1; j++) {
                     let bonds = c[i][1][j].concat(c[i][1][j + 1]);
                     // Some bonds are added twice, resulting in [[u, v], [u, v]] instead of [u, v].
@@ -379,7 +387,7 @@ export default class SSSR {
 
     /**
      * Returns the number of edges in a graph defined by an adjacency matrix.
-     * 
+     *
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @returns {Number} The number of edges in the graph defined by the adjacency matrix.
      */
@@ -402,7 +410,7 @@ export default class SSSR {
 
     /**
      * Returns an edge list constructed form an adjacency matrix.
-     * 
+     *
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @returns {Array[]} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
      */
@@ -425,7 +433,7 @@ export default class SSSR {
 
     /**
      * Return a set of vertex indices contained in an array of bonds.
-     * 
+     *
      * @param {Array} bonds An array of bonds. A bond is defined as [ sourceVertexId, targetVertexId ].
      * @returns {Set<Number>} An array of vertices.
      */
@@ -442,7 +450,7 @@ export default class SSSR {
 
     /**
     * Returns the number of bonds within a set of atoms.
-    * 
+    *
     * @param {Set<Number>} atoms An array of atom ids.
     * @param {Array[]} adjacencyMatrix An adjacency matrix.
     * @returns {Number} The number of bonds in a set of atoms.
@@ -463,7 +471,7 @@ export default class SSSR {
 
     /**
      * Checks whether or not a given path already exists in an array of paths.
-     * 
+     *
      * @param {Set[]} pathSets An array of sets each representing a path.
      * @param {Set<Number>} pathSet A set representing a path.
      * @param {Array[]} bonds The bonds associated with the current path.
@@ -534,7 +542,7 @@ export default class SSSR {
 
     /**
      * Checks whether or not two sets are equal (contain the same elements).
-     * 
+     *
      * @param {Set<Number>} setA A set.
      * @param {Set<Number>} setB A set.
      * @returns {Boolean} A boolean indicating whether or not the two sets are equal.
@@ -555,7 +563,7 @@ export default class SSSR {
 
     /**
      * Checks whether or not a set (setA) is a superset of another set (setB).
-     * 
+     *
      * @param {Set<Number>} setA A set.
      * @param {Set<Number>} setB A set.
      * @returns {Boolean} A boolean indicating whether or not setB is a superset of setA.

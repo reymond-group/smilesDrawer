@@ -13,20 +13,23 @@ export default class ReactionDrawer {
      */
     constructor(options, moleculeOptions) {
         this.defaultOptions = {
-            scale: moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
-            fontSize: moleculeOptions.fontSizeLarge * 0.8,
+            scale:      moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
+            fontSize:   moleculeOptions.fontSizeLarge * 0.8,
             fontFamily: 'Arial, Helvetica, sans-serif',
-            spacing: 10,
+            spacing:    10,
+
             plus: {
-                size: 9,
+                size:      9,
                 thickness: 1.0,
             },
+
             arrow: {
-                length: moleculeOptions.bondLength * 4.0,
-                headSize: 6.0,
+                length:    moleculeOptions.bondLength * 4.0,
+                headSize:  6.0,
                 thickness: 1.0,
-                margin: 3,
+                margin:    3,
             },
+
             weights: {
                 normalize: false,
             },
@@ -49,7 +52,7 @@ export default class ReactionDrawer {
    * @param {String} textBelow='' The text below the arrow.
    * @param {?Object} weights=null The weights for reactants, agents, and products.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
-   * 
+   *
    * @returns {SVGElement} The svg element
    */
     draw(reaction, target, themeName = 'light', weights = null, textAbove = '{reagents}', textBelow = '', infoOnly = false) {
@@ -136,9 +139,11 @@ export default class ReactionDrawer {
             svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
             svg.setAttributeNS(null, 'width', 500 + '');
             svg.setAttributeNS(null, 'height', 500 + '');
-        } else if (typeof target === 'string' || target instanceof String) {
+        }
+        else if (typeof target === 'string' || target instanceof String) {
             svg = document.getElementById(target);
-        } else {
+        }
+        else {
             svg = target;
         }
 
@@ -217,11 +222,11 @@ export default class ReactionDrawer {
         let centerOffsetX = (this.opts.arrow.length * this.opts.scale - topText.width) / 2.0;
 
         elements.push({
-            svg: topText.svg,
-            height: topText.height,
-            width: this.opts.arrow.length * this.opts.scale,
-            offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
-            offsetY: -(topText.height / 2.0) - this.opts.arrow.margin,
+            svg:      topText.svg,
+            height:   topText.height,
+            width:    this.opts.arrow.length * this.opts.scale,
+            offsetX:  -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
+            offsetY:  -(topText.height / 2.0) - this.opts.arrow.margin,
             position: 'relative',
         });
 
@@ -237,11 +242,11 @@ export default class ReactionDrawer {
         centerOffsetX = (this.opts.arrow.length * this.opts.scale - bottomText.width) / 2.0;
 
         elements.push({
-            svg: bottomText.svg,
-            height: bottomText.height,
-            width: this.opts.arrow.length * this.opts.scale,
-            offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
-            offsetY: bottomText.height / 2.0 + this.opts.arrow.margin,
+            svg:      bottomText.svg,
+            height:   bottomText.height,
+            width:    this.opts.arrow.length * this.opts.scale,
+            offsetX:  -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
+            offsetY:  bottomText.height / 2.0 + this.opts.arrow.margin,
             position: 'relative',
         });
 

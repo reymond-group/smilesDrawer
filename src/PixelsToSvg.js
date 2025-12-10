@@ -1,4 +1,4 @@
-// Adapted from https://codepen.io/shshaw/pen/XbxvNj by 
+// Adapted from https://codepen.io/shshaw/pen/XbxvNj by
 
 export default function convertImage(img) {
     'use strict';
@@ -13,7 +13,8 @@ export default function convertImage(img) {
                     break;
                 }
             }
-        } else {
+        }
+        else {
             for (const i in obj) {
                 if (fn.call(obj[i], i, obj[i]) === false) {
                     break;
@@ -49,7 +50,6 @@ export default function convertImage(img) {
     }
 
     function colorsToPaths(colors) {
-
         let output = '';
 
         // Loop through each color to build paths
@@ -66,17 +66,16 @@ export default function convertImage(img) {
 
             // Loops through each color's pixels to optimize paths
             each(values, function(index, value) {
-
                 if (curPath && value[1] === curPath[1] && value[0] === (curPath[0] + w)) {
                     w++;
-                } else {
+                }
+                else {
                     if (curPath) {
                         paths.push(makePathData(curPath[0], curPath[1], w));
                         w = 1;
                     }
                     curPath = value;
                 }
-
             });
 
             paths.push(makePathData(curPath[0], curPath[1], w)); // Finish last path
@@ -116,5 +115,4 @@ export default function convertImage(img) {
     dummyDiv.innerHTML = output;
 
     return dummyDiv.firstChild;
-
 }

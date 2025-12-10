@@ -1,5 +1,5 @@
-/** 
- * A static class containing helper functions for math-related tasks. 
+/**
+ * A static class containing helper functions for math-related tasks.
  */
 export default class MathHelper {
     /**
@@ -30,7 +30,7 @@ export default class MathHelper {
     static meanAngle(arr) {
         let sin = 0.0;
         let cos = 0.0;
-        
+
         for (let i = 0; i < arr.length; i++) {
             sin += Math.sin(arr[i]);
             cos += Math.cos(arr[i]);
@@ -76,7 +76,7 @@ export default class MathHelper {
 
     static apothemFromSideLength(s, n) {
         let r = MathHelper.polyCircumradius(s, n);
-        
+
         return MathHelper.apothem(r, n);
     }
 
@@ -147,16 +147,16 @@ export default class MathHelper {
 
     /** The factor to convert degrees to radians. */
     static get radFactor() {
-      return Math.PI / 180.0;
+        return Math.PI / 180.0;
     }
 
     /** The factor to convert radians to degrees. */
     static get degFactor() {
-      return 180.0 / Math.PI;
+        return 180.0 / Math.PI;
     }
 
     /** Two times PI. */
     static get twoPI() {
-      return 2.0 * Math.PI;
+        return 2.0 * Math.PI;
     }
 }

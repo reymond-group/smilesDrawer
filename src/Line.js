@@ -1,9 +1,9 @@
-//@ts-check
+// @ts-check
 import Vector2 from './Vector2';
 
-/** 
+/**
  * A class representing a line.
- * 
+ *
  * @property {Vector2} from The Vector2 defining the start of the line.
  * @property {Vector2} to The Vector2 defining the end of the line.
  * @property {String} elementFrom The element symbol associated with the start of the line.
@@ -51,7 +51,6 @@ export default class Line {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-
     /**
      * Returns the angle of the line in relation to the coordinate system (the x-axis).
      *
@@ -72,11 +71,12 @@ export default class Line {
         // Return the vector with the larger x value (the right one)
         if (this.from.x < this.to.x) {
             return this.to;
-        } else {
+        }
+        else {
             return this.from;
         }
     }
-    
+
     /**
      * Returns the left vector (the vector with the smaller x value).
      *
@@ -86,7 +86,8 @@ export default class Line {
         // Return the vector with the smaller x value (the left one)
         if (this.from.x < this.to.x) {
             return this.from;
-        } else {
+        }
+        else {
             return this.to;
         }
     }
@@ -99,7 +100,8 @@ export default class Line {
     getRightElement() {
         if (this.from.x < this.to.x) {
             return this.elementTo;
-        } else {
+        }
+        else {
             return this.elementFrom;
         }
     }
@@ -112,7 +114,8 @@ export default class Line {
     getLeftElement() {
         if (this.from.x < this.to.x) {
             return this.elementFrom;
-        } else {
+        }
+        else {
             return this.elementTo;
         }
     }
@@ -125,7 +128,8 @@ export default class Line {
     getRightChiral() {
         if (this.from.x < this.to.x) {
             return this.chiralTo;
-        } else {
+        }
+        else {
             return this.chiralFrom;
         }
     }
@@ -138,7 +142,8 @@ export default class Line {
     getLeftChiral() {
         if (this.from.x < this.to.x) {
             return this.chiralFrom;
-        } else {
+        }
+        else {
             return this.chiralTo;
         }
     }
@@ -154,7 +159,8 @@ export default class Line {
         if (this.from.x < this.to.x) {
             this.to.x = x;
             this.to.y = y;
-        } else {
+        }
+        else {
             this.from.x = x;
             this.from.y = y;
         }
@@ -173,7 +179,8 @@ export default class Line {
         if (this.from.x < this.to.x) {
             this.from.x = x;
             this.from.y = y;
-        } else {
+        }
+        else {
             this.to.x = x;
             this.to.y = y;
         }
@@ -188,9 +195,9 @@ export default class Line {
      */
     rotateToXAxis() {
         let left = this.getLeftVector();
-        
+
         this.setRightVector(left.x + this.getLength(), left.y);
-        
+
         return this;
     }
 
@@ -208,7 +215,7 @@ export default class Line {
 
         let x = cosTheta * (r.x - l.x) - sinTheta * (r.y - l.y) + l.x;
         let y = sinTheta * (r.x - l.x) - cosTheta * (r.y - l.y) + l.y;
-        
+
         this.setRightVector(x, y);
 
         return this;
@@ -222,10 +229,10 @@ export default class Line {
      */
     shortenFrom(by) {
         let f = Vector2.subtract(this.to, this.from);
-        
+
         f.normalize();
         f.multiplyScalar(by);
-        
+
         this.from.add(f);
 
         return this;
@@ -239,10 +246,10 @@ export default class Line {
      */
     shortenTo(by) {
         let f = Vector2.subtract(this.from, this.to);
-        
+
         f.normalize();
         f.multiplyScalar(by);
-        
+
         this.to.add(f);
 
         return this;
@@ -257,23 +264,25 @@ export default class Line {
     shortenRight(by) {
         if (this.from.x < this.to.x) {
             this.shortenTo(by);
-        } else {
+        }
+        else {
             this.shortenFrom(by);
         }
 
         return this;
     }
-    
+
     /**
      * Shorten the left side.
-     * 
+     *
      * @param {Number} by The length in pixels to shorten the vector by.
      * @returns {Line} Returns itself.
      */
     shortenLeft(by) {
         if (this.from.x < this.to.x) {
             this.shortenFrom(by);
-        } else {
+        }
+        else {
             this.shortenTo(by);
         }
 
@@ -288,10 +297,10 @@ export default class Line {
      */
     shorten(by) {
         let f = Vector2.subtract(this.from, this.to);
-        
+
         f.normalize();
         f.multiplyScalar(by / 2.0);
-        
+
         this.to.add(f);
         this.from.subtract(f);
 

@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 
 /**
  * A class representing an edge.
@@ -36,8 +36,8 @@ export default class Edge {
      * @param {String} bondType
      */
     setBondType(bondType) {
-      this.bondType = bondType;
-      this.weight = Edge.bonds[bondType];
+        this.bondType = bondType;
+        this.weight = Edge.bonds[bondType];
     }
 
     /**

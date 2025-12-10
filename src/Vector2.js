@@ -1,8 +1,8 @@
-//@ts-check
+// @ts-check
 
-/** 
+/**
  * A class representing a 2D vector.
- * 
+ *
  * @property {Number} x The x component of the vector.
  * @property {Number} y The y component of the vector.
  */
@@ -17,10 +17,12 @@ export default class Vector2 {
         if (arguments.length == 0) {
             this.x = 0;
             this.y = 0;
-        } else if (x instanceof Vector2) {
+        }
+        else if (x instanceof Vector2) {
             this.x = x.x;
             this.y = x.y;
-        } else {
+        }
+        else {
             this.x = x;
             this.y = y;
         }
@@ -82,7 +84,7 @@ export default class Vector2 {
 
         return this;
     }
-    
+
     /**
      * Multiply the x and y coordinate values of this vector by the values of another vector.
      *
@@ -159,7 +161,7 @@ export default class Vector2 {
     clockwise(vec) {
         let a = this.y * vec.x;
         let b = this.x * vec.y;
-        
+
         if (a > b) {
             return -1;
         }
@@ -180,7 +182,7 @@ export default class Vector2 {
     relativeClockwise(center, vec) {
         let a = (this.y - center.y) * (vec.x - center.x);
         let b = (this.x - center.x) * (vec.y - center.y);
-        
+
         if (a > b) {
             return -1;
         }
@@ -204,7 +206,7 @@ export default class Vector2 {
 
         tmp.x = this.x * cosAngle - this.y * sinAngle;
         tmp.y = this.x * sinAngle + this.y * cosAngle;
-        
+
         this.x = tmp.x;
         this.y = tmp.y;
 
@@ -258,16 +260,16 @@ export default class Vector2 {
 
     /**
      * Rotates the vector away from a specified vector around a center.
-     * 
+     *
      * @param {Vector2} vec The vector this one is rotated away from.
      * @param {Vector2} center The rotational center.
      * @param {Number} angle The angle by which to rotate.
      */
     rotateAwayFrom(vec, center, angle) {
         this.rotateAround(angle, center);
-        
+
         let distSqA = this.distanceSq(vec);
-        
+
         this.rotateAround(-2.0 * angle, center);
 
         let distSqB = this.distanceSq(vec);
@@ -280,7 +282,7 @@ export default class Vector2 {
 
     /**
      * Returns the angle in radians used to rotate this vector away from a given vector.
-     * 
+     *
      * @param {Vector2} vec The vector this one is rotated away from.
      * @param {Vector2} center The rotational center.
      * @param {Number} angle The angle by which to rotate.
@@ -290,23 +292,24 @@ export default class Vector2 {
         let tmp = this.clone();
 
         tmp.rotateAround(angle, center);
-        
+
         let distSqA = tmp.distanceSq(vec);
-        
+
         tmp.rotateAround(-2.0 * angle, center);
 
         let distSqB = tmp.distanceSq(vec);
 
         if (distSqB < distSqA) {
             return angle;
-        } else {
+        }
+        else {
             return -angle;
         }
     }
 
     /**
      * Returns the angle in radians used to rotate this vector towards a given vector.
-     * 
+     *
      * @param {Vector2} vec The vector this one is rotated towards to.
      * @param {Vector2} center The rotational center.
      * @param {Number} angle The angle by which to rotate.
@@ -316,16 +319,17 @@ export default class Vector2 {
         let tmp = this.clone();
 
         tmp.rotateAround(angle, center);
-        
+
         let distSqA = tmp.distanceSq(vec);
-        
+
         tmp.rotateAround(-2.0 * angle, center);
 
         let distSqB = tmp.distanceSq(vec);
 
         if (distSqB > distSqA) {
             return angle;
-        } else {
+        }
+        else {
             return -angle;
         }
     }
@@ -341,7 +345,7 @@ export default class Vector2 {
         let a = Vector2.subtract(this, center);
         let b = Vector2.subtract(vec, center);
         let angle = Vector2.angle(b, a);
-        
+
         return Number.isNaN(angle) ? 0.0 : angle;
     }
 
@@ -362,7 +366,6 @@ export default class Vector2 {
                 inside = !inside;
             }
         }
-
 
         return inside;
     }
@@ -534,7 +537,7 @@ export default class Vector2 {
      * @returns {Vector2} The fraction of the two vectors.
      */
     static divide(vecA, vecB) {
-      return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
+        return new Vector2(vecA.x / vecB.x, vecA.y / vecB.y);
     }
 
     /**
@@ -592,7 +595,7 @@ export default class Vector2 {
 
         return Math.acos(Vector2.dot(ab, bc) / (abLength * bcLength));
     }
-    
+
     /**
      * Returns the scalar projection of a vector on another vector.
      *
@@ -603,11 +606,11 @@ export default class Vector2 {
      */
     static scalarProjection(vecA, vecB) {
         let unit = vecB.normalized();
-        
+
         return Vector2.dot(vecA, unit);
     }
 
-     /**
+    /**
      * Returns the average vector (normalized) of the input vectors.
      *
      * @static
@@ -618,8 +621,8 @@ export default class Vector2 {
         let avg = new Vector2(0.0, 0.0);
 
         for (let i = 0; i < vecs.length; i++) {
-          let vec = vecs[i];
-          avg.add(vec);
+            let vec = vecs[i];
+            avg.add(vec);
         }
 
         return avg.normalize();

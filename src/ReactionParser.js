@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import Reaction from './Reaction';
 
 export default class ReactionParser {

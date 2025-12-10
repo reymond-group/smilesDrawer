@@ -1,10 +1,10 @@
-//@ts-check
+// @ts-check
 import Ring   from './Ring';
 import Vertex from './Vertex';
 
-/** 
+/**
  * A class representing a ring connection.
- * 
+ *
  * @property {Number} id The id of this ring connection.
  * @property {Number} firstRingId A ring id.
  * @property {Number} secondRingId A ring id.
@@ -54,14 +54,15 @@ export default class RingConnection {
     updateOther(ringId, otherRingId) {
         if (this.firstRingId === otherRingId) {
             this.secondRingId = ringId;
-        } else {
+        }
+        else {
             this.firstRingId = ringId;
         }
     }
 
     /**
      * Returns a boolean indicating whether or not a ring with a given id is participating in this ring connection.
-     * 
+     *
      * @param {Number} ringId A ring id.
      * @returns {Boolean} A boolean indicating whether or not a ring with a given id participates in this ring connection.
      */
@@ -77,11 +78,11 @@ export default class RingConnection {
      */
     isBridge(vertices) {
         if (this.vertices.size > 2) {
-          return true;
+            return true;
         }
 
         for (let vertexId of this.vertices) {
-            if(vertices[vertexId].value.rings.length > 2) {
+            if (vertices[vertexId].value.rings.length > 2) {
                 return true;
             }
         }
@@ -103,16 +104,16 @@ export default class RingConnection {
         let ringConnection = null;
 
         for (let i = 0; i < ringConnections.length; i++) {
-          ringConnection = ringConnections[i];
+            ringConnection = ringConnections[i];
 
             if ((ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId)
                 || (ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId)
             ) {
-              return ringConnection.isBridge(vertices);
+                return ringConnection.isBridge(vertices);
             }
         }
 
-      return false;
+        return false;
     }
 
     /**
@@ -128,10 +129,11 @@ export default class RingConnection {
 
         for (let i = 0; i < ringConnections.length; i++) {
             let ringConnection = ringConnections[i];
-            
+
             if (ringConnection.firstRingId === ringId) {
                 neighbours.push(ringConnection.secondRingId);
-            } else if (ringConnection.secondRingId === ringId) {
+            }
+            else if (ringConnection.secondRingId === ringId) {
                 neighbours.push(ringConnection.firstRingId);
             }
         }
@@ -152,7 +154,7 @@ export default class RingConnection {
         for (let i = 0; i < ringConnections.length; i++) {
             let ringConnection = ringConnections[i];
             if ((ringConnection.firstRingId === firstRingId && ringConnection.secondRingId === secondRingId)
-              || (ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId)
+                || (ringConnection.firstRingId === secondRingId && ringConnection.secondRingId === firstRingId)
             ) {
                 return [...ringConnection.vertices];
             }

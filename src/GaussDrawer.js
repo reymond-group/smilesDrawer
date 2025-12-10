@@ -6,7 +6,7 @@ import chroma from 'chroma-js';
 export default class GaussDrawer {
     /**
    * The constructor of the class Graph.
-   * 
+   *
    * @param {Vector2[]} points The centres of the gaussians.
    * @param {Number[]} weights The weights / amplitudes for each gaussian.
    */
@@ -61,7 +61,7 @@ export default class GaussDrawer {
             m.push(row);
         }
 
-        // It looks like in some common js engines, multiplication by a 
+        // It looks like in some common js engines, multiplication by a
         // fraction is faster than division ...
         let divisor = 1.0 / (2 * this.sigma * this.sigma);
 
@@ -124,7 +124,7 @@ export default class GaussDrawer {
 
     /**
      * Get the canvas as an HTML image.
-     * 
+     *
      * @param {CallableFunction} callback
      */
     getImage(callback) {
@@ -154,7 +154,7 @@ export default class GaussDrawer {
 
     /**
      * Set the colour at a specific point on the canvas.
-     * 
+     *
      * @param {Vector2} vec The pixel position on the canvas.
      * @param {Number} r The red colour-component.
      * @param {Number} g The green colour-component.
