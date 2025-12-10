@@ -1,12 +1,10 @@
 import {defineConfig} from 'eslint/config';
 
-// import eslint    from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import tslint    from 'typescript-eslint';
 import globals   from 'globals';
 
 export default defineConfig([
-    // eslint.configs.recommended,
     tslint.configs.recommended,
     stylistic.configs.recommended,
     {
@@ -40,8 +38,7 @@ export default defineConfig([
             // Aligning things improves readability!
             '@stylistic/no-multi-spaces': 'off',
 
-            // These light up way too much for now...
-            // '@stylistic/semi': 'off',
+            // Keep the original semicolon style...
             '@stylistic/semi': ['error', 'always'],
 
             // TODO: Re-enable these for the great whitespace revolution!
@@ -59,7 +56,7 @@ export default defineConfig([
             '@stylistic/semi-spacing':            'off',
             '@stylistic/spaced-comment':          'off',
 
-            // lakjdkjadlkasdjlkasjd
+            // A few places where I disagree with the defaults...
             '@stylistic/object-curly-spacing': ['error', 'never'],
             '@stylistic/space-before-function-paren': ['error', {
                 anonymous:  'never',
