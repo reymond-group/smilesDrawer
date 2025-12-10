@@ -1,10 +1,10 @@
 //@ts-check
-import Line         from './Line'
-import MathHelper   from './MathHelper'
-import Ring         from './Ring'
-import ThemeManager from './ThemeManager'
-import Vector2      from './Vector2'
-import Vertex       from './Vertex'
+import Line         from './Line';
+import MathHelper   from './MathHelper';
+import Ring         from './Ring';
+import ThemeManager from './ThemeManager';
+import Vector2      from './Vector2';
+import Vertex       from './Vertex';
 
 /**
  * Translate the integer indicating the charge to the appropriate text.
@@ -13,9 +13,9 @@ import Vertex       from './Vertex'
  */
 function getChargeText(charge) {
     if(!charge) {
-        return ''
+        return '';
     } else if (charge === 1) {
-        return '+'
+        return '+';
     } else if (charge === -1) {
         return '-';
     } else if (charge > 0) {
@@ -63,7 +63,7 @@ export default class CanvasWrapper {
             this.canvas = element;
         }
         else {
-            throw Error("First argument was not a canvas or the ID of a canvas.");
+            throw Error('First argument was not a canvas or the ID of a canvas.');
         }
 
         this.ctx = this.canvas.getContext('2d');
@@ -130,7 +130,7 @@ export default class CanvasWrapper {
         let minX = Number.MAX_VALUE;
         let minY = Number.MAX_VALUE;
 
-        for (var i = 0; i < vertices.length; i++) {
+        for (let i = 0; i < vertices.length; i++) {
             if (!vertices[i].value.isDrawn) {
                 continue;
             }
@@ -144,7 +144,7 @@ export default class CanvasWrapper {
         }
 
         // Add padding
-        var padding = this.opts.padding;
+        let padding = this.opts.padding;
         maxX += padding;
         maxY += padding;
         minX -= padding;
@@ -153,10 +153,10 @@ export default class CanvasWrapper {
         this.drawingWidth = maxX - minX;
         this.drawingHeight = maxY - minY;
 
-        var scaleX = this.canvas.offsetWidth / this.drawingWidth;
-        var scaleY = this.canvas.offsetHeight / this.drawingHeight;
+        let scaleX = this.canvas.offsetWidth / this.drawingWidth;
+        let scaleY = this.canvas.offsetHeight / this.drawingHeight;
 
-        var scale = (scaleX < scaleY) ? scaleX : scaleY;
+        let scale = (scaleX < scaleY) ? scaleX : scaleY;
 
         this.ctx.scale(scale, scale);
 
@@ -294,10 +294,10 @@ export default class CanvasWrapper {
         ctx.lineWidth = this.opts.bondThickness;
 
         let gradient = this.ctx.createLinearGradient(l.x, l.y, r.x, r.y);
-        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement()) ||
-            this.themeManager.getColor('C'));
-        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement()) ||
-            this.themeManager.getColor('C'));
+        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement())
+            || this.themeManager.getColor('C'));
+        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement())
+            || this.themeManager.getColor('C'));
 
         if (dashed) {
             ctx.setLineDash([1, 1.5]);
@@ -321,8 +321,7 @@ export default class CanvasWrapper {
      * @param {Number} width The wedge width.
      */
     drawWedge(line, width = 1.0) {
-        if (isNaN(line.from.x) || isNaN(line.from.y) ||
-            isNaN(line.to.x) || isNaN(line.to.y)) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
 
@@ -380,10 +379,10 @@ export default class CanvasWrapper {
         ctx.lineTo(w.x, w.y);
 
         let gradient = this.ctx.createRadialGradient(r.x, r.y, this.opts.bondLength, r.x, r.y, 0);
-        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement()) ||
-            this.themeManager.getColor('C'));
-        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement()) ||
-            this.themeManager.getColor('C'));
+        gradient.addColorStop(0.4, this.themeManager.getColor(line.getLeftElement())
+            || this.themeManager.getColor('C'));
+        gradient.addColorStop(0.6, this.themeManager.getColor(line.getRightElement())
+            || this.themeManager.getColor('C'));
 
         ctx.fillStyle = gradient;
 
@@ -397,8 +396,7 @@ export default class CanvasWrapper {
      * @param {Line} line A line.
      */
     drawDashedWedge(line) {
-        if (isNaN(line.from.x) || isNaN(line.from.y) ||
-            isNaN(line.to.x) || isNaN(line.to.y)) {
+        if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
 
@@ -464,7 +462,7 @@ export default class CanvasWrapper {
         let step = 1.25 / (length / (this.opts.bondThickness * 3.0));
 
         let changed = false;
-        for (var t = 0.0; t < 1.0; t += step) {
+        for (let t = 0.0; t < 1.0; t += step) {
             let to = Vector2.multiplyScalar(dir, t * length);
             let startDash = Vector2.add(start, to);
             let width = 1.5 * t;
@@ -581,7 +579,7 @@ export default class CanvasWrapper {
         let pseudoElementHandled = false;
 
         // Charge
-        let chargeText = ''
+        let chargeText = '';
         let chargeWidth = 0;
 
         if (charge) {
@@ -603,9 +601,8 @@ export default class CanvasWrapper {
 
         // TODO: Better handle exceptions
         // Exception for nitro (draw nitro as NO2 instead of N+O-O)
-        if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') &&
-            attachedPseudoElement.hasOwnProperty('0O-1')) {
-            attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
+        if (charge === 1 && elementName === 'N' && '0O' in attachedPseudoElement && '0O-1' in attachedPseudoElement) {
+            attachedPseudoElement = {'0O': {element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: ''}};
             charge = 0;
         }
 
@@ -701,7 +698,7 @@ export default class CanvasWrapper {
             }
 
             ctx.font = this.fontLarge;
-            ctx.fillText('H', hx, hy)
+            ctx.fillText('H', hx, hy);
 
             ctx.font = this.fontSmall;
             ctx.fillText(hydrogens.toString(), hx + this.halfHydrogenWidth + hydrogenCountWidth, hy + this.opts.fifthFontSizeSmall);
@@ -714,11 +711,7 @@ export default class CanvasWrapper {
             return;
         }
 
-        for (let key in attachedPseudoElement) {
-            if (!attachedPseudoElement.hasOwnProperty(key)) {
-                continue;
-            }
-
+        for (const key of Object.keys(attachedPseudoElement)) {
             let openParenthesisWidth = 0;
             let closeParenthesisWidth = 0;
 
@@ -786,23 +779,23 @@ export default class CanvasWrapper {
 
             if (direction === 'left') {
                 cursorPosLeft -= elementWidth;
-                ctx.fillText(element, hx + cursorPosLeft, hy)
+                ctx.fillText(element, hx + cursorPosLeft, hy);
             } else {
-                ctx.fillText(element, hx + cursorPos, hy)
+                ctx.fillText(element, hx + cursorPos, hy);
                 cursorPos += elementWidth;
             }
 
             if (hydrogenCount > 0) {
                 if (direction === 'left') {
                     cursorPosLeft -= hydrogenWidth + hydrogenCountWidth;
-                    ctx.fillText('H', hx + cursorPosLeft, hy)
+                    ctx.fillText('H', hx + cursorPosLeft, hy);
 
                     if (hydrogenCount > 1) {
                         ctx.font = this.fontSmall;
                         ctx.fillText(hydrogenCount, hx + cursorPosLeft + hydrogenWidth, hy + this.opts.fifthFontSizeSmall);
                     }
                 } else {
-                    ctx.fillText('H', hx + cursorPos, hy)
+                    ctx.fillText('H', hx + cursorPos, hy);
                     cursorPos += hydrogenWidth;
 
                     if (hydrogenCount > 1) {
@@ -829,9 +822,9 @@ export default class CanvasWrapper {
 
             if (elementCount > 1) {
                 if (direction === 'left') {
-                    ctx.fillText(elementCount, hx + cursorPosLeft +
-                        openParenthesisWidth + closeParenthesisWidth + hydrogenWidth +
-                        hydrogenCountWidth + elementWidth, hy + this.opts.fifthFontSizeSmall);
+                    ctx.fillText(elementCount, hx + cursorPosLeft
+                        + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth
+                        + hydrogenCountWidth + elementWidth, hy + this.opts.fifthFontSizeSmall);
                 } else {
                     ctx.fillText(elementCount, hx + cursorPos, hy + this.opts.fifthFontSizeSmall);
                     cursorPos += elementCountWidth;
@@ -840,9 +833,9 @@ export default class CanvasWrapper {
 
             if (elementCharge !== 0) {
                 if (direction === 'left') {
-                    ctx.fillText(elementChargeText, hx + cursorPosLeft +
-                        openParenthesisWidth + closeParenthesisWidth + hydrogenWidth +
-                        hydrogenCountWidth + elementWidth, y - this.opts.fifthFontSizeSmall + offsetY);
+                    ctx.fillText(elementChargeText, hx + cursorPosLeft
+                        + openParenthesisWidth + closeParenthesisWidth + hydrogenWidth
+                        + hydrogenCountWidth + elementWidth, y - this.opts.fifthFontSizeSmall + offsetY);
                 } else {
                     ctx.fillText(elementChargeText, hx + cursorPos, y - this.opts.fifthFontSizeSmall + offsetY);
                     cursorPos += elementChargeWidth;

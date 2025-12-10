@@ -7236,5 +7236,5 @@ let fdb = [
     'CCN1CCC2NC(=[NH2+])C12',
     'CC(CO)C1=C2OCCC3[NH2+]CC(S1)=C23',
     'NC(=[NH2+])C12CC3OC1C2CO3',
-    'CCC(C)(C)C12C[NH+](C1C)C(C)CC2'
+    'CCC(C)(C)C12C[NH+](C1C)C(C)CC2',
 ];

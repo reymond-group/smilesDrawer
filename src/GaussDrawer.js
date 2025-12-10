@@ -1,7 +1,7 @@
-import convertImage from './PixelsToSvg'
-import Vector2      from './Vector2'
+import convertImage from './PixelsToSvg';
+import Vector2      from './Vector2';
 
-import chroma from 'chroma-js'
+import chroma from 'chroma-js';
 
 export default class GaussDrawer {
     /**
@@ -22,9 +22,9 @@ export default class GaussDrawer {
 
         if (colormap === null) {
             let piyg11 = [
-                "#c51b7d", "#de77ae", "#f1b6da", "#fde0ef",
-                "#ffffff",
-                "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"];
+                '#c51b7d', '#de77ae', '#f1b6da', '#fde0ef',
+                '#ffffff',
+                '#e6f5d0', '#b8e186', '#7fbc41', '#4d9221'];
             colormap = piyg11;
         }
         this.colormap = colormap;
@@ -37,12 +37,12 @@ export default class GaussDrawer {
 
     setFromArray(arr_points, arr_weights) {
         this.points = [];
-        arr_points.forEach(a => {
+        arr_points.forEach((a) => {
             this.points.push(new Vector2(a[0], a[1]));
         });
 
         this.weights = [];
-        arr_weights.forEach(w => {
+        arr_weights.forEach((w) => {
             this.weights.push(w);
         });
     }
@@ -138,9 +138,9 @@ export default class GaussDrawer {
             }
         };
 
-        image.onerror = function (err) {
+        image.onerror = (err) => {
             console.log(err);
-        }
+        };
 
         image.src = this.canvas.toDataURL();
     }
@@ -161,7 +161,7 @@ export default class GaussDrawer {
      * @param {Number} b The blue colour-component.
      */
     setPixel(vec, r, g, b) {
-        this.context.fillStyle = "rgba(" + r + "," + g + "," + b + "," + this.opacity + ")";
+        this.context.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + this.opacity + ')';
         this.context.fillRect(vec.x, vec.y, 1, 1);
     }
 }

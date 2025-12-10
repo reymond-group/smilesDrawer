@@ -1,10 +1,10 @@
 //@ts-check
-import Atom       from './Atom'
-import Edge       from './Edge'
-import MathHelper from './MathHelper'
-import Ring       from './Ring'
-import Vector2    from './Vector2'
-import Vertex     from './Vertex'
+import Atom       from './Atom';
+import Edge       from './Edge';
+import MathHelper from './MathHelper';
+import Ring       from './Ring';
+import Vector2    from './Vector2';
+import Vertex     from './Vertex';
 
 /** 
  * A class representing the molecular graph. 
@@ -23,9 +23,9 @@ export default class Graph {
    * @param {Boolean} [isomeric=false] A boolean specifying whether or not the SMILES is isomeric.
    */
   constructor(parseTree, isomeric = false) {
-    this.vertices = Array();
-    this.edges = Array();
-    this.atomIdxToVertexId = Array();
+    this.vertices = [];
+    this.edges = [];
+    this.atomIdxToVertexId = [];
     this.vertexIdsToEdgeId = {};
     this.isomeric = isomeric;
 
@@ -57,7 +57,7 @@ export default class Graph {
     atom.branchBond = node.branchBond;
     atom.ringbonds = node.ringbonds;
     atom.bracket = node.atom.element ? node.atom : null;
-    atom.class = node.atom.class
+    atom.class = node.atom.class;
 
     let vertex = new Vertex(atom);
     let parentVertex = this.vertices[parentVertexId];
@@ -101,22 +101,22 @@ export default class Graph {
     if (atom.bracket && atom.bracket.chirality) {
       atom.isStereoCenter = true;
       stereoHydrogens = atom.bracket.hcount;
-      for (var i = 0; i < stereoHydrogens; i++) {
+      for (let i = 0; i < stereoHydrogens; i++) {
         this._init({
           atom: 'H',
           isBracket: 'false',
-          branches: Array(),
+          branches: [],
           branchCount: 0,
-          ringbonds: Array(),
+          ringbonds: [],
           ringbondCount: false,
           next: null,
           hasNext: false,
-          bond: '-'
+          bond: '-',
         }, i, vertex.id, true);
       }
     }
 
-    for (var i = 0; i < node.branchCount; i++) {
+    for (let i = 0; i < node.branchCount; i++) {
       this._init(node.branches[i], i + offset, vertex.id, true);
     }
 
@@ -129,8 +129,8 @@ export default class Graph {
    * Clears all the elements in this graph (edges and vertices).
    */
   clear() {
-    this.vertices = Array();
-    this.edges = Array();
+    this.vertices = [];
+    this.edges = [];
     this.vertexIdsToEdgeId = {};
   }
 
@@ -193,10 +193,10 @@ export default class Graph {
    * @returns {Number[]} An array containing the ids of edges connected to the vertex.
    */
   getEdges(vertexId) {
-    let edgeIds = Array();
+    let edgeIds = [];
     let vertex = this.vertices[vertexId];
 
-    for (var i = 0; i < vertex.neighbours.length; i++) {
+    for (let i = 0; i < vertex.neighbours.length; i++) {
       edgeIds.push(this.vertexIdsToEdgeId[vertexId + '_' + vertex.neighbours[i]]);
     }
 
@@ -212,7 +212,7 @@ export default class Graph {
    * @returns {Boolean} A boolean indicating whether or not two vertices are connected by an edge.
    */
   hasEdge(vertexIdA, vertexIdB) {
-    return this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB] !== undefined
+    return this.vertexIdsToEdgeId[vertexIdA + '_' + vertexIdB] !== undefined;
   }
 
   /**
@@ -223,7 +223,7 @@ export default class Graph {
   getVertexList() {
     let arr = [this.vertices.length];
 
-    for (var i = 0; i < this.vertices.length; i++) {
+    for (let i = 0; i < this.vertices.length; i++) {
       arr[i] = this.vertices[i].id;
     }
 
@@ -238,7 +238,7 @@ export default class Graph {
   getEdgeList() {
     let arr = Array(this.edges.length);
 
-    for (var i = 0; i < this.edges.length; i++) {
+    for (let i = 0; i < this.edges.length; i++) {
       arr[i] = [this.edges[i].sourceId, this.edges[i].targetId];
     }
 
@@ -254,12 +254,12 @@ export default class Graph {
     let length = this.vertices.length;
     let adjacencyMatrix = Array(length);
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       adjacencyMatrix[i] = new Array(length);
       adjacencyMatrix[i].fill(0);
     }
 
-    for (var i = 0; i < this.edges.length; i++) {
+    for (let i = 0; i < this.edges.length; i++) {
       let edge = this.edges[i];
 
       adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
@@ -279,19 +279,19 @@ export default class Graph {
     let adjacencyMatrix = Array(length);
     let bridges = this.getBridges();
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       adjacencyMatrix[i] = new Array(length);
       adjacencyMatrix[i].fill(0);
     }
 
-    for (var i = 0; i < this.edges.length; i++) {
+    for (let i = 0; i < this.edges.length; i++) {
       let edge = this.edges[i];
 
       adjacencyMatrix[edge.sourceId][edge.targetId] = 1;
       adjacencyMatrix[edge.targetId][edge.sourceId] = 1;
     }
 
-    for (var i = 0; i < bridges.length; i++) {
+    for (let i = 0; i < bridges.length; i++) {
       adjacencyMatrix[bridges[i][0]][bridges[i][1]] = 0;
       adjacencyMatrix[bridges[i][1]][bridges[i][0]] = 0;
     }
@@ -309,11 +309,11 @@ export default class Graph {
     let length = vertexIds.length;
     let adjacencyMatrix = Array(length);
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       adjacencyMatrix[i] = new Array(length);
       adjacencyMatrix[i].fill(0);
 
-      for (var j = 0; j < length; j++) {
+      for (let j = 0; j < length; j++) {
         if (i === j) {
           continue;
         }
@@ -337,24 +337,24 @@ export default class Graph {
     let adja = this.getAdjacencyMatrix();
     let dist = Array(length);
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       dist[i] = Array(length);
       dist[i].fill(Infinity);
     }
 
-    for (var i = 0; i < length; i++) {
-      for (var j = 0; j < length; j++) {
+    for (let i = 0; i < length; i++) {
+      for (let j = 0; j < length; j++) {
         if (adja[i][j] === 1) {
           dist[i][j] = 1;
         }
       }
     }
 
-    for (var k = 0; k < length; k++) {
-      for (var i = 0; i < length; i++) {
-        for (var j = 0; j < length; j++) {
+    for (let k = 0; k < length; k++) {
+      for (let i = 0; i < length; i++) {
+        for (let j = 0; j < length; j++) {
           if (dist[i][j] > dist[i][k] + dist[k][j]) {
-            dist[i][j] = dist[i][k] + dist[k][j]
+            dist[i][j] = dist[i][k] + dist[k][j];
           }
         }
       }
@@ -374,24 +374,24 @@ export default class Graph {
     let adja = this.getSubgraphAdjacencyMatrix(vertexIds);
     let dist = Array(length);
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       dist[i] = Array(length);
       dist[i].fill(Infinity);
     }
 
-    for (var i = 0; i < length; i++) {
-      for (var j = 0; j < length; j++) {
+    for (let i = 0; i < length; i++) {
+      for (let j = 0; j < length; j++) {
         if (adja[i][j] === 1) {
           dist[i][j] = 1;
         }
       }
     }
 
-    for (var k = 0; k < length; k++) {
-      for (var i = 0; i < length; i++) {
-        for (var j = 0; j < length; j++) {
+    for (let k = 0; k < length; k++) {
+      for (let i = 0; i < length; i++) {
+        for (let j = 0; j < length; j++) {
           if (dist[i][j] > dist[i][k] + dist[k][j]) {
-            dist[i][j] = dist[i][k] + dist[k][j]
+            dist[i][j] = dist[i][k] + dist[k][j];
           }
         }
       }
@@ -409,10 +409,10 @@ export default class Graph {
     let length = this.vertices.length;
     let adjacencyList = Array(length);
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       adjacencyList[i] = [];
 
-      for (var j = 0; j < length; j++) {
+      for (let j = 0; j < length; j++) {
         if (i === j) {
           continue;
         }
@@ -436,10 +436,10 @@ export default class Graph {
     let length = vertexIds.length;
     let adjacencyList = Array(length);
 
-    for (var i = 0; i < length; i++) {
-      adjacencyList[i] = Array();
+    for (let i = 0; i < length; i++) {
+      adjacencyList[i] = [];
 
-      for (var j = 0; j < length; j++) {
+      for (let j = 0; j < length; j++) {
         if (i === j) {
           continue;
         }
@@ -465,13 +465,13 @@ export default class Graph {
     let low = new Array(length);
     let parent = new Array(length);
     let adj = this.getAdjacencyList();
-    let outBridges = Array();
+    let outBridges = [];
 
     visited.fill(false);
     parent.fill(null);
     this._time = 0;
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       if (!visited[i]) {
         this._bridgeDfs(i, visited, disc, low, parent, adj, outBridges);
       }
@@ -492,7 +492,7 @@ export default class Graph {
 
     visited.fill(false);
 
-    var queue = [startVertexId];
+    let queue = [startVertexId];
 
     while (queue.length > 0) {
       // JavaScripts shift() is O(n) ... bad JavaScript, bad!
@@ -501,8 +501,8 @@ export default class Graph {
 
       callback(vertex);
 
-      for (var i = 0; i < vertex.neighbours.length; i++) {
-        let v = vertex.neighbours[i]
+      for (let i = 0; i < vertex.neighbours.length; i++) {
+        let v = vertex.neighbours[i];
         if (!visited[v]) {
           visited[v] = true;
           queue.push(v);
@@ -526,7 +526,7 @@ export default class Graph {
     let neighbours = this.vertices[vertexId].getSpanningTreeNeighbours(parentVertexId);
     let max = 0;
 
-    for (var i = 0; i < neighbours.length; i++) {
+    for (let i = 0; i < neighbours.length; i++) {
       let childId = neighbours[i];
       let d = this.getTreeDepth(childId, vertexId);
 
@@ -567,7 +567,7 @@ export default class Graph {
       callback(vertex);
     }
 
-    for (var i = 0; i < neighbours.length; i++) {
+    for (let i = 0; i < neighbours.length; i++) {
       this.traverseTree(neighbours[i], vertexId, callback, maxDepth, ignoreFirst, depth + 1, visited);
     }
   }
@@ -587,12 +587,6 @@ export default class Graph {
 
     let edgeStrength = bondLength;
 
-    // Add vertices that are directly connected to the ring
-    var i = vertexIds.length;
-    while (i--) {
-      let vertex = this.vertices[vertexIds[i]];
-    }
-
     let matDist = this.getSubgraphDistanceMatrix(vertexIds);
     let length = vertexIds.length;
 
@@ -604,7 +598,7 @@ export default class Graph {
     let arrPositionY = new Float32Array(length);
     let arrPositioned = Array(length);
 
-    i = length;
+    var i = length;
     while (i--) {
       let vertex = this.vertices[vertexIds[i]];
       if (!vertex.positioned) {
@@ -650,25 +644,24 @@ export default class Graph {
     }
 
     i = length;
-    let ux, uy, dEx, dEy, vx, vy, denom;
 
     while (i--) {
-      ux = arrPositionX[i];
-      uy = arrPositionY[i];
-      dEx = 0.0;
-      dEy = 0.0;
+      let ux = arrPositionX[i];
+      let uy = arrPositionY[i];
+      let dEx = 0.0;
+      let dEy = 0.0;
       let j = length;
       while (j--) {
         if (i === j) {
           continue;
         }
-        vx = arrPositionX[j];
-        vy = arrPositionY[j];
-        denom = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
+        let vx = arrPositionX[j];
+        let vy = arrPositionY[j];
+        let denom = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
         matEnergy[i][j] = [
           matStrength[i][j] * ((ux - vx) - matLength[i][j] * (ux - vx) * denom),
-          matStrength[i][j] * ((uy - vy) - matLength[i][j] * (uy - vy) * denom)
-        ]
+          matStrength[i][j] * ((uy - vy) - matLength[i][j] * (uy - vy) * denom),
+        ];
         matEnergy[j][i] = matEnergy[i][j];
         dEx += matEnergy[i][j][0];
         dEy += matEnergy[i][j][1];
@@ -678,32 +671,32 @@ export default class Graph {
     }
 
     // Utility functions, maybe inline them later
-    let energy = function (index) {
+    let energy = function(index) {
       return [arrEnergySumX[index] * arrEnergySumX[index] + arrEnergySumY[index] * arrEnergySumY[index], arrEnergySumX[index], arrEnergySumY[index]];
-    }
+    };
 
-    let highestEnergy = function () {
-      let maxEnergy = 0.0;
-      let maxEnergyId = 0;
-      let maxDEX = 0.0;
-      let maxDEY = 0.0
+    let highestEnergy = function() {
+      let highEnergy = 0.0;
+      let highEnergyId = 0;
+      let highDEX = 0.0;
+      let highDEY = 0.0;
 
       i = length;
       while (i--) {
         let [delta, dEX, dEY] = energy(i);
 
-        if (delta > maxEnergy && arrPositioned[i] === false) {
-          maxEnergy = delta;
-          maxEnergyId = i;
-          maxDEX = dEX;
-          maxDEY = dEY;
+        if (delta > highEnergy && arrPositioned[i] === false) {
+          highEnergy = delta;
+          highEnergyId = i;
+          highDEX = dEX;
+          highDEY = dEY;
         }
       }
 
-      return [maxEnergyId, maxEnergy, maxDEX, maxDEY];
-    }
+      return [highEnergyId, highEnergy, highDEX, highDEY];
+    };
 
-    let update = function (index, dEX, dEY) {
+    let update = function(index, dEX, dEY) {
       let dxx = 0.0;
       let dyy = 0.0;
       let dxy = 0.0;
@@ -758,19 +751,17 @@ export default class Graph {
       ux = arrPositionX[index];
       uy = arrPositionY[index];
 
-      let vx, vy, prevEx, prevEy, denom;
-
       i = length;
       while (i--) {
         if (index === i) {
           continue;
         }
-        vx = arrPositionX[i];
-        vy = arrPositionY[i];
+        let vx = arrPositionX[i];
+        let vy = arrPositionY[i];
         // Store old energies
-        prevEx = arrE[i][0];
-        prevEy = arrE[i][1];
-        denom = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
+        let prevEx = arrE[i][0];
+        let prevEy = arrE[i][1];
+        let denom = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
         dx = arrK[i] * ((ux - vx) - arrL[i] * (ux - vx) * denom);
         dy = arrK[i] * ((uy - vy) - arrL[i] * (uy - vy) * denom);
 
@@ -782,7 +773,7 @@ export default class Graph {
       }
       arrEnergySumX[index] = dEX;
       arrEnergySumY[index] = dEY;
-    }
+    };
 
     // Setting up variables for the while loops
     let maxEnergyId = 0;
@@ -822,7 +813,7 @@ export default class Graph {
     visited[u] = true;
     disc[u] = low[u] = ++this._time;
 
-    for (var i = 0; i < adj[u].length; i++) {
+    for (let i = 0; i < adj[u].length; i++) {
       let v = adj[u][i];
 
       if (!visited[v]) {
@@ -851,13 +842,13 @@ export default class Graph {
   static getConnectedComponents(adjacencyMatrix) {
     let length = adjacencyMatrix.length;
     let visited = new Array(length);
-    let components = new Array();
+    let components = [];
 
     visited.fill(false);
 
-    for (var u = 0; u < length; u++) {
+    for (let u = 0; u < length; u++) {
       if (!visited[u]) {
-        let component = Array();
+        let component = [];
         visited[u] = true;
         component.push(u);
         Graph._ccGetDfs(u, visited, adjacencyMatrix, component);
@@ -883,7 +874,7 @@ export default class Graph {
 
     visited.fill(false);
 
-    for (var u = 0; u < length; u++) {
+    for (let u = 0; u < length; u++) {
       if (!visited[u]) {
         visited[u] = true;
         count++;
@@ -898,7 +889,7 @@ export default class Graph {
    * PRIVATE FUNCTION used by getConnectedComponentCount().
    */
   static _ccCountDfs(u, visited, adjacencyMatrix) {
-    for (var v = 0; v < adjacencyMatrix[u].length; v++) {
+    for (let v = 0; v < adjacencyMatrix[u].length; v++) {
       let c = adjacencyMatrix[u][v];
 
       if (!c || visited[v] || u === v) {
@@ -914,7 +905,7 @@ export default class Graph {
    * PRIVATE FUNCTION used by getConnectedComponents().
    */
   static _ccGetDfs(u, visited, adjacencyMatrix, component) {
-    for (var v = 0; v < adjacencyMatrix[u].length; v++) {
+    for (let v = 0; v < adjacencyMatrix[u].length; v++) {
       let c = adjacencyMatrix[u][v];
 
       if (!c || visited[v] || u === v) {

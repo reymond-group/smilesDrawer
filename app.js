@@ -1,11 +1,11 @@
 //@ts-check
-import Drawer         from './src/Drawer'
-import GaussDrawer    from './src/GaussDrawer'
-import Parser         from './src/Parser'
-import ReactionDrawer from './src/ReactionDrawer'
-import ReactionParser from './src/ReactionParser'
-import SmiDrawer      from './src/SmilesDrawer'
-import SvgDrawer      from './src/SvgDrawer'
+import Drawer         from './src/Drawer';
+import GaussDrawer    from './src/GaussDrawer';
+import Parser         from './src/Parser';
+import ReactionDrawer from './src/ReactionDrawer';
+import ReactionParser from './src/ReactionParser';
+import SmiDrawer      from './src/SmilesDrawer';
+import SvgDrawer      from './src/SvgDrawer';
 
 /**
  * The SmilesDrawer namespace.
@@ -30,9 +30,9 @@ const SmilesDrawerNS = {
 * @param {String} smiles A SMILES string.
 * @returns {String} The clean SMILES string.
 */
-SmilesDrawerNS.clean = function (smiles) {
-  return smiles.replace(/[^A-Za-z0-9@\.\+\-\?!\(\)\[\]\{\}/\\=#\$:\*]/g, '');
-}
+SmilesDrawerNS.clean = function(smiles) {
+  return smiles.replace(/[^A-Za-z0-9@.+\-?!()[\]{}/\\=#$:*]/g, '');
+};
 
 /**
 * Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
@@ -43,22 +43,22 @@ SmilesDrawerNS.clean = function (smiles) {
 * @param {String} [themeName='light'] The theme to apply.
 * @param {Function} [onError='null'] A callback function providing an error object.
 */
-SmilesDrawerNS.apply = function (options, selector = 'canvas[data-smiles]', themeName = 'light', onError = null) {
+SmilesDrawerNS.apply = function(options, selector = 'canvas[data-smiles]', themeName = 'light', onError = null) {
   let smilesDrawer = new Drawer(options);
   let elements = document.querySelectorAll(selector);
 
   for (var i = 0; i < elements.length; i++) {
     let element = elements[i];
 
-    SmilesDrawerNS.parse(element.getAttribute('data-smiles'), function (tree) {
+    SmilesDrawerNS.parse(element.getAttribute('data-smiles'), function(tree) {
       smilesDrawer.draw(tree, element, themeName, false);
-    }, function (err) {
+    }, function(err) {
       if (onError) {
         onError(err);
       }
     });
   }
-}
+};
 
 /**
 * Parses the entered smiles string.
@@ -68,7 +68,7 @@ SmilesDrawerNS.apply = function (options, selector = 'canvas[data-smiles]', them
 * @param {Function} successCallback A callback that is called on success with the parse tree.
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
-SmilesDrawerNS.parse = function (smiles, successCallback, errorCallback) {
+SmilesDrawerNS.parse = function(smiles, successCallback, errorCallback) {
   try {
     if (successCallback) {
       successCallback(Parser.parse(smiles));
@@ -78,7 +78,7 @@ SmilesDrawerNS.parse = function (smiles, successCallback, errorCallback) {
       errorCallback(err);
     }
   }
-}
+};
 
 /**
 * Parses the entered reaction smiles string.
@@ -88,7 +88,7 @@ SmilesDrawerNS.parse = function (smiles, successCallback, errorCallback) {
 * @param {Function} successCallback A callback that is called on success with the parse tree.
 * @param {Function} errorCallback A callback that is called with the error object on error.
 */
-SmilesDrawerNS.parseReaction = function (reactionSmiles, successCallback, errorCallback) {
+SmilesDrawerNS.parseReaction = function(reactionSmiles, successCallback, errorCallback) {
   try {
     if (successCallback) {
       successCallback(ReactionParser.parse(reactionSmiles));
@@ -98,14 +98,12 @@ SmilesDrawerNS.parseReaction = function (reactionSmiles, successCallback, errorC
       errorCallback(err);
     }
   }
-}
+};
 
 
 // Here be dragons (polyfills)
 if (!Array.prototype.fill) {
-  Object.defineProperty(Array.prototype, 'fill', {
-    value: function (value) {
-
+    let fill = function(value) {
       // Steps 1-2.
       if (this == null) {
         throw new TypeError('this is null or not defined');
@@ -121,19 +119,18 @@ if (!Array.prototype.fill) {
       var relativeStart = start >> 0;
 
       // Step 8.
-      var k = relativeStart < 0 ?
-        Math.max(len + relativeStart, 0) :
-        Math.min(relativeStart, len);
+      var k = relativeStart < 0
+        ? Math.max(len + relativeStart, 0)
+        : Math.min(relativeStart, len);
 
       // Steps 9-10.
       var end = arguments[2];
-      var relativeEnd = end === undefined ?
-        len : end >> 0;
+      var relativeEnd = end === undefined ? len : end >> 0;
 
       // Step 11.
-      var final = relativeEnd < 0 ?
-        Math.max(len + relativeEnd, 0) :
-        Math.min(relativeEnd, len);
+      var final = relativeEnd < 0
+        ? Math.max(len + relativeEnd, 0)
+        : Math.min(relativeEnd, len);
 
       // Step 12.
       while (k < final) {
@@ -143,7 +140,11 @@ if (!Array.prototype.fill) {
 
       // Step 13.
       return O;
-    }
+    };
+
+  Object.defineProperty(Array.prototype, 'fill', {
+    value:     fill,
+    writeable: false,
   });
 }
 

@@ -1,15 +1,15 @@
 //@ts-check
 // we use the drawer to do all the preprocessing. then we take over the drawing
 // portion to output to svg
-import ArrayHelper  from './ArrayHelper'
-import Atom         from './Atom'
-import DrawerBase   from './DrawerBase'
-import GaussDrawer  from './GaussDrawer'
-import Line         from './Line'
-import Ring         from './Ring'
-import SvgWrapper   from './SvgWrapper'
-import ThemeManager from './ThemeManager'
-import Vector2      from './Vector2'
+import ArrayHelper  from './ArrayHelper';
+import Atom         from './Atom';
+import DrawerBase   from './DrawerBase';
+import GaussDrawer  from './GaussDrawer';
+import Line         from './Line';
+import Ring         from './Ring';
+import SvgWrapper   from './SvgWrapper';
+import ThemeManager from './ThemeManager';
+import Vector2      from './Vector2';
 
 export default class SvgDrawer {
   constructor(options, clear = true) {
@@ -41,8 +41,8 @@ export default class SvgDrawer {
     }
 
     let optionBackup = {
-      padding: this.opts.padding,
-      compactDrawing: this.opts.compactDrawing
+      padding:        this.opts.padding,
+      compactDrawing: this.opts.compactDrawing,
     };
 
     // Overwrite options when weights are added
@@ -77,9 +77,11 @@ export default class SvgDrawer {
     }
 
     if (preprocessor.opts.debug) {
-      console.log(preprocessor.graph);
-      console.log(preprocessor.rings);
-      console.log(preprocessor.ringConnections);
+      console.debug('SvgDrawer::draw()', {
+        graph:           preprocessor.graph,
+        rings:           preprocessor.rings,
+        ringConnections: preprocessor.ringConnections,
+      });
     }
 
     this.svgWrapper.constructSvg();
@@ -110,7 +112,7 @@ export default class SvgDrawer {
     }
 
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
     svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
     svg.setAttributeNS(null, 'width', 500 + '');
@@ -146,9 +148,9 @@ export default class SvgDrawer {
 
     drawn.fill(false);
 
-    graph.traverseBF(0, vertex => {
+    graph.traverseBF(0, (vertex) => {
       let edges = graph.getEdges(vertex.id);
-      for (var i = 0; i < edges.length; i++) {
+      for (let i = 0; i < edges.length; i++) {
         let edgeId = edges[i];
         if (!drawn[edgeId]) {
           drawn[edgeId] = true;
@@ -159,7 +161,7 @@ export default class SvgDrawer {
 
     // Draw ring for implicitly defined aromatic rings
     if (!this.bridgedRing) {
-      for (var i = 0; i < rings.length; i++) {
+      for (let i = 0; i < rings.length; i++) {
         let ring = rings[i];
 
         //TODO: uses canvas ctx to draw... need to update this to SVG
@@ -199,8 +201,10 @@ export default class SvgDrawer {
     sides[0].multiplyScalar(10).add(a);
     sides[1].multiplyScalar(10).add(a);
 
-    if (edge.bondType === '=' || preprocessor.getRingbondType(vertexA, vertexB) === '=' ||
-      (edge.isPartOfAromaticRing && preprocessor.bridgedRing)) {
+    if (edge.bondType === '='
+      || preprocessor.getRingbondType(vertexA, vertexB) === '='
+      || (edge.isPartOfAromaticRing && preprocessor.bridgedRing)
+    ) {
       // Always draw double bonds inside the ring
       let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);
       let s = preprocessor.chooseSide(vertexA, vertexB, sides);
@@ -236,8 +240,11 @@ export default class SvgDrawer {
         }
 
         svgWrapper.drawLine(new Line(a, b, elementA, elementB));
-      } else if ((edge.center || vertexA.isTerminal() && vertexB.isTerminal()) ||
-        (s.anCount == 0 && s.bnCount > 1 || s.bnCount == 0 && s.anCount > 1)) {
+      } else if (edge.center
+        || (vertexA.isTerminal() && vertexB.isTerminal())
+        || (s.anCount == 0 && s.bnCount > 1)
+        || (s.bnCount == 0 && s.anCount > 1)
+      ) {
         this.multiplyNormals(normals, opts.halfBondSpacing);
 
         let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB),
@@ -245,8 +252,7 @@ export default class SvgDrawer {
 
         svgWrapper.drawLine(lineA);
         svgWrapper.drawLine(lineB);
-      } else if ((s.sideCount[0] > s.sideCount[1]) ||
-        (s.totalSideCount[0] > s.totalSideCount[1])) {
+      } else if ((s.sideCount[0] > s.sideCount[1]) || (s.totalSideCount[0] > s.totalSideCount[1])) {
         this.multiplyNormals(normals, opts.bondSpacing);
 
         let line = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
@@ -255,8 +261,7 @@ export default class SvgDrawer {
 
         svgWrapper.drawLine(line);
         svgWrapper.drawLine(new Line(a, b, elementA, elementB));
-      } else if ((s.sideCount[0] < s.sideCount[1]) ||
-        (s.totalSideCount[0] <= s.totalSideCount[1])) {
+      } else if ((s.sideCount[0] < s.sideCount[1]) || (s.totalSideCount[0] <= s.totalSideCount[1])) {
         this.multiplyNormals(normals, opts.bondSpacing);
 
         let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
@@ -306,12 +311,12 @@ export default class SvgDrawer {
     let graph = preprocessor.graph;
     let svgWrapper = this.svgWrapper;
 
-    for (var i = 0; i < graph.vertices.length; i++) {
+    for (let i = 0; i < graph.vertices.length; i++) {
       let vertex = graph.vertices[i];
       let atom = vertex.value;
 
-      for (var j = 0; j < preprocessor.highlight_atoms.length; j++) {
-        let highlight = preprocessor.highlight_atoms[j]
+      for (let j = 0; j < preprocessor.highlight_atoms.length; j++) {
+        let highlight = preprocessor.highlight_atoms[j];
         if (atom.class === highlight[0]) {
           svgWrapper.drawAtomHighlight(vertex.position.x, vertex.position.y, highlight[1]);
         }
@@ -331,8 +336,7 @@ export default class SvgDrawer {
       rings = preprocessor.rings,
       svgWrapper = this.svgWrapper;
 
-    var i = graph.vertices.length;
-    for (var i = 0; i < graph.vertices.length; i++) {
+    for (let i = 0; i < graph.vertices.length; i++) {
       let vertex = graph.vertices[i];
       let atom = vertex.value;
       let charge = 0;
@@ -400,7 +404,7 @@ export default class SvgDrawer {
 
     // Draw the ring centers for debug purposes
     if (opts.debug) {
-      for (var i = 0; i < rings.length; i++) {
+      for (let i = 0; i < rings.length; i++) {
         let center = rings[i].center;
         svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
       }

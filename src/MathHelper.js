@@ -12,11 +12,11 @@ export default class MathHelper {
      */
     static round(value, decimals) {
         if (decimals) {
-            const pow = Math.pow(10, decimals)
-            return Math.round(value * pow) / pow
+            const pow = Math.pow(10, decimals);
+            return Math.round(value * pow) / pow;
         }
         else {
-            return Math.round(value)
+            return Math.round(value);
         }
     }
 
@@ -31,7 +31,7 @@ export default class MathHelper {
         let sin = 0.0;
         let cos = 0.0;
         
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             sin += Math.sin(arr[i]);
             cos += Math.cos(arr[i]);
         }
@@ -131,9 +131,9 @@ export default class MathHelper {
 
             visited[i] = 1;
             return traverseCycle(arr[i], cycleLength);
-        }
+        };
 
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             if (visited[i] === 1) {
                 continue;
             }

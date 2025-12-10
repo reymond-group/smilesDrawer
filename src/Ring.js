@@ -1,8 +1,8 @@
 //@ts-check
-import ArrayHelper    from './ArrayHelper'
-import RingConnection from './RingConnection'
-import Vector2        from './Vector2'
-import Vertex         from './Vertex'
+import ArrayHelper    from './ArrayHelper';
+import RingConnection from './RingConnection';
+import Vector2        from './Vector2';
+import Vertex         from './Vertex';
 
 /** 
  * A class representing a ring.
@@ -146,14 +146,12 @@ export default class Ring {
             
             orderedNeighbours[i] = {
                 n: vertices.length,
-                neighbour: this.neighbours[i]
+                neighbour: this.neighbours[i],
             };
         }
 
-        orderedNeighbours.sort(function (a, b) {
-            // Sort highest to lowest
-            return b.n - a.n;
-        });
+        // Sort highest to lowest
+        orderedNeighbours.sort((a, b) => b.n - a.n);
 
         return orderedNeighbours;
     }
@@ -168,8 +166,7 @@ export default class Ring {
         let db = this.getDoubleBondCount(vertices);
         let length = this.members.length;
 
-        return db === 3 && length === 6 ||
-               db === 2 && length === 5 ;
+        return (db === 3 && length === 6) || (db === 2 && length === 5);
     }
 
     /**

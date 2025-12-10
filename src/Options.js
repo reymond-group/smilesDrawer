@@ -5,7 +5,6 @@ export default class Options {
      * A helper method to extend the default options with user supplied ones.
      */
     static extend() {
-        let that = this;
         let extended = {};
         let deep = false;
         let i = 0;
@@ -16,11 +15,11 @@ export default class Options {
             i++;
         }
 
-        let merge = function (obj) {
-            for (var prop in obj) {
+        let merge = function(obj) {
+            for (let prop in obj) {
                 if (Object.prototype.hasOwnProperty.call(obj, prop)) {
                     if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
-                        extended[prop] = that.extend(true, extended[prop], obj[prop]);
+                        extended[prop] = Options.extend(true, extended[prop], obj[prop]);
                     } else {
                         extended[prop] = obj[prop];
                     }

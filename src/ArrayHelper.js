@@ -11,7 +11,7 @@ export default class ArrayHelper {
      * @returns {*} A clone of the array or object.
      */
     static clone(arr) {
-        let out = Array.isArray(arr) ? Array() : {};
+        let out = Array.isArray(arr) ? [] : {};
 
         for (let key in arr) {
             let value = arr[key];
@@ -44,7 +44,7 @@ export default class ArrayHelper {
         let tmpA = arrA.slice().sort();
         let tmpB = arrB.slice().sort();
 
-        for (var i = 0; i < tmpA.length; i++) {
+        for (let i = 0; i < tmpA.length; i++) {
             if (tmpA[i] !== tmpB[i]) {
                 return false;
             }
@@ -151,7 +151,7 @@ export default class ArrayHelper {
      * @returns {Array} The intersecting vlaues.
      */
     static intersection(arrA, arrB) {
-        let intersection = new Array();
+        let intersection = [];
 
         for (let i = 0; i < arrA.length; i++) {
             for (let j = 0; j < arrB.length; j++) {
@@ -173,7 +173,7 @@ export default class ArrayHelper {
      */
     static unique(arr) {
         let contains = {};
-        return arr.filter(function (i) {
+        return arr.filter(function(i) {
             // using !== instead of hasOwnProperty (http://andrew.hedges.name/experiments/in/)
             return contains[i] !== undefined ? false : (contains[i] = true);
         });
@@ -208,7 +208,7 @@ export default class ArrayHelper {
      * @returns {Array} The toggled array.
      */
     static toggle(arr, value) {
-        let newArr = Array();
+        let newArr = [];
 
         let removed = false;
         for (let i = 0; i < arr.length; i++) {
@@ -240,7 +240,7 @@ export default class ArrayHelper {
      * @returns {Array} A new array with the element with a given value removed.
      */
     static remove(arr, value) {
-        let tmp = Array();
+        let tmp = [];
 
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] !== value) {
@@ -278,7 +278,7 @@ export default class ArrayHelper {
      * @returns {Array} The filtered array.
      */
     static removeAll(arrA, arrB) {
-        return arrA.filter(function (item) {
+        return arrA.filter(function(item) {
             return arrB.indexOf(item) === -1;
         });
     }
@@ -335,11 +335,11 @@ export default class ArrayHelper {
      * @returns {Object[]} The array sorted by atomic number. Example of an array entry: { atomicNumber: 2, vertexId: 5 }.
      */
     static sortByAtomicNumberDesc(arr) {
-        let map = arr.map(function (e, i) {
-            return { index: i, value: e.atomicNumber.split('.').map(Number) };
+        let map = arr.map(function(e, i) {
+            return {index: i, value: e.atomicNumber.split('.').map(Number)};
         });
 
-        map.sort(function (a, b) {
+        map.sort(function(a, b) {
             let min = Math.min(b.value.length, a.value.length);
             let i = 0;
 
@@ -350,7 +350,7 @@ export default class ArrayHelper {
             return i === min ? b.value.length - a.value.length : b.value[i] - a.value[i];
         });
 
-        return map.map(function (e) {
+        return map.map(function(e) {
             return arr[e.index];
         });
     }
@@ -362,7 +362,7 @@ export default class ArrayHelper {
      * @returns {Array} The copy.
      */
     static deepCopy(arr) {
-        let newArr = Array();
+        let newArr = [];
 
         for (let i = 0; i < arr.length; i++) {
             let item = arr[i];

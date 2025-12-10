@@ -1,12 +1,12 @@
-import Line       from './Line'
-import MathHelper from './MathHelper'
-import Vector2    from './Vector2'
+import Line       from './Line';
+import MathHelper from './MathHelper';
+import Vector2    from './Vector2';
 
 function makeid(length) {
-  var result = '';
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
+  let result = '';
+  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
@@ -28,7 +28,7 @@ export default class SvgWrapper {
     // maintain a list of line elements and their corresponding gradients
     // maintain a list of vertex elements
     // maintain a list of highlighting elements
-    this.backgroundItems = []
+    this.backgroundItems = [];
     this.paths = [];
     this.vertices = [];
     this.gradients = [];
@@ -90,14 +90,16 @@ export default class SvgWrapper {
       pathChildNodes = this.paths;
 
 
-    let mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    mask.setAttributeNS(null, 'x', this.minX);
-    mask.setAttributeNS(null, 'y', this.minY);
-    mask.setAttributeNS(null, 'width', this.maxX - this.minX);
-    mask.setAttributeNS(null, 'height', this.maxY - this.minY);
-    mask.setAttributeNS(null, 'fill', 'white');
+    { // Set up the basic masking layer...
+      let mask = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      mask.setAttributeNS(null, 'x', this.minX);
+      mask.setAttributeNS(null, 'y', this.minY);
+      mask.setAttributeNS(null, 'width', this.maxX - this.minX);
+      mask.setAttributeNS(null, 'height', this.maxY - this.minY);
+      mask.setAttributeNS(null, 'fill', 'white');
 
-    masks.appendChild(mask);
+      masks.appendChild(mask);
+    }
 
     // give the mask an id
     masks.setAttributeNS(null, 'id', this.uid + '-text-mask');
@@ -107,10 +109,10 @@ export default class SvgWrapper {
     }
 
     for (let backgroundItem of this.backgroundItems) {
-      background.appendChild(backgroundItem)
+      background.appendChild(backgroundItem);
     }
     for (let highlight of this.highlights) {
-      highlights.appendChild(highlight)
+      highlights.appendChild(highlight);
     }
     for (let vertex of this.vertices) {
       vertices.appendChild(vertex);
@@ -225,7 +227,7 @@ export default class SvgWrapper {
       return SvgWrapper.createUnicodeSuperscript(n) + '⁻';
     }
 
-    return ''
+    return '';
   }
 
   /**
@@ -234,7 +236,7 @@ export default class SvgWrapper {
    * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
    */
   determineDimensions(vertices) {
-    for (var i = 0; i < vertices.length; i++) {
+    for (let i = 0; i < vertices.length; i++) {
       if (!vertices[i].value.isDrawn) {
         continue;
       }
@@ -359,7 +361,7 @@ export default class SvgWrapper {
    *  @param {Number} y The y position of the highlight
    *  @param {string} color The color of the highlight, default #03fc9d
    */
-  drawAtomHighlight(x, y, color = "#03fc9d") {
+  drawAtomHighlight(x, y, color = '#03fc9d') {
     let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     ball.setAttributeNS(null, 'cx', x);
     ball.setAttributeNS(null, 'cy', y);
@@ -375,8 +377,7 @@ export default class SvgWrapper {
    * @param {Line} line A line.
    */
   drawDashedWedge(line) {
-    if (isNaN(line.from.x) || isNaN(line.from.y) ||
-      isNaN(line.to.x) || isNaN(line.to.y)) {
+    if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
       return;
     }
 
@@ -590,41 +591,36 @@ export default class SvgWrapper {
     text.push([display, elementName]);
 
     if (hydrogens === 1) {
-      text.push(['H', 'H'])
+      text.push(['H', 'H']);
     } else if (hydrogens > 1) {
-      text.push(['H' + SvgWrapper.createUnicodeSubscript(hydrogens), 'H'])
+      text.push(['H' + SvgWrapper.createUnicodeSubscript(hydrogens), 'H']);
     }
 
     // TODO: Better handle exceptions
     // Exception for nitro (draw nitro as NO2 instead of N+O-O)
-    if (charge === 1 && elementName === 'N' && attachedPseudoElement.hasOwnProperty('0O') &&
-      attachedPseudoElement.hasOwnProperty('0O-1')) {
-      attachedPseudoElement = { '0O': { element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: '' } }
+    if (charge === 1 && elementName === 'N' && '0O' in attachedPseudoElement && '0O-1' in attachedPseudoElement) {
+      attachedPseudoElement = {'0O': {element: 'O', count: 2, hydrogenCount: 0, previousElement: 'C', charge: ''}};
       charge = 0;
     }
 
-    for (let key in attachedPseudoElement) {
-      if (!attachedPseudoElement.hasOwnProperty(key)) {
-        continue;
-      }
-
+    for (let key in Object.keys(attachedPseudoElement)) {
       let pe = attachedPseudoElement[key];
-      let display = pe.element;
+      let pe_display = pe.element;
 
       if (pe.count > 1) {
-        display += SvgWrapper.createUnicodeSubscript(pe.count);
+        pe_display += SvgWrapper.createUnicodeSubscript(pe.count);
       }
 
       if (pe.charge !== '') {
-        display += SvgWrapper.createUnicodeCharge(charge);
+        pe_display += SvgWrapper.createUnicodeCharge(charge);
       }
 
-      text.push([display, pe.element]);
+      text.push([pe_display, pe.element]);
 
       if (pe.hydrogenCount === 1) {
-        text.push(['H', 'H'])
+        text.push(['H', 'H']);
       } else if (pe.hydrogenCount > 1) {
-        text.push(['H' + SvgWrapper.createUnicodeSubscript(pe.hydrogenCount), 'H'])
+        text.push(['H' + SvgWrapper.createUnicodeSubscript(pe.hydrogenCount), 'H']);
       }
     }
 
@@ -723,7 +719,7 @@ export default class SvgWrapper {
       tspanElem.textContent = display;
 
       if (direction === 'up' || direction === 'down') {
-        tspanElem.setAttributeNS(null, 'x', '0px')
+        tspanElem.setAttributeNS(null, 'x', '0px');
         if (direction === 'up') {
           tspanElem.setAttributeNS(null, 'y', `-${0.9 * i}em`);
         } else {
@@ -732,7 +728,7 @@ export default class SvgWrapper {
       }
 
       textElem.appendChild(tspanElem);
-    })
+    });
 
     textElem.setAttributeNS(null, 'data-direction', direction);
 
@@ -747,7 +743,7 @@ export default class SvgWrapper {
       textElem.setAttributeNS(null, 'text-anchor', 'end');
     }
 
-    g.appendChild(textElem)
+    g.appendChild(textElem);
 
     g.setAttributeNS(null, 'style', `transform: translateX(${x}px) translateY(${y}px)`);
 
@@ -778,7 +774,7 @@ export default class SvgWrapper {
 
     let image = new Image();
 
-    image.onload = function () {
+    image.onload = function() {
       canvas.width = width;
       canvas.height = height;
       canvas.getContext('2d').drawImage(image, 0, 0, width, height);
@@ -790,31 +786,28 @@ export default class SvgWrapper {
   static createUnicodeSubscript(n) {
     let result = '';
 
-    n.toString().split('').forEach(d => {
+    n.toString().split('').forEach((d) => {
       result += ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'][parseInt(d)];
     });
 
-    return result
+    return result;
   }
 
   static createUnicodeSuperscript(n) {
     let result = '';
 
-    n.toString().split('').forEach(d => {
+    n.toString().split('').forEach((d) => {
       let parsed = parseInt(d);
       if (Number.isFinite(parsed)) {
         result += ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'][parsed];
       }
     });
 
-    return result
+    return result;
   }
 
   static replaceNumbersWithSubscript(text) {
-    let subscriptNumbers = {
-      '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄',
-      '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉'
-    };
+    let subscriptNumbers = {0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉'};
 
     for (const [key, value] of Object.entries(subscriptNumbers)) {
       text = text.replaceAll(key, value);
@@ -825,14 +818,14 @@ export default class SvgWrapper {
 
   static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
     const element = document.createElement('canvas');
-    const ctx = element.getContext("2d");
-    ctx.font = `${fontSize}pt ${fontFamily}`
-    let textMetrics = ctx.measureText(text)
+    const ctx = element.getContext('2d');
+    ctx.font = `${fontSize}pt ${fontFamily}`;
+    let textMetrics = ctx.measureText(text);
 
     let compWidth = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
     return {
-      'width': textMetrics.width > compWidth ? textMetrics.width : compWidth,
-      'height': (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight
+      width:  textMetrics.width > compWidth ? textMetrics.width : compWidth,
+      height: (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight,
     };
   }
 
@@ -851,7 +844,7 @@ export default class SvgWrapper {
     svg.setAttributeNS(null, 'height', height);
 
     let image = new Image();
-    image.onload = function () {
+    image.onload = function() {
       canvas.width = width;
       canvas.height = height;
 
@@ -864,9 +857,9 @@ export default class SvgWrapper {
       }
     };
 
-    image.onerror = function (err) {
+    image.onerror = function(err) {
       console.log(err);
-    }
+    };
 
     image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(svg.outerHTML);
     return canvas;
@@ -883,7 +876,7 @@ export default class SvgWrapper {
   static svgToImg(svg, img, width, height) {
     let canvas = document.createElement('canvas');
     this.svgToCanvas(svg, canvas, width, height, () => {
-      img.src = canvas.toDataURL("image/png");
+      img.src = canvas.toDataURL('image/png');
     });
   }
 
@@ -913,12 +906,12 @@ export default class SvgWrapper {
 
     let lines = [];
 
-    text.split("\n").forEach(line => {
+    text.split('\n').forEach((line) => {
       let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.0);
       if (dims.width >= maxWidth) {
         let totalWordsWidth = 0.0;
         let maxWordsHeight = 0.0;
-        let words = line.split(" ");
+        let words = line.split(' ');
         let offset = 0;
 
         for (let i = 0; i < words.length; i++) {
@@ -926,14 +919,14 @@ export default class SvgWrapper {
 
           if (totalWordsWidth + wordDims.width > maxWidth) {
             lines.push({
-              text: words.slice(offset, i).join(' '),
-              width: totalWordsWidth,
-              height: maxWordsHeight
+              text:   words.slice(offset, i).join(' '),
+              width:  totalWordsWidth,
+              height: maxWordsHeight,
             });
 
             totalWordsWidth = 0.0;
             maxWordsHeight = 0.0;
-            offset = i
+            offset = i;
           }
 
           if (wordDims.height > maxWordsHeight) {
@@ -945,26 +938,26 @@ export default class SvgWrapper {
 
         if (offset < words.length) {
           lines.push({
-            text: words.slice(offset, words.length).join(' '),
-            width: totalWordsWidth,
-            height: maxWordsHeight
+            text:   words.slice(offset, words.length).join(' '),
+            width:  totalWordsWidth,
+            height: maxWordsHeight,
           });
         }
       } else {
         lines.push({
-          text: line,
-          width: dims.width,
-          height: dims.height
+          text:   line,
+          width:  dims.width,
+          height: dims.height,
         });
       }
     });
 
-    lines.forEach(line => {
+    lines.forEach((line) => {
       totalHeight += line.height;
       let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-      tspanElem.setAttributeNS(null, 'fill', themeManager.getColor("C"));
+      tspanElem.setAttributeNS(null, 'fill', themeManager.getColor('C'));
       tspanElem.textContent = line.text;
-      tspanElem.setAttributeNS(null, 'x', '0px')
+      tspanElem.setAttributeNS(null, 'x', '0px');
       tspanElem.setAttributeNS(null, 'y', `${totalHeight}px`);
       textElem.appendChild(tspanElem);
 
@@ -975,6 +968,6 @@ export default class SvgWrapper {
 
     svg.appendChild(textElem);
 
-    return { svg: svg, width: maxLineWidth, height: totalHeight };
+    return {svg: svg, width: maxLineWidth, height: totalHeight};
   }
 }
