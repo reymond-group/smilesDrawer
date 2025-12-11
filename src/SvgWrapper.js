@@ -607,7 +607,7 @@ export default class SvgWrapper {
             charge = 0;
         }
 
-        for (let key in Object.keys(attachedPseudoElement)) {
+        for (let key of Object.keys(attachedPseudoElement)) {
             let pe = attachedPseudoElement[key];
             let pe_display = pe.element;
 

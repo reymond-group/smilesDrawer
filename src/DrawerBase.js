@@ -2600,6 +2600,7 @@ export default class DrawerBase {
 
                 if (neighbours.length === 3
                     && previousVertex
+                    && previousVertex.parentVertexId !== null
                     && previousVertex.value.rings.length < 1
                     && vertices[2].value.rings.length < 1
                     && vertices[1].value.rings.length < 1
