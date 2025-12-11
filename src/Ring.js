@@ -1,12 +1,12 @@
-//@ts-check
+// @ts-check
 import ArrayHelper    from './ArrayHelper';
 import RingConnection from './RingConnection';
 import Vector2        from './Vector2';
 import Vertex         from './Vertex';
 
-/** 
+/**
  * A class representing a ring.
- * 
+ *
  * @property {Number} id The id of this ring.
  * @property {Number[]} members An array containing the vertex ids of the ring members.
  * @property {Number[]} edges An array containing the edge ids of the edges between the ring members.
@@ -44,7 +44,7 @@ export default class Ring {
         this.centralAngle = 0.0;
         this.canFlip = true;
     }
-    
+
     /**
      * Clones this ring and returns the clone.
      *
@@ -118,11 +118,11 @@ export default class Ring {
 
         while (current != null && max < 100) {
             let prev = current;
-            
+
             callback(prev);
             current = vertices[current].getNextInRing(vertices, this.id, previousVertexId);
             previousVertexId = prev;
-            
+
             // Stop while loop when arriving back at the start vertex
             if (current == startVertexId) {
                 current = null;
@@ -140,12 +140,12 @@ export default class Ring {
      */
     getOrderedNeighbours(ringConnections) {
         let orderedNeighbours = Array(this.neighbours.length);
-        
+
         for (let i = 0; i < this.neighbours.length; i++) {
             let vertices = RingConnection.getVertices(ringConnections, this.id, this.neighbours[i]);
-            
+
             orderedNeighbours[i] = {
-                n: vertices.length,
+                n:         vertices.length,
                 neighbour: this.neighbours[i],
             };
         }

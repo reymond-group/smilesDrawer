@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 
 export default class Options {
     /**
@@ -20,7 +20,8 @@ export default class Options {
                 if (Object.prototype.hasOwnProperty.call(obj, prop)) {
                     if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
                         extended[prop] = Options.extend(true, extended[prop], obj[prop]);
-                    } else {
+                    }
+                    else {
                         extended[prop] = obj[prop];
                     }
                 }

@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 import Options        from './Options';
 import Parser         from './Parser';
 import ReactionDrawer from './ReactionDrawer';
@@ -76,7 +76,8 @@ export default class SmilesDrawer {
 
                 let smilesDrawer = new SmilesDrawer(moleculeOptions, reactionOptions);
                 smilesDrawer.draw(smiles, element, currentTheme, successCallback, errorCallback, weights);
-            } else {
+            }
+            else {
                 this.draw(smiles, element, currentTheme, successCallback, errorCallback, weights);
             }
         });
@@ -118,20 +119,25 @@ export default class SmilesDrawer {
         if (smiles.includes('>')) {
             try {
                 this.drawReaction(smiles, target, theme, settings, weights, successCallback);
-            } catch (err) {
+            }
+            catch (err) {
                 if (errorCallback) {
                     errorCallback(err);
-                } else {
+                }
+                else {
                     console.error(err);
                 }
             }
-        } else {
+        }
+        else {
             try {
                 this.drawMolecule(smiles, target, theme, weights, successCallback);
-            } catch (err) {
+            }
+            catch (err) {
                 if (errorCallback) {
                     errorCallback(err);
-                } else {
+                }
+                else {
                     console.error(err);
                 }
             }
@@ -149,27 +155,32 @@ export default class SmilesDrawer {
             if (callback) {
                 callback(svg);
             }
-        } else if (target === 'canvas') {
+        }
+        else if (target === 'canvas') {
             let canvas = this.svgToCanvas(this.drawer.draw(parseTree, null, theme, weights));
             if (callback) {
                 callback(canvas);
             }
-        } else if (target === 'img') {
+        }
+        else if (target === 'img') {
             let img = this.svgToImg(this.drawer.draw(parseTree, null, theme, weights));
             if (callback) {
                 callback(img);
             }
-        } else if (target instanceof HTMLImageElement) {
+        }
+        else if (target instanceof HTMLImageElement) {
             this.svgToImg(this.drawer.draw(parseTree, null, theme, weights), target);
             if (callback) {
                 callback(target);
             }
-        } else if (target instanceof SVGElement) {
+        }
+        else if (target instanceof SVGElement) {
             this.drawer.draw(parseTree, target, theme, weights);
             if (callback) {
                 callback(target);
             }
-        } else {
+        }
+        else {
             let elements = document.querySelectorAll(target);
             elements.forEach((element) => {
                 let tag = element.nodeName.toLowerCase();
@@ -181,12 +192,14 @@ export default class SmilesDrawer {
                     if (callback) {
                         callback(element);
                     }
-                } else if (tag === 'canvas') {
+                }
+                else if (tag === 'canvas') {
                     this.svgToCanvas(this.drawer.draw(parseTree, null, theme, weights), element);
                     if (callback) {
                         callback(element);
                     }
-                } else if (tag === 'img') {
+                }
+                else if (tag === 'img') {
                     this.svgToImg(this.drawer.draw(parseTree, null, theme, weights), element);
                     if (callback) {
                         callback(element);
@@ -207,27 +220,32 @@ export default class SmilesDrawer {
             if (callback) {
                 callback(svg);
             }
-        } else if (target === 'canvas') {
+        }
+        else if (target === 'canvas') {
             let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow));
             if (callback) {
                 callback(canvas);
             }
-        } else if (target === 'img') {
+        }
+        else if (target === 'img') {
             let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow));
             if (callback) {
                 callback(img);
             }
-        } else if (target instanceof HTMLImageElement) {
+        }
+        else if (target instanceof HTMLImageElement) {
             this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), target);
             if (callback) {
                 callback(target);
             }
-        } else if (target instanceof SVGElement) {
+        }
+        else if (target instanceof SVGElement) {
             this.reactionDrawer.draw(reaction, target, theme, weights, settings.textAboveArrow, settings.textBelowArrow);
             if (callback) {
                 callback(target);
             }
-        } else {
+        }
+        else {
             let elements = document.querySelectorAll(target);
             elements.forEach((element) => {
                 let tag = element.nodeName.toLowerCase();
@@ -245,12 +263,14 @@ export default class SmilesDrawer {
                     if (callback) {
                         callback(element);
                     }
-                } else if (tag === 'canvas') {
+                }
+                else if (tag === 'canvas') {
                     this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), element);
                     if (callback) {
                         callback(element);
                     }
-                } else if (tag === 'img') {
+                }
+                else if (tag === 'img') {
                     this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), element);
                     if (callback) {
                         callback(element);
@@ -283,9 +303,9 @@ export default class SmilesDrawer {
     }
 
     /**
-     * 
-     * @param {HTMLImageElement|HTMLCanvasElement|SVGElement} element 
-     * @param {SVGElement} svg 
+     *
+     * @param {HTMLImageElement|HTMLCanvasElement|SVGElement} element
+     * @param {SVGElement} svg
      * @returns {{w: Number, h: Number}} The width and height.
      */
     getDimensions(element, svg = null) {
@@ -305,7 +325,8 @@ export default class SmilesDrawer {
             if (element.style.height !== '') {
                 h = parseInt(element.style.height);
             }
-        } else if (svg) {
+        }
+        else if (svg) {
             w = parseFloat(svg.style.width);
             h = parseFloat(svg.style.height);
         }

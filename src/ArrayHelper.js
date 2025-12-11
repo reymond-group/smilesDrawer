@@ -1,6 +1,6 @@
-//@ts-check
-/** 
- * A static class containing helper functions for array-related tasks. 
+// @ts-check
+/**
+ * A static class containing helper functions for array-related tasks.
  */
 export default class ArrayHelper {
     /**
@@ -125,13 +125,15 @@ export default class ArrayHelper {
                     return true;
                 }
             }
-        } else if (options.func) {
+        }
+        else if (options.func) {
             for (let i = 0; i < arr.length; i++) {
                 if (options.func(arr[i])) {
                     return true;
                 }
             }
-        } else {
+        }
+        else {
             for (let i = 0; i < arr.length; i++) {
                 if (arr[i][options.property] == options.value) {
                     return true;
@@ -215,7 +217,8 @@ export default class ArrayHelper {
             // Do not copy value if it exists
             if (arr[i] !== value) {
                 newArr.push(arr[i]);
-            } else {
+            }
+            else {
                 // The element was not copied to the new array, which
                 // means it was removed
                 removed = true;
@@ -357,7 +360,7 @@ export default class ArrayHelper {
 
     /**
      * Copies a an n-dimensional array.
-     * 
+     *
      * @param {Array} arr The array to be copied.
      * @returns {Array} The copy.
      */
@@ -369,12 +372,12 @@ export default class ArrayHelper {
 
             if (item instanceof Array) {
                 newArr[i] = ArrayHelper.deepCopy(item);
-            } else {
+            }
+            else {
                 newArr[i] = item;
             }
         }
 
         return newArr;
     }
-
 }

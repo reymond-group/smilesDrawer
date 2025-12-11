@@ -9,10 +9,12 @@ export default defineConfig([
     stylistic.configs.recommended,
     {
         ignores: [
-            'dist/',         // Automatically generated
-            'doc/',          // Automatically generated
-            'docs/',         // Automatically generated
-            'src/Parser.js', // Automatically generated
+            'dist/',               // Automatically generated
+            'doc/',                // Automatically generated
+            'docs/',               // Automatically generated
+            'src/Parser.js',       // Automatically generated
+            'test/',               // Too many tabs
+            'example/drugbank.js', // Too many tabs
         ],
     },
     {
@@ -20,7 +22,7 @@ export default defineConfig([
             globals: globals.browser,
 
             ecmaVersion: 2015,
-            sourceType: 'module',
+            sourceType:  'module',
 
             parserOptions: {
                 ecmaVersion: 2015,
@@ -41,23 +43,15 @@ export default defineConfig([
             // Keep the original semicolon style...
             '@stylistic/semi': ['error', 'always'],
 
-            // TODO: Re-enable these for the great whitespace revolution!
-            '@stylistic/brace-style':             'off',
-            '@stylistic/eol-last':                'off',
-            '@stylistic/indent':                  'off', // ['error', 4],
-            '@stylistic/indent-binary-ops':       'off', // ['error', 4],
-            '@stylistic/key-spacing':             'off', // ['error', {align: 'value'}],
-            '@stylistic/keyword-spacing':         'off',
-            '@stylistic/linebreak-style':         'off', // ['error', 'unix'],
-            '@stylistic/no-multiple-empty-lines': 'off',
-            '@stylistic/no-tabs':                 'off',
-            '@stylistic/no-trailing-spaces':      'off',
-            '@stylistic/padded-blocks':           'off',
-            '@stylistic/semi-spacing':            'off',
-            '@stylistic/spaced-comment':          'off',
+            // Enforce consistent indentation and line breaks...
+            '@stylistic/brace-style':       ['error', 'stroustrup'],
+            '@stylistic/indent':            ['error', 4],
+            '@stylistic/indent-binary-ops': ['error', 4],
+            '@stylistic/key-spacing':       ['error', {align: 'value'}],
+            '@stylistic/linebreak-style':   ['error', 'unix'],
 
             // A few places where I disagree with the defaults...
-            '@stylistic/object-curly-spacing': ['error', 'never'],
+            '@stylistic/object-curly-spacing':        ['error', 'never'],
             '@stylistic/space-before-function-paren': ['error', {
                 anonymous:  'never',
                 named:      'never',

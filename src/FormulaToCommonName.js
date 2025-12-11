@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 
 export default {
     C2H4O2:    'acetic acid',
