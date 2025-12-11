@@ -20,15 +20,15 @@ export default class SvgDrawer {
     }
 
     /**
-   * Draws the parsed smiles data to an svg element.
-   *
-   * @param {Object} data The tree returned by the smiles parser.
-   * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
-   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
-   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
-   *
-   * @returns {SVGElement} The svg element
-   */
+     * Draws the parsed smiles data to an svg element.
+     *
+     * @param {Object} data The tree returned by the smiles parser.
+     * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+     * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+     * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+     *
+     * @returns {SVGElement} The svg element
+     */
     draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
         if (target === null || target === 'svg') {
             target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -97,13 +97,13 @@ export default class SvgDrawer {
     }
 
     /**
- * Draws the parsed smiles data to a canvas element.
- *
- * @param {Object} data The tree returned by the smiles parser.
- * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
- * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
- * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
- */
+     * Draws the parsed smiles data to a canvas element.
+     *
+     * @param {Object} data The tree returned by the smiles parser.
+     * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+     * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+     */
     drawCanvas(data, target, themeName = 'light', infoOnly = false) {
         let canvas = null;
         if (typeof target === 'string' || target instanceof String) {
@@ -128,20 +128,20 @@ export default class SvgDrawer {
     }
 
     /**
-   * Draws a ring inside a provided ring, indicating aromaticity.
-   *
-   * @param {Ring} ring A ring.
-   */
+     * Draws a ring inside a provided ring, indicating aromaticity.
+     *
+     * @param {Ring} ring A ring.
+     */
     drawAromaticityRing(ring) {
         let svgWrapper = this.svgWrapper;
         svgWrapper.drawRing(ring.center.x, ring.center.y, ring.getSize());
     }
 
     /**
-   * Draw the actual edges as bonds.
-   *
-   * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
-   */
+     * Draw the actual edges as bonds.
+     *
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+     */
     drawEdges(debug) {
         let preprocessor = this.preprocessor,
             graph = preprocessor.graph,
@@ -175,11 +175,11 @@ export default class SvgDrawer {
     }
 
     /**
-   * Draw the an edge as a bond.
-   *
-   * @param {Number} edgeId An edge id.
-   * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
-   */
+     * Draw the an edge as a bond.
+     *
+     * @param {Number} edgeId An edge id.
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+     */
     drawEdge(edgeId, debug) {
         let preprocessor = this.preprocessor,
             opts = preprocessor.opts,
@@ -314,10 +314,10 @@ export default class SvgDrawer {
     }
 
     /**
-   * Draw the highlights for atoms to the canvas.
-   *
-   * @param {Boolean} debug
-   */
+     * Draw the highlights for atoms to the canvas.
+     *
+     * @param {Boolean} debug
+     */
     drawAtomHighlights(debug) {
         let preprocessor = this.preprocessor;
         let graph = preprocessor.graph;
@@ -337,10 +337,10 @@ export default class SvgDrawer {
     }
 
     /**
-   * Draws the vertices representing atoms to the canvas.
-   *
-   * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
-   */
+     * Draws the vertices representing atoms to the canvas.
+     *
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
+     */
     drawVertices(debug) {
         let preprocessor = this.preprocessor,
             opts = preprocessor.opts,
@@ -427,9 +427,9 @@ export default class SvgDrawer {
     }
 
     /**
-   * Draw the weights on a background image.
-   * @param {Number[]} weights The weights assigned to each atom.
-   */
+     * Draw the weights on a background image.
+     * @param {Number[]} weights The weights assigned to each atom.
+     */
     drawWeights(weights, weightsNormalized) {
         if (!weights) {
             return;
@@ -464,27 +464,27 @@ export default class SvgDrawer {
     }
 
     /**
-   * Returns the total overlap score of the current molecule.
-   *
-   * @returns {Number} The overlap score.
-   */
+     * Returns the total overlap score of the current molecule.
+     *
+     * @returns {Number} The overlap score.
+     */
     getTotalOverlapScore() {
         return this.preprocessor.getTotalOverlapScore();
     }
 
     /**
-   * Returns the molecular formula of the loaded molecule as a string.
-   *
-   * @returns {String} The molecular formula.
-   */
+     * Returns the molecular formula of the loaded molecule as a string.
+     *
+     * @returns {String} The molecular formula.
+     */
     getMolecularFormula(graph = null) {
         return this.preprocessor.getMolecularFormula(graph);
     }
 
     /**
-   * @param {Array} normals list of normals to multiply
-   * @param {Number} spacing value to multiply normals by
-   */
+     * @param {Array} normals list of normals to multiply
+     * @param {Number} spacing value to multiply normals by
+     */
     multiplyNormals(normals, spacing) {
         normals[0].multiplyScalar(spacing);
         normals[1].multiplyScalar(spacing);

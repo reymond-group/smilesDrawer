@@ -5,11 +5,11 @@ import chroma from 'chroma-js';
 
 export default class GaussDrawer {
     /**
-   * The constructor of the class Graph.
-   *
-   * @param {Vector2[]} points The centres of the gaussians.
-   * @param {Number[]} weights The weights / amplitudes for each gaussian.
-   */
+     * The constructor of the class Graph.
+     *
+     * @param {Vector2[]} points The centres of the gaussians.
+     * @param {Number[]} weights The weights / amplitudes for each gaussian.
+     */
     constructor(points, weights, width, height, sigma = 0.3, interval = 0, colormap = null, opacity = 1.0, normalized = false) {
         this.points = points;
         this.weights = weights;
@@ -48,8 +48,8 @@ export default class GaussDrawer {
     }
 
     /**
-     * Compute and draw the gaussians.
-     */
+       * Compute and draw the gaussians.
+       */
     draw() {
         let m = [];
 
@@ -123,10 +123,10 @@ export default class GaussDrawer {
     }
 
     /**
-     * Get the canvas as an HTML image.
-     *
-     * @param {CallableFunction} callback
-     */
+       * Get the canvas as an HTML image.
+       *
+       * @param {CallableFunction} callback
+       */
     getImage(callback) {
         let image = new Image();
         image.onload = () => {
@@ -146,20 +146,20 @@ export default class GaussDrawer {
     }
 
     /**
-     * Get the canvas as an SVG element.
-     */
+       * Get the canvas as an SVG element.
+       */
     getSVG() {
         return convertImage(this.context.getImageData(0, 0, this.width, this.height));
     }
 
     /**
-     * Set the colour at a specific point on the canvas.
-     *
-     * @param {Vector2} vec The pixel position on the canvas.
-     * @param {Number} r The red colour-component.
-     * @param {Number} g The green colour-component.
-     * @param {Number} b The blue colour-component.
-     */
+       * Set the colour at a specific point on the canvas.
+       *
+       * @param {Vector2} vec The pixel position on the canvas.
+       * @param {Number} r The red colour-component.
+       * @param {Number} g The green colour-component.
+       * @param {Number} b The blue colour-component.
+       */
     setPixel(vec, r, g, b) {
         this.context.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + this.opacity + ')';
         this.context.fillRect(vec.x, vec.y, 1, 1);

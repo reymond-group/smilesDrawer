@@ -28,10 +28,10 @@ import Vertex         from './Vertex';
  */
 export default class DrawerBase {
     /**
-   * The constructor for the class SmilesDrawer.
-   *
-   * @param {Object} options An object containing custom values for different options. It is merged with the default options.
-   */
+     * The constructor for the class SmilesDrawer.
+     *
+     * @param {Object} options An object containing custom values for different options. It is merged with the default options.
+     */
     constructor(options) {
         this.graph = null;
         this.doubleBondConfigCount = 0;
@@ -296,13 +296,13 @@ export default class DrawerBase {
     }
 
     /**
-   * Draws the parsed smiles data to a canvas element.
-   *
-   * @param {Object} data The tree returned by the smiles parser.
-   * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
-   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
-   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
-   */
+     * Draws the parsed smiles data to a canvas element.
+     *
+     * @param {Object} data The tree returned by the smiles parser.
+     * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
+     * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
+     */
     draw(data, target, themeName = 'light', infoOnly = false) {
         this.initDraw(data, themeName, infoOnly);
 
@@ -333,11 +333,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the number of rings this edge is a part of.
-   *
-   * @param {Number} edgeId The id of an edge.
-   * @returns {Number} The number of rings the provided edge is part of.
-   */
+     * Returns the number of rings this edge is a part of.
+     *
+     * @param {Number} edgeId The id of an edge.
+     * @returns {Number} The number of rings the provided edge is part of.
+     */
     edgeRingCount(edgeId) {
         let edge = this.graph.edges[edgeId];
         let a = this.graph.vertices[edge.sourceId];
@@ -347,37 +347,37 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns an array containing the bridged rings associated with this  molecule.
-   *
-   * @returns {Ring[]} An array containing all bridged rings associated with this molecule.
-   */
+     * Returns an array containing the bridged rings associated with this  molecule.
+     *
+     * @returns {Ring[]} An array containing all bridged rings associated with this molecule.
+     */
     getBridgedRings() {
         return this.rings.filter(ring => ring.isBridged);
     }
 
     /**
-   * Returns an array containing all fused rings associated with this molecule.
-   *
-   * @returns {Ring[]} An array containing all fused rings associated with this molecule.
-   */
+     * Returns an array containing all fused rings associated with this molecule.
+     *
+     * @returns {Ring[]} An array containing all fused rings associated with this molecule.
+     */
     getFusedRings() {
         return this.rings.filter(ring => ring.isFused);
     }
 
     /**
-   * Returns an array containing all spiros associated with this molecule.
-   *
-   * @returns {Ring[]} An array containing all spiros associated with this molecule.
-   */
+     * Returns an array containing all spiros associated with this molecule.
+     *
+     * @returns {Ring[]} An array containing all spiros associated with this molecule.
+     */
     getSpiros() {
         return this.rings.filter(ring => ring.isSpiro);
     }
 
     /**
-   * Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings)
-   *
-   * @returns {String} A string as described in the method description.
-   */
+     * Returns a string containing a semicolon and new-line separated list of ring properties: Id; Members Count; Neighbours Count; IsSpiro; IsFused; IsBridged; Ring Count (subrings of bridged rings)
+     *
+     * @returns {String} A string as described in the method description.
+     */
     printRingInfo() {
         let result = '';
         for (let i = 0; i < this.rings.length; i++) {
@@ -397,8 +397,8 @@ export default class DrawerBase {
     }
 
     /**
-   * Rotates the drawing to make the widest dimension horizontal.
-   */
+     * Rotates the drawing to make the widest dimension horizontal.
+     */
     rotateDrawing() {
     // Rotate the vertices to make the molecule align horizontally
     // Find the longest distance
@@ -459,37 +459,37 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the total overlap score of the current molecule.
-   *
-   * @returns {Number} The overlap score.
-   */
+     * Returns the total overlap score of the current molecule.
+     *
+     * @returns {Number} The overlap score.
+     */
     getTotalOverlapScore() {
         return this.totalOverlapScore;
     }
 
     /**
-   * Returns the ring count of the current molecule.
-   *
-   * @returns {Number} The ring count.
-   */
+     * Returns the ring count of the current molecule.
+     *
+     * @returns {Number} The ring count.
+     */
     getRingCount() {
         return this.rings.length;
     }
 
     /**
-   * Checks whether or not the current molecule  a bridged ring.
-   *
-   * @returns {Boolean} A boolean indicating whether or not the current molecule  a bridged ring.
-   */
+     * Checks whether or not the current molecule  a bridged ring.
+     *
+     * @returns {Boolean} A boolean indicating whether or not the current molecule  a bridged ring.
+     */
     hasBridgedRing() {
         return this.bridgedRing;
     }
 
     /**
-   * Returns the number of heavy atoms (non-hydrogen) in the current molecule.
-   *
-   * @returns {Number} The heavy atom count.
-   */
+     * Returns the number of heavy atoms (non-hydrogen) in the current molecule.
+     *
+     * @returns {Number} The heavy atom count.
+     */
     getHeavyAtomCount() {
         let hac = 0;
 
@@ -503,10 +503,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the molecular formula of the loaded molecule as a string.
-   *
-   * @returns {String} The molecular formula.
-   */
+     * Returns the molecular formula of the loaded molecule as a string.
+     *
+     * @returns {String} The molecular formula.
+     */
     getMolecularFormula(data = null) {
         let molecularFormula = '';
         let counts = new Map();
@@ -580,12 +580,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond represents the break in a ring introduced when creating the MST. If the two vertices supplied as arguments are not part of a common ringbond, the method returns null.
-   *
-   * @param {Vertex} vertexA A vertex.
-   * @param {Vertex} vertexB A vertex.
-   * @returns {(String|null)} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
-   */
+     * Returns the type of the ringbond (e.g. '=' for a double bond). The ringbond represents the break in a ring introduced when creating the MST. If the two vertices supplied as arguments are not part of a common ringbond, the method returns null.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {(String|null)} Returns the ringbond type or null, if the two supplied vertices are not connected by a ringbond.
+     */
     getRingbondType(vertexA, vertexB) {
     // Checks whether the two vertices are the ones connecting the ring
     // and what the bond type should be.
@@ -748,8 +748,8 @@ export default class DrawerBase {
     }
 
     /**
-   * Initializes rings and ringbonds for the current molecule.
-   */
+     * Initializes rings and ringbonds for the current molecule.
+     */
     initRings() {
         let openBonds = new Map();
 
@@ -901,11 +901,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns all rings connected by bridged bonds starting from the ring with the supplied ring id.
-   *
-   * @param {Number} ringId A ring id.
-   * @returns {Number[]} An array containing all ring ids of rings part of a bridged ring system.
-   */
+     * Returns all rings connected by bridged bonds starting from the ring with the supplied ring id.
+     *
+     * @param {Number} ringId A ring id.
+     * @returns {Number[]} An array containing all ring ids of rings part of a bridged ring system.
+     */
     getBridgedRingRings(ringId) {
         let involvedRings = [];
 
@@ -929,11 +929,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Checks whether or not a ring is part of a bridged ring.
-   *
-   * @param {Number} ringId A ring id.
-   * @returns {Boolean} A boolean indicating whether or not the supplied ring (by id) is part of a bridged ring system.
-   */
+     * Checks whether or not a ring is part of a bridged ring.
+     *
+     * @param {Number} ringId A ring id.
+     * @returns {Boolean} A boolean indicating whether or not the supplied ring (by id) is part of a bridged ring system.
+     */
     isPartOfBridgedRing(ringId) {
         for (let i = 0; i < this.ringConnections.length; i++) {
             if (this.ringConnections[i].containsRing(ringId) && this.ringConnections[i].isBridge(this.graph.vertices)) {
@@ -945,12 +945,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Creates a bridged ring.
-   *
-   * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
-   * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
-   * @returns {Ring} The bridged ring.
-   */
+     * Creates a bridged ring.
+     *
+     * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
+     * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
+     * @returns {Ring} The bridged ring.
+     */
     createBridgedRing(ringIds, sourceVertexId) {
         let ringMembers = new Set();
         let vertices = new Set();
@@ -1066,12 +1066,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Checks whether or not two vertices are in the same ring.
-   *
-   * @param {Vertex} vertexA A vertex.
-   * @param {Vertex} vertexB A vertex.
-   * @returns {Boolean} A boolean indicating whether or not the two vertices are in the same ring.
-   */
+     * Checks whether or not two vertices are in the same ring.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {Boolean} A boolean indicating whether or not the two vertices are in the same ring.
+     */
     areVerticesInSameRing(vertexA, vertexB) {
     // This is a little bit lighter (without the array and push) than
     // getCommonRings().length > 0
@@ -1087,12 +1087,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns an array of ring ids shared by both vertices.
-   *
-   * @param {Vertex} vertexA A vertex.
-   * @param {Vertex} vertexB A vertex.
-   * @returns {Number[]} An array of ids of rings shared by the two vertices.
-   */
+     * Returns an array of ring ids shared by both vertices.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {Number[]} An array of ids of rings shared by the two vertices.
+     */
     getCommonRings(vertexA, vertexB) {
         let commonRings = [];
 
@@ -1108,12 +1108,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the aromatic or largest ring shared by the two vertices.
-   *
-   * @param {Vertex} vertexA A vertex.
-   * @param {Vertex} vertexB A vertex.
-   * @returns {(Ring|null)} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
-   */
+     * Returns the aromatic or largest ring shared by the two vertices.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @returns {(Ring|null)} If an aromatic common ring exists, that ring, else the largest (non-aromatic) ring, else null.
+     */
     getLargestOrAromaticCommonRing(vertexA, vertexB) {
         let commonRings = this.getCommonRings(vertexA, vertexB);
         let maxSize = 0;
@@ -1136,13 +1136,13 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns an array of vertices positioned at a specified location.
-   *
-   * @param {Vector2} position The position to search for vertices.
-   * @param {Number} radius The radius within to search.
-   * @param {Number} excludeVertexId A vertex id to be excluded from the search results.
-   * @returns {Number[]} An array containing vertex ids in a given location.
-   */
+     * Returns an array of vertices positioned at a specified location.
+     *
+     * @param {Vector2} position The position to search for vertices.
+     * @param {Number} radius The radius within to search.
+     * @param {Number} excludeVertexId A vertex id to be excluded from the search results.
+     * @returns {Number[]} An array containing vertex ids in a given location.
+     */
     getVerticesAt(position, radius, excludeVertexId) {
         let locals = [];
 
@@ -1164,11 +1164,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the closest vertex (connected as well as unconnected).
-   *
-   * @param {Vertex} vertex The vertex of which to find the closest other vertex.
-   * @returns {Vertex} The closest vertex.
-   */
+     * Returns the closest vertex (connected as well as unconnected).
+     *
+     * @param {Vertex} vertex The vertex of which to find the closest other vertex.
+     * @returns {Vertex} The closest vertex.
+     */
     getClosestVertex(vertex) {
         let minDist = 99999;
         let minVertex = null;
@@ -1192,11 +1192,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Add a ring to this representation of a molecule.
-   *
-   * @param {Ring} ring A new ring.
-   * @returns {Number} The ring id of the new ring.
-   */
+     * Add a ring to this representation of a molecule.
+     *
+     * @param {Ring} ring A new ring.
+     * @returns {Number} The ring id of the new ring.
+     */
     addRing(ring) {
         ring.id = this.ringIdCounter++;
         this.rings.push(ring);
@@ -1205,10 +1205,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Removes a ring from the array of rings associated with the current molecule.
-   *
-   * @param {Number} ringId A ring id.
-   */
+     * Removes a ring from the array of rings associated with the current molecule.
+     *
+     * @param {Number} ringId A ring id.
+     */
     removeRing(ringId) {
         this.rings = this.rings.filter(function(item) {
             return item.id !== ringId;
@@ -1229,11 +1229,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.
-   *
-   * @param {Number} ringId A ring id.
-   * @returns {Ring} A ring associated with the current molecule.
-   */
+     * Gets a ring object from the array of rings associated with the current molecule by its id. The ring id is not equal to the index, since rings can be added and removed when processing bridged rings.
+     *
+     * @param {Number} ringId A ring id.
+     * @returns {Ring} A ring associated with the current molecule.
+     */
     getRing(ringId) {
         for (let i = 0; i < this.rings.length; i++) {
             if (this.rings[i].id == ringId) {
@@ -1243,11 +1243,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Add a ring connection to this representation of a molecule.
-   *
-   * @param {RingConnection} ringConnection A new ringConnection.
-   * @returns {Number} The ring connection id of the new ring connection.
-   */
+     * Add a ring connection to this representation of a molecule.
+     *
+     * @param {RingConnection} ringConnection A new ringConnection.
+     * @returns {Number} The ring connection id of the new ring connection.
+     */
     addRingConnection(ringConnection) {
         ringConnection.id = this.ringConnectionIdCounter++;
         this.ringConnections.push(ringConnection);
@@ -1256,10 +1256,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Removes a ring connection from the array of rings connections associated with the current molecule.
-   *
-   * @param {Number} ringConnectionId A ring connection id.
-   */
+     * Removes a ring connection from the array of rings connections associated with the current molecule.
+     *
+     * @param {Number} ringConnectionId A ring connection id.
+     */
     removeRingConnection(ringConnectionId) {
         this.ringConnections = this.ringConnections.filter(function(item) {
             return item.id !== ringConnectionId;
@@ -1267,11 +1267,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Removes all ring connections between two vertices.
-   *
-   * @param {Number} vertexIdA A vertex id.
-   * @param {Number} vertexIdB A vertex id.
-   */
+     * Removes all ring connections between two vertices.
+     *
+     * @param {Number} vertexIdA A vertex id.
+     * @param {Number} vertexIdB A vertex id.
+     */
     removeRingConnectionsBetween(vertexIdA, vertexIdB) {
         let toRemove = [];
         for (let i = 0; i < this.ringConnections.length; i++) {
@@ -1290,11 +1290,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Get a ring connection with a given id.
-   *
-   * @param {Number} id
-   * @returns {RingConnection} The ring connection with the specified id.
-   */
+     * Get a ring connection with a given id.
+     *
+     * @param {Number} id
+     * @returns {RingConnection} The ring connection with the specified id.
+     */
     getRingConnection(id) {
         for (let i = 0; i < this.ringConnections.length; i++) {
             if (this.ringConnections[i].id == id) {
@@ -1304,12 +1304,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Get the ring connections between a ring and a set of rings.
-   *
-   * @param {Number} ringId A ring id.
-   * @param {Number[]} ringIds An array of ring ids.
-   * @returns {Number[]} An array of ring connection ids.
-   */
+     * Get the ring connections between a ring and a set of rings.
+     *
+     * @param {Number} ringId A ring id.
+     * @param {Number[]} ringIds An array of ring ids.
+     * @returns {Number[]} An array of ring connection ids.
+     */
     getRingConnections(ringId, ringIds) {
         let ringConnections = [];
 
@@ -1329,10 +1329,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the overlap score of the current molecule based on its positioned vertices. The higher the score, the more overlaps occur in the structure drawing.
-   *
-   * @returns {Object} Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }
-   */
+     * Returns the overlap score of the current molecule based on its positioned vertices. The higher the score, the more overlaps occur in the structure drawing.
+     *
+     * @returns {Object} Returns the total overlap score and the overlap score of each vertex sorted by score (higher to lower). Example: { total: 99, scores: [ { id: 0, score: 22 }, ... ]  }
+     */
     getOverlapScore() {
         let total = 0.0;
         let overlapScores = new Float32Array(this.graph.vertices.length);
@@ -1380,12 +1380,12 @@ export default class DrawerBase {
     }
 
     /**
-   * When drawing a double bond, choose the side to place the double bond. E.g. a double bond should always been drawn inside a ring.
-   *
-   * @param {Vertex} vertexA A vertex.
-   * @param {Vertex} vertexB A vertex.
-   * @param {Vector2[]} sides An array containing the two normals of the line spanned by the two provided vertices.
-   * @returns {Object} Returns an object containing the following information: {
+     * When drawing a double bond, choose the side to place the double bond. E.g. a double bond should always been drawn inside a ring.
+     *
+     * @param {Vertex} vertexA A vertex.
+     * @param {Vertex} vertexB A vertex.
+     * @param {Vector2[]} sides An array containing the two normals of the line spanned by the two provided vertices.
+     * @returns {Object} Returns an object containing the following information: {
           totalSideCount: Counts the sides of each vertex in the molecule, is an array [ a, b ],
           totalPosition: Same as position, but based on entire molecule,
           sideCount: Counts the sides of each neighbour, is an array [ a, b ],
@@ -1393,7 +1393,7 @@ export default class DrawerBase {
           anCount: the number of neighbours of vertexA,
           bnCount: the number of neighbours of vertexB
       }
-   */
+     */
     chooseSide(vertexA, vertexB, sides) {
     // Check which side has more vertices
     // Get all the vertices connected to the both ends
@@ -1445,10 +1445,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Sets the center for a ring.
-   *
-   * @param {Ring} ring A ring.
-   */
+     * Sets the center for a ring.
+     *
+     * @param {Ring} ring A ring.
+     */
     setRingCenter(ring) {
         let ringSize = ring.getSize();
         let total = new Vector2(0, 0);
@@ -1461,12 +1461,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Gets the center of a ring contained within a bridged ring and containing a given vertex.
-   *
-   * @param {Ring} ring A bridged ring.
-   * @param {Vertex} vertex A vertex.
-   * @returns {Vector2} The center of the subring that containing the vertex.
-   */
+     * Gets the center of a ring contained within a bridged ring and containing a given vertex.
+     *
+     * @param {Ring} ring A bridged ring.
+     * @param {Vertex} vertex A vertex.
+     * @returns {Vector2} The center of the subring that containing the vertex.
+     */
     getSubringCenter(ring, vertex) {
         let rings = vertex.value.originalRings;
         let center = ring.center;
@@ -1488,10 +1488,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Draw the actual edges as bonds to the canvas.
-   *
-   * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
-   */
+     * Draw the actual edges as bonds to the canvas.
+     *
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+     */
     drawEdges(debug) {
         let drawn = Array(this.graph.edges.length);
         drawn.fill(false);
@@ -1520,11 +1520,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Draw the an edge as a bonds to the canvas.
-   *
-   * @param {Number} edgeId An edge id.
-   * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
-   */
+     * Draw the an edge as a bonds to the canvas.
+     *
+     * @param {Number} edgeId An edge id.
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug helpers.
+     */
     drawEdge(edgeId, debug) {
         let edge = this.graph.edges[edgeId];
         let vertexA = this.graph.vertices[edge.sourceId];
@@ -1684,10 +1684,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Draws the vertices representing atoms to the canvas.
-   *
-   * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
-   */
+     * Draws the vertices representing atoms to the canvas.
+     *
+     * @param {Boolean} debug A boolean indicating whether or not to draw debug messages to the canvas.
+     */
     drawVertices(debug) {
         for (let i = 0; i < this.graph.vertices.length; i++) {
             let vertex = this.graph.vertices[i];
@@ -1760,8 +1760,8 @@ export default class DrawerBase {
     }
 
     /**
-   * Position the vertices according to their bonds and properties.
-   */
+     * Position the vertices according to their bonds and properties.
+     */
     position() {
         let startVertex = null;
 
@@ -1793,8 +1793,8 @@ export default class DrawerBase {
     }
 
     /**
-   * Stores the current information associated with rings.
-   */
+     * Stores the current information associated with rings.
+     */
     backupRingInformation() {
         this.originalRings = [];
         this.originalRingConnections = [];
@@ -1813,8 +1813,8 @@ export default class DrawerBase {
     }
 
     /**
-   * Restores the most recently backed up information associated with rings.
-   */
+     * Restores the most recently backed up information associated with rings.
+     */
     restoreRingInformation() {
     // Get the subring centers from the bridged rings
         let bridgedRings = this.getBridgedRings();
@@ -1847,14 +1847,14 @@ export default class DrawerBase {
     // TODO: This needs some cleaning up
 
     /**
-   * Creates a new ring, that is, positiones all the vertices inside a ring.
-   *
-   * @param {Ring} ring The ring to position.
-   * @param {(Vector2|null)} [center=null] The center of the ring to be created.
-   * @param {(Vertex|null)} [startVertex=null] The first vertex to be positioned inside the ring.
-   * @param {(Vertex|null)} [previousVertex=null] The last vertex that was positioned.
-   * @param {Boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
-   */
+     * Creates a new ring, that is, positiones all the vertices inside a ring.
+     *
+     * @param {Ring} ring The ring to position.
+     * @param {(Vector2|null)} [center=null] The center of the ring to be created.
+     * @param {(Vertex|null)} [startVertex=null] The first vertex to be positioned inside the ring.
+     * @param {(Vertex|null)} [previousVertex=null] The last vertex that was positioned.
+     * @param {Boolean} [previousVertex=false] A boolean indicating whether or not this ring was force positioned already - this is needed after force layouting a ring, in order to draw rings connected to it.
+     */
     createRing(ring, center = null, startVertex = null, previousVertex = null) {
         if (ring.positioned) {
             return;
@@ -2020,13 +2020,13 @@ export default class DrawerBase {
     }
 
     /**
-   * Rotate an entire subtree by an angle around a center.
-   *
-   * @param {Number} vertexId A vertex id (the root of the sub-tree).
-   * @param {Number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
-   * @param {Number} angle An angle in randians.
-   * @param {Vector2} center The rotational center.
-   */
+     * Rotate an entire subtree by an angle around a center.
+     *
+     * @param {Number} vertexId A vertex id (the root of the sub-tree).
+     * @param {Number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
+     * @param {Number} angle An angle in randians.
+     * @param {Vector2} center The rotational center.
+     */
     rotateSubtree(vertexId, parentVertexId, angle, center) {
         this.graph.traverseTree(vertexId, parentVertexId, (vertex) => {
             vertex.position.rotateAround(angle, center);
@@ -2042,13 +2042,13 @@ export default class DrawerBase {
     }
 
     /**
-   * Gets the overlap score of a subtree.
-   *
-   * @param {Number} vertexId A vertex id (the root of the sub-tree).
-   * @param {Number} parentVertexId A vertex id in the previous direction of the subtree.
-   * @param {Number[]} vertexOverlapScores An array containing the vertex overlap scores indexed by vertex id.
-   * @returns {Object} An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new Vector2() }.
-   */
+     * Gets the overlap score of a subtree.
+     *
+     * @param {Number} vertexId A vertex id (the root of the sub-tree).
+     * @param {Number} parentVertexId A vertex id in the previous direction of the subtree.
+     * @param {Number[]} vertexOverlapScores An array containing the vertex overlap scores indexed by vertex id.
+     * @returns {Object} An object containing the total overlap score and the center of mass of the subtree weighted by overlap score { value: 0.2, center: new Vector2() }.
+     */
     getSubtreeOverlapScore(vertexId, parentVertexId, vertexOverlapScores) {
         let score = 0;
         let center = new Vector2(0, 0);
@@ -2079,10 +2079,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the current (positioned vertices so far) center of mass.
-   *
-   * @returns {Vector2} The current center of mass.
-   */
+     * Returns the current (positioned vertices so far) center of mass.
+     *
+     * @returns {Vector2} The current center of mass.
+     */
     getCurrentCenterOfMass() {
         let total = new Vector2(0, 0);
         let count = 0;
@@ -2100,12 +2100,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
-   *
-   * @param {Vector2} vec The point at which to look for neighbours.
-   * @param {Number} [r=currentBondLength*2.0] The radius of vertices to include.
-   * @returns {Vector2} The current center of mass.
-   */
+     * Returns the current (positioned vertices so far) center of mass in the neighbourhood of a given position.
+     *
+     * @param {Vector2} vec The point at which to look for neighbours.
+     * @param {Number} [r=currentBondLength*2.0] The radius of vertices to include.
+     * @returns {Vector2} The current center of mass.
+     */
     getCurrentCenterOfMassInNeigbourhood(vec, r = this.opts.bondLength * 2.0) {
         let total = new Vector2(0, 0);
         let count = 0;
@@ -2124,8 +2124,8 @@ export default class DrawerBase {
     }
 
     /**
-   * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
-   */
+     * Resolve primary (exact) overlaps, such as two vertices that are connected to the same ring vertex.
+     */
     resolvePrimaryOverlaps() {
         let overlaps = [];
         let done = Array(this.graph.vertices.length);
@@ -2222,12 +2222,12 @@ export default class DrawerBase {
     }
 
     /**
-   * Resolve secondary overlaps. Those overlaps are due to the structure turning back on itself.
-   *
-   * @param {Object[]} scores An array of objects sorted descending by score.
-   * @param {Number} scores[].id A vertex id.
-   * @param {Number} scores[].score The overlap score associated with the vertex id.
-   */
+     * Resolve secondary overlaps. Those overlaps are due to the structure turning back on itself.
+     *
+     * @param {Object[]} scores An array of objects sorted descending by score.
+     * @param {Number} scores[].id A vertex id.
+     * @param {Number} scores[].score The overlap score associated with the vertex id.
+     */
     resolveSecondaryOverlaps(scores) {
         for (let i = 0; i < scores.length; i++) {
             if (scores[i].score > this.opts.overlapSensitivity) {
@@ -2258,10 +2258,10 @@ export default class DrawerBase {
     }
 
     /**
-   * Get the last non-null or 0 angle.
-   * @param {Number} vertexId A vertex id.
-   * @returns {Number} The last angle that was not 0 or null.
-   */
+     * Get the last non-null or 0 angle.
+     * @param {Number} vertexId A vertex id.
+     * @returns {Number} The last angle that was not 0 or null.
+     */
     getLastAngle(vertexId) {
         while (vertexId) {
             let vertex = this.graph.vertices[vertexId];
@@ -2280,14 +2280,14 @@ export default class DrawerBase {
     }
 
     /**
-   * Positiones the next vertex thus creating a bond.
-   *
-   * @param {Vertex} vertex A vertex.
-   * @param {Vertex} [previousVertex=null] The previous vertex which has been positioned.
-   * @param {Number} [angle=0.0] The (global) angle of the vertex.
-   * @param {Boolean} [originShortest=false] Whether the origin is the shortest subtree in the branch.
-   * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
-   */
+     * Positiones the next vertex thus creating a bond.
+     *
+     * @param {Vertex} vertex A vertex.
+     * @param {Vertex} [previousVertex=null] The previous vertex which has been positioned.
+     * @param {Number} [angle=0.0] The (global) angle of the vertex.
+     * @param {Boolean} [originShortest=false] Whether the origin is the shortest subtree in the branch.
+     * @param {Boolean} [skipPositioning=false] Whether or not to skip positioning and just check the neighbours.
+     */
     createNextBond(vertex, previousVertex = null, angle = 0.0, originShortest = false, skipPositioning = false) {
         if (vertex.positioned && !skipPositioning) {
             return;
@@ -2656,11 +2656,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Gets the vetex sharing the edge that is the common bond of two rings.
-   *
-   * @param {Vertex} vertex A vertex.
-   * @returns {(Number|null)} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
-   */
+     * Gets the vetex sharing the edge that is the common bond of two rings.
+     *
+     * @param {Vertex} vertex A vertex.
+     * @returns {(Number|null)} The id of a vertex sharing the edge that is the common bond of two rings with the vertex provided or null, if none.
+     */
     getCommonRingbondNeighbour(vertex) {
         let neighbours = vertex.neighbours;
 
@@ -2676,11 +2676,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Check if a vector is inside any ring.
-   *
-   * @param {Vector2} vec A vector.
-   * @returns {Boolean} A boolean indicating whether or not the point (vector) is inside any of the rings associated with the current molecule.
-   */
+     * Check if a vector is inside any ring.
+     *
+     * @param {Vector2} vec A vector.
+     * @returns {Boolean} A boolean indicating whether or not the point (vector) is inside any of the rings associated with the current molecule.
+     */
     isPointInRing(vec) {
         for (let i = 0; i < this.rings.length; i++) {
             let ring = this.rings[i];
@@ -2701,11 +2701,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Check whether or not an edge is part of a ring.
-   *
-   * @param {Edge} edge An edge.
-   * @returns {Boolean} A boolean indicating whether or not the edge is part of a ring.
-   */
+     * Check whether or not an edge is part of a ring.
+     *
+     * @param {Edge} edge An edge.
+     * @returns {Boolean} A boolean indicating whether or not the edge is part of a ring.
+     */
     isEdgeInRing(edge) {
         let source = this.graph.vertices[edge.sourceId];
         let target = this.graph.vertices[edge.targetId];
@@ -2714,11 +2714,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Check whether or not an edge is rotatable.
-   *
-   * @param {Edge} edge An edge.
-   * @returns {Boolean} A boolean indicating whether or not the edge is rotatable.
-   */
+     * Check whether or not an edge is rotatable.
+     *
+     * @param {Edge} edge An edge.
+     * @returns {Boolean} A boolean indicating whether or not the edge is rotatable.
+     */
     isEdgeRotatable(edge) {
         let vertexA = this.graph.vertices[edge.sourceId];
         let vertexB = this.graph.vertices[edge.targetId];
@@ -2747,11 +2747,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Check whether or not a ring is an implicitly defined aromatic ring (lower case smiles).
-   *
-   * @param {Ring} ring A ring.
-   * @returns {Boolean} A boolean indicating whether or not a ring is implicitly defined as aromatic.
-   */
+     * Check whether or not a ring is an implicitly defined aromatic ring (lower case smiles).
+     *
+     * @param {Ring} ring A ring.
+     * @returns {Boolean} A boolean indicating whether or not a ring is implicitly defined as aromatic.
+     */
     isRingAromatic(ring) {
         for (let i = 0; i < ring.members.length; i++) {
             let vertex = this.graph.vertices[ring.members[i]];
@@ -2765,11 +2765,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Get the normals of an edge.
-   *
-   * @param {Edge} edge An edge.
-   * @returns {Vector2[]} An array containing two vectors, representing the normals.
-   */
+     * Get the normals of an edge.
+     *
+     * @param {Edge} edge An edge.
+     * @returns {Vector2[]} An array containing two vectors, representing the normals.
+     */
     getEdgeNormals(edge) {
         let v1 = this.graph.vertices[edge.sourceId].position;
         let v2 = this.graph.vertices[edge.targetId].position;
@@ -2781,11 +2781,11 @@ export default class DrawerBase {
     }
 
     /**
-   * Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
-   *
-   * @param {Number} vertexId A vertex id.
-   * @returns {Vertex[]} An array of vertices.
-   */
+     * Returns an array of vertices that are neighbouring a vertix but are not members of a ring (including bridges).
+     *
+     * @param {Number} vertexId A vertex id.
+     * @returns {Vertex[]} An array of vertices.
+     */
     getNonRingNeighbours(vertexId) {
         let nrneighbours = [];
         let vertex = this.graph.vertices[vertexId];
@@ -2804,8 +2804,8 @@ export default class DrawerBase {
     }
 
     /**
-   * Annotaed stereochemistry information for visualization.
-   */
+     * Annotaed stereochemistry information for visualization.
+     */
     annotateStereochemistry() {
         let maxDepth = 10;
 
@@ -2983,15 +2983,15 @@ export default class DrawerBase {
     }
 
     /**
-   *
-   *
-   * @param {Number} vertexId The id of a vertex.
-   * @param {(Number|null)} previousVertexId The id of the parent vertex of the vertex.
-   * @param {Uint8Array} visited An array containing the visited flag for all vertices in the graph.
-   * @param {Array} priority An array of arrays storing the atomic numbers for each level.
-   * @param {Number} maxDepth The maximum depth.
-   * @param {Number} depth The current depth.
-   */
+     *
+     *
+     * @param {Number} vertexId The id of a vertex.
+     * @param {(Number|null)} previousVertexId The id of the parent vertex of the vertex.
+     * @param {Uint8Array} visited An array containing the visited flag for all vertices in the graph.
+     * @param {Array} priority An array of arrays storing the atomic numbers for each level.
+     * @param {Number} maxDepth The maximum depth.
+     * @param {Number} depth The current depth.
+     */
     visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth, parentAtomicNumber = 0) {
         visited[vertexId] = 1;
         let vertex = this.graph.vertices[vertexId];
@@ -3032,9 +3032,9 @@ export default class DrawerBase {
     }
 
     /**
-   * Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
-   * the involved atoms not to be displayed.
-   */
+     * Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
+     * the involved atoms not to be displayed.
+     */
     initPseudoElements() {
         for (let i = 0; i < this.graph.vertices.length; i++) {
             const vertex = this.graph.vertices[i];
@@ -3164,6 +3164,6 @@ export default class DrawerBase {
         }
       }
     }
-    */
+      */
     }
 }

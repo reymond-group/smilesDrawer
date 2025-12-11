@@ -151,17 +151,17 @@ export default class SvgWrapper {
     }
 
     /**
-   * Add a background to the svg.
-   */
+     * Add a background to the svg.
+     */
     addLayer(svg) {
         this.backgroundItems.push(svg.firstChild);
     }
 
     /**
-   * Create a linear gradient to apply to a line
-   *
-   * @param {Line} line the line to apply the gradiation to.
-   */
+     * Create a linear gradient to apply to a line
+     *
+     * @param {Line} line the line to apply the gradiation to.
+     */
     createGradient(line) {
     // create the gradient and add it
         let gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'),
@@ -197,12 +197,12 @@ export default class SvgWrapper {
     }
 
     /**
-   * Create a tspan element for sub or super scripts that styles the text
-   * appropriately as one of those text types.
-   *
-   * @param {String} text the actual text
-   * @param {String} shift the type of text, either 'sub', or 'super'
-   */
+     * Create a tspan element for sub or super scripts that styles the text
+     * appropriately as one of those text types.
+     *
+     * @param {String} text the actual text
+     * @param {String} shift the type of text, either 'sub', or 'super'
+     */
     createSubSuperScripts(text, shift) {
         let elem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
         elem.setAttributeNS(null, 'baseline-shift', shift);
@@ -233,10 +233,10 @@ export default class SvgWrapper {
     }
 
     /**
-   * Determine drawing dimensiosn based on vertex positions.
-   *
-   * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
-   */
+     * Determine drawing dimensiosn based on vertex positions.
+     *
+     * @param {Vertex[]} vertices An array of vertices containing the vertices associated with the current molecule.
+     */
     determineDimensions(vertices) {
         for (let i = 0; i < vertices.length; i++) {
             if (!vertices[i].value.isDrawn) {
@@ -291,12 +291,12 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draw an svg ellipse as a ball.
-   *
-   * @param {Number} x The x position of the text.
-   * @param {Number} y The y position of the text.
-   * @param {String} elementName The name of the element (single-letter).
-   */
+     * Draw an svg ellipse as a ball.
+     *
+     * @param {Number} x The x position of the text.
+     * @param {Number} y The y position of the text.
+     * @param {String} elementName The name of the element (single-letter).
+     */
     drawBall(x, y, elementName) {
         let r = this.opts.bondLength / 4.5;
 
@@ -326,8 +326,8 @@ export default class SvgWrapper {
     }
 
     /**
-   * @param {Line} line the line object to create the wedge from
-   */
+     * @param {Line} line the line object to create the wedge from
+     */
     drawWedge(line) {
         let l = line.getLeftVector().clone(),
             r = line.getRightVector().clone();
@@ -360,11 +360,11 @@ export default class SvgWrapper {
     }
 
     /* Draw a highlight for an atom
-   *
-   *  @param {Number} x The x position of the highlight
-   *  @param {Number} y The y position of the highlight
-   *  @param {string} color The color of the highlight, default #03fc9d
-   */
+     *
+     *  @param {Number} x The x position of the highlight
+     *  @param {Number} y The y position of the highlight
+     *  @param {string} color The color of the highlight, default #03fc9d
+     */
     drawAtomHighlight(x, y, color = '#03fc9d') {
         let ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         ball.setAttributeNS(null, 'cx', x);
@@ -376,10 +376,10 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draw a dashed wedge on the canvas.
-   *
-   * @param {Line} line A line.
-   */
+     * Draw a dashed wedge on the canvas.
+     *
+     * @param {Line} line A line.
+     */
     drawDashedWedge(line) {
         if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
@@ -426,13 +426,13 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draws a debug dot at a given coordinate and adds text.
-   *
-   * @param {Number} x The x coordinate.
-   * @param {Number} y The y coordindate.
-   * @param {String} [debugText=''] A string.
-   * @param {String} [color='#f00'] A color in hex form.
-   */
+     * Draws a debug dot at a given coordinate and adds text.
+     *
+     * @param {Number} x The x coordinate.
+     * @param {Number} y The y coordindate.
+     * @param {String} [debugText=''] A string.
+     * @param {String} [color='#f00'] A color in hex form.
+     */
     drawDebugPoint(x, y, debugText = '', color = '#f00') {
         let point = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         point.setAttributeNS(null, 'cx', x);
@@ -444,12 +444,12 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draws a debug text message at a given position
-   *
-   * @param {Number} x The x coordinate.
-   * @param {Number} y The y coordinate.
-   * @param {String} text The debug text.
-   */
+     * Draws a debug text message at a given position
+     *
+     * @param {Number} x The x coordinate.
+     * @param {Number} y The y coordinate.
+     * @param {String} text The debug text.
+     */
     drawDebugText(x, y, text) {
         let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textElem.setAttributeNS(null, 'x', x);
@@ -465,12 +465,12 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draws a ring.
-   *
-   * @param {x} x The x coordinate of the ring.
-   * @param {y} r The y coordinate of the ring.
-   * @param {s} s The size of the ring.
-   */
+     * Draws a ring.
+     *
+     * @param {x} x The x coordinate of the ring.
+     * @param {y} r The y coordinate of the ring.
+     * @param {s} s The size of the ring.
+     */
     drawRing(x, y, s) {
         let circleElem = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         let radius = MathHelper.apothemFromSideLength(this.opts.bondLength, s);
@@ -484,12 +484,12 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draws a line.
-   *
-   * @param {Line} line A line.
-   * @param {Boolean} dashed defaults to false.
-   * @param {String} gradient gradient url. Defaults to null.
-   */
+     * Draws a line.
+     *
+     * @param {Line} line A line.
+     * @param {Boolean} dashed defaults to false.
+     * @param {String} gradient gradient url. Defaults to null.
+     */
     drawLine(line, dashed = false, gradient = null, linecap = 'round') {
         let stylesArr = [
                 ['stroke-width', this.opts.bondThickness],
@@ -520,12 +520,12 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draw a point.
-   *
-   * @param {Number} x The x position of the point.
-   * @param {Number} y The y position of the point.
-   * @param {String} elementName The name of the element (single-letter).
-   */
+     * Draw a point.
+     *
+     * @param {Number} x The x position of the point.
+     * @param {Number} y The y position of the point.
+     * @param {String} elementName The name of the element (single-letter).
+     */
     drawPoint(x, y, elementName) {
         let r = 0.75;
 
@@ -563,22 +563,22 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draw a text to the canvas.
-   *
-   * @param {Number} x The x position of the text.
-   * @param {Number} y The y position of the text.
-   * @param {String} elementName The name of the element (single-letter).
-   * @param {Number} hydrogens The number of hydrogen atoms.
-   * @param {String} direction The direction of the text in relation to the associated vertex.
-   * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
-   * @param {Number} charge The charge of the atom.
-   * @param {Number} isotope The isotope number.
-   * @param {Number} totalVertices The total number of vertices in the graph.
-   * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
-   * @param {String} attachedPseudoElement.element The element symbol.
-   * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
-   * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
-   */
+     * Draw a text to the canvas.
+     *
+     * @param {Number} x The x position of the text.
+     * @param {Number} y The y position of the text.
+     * @param {String} elementName The name of the element (single-letter).
+     * @param {Number} hydrogens The number of hydrogen atoms.
+     * @param {String} direction The direction of the text in relation to the associated vertex.
+     * @param {Boolean} isTerminal A boolean indicating whether or not the vertex is terminal.
+     * @param {Number} charge The charge of the atom.
+     * @param {Number} isotope The isotope number.
+     * @param {Number} totalVertices The total number of vertices in the graph.
+     * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
+     * @param {String} attachedPseudoElement.element The element symbol.
+     * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
+     * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
+     */
     drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, totalVertices, attachedPseudoElement = {}) {
         let text = [];
         let display = elementName;
@@ -633,7 +633,7 @@ export default class SvgWrapper {
     }
 
     write(text, direction, x, y, singleVertex) {
-    // Measure element name only, without charge or isotope ...
+        // Measure element name only, without charge or isotope ...
         let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
 
         // ... but for direction left move to the right to
@@ -773,9 +773,9 @@ export default class SvgWrapper {
     }
 
     /**
-   * Draw the wrapped SVG to a canvas.
-   * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
-   */
+     * Draw the wrapped SVG to a canvas.
+     * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
+     */
     toCanvas(canvas, width, height) {
         if (typeof canvas === 'string' || canvas instanceof String) {
             canvas = document.getElementById(canvas);
@@ -839,15 +839,15 @@ export default class SvgWrapper {
     }
 
     /**
-   * Convert an SVG to a canvas. Warning: This happens async!
-   *
-   * @param {SVGElement} svg
-   * @param {HTMLCanvasElement} canvas
-   * @param {Number} width
-   * @param {Number} height
-   * @param {CallableFunction} callback
-   * @returns {HTMLCanvasElement} The input html canvas element after drawing to.
-   */
+     * Convert an SVG to a canvas. Warning: This happens async!
+     *
+     * @param {SVGElement} svg
+     * @param {HTMLCanvasElement} canvas
+     * @param {Number} width
+     * @param {Number} height
+     * @param {CallableFunction} callback
+     * @returns {HTMLCanvasElement} The input html canvas element after drawing to.
+     */
     static svgToCanvas(svg, canvas, width, height, callback = null) {
         svg.setAttributeNS(null, 'width', width);
         svg.setAttributeNS(null, 'height', height);
@@ -875,13 +875,13 @@ export default class SvgWrapper {
     }
 
     /**
-   * Convert an SVG to a canvas. Warning: This happens async!
-   *
-   * @param {SVGElement} svg
-   * @param {HTMLImageElement} canvas
-   * @param {Number} width
-   * @param {Number} height
-   */
+     * Convert an SVG to a canvas. Warning: This happens async!
+     *
+     * @param {SVGElement} svg
+     * @param {HTMLImageElement} canvas
+     * @param {Number} width
+     * @param {Number} height
+     */
     static svgToImg(svg, img, width, height) {
         let canvas = document.createElement('canvas');
         this.svgToCanvas(svg, canvas, width, height, () => {
@@ -890,21 +890,21 @@ export default class SvgWrapper {
     }
 
     /**
-   * Create an SVG element containing text.
-   * @param {String} text
-   * @param {*} themeManager
-   * @param {*} options
-   * @returns {{svg: SVGElement, width: Number, height: Number}} The SVG element containing the text and its dimensions.
-   */
+     * Create an SVG element containing text.
+     * @param {String} text
+     * @param {*} themeManager
+     * @param {*} options
+     * @returns {{svg: SVGElement, width: Number, height: Number}} The SVG element containing the text and its dimensions.
+     */
     static writeText(text, themeManager, fontSize, fontFamily, maxWidth = Number.MAX_SAFE_INTEGER) {
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         let style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
         style.appendChild(document.createTextNode(`
-        .text {
-            font: ${fontSize}pt ${fontFamily};
-            dominant-baseline: ideographic;
-        }
-    `));
+            .text {
+                font: ${fontSize}pt ${fontFamily};
+                dominant-baseline: ideographic;
+            }
+        `));
         svg.appendChild(style);
 
         let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
