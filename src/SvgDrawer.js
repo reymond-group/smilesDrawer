@@ -162,7 +162,7 @@ export default class SvgDrawer {
         });
 
         // Draw ring for implicitly defined aromatic rings
-        if (!this.bridgedRing) {
+        if (!preprocessor.bridgedRing) {
             for (let i = 0; i < rings.length; i++) {
                 let ring = rings[i];
 
