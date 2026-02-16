@@ -492,9 +492,9 @@ export default class SvgWrapper {
      */
     drawLine(line, dashed = false, gradient = null, linecap = 'round') {
         let stylesArr = [
-                ['stroke-width', this.opts.bondThickness],
+                ['stroke-width', dashed ? this.opts.bondThickness * 0.6 : this.opts.bondThickness],
                 ['stroke-linecap', linecap],
-                ['stroke-dasharray', dashed ? '5, 5' : 'none'],
+                ['stroke-dasharray', dashed ? '2, 2' : 'none'],
             ],
             l = line.getLeftVector(),
             r = line.getRightVector(),
