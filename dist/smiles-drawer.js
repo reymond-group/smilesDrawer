@@ -6727,7 +6727,7 @@
     static getRings(graph, experimental = false) {
       let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
       if (adjacencyMatrix.length === 0) {
-        return null;
+        return [];
       }
       let connectedComponents = Graph.getConnectedComponents(adjacencyMatrix);
       let rings = [];
@@ -7908,8 +7908,8 @@
         }
       }
       let rings = SSSR.getRings(this.graph, this.opts.experimentalSSSR);
-      if (rings === null) {
-        throw new Error("Could not detect ring systems: the graph has no connected components.");
+      if (rings === null || rings.length === 0) {
+        return;
       }
       for (let i = 0; i < rings.length; i++) {
         let ringVertices = [...rings[i]];
@@ -10316,7 +10316,7 @@
         if (pe.count > 1) {
           pe_display += _SvgWrapper.createUnicodeSubscript(pe.count);
         }
-        if (pe.charge !== "" && pe.charge !== 0) {
+        if (pe.charge) {
           pe_display += _SvgWrapper.createUnicodeCharge(pe.charge);
         }
         text.push([pe_display, pe.element]);

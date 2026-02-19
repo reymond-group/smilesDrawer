@@ -620,7 +620,7 @@ export default class SvgWrapper {
                 pe_display += SvgWrapper.createUnicodeSubscript(pe.count);
             }
 
-            if (pe.charge !== '' && pe.charge !== 0) {
+            if (pe.charge) {
                 pe_display += SvgWrapper.createUnicodeCharge(pe.charge);
             }
 

@@ -13,7 +13,7 @@ export default class SSSR {
     static getRings(graph, experimental = false) {
         let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
         if (adjacencyMatrix.length === 0) {
-            return null;
+            return [];
         }
 
         let connectedComponents = Graph.getConnectedComponents(adjacencyMatrix);

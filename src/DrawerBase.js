@@ -796,8 +796,8 @@ export default class DrawerBase {
         // Get the rings in the graph (the SSSR)
         let rings = SSSR.getRings(this.graph, this.opts.experimentalSSSR);
 
-        if (rings === null) {
-            throw new Error('Could not detect ring systems: the graph has no connected components.');
+        if (rings === null || rings.length === 0) {
+            return;
         }
 
         for (let i = 0; i < rings.length; i++) {
