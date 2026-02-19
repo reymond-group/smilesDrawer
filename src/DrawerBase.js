@@ -797,7 +797,7 @@ export default class DrawerBase {
         let rings = SSSR.getRings(this.graph, this.opts.experimentalSSSR);
 
         if (rings === null) {
-            return;
+            throw new Error('Could not detect ring systems: the graph has no connected components.');
         }
 
         for (let i = 0; i < rings.length; i++) {
@@ -2361,6 +2361,28 @@ export default class DrawerBase {
 
                         if (v.positioned && this.areVerticesInSameRing(v, previousVertex)) {
                             pos.add(Vector2.subtract(v.position, previousVertex.position));
+                        }
+                    }
+
+                    // When ring neighbors cancel out (e.g. bridgehead with 3
+                    // neighbors at ~120°), the sum is near-zero and normalize()
+                    // would produce Infinity. Fall back to pointing away from
+                    // the ring center.
+                    if (pos.lengthSq() < 1.0) {
+                        let ring = null;
+                        if (previousVertex.value.bridgedRing !== null) {
+                            ring = this.getRing(previousVertex.value.bridgedRing);
+                        } else {
+                            ring = this.getRing(previousVertex.value.rings[0]);
+                        }
+                        if (ring && ring.center) {
+                            // Vector from center to vertex (away from ring), then
+                            // invert below makes it toward center — but we want
+                            // away, so use center-to-vertex AFTER invert:
+                            // pos = center - vertex → invert → vertex - center = away ✓
+                            pos = Vector2.subtract(ring.center, previousVertex.position);
+                        } else {
+                            pos = new Vector2(1.0, 0.0);
                         }
                     }
 

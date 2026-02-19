@@ -81,9 +81,21 @@ export default class RingConnection {
             return true;
         }
 
-        for (let vertexId of this.vertices) {
-            if (vertices[vertexId].value.rings.length > 2) {
-                return true;
+        // For 2 shared atoms, check if they form a triangle with a common
+        // neighbor that's in one of the two rings. This detects bridged
+        // bicyclic systems (e.g. norbornane, oxanorbornane) where SSSR
+        // produces a small ring and a large ring sharing 2 bridgehead atoms.
+        if (this.vertices.size === 2) {
+            let [v1, v2] = [...this.vertices];
+            let v2NeighbourSet = new Set(vertices[v2].neighbours);
+
+            for (let n of vertices[v1].neighbours) {
+                if (n !== v2 && v2NeighbourSet.has(n)) {
+                    let nRings = vertices[n].value.rings;
+                    if (nRings.includes(this.firstRingId) || nRings.includes(this.secondRingId)) {
+                        return true;
+                    }
+                }
             }
         }
 

@@ -377,6 +377,7 @@ export default class Graph {
         for (let i = 0; i < length; i++) {
             dist[i] = Array(length);
             dist[i].fill(Infinity);
+            dist[i][i] = 0;
         }
 
         for (let i = 0; i < length; i++) {
@@ -594,7 +595,10 @@ export default class Graph {
         let length = vertexIds.length;
 
         // Initialize the positions. Place all vertices on a ring around the center
-        let radius = MathHelper.polyCircumradius(500, length);
+        // Use bondLength (not 500) so initial positions are at the correct scale
+        // for convergence. Using 500 creates a ~19x oversized initial spread that
+        // causes severe convergence issues for small bridged rings.
+        let radius = MathHelper.polyCircumradius(bondLength, length);
         let angle = MathHelper.centralAngle(length);
         let a = 0.0;
         let arrPositionX = new Float32Array(length);
@@ -740,9 +744,24 @@ export default class Graph {
                 dxy = 0.1;
             }
 
-            let dy = (dEX / dxx + dEY / dxy);
-            dy /= (dxy / dxx - dyy / dxy); // had to split this onto two lines because the syntax highlighter went crazy.
-            let dx = -(dxy * dy + dEX) / dxx;
+            let denom = (dxy / dxx - dyy / dxy);
+            let dy, dx;
+            if (Math.abs(denom) < 1e-6) {
+                // Degenerate case: fall back to simple gradient descent
+                dx = -dEX * 0.1;
+                dy = -dEY * 0.1;
+            } else {
+                dy = (dEX / dxx + dEY / dxy) / denom;
+                dx = -(dxy * dy + dEX) / dxx;
+            }
+
+            // Clamp step size to prevent extreme jumps
+            let stepLen = Math.sqrt(dx * dx + dy * dy);
+            if (stepLen > bondLength) {
+                let scale = bondLength / stepLen;
+                dx *= scale;
+                dy *= scale;
+            }
 
             arrPositionX[index] += dx;
             arrPositionY[index] += dy;
