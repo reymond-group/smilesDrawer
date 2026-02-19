@@ -102,8 +102,13 @@ export default class SvgWrapper {
             masks.appendChild(mask);
         }
 
-        // give the mask an id
+        // give the mask an id and set bounds explicitly for userSpaceOnUse
         masks.setAttributeNS(null, 'id', this.uid + '-text-mask');
+        masks.setAttributeNS(null, 'maskUnits', 'userSpaceOnUse');
+        masks.setAttributeNS(null, 'x', this.minX);
+        masks.setAttributeNS(null, 'y', this.minY);
+        masks.setAttributeNS(null, 'width', this.maxX - this.minX);
+        masks.setAttributeNS(null, 'height', this.maxY - this.minY);
 
         for (let path of pathChildNodes) {
             paths.appendChild(path);
@@ -615,8 +620,8 @@ export default class SvgWrapper {
                 pe_display += SvgWrapper.createUnicodeSubscript(pe.count);
             }
 
-            if (pe.charge !== '') {
-                pe_display += SvgWrapper.createUnicodeCharge(charge);
+            if (pe.charge) {
+                pe_display += SvgWrapper.createUnicodeCharge(pe.charge);
             }
 
             text.push([pe_display, pe.element]);
@@ -636,9 +641,11 @@ export default class SvgWrapper {
         // Measure element name only, without charge or isotope ...
         let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
 
-        // ... but for direction left move to the right to
+        // For left-direction text with charges/isotopes, account for
+        // the extra width from decorations without inflating the bbox
         if (direction === 'left' && text[0][0] !== text[0][1]) {
-            bbox.width *= 2.0;
+            let fullBbox = SvgWrapper.measureText(text[0][0], this.opts.fontSizeLarge, this.opts.fontFamily);
+            bbox.width = fullBbox.width;
         }
 
         // Get the approximate width and height of text and add update max/min

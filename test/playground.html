@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>SmilesDrawer Playground</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f5f5f5; padding: 20px; }
+        h1 { font-size: 18px; margin-bottom: 12px; }
+        .controls { display: flex; gap: 8px; margin-bottom: 16px; }
+        #smiles-input { flex: 1; padding: 8px 12px; font-size: 14px; font-family: monospace;
+                        border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 16px; font-size: 14px; border: none; border-radius: 4px;
+                 cursor: pointer; background: #2563eb; color: white; }
+        button:hover { background: #1d4ed8; }
+        #theme-toggle { background: #555; }
+        .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .mol-card { background: white; border-radius: 6px; padding: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .mol-card svg { display: block; }
+        .mol-label { font-size: 11px; color: #666; font-family: monospace; margin-top: 4px;
+                     max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .error { color: #dc2626; font-size: 12px; margin-top: 4px; }
+        #presets { margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .preset { padding: 4px 10px; font-size: 12px; background: #e5e7eb; border: none;
+                  border-radius: 12px; cursor: pointer; }
+        .preset:hover { background: #d1d5db; }
+    </style>
+</head>
+<body>
+    <h1>SmilesDrawer Playground</h1>
+    <div class="controls">
+        <input id="smiles-input" type="text" placeholder="Enter SMILES string..." value="CC1C(=O)NCCN1C(=O)C1(CNC(=O)[C@@H]2[C@H]3CCOC[C@H]32)CC=CC1">
+        <button onclick="drawSmiles()">Draw</button>
+        <button id="theme-toggle" onclick="toggleTheme()">Theme: light</button>
+        <button onclick="drawAll()">Draw All Presets</button>
+    </div>
+    <div id="presets"></div>
+    <div id="output" class="grid"></div>
+
+    <script src="../dist/smiles-drawer.js"></script>
+    <script>
+        let currentTheme = 'light';
+
+        const presets = {
+            // The molecule from the bug report
+            'oxanorbornane (bug)': 'CC1C(=O)NCCN1C(=O)C1(CNC(=O)[C@@H]2[C@H]3CCOC[C@H]32)CC=CC1',
+            // Simple molecules
+            'methanol': 'CO',
+            'ethane': 'CC',
+            'acetic acid': 'CC(=O)O',
+            // Rings
+            'benzene': 'c1ccccc1',
+            'naphthalene': 'c1ccc2ccccc2c1',
+            'cyclohexane': 'C1CCCCC1',
+            // Bridged rings
+            'norbornane': 'C1CC2CC1CC2',
+            'camphor': 'CC1(C)C2CCC1(C)C(=O)C2',
+            // Fused rings
+            'indole': 'c1ccc2[nH]ccc2c1',
+            'anthracene': 'c1ccc2cc3ccccc3cc2c1',
+            // Drugs
+            'aspirin': 'CC(=O)Oc1ccccc1C(=O)O',
+            'caffeine': 'Cn1cnc2c1c(=O)n(c(=O)n2C)C',
+            'ibuprofen': 'CC(C)Cc1ccc(cc1)C(C)C(=O)O',
+            'nicotine': 'CN1CCC[C@H]1c1cccnc1',
+            'penicillin G': 'CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)Cc1ccccc1)C(=O)O)C',
+            // Issue molecules
+            '#162 polyphenyl': 'C(C1=CC=CC=C1)1=CC=C(C2C=CC(C3C=CC(C4C=CC(C5C=CC=CC=5)=CC=4)=CC=3)=CC=2)C=C1',
+            '#209 pseudo charge': 'CCS(=O)(=O)[O-]',
+            '#217 stereo': 'C/C(=C\\C(=O)OC)/C1=CC=C(C=C1)C(C)(F)F',
+            '#188 fused rings': 'O(C(c1cccc2c1cccc2)c3cccc4ccccc34)C(C(C)Sc5ccc(cc5)Br)=O',
+            // Charged / salts
+            'NaCl': '[Na+].[Cl-]',
+            '[NH4]+': '[NH4+]',
+            // Stereo
+            'L-alanine': 'N[C@@H](C)C(=O)O',
+            'cholesterol': 'C([C@@H]1CC2=CC(O)CC[C@@]2(C)[C@H]1[C@H]1CC[C@@]2([C@@H]1CC1=C)[C@H](C)CC[C@H]2C)C',
+            // Complex
+            'glucose': 'OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O',
+            'vancomycin partial': 'CC(O)C(NC(=O)C1CC(=O)N1)C(=O)NCC(=O)O',
+        };
+
+        // Build preset buttons
+        const presetsDiv = document.getElementById('presets');
+        for (const [name, smiles] of Object.entries(presets)) {
+            const btn = document.createElement('button');
+            btn.className = 'preset';
+            btn.textContent = name;
+            btn.onclick = () => {
+                document.getElementById('smiles-input').value = smiles;
+                drawSmiles();
+            };
+            presetsDiv.appendChild(btn);
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.getElementById('theme-toggle').textContent = 'Theme: ' + currentTheme;
+            if (currentTheme === 'dark') {
+                document.body.style.background = '#1a1a1a';
+                document.body.style.color = '#eee';
+            } else {
+                document.body.style.background = '#f5f5f5';
+                document.body.style.color = '#000';
+            }
+        }
+
+        function drawSingle(smiles, label) {
+            const card = document.createElement('div');
+            card.className = 'mol-card';
+            if (currentTheme === 'dark') card.style.background = '#2a2a2a';
+
+            try {
+                const drawer = new SmilesDrawer.SmiDrawer({ width: 300, height: 300 });
+                const svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svgEl.setAttribute('width', '300');
+                svgEl.setAttribute('height', '300');
+                card.appendChild(svgEl);
+                drawer.draw(smiles, svgEl, currentTheme);
+            } catch (e) {
+                const err = document.createElement('div');
+                err.className = 'error';
+                err.textContent = 'Error: ' + e.message;
+                card.appendChild(err);
+            }
+
+            const lbl = document.createElement('div');
+            lbl.className = 'mol-label';
+            lbl.textContent = label || smiles;
+            lbl.title = smiles;
+            card.appendChild(lbl);
+
+            return card;
+        }
+
+        function drawSmiles() {
+            const smiles = document.getElementById('smiles-input').value.trim();
+            if (!smiles) return;
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+            output.appendChild(drawSingle(smiles, smiles));
+        }
+
+        function drawAll() {
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+            for (const [name, smiles] of Object.entries(presets)) {
+                output.appendChild(drawSingle(smiles, name + ': ' + smiles));
+            }
+        }
+
+        // Draw initial molecule
+        drawSmiles();
+    </script>
+</body>
+</html>

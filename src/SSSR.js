@@ -13,7 +13,7 @@ export default class SSSR {
     static getRings(graph, experimental = false) {
         let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
         if (adjacencyMatrix.length === 0) {
-            return null;
+            return [];
         }
 
         let connectedComponents = Graph.getConnectedComponents(adjacencyMatrix);
@@ -46,10 +46,6 @@ export default class SSSR {
 
             let nSssr = nEdges - ccAdjacencyMatrix.length + 1;
 
-            // console.log(nEdges, ccAdjacencyMatrix.length, nSssr);
-            // console.log(SSSR.getEdgeList(ccAdjacencyMatrix));
-            // console.log(ccAdjacencyMatrix);
-
             // If all vertices have 3 incident edges, calculate with different formula (see Euler)
             let allThree = true;
             for (let j = 0; j < arrBondCount.length; j++) {
@@ -76,6 +72,15 @@ export default class SSSR {
             let c = SSSR.getRingCandidates(d, pe, pe_prime);
             let sssr = SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
 
+            // If the SSSR algorithm found fewer rings than expected,
+            // supplement with BFS-based ring finding for missing cycles.
+            if (sssr.length < nSssr) {
+                let missing = SSSR.findMissingRings(ccAdjacencyMatrix, sssr, nSssr);
+                for (let j = 0; j < missing.length; j++) {
+                    sssr.push(missing[j]);
+                }
+            }
+
             for (let j = 0; j < sssr.length; j++) {
                 let ring = Array(sssr[j].size);
                 let index = 0;
@@ -92,6 +97,12 @@ export default class SSSR {
         // So, for some reason, this would return three rings for C1CCCC2CC1CCCC2, which is wrong
         // As I don't have time to fix this properly, it will stay in. I'm sorry next person who works
         // on it. At that point it might be best to reimplement the whole SSSR thing...
+
+        // The error is SSSR would compute the correct expected ring count but actually return fewer rings 
+        // than expected. Fix is add BFS post SSSR to recover via findMissingRings() -which is probably a better fix 
+        // than rewriting SSSR entirely at least for now-, it finds uncovered edges and use shortest cycle (BFS) to fill 
+        // the missing rings. 
+        
         return rings;
     }
 
@@ -576,5 +587,137 @@ export default class SSSR {
         }
 
         return true;
+    }
+
+    /**
+     * Find missing rings using BFS when the main SSSR algorithm falls short.
+     * For each edge not covered by existing rings, find the shortest cycle
+     * containing that edge.
+     *
+     * @static
+     * @param {Array[]} adjacencyMatrix 
+     * @param {Set[]} existingRings The rings already found by the SSSR algorithm.
+     * @param {Number} nSssr The expected number of rings.
+     * @returns {Set[]} newly found rings 
+     */
+    static findMissingRings(adjacencyMatrix, existingRings, nSssr) {
+        let length = adjacencyMatrix.length;
+        let newRings = [];
+
+        // Collect edges already covered by existing rings
+        let coveredEdges = new Set();
+        for (let ring of existingRings) {
+            let members = [...ring];
+            for (let k = 0; k < members.length; k++) {
+                for (let l = k + 1; l < members.length; l++) {
+                    if (adjacencyMatrix[members[k]][members[l]] === 1) {
+                        let a = Math.min(members[k], members[l]);
+                        let b = Math.max(members[k], members[l]);
+                        coveredEdges.add(a + ',' + b);
+                    }
+                }
+            }
+        }
+
+        // For each edge not in any existing ring, find shortest cycle through it
+        for (let u = 0; u < length; u++) {
+            for (let v = u + 1; v < length; v++) {
+                if (adjacencyMatrix[u][v] !== 1) continue;
+
+                let edgeKey = u + ',' + v;
+                if (coveredEdges.has(edgeKey)) continue;
+
+                // BFS from u to v without using edge u-v directly
+                let cycle = SSSR.bfsShortestCycle(adjacencyMatrix, u, v, length);
+                if (cycle !== null) {
+                    let ringSet = new Set(cycle);
+
+                    // Check it's not a duplicate of existing rings
+                    let isDuplicate = false;
+                    for (let existing of existingRings) {
+                        if (SSSR.areSetsEqual(ringSet, existing)) {
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+                    for (let nr of newRings) {
+                        if (SSSR.areSetsEqual(ringSet, nr)) {
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+
+                    if (!isDuplicate) {
+                        newRings.push(ringSet);
+                        // Mark this ring's edges as covered
+                        let members = [...ringSet];
+                        for (let k = 0; k < members.length; k++) {
+                            for (let l = k + 1; l < members.length; l++) {
+                                if (adjacencyMatrix[members[k]][members[l]] === 1) {
+                                    let a = Math.min(members[k], members[l]);
+                                    let b = Math.max(members[k], members[l]);
+                                    coveredEdges.add(a + ',' + b);
+                                }
+                            }
+                        }
+
+                        if (existingRings.length + newRings.length >= nSssr) {
+                            return newRings;
+                        }
+                    }
+                }
+            }
+        }
+
+        return newRings;
+    }
+
+    /**
+     * BFS to find shortest path from u to v without using the direct u-v edge.
+     * Returns the cycle as an array of vertex indices, or null if no path exists.
+     *
+     * @static
+     * @param {Array[]} adjacencyMatrix The adjacency matrix.
+     * @param {Number} u Source vertex.
+     * @param {Number} v Target vertex.
+     * @param {Number} length Number of vertices.
+     * @returns {Number[]|null} The cycle vertices, or null.
+     */
+    static bfsShortestCycle(adjacencyMatrix, u, v, length) {
+        let visited = new Array(length).fill(false);
+        let parent = new Array(length).fill(-1);
+        let queue = [u];
+        visited[u] = true;
+
+        while (queue.length > 0) {
+            let current = queue.shift();
+
+            for (let neighbor = 0; neighbor < length; neighbor++) {
+                if (adjacencyMatrix[current][neighbor] !== 1) continue;
+
+                // Skip the direct u-v edge
+                if (current === u && neighbor === v) continue;
+                if (current === v && neighbor === u) continue;
+
+                if (neighbor === v) {
+                    // Found the path, reconstruct
+                    let path = [v];
+                    let node = current;
+                    while (node !== -1) {
+                        path.push(node);
+                        node = parent[node];
+                    }
+                    return path;
+                }
+
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    parent[neighbor] = current;
+                    queue.push(neighbor);
+                }
+            }
+        }
+
+        return null;
     }
 }
