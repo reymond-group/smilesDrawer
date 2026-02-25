@@ -1,17 +1,114 @@
 import formulaToCommonName from './FormulaToCommonName';
-import Options             from './Options.js';
+// import Graph               from './Graph';
+import Options             from './Options';
+import Reaction            from './Reaction';
 import SvgDrawer           from './SvgDrawer';
 import SvgWrapper          from './SvgWrapper';
 import ThemeManager        from './ThemeManager';
 
+type ColorMap = {
+    FOREGROUND: string
+    BACKGROUND: string
+};
+
+type ThemeMap = {
+    [index: string]: ColorMap
+};
+
+type MoleculeOptions = {
+    width:   number
+    height:  number
+    padding: number
+    scale:   number
+
+    atomVisualization: string
+    terminalCarbons:   boolean
+    explicitHydrogens: boolean
+    compactDrawing:    boolean
+
+    bondLength:      number
+    bondThickness:   number
+    shortBondLength: number
+    bondSpacing:     number
+    fontFamily:      string
+    fontSizeLarge:   number
+    fontSizeSmall:   number
+
+    isomeric:                    boolean
+    debug:                       boolean
+    overlapSensitivity:          number
+    overlapResolutionIterations: number
+    experimentalSSSR:            boolean
+
+    kkThreshold:         number
+    kkInnerThreshold:    number
+    kkMaxIteration:      number
+    kkMaxInnerIteration: number
+    kkMaxEnergy:         number
+
+    // weights: type TypeName {
+    //     colormap:          null // ???
+    //     additionalPadding: number
+    //     sigma:             number
+    //     interval:          number
+    //     opacity:           number
+    // }
+
+    themes: ThemeMap
+};
+
+type ReactionOptions = {
+    scale?:      number
+    fontSize?:   number
+    fontFamily?: string
+    spacing?:    number
+
+    plus?: {
+        size?:      number
+        thickness?: number
+    }
+
+    arrow?: {
+        length?:    number
+        headSize?:  number
+        thickness?: number
+        margin?:    number
+    }
+
+    weights?: {
+        normalize?: boolean
+    }
+};
+
+type ReactionWeights = {
+    reactants?: number[][]
+    reagents?:  number[][]
+    products?:  number[][]
+};
+
+// function createSvgElement(name: string, attributes: object): SVGElement {
+//     const element = document.createElementNS('http://www.w3.org/2000/svg', name)
+//     for (const [attribute, value] of Object.entries(attributes)) {
+//         element.setAttributeNS(null, attribute, value.toString())
+//     }
+
+//     return element
+// }
+
 export default class ReactionDrawer {
+    defaultOptions: ReactionOptions;
+    drawer:         SvgDrawer;
+    molOpts:        MoleculeOptions;
+    opts:           ReactionOptions;
+    themeManager:   ThemeManager;
+
     /**
      * The constructor for the class ReactionDrawer.
      *
-     * @param {Object} options An object containing reaction drawing specitic options.
-     * @param {Object} moleculeOptions An object containing molecule drawing specific options.
+     * @param reactionOptions - An object containing reaction drawing specitic options.
+     * @param moleculeOptions - An object containing molecule drawing specific options.
      */
-    constructor(options, moleculeOptions) {
+    constructor(reactionOptions: ReactionOptions, moleculeOptions: MoleculeOptions) {
         this.defaultOptions = {
             scale:      moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
             fontSize:   moleculeOptions.fontSizeLarge * 0.8,
@@ -35,33 +132,41 @@ export default class ReactionDrawer {
             },
         };
 
-        this.opts = Options.extend(true, this.defaultOptions, options);
+        this.opts = Options.extend(true, this.defaultOptions, reactionOptions);
 
         this.drawer = new SvgDrawer(moleculeOptions);
         this.molOpts = this.drawer.opts;
     }
 
     /**
-   * Draws the parsed reaction smiles data to a canvas element.
-   *
-   * @param {Object} reaction The reaction object returned by the reaction smiles parser.
-   * @param {(String|SVGElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
-   * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
-   * @param {?Object} weights=null The weights for reactants, agents, and products.
-   * @param {String} textAbove='{reagents}' The text above the arrow.
-   * @param {String} textBelow='' The text below the arrow.
-   * @param {?Object} weights=null The weights for reactants, agents, and products.
-   * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
-   *
-   * @returns {SVGElement} The svg element
-   */
-    draw(reaction, target, themeName = 'light', weights = null, textAbove = '{reagents}', textBelow = '', infoOnly = false) {
+     * Draws the parsed reaction smiles data to a canvas element.
+     *
+     * @param reaction  - The reaction object returned by the reaction smiles parser.
+     * @param target    - The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param themeName - The name of the theme to use. Built-in themes are 'light' and 'dark'.
+     * @param weights   - The weights for reactants, agents, and products.
+     * @param textAbove - The text above the arrow (default "{reagents}", which will be replaced).
+     * @param textBelow - The text below the arrow.
+     * @param infoOnly  - Only output info on the molecule without drawing anything to the canvas.
+     *
+     * @returns The svg element.
+     */
+    draw(
+        reaction:  Reaction,
+        target:    SVGElement | string,
+
+        themeName: string          = 'light',
+        weights:   ReactionWeights = undefined,
+        textAbove: string          = '{reagents}',
+        textBelow: string          = '',
+        infoOnly:  boolean         = false
+    ) {
         this.themeManager = new ThemeManager(this.molOpts.themes, themeName);
 
         // Normalize the weights over the reaction molecules
         if (this.opts.weights.normalize) {
             let max = -Number.MAX_SAFE_INTEGER;
-            let min = Number.MAX_SAFE_INTEGER;
+            let min =  Number.MAX_SAFE_INTEGER;
 
             if ('reactants' in weights) {
                 for (let i = 0; i < weights.reactants.length; i++) {
@@ -132,7 +237,7 @@ export default class ReactionDrawer {
             }
         }
 
-        let svg = null;
+        let svg: SVGElement | Element;
 
         if (target === null || target === 'svg') {
             svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -140,18 +245,22 @@ export default class ReactionDrawer {
             svg.setAttributeNS(null, 'width', 500 + '');
             svg.setAttributeNS(null, 'height', 500 + '');
         }
-        else if (typeof target === 'string' || target instanceof String) {
-            svg = document.getElementById(target);
+        else if (target instanceof SVGElement) {
+            svg = target;
         }
         else {
-            svg = target;
+            svg = document.getElementById(target);
+        }
+
+        if (!(svg instanceof SVGElement)) {
+            throw Error('Target was not an SVGElement or the ID of an SVGElement.');
         }
 
         while (svg.firstChild) {
             svg.removeChild(svg.firstChild);
         }
 
-        let elements = [];
+        const elements = [];
 
         let maxHeight = 0.0;
 
@@ -170,11 +279,11 @@ export default class ReactionDrawer {
                 reactantWeights = weights.reactants[i];
             }
 
-            let reactantSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            const reactantSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
             this.drawer.draw(reaction.reactants[i], reactantSvg, themeName, reactantWeights, infoOnly, [], this.opts.weights.normalize);
 
-            let element = {
+            const element = {
                 width:  reactantSvg.viewBox.baseVal.width  * this.opts.scale,
                 height: reactantSvg.viewBox.baseVal.height * this.opts.scale,
                 svg:    reactantSvg,
@@ -265,11 +374,11 @@ export default class ReactionDrawer {
                 productWeights = weights.products[i];
             }
 
-            let productSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            const productSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
             this.drawer.draw(reaction.products[i], productSvg, themeName, productWeights, infoOnly, [], this.opts.weights.normalize);
 
-            let element = {
+            const element = {
                 width:  productSvg.viewBox.baseVal.width  * this.opts.scale,
                 height: productSvg.viewBox.baseVal.height * this.opts.scale,
                 svg:    productSvg,
@@ -285,8 +394,8 @@ export default class ReactionDrawer {
         let totalWidth = 0.0;
 
         elements.forEach((element) => {
-            let offsetX = element.offsetX || 0.0;
-            let offsetY = element.offsetY || 0.0;
+            const offsetX = element.offsetX || 0.0;
+            const offsetY = element.offsetY || 0.0;
 
             element.svg.setAttributeNS(null, 'x', Math.round(totalWidth + offsetX));
             element.svg.setAttributeNS(null, 'y', Math.round(((maxHeight - element.height) / 2.0) + offsetY));
@@ -306,26 +415,28 @@ export default class ReactionDrawer {
         return svg;
     }
 
-    getPlus() {
-        let s = this.opts.plus.size;
-        let w = this.opts.plus.thickness;
-        let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        let rect_h = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        let rect_v = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    getPlus(): SVGElement {
+        const s = this.opts.plus.size.toString();
+        const w = this.opts.plus.thickness.toString();
+        const m = ((this.opts.plus.size - this.opts.plus.thickness) / 2).toString();
+
+        const svg    = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const rect_h = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        const rect_v = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 
         svg.setAttributeNS(null, 'id', 'plus');
 
-        rect_h.setAttributeNS(null, 'x', 0);
-        rect_h.setAttributeNS(null, 'y', s / 2.0 - w / 2.0);
-        rect_h.setAttributeNS(null, 'width', s);
+        rect_h.setAttributeNS(null, 'x',     '0');
+        rect_h.setAttributeNS(null, 'y',      m);
+        rect_h.setAttributeNS(null, 'width',  s);
         rect_h.setAttributeNS(null, 'height', w);
-        rect_h.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
+        rect_h.setAttributeNS(null, 'fill',   this.themeManager.getColor('C'));
 
-        rect_v.setAttributeNS(null, 'x', s / 2.0 - w / 2.0);
-        rect_v.setAttributeNS(null, 'y', 0);
-        rect_v.setAttributeNS(null, 'width', w);
+        rect_v.setAttributeNS(null, 'x',      m);
+        rect_v.setAttributeNS(null, 'y',     '0');
+        rect_v.setAttributeNS(null, 'width',  w);
         rect_v.setAttributeNS(null, 'height', s);
-        rect_v.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
+        rect_v.setAttributeNS(null, 'fill',   this.themeManager.getColor('C'));
 
         svg.appendChild(rect_h);
         svg.appendChild(rect_v);
@@ -334,43 +445,45 @@ export default class ReactionDrawer {
         return svg;
     }
 
-    getArrowhead() {
-        let s = this.opts.arrow.headSize;
-        let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
-        let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    getArrowhead(): SVGMarkerElement {
+        const s =  this.opts.arrow.headSize.toString();
+        const h = (this.opts.arrow.headSize / 2).toString();
 
-        marker.setAttributeNS(null, 'id', 'arrowhead');
-        marker.setAttributeNS(null, 'viewBox', `0 0 ${s} ${s}`);
+        const marker  = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+
+        marker.setAttributeNS(null, 'id',          'arrowhead');
+        marker.setAttributeNS(null, 'viewBox',     `0 0 ${s} ${s}`);
         marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
-        marker.setAttributeNS(null, 'markerWidth', s);
+        marker.setAttributeNS(null, 'markerWidth',  s);
         marker.setAttributeNS(null, 'markerHeight', s);
-        marker.setAttributeNS(null, 'refX', 0);
-        marker.setAttributeNS(null, 'refY', s / 2);
-        marker.setAttributeNS(null, 'orient', 'auto');
-        marker.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
+        marker.setAttributeNS(null, 'refX',        '0');
+        marker.setAttributeNS(null, 'refY',         h);
+        marker.setAttributeNS(null, 'orient',      'auto');
+        marker.setAttributeNS(null, 'fill',         this.themeManager.getColor('C'));
 
-        polygon.setAttributeNS(null, 'points', `0 0, ${s} ${s / 2}, 0 ${s}`);
+        polygon.setAttributeNS(null, 'points', `0 0, ${s} ${h}, 0 ${s}`);
 
         marker.appendChild(polygon);
 
         return marker;
     }
 
-    getCDArrowhead() {
-        let s = this.opts.arrow.headSize;
-        let sw = s * (7 / 4.5);
-        let marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
-        let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    getCDArrowhead(): SVGMarkerElement {
+        const s = this.opts.arrow.headSize;
+        const sw = s * (7 / 4.5);
+        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        const path   = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
-        marker.setAttributeNS(null, 'id', 'arrowhead');
-        marker.setAttributeNS(null, 'viewBox', `0 0 ${sw} ${s}`);
-        marker.setAttributeNS(null, 'markerUnits', 'userSpaceOnUse');
-        marker.setAttributeNS(null, 'markerWidth', sw * 2);
-        marker.setAttributeNS(null, 'markerHeight', s * 2);
-        marker.setAttributeNS(null, 'refX', 2.2);
-        marker.setAttributeNS(null, 'refY', 2.2);
-        marker.setAttributeNS(null, 'orient', 'auto');
-        marker.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
+        marker.setAttributeNS(null, 'id',           'arrowhead');
+        marker.setAttributeNS(null, 'viewBox',      `0 0 ${sw} ${s}`);
+        marker.setAttributeNS(null, 'markerUnits',  'userSpaceOnUse');
+        marker.setAttributeNS(null, 'markerWidth',  (sw * 2).toString());
+        marker.setAttributeNS(null, 'markerHeight', (s  * 2).toString());
+        marker.setAttributeNS(null, 'refX',         '2.2');
+        marker.setAttributeNS(null, 'refY',         '2.2');
+        marker.setAttributeNS(null, 'orient',       'auto');
+        marker.setAttributeNS(null, 'fill',         this.themeManager.getColor('C'));
 
         path.setAttributeNS(null, 'style', 'fill-rule:nonzero;');
         path.setAttributeNS(null, 'd', 'm 0 0 l 7 2.25 l -7 2.25 c 0 0 0.735 -1.084 0.735 -2.28 c 0 -1.196 -0.735 -2.22 -0.735 -2.22 z');
@@ -380,26 +493,26 @@ export default class ReactionDrawer {
         return marker;
     }
 
-    getArrow() {
-        let s = this.opts.arrow.headSize;
-        let l = this.opts.arrow.length;
+    getArrow(): SVGElement {
+        const s = this.opts.arrow.headSize;
+        const l = this.opts.arrow.length;
 
-        let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const svg  = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 
         defs.appendChild(this.getCDArrowhead());
         svg.appendChild(defs);
 
         svg.setAttributeNS(null, 'id', 'arrow');
 
-        line.setAttributeNS(null, 'x1', 0.0);
-        line.setAttributeNS(null, 'y1', -this.opts.arrow.thickness / 2.0);
-        line.setAttributeNS(null, 'x2', l);
-        line.setAttributeNS(null, 'y2', -this.opts.arrow.thickness / 2.0);
-        line.setAttributeNS(null, 'stroke-width', this.opts.arrow.thickness);
-        line.setAttributeNS(null, 'stroke', this.themeManager.getColor('C'));
-        line.setAttributeNS(null, 'marker-end', 'url(#arrowhead)');
+        line.setAttributeNS(null, 'x1',          '0.0');
+        line.setAttributeNS(null, 'y1',          (this.opts.arrow.thickness / -2).toString());
+        line.setAttributeNS(null, 'x2',           l.toString());
+        line.setAttributeNS(null, 'y2',          (this.opts.arrow.thickness / -2).toString());
+        line.setAttributeNS(null, 'stroke-width', this.opts.arrow.thickness.toString());
+        line.setAttributeNS(null, 'stroke',       this.themeManager.getColor('C'));
+        line.setAttributeNS(null, 'marker-end',  'url(#arrowhead)');
 
         svg.appendChild(line);
         svg.setAttributeNS(null, 'viewBox', `0 ${-s / 2.0} ${l + s * (7 / 4.5)} ${s}`);

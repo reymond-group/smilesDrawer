@@ -23,22 +23,30 @@ export default class SvgDrawer {
      * Draws the parsed smiles data to an svg element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+     * @param {SVGElement|string} target The id of the HTML svg element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      *
      * @returns {SVGElement} The svg element
      */
     draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
+        let element = undefined;
         if (target === null || target === 'svg') {
-            target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            target.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-            target.setAttributeNS(null, 'width', this.opts.width);
-            target.setAttributeNS(null, 'height', this.opts.height);
+            element = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            element.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            element.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+            element.setAttributeNS(null, 'width',  this.opts.width);
+            element.setAttributeNS(null, 'height', this.opts.height);
         }
-        else if (target instanceof String) {
-            target = document.getElementById(target);
+        else if (target instanceof SVGElement) {
+            element = target;
+        }
+        else {
+            element = document.getElementById(target);
+        }
+
+        if (!(element instanceof SVGElement)) {
+            throw Error('First argument was not an SVGElement or the ID of an SVGElement.');
         }
 
         let optionBackup = {
@@ -59,7 +67,7 @@ export default class SvgDrawer {
         if (!infoOnly) {
             this.themeManager = new ThemeManager(this.opts.themes, themeName);
             if (this.svgWrapper === null || this.clear) {
-                this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+                this.svgWrapper = new SvgWrapper(this.themeManager, element, this.opts, this.clear);
             }
         }
 
@@ -93,24 +101,28 @@ export default class SvgDrawer {
             this.opts.compactDrawing = optionBackup.padding;
         }
 
-        return target;
+        return element;
     }
 
     /**
      * Draws the parsed smiles data to a canvas element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {HTMLCanvasElement|string} target The id of the HTML canvas element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
     drawCanvas(data, target, themeName = 'light', infoOnly = false) {
         let canvas = null;
-        if (typeof target === 'string' || target instanceof String) {
-            canvas = document.getElementById(target);
+        if (target instanceof HTMLCanvasElement) {
+            canvas = target;
         }
         else {
-            canvas = target;
+            canvas = document.getElementById(target);
+        }
+
+        if (!(canvas instanceof HTMLCanvasElement)) {
+            throw Error('First argument was not an HTMLCanvasElement or the ID of an HTMLCanvasElement.');
         }
 
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

@@ -1,16 +1,18 @@
-// @ts-check
 import Graph from './Graph';
+import Ring  from './Ring';
 
-/** A class encapsulating the functionality to find the smallest set of smallest rings in a graph. */
+/**
+ * A class encapsulating the functionality to find the smallest set of smallest rings in a graph.
+ */
 export default class SSSR {
     /**
      * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
      *
-     * @param {Graph} graph A Graph object.
-     * @param {Boolean} [experimental=false] Whether or not to use experimental SSSR.
-     * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
+     * @param graph        - A Graph object.
+     * @param experimental - Whether or not to use experimental SSSR (default false).
+     * @returns An array of arrays, each representing a ring from the smallest set of smallest rings.
      */
-    static getRings(graph, experimental = false) {
+    static getRings(graph: Graph, experimental: boolean = false): number[][] {
         let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
         if (adjacencyMatrix.length === 0) {
             return null;
@@ -98,10 +100,10 @@ export default class SSSR {
     /**
      * Creates a printable string from a matrix (2D array).
      *
-     * @param {Array[]} matrix A 2D array.
-     * @returns {String} A string representing the matrix.
+     * @param matrix - A 2D array.
+     * @returns A string representing the matrix.
      */
-    static matrixToString(matrix) {
+    static matrixToString(matrix: any[][]): string {
         let str = '';
 
         for (let i = 0; i < matrix.length; i++) {
@@ -121,7 +123,7 @@ export default class SSSR {
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
      * @returns {Object} The path-included distance matrices. { p1, p2 }
      */
-    static getPathIncludedDistanceMatrices(adjacencyMatrix) {
+    static getPathIncludedDistanceMatrices(adjacencyMatrix: number[][]) {
         let length = adjacencyMatrix.length;
         let d = Array(length);
         let pe = Array(length);
@@ -543,11 +545,11 @@ export default class SSSR {
     /**
      * Checks whether or not two sets are equal (contain the same elements).
      *
-     * @param {Set<Number>} setA A set.
-     * @param {Set<Number>} setB A set.
-     * @returns {Boolean} A boolean indicating whether or not the two sets are equal.
+     * @param setA - A set.
+     * @param setB - A set.
+     * @returns A boolean indicating whether or not the two sets are equal.
      */
-    static areSetsEqual(setA, setB) {
+    static areSetsEqual(setA: Set<number>, setB: Set<number>):boolean {
         if (setA.size !== setB.size) {
             return false;
         }
@@ -564,11 +566,11 @@ export default class SSSR {
     /**
      * Checks whether or not a set (setA) is a superset of another set (setB).
      *
-     * @param {Set<Number>} setA A set.
-     * @param {Set<Number>} setB A set.
-     * @returns {Boolean} A boolean indicating whether or not setB is a superset of setA.
+     * @param setA - A set.
+     * @param setB - A set.
+     * @returns A boolean indicating whether or not setB is a superset of setA.
      */
-    static isSupersetOf(setA, setB) {
+    static isSupersetOf(setA: Set<number>, setB: Set<number>): boolean {
         for (let element of setB) {
             if (!setA.has(element)) {
                 return false;

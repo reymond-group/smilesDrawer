@@ -1,27 +1,30 @@
-// @ts-check
+import Graph  from './Graph';
 import Parser from './Parser';
 
 export default class Reaction {
+    reactantsSmiles: string[];
+    reagentsSmiles:  string[];
+    productsSmiles:  string[];
+
+    reactants: Graph[];
+    reagents:  Graph[];
+    products:  Graph[];
+
     /**
      * The constructor for the class Reaction.
      *
      * @param {string} reactionSmiles A reaction SMILES.
      */
-    constructor(reactionSmiles) {
+    constructor(reactionSmiles: string) {
         this.reactantsSmiles = [];
         this.reagentsSmiles  = [];
         this.productsSmiles  = [];
-
-        this.reactantsWeights = [];
-        this.reagentsWeights  = [];
-        this.productsWeights  = [];
 
         this.reactants = [];
         this.reagents  = [];
         this.products  = [];
 
-        let parts = reactionSmiles.split('>');
-
+        const parts = reactionSmiles.split('>');
         if (parts.length !== 3) {
             throw new Error('Invalid reaction SMILES: Expected exactly two ">" symbols.');
         }
@@ -29,11 +32,9 @@ export default class Reaction {
         if (parts[0] !== '') {
             this.reactantsSmiles = parts[0].split('.');
         }
-
         if (parts[1] !== '') {
             this.reagentsSmiles = parts[1].split('.');
         }
-
         if (parts[2] !== '') {
             this.productsSmiles = parts[2].split('.');
         }
@@ -41,11 +42,9 @@ export default class Reaction {
         for (let i = 0; i < this.reactantsSmiles.length; i++) {
             this.reactants.push(Parser.parse(this.reactantsSmiles[i]));
         }
-
         for (let i = 0; i < this.reagentsSmiles.length; i++) {
             this.reagents.push(Parser.parse(this.reagentsSmiles[i]));
         }
-
         for (let i = 0; i < this.productsSmiles.length; i++) {
             this.products.push(Parser.parse(this.productsSmiles[i]));
         }
