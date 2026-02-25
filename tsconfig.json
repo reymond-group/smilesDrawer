@@ -5,6 +5,6 @@
     "allowJs": true
   },
   "files": [
-    "app.js"
+    "app.ts"
   ]
 }

@@ -1,12 +1,12 @@
 export const BUILD = {
-    entryPoints: ['app.js'],
+    entryPoints: ['app.ts'],
     outfile:     'dist/smiles-drawer.js',
     sourcemap:   true,
     bundle:      true,
 };
 
 export const MINIFY = {
-    entryPoints: ['app.js'],
+    entryPoints: ['app.ts'],
     outfile:     'dist/smiles-drawer.min.js',
     target:      ['chrome65'],
     sourcemap:   true,
