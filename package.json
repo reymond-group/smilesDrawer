@@ -21,7 +21,7 @@
     "build":     "node ./scripts/build.mjs",
     "lint":      "npm exec eslint",
     "minify":    "node ./scripts/minify.mjs",
-    "release":   "echo Not yet implemented...",
+    "release":   "node ./scripts/release.mjs",
     "typecheck": "tsc --noEmit",
     "watch":     "node ./scripts/watch.mjs"
   }

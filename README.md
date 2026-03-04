@@ -98,7 +98,9 @@ If you experience problems with the drawing of complex ring systems (including v
 
 ### "Installation"
 
-SmilesDrawer is available from the unpkg content delivery network:
+You can find the latest release in the `dist` folder.
+
+<!--SmilesDrawer is available from the unpkg content delivery network:
 
 ```
 https://unpkg.com/smiles-drawer@1.2.0/dist/smiles-drawer.min.js
@@ -110,16 +112,11 @@ You can easily get smiles-drawer using yarn:
 yarn add smiles-drawer
 ```
 
-or you can just download the files from here.
+or you can just download the files from here.-->
 
 ### Building Smiles Drawer
 
-If you decide not to use the ready-to-go scripts in `dist`, you can (edit and) build the project by running:
-
-```bash
-npm install
-npm run build
-```
+See `CONTRIBUTING.md` for how to get the code and build your own custom version.
 
 ### Getting Started
 
