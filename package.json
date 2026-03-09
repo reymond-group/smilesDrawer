@@ -11,8 +11,10 @@
     "@stylistic/eslint-plugin": "^5.6.1",
     "esbuild":                  "^0.25.0",
     "eslint":                   "^9.39.1",
+    "jsdom":                    "^26.1.0",
     "typescript":               "^5.8.2",
-    "typescript-eslint":        "^8.48.1"
+    "typescript-eslint":        "^8.48.1",
+    "vitest":                   "^4.0.18"
   },
   "dependencies": {
     "chroma-js": "^2.4.2"
@@ -22,6 +24,9 @@
     "lint":      "npm exec eslint",
     "minify":    "node ./scripts/minify.mjs",
     "release":   "echo Not yet implemented...",
+    "test:ci":   "npm run test:unit && npm run test:stereo",
+    "test:stereo":"vitest run test/stereo-reference/stereo-vs-rdkit.test.js test/stereo-reference/stereo-inversion-baseline.test.js",
+    "test:unit": "vitest run test/unit test/regression/smiles-parsing.test.js",
     "typecheck": "tsc --noEmit",
     "watch":     "node ./scripts/watch.mjs"
   }
