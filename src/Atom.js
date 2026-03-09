@@ -73,6 +73,11 @@ export default class Atom {
         this.subtreeDepth = 1;
         this.hasHydrogen = false;
         this.class = undefined;
+        this.smilesOrder = 0;
+        this.smilesBranchCount = 0;
+        this.smilesRingbondCount = 0;
+        this.smilesHasNext = false;
+        this.smilesIsBranchBond = false;
     }
 
     /**

@@ -58,6 +58,11 @@ export default class Graph {
         atom.ringbonds = node.ringbonds;
         atom.bracket = node.atom.element ? node.atom : null;
         atom.class = node.atom.class;
+        atom.smilesOrder = order;
+        atom.smilesBranchCount = node.branchCount || 0;
+        atom.smilesRingbondCount = node.ringbondCount || 0;
+        atom.smilesHasNext = !!node.hasNext;
+        atom.smilesIsBranchBond = !!isBranch;
 
         let vertex = new Vertex(atom);
         let parentVertex = this.vertices[parentVertexId];
