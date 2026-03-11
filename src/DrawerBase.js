@@ -934,6 +934,35 @@ export default class DrawerBase {
 
         recurse(ringId);
 
+        // The recurse() above only follows bridge connections (3+ shared atoms).
+        // But fused rings (2 shared atoms) adjacent to the bridged system also
+        // share vertices that Kamada-Kawai will position. If we don't include
+        // them, those shared atoms get placed by two different layout algorithms
+        // (KK vs regular ring layout) which produces distorted drawings.
+        //
+        // any ring sharing 2+ atoms with an already-involved
+        // ring is pulled in. Repeat until no new rings are added (fixed-point).
+        // Skip spiro connections (1 shared atom), those can be laid out independently.
+        let changed = true;
+        while (changed) {
+            changed = false;
+            for (let i = 0; i < this.ringConnections.length; i++) {
+                let rc = this.ringConnections[i];
+                if (rc.vertices.size < 2) continue;
+                let hasFirst = involvedRings.indexOf(rc.firstRingId) !== -1;
+                let hasSecond = involvedRings.indexOf(rc.secondRingId) !== -1;
+
+                if (hasFirst && !hasSecond) {
+                    involvedRings.push(rc.secondRingId);
+                    changed = true;
+                }
+                else if (hasSecond && !hasFirst) {
+                    involvedRings.push(rc.firstRingId);
+                    changed = true;
+                }
+            }
+        }
+
         return ArrayHelper.unique(involvedRings);
     }
 
