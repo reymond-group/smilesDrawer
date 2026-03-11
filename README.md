@@ -67,8 +67,45 @@ Current Version: **2.2.0**
 <!--usage-->
 <Molecule smiles="CCCO" />
 ```
-
 </details>
+
+<details>
+  <summary>React</summary>
+
+```jsx
+import { useEffect, useRef } from "react";
+import SmilesDrawer from "smiles-drawer";
+
+export function SmilesViewer({
+  smilesStr,
+  type = "svg",
+  width = 400,
+  height = 400,
+}) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!smilesStr || !containerRef.current) return;
+
+    const sd = new SmilesDrawer.SmiDrawer({ width, height });
+    sd.draw(smilesStr, containerRef.current);
+  }, [smilesStr, width, height]);
+
+  if (type === "img") {
+    return (
+      <img
+        ref={containerRef}
+        style={{ width, height }}
+        alt="SMILES structure"
+      />
+    );
+  }
+  return <svg ref={containerRef} width={width} height={height} />;
+}
+```
+</details>
+
+
 
 ### Please cite
 
