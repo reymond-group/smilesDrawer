@@ -26,9 +26,8 @@ SmilesDrawer "compiles" to a JavaScript bundle, which can be found in the `dist`
 folder.
 
 When doing development work on SmilesDrawer,  you'll use a special bundle called
-`dist/smiles-drawer.dev.js`. For logistics reasons, this file isn't checked into
-Git, but the HTML examples will use it by default (see `loader.js` for details).
-To create this file, or to update it when you've changed the sources, run:
+`dist/smiles-drawer.dev.js`. This file isn't checked into Git, but it is used by
+all the HTML files in the `test` directory.  To (re)create it, run:
 
 ```sh
 npm run build
