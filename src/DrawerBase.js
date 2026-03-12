@@ -3145,8 +3145,14 @@ export default class DrawerBase {
     }
 
     /**
-     * Apply narrow parity inversions for parser-order edge cases where the
-     * local bond-order convention differs from the current neighbour order.
+     * TRANSITIONAL — do not add more patterns here without good reason.
+     *
+     * This flips the R/S parity for specific parser-order edge cases where
+     * the neighbor ordering we get from the SMILES parser disagrees with
+     * what RDKit expects. It works for most molecules but is brittle:
+     * each pattern was matched empirically against the RDKit reference set.
+     * The long-term fix is a single canonical parity model that does not
+     * depend on parser traversal order at all.
      *
      * @param {Vertex} vertex The stereocenter.
      * @param {Number[]} neighbours Neighbors in current local order.
