@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmilesDrawer as a Web Component</title>
+    <script type="text/javascript" src="../../../dist/smiles-drawer.min.js"></script>
+    <script type="text/javascript">
+      class SmilesDrawerCanvas extends HTMLCanvasElement {
+        // Call attributeChangedCallback() when any of these are set:
+        static get observedAttributes() {
+          return ['smiles', 'width', 'height', 'theme'];
+        }
+
+        constructor() {
+          super();
+
+          // Prevent drawing until the element is connected to the DOM.
+          // This prevents repeated re-drawing as attributes are added
+          // to the canvas one by one during construction.
+          this.blockDrawing = true;
+          this.modified = false;
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+          // This function is called whenever attributes are set, even if
+          // the value doesn't change.  Since SmilesDrawer sets the width
+          // and height, we need this check to prevent an infinite loop.
+          if(oldValue !== newValue) {
+            this.modified = true;
+            this.draw();
+          }
+        }
+
+        connectedCallback() {
+          // Once the element is added to a DOM it's safe to render without
+          // the risk of needless re-drawing.  Make sure the attributes are
+          // all set beforehand (so the "did it really change?" guard works)
+          // and then do a single render.
+          if (this.blockDrawing) {
+            this.setAttribute('width',  this.width);
+            this.setAttribute('height', this.height);
+            this.blockDrawing = false;
+            this.draw();
+          }
+        }
+
+        delayDrawing(callback) {
+          this.blockDrawing = true;
+          callback(this);
+
+          this.blockDrawing = false;
+          if (this.modified) {
+            this.draw();
+          }
+        }
+
+        draw() {
+          if (this.blockDrawing) {
+            return;
+          }
+
+          const smiles = this.getAttribute('smiles');
+          SmilesDrawer.parse(smiles, (tree) => {
+            const options = {width: this.width, height: this.height};
+            const drawer  = new SmilesDrawer.Drawer(options);
+            const theme   = this.getAttribute('theme');
+
+            // console.log('Drawing...');
+            drawer.draw(tree, this, theme);
+          }, (error) => {
+            // Handle parse errors (invalid SMILES) here.
+            console.warn(error);
+          });
+
+          this.modified = false;
+        }
+      }
+
+      customElements.define('smiles-drawer', SmilesDrawerCanvas, {extends: 'canvas'});
+    </script>
+    <style type="text/css">
+      canvas[is=smiles-drawer] {
+        /* For ease of visualization... */
+        border: 1px solid blue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SmilesDrawer as a Web Component</h1>
+    <canvas is="smiles-drawer" smiles="CC(C2C(OCC)=O)(O2)C1=CC=CC=C1" height="222" />
+  </body>
+</html>

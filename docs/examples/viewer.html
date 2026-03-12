@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="common.css" />
+    <title>SmilesDrawer Molecule Viewer</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+    <style type="text/css">
+      header {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 48px;
+      }
+
+      #output {
+        position: fixed;
+
+        top: 48px;
+        left: 0;
+        right: 0;
+        bottom: 40px;
+      }
+
+      #controls {
+        position: fixed;
+
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        border-top: 1px solid #456;
+        background-color: #ccc;
+        display: flex;
+        gap: 5px;
+        padding: 5px;
+      }
+      #controls > * {
+        box-sizing: border-box;
+        height: 30px;
+        line-height: 30px;
+        font-size: 16px;
+        padding: 0 10px;
+      }
+      #controls > label,
+      #controls > button {
+        background-color: #456;
+        border-radius: 5px;
+        border: none;
+        color: #ddd;
+      }
+      #controls > label:hover,
+      #controls > button:hover {
+        background-color: #345;
+      }
+      #smiles {
+        border: 1px solid #456;
+        border-radius: 5px;
+        flex-grow: 1;
+      }
+      #render {
+        font-weight: bold;
+      }
+
+      #message {
+        position: absolute;
+        right: 5px;
+        bottom: 5px;
+
+        font-size: small;
+      }
+      #message.error {
+        color: #800000;
+      }
+
+      dialog {
+        background-color: #fff;
+        border: 1px solid #456;
+        border-radius: 10px;
+
+        box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 50%);
+
+        padding: 10px;
+        padding-bottom: 7px;
+      }
+
+      dialog > h2 {
+        color: #456;
+        font-size: 20px;
+        border-bottom: 1px solid #ddd;
+
+        margin: 0;
+        margin-bottom: 7px;
+        text-align: center;
+      }
+
+      .fields label {
+        display: block;
+
+        height: 24px;
+        line-height: 24px;
+        margin-bottom: 5px;
+        min-width: 200px;
+        overflow: auto;
+      }
+      .fields label > input {
+        float: right;
+
+        box-sizing: border-box;
+        height: 24px;
+        max-width: 75px;
+      }
+      .buttons {
+        margin-top: 10px;
+        text-align: center;
+      }
+      .buttons button {
+        background-color: #456;
+        border-radius: 5px;
+        border: none;
+        box-sizing: border-box;
+        color: #ddd;
+        font-size: 16px;
+        height: 30px;
+        line-height: 30px;
+        padding: 0 10px;
+      }
+      .buttons button:hover {
+        background-color: #345;
+      }
+
+      .export-buttons button {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 5px;
+        height: 24px;
+        width: 200px;
+
+        background-color: #ddd;
+        border-radius: 5px;
+        border: none;
+        box-sizing: border-box;
+        color: #456;
+      }
+      .export-buttons button:hover {
+        background-color: #ccc;
+      }
+      .export-buttons button:disabled {
+        background-color: #aaa;
+        color: #888;
+      }
+
+      @keyframes flash-animation {
+        from {background: #f80;}
+        to   {background: default;}
+      }
+      .flash {
+        animation-duration: 0.5s;
+        animation-name: flash-animation;
+        animation-timing-function: ease-in-out;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div id="version"></div>
+      <h1>SmilesDrawer Molecule Viewer</h1>
+    </header>
+    <div id="output">
+      <canvas id="canvas" style="background-color: #fff;"></canvas>
+      <div id="message">Enter a SMILES string to see the molecule!</div>
+    </div>
+    <div id="controls">
+      <input id="smiles" type="string" placeholder="Your SMILES here..." value="CN1C=NC2=C1C(=O)N(C(=O)N2C)C" autofocus />
+      <label><input id="auto" type="checkbox" checked />Auto</label>
+      <button id="render">Render</button>
+      <button id="options" command="show-modal" commandfor="options-modal">Options</button>
+      <button id="export"  command="show-modal" commandfor="export-modal">Export</button>
+    </div>
+    <dialog id="options-modal" closedby="any">
+      <h2>Options</h2>
+      <div class="fields">
+        <label><input type="checkbox" checked />Fullscreen Mode</label>
+        <label><input type="number" value="300" />Width</label>
+        <label><input type="number" value="200" />Height</label>
+        <label><input type="number" value="10" />Padding</label>
+      </div>
+      <div class="buttons">
+        <button command="close" commandfor="options-modal">Close</button>
+      </div>
+    </dialog>
+    <dialog id="export-modal" closedby="any">
+      <h2>Export</h2>
+      <div class="export-buttons">
+        <button id="copy-png">Copy PNG</button>
+        <button id="copy-svg">Copy SVG</button>
+        <button id="copy-xml">Copy SVG Source</button>
+        <button id="save-png">Download PNG</button>
+        <button id="save-svg">Download SVG</button>
+      </div>
+      <div class="buttons">
+        <button command="close" commandfor="export-modal">Close</button>
+      </div>
+    </dialog>
+    <script type="text/javascript">
+      const version = document.getElementById('version');
+      version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
+
+      const auto    = document.getElementById('auto');
+      const output  = document.getElementById('output');
+      const canvas  = document.getElementById('canvas');
+      const smiles  = document.getElementById('smiles');
+      const message = document.getElementById('message');
+
+      const last = {
+        smiles: undefined,
+        svg:    undefined
+      };
+
+      function render() {
+        last.smiles = smiles.value;
+        last.svg    = undefined;
+
+        const options = {
+          width:  output.offsetWidth,
+          height: output.offsetHeight
+        };
+
+        const a = performance.now();
+        // Slightly roundabout, but it lets us save the intermediate SVG:
+        const drawer = new SmilesDrawer.SmiDrawer(options);
+        drawer.draw(smiles.value, 'svg', 'light', (svg) => {
+          drawer.svgToCanvas(svg, canvas);
+          last.svg = svg;
+
+          const z = performance.now();
+          message.innerText = `Rendered in ${z-a}ms.`
+          message.classList.remove('error');
+        }, error => {
+          message.classList.add('error');
+          message.innerText = error;
+        })
+      }
+
+      smiles.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+          render();
+        }
+        else if (auto.checked && smiles.value !== last.smiles) {
+          render();
+        }
+      });
+
+      document.getElementById('render').addEventListener('click', (event) => {
+        render();
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.target.tagName === 'INPUT') {
+          // Don't steal keystrokes from inputs!
+          return;
+        }
+
+        if (event.key === '/') {
+          event.preventDefault();
+          smiles.focus();
+        }
+        else if (event.key === 'x') {
+          document.getElementById('export-modal').showModal();
+        }
+      });
+
+      window.addEventListener('resize', (event) => {
+        // TODO: Only if drawing fullscreen.
+        render();
+      });
+
+      function flash(element) {
+        element.classList.add('flash');
+        setTimeout(() => {
+          element.classList.remove('flash');
+        }, 500);
+      }
+
+      function download(data_url, filename) {
+        const a = document.createElement('a');
+        a.setAttribute('download', filename);
+        a.setAttribute('href', data_url);
+        a.click();
+      }
+
+      document.getElementById('copy-png').addEventListener('click', async (event) => {
+        const blob   = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const cbitem = new ClipboardItem({'image/png': blob});
+        await navigator.clipboard.write([cbitem]);
+        flash(event.target);
+      });
+
+      document.getElementById('copy-svg').addEventListener('click', async (event) => {
+        try {
+          const cbitem = new ClipboardItem({'image/svg+xml': last.svg.outerHTML});
+          await navigator.clipboard.write([cbitem]);
+          flash(event.target);
+        }
+        catch (error) {
+          alert('Your browser does not support copying SVGs as images. Try copying the SVG source as text or downloading the SVG instead.');
+          event.target.disabled = true;
+        }
+      });
+
+      document.getElementById('copy-xml').addEventListener('click', async (event) => {
+        await navigator.clipboard.writeText(last.svg.outerHTML);
+        flash(event.target);
+      });
+
+      document.getElementById('save-png').addEventListener('click', async (event) => {
+        download(canvas.toDataURL(), 'molecule.png');
+      });
+
+      document.getElementById('save-svg').addEventListener('click', async (event) => {
+        const data_url = 'data:text/plain;charset=UTF-8,' + encodeURIComponent(SVG.outerHTML);
+        download(data_url, 'molecule.svg');
+      });
+
+      function load_smiles() {
+        const params = new URLSearchParams(window.location.search);
+        const smiles = params.get('smiles');
+        if(smiles) {
+          const input = document.getElementById('smiles');
+          input.value = smiles;
+        }
+      }
+
+      load_smiles();
+      render();
+    </script>
+  </body>
+</html>

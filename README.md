@@ -1,6 +1,6 @@
 # SmilesDrawer 2.0
 
-No server, no images, no templates, just a SMILES 😊
+No server, no images, no templates - just SMILES 😊
 
 Current Version: **2.2.0**
 
@@ -25,10 +25,207 @@ Current Version: **2.2.0**
     </tbody>
 </table>
 
+
+### "Installation"
+
+The latest version of SmilesDrawer can be found in the `dist` folder on GitHub:\
+<https://github.com/reymond-group/smilesDrawer/tree/master/dist>
+
+It is also available as an [NPM package](https://www.npmjs.com/package/smiles-drawer),
+but this package is currently  **out of date**.  Prefer the bundles from GitHub.
+NPM updates should (hopefully!) resume soon.
+
+If you'd rather build your own version of SmilesDrawer - or if you're interested
+in contributing - see  `CONTRIBUTING.md`  for how to get the code and build your
+own version of the package.
+
+
+### Simple Drawing
+
+If you simply want to display some molecules, create some `canvas` elements with
+the `data-smiles` attribute set, then call `SmilesDrawer.apply()`:
+
+```html
+<html>
+    <head>
+        <script type="text/javascript" src="path/to/smiles-drawer.js"></script>
+    </head>
+    <body>
+        <canvas data-smiles="Cn1cnc2c1C(=O)N(C(=O)N2C)C"></canvas>
+        <canvas data-smiles="c1(C=O)cc(OC)c(O)cc1"></canvas>
+        <script type="text/javascript">
+            SmilesDrawer.apply()
+        </script>
+    </body>
+</html>
+```
+
+The `SmilesDrawer.apply()` function takes up to four arguments, all optional:
+
+- `options`   - An options object (see the Options section below).
+- `selector`  - A CSS selector for finding HTML elements (defaults to `"canvas[data-smiles]"`).
+- `themeName` - The name of the theme used when drawing (defaults to `"light"`).
+- `onError`   - A function to be called in case of error (none by default).
+
+
+### Dynamic Drawing
+
+To draw a single molecule to a  specific HTML element,  create a `SmiDrawer` and
+use  its `draw()` function.  This can be used to update a molecule when an input
+changes:
+
+```html
+<html>
+    <head>
+        <script type="text/javascript" src="path/to/smiles-drawer.js"></script>
+    </head>
+    <body>
+        <input  id="input" value="O=C(O)CNCP(=O)(O)O" />
+        <canvas id="output"></canvas>
+        <script type="text/javascript">
+            function render(smiles, target) {
+                const options = {width: 300, height: 200}
+                const drawer  = new SmilesDrawer.SmiDrawer(options)
+                drawer.draw(smiles, target)
+            }
+
+            const input = document.getElementById('input')
+            input.addEventListener('input', function(event) {
+                // Re-render when the user enters a new SMILES string:
+                render(input.value, '#output')
+            })
+
+            // Initial render for when the page loads:
+            render(input.value, '#output')
+        </script>
+    </body>
+</html>
+```
+
+The `SmiDrawer.draw()` function takes at least two and up to six arguments:
+
+- `smiles`          - Required.  The SMILES string to parse and render.
+- `target`          - Required.  The render target.  This can be many things:
+    - Pass `null` to create a new SVG element.
+    - Pass `"svg"`, `"canvas"`, or `"img"` to create a new element of that type.
+    - Pass an `SVGElement` or an `HTMLImageElement` to draw to an existing element.
+    - Pass a CSS selector string that matches the element(s) to render to.
+- `theme`           - The name of the theme used when drawing (defaults to `"light"`).
+- `successCallback` - Called on the target element after each successful render.
+- `errorCallback`   - Called on the exception in case of failure.
+- `weights`         - Very optional.  Used for atom highlighting.
+
+
+### More Examples
+
+For more examples  - including examples in various frameworks, like React -  see
+the [examples](TODO) page in the online documentation.
+
+
+### Options
+
+Options are passed to the `SmilesDrawer.apply()` function and to the `SmiDrawer`
+constructor.  Note that `width` and `height`  are included in these options:  if
+you want to create drawings of different sizes, you'll need to instantiate a new
+`SmiDrawer` for each size.
+
+The most useful options  are listed below.  To experiment with these,  go to the
+[playground](TODO) page in the online documentation.  For the full list, see the
+`DrawerBase` constructor in `src/DrawerBase.js`.
+
+| Option                        | Default     | Description
+| ----------------------------- | ----------- | --------------
+| Image Dimensions
+| `width`                       | `500`       | Drawing width
+| `height`                      | `500`       | Drawing height
+| `padding`                     | `10`        | Drawing padding
+| Atom Visualization
+| `atomVisualization`           | `"default"` | Atom visualization: `"default"`, `"balls"`, or `"none"`
+| `fontSizeLarge`               | `11`        | Large font size (in pt, for elements)
+| `fontSizeSmall`               | `3`         | Small font size (in pt, for numbers)
+| `compactDrawing`              | `true`      | Draw concatenated terminals and pseudo-elements
+| `terminalCarbons`             | `false`     | Show terminal carbons (CH3)
+| `explicitHydrogens`           | `true`      | Show explicit hydrogens
+| Bond Visualization
+| `bondThickness`               | `1.0`       | Bond thickness
+| `bondLength`                  | `30.0`      | Bond length
+| `shortBondLength`             | `0.8`       | Short bond length (e.g. double bonds) as a percent of `bondLength`
+| `bondSpacing`                 | `5.1`       | Spacing between double bonds
+| `isometric`                   | `true`      | Draw isometric SMILES if available
+| Advanced
+| `overlapSensitivity`          | `0.42`      | Sensitivity to atom overlaps
+| `overlapResolutionIterations` | `1`         | Number of overlap resolution iterations
+| `experimentalSSSR`            | `false`     | Use improved(?) ring system detection
+| `debug`                       | `false`     | Draw debug labels
+| `themes`                      | see below   | Color themes
+
+
+A few common issues can be fixed by adjusting these options:
+
+- If you want to see a full structure, but are seeing too much abbreviation (for
+  example, `COOH` renders as a single string), set `compactDrawing` to `false`.
+- If you are seeing  hydrogens  that you don't need  (typically at stereocenters
+  like `[C@@H]`), set `explicitHydrogens` to `false`.
+- If you have problems drawing large ring systems - including extra-long bonds -
+  try setting `experimentalSSSR` to `true`.
+
+
+### Themes
+
+Themes let you control the colors of atoms. An initial set of possible themes is
+passed as part of the `options` object; when drawing, you can pass the name of a
+theme to use it.  SmilesDrawer uses the `"light"` theme by default.
+
+To see all the built-in themes, go to [examples](TODO).  You can make your own
+theme in the [playground](TODO).
+
+To use custom colors, pass your own theme in the `options` object, then pass its
+name when you draw your molecules (or you can name it `light` so it gets used by
+default).
+
+```js
+const options = {
+    // ...
+    themes: {
+        'my-theme': {
+            FOREGROUND: '#222222',
+            BACKGROUND: '#ffffff',
+
+            C:  '#222222',
+            O:  '#e74c3c',
+            N:  '#3498db',
+            F:  '#27ae60',
+            CL: '#16a085',
+            BR: '#d35400',
+            I:  '#8e44ad',
+            P:  '#d35400',
+            S:  '#f1c40f',
+            B:  '#e67e22',
+            SI: '#e67e22',
+            H:  '#666666',
+        }
+    }
+}
+
+// Example using the apply() function:
+SmilesDrawer.apply(options, 'canvas[data-smiles]', 'my-theme')
+
+// example using a targeted draw() call:
+const drawer  = new SmilesDrawer.SmiDrawer(options)
+drawer.draw(smiles, target, 'my-theme')
+```
+
+Some possible gotchas:
+
+- Unknown atoms draw with the color for carbon.
+- Atom names are currently all upper case.
+- The background is not currently drawn.
+
+
 ### Examples in Specific Frameworks
 
 <details>
-    <summary>Svelte </summary>
+    <summary>Svelte</summary>
 
 ```html
 <!--file:Molecule.svlete-->
@@ -70,13 +267,61 @@ Current Version: **2.2.0**
 
 </details>
 
-### Please cite
 
-If you use this code or application, please cite the original paper published by the Journal of Chemical Information and Modeling: [10.1021/acs.jcim.7b00425](http://dx.doi.org/10.1021/acs.jcim.7b00425)
+### Please Cite
 
-## Legacy Documentation
+If you use this project in your research,  please cite the original paper, which
+was published in the Journal of Chemical Information and Modeling:
+[10.1021/acs.jcim.7b00425](https://dx.doi.org/10.1021/acs.jcim.7b00425)
 
-As of now, there is full backwards compatibility.
+<details>
+<summary>Show BibTeX</summary>
+
+```tex
+@article{doi:10.1021/acs.jcim.7b00425,
+    author  = {Probst, Daniel and Reymond, Jean-Louis},
+    title   = {SmilesDrawer: Parsing and Drawing SMILES-Encoded Molecular Structures Using Client-Side JavaScript},
+    journal = {Journal of Chemical Information and Modeling},
+    volume  = {58},
+    number  = {1},
+    pages   = {1-7},
+    year    = {2018},
+    doi     = {10.1021/acs.jcim.7b00425},
+    note    = {PMID: 29257869},
+    URL     = {https://doi.org/10.1021/acs.jcim.7b00425},
+    eprint  = {https://doi.org/10.1021/acs.jcim.7b00425}
+}
+```
+</details>
+
+<details>
+<summary>Show RIS</summary>
+
+```ris
+TY  - JOUR
+T1  - SmilesDrawer: Parsing and Drawing SMILES-Encoded Molecular Structures Using Client-Side JavaScript
+AU  - Probst, Daniel
+AU  - Reymond, Jean-Louis
+Y1  - 2018/01/22
+PY  - 2018
+DA  - 2018/01/22
+N1  - doi: 10.1021/acs.jcim.7b00425
+DO  - 10.1021/acs.jcim.7b00425
+T2  - Journal of Chemical Information and Modeling
+JF  - Journal of Chemical Information and Modeling
+JO  - J. Chem. Inf. Model.
+SP  - 1
+EP  - 7
+VL  - 58
+IS  - 1
+PB  - American Chemical Society
+SN  - 1549-9596
+M3  - doi: 10.1021/acs.jcim.7b00425
+UR  - https://doi.org/10.1021/acs.jcim.7b00425
+ER  - 
+```
+</details>
+
 
 ### Examples
 
@@ -91,203 +336,6 @@ Examples showing molecules from different databases:
 - [ChEMBL](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=chembl)
 
 A very simple JSFiddle example can be found [here](https://jsfiddle.net/zjdtkL57/1/). This example shows the `SmilesDrawer.apply()` functionality which draws the structure for every `canvas` element with a `data-smiles` attribute. E.g. `<canvas data-smiles="C1CCCCC1"></canvas>`
-
-### Experimental Features
-
-If you experience problems with the drawing of complex ring systems (including very long bonds), please enable experimental features (see options).
-
-### "Installation"
-
-SmilesDrawer is available from the unpkg content delivery network:
-
-```
-https://unpkg.com/smiles-drawer@1.2.0/dist/smiles-drawer.min.js
-```
-
-You can easily get smiles-drawer using yarn:
-
-```
-yarn add smiles-drawer
-```
-
-or you can just download the files from here.
-
-### Building Smiles Drawer
-
-If you decide not to use the ready-to-go scripts in `dist`, you can (edit and) build the project by running:
-
-```bash
-npm install
-npm run build
-```
-
-### Getting Started
-
-To get a simple input box which lets the user enter a SMILES and then display it in a canvas, the following minimal example is sufficient.
-In order to have nice consistent font rendering you have to include the droid sans font from google fonts.
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <title>Smiles Drawer Example</title>
-    <meta name="description" content="A minimal smiles drawer example." />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <link
-      href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <input id="example-input" name="example-input" />
-    <canvas id="example-canvas" width="500" height="500"></canvas>
-
-    <script src="https://unpkg.com/smiles-drawer@1.0.10/dist/smiles-drawer.min.js"></script>
-    <script>
-      let input = document.getElementById("example-input");
-      let options = {};
-
-      // Initialize the drawer to draw to canvas
-      let smilesDrawer = new SmilesDrawer.Drawer(options);
-      // Alternatively, initialize the SVG drawer:
-      // let svgDrawer = new SmilesDrawer.SvgDrawer(options);
-
-      input.addEventListener("input", function() {
-        // Clean the input (remove unrecognized characters, such as spaces and tabs) and parse it
-        SmilesDrawer.parse(input.value, function(tree) {
-          // Draw to the canvas
-          smilesDrawer.draw(tree, "example-canvas", "light", false);
-          // Alternatively, draw to SVG:
-          // svgDrawer.draw(tree, 'output-svg', 'dark', false);
-        });
-      });
-    </script>
-  </body>
-</html>
-```
-
-See the example folder for a more complete example.
-
-### Options
-
-The options are supplied to the constructor as shown in the example above.
-
-```javascript
-let options = { ... };
-let smilesDrawer = new SmilesDrawer(options);
-```
-
-The following options are available:
-
-| Option                                                          | Identifier                  | Data Type                           | Default Value |
-| --------------------------------------------------------------- | --------------------------- | ----------------------------------- | ------------- |
-| Drawing width                                                   | width                       | number                              | 500           |
-| Drawing height                                                  | height                      | number                              | 500           |
-| Bond thickness                                                  | bondThickness               | number                              | 0.6           |
-| Bond length                                                     | bondLength                  | number                              | 15            |
-| Short bond length (e.g. double bonds) in percent of bond length | shortBondLength             | number                              | 0.85          |
-| Bond spacing (e.g. space between double bonds)                  | bondSpacing                 | number                              | 0.18 \* 15    |
-| Atom Visualization                                              | atomVisualization           | string ['default', 'balls', 'none'] | 'default'     |
-| Large Font Size (in pt for elements)                            | fontSizeLarge               | number                              | 6             |
-| Small Font Size (in pt for numbers)                             | fontSizeSmall               | number                              | 4             |
-| Padding                                                         | padding                     | number                              | 20.0          |
-| Use experimental features                                       | experimental                | boolean                             | false         |
-| Show Terminal Carbons (CH3)                                     | terminalCarbons             | boolean                             | false         |
-| Show explicit hydrogens                                         | explicitHydrogens           | boolean                             | false         |
-| Overlap sensitivity                                             | overlapSensitivity          | number                              | 0.42          |
-| # of overlap resolution iterations                              | overlapResolutionIterations | number                              | 1             |
-| Draw concatenated terminals and pseudo elements                 | compactDrawing              | boolean                             | true          |
-| Draw isometric SMILES if available                              | isometric                   | boolean                             | true          |
-| Debug (draw debug information to canvas)                        | debug                       | boolean                             | false         |
-| Color themes                                                    | themes                      | object                              | see below     |
-
-The default options are defined as follows:
-
-```javascript
-{
-    width: 500,
-    height: 500,
-    bondThickness: 0.6,
-    bondLength: 15,
-    shortBondLength: 0.85,
-    bondSpacing: 0.18 * 15,
-    atomVisualization: 'default',
-    isomeric: true,
-    debug: false,
-    terminalCarbons: false,
-    explicitHydrogens: false,
-    overlapSensitivity: 0.42,
-    overlapResolutionIterations: 1,
-    compactDrawing: true,
-    fontSizeLarge: 5,
-    fontSizeSmall: 3,
-    padding: 20.0,
-    experimental: false,
-    themes: {
-        dark: {
-            C: '#fff',
-            O: '#e74c3c',
-            N: '#3498db',
-            F: '#27ae60',
-            CL: '#16a085',
-            BR: '#d35400',
-            I: '#8e44ad',
-            P: '#d35400',
-            S: '#f1c40f',
-            B: '#e67e22',
-            SI: '#e67e22',
-            H: '#fff',
-            BACKGROUND: '#141414'
-        },
-        light: {
-            C: '#222',
-            O: '#e74c3c',
-            N: '#3498db',
-            F: '#27ae60',
-            CL: '#16a085',
-            BR: '#d35400',
-            I: '#8e44ad',
-            P: '#d35400',
-            S: '#f1c40f',
-            B: '#e67e22',
-            SI: '#e67e22',
-            H: '#222',
-            BACKGROUND: '#fff'
-        }
-    }
-};
-```
-
-### Usage
-
-An instance of SmilesDrawer is able to draw to multiple targets. Initialize SmilesDrawer once for each set of options (you would initialize two different objects if you were to draw in two different sizes).
-
-```javascript
-let smilesDrawer = new SmilesDrawer.Drawer({ width: 250, height: 250 });
-```
-
-In order to depict a SMILES string it has to be parsed using SmilesDrawer's SMILES parser, which is encapsulated in the static function `SmilesDrawer.parse()` where the first argument is the SMILES string and the second argument a callback for a successful parsing. The third argument provides a way to handle errors using a callback.
-
-```javascript
-SmilesDrawer.parse('C1CCCCC1', function (tree) {
-    smilesDrawer.draw(tree, 'output-canvas', 'light', false);
-}, function (err) {
-    console.log(err);
-}
-```
-
-The function `smilesDrawer.draw()` requires two and accepts up to four arguments. The first argument is the parse tree returned by the parse function (through the callback), the second is the `id` of a HTML canvas element on which the structure will be drawn. The two optional arguments are whether to use the light or dark theme (defaults to `'light'`) and whether to only compute properties such as ring count, hac, etc. and not depict the structure (defaults to `false`).
-
-### API
-
-The SmilesDrawer object exposes methods that can be used for purposes other than drawing chemical structures.
-
-| Method                  | Description                                                                       | Returns  |
-| ----------------------- | --------------------------------------------------------------------------------- | -------- |
-| `getMolecularFormula()` | Returns the molecular formula, eg. C22H30N6O4S, of the currently loaded molecule. | `String` |
 
 ### Bridged Rings
 
