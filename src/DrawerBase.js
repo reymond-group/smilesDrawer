@@ -3147,12 +3147,15 @@ export default class DrawerBase {
     /**
      * TRANSITIONAL — do not add more patterns here without good reason.
      *
-     * This flips the R/S parity for specific parser-order edge cases where
-     * the neighbor ordering we get from the SMILES parser disagrees with
-     * what RDKit expects. It works for most molecules but is brittle:
-     * each pattern was matched empirically against the RDKit reference set.
-     * The long-term fix is a single canonical parity model that does not
-     * depend on parser traversal order at all.
+     * The R/S assignment depends on the order we visit neighbors, but
+     * the SMILES parser doesn't always give them in the right order.
+     * When that happens, we get R instead of S or vice versa. This
+     * method catches those specific cases and flips the result.
+     *
+     * It works, but it's fragile — each pattern was found by trial and
+     * error, not derived from first principles. The real fix is to stop
+     * depending on parse order entirely and use a single canonical way
+     * to assign parity.
      *
      * @param {Vertex} vertex The stereocenter.
      * @param {Number[]} neighbours Neighbors in current local order.

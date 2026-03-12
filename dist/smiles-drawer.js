@@ -9748,8 +9748,17 @@
       return child.value.branchBond ? "branch" : "next";
     }
     /**
-     * Apply narrow parity inversions for parser-order edge cases where the
-     * local bond-order convention differs from the current neighbour order.
+     * TRANSITIONAL — do not add more patterns here without good reason.
+     *
+     * The R/S assignment depends on the order we visit neighbors, but
+     * the SMILES parser doesn't always give them in the right order.
+     * When that happens, we get R instead of S or vice versa. This
+     * method catches those specific cases and flips the result.
+     *
+     * It works, but it's fragile — each pattern was found by trial and
+     * error, not derived from first principles. The real fix is to stop
+     * depending on parse order entirely and use a single canonical way
+     * to assign parity.
      *
      * @param {Vertex} vertex The stereocenter.
      * @param {Number[]} neighbours Neighbors in current local order.
