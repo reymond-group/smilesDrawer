@@ -640,6 +640,7 @@ export default class DrawerBase {
 
     processGraph() {
         this.position();
+        this.fixDoubleBondStereo();
 
         // Restore the ring information (removes bridged rings and replaces them with the original, multiple, rings)
         this.restoreRingInformation();
@@ -1049,6 +1050,7 @@ export default class DrawerBase {
             }
             else {
                 vertex.value.isBridge = true;
+                insideRing.push(vertex.id);
                 ringMembers.add(vertex.id);
             }
         }
@@ -1058,6 +1060,7 @@ export default class DrawerBase {
         this.addRing(ring);
 
         ring.isBridged = true;
+        ring.insiders = insideRing;
         ring.neighbours = [...neighbours];
 
         for (let i = 0; i < ringIds.length; i++) {
@@ -2058,11 +2061,146 @@ export default class DrawerBase {
     }
 
     /**
+     * Post-processing fix for E/Z double bond stereochemistry.
+     * After position(), checks all stereo double bonds and corrects any
+     * where the visual geometry doesn't match the SMILES encoding.
+     *
+     * The SMILES edge source→target preserves reading order, so we can
+     * determine the intended side for each substituent independent of
+     * the graph traversal order used during position().
+     */
+    fixDoubleBondStereo() {
+        const graph = this.graph;
+
+        for (let i = 0; i < graph.edges.length; i++) {
+            const edge = graph.edges[i];
+            if (edge.bondType !== '=') continue;
+
+            const vA = edge.sourceId;
+            const vB = edge.targetId;
+
+            // Skip double bonds where both atoms are in rings
+            if (graph.vertices[vA].value.rings.length > 0 &&
+                graph.vertices[vB].value.rings.length > 0) {
+                continue;
+            }
+
+            // Find stereo-marked (/ or \) bonds on each side
+            let stereoA = null, stereoB = null;
+
+            for (const nid of graph.vertices[vA].getNeighbours()) {
+                if (nid === vB) continue;
+                const e = graph.getEdge(vA, nid);
+                if (e && (e.bondType === '/' || e.bondType === '\\')) {
+                    // '/' means source is below, target is above
+                    // So neighbor's side depends on whether it's source or target
+                    let neighborAbove = (e.sourceId === vA)
+                        ? (e.bondType === '/')    // A→N: '/' = N above
+                        : (e.bondType === '\\');  // N→A: '\\' = N above
+                    stereoA = {nid, above: neighborAbove};
+                    break;
+                }
+            }
+
+            for (const nid of graph.vertices[vB].getNeighbours()) {
+                if (nid === vA) continue;
+                const e = graph.getEdge(vB, nid);
+                if (e && (e.bondType === '/' || e.bondType === '\\')) {
+                    let neighborAbove = (e.sourceId === vB)
+                        ? (e.bondType === '/')
+                        : (e.bondType === '\\');
+                    stereoB = {nid, above: neighborAbove};
+                    break;
+                }
+            }
+
+            if (!stereoA || !stereoB) continue;
+
+            // Expected: same above → same side → Z; different → opposite → E
+            const expectedSameSide = (stereoA.above === stereoB.above);
+
+            // Actual geometry via cross products
+            const posA = graph.vertices[vA].position;
+            const posB = graph.vertices[vB].position;
+            const posS1 = graph.vertices[stereoA.nid].position;
+            const posS2 = graph.vertices[stereoB.nid].position;
+
+            const ax = posB.x - posA.x;
+            const ay = posB.y - posA.y;
+
+            const cross1 = ax * (posS1.y - posA.y) - ay * (posS1.x - posA.x);
+            const cross2 = ax * (posS2.y - posB.y) - ay * (posS2.x - posB.x);
+            const actualSameSide = (cross1 > 0) === (cross2 > 0);
+
+            if (expectedSameSide === actualSameSide) continue;
+
+            // Geometry is wrong — reflect a subtree across the double bond axis.
+            // Prefer to flip from the side with fewer stereo bonds to avoid
+            // disrupting other stereo constraints at the same carbon.
+            let countA = 0, countB = 0;
+            for (const nid of graph.vertices[vA].getNeighbours()) {
+                if (nid === vB) continue;
+                const e = graph.getEdge(vA, nid);
+                if (e && (e.bondType === '/' || e.bondType === '\\')) countA++;
+            }
+            for (const nid of graph.vertices[vB].getNeighbours()) {
+                if (nid === vA) continue;
+                const e = graph.getEdge(vB, nid);
+                if (e && (e.bondType === '/' || e.bondType === '\\')) countB++;
+            }
+
+            let flipId, pivotId;
+            if (countA <= countB) {
+                flipId = stereoA.nid;
+                pivotId = vA;
+            }
+            else {
+                flipId = stereoB.nid;
+                pivotId = vB;
+            }
+
+            // Don't flip ring members; try the other side
+            if (graph.vertices[flipId].value.rings.length > 0) {
+                flipId = (pivotId === vA) ? stereoB.nid : stereoA.nid;
+                pivotId = (pivotId === vA) ? vB : vA;
+                if (graph.vertices[flipId].value.rings.length > 0) continue;
+            }
+
+            // Reflect subtree across the line through pivot in direction (ax, ay)
+            const pivot = graph.vertices[pivotId].position;
+            const len2 = ax * ax + ay * ay;
+            if (len2 < 0.001) continue;
+
+            const self = this;
+            graph.traverseTree(flipId, pivotId, function(vertex) {
+                const dx = vertex.position.x - pivot.x;
+                const dy = vertex.position.y - pivot.y;
+                const dot = dx * ax + dy * ay;
+
+                vertex.position.x = pivot.x + (2 * dot * ax / len2) - dx;
+                vertex.position.y = pivot.y + (2 * dot * ay / len2) - dy;
+
+                // Also reflect anchored ring centers
+                for (let j = 0; j < vertex.value.anchoredRings.length; j++) {
+                    let ring = self.rings[vertex.value.anchoredRings[j]];
+                    if (ring) {
+                        const rdx = ring.center.x - pivot.x;
+                        const rdy = ring.center.y - pivot.y;
+                        const rdot = rdx * ax + rdy * ay;
+                        ring.center.x = pivot.x + (2 * rdot * ax / len2) - rdx;
+                        ring.center.y = pivot.y + (2 * rdot * ay / len2) - rdy;
+                    }
+                }
+            });
+        }
+    }
+
+    /**
      * Rotate an entire subtree by an angle around a center.
      *
      * @param {Number} vertexId A vertex id (the root of the sub-tree).
      * @param {Number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
-     * @param {Number} angle An angle in randians.
+     * @param {Number} angle An angle in radians.
      * @param {Vector2} center The rotational center.
      */
     rotateSubtree(vertexId, parentVertexId, angle, center) {
