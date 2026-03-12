@@ -1,0 +1,1795 @@
+{
+  "N[C@@H](C)C(=O)O": {
+    "name": "L-Alanine",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "N[C@H](C)C(=O)O": {
+    "name": "D-Alanine",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "N[C@@H](CO)C(=O)O": {
+    "name": "L-Serine",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "N[C@@H]([C@@H](O)C)C(=O)O": {
+    "name": "L-Threonine",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "N[C@@H](CS)C(=O)O": {
+    "name": "L-Cysteine",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "N[C@@H](CC(C)C)C(=O)O": {
+    "name": "L-Leucine",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "N[C@@H]([C@H](C)CC)C(=O)O": {
+    "name": "L-Isoleucine",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "OC(=O)[C@@H]1CCCN1": {
+    "name": "L-Proline",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "N[C@@H](Cc1ccccc1)C(=O)O": {
+    "name": "L-Phenylalanine",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "N[C@@H](Cc1c[nH]c2ccccc12)C(=O)O": {
+    "name": "L-Tryptophan",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O": {
+    "name": "D-Glucose",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "OC[C@H]1OC(O)[C@H](O)[C@@H]1O": {
+    "name": "D-Ribose",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC(C)Cc1ccc(cc1)[C@@H](C)C(=O)O": {
+    "name": "(S)-Ibuprofen",
+    "centers": [
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "OC(=O)[C@@H](O)c1ccccc1": {
+    "name": "(R)-Mandelic acid",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "OC(=O)[C@@H](O)[C@@H](O)C(=O)O": {
+    "name": "L-Tartaric acid",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "OC(=O)[C@@H](O)[C@H](O)C(=O)O": {
+    "name": "meso-Tartaric acid",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "ClC1=CC=C(C=C1)COC[C@H]2N(CCC2)CCC3=CC=C(C=C3)OC": {
+    "name": "Problematic stereo mol",
+    "centers": [
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CNC[C@@H](O)c1ccc(O)c(O)c1": {
+    "name": "Epinephrine",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CN1CCC[C@H]1c1cccnc1": {
+    "name": "Nicotine",
+    "centers": [
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "OC(=O)[C@@H]1C(=O)N2[C@@H]1SC(C)(C)[C@H]2C(=O)NCc1ccccc1": {
+    "name": "Penicillin G",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "N[C@@H](c1ccccc1)C(=O)N[C@H]1[C@@H]2SC(C)(C)[C@@H](N2C1=O)C(=O)O": {
+    "name": "Ampicillin",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 11,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "N[C@@H](c1ccc(O)cc1)C(=O)N[C@H]1[C@@H]2SC(C)(C)[C@@H](N2C1=O)C(=O)O": {
+    "name": "Amoxicillin",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C[C@@H]1CC[C@H]2[C@@H](C)C(=O)O[C@@H]3O[C@@]4(C)CC[C@@H]1[C@@]23OO4": {
+    "name": "Artemisinin",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "CN1CC[C@]23[C@@H]4[C@H]1CC5=C2C(=C(C=C5)O)O[C@H]3[C@H](C=C4)O": {
+    "name": "Morphine",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "COc1ccc2C[C@@H]3N(C)CC[C@]45[C@@H]3Oc1c2[C@@H]4O[C@H]5CC=C": {
+    "name": "Codeine",
+    "centers": [
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "n2c1c(ncnc1n(c2)[C@@H]3O[C@@H]([C@@H](O)[C@H]3O)CO)N": {
+    "name": "Adenosine",
+    "centers": [
+      {
+        "atomIdx": 9,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 11,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "Nc1ncnc2c1ncn2[C@@H]1O[C@H](COP(=O)(O)O)[C@@H](O)[C@H]1O": {
+    "name": "AMP",
+    "centers": [
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "O=C(N)c1ccc[n+](c1)[C@H]2[C@H](O)[C@H](O)[C@H](O2)COP([O-])(=O)OP(=O)(O)OC[C@H]3O[C@@H](n4cnc5c4ncnc5N)[C@@H]([C@@H]3O)OP(=O)(O)O": {
+    "name": "NAD+",
+    "centers": [
+      {
+        "atomIdx": 9,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 27,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 29,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 40,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 41,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "O=C1NC(C(C)=CN1[C@@H]2O[C@H](CO)[C@@H](N=[N+]=[N-])C2)=O": {
+    "name": "AZT-like",
+    "centers": [
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC(=O)N[C@@H]1[C@H](O)[C@@H](O)[C@H](CO)O[C@H]1O": {
+    "name": "GlcNAc",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 9,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "OC[C@H]1O[C@@](CO)(O[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@@H](O)[C@@H]1O": {
+    "name": "Sucrose",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "N[C@@H](CCC(=O)N[C@@H](CS)C(=O)NCC(=O)O)C(=O)O": {
+    "name": "Glutathione",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@H]1O": {
+    "name": "D-Galactose",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "OC[C@H]1OC(O)[C@@H](O)[C@@H](O)[C@@H]1O": {
+    "name": "D-Mannose",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "OC[C@@H](O)[C@@H](O)[C@H](O)C(=O)CO": {
+    "name": "D-Fructose",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "[C@@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C": {
+    "name": "Cholesterol",
+    "centers": [
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 11,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 22,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC1=C2[C@@]([C@]([C@H]([C@@H]3[C@]4([C@H](OC4)C[C@@H]([C@]3(C(=O)[C@@H]2OC(=O)C)C)O)OC(=O)C)OC(=O)c5ccccc5)(C[C@@H]1OC(=O)[C@H](O)[C@@H](NC(=O)c6ccccc6)c7ccccc7)O)(C)C": {
+    "name": "Taxol",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 37,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 41,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 43,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "OC(c1ccnc2ccc(OC)cc12)[C@@H]3C[C@H]4CC[C@@H](C3)N4C=C": {
+    "name": "Quinine",
+    "centers": [
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "OC(c1ccnc2ccc(OC)cc12)[C@H]3C[C@@H]4CC[C@H](C3)N4C=C": {
+    "name": "Quinidine",
+    "centers": [
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "CC[C@@H]1OC(=O)[C@H](C)[C@@H](O[C@H]2C[C@@](C)(OC)[C@@H](O)[C@H](C)O2)[C@H](C)[C@@H](O[C@@H]3O[C@H](C)C[C@@H]([C@H]3O)N(C)C)[C@](C)(O)C[C@@H](C)C(=O)[C@H](C)[C@@H](O)[C@]1(C)O": {
+    "name": "Erythromycin",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 23,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 25,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 27,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 30,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 31,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 36,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 40,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 44,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 46,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 48,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "COc1cccc2c1C(=O)c1c(O)c3c(c(O)c1C2=O)C[C@@](O)(C[C@@H]3O[C@H]1C[C@H](N)[C@H](O)[C@H](C)O1)C(=O)CO": {
+    "name": "Doxorubicin",
+    "centers": [
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 24,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 26,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 28,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 30,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 32,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "O=C1C[C@H]2OCC=C3C[C@H]4[C@@H](N5CC[C@@]61[C@@H]5C=CC4)N3C6=CC=C2": {
+    "name": "Strychnine",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 9,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CO[C@H]1[C@@H](CC2=C1NC1=CC(OC)=CC=C21)C(=O)OC": {
+    "name": "Reserpine",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "CC(C)c1n(CC[C@@H](O)C[C@@H](O)CC(=O)O)c(c2ccc(F)cc2)c(c1c1ccccc1)C(=O)Nc1ccccc1": {
+    "name": "Atorvastatin",
+    "centers": [
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "CCC(C)(C)C(=O)O[C@H]1C[C@@H](O)C=C2C=C[C@H](C)[C@H](CC[C@@H](O)CC(=O)O)[C@@H]21": {
+    "name": "Simvastatin",
+    "centers": [
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 27,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC[C@H](C)C(=O)O[C@H]1C[C@@H](O)C=C2C=C[C@H](C)[C@H](CC[C@@H](O)CC(=O)O)[C@@H]21": {
+    "name": "Lovastatin",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 9,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 20,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 26,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CN(Cc1cnc2nc(N)nc(N)c2n1)c1ccc(C(=O)N[C@@H](CCC(=O)O)C(=O)O)cc1": {
+    "name": "Methotrexate",
+    "centers": [
+      {
+        "atomIdx": 22,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C[C@@H](CS)C(=O)N1CCC[C@H]1C(=O)O": {
+    "name": "Captopril",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CCOC(=O)[C@@H](CCc1ccccc1)N[C@@H](C)C(=O)N1CCC[C@H]1C(=O)O": {
+    "name": "Enalapril",
+    "centers": [
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 23,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "NCCCC[C@@H](N[C@@H](CCc1ccccc1)C(=O)O)C(=O)N1CCC[C@H]1C(=O)O": {
+    "name": "Lisinopril",
+    "centers": [
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 25,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC(=O)CC(c1ccccc1)c1c(O)c2ccccc2oc1=O": {
+    "name": "Warfarin",
+    "centers": []
+  },
+  "COC(=O)[C@H](c1ccccc1Cl)N1CCc2sccc2C1": {
+    "name": "Clopidogrel",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CCOC(=O)C1=C[C@@H](OC(CC)CC)[C@H](NC(C)=O)[C@@H](N)C1": {
+    "name": "Oseltamivir",
+    "centers": [
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC(C)[C@@H](NC(=O)[C@@H](CC(=O)N[C@H](Cc1ccccc1)[C@H](O)C[C@@H](Cc1ccccc1)NC(=O)C(C)(C)C)CC1CCCCCC1)C(=O)O": {
+    "name": "Lopinavir",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 20,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 23,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "CC(C)[C@@H](NC(=O)N(C)Cc1csc(n1)C(C)C)C(=O)N[C@@H](C[C@@H](O)[C@H](Cc1ccccc1)NC(=O)OCc1cncs1)Cc1ccccc1": {
+    "name": "Ritonavir",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 23,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 25,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C[C@@H]1CC[C@H](C(C)C)[C@@H](O)C1": {
+    "name": "Menthol",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC1(C)[C@@H]2CC[C@]1(C)C(=O)C2": {
+    "name": "Camphor",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC1=CC[C@@H]2C[C@H]1C2(C)C": {
+    "name": "alpha-Pinene",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C=C(C)[C@@H]1CC=C(C)CC1": {
+    "name": "Limonene",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C=C(C)[C@@H]1CC=C(C)C(=O)C1": {
+    "name": "Carvone",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "CC1(C)[C@@H]2CC[C@]1(C)[C@@H](O)C2": {
+    "name": "Borneol",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@@]34C)[C@@H]1CC[C@@H]2O": {
+    "name": "Testosterone",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C[C@]12CC[C@H]3[C@@H](CCc4cc(O)ccc43)[C@@H]1CC[C@@H]2O": {
+    "name": "Estradiol",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@@]34C)[C@@H]1CC[C@@H]2C(=O)C": {
+    "name": "Progesterone",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "O[C@@]1(CC[C@@H]2[C@@H]1CC[C@H]1[C@H]3CCC(=O)C=C3CC[C@@]21C)C(=O)CO": {
+    "name": "Cortisol",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 9,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "C[C@@H]1C[C@H]2[C@@H]3CCC4=CC(=O)C=C[C@]4(C)[C@@]3(F)[C@@H](O)C[C@]2(C)[C@@]1(O)C(=O)CO": {
+    "name": "Dexamethasone",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 20,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 22,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "OC(=O)c1cn(C2CC2)c2cc(N3CCNCC3)c(F)cc2c1=O": {
+    "name": "Ciprofloxacin",
+    "centers": []
+  },
+  "C[C@H]1COc2c(N3CCN(C)CC3)c(F)cc3c(=O)c(cn1c23)C(=O)O": {
+    "name": "Levofloxacin",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC[C@@H]1OC(=O)[C@H](C)[C@@H](O[C@H]2C[C@@](C)(OC)[C@@H](O)[C@H](C)O2)[C@H](C)[C@@H](O[C@@H]3O[C@H](C)C[C@@H]([C@H]3O)N(C)C)[C@](C)(O)C[C@@H](C)CN(C)[C@H](C)[C@@H](O)[C@]1(C)O": {
+    "name": "Azithromycin",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 16,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 23,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 25,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 27,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 30,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 31,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 36,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 40,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 45,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 47,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 49,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CCCCCCCCCC(=O)N[C@@H](CC(=O)O)C(=O)N[C@H]1CC(=O)N[C@@H](CC(N)=O)C(=O)O1": {
+    "name": "Daptomycin partial",
+    "centers": [
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 20,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 25,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C[C@@H]1OC(O)[C@@H](O)[C@H](O)[C@@H]1O": {
+    "name": "L-Fucose",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 9,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CC(=O)N[C@@H]1[C@@H](O)C[C@@](O)(OC1[C@H](O)[C@H](O)CO)C(=O)O": {
+    "name": "N-Acetylneuraminic acid",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "OC[C@H]1OC(O[C@@H]2OC(CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O": {
+    "name": "Trehalose",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 11,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CO[C@@H]1C[C@@H](CC(=O)[C@@H](CC=C)C(=O)O1)OC": {
+    "name": "Rapamycin partial",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "CC(/C=C/C1=CSC(C)=N1)[C@@H]1C[C@@H]2O[C@]2(C)CCC[C@@H](O)C(=O)C(=C)[C@@H](C)C(=O)O1": {
+    "name": "Epothilone B",
+    "centers": [
+      {
+        "atomIdx": 10,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 25,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  }
+}
