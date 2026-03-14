@@ -222,52 +222,6 @@ Some possible gotchas:
 - The background is not currently drawn.
 
 
-### Examples in Specific Frameworks
-
-<details>
-    <summary>Svelte</summary>
-
-```html
-<!--file:Molecule.svlete-->
-<!--Tested against v2.1.7 of smiles-drawer-->
-<script>
-    import { afterUpdate } from "svelte";
-    import SmilesDrawer from "smiles-drawer";
-
-    export let smiles = "";
-
-    const SETTINGS = {
-        width: 300,
-        height: 200,
-    };
-    let drawer = new SmilesDrawer.SvgDrawer(SETTINGS);
-    let svgElement;
-
-    afterUpdate(() => {
-        SmilesDrawer.parse(smiles, function (tree) {
-            drawer.draw(tree, svgElement, "light");
-        });
-    });
-</script>
-
-<div>
-    <svg bind:this={svgElement} data-smiles={smiles} />
-</div>
-
-<style>
-    svg {
-        width: 300px;
-        height: 200px;
-    }
-</style>
-
-<!--usage-->
-<Molecule smiles="CCCO" />
-```
-
-</details>
-
-
 ### Please Cite
 
 If you use this project in your research,  please cite the original paper, which
@@ -323,7 +277,7 @@ ER  -
 </details>
 
 
-### Examples
+<!-- ### Examples
 
 An example using the light theme can be found [here](http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html), while one using the dark theme can be found [here](http://doc.gdb.tools/smilesDrawer/sd/example/index.html) . The colors of SmilesDrawer are completely configurable.
 
@@ -335,7 +289,8 @@ Examples showing molecules from different databases:
 - [SureChEMBL](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=schembl)
 - [ChEMBL](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=chembl)
 
-A very simple JSFiddle example can be found [here](https://jsfiddle.net/zjdtkL57/1/). This example shows the `SmilesDrawer.apply()` functionality which draws the structure for every `canvas` element with a `data-smiles` attribute. E.g. `<canvas data-smiles="C1CCCCC1"></canvas>`
+A very simple JSFiddle example can be found [here](https://jsfiddle.net/zjdtkL57/1/). This example shows the `SmilesDrawer.apply()` functionality which draws the structure for every `canvas` element with a `data-smiles` attribute. E.g. `<canvas data-smiles="C1CCCCC1"></canvas>`-->
+
 
 ### Bridged Rings
 
