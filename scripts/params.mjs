@@ -1,15 +1,26 @@
-export const BUILD = {
+export const BASE = {
     entryPoints: ['app.js'],
-    outfile:     'dist/smiles-drawer.js',
+    target:      ['chrome65'],
     sourcemap:   true,
     bundle:      true,
 };
 
-export const MINIFY = {
-    entryPoints: ['app.js'],
-    outfile:     'dist/smiles-drawer.min.js',
-    target:      ['chrome65'],
-    sourcemap:   true,
-    bundle:      true,
-    minify:      true,
-};
+// Targets for local development and custom builds:
+export const DEV_BUNDLE = Object.assign({}, BASE, {
+    outfile: 'dist/smiles-drawer.dev.js',
+});
+
+export const DEV_MINIFY = Object.assign({}, BASE, {
+    outfile: 'dist/smiles-drawer.dev.min.js',
+    minify:  true,
+});
+
+// Targets for the official builds:
+export const BUNDLE = Object.assign({}, BASE, {
+    outfile: 'dist/smiles-drawer.js',
+});
+
+export const MINIFY = Object.assign({}, BASE, {
+    outfile: 'dist/smiles-drawer.min.js',
+    minify:  true,
+});

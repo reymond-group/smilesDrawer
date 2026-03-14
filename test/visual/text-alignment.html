@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="./visual-tests.css" />
+    <script type="text/javascript" src="./visual-tests.js"></script>
+    <script type="text/javascript" src="../../dist/smiles-drawer.dev.js"></script>
+    <title>Text Alignment Tests</title>
+    <script type="module" defer>
+      const TESTS = [
+        {
+          desc: 'All of these molecules should be centered in the canvas.',
+          cause: undefined,
+          status: 'passing',
+          smiles: [
+            '[C][C]',
+            '[C+][C]',
+            '[C][C+]',
+            '[C+][C+]',
+
+            '[N][N][N]',
+            '[N+][N][N]',
+            '[N][N+][N]',
+            '[N][N][N+]',
+          ],
+          links: [
+            'https://github.com/reymond-group/smilesDrawer/issues/195'
+          ]
+        },
+        {
+          desc: 'All of the superscript numbers should be the same size and weight.',
+          cause: 'Not our fault! The superscript characters were added to Unicode (and most fonts) at different times, and ended up looking different...',
+          status: 'failing',
+          smiles: [
+            '[145X][267X][389X][901X]'
+          ],
+          links: [
+            'https://github.com/reymond-group/smilesDrawer/issues/186',
+            'https://github.com/liberationfonts/liberation-fonts/issues/77'
+          ]
+        },
+        {
+          desc: 'The carbons should be centered based on their element symbol, like the hydrogens.',
+          cause: 'Superscripts and subscripts are used to calculate the bounding boxes for each atom, which messes with alignment.',
+          status: 'failing',
+          smiles: [
+            '[13CH2]([CH2-2][13C@@H]([13C](=O)O)N)[13CH2]N'
+          ],
+          links: [
+            'https://github.com/reymond-group/smilesDrawer/issues/207'
+          ]
+        }
+      ];
+
+      // await loadSmilesDrawer();
+      const container = document.getElementById('tests');
+      loadTests(container, TESTS);
+    </script>
+  </head>
+  <body>
+    <h1>Text Alignment Tests</h1>
+    <div id="tests"></div>
+  </body>
+</html>

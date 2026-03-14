@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="./visual-tests.css" />
+    <script type="text/javascript" src="./visual-tests.js"></script>
+    <script type="text/javascript" src="../../dist/smiles-drawer.dev.js"></script>
+    <title>Bond Parsing Tests</title>
+    <script type="module" defer>
+      const TESTS = [
+        {
+          desc: 'All of the rings in these molecules should be six-membered rings.',
+          cause: 'Re-using the ringbond ID 1 creates a larger ring due to a ringbond parsing bug.',
+          status: 'failing',
+          smiles: [
+            'C(C1=CC=CC=C1)1=CC=C(C2C=CC(C3C=CC(C4C=CC(C5C=CC=CC=5)=CC=4)=CC=3)=CC=2)C=C1',
+            'C(C1=CC=CC=C1)1=CC=C(C2C=CC=CC=2)C=C1',
+            'C(C1=CC=CC=C1)1=CC=CC=C1',
+            'C(C1=CC=CC=C1)2=CC=CC=C2 EXPECTED'
+          ],
+          links: [
+            'https://github.com/reymond-group/smilesDrawer/issues/162'
+          ]
+        },
+        {
+          desc: 'All of these bonds should draw as aromatic bonds.',
+          cause: 'The parser bases the bond type on the SMILES aromaticity of the atom (lower vs upper case) and ignores explicit bonds.',
+          status: 'failing',
+          smiles: [
+            'C1:C:C:N:N:C:1',
+            'O:C(:O):O'
+          ],
+          links: [
+            'https://github.com/reymond-group/smilesDrawer/issues/174'
+          ]
+        },
+        {
+          desc: 'None of these rings should draw as aromatic rings.',
+          cause: 'The parser bases the bond type on the SMILES aromaticity of the atom (lower vs upper case) and ignores explicit bonds.',
+          status: 'failing',
+          smiles: [
+            'c1-c-c-c-c-c-1',
+            'C1c=cn=nc1',
+            'c1c=cn=nc1',
+            'c1=c=c=c=c=c=1',
+            'c1#cc#cc#c1',
+          ],
+          links: [
+            'https://github.com/reymond-group/smilesDrawer/issues/174'
+          ]
+        }
+      ];
+
+      // await loadSmilesDrawer();
+      const container = document.getElementById('tests');
+      loadTests(container, TESTS);
+    </script>
+  </head>
+  <body>
+    <h1>Bond Parsing Tests</h1>
+    <div id="tests"></div>
+  </body>
+</html>

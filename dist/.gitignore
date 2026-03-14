@@ -1,3 +1,12 @@
+# Local development targets that won't be checked in by default.
+# To make a new committable release, run `npm run release`.
+smiles-drawer.dev.js
+smiles-drawer.dev.js.map
+
+# A minified local bundle for custom builds.
+smiles-drawer.dev.min.js
+smiles-drawer.dev.min.js.map
+
 # Useful for local dev work, but not so much for production.
 # Real deployments will be using the minified bundle.
 smiles-drawer.js.map
