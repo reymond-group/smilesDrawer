@@ -1,0 +1,49 @@
+.test-case {
+  border: 2px solid black;
+  margin: 12px 4px;
+  overflow: auto;
+}
+
+.description {
+  clear: both;
+  background-color: #ddd;
+/*  margin: 4px;*/
+  padding: 4px;
+}
+
+.status {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.status.passing {
+  color: #040;
+}
+
+.status.failing {
+  color: #400;
+}
+
+.cause {
+  background-color: #ddd;
+  color: #666;
+  padding: 0px 4px 4px 4px;
+}
+
+.frame {
+  background-color: #ddd;
+  float: left;
+  padding: 4px;
+  margin: 4px;
+}
+
+.frame > canvas {
+  background-color: #fff;
+}
+
+.caption {
+  max-width: 200px;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+}
