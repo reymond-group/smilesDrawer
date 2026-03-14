@@ -1,6 +1,6 @@
 {
   "name": "smiles-drawer",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A SMILES drawer and parser. Generate molecular structure depictions in pure JavaScript.",
   "main": "./app.js",
   "repository": "https://github.com/reymond-group/smilesDrawer.git",
@@ -20,13 +20,13 @@
   },
   "scripts": {
     "build":     "node ./scripts/build.mjs",
-    "lint":      "npm exec eslint",
+    "lint":      "npm exec -- eslint",
     "minify":    "node ./scripts/minify.mjs",
     "release":   "node ./scripts/release.mjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "npm exec -- tsc --noEmit",
     "watch":     "node ./scripts/watch.mjs",
 
     "test:ci":     "npm run test:unit",
-    "test:unit":   "vitest run test/unit test/regression/smiles-parsing.test.js"
+    "test:unit":   "npm exec -- vitest run test/unit test/regression/smiles-parsing.test.js"
   }
 }

@@ -13223,7 +13223,7 @@
 
   // app.js
   var SmilesDrawerNS = {
-    Version: "2.2.0",
+    Version: "2.2.1",
     Drawer,
     GaussDrawer,
     Parser: Parser_default,
