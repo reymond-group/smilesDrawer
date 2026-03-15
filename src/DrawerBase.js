@@ -691,7 +691,10 @@ export default class DrawerBase {
                         }
                         else if (neighboursB.length === 2) {
                             // Switch places / sides
-                            // If vertex a is in a ring, do nothing
+                            // Here we only try to rotate a simple ring substituent.
+                            // If both ends of the bond are already inside rings, this code gives up.
+                            // That means it will not help with a ring attached to another ring 
+                            // layouts, which is why a later dedicated pass was added
                             if (vertexB.value.rings.length !== 0 && vertexA.value.rings.length !== 0) {
                                 continue;
                             }
@@ -700,11 +703,58 @@ export default class DrawerBase {
                             let neighbourB = this.graph.vertices[neighboursB[1]];
 
                             if (neighbourA.value.rings.length === 1 && neighbourB.value.rings.length === 1) {
-                                // Both neighbours in same ring. TODO: does this create problems with wedges? (up = down and vice versa?)
+                                // We only want the case where these two neighbours belong to the same ring.
+                                // In practice, this means vertexB is acting like the attachment point for one ring.
                                 if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
                                     continue;
                                 }
-                                // TODO: Rotate circle
+
+                                let ringId = neighbourA.value.rings[0];
+                                // only handle rings that have a single
+                                // connection to the rest of the structure. If the ring has multiple exits,
+                                // rotating it here becomes much less predictable
+                                if (this.getRingExternalConnectionCount(ringId) !== 1) {
+                                    continue;
+                                }
+
+                                let bestAngle = 0.0;
+                                let bestOverlap = this.totalOverlapScore;
+                                let ring = this.getRing(ringId);
+                                let stepAngle = MathHelper.centralAngle(ring.getSize());
+                                let maxSteps = Math.max(1, Math.floor(ring.getSize() / 2));
+
+                                for (let step = 1; step <= maxSteps; step++) {
+                                    let angle = stepAngle * step;
+                                    
+                                    // Try roatation in one direction 
+                                    this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
+
+                                    let newTotalOverlapScore = this.getOverlapScore().total;
+                                    if (newTotalOverlapScore < bestOverlap) {
+                                        bestOverlap = newTotalOverlapScore;
+                                        bestAngle = angle;
+                                    }
+
+                                    // Try in the other direction (twice to revert previous one)
+                                    this.rotateSubtree(vertexB.id, vertexA.id, -angle, vertexB.position);
+                                    this.rotateSubtree(vertexB.id, vertexA.id, -angle, vertexB.position);
+
+                                    newTotalOverlapScore = this.getOverlapScore().total;
+                                    if (newTotalOverlapScore < bestOverlap) {
+                                        bestOverlap = newTotalOverlapScore;
+                                        bestAngle = -angle;
+                                    }
+
+                                    // restore the original before testing the next angle.
+                                    this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
+                                }
+
+                                // only keep a rotation if we actually found an orientation that improved
+                                // the global overlap score
+                                if (bestAngle !== 0.0) {
+                                    this.rotateSubtree(vertexB.id, vertexA.id, bestAngle, vertexB.position);
+                                    this.totalOverlapScore = bestOverlap;
+                                }
                             }
                             else if (neighbourA.value.rings.length !== 0 || neighbourB.value.rings.length !== 0) {
                                 continue;
@@ -734,6 +784,9 @@ export default class DrawerBase {
             }
         }
 
+        this.resolveSecondaryOverlaps(overlapScore.scores);
+        this.resolveRigidRingOverlaps();
+        overlapScore = this.getOverlapScore();
         this.resolveSecondaryOverlaps(overlapScore.scores);
 
         if (this.opts.isomeric) {
@@ -2204,14 +2257,16 @@ export default class DrawerBase {
      * @param {Vector2} center The rotational center.
      */
     rotateSubtree(vertexId, parentVertexId, angle, center) {
+        let rotationCenter = center.clone();
+
         this.graph.traverseTree(vertexId, parentVertexId, (vertex) => {
-            vertex.position.rotateAround(angle, center);
+            vertex.position.rotateAround(angle, rotationCenter);
 
             for (let i = 0; i < vertex.value.anchoredRings.length; i++) {
                 let ring = this.rings[vertex.value.anchoredRings[i]];
 
                 if (ring) {
-                    ring.center.rotateAround(angle, center);
+                    ring.center.rotateAround(angle, rotationCenter);
                 }
             }
         });
@@ -3003,7 +3058,190 @@ export default class DrawerBase {
     }
 
     /**
-     * Annotaed stereochemistry information for visualization.
+     * Returns the minimum distance between any pair of non-bonded drawn atoms.
+     *
+     * @returns {Number} The minimum non-bonded distance.
+     */
+    getMinimumNonBondedDistance() {
+        let minimumDistance = Number.POSITIVE_INFINITY;
+
+        for (let i = 0; i < this.graph.vertices.length; i++) {
+            let vertexA = this.graph.vertices[i];
+
+            if (!vertexA.value.isDrawn) {
+                continue;
+            }
+
+            for (let j = i + 1; j < this.graph.vertices.length; j++) {
+                if (this.graph.hasEdge(i, j)) {
+                    continue;
+                }
+
+                let vertexB = this.graph.vertices[j];
+                if (!vertexB.value.isDrawn) {
+                    continue;
+                }
+
+                let distance = vertexA.position.distance(vertexB.position);
+                if (distance < minimumDistance) {
+                    minimumDistance = distance;
+                }
+            }
+        }
+
+        return minimumDistance;
+    }
+
+    /**
+     * Returns the number of external ring connections, counting bonds from ring members
+     * to atoms outside the ring.
+     *
+     * @param {Number} ringId A ring id.
+     * @returns {Number} The number of external connections.
+     */
+    getRingExternalConnectionCount(ringId) {
+        let ring = this.getRing(ringId);
+
+        if (!ring) {
+            return 0;
+        }
+
+        let members = new Set(ring.members);
+        let externalConnections = new Set();
+
+        for (let i = 0; i < ring.members.length; i++) {
+            let memberId = ring.members[i];
+            let vertex = this.graph.vertices[memberId];
+
+            for (let j = 0; j < vertex.neighbours.length; j++) {
+                let neighbourId = vertex.neighbours[j];
+
+                if (!members.has(neighbourId)) {
+                    externalConnections.add(`${memberId}:${neighbourId}`);
+                }
+            }
+        }
+
+        return externalConnections.size;
+    }
+
+    /**
+     * Try rigid rotations for ring systems attached through a rotatable bond after the
+     * main overlap passes have settled. This catches ring-on-ring stacking that is only
+     * obvious in the final geometry.
+     */
+    resolveRigidRingOverlaps() {
+        let currentOverlap = this.getOverlapScore().total; //total overlap score
+        let currentMinimumDistance = this.getMinimumNonBondedDistance(); //to make sure we are 
+        // not creating a collision elsewhere
+        let minimumAllowedDistance = this.opts.bondLength * 0.3;
+
+        for (let i = 0; i < this.graph.edges.length; i++) {
+            let edge = this.graph.edges[i];
+            // Only single, non-terminal, non-ring bonds can be rotated.
+            if (!this.isEdgeRotatable(edge)) {
+                continue;
+            }
+
+            let subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
+            let subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
+            let a = edge.targetId;
+            let b = edge.sourceId;
+
+            // Rotate the shorter side of the bond.
+            // This changes less of the drawing and is less likely to disturb the rest of the layout
+            if (subTreeDepthA > subTreeDepthB) {
+                a = edge.sourceId;
+                b = edge.targetId;
+            }
+
+            let vertexA = this.graph.vertices[a];
+            let vertexB = this.graph.vertices[b];
+            let neighboursB = vertexB.getNeighbours(a);
+
+            // We only handle a very specific shape here:
+            // after removing the pivot bond to vertexA, vertexB must connect to exactly two atoms.
+            // That makes vertexB look like the entry point into one ring.
+            if (neighboursB.length !== 2) {
+                continue;
+            }
+
+            let neighbourA = this.graph.vertices[neighboursB[0]];
+            let neighbourB = this.graph.vertices[neighboursB[1]];
+
+            // Both neighbours must belong to exactly one ring.
+            // If either atom is in no ring or in multiple rings, this is not the clean rigid-ring case.
+            if (neighbourA.value.rings.length !== 1 || neighbourB.value.rings.length !== 1) {
+                continue;
+            }
+
+            // The two neighbours must belong to the same ring.
+            // This confirms that rotating around A-B will rotate one attached ring system as a rigid unit.
+            if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
+                continue;
+            }
+
+            let ring = this.getRing(neighbourA.value.rings[0]);
+            // Safety check in case ring data is missing or was not restored as expected.
+            if (!ring) {
+                continue;
+            }
+
+            let bestAngle = 0.0;
+            let bestOverlap = currentOverlap;
+            let bestMinimumDistance = currentMinimumDistance;
+            // Try sensible orientations based on ring geometry
+            // e.g., a six-membered ring is tested in 60 degree increments
+            let stepAngle = MathHelper.centralAngle(ring.getSize());
+            let maxSteps = Math.max(1, Math.floor(ring.getSize() / 2));
+
+            for (let step = 1; step <= maxSteps; step++) {
+                let baseAngle = stepAngle * step;
+
+                for (let direction = 0; direction < 2; direction++) {
+                    let angle = direction === 0 ? baseAngle : -baseAngle;
+
+                    //rotate first by angle
+                    this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
+
+                    let newOverlap = this.getOverlapScore().total;
+                    let newMinimumDistance = this.getMinimumNonBondedDistance();
+
+                    //undo rotation once we got the score
+                    this.rotateSubtree(vertexB.id, vertexA.id, -angle, vertexB.position);
+
+                    // reject if two non-bonded atoms come too close together 
+                    if (newMinimumDistance <= minimumAllowedDistance) {
+                        continue;
+                    }
+
+                    // prefer the one with a lower overlap score
+                    // and if two candidates tie, select one with more clearance between atoms
+                    if (newOverlap < bestOverlap - 1e-6
+                        || (Math.abs(newOverlap - bestOverlap) <= 1e-6 && newMinimumDistance > bestMinimumDistance + 1e-6)
+                    ) {
+                        bestAngle = angle;
+                        bestOverlap = newOverlap;
+                        bestMinimumDistance = newMinimumDistance;
+                    }
+                }
+            }
+
+            // apply the best rigid rotation if we found one
+            // Then update the "current best" baseline so later edges are judged against the improved layout.
+            if (bestAngle !== 0.0) {
+                this.rotateSubtree(vertexB.id, vertexA.id, bestAngle, vertexB.position);
+                currentOverlap = bestOverlap;
+                currentMinimumDistance = bestMinimumDistance;
+            }
+        }
+
+        // keep the stored total overlap score in sync with the final geometry after this pass.
+        this.totalOverlapScore = currentOverlap;
+    }
+
+    /**
+     * Annotated stereochemistry information for visualization.
      */
     annotateStereochemistry() {
         let maxDepth = 10;
