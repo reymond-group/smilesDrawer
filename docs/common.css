@@ -1,3 +1,8 @@
+/* This file contains styles for the standard SmilesDrawer header used in the JS
+ * examples.  It doesn't affect how the molecules are drawn.  If an example uses
+ * custom CSS, that can be found in the example folder (possibly in the HTML).
+ */
+
 body {
   background-color: #eee;
   font-family: Arial, Helvetica, sans-serif;

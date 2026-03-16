@@ -1,3 +1,5 @@
+![NPM Package](https://img.shields.io/npm/v/smiles-drawer)
+
 # SmilesDrawer 2.0
 
 No server, no images, no templates - just SMILES 😊
@@ -26,23 +28,30 @@ Current Version: **2.2.1**
 </table>
 
 
+## Getting Started
+
 ### "Installation"
 
 The latest version of SmilesDrawer can be found in the `dist` folder on GitHub:\
 <https://github.com/reymond-group/smilesDrawer/tree/master/dist>
 
-It is also available as an [NPM package](https://www.npmjs.com/package/smiles-drawer),
-but this package is currently  **out of date**.  Prefer the bundles from GitHub.
-NPM updates should (hopefully!) resume soon.
+SmilesDrawer is also available as `smiles-drawer` on NPM,  so you can install it
+with your favorite JavaScript package manager (`npm`, `yarn`, etc.):\
+<https://www.npmjs.com/package/smiles-drawer>
+
+The code on NPM is also available through various CDNs, including:
+
+- **UNPKG**     <https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js>
+- **jsDelivr**  <https://cdn.jsdelivr.net/npm/smiles-drawer@2/dist/smiles-drawer.min.js>
+- **ESM.sh**    <https://esm.sh/smiles-drawer@2/dist/smiles-drawer.min.js>
 
 If you'd rather build your own version of SmilesDrawer - or if you're interested
-in contributing - see  `CONTRIBUTING.md`  for how to get the code and build your
-own version of the package.
+in contributing - see `CONTRIBUTING.md`.
 
 
 ### Simple Drawing
 
-If you simply want to display some molecules, create some `canvas` elements with
+If you just want to  display some molecules,  create some `canvas` elements with
 the `data-smiles` attribute set, then call `SmilesDrawer.apply()`:
 
 ```html
@@ -122,6 +131,8 @@ For more examples  - including examples in various frameworks, like React -  see
 the [examples](TODO) page in the online documentation.
 
 
+## Customizing SmilesDrawer
+
 ### Options
 
 Options are passed to the `SmilesDrawer.apply()` function and to the `SmiDrawer`
@@ -135,24 +146,24 @@ The most useful options  are listed below.  To experiment with these,  go to the
 
 | Option                        | Default     | Description
 | ----------------------------- | ----------- | --------------
-| Image Dimensions
+| **Image Dimensions**
 | `width`                       | `500`       | Drawing width
 | `height`                      | `500`       | Drawing height
 | `padding`                     | `10`        | Drawing padding
-| Atom Visualization
+| **Atom Visualization**
 | `atomVisualization`           | `"default"` | Atom visualization: `"default"`, `"balls"`, or `"none"`
-| `fontSizeLarge`               | `11`        | Large font size (in pt, for elements)
-| `fontSizeSmall`               | `3`         | Small font size (in pt, for numbers)
+| `fontSizeLarge`               | `11`        | Large font size (in `pt`, for elements)
+| `fontSizeSmall`               | `3`         | Small font size (in `pt`, for numbers)
 | `compactDrawing`              | `true`      | Draw concatenated terminals and pseudo-elements
 | `terminalCarbons`             | `false`     | Show terminal carbons (CH3)
 | `explicitHydrogens`           | `true`      | Show explicit hydrogens
-| Bond Visualization
+| **Bond Visualization**
 | `bondThickness`               | `1.0`       | Bond thickness
 | `bondLength`                  | `30.0`      | Bond length
 | `shortBondLength`             | `0.8`       | Short bond length (e.g. double bonds) as a percent of `bondLength`
 | `bondSpacing`                 | `5.1`       | Spacing between double bonds
-| `isometric`                   | `true`      | Draw isometric SMILES if available
-| Advanced
+| `isomeric`                    | `true`      | Draw stereochemistry if available
+| **Advanced**
 | `overlapSensitivity`          | `0.42`      | Sensitivity to atom overlaps
 | `overlapResolutionIterations` | `1`         | Number of overlap resolution iterations
 | `experimentalSSSR`            | `false`     | Use improved(?) ring system detection
@@ -210,8 +221,8 @@ const options = {
 // Example using the apply() function:
 SmilesDrawer.apply(options, 'canvas[data-smiles]', 'my-theme')
 
-// example using a targeted draw() call:
-const drawer  = new SmilesDrawer.SmiDrawer(options)
+// Example using a targeted draw() call:
+const drawer = new SmilesDrawer.SmiDrawer(options)
 drawer.draw(smiles, target, 'my-theme')
 ```
 
@@ -222,7 +233,7 @@ Some possible gotchas:
 - The background is not currently drawn.
 
 
-### Please Cite
+## Please Cite
 
 If you use this project in your research,  please cite the original paper, which
 was published in the Journal of Chemical Information and Modeling:
@@ -277,27 +288,8 @@ ER  -
 </details>
 
 
-<!-- ### Examples
-
-An example using the light theme can be found [here](http://doc.gdb.tools/smilesDrawer/sd/example/index_light.html), while one using the dark theme can be found [here](http://doc.gdb.tools/smilesDrawer/sd/example/index.html) . The colors of SmilesDrawer are completely configurable.
-
-Examples showing molecules from different databases:
-
-- [Drugbank](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=drugbank)
-- [GDB-17](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=gdb17)
-- [FDB-17](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=fdb)
-- [SureChEMBL](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=schembl)
-- [ChEMBL](http://doc.gdb.tools/smilesDrawer/sd/test/browser.html?set=chembl)
-
-A very simple JSFiddle example can be found [here](https://jsfiddle.net/zjdtkL57/1/). This example shows the `SmilesDrawer.apply()` functionality which draws the structure for every `canvas` element with a `data-smiles` attribute. E.g. `<canvas data-smiles="C1CCCCC1"></canvas>`-->
-
-
-### Bridged Rings
-
-Bridged rings are positioned using the Kamada–Kawai algorithm. If there is a bridged ring in the molecule, explicitly defined aromatic rings are not drawn with a circle inside the ring, but with dashed gray lines where double bonds would be.
-
-### Contributors
+### Thank You!
 
 Thank you for contributing:
-- SRI International's CSE group (For the excellent SVG support)
-- [ohardy](https://github.com/ohardy)
+- SRI International's CSE group (for the excellent SVG support).
+- And all our [contributors](https://github.com/reymond-group/smilesDrawer/graphs/contributors) on GitHub!

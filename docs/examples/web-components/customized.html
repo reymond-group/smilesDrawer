@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../common.css" />
     <title>SmilesDrawer as a Web Component</title>
     <script type="text/javascript" src="../../../dist/smiles-drawer.min.js"></script>
     <script type="text/javascript">
@@ -15,17 +16,11 @@
         constructor() {
           super();
 
-          // Prevent drawing until the element is connected to the DOM.
-          // This prevents repeated re-drawing as attributes are added
-          // to the canvas one by one during construction.
           this.blockDrawing = true;
           this.modified = false;
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
-          // This function is called whenever attributes are set, even if
-          // the value doesn't change.  Since SmilesDrawer sets the width
-          // and height, we need this check to prevent an infinite loop.
           if(oldValue !== newValue) {
             this.modified = true;
             this.draw();
@@ -33,10 +28,6 @@
         }
 
         connectedCallback() {
-          // Once the element is added to a DOM it's safe to render without
-          // the risk of needless re-drawing.  Make sure the attributes are
-          // all set beforehand (so the "did it really change?" guard works)
-          // and then do a single render.
           if (this.blockDrawing) {
             this.setAttribute('width',  this.width);
             this.setAttribute('height', this.height);
@@ -47,7 +38,7 @@
 
         delayDrawing(callback) {
           this.blockDrawing = true;
-          callback(this);
+          callback();
 
           this.blockDrawing = false;
           if (this.modified) {
@@ -63,8 +54,8 @@
           const smiles = this.getAttribute('smiles');
           SmilesDrawer.parse(smiles, (tree) => {
             const options = {width: this.width, height: this.height};
+            const theme   = this.getAttribute('theme') || 'light';
             const drawer  = new SmilesDrawer.Drawer(options);
-            const theme   = this.getAttribute('theme');
 
             // console.log('Drawing...');
             drawer.draw(tree, this, theme);
@@ -77,17 +68,25 @@
         }
       }
 
+      // Register our new element type:
       customElements.define('smiles-drawer', SmilesDrawerCanvas, {extends: 'canvas'});
     </script>
-    <style type="text/css">
-      canvas[is=smiles-drawer] {
-        /* For ease of visualization... */
-        border: 1px solid blue;
-      }
-    </style>
   </head>
   <body>
-    <h1>SmilesDrawer as a Web Component</h1>
-    <canvas is="smiles-drawer" smiles="CC(C2C(OCC)=O)(O2)C1=CC=CC=C1" height="222" />
+    <header>
+      <div id="version"></div>
+      <h1>SmilesDrawer as a Web Component</h1>
+    </header>
+    <content>
+      <canvas is="smiles-drawer" smiles="C" width="300" height="200"></canvas>
+      <canvas is="smiles-drawer" smiles="CC" width="300" height="200"></canvas>
+      <canvas is="smiles-drawer" smiles="CCC" width="300" height="200"></canvas>
+      <canvas is="smiles-drawer" smiles="CCCC" width="300" height="200"></canvas>
+    </content>
+    <script type="text/javascript">
+      // Show version numbers in the header:
+      const version = document.getElementById('version');
+      version.innerText = `Using SmilesDrawer v${SmilesDrawer.Version}`;
+    </script>
   </body>
 </html>

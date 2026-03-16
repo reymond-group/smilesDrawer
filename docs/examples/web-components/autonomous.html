@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../common.css" />
     <title>SmilesDrawer as a Web Component</title>
     <script type="text/javascript" src="../../../dist/smiles-drawer.min.js"></script>
     <script type="text/javascript">
@@ -29,12 +30,18 @@
         }
 
         connectedCallback() {
-          // Once the element is added to a DOM it's safe to render without
-          // the risk of needless re-drawing.  Make sure the attributes are
-          // all set beforehand (so the "did it really change?" guard works)
-          // and then do a single render.
           if (this.blockDrawing) {
             this.blockDrawing = false;
+            this.draw();
+          }
+        }
+
+        delayDrawing(callback) {
+          this.blockDrawing = true;
+          callback();
+
+          this.blockDrawing = false;
+          if (this.modified) {
             this.draw();
           }
         }
@@ -54,10 +61,10 @@
 
             const canvas = this.shadowRoot.firstElementChild;
             const drawer = new SmilesDrawer.Drawer(options);
-            const theme  = this.getAttribute('theme');
+            const theme  = this.getAttribute('theme') || 'light';
 
             // console.log('Drawing...');
-            drawer.draw(canvas, tree, theme);
+            drawer.draw(tree, canvas, theme);
           }, (error) => {
             // Handle parse errors (invalid SMILES) here.
             console.warn(error);
@@ -72,9 +79,6 @@
     </script>
     <style type="text/css">
       smiles-drawer {
-        /* Just for visualizing the example... */
-        border: 1px solid blue;
-
         /* Use this or `display: block` for sensible behaviour: */
         display: inline-block;
 
@@ -84,7 +88,20 @@
     </style>
   </head>
   <body>
-    <h1>SmilesDrawer as a Web Component</h1>
-    <smiles-drawer smiles="CC(C2C(OCC)=O)(O2)C1=CC=CC=C1" width="300" height="200" />
+    <header>
+      <div id="version"></div>
+      <h1>SmilesDrawer as a Web Component</h1>
+    </header>
+    <content>
+      <smiles-drawer smiles="C" width="300" height="200"></smiles-drawer>
+      <smiles-drawer smiles="CC" width="300" height="200"></smiles-drawer>
+      <smiles-drawer smiles="CCC" width="300" height="200"></smiles-drawer>
+      <smiles-drawer smiles="CCCC" width="300" height="200"></smiles-drawer>
+    </content>
+    <script type="text/javascript">
+      // Show version numbers in the header:
+      const version = document.getElementById('version');
+      version.innerText = `Using SmilesDrawer v${SmilesDrawer.Version}`;
+    </script>
   </body>
 </html>

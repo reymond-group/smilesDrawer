@@ -4,12 +4,12 @@ There are two ways to implement  Web Components.  You can create an entirely new
 type of element and manage its content with a shadow DOM:
 
 - Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/examples/web-components/autonomous.html>
-- Live:
+- Live: <https://reymond-group.github.io/smilesDrawer/docs/examples/web-components/autonomous.html>
 
 Or you can customize an existing element type (in this example, `canvas`):
 
 - Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/examples/web-components/customized.html>
-- Live: 
+- Live: <https://reymond-group.github.io/smilesDrawer/docs/examples/web-components/customized.html>
 
 For more information on Web Components, see MDN:
 
@@ -32,7 +32,7 @@ extra logic to prevent a whole lot of unnecessary redrawing:
 - Don't draw during element construction; wait until it's attached to the DOM.
 - Don't draw unless an attribute actually changes (`canvas` elements only clear
   if their widths or heights change, so there's no risk of blank canvases).
-- And we've added a `delayedDrawing()` function so that performance-conscious
+- And we've added a `delayDrawing()` function so that performance-conscious
   applications can change multiple attributes but only redraw once:
   ```js
   element.delayDrawing(() => {
