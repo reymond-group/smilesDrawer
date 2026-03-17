@@ -17,17 +17,18 @@
       <canvas id="output"></canvas>
     </content>
     <script type="text/javascript">
+      // Show the SmilesDrawer version in the header:
       const version = document.getElementById('version');
       version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
 
       function render(smiles, target, theme) {
         SmilesDrawer.parse(smiles, (tree) => {
           const drawer = new SmilesDrawer.Drawer({width: 300, height: 200});
-          drawer.draw(tree, target, theme)
+          drawer.draw(tree, target, theme);
         }, (error) => {
           // Handle parse errors (invalid SMILES) here.
           console.warn(error);
-        })
+        });
       }
 
       const input  = document.getElementById('smiles');

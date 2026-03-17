@@ -19,9 +19,11 @@
       <canvas data-smiles="CCCC"></canvas>
     </content>
     <script type="text/javascript">
+      // Show the SmilesDrawer version in the header:
       const version = document.getElementById('version');
       version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
 
+      // Call apply() to draw all the molecules!
       SmilesDrawer.apply({width: 300, height: 200});
     </script>
   </body>

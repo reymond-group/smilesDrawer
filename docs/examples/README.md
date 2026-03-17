@@ -1,12 +1,18 @@
 # Examples
 
-## Simple Examples
+## Basic Examples
 
-- **Using `apply()`**  This is the 
+See the [Basic Examples](https://github.com/reymond-group/smilesDrawer/tree/master/docs/examples/basic)
+page for examples of typical SmilesDrawer usage.
 
-- **Using `draw()`**
 
-- **Using `parse()`**  You can also 
+## Advanced Examples
+
+TODO...
+
+- Use a custom color scheme.
+- Draw reactions.
+- Highlight atoms.
 
 
 ## Other Frameworks
