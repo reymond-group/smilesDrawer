@@ -35,9 +35,9 @@ Current Version: **2.2.1**
 The latest version of SmilesDrawer can be found in the `dist` folder on GitHub:\
 <https://github.com/reymond-group/smilesDrawer/tree/master/dist>
 
-SmilesDrawer is also available as `smiles-drawer` on NPM,  so you can install it
-with your favorite JavaScript package manager (`npm`, `yarn`, etc.):\
-<https://www.npmjs.com/package/smiles-drawer>
+SmilesDrawer is available as `smiles-drawer` on [NPM](https://www.npmjs.com/package/smiles-drawer).
+You can install it with your favorite JavaScript package manager (`npm`, `pnpm`,
+`yarn`, etc.).
 
 The code on NPM is also available through various CDNs, including:
 
@@ -52,7 +52,8 @@ in contributing - see `CONTRIBUTING.md`.
 ### Simple Drawing
 
 If you just want to  display some molecules,  create some `canvas` elements with
-the `data-smiles` attribute set, then call `SmilesDrawer.apply()`:
+the `data-smiles` attribute set,  then call `SmilesDrawer.apply()`.  Control the
+size of the drawings with an options object.
 
 ```html
 <html>
@@ -63,18 +64,11 @@ the `data-smiles` attribute set, then call `SmilesDrawer.apply()`:
         <canvas data-smiles="Cn1cnc2c1C(=O)N(C(=O)N2C)C"></canvas>
         <canvas data-smiles="c1(C=O)cc(OC)c(O)cc1"></canvas>
         <script type="text/javascript">
-            SmilesDrawer.apply()
+            SmilesDrawer.apply({width: 300, height: 200})
         </script>
     </body>
 </html>
 ```
-
-The `SmilesDrawer.apply()` function takes up to four arguments, all optional:
-
-- `options`   - An options object (see the Options section below).
-- `selector`  - A CSS selector for finding HTML elements (defaults to `"canvas[data-smiles]"`).
-- `themeName` - The name of the theme used when drawing (defaults to `"light"`).
-- `onError`   - A function to be called in case of error (none by default).
 
 
 ### Dynamic Drawing
@@ -111,24 +105,17 @@ changes:
 </html>
 ```
 
-The `SmiDrawer.draw()` function takes at least two and up to six arguments:
-
-- `smiles`          - Required.  The SMILES string to parse and render.
-- `target`          - Required.  The render target.  This can be many things:
-    - Pass `null` to create a new SVG element.
-    - Pass `"svg"`, `"canvas"`, or `"img"` to create a new element of that type.
-    - Pass an `SVGElement` or an `HTMLImageElement` to draw to an existing element.
-    - Pass a CSS selector string that matches the element(s) to render to.
-- `theme`           - The name of the theme used when drawing (defaults to `"light"`).
-- `successCallback` - Called on the target element after each successful render.
-- `errorCallback`   - Called on the exception in case of failure.
-- `weights`         - Very optional.  Used for atom highlighting.
-
 
 ### More Examples
 
-For more examples  - including examples in various frameworks, like React -  see
-the [examples](TODO) page in the online documentation.
+- See the [SmilesDrawer Basics][basic-examples] page for more information on the
+  functions used above - including live examples.
+
+- See  [Advanced SmilesDrawer][advanced-examples]  for examples of more advanced
+  SmilesDrawer features, like drawing reactions and highlighting atoms.
+
+- See [Other Frameworks][framework-examples]  for examples of using SmilesDrawer
+  in various JavaScript frameworks, including React, Vue, and Web Components.
 
 
 ## Customizing SmilesDrawer
@@ -140,9 +127,9 @@ constructor.  Note that `width` and `height`  are included in these options:  if
 you want to create drawings of different sizes, you'll need to instantiate a new
 `SmiDrawer` for each size.
 
-The most useful options  are listed below.  To experiment with these,  go to the
-[playground](TODO) page in the online documentation.  For the full list, see the
-`DrawerBase` constructor in `src/DrawerBase.js`.
+The most useful options  are listed below.  You can experiment with these in the
+[Playground][playground]. For the full list, see the `DrawerBase` constructor in
+`src/DrawerBase.js`.
 
 | Option                        | Default     | Description
 | ----------------------------- | ----------- | --------------
@@ -170,7 +157,6 @@ The most useful options  are listed below.  To experiment with these,  go to the
 | `debug`                       | `false`     | Draw debug labels
 | `themes`                      | see below   | Color themes
 
-
 A few common issues can be fixed by adjusting these options:
 
 - If you want to see a full structure, but are seeing too much abbreviation (for
@@ -187,8 +173,8 @@ Themes let you control the colors of atoms. An initial set of possible themes is
 passed as part of the `options` object; when drawing, you can pass the name of a
 theme to use it.  SmilesDrawer uses the `"light"` theme by default.
 
-To see all the built-in themes, go to [examples](TODO).  You can make your own
-theme in the [playground](TODO).
+You can see all the built-in themes in the  [Theme Gallery][theme-gallery]; you
+can experiment with making your own themes in the [Playground][playground].
 
 To use custom colors, pass your own theme in the `options` object, then pass its
 name when you draw your molecules (or you can name it `light` so it gets used by
@@ -228,7 +214,7 @@ drawer.draw(smiles, target, 'my-theme')
 
 Some possible gotchas:
 
-- Unknown atoms draw with the color for carbon.
+- Unlisted atoms draw with the color for carbon.
 - Atom names are currently all upper case.
 - The background is not currently drawn.
 
@@ -293,3 +279,11 @@ ER  -
 Thank you for contributing:
 - SRI International's CSE group (for the excellent SVG support).
 - And all our [contributors](https://github.com/reymond-group/smilesDrawer/graphs/contributors) on GitHub!
+
+
+
+[basic-examples]:     <https://github.com/reymond-group/smilesDrawer/tree/master/docs/basic>
+[advanced-examples]:  <https://github.com/reymond-group/smilesDrawer/tree/master/docs/advanced>
+[framework-examples]: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks>
+[playground]:         <https://reymond-group.github.io/smilesDrawer/docs/tools/playground.html>
+[theme-gallery]:      <https://reymond-group.github.io/smilesDrawer/docs/tools/theme-gallery.html>

@@ -1,4 +1,4 @@
-# Basic Examples
+# SmilesDrawer Basics
 
 The easiest ways to use SmilesDrawer are to use `apply()` to display some static
 molecules, or to use `draw()` to draw individual molecules dynamically.  You can
@@ -8,14 +8,14 @@ complicated; it's better to use `apply()` or `draw()` directly.
 You can find live examples of these approaches at the links below.  The code for
 these examples is in the HTML files in this folder.
 
-- Apply: <https://reymond-group.github.io/smilesDrawer/docs/examples/basic/apply.html>
-- Draw:  <https://reymond-group.github.io/smilesDrawer/docs/examples/basic/draw.html>
-- Parse: <https://reymond-group.github.io/smilesDrawer/docs/examples/basic/parse.html>
+- Apply: <https://reymond-group.github.io/smilesDrawer/docs/basic/apply.html>
+- Draw:  <https://reymond-group.github.io/smilesDrawer/docs/basic/draw.html>
+- Parse: <https://reymond-group.github.io/smilesDrawer/docs/basic/parse.html>
 
 For more information about each method, read on.
 
 
-### Apply
+## Apply
 
 This is the simplest way to use SmilesDrawer.  Use it when:
 
@@ -30,9 +30,9 @@ For each molecule you want to draw, add a `canvas` element to your HTML. Set its
 <canvas data-smiles="c1ccc2c(c1)C(=O)/C(=C\3/C(=O)c4ccccc4N3)/N2"></canvas>
 ```
 
-Once the page has  fully loaded,  call  `SmilesDrawer.apply()`.  You'll probably
-want to pass an options object as the first argument, as this is how you control
-the size of the drawings (the default is 500 by 500).
+Once the page  has fully loaded,  call  `SmilesDrawer.apply()`.  Pass an options
+object as the first argument to control the size of the drawings (the default is
+500 by 500).
 
 ```html
   <!-- ... -->
@@ -51,6 +51,7 @@ The `SmilesDrawer.apply()` function takes up to four arguments, all optional:
 - `themeName` - The name of the theme used when drawing (defaults to `"light"`).
 - `onError`   - A function to be called in case of error (none by default).
 
+
 **Caution:**
 
 - This function can currently only draw to `canvas` elements.
@@ -58,7 +59,7 @@ The `SmilesDrawer.apply()` function takes up to four arguments, all optional:
 - The original dimensions of the canvases are overwritten by those in `options`.
 
 
-### Draw
+## Draw
 
 You can also use the  `SmiDrawer.draw()`  function to draw molecules.  Use it if
 you need more control over your drawings, or if any of the following apply:
@@ -85,6 +86,7 @@ The `SmiDrawer` constructor takes two arguments, both optional:
 - `moleculeOptions` - A standard SmilesDrawer options object (defaults to `{}`).
 - `reactionOptions` - A reaction options object (defaults to `{}`).
 
+
 The `SmiDrawer.draw()` function takes at least two and up to six arguments:
 
 - `smiles`          - The SMILES string of a molecule _or_ a reaction.
@@ -98,11 +100,12 @@ The `SmiDrawer.draw()` function takes at least two and up to six arguments:
 - `errorCallback`   - Optional.  Called on the exception in case of failure.
 - `weights`         - Optional.  Used for atom highlighting.
 
+
 **Caution:**
 
 - The original dimensions of the target are overwritten by those in `options`.
 - This function cannot currently accept an `HTMLCanvasElement`  as a target.  To
-  draw to an existing canvas, give it an ID and pass in CSS to select it.
+  draw to an existing canvas, pass in CSS that selects it.
 - Note that the options object is passed to the constructor. If you want to draw
   molecules of different sizes, you'll need to create multiple `SmiDrawer`s, one
   for each size (fortunately, this is cheap).
@@ -111,7 +114,7 @@ The `SmiDrawer.draw()` function takes at least two and up to six arguments:
   drawn to, you have to do this in the success callback.
 
 
-### Parse then Draw
+## Parse then Draw
 
 It's also possible to parse a SMILES string first, and then pass it to a drawing
 function. You'll need to use a different drawer object in this case, though. For
@@ -145,6 +148,7 @@ The `SmilesDrawer.parse()` function takes at least two and up to three arguments
 - `successCallback` - Called on the result of parsing, if successful.
 - `errorCallback`   - Optional.  Called on the exception in case of failure.
 
+
 The `Drawer.draw()` function takes at least two arguments, and up to five:
 
 - `data`            - The parse tree of a single molecule, as returned by `SmilesDrawer.parse()`.
@@ -152,6 +156,7 @@ The `Drawer.draw()` function takes at least two arguments, and up to five:
 - `themeName`       - Optional.  The theme to use when drawing (defaults to `"light"`).
 - `infoOnly`        - Optional.  Set to `true` to skip drawing (defaults to `false`).
 - `highlight_atoms` - Optional.  Atoms to highlight (defaults to `[]`, or no highlighting).
+
 
 The `SvgDrawer.draw()` function takes at least two arguments, and up to five:
 
@@ -171,7 +176,7 @@ The `SvgDrawer.draw()` function takes at least two arguments, and up to five:
 - There is currently no way to parse and then draw to an `HTMLImageElement`.
 
 
-### Parse then Draw for Reactions
+## Parse then Draw for Reactions
 
 It's also possible  to parse and then draw reactions,  but you currently have to
 use different functions.  Use `SmilesDrawer.parseReaction()` to parse,  and then
@@ -197,10 +202,12 @@ The `SmilesDrawer.parseReaction()` function takes two or three arguments:
 - `successCallback` - Called on the result of parsing, if successful.
 - `errorCallback`   - Optional.  Called on the exception in case of failure.
 
+
 The `ReactionDrawer` constructor takes two arguments, both optional:
 
 - `reactionOptions` - A reaction options object (defaults to `{}`).
 - `moleculeOptions` - A SmilesDrawer options object (defaults to `{}`).
+
 
 The `RectionDrawer.draw()` function takes at least two arguments:
 
@@ -211,6 +218,7 @@ The `RectionDrawer.draw()` function takes at least two arguments:
 - `textAbove` - Optional.  Text to display above the reaction arrow (defaults to `"{reagents}"`, which will display the chemical formulae of the reagents).
 - `textBelow` - Optional.  Text to display below the reaction arrow (defaults to `""`).
 - `infoOnly`  - Optional.  Set to `true` to skip drawing (defaults to `false`).
+
 
 **Caution:**
 
@@ -223,6 +231,6 @@ The `RectionDrawer.draw()` function takes at least two arguments:
 ## Advanced
 
 For a complete tour of the many entrypoints of SmilesDrawer - including the
-unreachable, the obscure, and the possibly deprecated - see:
+unreachable, the obscure, and the probably deprecated - see:
 
 - <https://github.com/reymond-group/smilesDrawer/tree/master/docs/entrypoints.md>

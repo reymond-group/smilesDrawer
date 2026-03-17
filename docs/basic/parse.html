@@ -3,18 +3,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" type="text/css" href="../../common.css" />
-    <title>SmilesDrawer Example</title>
-    <script type="text/javascript" src="../../../dist/smiles-drawer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../common.css" />
+    <title>SmilesDrawer Basics: parse()</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+    <style type="text/css">
+      input {width: 500px};
+    </style>
   </head>
   <body>
     <header>
       <div id="version"></div>
-      <h1>SmilesDrawer Example</h1>
+      <h1>SmilesDrawer Basics: parse()</h1>
     </header>
     <content>
-      <input id="smiles" value="CCC" />
-      <canvas id="output"></canvas>
+      <div>
+        <input id="smiles" value="[Na+].[O-]S(=O)(=O)c5cc(/N=N/c1ccc(cc1)c4ccc(/N=N/c3cc(c2ccccc2c3N)S([O-].[Na+])(=O)=O)cc4)c(N)c6c5cccc6" placeholder="Your SMILES here..." />
+      </div>
+      <div>
+        <canvas id="output"></canvas>
+      </div>
     </content>
     <script type="text/javascript">
       // Show the SmilesDrawer version in the header:
@@ -23,7 +30,7 @@
 
       function render(smiles, target, theme) {
         SmilesDrawer.parse(smiles, (tree) => {
-          const drawer = new SmilesDrawer.Drawer({width: 300, height: 200});
+          const drawer = new SmilesDrawer.Drawer({width: 500, height: 400});
           drawer.draw(tree, target, theme);
         }, (error) => {
           // Handle parse errors (invalid SMILES) here.
@@ -34,9 +41,8 @@
       const input  = document.getElementById('smiles');
       const output = document.getElementById('output');
 
-      // This fires when the user hits enter or changes focus.
-      // Listen for 'keyup' to fire on every keystroke.
-      input.addEventListener('change', (event) => {
+      // This fires on every keystroke.
+      input.addEventListener('keyup', (event) => {
         render(input.value, output, 'light');
       })
 
