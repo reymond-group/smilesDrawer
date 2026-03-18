@@ -49,6 +49,9 @@ Uses `SmilesDrawer.Drawer().draw()`.
 And thus only works on canvases.
 No return value.
 
+Magic attributes:
+- `data-smiles`
+
 
 ```js
 SmilesDrawer.SmiDrawer.apply(
@@ -74,8 +77,18 @@ new SmilesDrawer.SmiDrawer(moleculeOptions={}, reactionOptions={}).apply(
 ```
 
 Calls `document.querySelectorAll("[" + attirbute + "]")` to find targets.
-Allows `  __{json options}__` at the end of the SMILES string.
+Allows `  __{textAboveArrow: 'xxx', textBelowArrow: 'yyy'}__` at the end of the SMILES string.
 Calls `this.draw()`.
+
+Magic attributes:
+- `data-smiles`
+- `data-smiles-theme`
+- `data-smiles-options`
+- `data-smiles-reaction-options`
+- `data-smiles-weights`
+- `data-smiles-reactant-weights`
+- `data-smiles-reagent-weights`
+- `data-smiles-product-weights`
 
 
 ## Draw
@@ -140,12 +153,13 @@ new SmilesDrawer.SmiDrawer(moleculeOptions={}, reactionOptions={}).draw(
 )
 ```
 
+Allows `  __{textAboveArrow: 'xxx', textBelowArrow: 'yyy'}__` at the end of the SMILES string.
 Calls `this.drawMolecule()` or `this.drawReaction()`.
 
 
 ```js
 new SmilesDrawer.SmiDrawer(moleculeOptions={}, reactionOptions={}).drawMolecule(
-    smiles, // smiles string (single molecule)
+    smiles, // smiles string (molecule)
     target, // same as in SmiDrawer.draw()
     theme,
     weights,
