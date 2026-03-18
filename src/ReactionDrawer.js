@@ -8,10 +8,10 @@ export default class ReactionDrawer {
     /**
      * The constructor for the class ReactionDrawer.
      *
-     * @param {Object} options An object containing reaction drawing specitic options.
+     * @param {Object} reactionOptions An object containing reaction drawing specific options.
      * @param {Object} moleculeOptions An object containing molecule drawing specific options.
      */
-    constructor(options, moleculeOptions) {
+    constructor(reactionOptions, moleculeOptions) {
         this.drawer  = new SvgDrawer(moleculeOptions);
         this.molOpts = this.drawer.opts;
 
@@ -38,7 +38,7 @@ export default class ReactionDrawer {
             },
         };
 
-        this.opts = Options.extend(true, this.defaultOptions, options);
+        this.opts = Options.extend(true, this.defaultOptions, reactionOptions);
     }
 
     /**
