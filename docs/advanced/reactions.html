@@ -32,20 +32,20 @@
         drawer.draw(reaction, '#reaction1');
       }
 
-      function parseThenDraw() {
+      function useParseThenDraw() {
         const reaction = 'c1c([R])cccc1S(=O)(=O)C.c1ncccc1B(CC)CC>>c1ncccc1c2cccc(S(=O)(=O)C)c2';
         const drawer = new SmilesDrawer.ReactionDrawer(); //{}, );
 
         SmilesDrawer.parseReaction(reaction, (result) => {
           drawer.draw(result, 'reaction2', 'light', null, 'Pd(PPh₃)₄', 'Bu₄NBr + K₂CO₃');
         }, (error) => {
-          console.warn(error);
+          console.error(error);
         });
       }
 
       useApply();
       useDraw();
-      parseThenDraw();
+      useParseThenDraw();
     </script>
   </body>
 </html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../common.css" />
+    <title>Advanced SmilesDrawer: Highlights</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <div id="version"></div>
+      <h1>Advanced SmilesDrawer: Highlights</h1>
+    </header>
+    <content>
+      <div><canvas id="output1"></canvas></div>
+      <div><svg id="output2"></svg></div>
+    </content>
+    <script type="text/javascript">
+      // Show the SmilesDrawer version in the header:
+      const version = document.getElementById('version');
+      version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
+
+      const options = {width: 500, height: 200};
+
+      function drawToCanvas() {
+        SmilesDrawer.parse('CCCC[CH2:1][CH2:2]CC[NH2:2]', (result) => {
+          const drawer = new SmilesDrawer.Drawer(options);
+          drawer.draw(result, 'output1', 'light', false, [[1, '#ff8'], [2, '#8f8']]);
+        }, (error) => {
+          console.error(error);
+        });
+      }
+
+      function drawToSvg() {
+        SmilesDrawer.parse('CCCC[CH2:1][CH2:2]CC[NH2:2]', (result) => {
+          const drawer = new SmilesDrawer.SvgDrawer(options);
+          drawer.draw(result, 'output2', 'light', null, false, [[1, '#ff8'], [2, '#8f8']]);
+        }, (error) => {
+          console.error(error);
+        });
+      }
+
+      drawToCanvas();
+      drawToSvg();
+    </script>
+  </body>
+</html>

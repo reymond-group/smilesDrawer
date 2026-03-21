@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../common.css" />
+    <title>Advanced SmilesDrawer: Reaction Weights</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <div id="version"></div>
+      <h1>Advanced SmilesDrawer: Reaction Weights</h1>
+    </header>
+    <content>
+      <div><canvas
+        data-smiles="CF.FC#N>>CC#N.FF"
+        data-smiles-reactant-weights="1,0;0,-1,0"
+        data-smiles-product-weights="1,-1,0;0,0"
+      ></canvas></div>
+      <div><canvas id="output2"></canvas></div>
+      <div><svg id="output3"></svg></div>
+    </content>
+    <script type="text/javascript">
+      // Show the SmilesDrawer version in the header:
+      const version = document.getElementById('version');
+      version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
+
+      const options = {width: 500, height: 120};
+
+      function useApply() {
+        const drawer = new SmilesDrawer.SmiDrawer(options);
+        drawer.apply();
+      }
+
+      function useDraw() {
+        const weights = {
+          reactants: [[1, 0], [0, -1, 0]],
+          reagents:  [], // Could also be omitted.
+          products:  [[1, -1, 0], [0, 0]]
+        };
+
+        const drawer = new SmilesDrawer.SmiDrawer(options);
+        drawer.draw('CF.FC#N>>CC#N.FF', '#output2', 'light', null, null, weights);
+      }
+
+      function useParseThenDraw() {
+        const weights = {
+          reactants: [[1, 0], [0, -1, 0]],
+          reagents:  [], // Could also be omitted.
+          products:  [[1, -1, 0], [0, 0]]
+        };
+
+        SmilesDrawer.parseReaction('CF.FC#N>>CC#N.FF', (result) => {
+          const drawer = new SmilesDrawer.ReactionDrawer();
+          drawer.draw(result, 'output-3', 'light', weights);
+        }, (error) => {
+          console.error(error);
+        });
+      }
+
+      useApply();
+      useDraw();
+      useParseThenDraw();
+    </script>
+  </body>
+</html>

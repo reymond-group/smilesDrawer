@@ -1,7 +1,13 @@
 # Advanced SmilesDrawer Usage
 
+**Table of Contents**
+
 - [Reactions](#reactions)
+- [Weights](#weights)
+- [Reaction Weights](#reaction-weights)
 - [Highlighting](#highlighting)
+
+
 
 ## Reactions
 
@@ -130,6 +136,13 @@ SmilesDrawer.parseReaction('[Pb]>>[Au]', (result) => {
 });
 ```
 
+The `SmilesDrawer.parseReaction()` function takes two or three arguments:
+
+- `smiles`          - The reaction SMILES string to parse.
+- `successCallback` - Called on the result of parsing, if successful.
+- `errorCallback`   - Optional.  Called on the exception in case of failure.
+
+
 The `ReactionDrawer` constructor takes two optional arguments (note the order):
 
 -  `reactionOptions` - Reaction options (defaults to `{}`).
@@ -151,9 +164,224 @@ The `ReactionDrawer.draw()` function
 
 - There is currently no way to control the size of the drawing.
 - The `ReactionDrawer.draw()` function can only draw to SVG elements.
+- `SmilesDrawer.parseReaction()` only handles reactions, not single molecules.
+- `SmilesDrawer.parseReaction()` function does not return the result.  To access
+  the result, you must provide a success callback.
 
 
-<!-- ## Atom Highlighting -->
 
-<!-- ## Reaction Highlighting -->
+## Weights
 
+You can render  red and green patches  around your molecules  by assigning atoms
+"weights." Atoms with a positive weight draw with a green background by default,
+and atoms with a negative weight draw with a red(ish) background. The higher the
+weight,  the darker the background;  atoms with weight zero  don't get a colored
+background.
+
+Weights are provided as  an array of numbers.  The first weight  in the array is
+for the first _heavy_ atom in the SMILES string, and so on; hydrogens do not get
+weights!  By default, SmilesDrawer normalizes all weights to the range `[-1, 1]`
+by dividing by the maximum absolute value.
+
+Like most drawing tasks in SmilesDrawer,  drawing a molecule with weights can be
+done with `apply()`, with `draw()`, or with `parse()` then `draw()`.  For a live
+example of all three methods, see:
+
+- <http://reymond-group.github.io/smilesDrawer/docs/advanced/weights.html>
+
+
+**Caution:**
+
+- Drawing weights currently adds a white background to your molecule, regardless
+  of the color scheme you have chosen.  Put your images on a white background to
+  hide this.
+- The current rendering mechanism uses lots and lots of  SVG `rect`s to simulate
+  pixels inside the SVG. This can result in  artifacts when transferring the SVG
+  to an `img` or `canvas`; for best results, draw weighted molecules in `svg`s.
+
+
+### Apply
+
+To `apply()` weights, add the `data-smiles-weights` attribute to your canvas (or
+`svg` or `img`). The value of this attribute is a string containing one floating
+point number for each  **heavy** atom in your molecule, separated by commas. The
+first heavy atom in the SMILES string gets the first weight, and so on.
+
+```html
+<canvas data-smiles="N[C@H](O)C" data-smiles-weights="-2,0,-1,1"></canvas>
+```
+
+Then create a `SmiDrawer` and call its `apply()` function:
+
+```js
+const options = {width: 300, height: 200};
+const drawer  = new SmilesDrawer.SmiDrawer(options);
+drawer.apply();
+```
+
+
+### Draw
+
+To `draw()` weights, create a `SmiDrawer` and call its `draw()` function.  The
+weights are passed as an array of numbers.
+
+```js
+const drawer = new SmilesDrawer.SmiDrawer(options);
+drawer.draw('CCCCCCN', '#id-of-target', 'light', null, null, [-3, -2, -1, 0, 1, 2, 3]);
+```
+
+
+### Parse then Draw
+
+First, `parse()` your molecule as usual. Then, to draw to an SVG element, create
+an `SvgDrawer` and call its `draw()` function:
+
+```js
+SmilesDrawer.parse('CCCCCCCCN', (result) => {
+  const drawer = new SmilesDrawer.SvgDrawer(options);
+  drawer.draw(result, 'id-of-svg', 'light', [-4, -3, -2, -1, 0, 1, 2, 3, 4]);
+}
+```
+
+To draw to a canvas, use `SvgDrawer.drawCanvas()` instead:
+
+```js
+SmilesDrawer.parse('CCCCCCCCN', (result) => {
+  const drawer = new SmilesDrawer.SvgDrawer(options);
+  drawer.drawCanvas(result, 'id-of-canvas', 'light', [-4, -3, -2, -1, 0, 1, 2, 3, 4]);
+}
+```
+
+**Caution:**
+
+- There is currently no way to parse then draw weights to an `img`.
+
+
+
+## Reaction Weights
+
+You can also add weights to molecules in reactions.
+
+For a live example of all three methods, see:
+
+- <http://reymond-group.github.io/smilesDrawer/docs/advanced/reaction-weights.html>
+
+
+**Caution:**
+
+- There doesn't seem to be any way to show weights for reagents, as these aren't
+  rendered as molecules (they only appear as formulae over the reaction arrow).
+
+
+### Apply
+
+To add weights to a reaction, add at least one of these attributes:
+
+- `data-smiles-reactant-weights`
+- `data-smiles-reagent-weights`  (Unused? See above.)
+- `data-smiles-product-weights`
+
+If the category  (reactants, reagents, or products)  has more than one molecule,
+separate the weights for  each molecule  with semicolons.  Within each molecule,
+separate the weights for each heavy atom with commas.
+
+```html
+<canvas
+  data-smiles="CF.FC#N>>CC#N.FF"
+  data-smiles-reactant-weights="1,0;0,-1,0"
+  data-smiles-product-weights="1,-1,0;0,0"
+></canvas>
+```
+
+The call `SmiDrawer.apply()` as you would to `apply()` an unweighted reaction.
+
+
+### Draw
+
+You can also pass weights to  `SmiDrawer.draw()`:  pass them as an object with a
+key  for each category.  Values in this object are  arrays of arrays:  the outer
+array has one inner array for each  molecule,  and an inner array has one weight
+for each heavy atom.
+
+```js
+const weights = {
+  reactants: [[1, 0], [0, -1, 0]],
+  reagents:  [], // Could also be omitted.
+  products:  [[1, -1, 0], [0, 0]]
+};
+
+const drawer = new SmilesDrawer.SmiDrawer(options);
+drawer.draw('CF.FC#N>>CC#N.FF', '#id-of-target', 'light', null, null, weights);
+```
+
+
+### Parse then Draw
+
+You can also  parse your reaction in advance,  and then pass  the reaction and a
+weights object to `ReactionDrawer.draw()`:
+
+```js
+SmilesDrawer.parseReaction('CF.FC#N>>CC#N.FF', (result) => {
+  const drawer = new ReactionDrawer();
+  drawer.draw(result, '#id-of-svg', 'light', weights);
+});
+```
+
+**Caution:**
+
+- This method can currently only draw to SVG elements.
+
+
+
+## Highlighting
+
+SmilesDrawer also allows you to highlight atoms by class.  This uses a different
+mechanism  than the weights drawer,  and draws  a colored circle under the atoms
+you want to highlight.
+
+This only works with a "parse then draw" approach. To use it, your SMILES string
+must have "classes" attached to some atoms.  In this example, one carbon has the
+class `1`, and another carbon and the nitrogen have the class `2`:
+
+```js
+const smiles = 'CCCC[CH2:1][CH2:2]CC[NH2:2]';
+```
+
+Then make an array of pairs.  The first item in each pair should be a class (an
+integer), and the second item should be the CSS color used to highlight atoms of
+that class.  In this example, class `1` is yellow and class `2` is green:
+
+```js
+const colors = [[1, '#ff8'], [2, '#8f8']];
+```
+
+Finally, parse your SMILES string and pass the result to a `draw()` function. To
+draw to a canvas, pass your color map as the fifth argument to `Drawer.draw()`:
+
+```js
+function drawToCanvas() {
+  SmilesDrawer.parse(smiles, (result) => {
+    const drawer = new SmilesDrawer.Drawer();
+    drawer.draw(result, 'id-of-canvas', 'light', false, colors);
+  });
+}
+```
+
+To draw to an SVG, pass it as the sixth argument to `SvgDrawer.draw()`:
+
+```js
+SmilesDrawer.parse(smiles, (result) => {
+  const drawer = new SmilesDrawer.SvgDrawer();
+  drawer.draw(result, 'id-of-svg', 'light', null, false, colors);
+});
+```
+
+For a live example of both methods, see:
+
+- <http://reymond-group.github.io/smilesDrawer/docs/advanced/highlights.html>
+
+
+**Caution:**
+
+- The functions above are currently the only two that support atom highlighting.
+- There is currently no way to highlight atoms in reactions.

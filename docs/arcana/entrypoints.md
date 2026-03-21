@@ -173,10 +173,10 @@ The callback is a success callback.
 
 ```js
 new SmilesDrawer.SmiDrawer(moleculeOptions={}, reactionOptions={}).drawReaction(
-    smiles, // smiles string (reaction)
-    target, // same as in SmiDrawer.draw()
+    smiles,   // smiles string (reaction)
+    target,   // same as in SmiDrawer.draw()
     theme,
-    settings,
+    settings, // {textAboveArrow: 'xxx', textBelowArrow: 'yyy'}
     weights,
     callback
 )
@@ -184,6 +184,7 @@ new SmilesDrawer.SmiDrawer(moleculeOptions={}, reactionOptions={}).drawReaction(
 
 Uses `ReactionDrawer` internally.
 The callback is a success callback.
+No defaults!
 
 
 ```js
@@ -212,6 +213,7 @@ new SmilesDrawer.SvgDrawer(options, clear=true).drawCanvas(
 ```
 
 Calls `this.draw()` on a temp SVG, then copies it to the canvas.
+Note that `infoOnly` is actually passed as the `weights` argument to `draw()`!
 
 
 ## Parse
