@@ -8,13 +8,16 @@ export default class ReactionDrawer {
     /**
      * The constructor for the class ReactionDrawer.
      *
-     * @param {Object} options An object containing reaction drawing specitic options.
+     * @param {Object} reactionOptions An object containing reaction drawing specific options.
      * @param {Object} moleculeOptions An object containing molecule drawing specific options.
      */
-    constructor(options, moleculeOptions) {
+    constructor(reactionOptions, moleculeOptions) {
+        this.drawer  = new SvgDrawer(moleculeOptions);
+        this.molOpts = this.drawer.opts;
+
         this.defaultOptions = {
-            scale:      moleculeOptions.scale > 0.0 ? moleculeOptions.scale : 1.0,
-            fontSize:   moleculeOptions.fontSizeLarge * 0.8,
+            scale:      this.molOpts.scale > 0.0 ? this.molOpts.scale : 1.0,
+            fontSize:   this.molOpts.fontSizeLarge * 0.8,
             fontFamily: 'Arial, Helvetica, sans-serif',
             spacing:    10,
 
@@ -24,7 +27,7 @@ export default class ReactionDrawer {
             },
 
             arrow: {
-                length:    moleculeOptions.bondLength * 4.0,
+                length:    this.molOpts.bondLength * 4.0,
                 headSize:  6.0,
                 thickness: 1.0,
                 margin:    3,
@@ -35,10 +38,7 @@ export default class ReactionDrawer {
             },
         };
 
-        this.opts = Options.extend(true, this.defaultOptions, options);
-
-        this.drawer = new SvgDrawer(moleculeOptions);
-        this.molOpts = this.drawer.opts;
+        this.opts = Options.extend(true, this.defaultOptions, reactionOptions);
     }
 
     /**
