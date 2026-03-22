@@ -176,61 +176,16 @@ The `SvgDrawer.draw()` function takes at least two arguments, and up to five:
 - There is currently no way to parse and then draw to an `HTMLImageElement`.
 
 
-## Parse then Draw for Reactions
+## Advanced Drawing
 
-It's also possible  to parse and then draw reactions,  but you currently have to
-use different functions.  Use `SmilesDrawer.parseReaction()` to parse,  and then
-pass the result to a `ReactionDrawer` for drawing:
+Want to draw reactions?  Highlight atoms?  See the advanced documentation at:
 
-```js
-// Reaction options control the plus signs, arrow, etc.
-const reaction_options = {};
-// Molecule options are for individual molecules in the reaction:
-const molecule_options = {width: 100, height: 100};
-const drawer = new SmilesDrawer.ReactionDrawer(reaction_options, molecule_options);
-SmilesDrawer.parseReaction(smiles, (result) => {
-    drawer.draw(result, svg);
-}, (error) => {
-    // Handle parse errors here!
-    console.warn(error);
-});
-```
-
-The `SmilesDrawer.parseReaction()` function takes two or three arguments:
-
-- `smiles`          - The reaction SMILES string to parse.
-- `successCallback` - Called on the result of parsing, if successful.
-- `errorCallback`   - Optional.  Called on the exception in case of failure.
+- <https://github.com/reymond-group/smilesDrawer/tree/master/docs/advanced>
 
 
-The `ReactionDrawer` constructor takes two arguments, both optional:
-
-- `reactionOptions` - A reaction options object (defaults to `{}`).
-- `moleculeOptions` - A SmilesDrawer options object (defaults to `{}`).
-
-
-The `RectionDrawer.draw()` function takes at least two arguments:
-
-- `reaction`  - A parsed reaction, as returned by `SmilesDrawer.parseReaction()`.
-- `target`    - An `SVGElement`, the ID of an `SVGElement`, or `null` or `"svg"` to create a new `SVGElement`.
-- `themeName` - Optional.  The theme to use when drawing (defaults to `"light"`).
-- `weights`   - Optional.  Atom weights to use for highlighting (defaults to `null`, or no highlighting).
-- `textAbove` - Optional.  Text to display above the reaction arrow (defaults to `"{reagents}"`, which will display the chemical formulae of the reagents).
-- `textBelow` - Optional.  Text to display below the reaction arrow (defaults to `""`).
-- `infoOnly`  - Optional.  Set to `true` to skip drawing (defaults to `false`).
-
-
-**Caution:**
-
-- You can currently only draw reactions to SVG elements.
-- `SmilesDrawer.parseReaction()` only handles reactions, not single molecules.
-- `SmilesDrawer.parseReaction()` doesn't return its result.  You can only access
-  the result through the success callback.
-
-
-## Advanced
+## Arcana
 
 For a complete tour of the many entrypoints of SmilesDrawer - including the
 unreachable, the obscure, and the probably deprecated - see:
 
-- <https://github.com/reymond-group/smilesDrawer/tree/master/docs/entrypoints.md>
+- <https://github.com/reymond-group/smilesDrawer/tree/master/docs/arcana/entrypoints.md>

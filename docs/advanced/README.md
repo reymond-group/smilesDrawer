@@ -359,12 +359,10 @@ Finally, parse your SMILES string and pass the result to a `draw()` function. To
 draw to a canvas, pass your color map as the fifth argument to `Drawer.draw()`:
 
 ```js
-function drawToCanvas() {
-  SmilesDrawer.parse(smiles, (result) => {
-    const drawer = new SmilesDrawer.Drawer();
-    drawer.draw(result, 'id-of-canvas', 'light', false, colors);
-  });
-}
+SmilesDrawer.parse(smiles, (result) => {
+  const drawer = new SmilesDrawer.Drawer();
+  drawer.draw(result, 'id-of-canvas', 'light', false, colors);
+});
 ```
 
 To draw to an SVG, pass it as the sixth argument to `SvgDrawer.draw()`:
@@ -385,3 +383,12 @@ For a live example of both methods, see:
 
 - The functions above are currently the only two that support atom highlighting.
 - There is currently no way to highlight atoms in reactions.
+
+
+
+## Arcana
+
+For a complete tour of the many entrypoints of SmilesDrawer - including the
+unreachable, the obscure, and the probably deprecated - see:
+
+- <https://github.com/reymond-group/smilesDrawer/tree/master/docs/arcana/entrypoints.md>
