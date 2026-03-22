@@ -1,4 +1,5 @@
 // @ts-check
+import DomHelper from './DomHelper';
 import SvgDrawer from './SvgDrawer';
 
 /**
@@ -32,32 +33,9 @@ export default class Drawer {
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
     draw(data, target, themeName = 'light', infoOnly = false, highlight_atoms = []) {
-        let element = null;
-        let canvas  = null;
-        if (target instanceof String) {
-            element = document.getElementById(target.valueOf());
-        }
-        else if (typeof target === 'string') {
-            element = document.getElementById(target);
-        }
-        else {
-            element = target;
-        }
-
-        if (element instanceof HTMLCanvasElement) {
-            canvas = element;
-        }
-        else {
-            throw Error('First argument was not a canvas or the ID of a canvas.');
-        }
-
-        let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        svg.setAttributeNS(null, 'viewBox', '0 0 ' + this.svgDrawer.opts.width + ' ' + this.svgDrawer.opts.height);
-        svg.setAttributeNS(null, 'width', this.svgDrawer.opts.width + '');
-        svg.setAttributeNS(null, 'height', this.svgDrawer.opts.height + '');
-        this.svgDrawer.draw(data, svg, themeName, null, infoOnly, highlight_atoms);
-        this.svgDrawer.svgWrapper.toCanvas(canvas, this.svgDrawer.opts.width, this.svgDrawer.opts.height);
+        const canvas = DomHelper.getDrawable(target, HTMLCanvasElement);
+        const svg = this.svgDrawer.draw(data, null, themeName, null, infoOnly, highlight_atoms);
+        return DomHelper.svgToCanvas(svg, canvas);
     }
 
     /**

@@ -3,6 +3,7 @@
 // portion to output to svg
 import ArrayHelper  from './ArrayHelper';
 import Atom         from './Atom';
+import DomHelper    from './DomHelper';
 import DrawerBase   from './DrawerBase';
 import GaussDrawer  from './GaussDrawer';
 import Line         from './Line';
@@ -23,23 +24,22 @@ export default class SvgDrawer {
      * Draws the parsed smiles data to an svg element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+     * @param {?(String|SVGSVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      *
-     * @returns {SVGElement} The svg element
+     * @returns {SVGSVGElement} The svg element
      */
     draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
         if (target === null || target === 'svg') {
-            target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            target.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-            target.setAttributeNS(null, 'width', this.opts.width);
-            target.setAttributeNS(null, 'height', this.opts.height);
+            target = DomHelper.createSvg(this.opts.width, this.opts.height);
         }
-        else if (target instanceof String) {
-            target = document.getElementById(target);
+        else {
+            target = DomHelper.getDrawable(target, SVGSVGElement);
         }
+
+        target.setAttributeNS(null, 'width',  this.opts.width);
+        target.setAttributeNS(null, 'height', this.opts.height);
 
         let optionBackup = {
             padding:        this.opts.padding,
@@ -105,26 +105,9 @@ export default class SvgDrawer {
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
     drawCanvas(data, target, themeName = 'light', infoOnly = false) {
-        let canvas = null;
-        if (typeof target === 'string' || target instanceof String) {
-            canvas = document.getElementById(target);
-        }
-        else {
-            canvas = target;
-        }
-
-        let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        // 500 as a size is arbritrary, but the canvas is scaled when drawn to the canvas anyway
-        svg.setAttributeNS(null, 'viewBox', '0 0 ' + 500 + ' ' + 500);
-        svg.setAttributeNS(null, 'width', 500 + '');
-        svg.setAttributeNS(null, 'height', 500 + '');
-        svg.setAttributeNS(null, 'style', 'visibility: hidden: position: absolute; left: -1000px');
-        document.body.appendChild(svg);
-        this.draw(data, svg, themeName, infoOnly);
-        this.svgWrapper.toCanvas(canvas, this.opts.width, this.opts.height);
-        document.body.removeChild(svg);
-        return target;
+        const canvas = DomHelper.getDrawable(target, HTMLCanvasElement);
+        const svg    = this.draw(data, null, themeName, infoOnly);
+        return DomHelper.svgToCanvas(svg, canvas);
     }
 
     /**

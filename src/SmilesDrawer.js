@@ -1,4 +1,5 @@
 // @ts-check
+import DomHelper      from './DomHelper';
 import Options        from './Options';
 import Parser         from './Parser';
 import ReactionDrawer from './ReactionDrawer';
@@ -116,30 +117,20 @@ export default class SmilesDrawer {
 
         settings = Options.extend(true, defaultSettings, settings);
 
-        if (smiles.includes('>')) {
-            try {
+        try {
+            if (smiles.includes('>')) {
                 this.drawReaction(smiles, target, theme, settings, weights, successCallback);
             }
-            catch (err) {
-                if (errorCallback) {
-                    errorCallback(err);
-                }
-                else {
-                    console.error(err);
-                }
-            }
-        }
-        else {
-            try {
+            else {
                 this.drawMolecule(smiles, target, theme, weights, successCallback);
             }
-            catch (err) {
-                if (errorCallback) {
-                    errorCallback(err);
-                }
-                else {
-                    console.error(err);
-                }
+        }
+        catch (err) {
+            if (errorCallback) {
+                errorCallback(err);
+            }
+            else {
+                console.error(err);
             }
         }
     }
@@ -147,159 +138,48 @@ export default class SmilesDrawer {
     drawMolecule(smiles, target, theme, weights, callback) {
         let parseTree = Parser.parse(smiles);
 
-        if (target === null || target === 'svg') {
-            let svg = this.drawer.draw(parseTree, null, theme, weights);
-            let dims = this.getDimensions(svg);
-            svg.setAttributeNS(null, 'width', '' + dims.w);
-            svg.setAttributeNS(null, 'height', '' + dims.h);
+        const targets = this.getTargets(target || 'svg');
+        if (targets.length === 1 && targets[0] instanceof SVGSVGElement) {
+            // In the common case where we draw to a single SVG element, draw directly.
+            this.drawer.draw(parseTree, targets[0], theme, weights);
             if (callback) {
-                callback(svg);
-            }
-        }
-        else if (target === 'canvas') {
-            let canvas = this.svgToCanvas(this.drawer.draw(parseTree, null, theme, weights));
-            if (callback) {
-                callback(canvas);
-            }
-        }
-        else if (target === 'img') {
-            let img = this.svgToImg(this.drawer.draw(parseTree, null, theme, weights));
-            if (callback) {
-                callback(img);
-            }
-        }
-        else if (target instanceof HTMLImageElement) {
-            this.svgToImg(this.drawer.draw(parseTree, null, theme, weights), target);
-            if (callback) {
-                callback(target);
-            }
-        }
-        else if (target instanceof SVGElement) {
-            this.drawer.draw(parseTree, target, theme, weights);
-            if (callback) {
-                callback(target);
+                callback(targets[0]);
             }
         }
         else {
-            let elements = document.querySelectorAll(target);
-            elements.forEach((element) => {
-                let tag = element.nodeName.toLowerCase();
-                if (tag === 'svg') {
-                    this.drawer.draw(parseTree, element, theme, weights);
-                    // let dims = this.getDimensions(element);
-                    // element.setAttributeNS(null, 'width', '' + dims.w);
-                    // element.setAttributeNS(null, 'height', '' + dims.h);
-                    if (callback) {
-                        callback(element);
-                    }
-                }
-                else if (tag === 'canvas') {
-                    this.svgToCanvas(this.drawer.draw(parseTree, null, theme, weights), element);
-                    if (callback) {
-                        callback(element);
-                    }
-                }
-                else if (tag === 'img') {
-                    this.svgToImg(this.drawer.draw(parseTree, null, theme, weights), element);
-                    if (callback) {
-                        callback(element);
-                    }
-                }
-            });
+            // Otherwise, draw the SVG once and copy it out to the target elements.
+            const svg = this.drawer.draw(parseTree, null, theme, weights);
+            this.copySvgToTargets(svg, targets, callback);
         }
     }
 
     drawReaction(smiles, target, theme, settings, weights, callback) {
         let reaction = ReactionParser.parse(smiles);
 
-        if (target === null || target === 'svg') {
-            let svg = this.reactionDrawer.draw(reaction, null, theme);
-            let dims = this.getDimensions(svg);
-            svg.setAttributeNS(null, 'width', '' + dims.w);
-            svg.setAttributeNS(null, 'height', '' + dims.h);
+        const above   = settings.textAboveArrow;
+        const below   = settings.textBelowArrow;
+        const targets = this.getTargets(target || 'svg');
+
+        if (targets.length === 1 && targets[0] instanceof SVGSVGElement) {
+            // In the common case where we draw to a single SVG element, draw directly.
+            this.reactionDrawer.draw(reaction, targets[0], theme, weights, above, below);
             if (callback) {
-                callback(svg);
-            }
-        }
-        else if (target === 'canvas') {
-            let canvas = this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow));
-            if (callback) {
-                callback(canvas);
-            }
-        }
-        else if (target === 'img') {
-            let img = this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow));
-            if (callback) {
-                callback(img);
-            }
-        }
-        else if (target instanceof HTMLImageElement) {
-            this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), target);
-            if (callback) {
-                callback(target);
-            }
-        }
-        else if (target instanceof SVGElement) {
-            this.reactionDrawer.draw(reaction, target, theme, weights, settings.textAboveArrow, settings.textBelowArrow);
-            if (callback) {
-                callback(target);
+                callback(targets[0]);
             }
         }
         else {
-            let elements = document.querySelectorAll(target);
-            elements.forEach((element) => {
-                let tag = element.nodeName.toLowerCase();
-                if (tag === 'svg') {
-                    this.reactionDrawer.draw(reaction, element, theme, weights, settings.textAboveArrow, settings.textBelowArrow);
-                    // The svg has to have a css width and height set for the other
-                    // tags, however, here it would overwrite the chosen width and height
-                    if (this.reactionDrawer.opts.scale <= 0) {
-                        element.style.width = null;
-                        element.style.height = null;
-                    }
-                    // let dims = this.getDimensions(element);
-                    // element.setAttributeNS(null, 'width', '' + dims.w);
-                    // element.setAttributeNS(null, 'height', '' + dims.h);
-                    if (callback) {
-                        callback(element);
-                    }
-                }
-                else if (tag === 'canvas') {
-                    this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), element);
-                    if (callback) {
-                        callback(element);
-                    }
-                }
-                else if (tag === 'img') {
-                    this.svgToImg(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), element);
-                    if (callback) {
-                        callback(element);
-                    }
-                }
-            });
+            // Otherwise, draw the SVG once and copy it out to the target elements.
+            const svg = this.reactionDrawer.draw(reaction, null, theme, weights, above, below);
+            this.copySvgToTargets(svg, targets, callback);
         }
     }
 
     svgToCanvas(svg, canvas = null) {
-        if (canvas === null) {
-            canvas = document.createElement('canvas');
-        }
-
-        let dims = this.getDimensions(canvas, svg);
-
-        SvgWrapper.svgToCanvas(svg, canvas, dims.w, dims.h);
-        return canvas;
+        return DomHelper.svgToCanvas(svg, canvas);
     }
 
     svgToImg(svg, img = null) {
-        if (img === null) {
-            img = document.createElement('img');
-        }
-
-        let dims = this.getDimensions(img, svg);
-
-        SvgWrapper.svgToImg(svg, img, dims.w, dims.h);
-        return img;
+        return DomHelper.svgToImg(svg, img);
     }
 
     /**
@@ -332,5 +212,68 @@ export default class SmilesDrawer {
         }
 
         return {w: w, h: h};
+    }
+
+    getTargets(target) {
+        // Probably a querySelectorAll() result.
+        if (target instanceof NodeList) {
+            return target;
+        }
+
+        // Assume all non-strings are drawable.
+        if (typeof target !== 'string') {
+            return [target];
+        }
+
+        if (target === 'svg') {
+            return [DomHelper.createSvg()];
+        }
+        if (target === 'canvas') {
+            return [DomHelper.createCanvas()];
+        }
+        if (target === 'img') {
+            return [DomHelper.createImg()];
+        }
+        if (target === 'offscreen-canvas') {
+            const w = this.drawer.opts.width;
+            const h = this.drawer.opts.height;
+            return [DomHelper.createOffscreenCanvas(w, h)];
+        }
+
+        // Assume all other strings are CSS queries:
+        return document.querySelectorAll(target);
+    }
+
+    copySvgToTargets(svg, targets, callback) {
+        let data_url = undefined;
+        let promise  = undefined;
+
+        const w = this.drawer.opts.width;
+        const h = this.drawer.opts.height;
+
+        targets.forEach((element) => {
+            if (element instanceof SVGSVGElement) {
+                promise = DomHelper.svgToSvg(svg, element);
+            }
+            else if (element instanceof HTMLCanvasElement) {
+                data_url ||= DomHelper.svgToDataUrl(svg);
+                promise = DomHelper.dataUrlToCanvas(data_url, element, w, h);
+            }
+            else if (element instanceof HTMLImageElement) {
+                data_url ||= DomHelper.svgToDataUrl(svg);
+                promise = DomHelper.dataUrlToImg(data_url, element, w, h);
+            }
+            else if (element instanceof OffscreenCanvas) {
+                data_url ||= DomHelper.svgToDataUrl(svg);
+                promise = DomHelper.dataUrlToOffscreenCanvas(data_url, element, w, h);
+            }
+            else {
+                console.warn(`Can't copy an SVG to a ${element.constructor.name}!`);
+                return;
+            }
+
+            // This only runs if callback is callable:
+            promise.then(callback);
+        });
     }
 }

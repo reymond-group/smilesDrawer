@@ -1,3 +1,4 @@
+import DomHelper           from './DomHelper';
 import formulaToCommonName from './FormulaToCommonName';
 import Options             from './Options.js';
 import SvgDrawer           from './SvgDrawer';
@@ -135,24 +136,16 @@ export default class ReactionDrawer {
         let svg = null;
 
         if (target === null || target === 'svg') {
-            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            svg.setAttributeNS(null, 'width', 500 + '');
-            svg.setAttributeNS(null, 'height', 500 + '');
-        }
-        else if (typeof target === 'string' || target instanceof String) {
-            svg = document.getElementById(target);
+            svg = DomHelper.createSvg();
         }
         else {
-            svg = target;
+            svg = DomHelper.getDrawable(target, SVGSVGElement);
+            while (svg.firstChild) {
+                svg.removeChild(svg.firstChild);
+            }
         }
 
-        while (svg.firstChild) {
-            svg.removeChild(svg.firstChild);
-        }
-
-        let elements = [];
-
+        let elements  = [];
         let maxHeight = 0.0;
 
         // Reactants
@@ -299,10 +292,9 @@ export default class ReactionDrawer {
             }
         });
 
+        svg.setAttributeNS(null, 'width',   this.molOpts.width.toString());
+        svg.setAttributeNS(null, 'height',  this.molOpts.height.toString());
         svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
-        svg.style.width = totalWidth + 'px';
-        svg.style.height = maxHeight + 'px';
-
         return svg;
     }
 

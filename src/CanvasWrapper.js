@@ -1,4 +1,5 @@
 // @ts-check
+import DomHelper    from './DomHelper';
 import Line         from './Line';
 import MathHelper   from './MathHelper';
 import Ring         from './Ring';
@@ -52,23 +53,7 @@ export default class CanvasWrapper {
      * @param {Object} options The smiles drawer options object.
      */
     constructor(target, themeManager, options) {
-        let element = null;
-        if (target instanceof String) {
-            element = document.getElementById(target.valueOf());
-        }
-        else if (typeof target === 'string') {
-            element = document.getElementById(target);
-        }
-        else {
-            element = target;
-        }
-
-        if (element instanceof HTMLCanvasElement) {
-            this.canvas = element;
-        }
-        else {
-            throw Error('First argument was not a canvas or the ID of a canvas.');
-        }
+        this.canvas = DomHelper.getDrawable(target, HTMLCanvasElement);
 
         this.ctx = this.canvas.getContext('2d');
         this.themeManager = themeManager;

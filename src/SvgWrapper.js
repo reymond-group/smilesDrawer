@@ -1,3 +1,4 @@
+import DomHelper  from './DomHelper';
 import Line       from './Line';
 import MathHelper from './MathHelper';
 import Vector2    from './Vector2';
@@ -14,12 +15,7 @@ function makeid(length) {
 
 export default class SvgWrapper {
     constructor(themeManager, target, options, clear = true) {
-        if (typeof target === 'string' || target instanceof String) {
-            this.svg = document.getElementById(target);
-        }
-        else {
-            this.svg = target;
-        }
+        this.svg = DomHelper.getDrawable(target, SVGSVGElement);
 
         this.container = null;
         this.opts = options;
@@ -272,25 +268,6 @@ export default class SvgWrapper {
         let y = this.minY;
         let width = this.maxX - this.minX;
         let height = this.maxY - this.minY;
-
-        if (scale <= 0.0) {
-            if (width > height) {
-                let diff = width - height;
-                height = width;
-                y -= diff / 2.0;
-            }
-            else {
-                let diff = height - width;
-                width = height;
-                x -= diff / 2.0;
-            }
-        }
-        else {
-            if (this.svg) {
-                this.svg.style.width = scale * width + 'px';
-                this.svg.style.height = scale * height + 'px';
-            }
-        }
 
         this.svg.setAttributeNS(null, 'viewBox', `${x} ${y} ${width} ${height}`);
     }
@@ -784,19 +761,8 @@ export default class SvgWrapper {
      * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
      */
     toCanvas(canvas, width, height) {
-        if (typeof canvas === 'string' || canvas instanceof String) {
-            canvas = document.getElementById(canvas);
-        }
-
-        let image = new Image();
-
-        image.onload = function() {
-            canvas.width = width;
-            canvas.height = height;
-            canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-        };
-
-        image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(this.svg.outerHTML);
+        const cavas = DomHelper.getDrawable(canvas);
+        DomHelper.svgToCanvas(this.svg, canvas);
     }
 
     static createUnicodeSubscript(n) {
@@ -850,50 +816,26 @@ export default class SvgWrapper {
      *
      * @param {SVGElement} svg
      * @param {HTMLCanvasElement} canvas
-     * @param {Number} width
-     * @param {Number} height
-     * @param {CallableFunction} callback
+     * @param {Number} width  (unused)
+     * @param {Number} height (unused)
+     * @param {?CallableFunction} callback
      * @returns {HTMLCanvasElement} The input html canvas element after drawing to.
      */
     static svgToCanvas(svg, canvas, width, height, callback = null) {
-        svg.setAttributeNS(null, 'width', width);
-        svg.setAttributeNS(null, 'height', height);
-
-        let image = new Image();
-        image.onload = function() {
-            canvas.width = width;
-            canvas.height = height;
-
-            let context = canvas.getContext('2d');
-            context.imageSmoothingEnabled = false;
-            context.drawImage(image, 0, 0, width, height);
-
-            if (callback) {
-                callback(canvas);
-            }
-        };
-
-        image.onerror = function(err) {
-            console.log(err);
-        };
-
-        image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(svg.outerHTML);
+        DomHelper.svgToCanvas(svg, canvas).then(callback);
         return canvas;
     }
 
     /**
-     * Convert an SVG to a canvas. Warning: This happens async!
+     * Convert an SVG to an image. Warning: This happens async!
      *
      * @param {SVGElement} svg
-     * @param {HTMLImageElement} canvas
-     * @param {Number} width
-     * @param {Number} height
+     * @param {HTMLImageElement} img
+     * @param {Number} width  (unused)
+     * @param {Number} height (unused)
      */
     static svgToImg(svg, img, width, height) {
-        let canvas = document.createElement('canvas');
-        this.svgToCanvas(svg, canvas, width, height, () => {
-            img.src = canvas.toDataURL('image/png');
-        });
+        DomHelper.svgToImg(svg, img);
     }
 
     /**
