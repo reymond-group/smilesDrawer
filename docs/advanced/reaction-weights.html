@@ -13,7 +13,7 @@
       <h1>Advanced SmilesDrawer: Reaction Weights</h1>
     </header>
     <content>
-      <div><canvas
+      <div><canvas id="output-1"
         data-smiles="CF.FC#N>>CC#N.FF"
         data-smiles-reactant-weights="1,0;0,-1,0"
         data-smiles-product-weights="1,-1,0;0,0"
@@ -26,10 +26,12 @@
       const version = document.getElementById('version');
       version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
 
-      const options = {width: 500, height: 120};
+      // Use the same options for all three drawings:
+      const molecule_opts = {width: 500, height: 150};
+      const reaction_opts = {};
 
       function useApply() {
-        const drawer = new SmilesDrawer.SmiDrawer(options);
+        const drawer = new SmilesDrawer.SmiDrawer(molecule_opts, reaction_opts);
         drawer.apply();
       }
 
@@ -40,7 +42,7 @@
           products:  [[1, -1, 0], [0, 0]]
         };
 
-        const drawer = new SmilesDrawer.SmiDrawer(options);
+        const drawer = new SmilesDrawer.SmiDrawer(molecule_opts, reaction_opts);
         drawer.draw('CF.FC#N>>CC#N.FF', '#output2', 'light', null, null, weights);
       }
 
@@ -52,7 +54,7 @@
         };
 
         SmilesDrawer.parseReaction('CF.FC#N>>CC#N.FF', (result) => {
-          const drawer = new SmilesDrawer.ReactionDrawer();
+          const drawer = new SmilesDrawer.ReactionDrawer(reaction_opts, molecule_opts);
           drawer.draw(result, 'output3', 'light', weights);
         }, (error) => {
           console.error(error);

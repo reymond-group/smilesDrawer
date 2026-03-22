@@ -13,31 +13,35 @@
       <h1>Advanced SmilesDrawer: Reactions</h1>
     </header>
     <content>
-      <div><svg id="reaction0" data-smiles="FC(F)(F)CCl>>FC(F)(F)C(Br)Cl"></svg></div>
-      <div><svg id="reaction1"></svg></div>
+      <div><svg id="reaction1" data-smiles="FC(F)(F)CCl>>FC(F)(F)C(Br)Cl"></svg></div>
       <div><svg id="reaction2"></svg></div>
+      <div><svg id="reaction3"></svg></div>
     </content>
     <script type="text/javascript">
       // Show the SmilesDrawer version in the header:
       const version = document.getElementById('version');
       version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
 
+      // Use the same options for all three drawings:
+      const molecule_opts = {width: 500, height: 150};
+      const reaction_opts = {};
+
       function useApply() {
-        SmilesDrawer.SmiDrawer.apply();
+        SmilesDrawer.SmiDrawer.apply(molecule_opts, reaction_opts);
       }
 
       function useDraw() {
-        const reaction = 'c1ccccc1NNc2ccccc2>[H+]>c1cc(N)ccc1c2ccc(N)cc2';
-        const drawer = new SmilesDrawer.SmiDrawer({width: 500, height: 300});
-        drawer.draw(reaction, '#reaction1');
+        const smiles = 'c1ccccc1NNc2ccccc2>[H+]>c1cc(N)ccc1c2ccc(N)cc2';
+        const drawer = new SmilesDrawer.SmiDrawer(molecule_opts, reaction_opts);
+        drawer.draw(smiles, '#reaction2');
       }
 
       function useParseThenDraw() {
-        const reaction = 'c1c([R])cccc1S(=O)(=O)C.c1ncccc1B(CC)CC>>c1ncccc1c2cccc(S(=O)(=O)C)c2';
-        const drawer = new SmilesDrawer.ReactionDrawer(); //{}, );
+        const smiles = 'c1c([R])cccc1S(=O)(=O)C.c1ncccc1B(CC)CC>>c1ncccc1c2cccc(S(=O)(=O)C)c2';
+        const drawer = new SmilesDrawer.ReactionDrawer(reaction_opts, molecule_opts);
 
-        SmilesDrawer.parseReaction(reaction, (result) => {
-          drawer.draw(result, 'reaction2', 'light', null, 'Pd(PPh₃)₄', 'Bu₄NBr + K₂CO₃');
+        SmilesDrawer.parseReaction(smiles, (result) => {
+          drawer.draw(result, 'reaction3', 'light', null, 'Pd(PPh₃)₄', 'Bu₄NBr + K₂CO₃');
         }, (error) => {
           console.error(error);
         });
