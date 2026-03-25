@@ -1,4 +1,4 @@
-import {describe, it, expect, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import DomHelper from '../../src/DomHelper';
 
 vi.mock(import('../../src/DomHelper'), {spy: true});
@@ -245,6 +245,39 @@ describe('DomHelper', () => {
         });
     });
 
+    describe('getDrawable()', () => {
+        beforeEach(() => {
+            // Clear and load a base HTML structure for each test
+            document.body.innerHTML = `<div>
+                <svg id="svg-id"></svg>
+                <canvas id="canvas-id"></canvas>
+                <p id="other-id"></p>
+            </div>`;
+        });
+
+        it('should pass through drawable elements unchanged', () => {
+            const canvas = DomHelper.createCanvas();
+            const result = DomHelper.getDrawable(canvas, HTMLCanvasElement);
+            expect(result).toBe(canvas);
+        });
+
+        it('should get elements by id when passed a string', () => {
+            const result = DomHelper.getDrawable('canvas-id', HTMLCanvasElement);
+            expect(result).toBeInstanceOf(HTMLCanvasElement);
+        });
+
+        it('should get elements by id when passed a String', () => {
+            const result = DomHelper.getDrawable(new String('svg-id'), SVGSVGElement);
+            expect(result).toBeInstanceOf(SVGSVGElement);
+        });
+
+        it('should throw if it finds the wrong type of element', () => {
+            expect(() => {
+                DomHelper.getDrawable(new String('svg-id'), HTMLCanvasElement);
+            }).toThrow();
+        });
+    });
+
     describe('svgTo()', () => {
         it('should copy an svg to an existing canvas', async () => {
             const svg    = DomHelper.createSvg(123, 234);
@@ -480,6 +513,20 @@ describe('DomHelper', () => {
 
             expect(result).toBeInstanceOf(SVGSVGElement);
             expect(result).not.toBe(svg);
+        });
+
+        it('should remove existing children from the target', async () => {
+            const src = DomHelper.createSvg(100, 200);
+            const dst = DomHelper.createSvg(100, 200);
+
+            const circle = document.createElementNS(null, 'circle');
+            circle.setAttributeNS(null, 'cx',    '70');
+            circle.setAttributeNS(null, 'cy',   '130');
+            circle.setAttributeNS(null, 'radius', '5');
+            dst.append(circle);
+
+            await DomHelper.svgToSvg(src, dst);
+            expect(dst.children.length).toBe(0);
         });
 
         it('should copy nodes from one svg to another', async () => {
