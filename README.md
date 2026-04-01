@@ -11,7 +11,7 @@ Current Version: **2.2.1**
         <tr>
             <td><a href="https://reymond-group.github.io/smilesDrawer/manual/basic-drawing.md">Draw Molecules</a></td>
             <td><a href="https://reymond-group.github.io/smilesDrawer/manual/customization.md">Use Custom Styles</a></td>
-            <td><a href="https://reymond-group.github.io/smilesDrawer/manual/weights.md">Highlight Atoms</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/manual/atom-weights.md">Highlight Atoms</a></td>
         </tr>
         <tr>
             <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/docs/images/caffeine.png"></td></td>

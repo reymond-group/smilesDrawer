@@ -52,9 +52,9 @@ For a live example of both methods, see:
 
 ## Function Reference
 
-- [SmilesDrawer.parse()](entrypoints.md#static-smilesdrawer-parse)
-- [Drawer.draw()](entrypoints.md#drawer-draw)
-- [SvgDrawer.draw()](entrypoints.md#svgdrawer-draw)
+- [SmilesDrawer.parse()](entrypoints.md#static-smilesdrawerparse)
+- [Drawer.draw()](entrypoints.md#drawerdraw)
+- [SvgDrawer.draw()](entrypoints.md#svgdrawerdraw)
 
 
 ## See Also

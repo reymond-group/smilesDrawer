@@ -14,7 +14,7 @@ Like most drawing tasks in SmilesDrawer,  drawing a molecule with weights can be
 done with `apply()`, with `draw()`, or with `parse()` then `draw()`.  For a live
 example of all three methods, see:
 
-- <http://reymond-group.github.io/smilesDrawer/manual/live/weights.html>
+- <http://reymond-group.github.io/smilesDrawer/manual/live/atom-weights.html>
 
 
 **Caution:**
@@ -86,10 +86,10 @@ SmilesDrawer.parse('CCCCCCCCN', (result) => {
 
 ## Function Reference
 
-- [`SmiDrawer.apply()`](entrypoints.md#smidrawer-apply)
-- [`SmiDrawer.draw()`](entrypoints.md#smidrawer-draw)
-- [`SvgDrawer.draw()`](entrypoints.md#svgdrawer-draw)
-- [`SvgDrawer.draw()`](entrypoints.md#svgdrawer-drawcanvas)
+- [`SmiDrawer.apply()`](entrypoints.md#smidrawerapply)
+- [`SmiDrawer.draw()`](entrypoints.md#smidrawerdraw)
+- [`SvgDrawer.draw()`](entrypoints.md#svgdrawerdraw)
+- [`SvgDrawer.drawCanvas()`](entrypoints.md#svgdrawerdrawcanvas)
 
 
 ## See Also

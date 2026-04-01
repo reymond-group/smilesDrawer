@@ -155,12 +155,12 @@ Note that the `plus`, `arrow`, and `weights` options are nested objects.
 
 | Option              | Default                          | Description
 | ------------------- | -------------------------------- | -----------
-| `fontSize`          | *                                | Numeric font size (in `pt`)
+| `fontSize`          | see below                        | Numeric font size (in `pt`)
 | `fontFamily`        | `"Arial, Helvetica, sans-serif"` | CSS `font-family` string
 | `spacing`           | `10`                             | Horizontal space between graphics
 | `plus.size`         | `9`                              | Size of the plus sign between molecules
 | `plus.thickness`    | `1.0`                            | Thickness of the plus sign
-| `arrow.length`      | *                                | Length of the reaction arrow
+| `arrow.length`      | see below                        | Length of the reaction arrow
 | `arrow.headSize`    | `6.0`                            | Size of the head of the reaction arrow
 | `arrow.thickness`   | `1.0`                            | Thickness of the reaction arrow
 | `arrow.margin`      | `3`                              | Vertical space between arrow and any text

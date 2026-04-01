@@ -85,13 +85,13 @@ SmilesDrawer.parseReaction('CF.FC#N>>CC#N.FF', (result) => {
 
 ## Function Reference
 
-- [`SmiDrawer.apply()`](entrypoints.md#smidrawer-apply)
-- [`SmiDrawer.draw()`](entrypoints.md#smidrawer-draw)
-- [`ReactionDrawer.draw()`](entrypoints.md#reactiondrawer-draw)
+- [`SmiDrawer.apply()`](entrypoints.md#smidrawerapply)
+- [`SmiDrawer.draw()`](entrypoints.md#smidrawerdraw)
+- [`ReactionDrawer.draw()`](entrypoints.md#reactiondrawerdraw)
 
 
 ## See Also
 
-- [Drawing Weighted Molecules](weights.md)
+- [Drawing Weighted Molecules](atom-weights.md)
 - [Drawing Unweighted Reactions](reactions.md)
 - [Back to the Index](README.md)

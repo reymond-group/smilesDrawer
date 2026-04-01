@@ -28,14 +28,15 @@ an `svg` with a `data-smiles` attribute that contains reaction SMILES:
 <svg data-smiles="[Pb]>>[Au]"></svg>
 ```
 
-Then call `SmiDrawer`'s `apply()` function:
+Then create a `SmiDrawer` and call its `apply()` function:
 
 ```js
-SmilesDrawer.SmiDrawer.apply();
+const drawer = new SmilesDrawer.SmiDrawer();
+drawer.apply();
 ```
 
 See the function reference for more details:
-- [`SmiDrawer.apply()`](entrypoints.md#static-smidrawer-apply)
+- [`SmiDrawer.apply()`](entrypoints.md#smidrawerapply)
 
 
 **Caution:**
@@ -68,8 +69,7 @@ drawer.draw('[Pb]>>[Au]', '#id-of-target');
 ```
 
 See the function documentation for more details:
-- [`SmiDrawer.draw()`](entrypoints.md#smidrawer-draw)
-- [`SmiDrawer.drawReaction()`](entrypoints.md#smidrawer-drawreaction)
+- [`SmiDrawer.draw()`](entrypoints.md#smidrawerdraw)
 
 **Caution:**
 
@@ -83,8 +83,8 @@ See the function documentation for more details:
 ## Parse then Draw
 
 You can also parse your reaction SMILES first,  then pass the parsed reaction to
-`ReactionDrawer.draw()`.  This lets you to pass any text you want above or below
-the arrow as arguments to the function:
+`ReactionDrawer.draw()`.  This lets you to pass any text you want shown above or
+below the arrow as arguments to the function:
 
 ```js
 SmilesDrawer.parseReaction('[Pb]>>[Au]', (result) => {
@@ -96,8 +96,8 @@ SmilesDrawer.parseReaction('[Pb]>>[Au]', (result) => {
 ```
 
 See the function documentation for more details:
-- [`SmilesDrawer.parseReaction()`](entrypoints.md#static-smilesdrawer-parsereaction)
-- [`ReactionDrawer.draw()`](entrypoints.md#reactiondrawer-draw)
+- [`SmilesDrawer.parseReaction()`](entrypoints.md#static-smilesdrawerparsereaction)
+- [`ReactionDrawer.draw()`](entrypoints.md#reactiondrawerdraw)
 
 **Caution:**
 

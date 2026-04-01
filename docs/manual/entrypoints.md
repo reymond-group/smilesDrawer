@@ -46,7 +46,7 @@ more powerful; it will likely become the default in a future version.
   using `draw()` to update individual drawings instead.
 
 
-### `SmilesDrawer.apply()`
+### `static SmilesDrawer.apply()`
 
 ```js
 SmilesDrawer.apply(
@@ -145,7 +145,7 @@ need to use a `parse()` function (see the next section) before calling those.
 ```js
 new SmilesDrawer.Drawer(options).draw(
     data,           // pre-parsed molecule
-    target,         // canvas or the ID of a canvas
+    target,         // a canvas or the ID of a canvas
     themeName       = "light",
     infoOnly        = false,
     highlight_atoms = []
@@ -161,7 +161,7 @@ No return value.
 ```js
 new DrawerBase(options).draw(
     data,       // pre-parsed molecule
-    target,     // canvas or the ID of a canvas
+    target,     // a canvas or the ID of a canvas
     themeName = "light",
     infoOnly  = false
 )
@@ -186,7 +186,7 @@ This is not the function you're looking for.
 ```js
 new SmilesDrawer.ReactionDrawer(reactionOptions, moleculeOptions).draw(
     reaction, // pre-parsed reaction
-    target,   // svg, the ID of an svg, or null or "svg" to create a new one
+    target,   // an svg, the ID of an svg, or null or "svg" to create a new one
     themeName = "light",
     weights   = null,
     textAbove = "{reagents}",
@@ -210,7 +210,7 @@ Returns the SVG.
 ```js
 new SmilesDrawer.SmiDrawer(moleculeOptions={}, reactionOptions={}).draw(
     smiles,         // smiles string (molecule OR reaction)
-    target,         // null, "svg", "img", "canvas", img, svg, or CSS query
+    target,         // see below
     theme           = "light",
     successCallback = null,
     errorCallback   = null,
@@ -277,7 +277,7 @@ No return value.
 ```js
 new SmilesDrawer.SvgDrawer(options, clear=true).draw(
     data,             // pre-parsed molecule
-    target,           // svg or the ID of an svg
+    target,           // an svg or the ID of an svg
     themeName         = "light",
     weights           = null,
     infoOnly          = false,
@@ -296,7 +296,7 @@ Returns the SVG.
 ```js
 new SmilesDrawer.SvgDrawer(options, clear=true).drawCanvas(
     data,     // pre-parsed molecule
-    target,   // canvas or the ID of a canvas
+    target,   // a canvas or the ID of a canvas
     themeName = "light",
     infoOnly  = false // actually weights!?
 )

@@ -41,7 +41,7 @@ SmilesDrawer.apply(options);
 ```
 
 See the function documentation for more details:
-- [`SmilesDrawer.apply()`](entrypoints.md#static-smilesdrawer-apply)
+- [`SmilesDrawer.apply()`](entrypoints.md#static-smilesdrawerapply)
 
 There are several ways  to make sure  your JavaScript doesn't run until  all the
 `canvas` elements you want to draw to have loaded.  Try one of these:
@@ -79,7 +79,7 @@ drawer.draw('Oc2c1ccccc1[nH]c2', '#indoxyl');
 
 The second argument to  `SmiDrawer.draw()`  is the render target,  and it can be
 many things.  See the function documentation for more details:
-- [`SmiDrawer.draw()`](entrypoints.md#smidrawer-draw)
+- [`SmiDrawer.draw()`](entrypoints.md#smidrawerdraw)
 
 **Caution:**
 
@@ -123,9 +123,9 @@ SmilesDrawer.parse(smiles, (result) => {
 ```
 
 See the function documentation for more details:
-- [`SmilesDrawer.parse()`](entrypoints.md#static-smilesdrawer-parse)
-- [`Drawer.draw()`](entrypoints.md#drawer-draw)
-- [`SvgDrawer.draw()`](entrypoints.md#svgdrawer-draw)
+- [`SmilesDrawer.parse()`](entrypoints.md#static-smilesdrawerparse)
+- [`Drawer.draw()`](entrypoints.md#drawerdraw)
+- [`SvgDrawer.draw()`](entrypoints.md#svgdrawerdraw)
 
 **Caution:**
 

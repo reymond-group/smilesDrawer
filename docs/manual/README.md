@@ -5,7 +5,7 @@
 - [Basic Drawing](basic-drawing.md)\
   Draw some molecules.
 
-- [Customization](customization.md)
+- [Customization](customization.md)\
   Fine-tune your drawings and use custom colors.
 
 - [Drawing Reactions](reactions.md)\
