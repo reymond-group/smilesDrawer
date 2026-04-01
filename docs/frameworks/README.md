@@ -7,16 +7,25 @@ can find some examples below.
 
 - **Preact**
   - Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks/preact>
-  - Live: <https://reymond-group.github.io/smilesDrawer/docs/frameworks/preact/index.html>
+  - Live: <https://reymond-group.github.io/smilesDrawer/frameworks/preact/index.html>
+
 - **React**
   - Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks/react>
-  - Live: <https://reymond-group.github.io/smilesDrawer/docs/frameworks/react/index.html>
+  - Live: <https://reymond-group.github.io/smilesDrawer/frameworks/react/index.html>
+
 - **Svelte**
   - Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks/svelte>
-  - Live: <https://reymond-group.github.io/smilesDrawer/docs/frameworks/svelte/index.html>
+  - Live: <https://reymond-group.github.io/smilesDrawer/frameworks/svelte/index.html>
+
 - **Vue**
   - Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks/vue>
-  - Live: <https://reymond-group.github.io/smilesDrawer/docs/frameworks/vue/index.html>
+  - Live: <https://reymond-group.github.io/smilesDrawer/frameworks/vue/index.html>
+
 - **Web Components**
   - Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks/web-components>
   - Live: There are two example implementations - see the page linked above.
+
+
+## See Also
+
+- [Documentation Index](../manual/README.md)

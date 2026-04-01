@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="../common.css" />
     <title>Advanced SmilesDrawer: Reactions</title>
     <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
@@ -37,7 +37,7 @@
       }
 
       function useParseThenDraw() {
-        const smiles = 'c1c([R])cccc1S(=O)(=O)C.c1ncccc1B(CC)CC>>c1ncccc1c2cccc(S(=O)(=O)C)c2';
+        const smiles = 'c1c([R])cccc1S(=O)(=O)C.c1ncccc1B(CC)CC>Na>c1ncccc1c2cccc(S(=O)(=O)C)c2';
         const drawer = new SmilesDrawer.ReactionDrawer(reaction_opts, molecule_opts);
 
         SmilesDrawer.parseReaction(smiles, (result) => {

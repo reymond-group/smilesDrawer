@@ -3,13 +3,13 @@
 There are two ways to implement  Web Components.  You can create an entirely new
 type of element and manage its content with a shadow DOM:
 
-- Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/examples/web-components/autonomous.html>
-- Live: <https://reymond-group.github.io/smilesDrawer/docs/examples/web-components/autonomous.html>
+- Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks/web-components/autonomous.html>
+- Live: <https://reymond-group.github.io/smilesDrawer/frameworks/web-components/autonomous.html>
 
 Or you can customize an existing element type (in this example, `canvas`):
 
-- Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/examples/web-components/customized.html>
-- Live: <https://reymond-group.github.io/smilesDrawer/docs/examples/web-components/customized.html>
+- Code: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks/web-components/customized.html>
+- Live: <https://reymond-group.github.io/smilesDrawer/frameworks/web-components/customized.html>
 
 For more information on Web Components, see MDN:
 

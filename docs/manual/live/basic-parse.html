@@ -29,9 +29,9 @@
       version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
 
       function render(smiles, target, theme) {
-        SmilesDrawer.parse(smiles, (tree) => {
+        SmilesDrawer.parse(smiles, (result) => {
           const drawer = new SmilesDrawer.Drawer({width: 500, height: 400});
-          drawer.draw(tree, target, theme);
+          drawer.draw(result, target, theme);
         }, (error) => {
           // Handle parse errors (invalid SMILES) here.
           console.warn(error);

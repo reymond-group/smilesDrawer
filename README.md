@@ -9,20 +9,20 @@ Current Version: **2.2.1**
 <table style="width: 100%; table-layout: fixed">
     <tbody>
         <tr>
-            <td><a href="https://smilesdrawer.rocks">Molecules</a></td>
-            <td><a href="https://smilesdrawer.rocks">Reactions & Highlights</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/manual/basic-drawing.md">Draw Molecules</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/manual/customization.md">Use Custom Styles</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/manual/weights.md">Highlight Atoms</a></td>
         </tr>
         <tr>
-            <td><a href="https://smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/main.png"></img></a></td>
-            <td><a href="https://smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/rxn_highlight.png"></img></a></td>
+            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/docs/images/caffeine.png"></td></td>
+            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/docs/images/customize.png"></td>
+            <td><img src="https://github.com/reymond-group/smilesDrawer/raw/master/docs/images/weights.png"></td>
         </tr>
         <tr>
-            <td><a href="https://smilesdrawer.surge.sh/use.html">Learn & Copy-Paste</a></td>
-            <td><a href="https://smilesdrawer.surge.sh/playground.html">Style & Customize</a></td>
+            <td colspan="3"><a href="https://reymond-group.github.io/smilesDrawer/manual/reactions.md">Draw Reactions</a></td>
         </tr>
         <tr>
-            <td><a href="https://smilesdrawer.surge.sh/use.html"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/learn.png"></img></a></td>
-            <td><a href="https://smilesdrawer.surge.sh/playground.html"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/style.png"></img></a></td>
+            <td colspan="3"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/docs/images/reaction.png"></td></td>
         </tr>
     </tbody>
 </table>
@@ -58,7 +58,7 @@ size of the drawings with an options object.
 ```html
 <html>
     <head>
-        <script type="text/javascript" src="path/to/smiles-drawer.js"></script>
+        <script type="text/javascript" src="path/to/smiles-drawer.min.js"></script>
     </head>
     <body>
         <canvas data-smiles="Cn1cnc2c1C(=O)N(C(=O)N2C)C"></canvas>
@@ -70,7 +70,6 @@ size of the drawings with an options object.
 </html>
 ```
 
-
 ### Dynamic Drawing
 
 To draw a single molecule to a  specific HTML element,  create a `SmiDrawer` and
@@ -80,7 +79,7 @@ changes:
 ```html
 <html>
     <head>
-        <script type="text/javascript" src="path/to/smiles-drawer.js"></script>
+        <script type="text/javascript" src="path/to/smiles-drawer.min.js"></script>
     </head>
     <body>
         <input  id="input" value="O=C(O)CNCP(=O)(O)O" />
@@ -105,17 +104,18 @@ changes:
 </html>
 ```
 
-
 ### More Examples
 
-- See the [SmilesDrawer Basics][basic-examples] page for more information on the
-  functions used above - including live examples.
+- See  [Basic Drawing](docs/manual/basic-drawing.md) for more information on the
+  functions used above.
 
-- See  [Advanced SmilesDrawer][advanced-examples]  for examples of more advanced
-  SmilesDrawer features, like drawing reactions and highlighting atoms.
+- See [Drawing Reactions](docs/manual/reactions.md) for how to draw reactions.
 
-- See [Other Frameworks][framework-examples]  for examples of using SmilesDrawer
-  in various JavaScript frameworks, including React, Vue, and Web Components.
+- See  [SmilesDrawer in Other Frameworks](docs/frameworks) for examples of using
+  SmilesDrawer in various JavaScript frameworks.
+
+- See the [Documentation Index](docs/manual) for many other topics.
+
 
 
 ## Customizing SmilesDrawer
@@ -127,96 +127,54 @@ constructor.  Note that `width` and `height`  are included in these options:  if
 you want to create drawings of different sizes, you'll need to instantiate a new
 `SmiDrawer` for each size.
 
-The most useful options  are listed below.  You can experiment with these in the
-[Playground][playground]. For the full list, see the `DrawerBase` constructor in
-`src/DrawerBase.js`.
+The most useful options are listed below,  but almost everything in SmilesDrawer
+is customizable: see [Customization](docs/manual/customization.md)  for the full
+list of options.
 
 | Option                        | Default     | Description
 | ----------------------------- | ----------- | --------------
-| **Image Dimensions**
 | `width`                       | `500`       | Drawing width
 | `height`                      | `500`       | Drawing height
-| `padding`                     | `10`        | Drawing padding
-| **Atom Visualization**
 | `atomVisualization`           | `"default"` | Atom visualization: `"default"`, `"balls"`, or `"none"`
-| `fontSizeLarge`               | `11`        | Large font size (in `pt`, for elements)
-| `fontSizeSmall`               | `3`         | Small font size (in `pt`, for numbers)
 | `compactDrawing`              | `true`      | Draw concatenated terminals and pseudo-elements
 | `terminalCarbons`             | `false`     | Show terminal carbons (CH3)
 | `explicitHydrogens`           | `true`      | Show explicit hydrogens
-| **Bond Visualization**
-| `bondThickness`               | `1.0`       | Bond thickness
-| `bondLength`                  | `30.0`      | Bond length
-| `shortBondLength`             | `0.8`       | Short bond length (e.g. double bonds) as a percent of `bondLength`
-| `bondSpacing`                 | `5.1`       | Spacing between double bonds
-| `isomeric`                    | `true`      | Draw stereochemistry if available
-| **Advanced**
-| `overlapSensitivity`          | `0.42`      | Sensitivity to atom overlaps
-| `overlapResolutionIterations` | `1`         | Number of overlap resolution iterations
-| `experimentalSSSR`            | `false`     | Use improved(?) ring system detection
-| `debug`                       | `false`     | Draw debug labels
-| `themes`                      | see below   | Color themes
 
-A few common issues can be fixed by adjusting these options:
+You can also experiment with options in the SmilesDrawer Playground:
 
-- If you want to see a full structure, but are seeing too much abbreviation (for
-  example, `COOH` renders as a single string), set `compactDrawing` to `false`.
-- If you are seeing  hydrogens  that you don't need  (typically at stereocenters
-  like `[C@@H]`), set `explicitHydrogens` to `false`.
-- If you have problems drawing large ring systems - including extra-long bonds -
-  try setting `experimentalSSSR` to `true`.
+- <https://reymond-group.github.io/smilesDrawer/tools/playground.html>
 
 
 ### Themes
 
-Themes let you control the colors of atoms. An initial set of possible themes is
-passed as part of the `options` object; when drawing, you can pass the name of a
-theme to use it.  SmilesDrawer uses the `"light"` theme by default.
+Themes let you control the colors of atoms.  SmilesDrawer uses the `light` theme
+by default,  but it comes with many other themes built in.  You can see these in
+the Theme Gallery:
 
-You can see all the built-in themes in the  [Theme Gallery][theme-gallery]; you
-can experiment with making your own themes in the [Playground][playground].
+- <https://reymond-group.github.io/smilesDrawer/tools/theme-gallery.html>
 
-To use custom colors, pass your own theme in the `options` object, then pass its
-name when you draw your molecules (or you can name it `light` so it gets used by
-default).
+To use a built-in theme, pass its name when drawing.  For example, to use the
+`matrix` theme with `SmilesDrawer.apply()`:
 
 ```js
-const options = {
-    // ...
-    themes: {
-        'my-theme': {
-            FOREGROUND: '#222222',
-            BACKGROUND: '#ffffff',
-
-            C:  '#222222',
-            O:  '#e74c3c',
-            N:  '#3498db',
-            F:  '#27ae60',
-            CL: '#16a085',
-            BR: '#d35400',
-            I:  '#8e44ad',
-            P:  '#d35400',
-            S:  '#f1c40f',
-            B:  '#e67e22',
-            SI: '#e67e22',
-            H:  '#666666',
-        }
-    }
-}
-
-// Example using the apply() function:
-SmilesDrawer.apply(options, 'canvas[data-smiles]', 'my-theme')
-
-// Example using a targeted draw() call:
-const drawer = new SmilesDrawer.SmiDrawer(options)
-drawer.draw(smiles, target, 'my-theme')
+SmilesDrawer.apply(options, "canvas[data-smiles]", "matrix");
 ```
 
-Some possible gotchas:
+Or to use the `gruvbox` theme with `SmiDrawer.draw()`:
 
-- Unlisted atoms draw with the color for carbon.
-- Atom names are currently all upper case.
-- The background is not currently drawn.
+```js
+const drawer = new SmilesDrawer.SmiDrawer(options);
+drawer.draw(smiles, target, "gruvbox");
+```
+
+For more information on themes - including how to create custom themes with your
+own  colors - see the  [Themes](docs/manual/customization.md#themes)  section of
+the Customization guide.
+
+
+## Further Reading
+
+For more detailed documentation, see the [SmilesDrawer Manual](docs/manual).
 
 
 ## Please Cite
@@ -274,16 +232,7 @@ ER  -
 </details>
 
 
-### Thank You!
+### Thank you for contributing!
 
-Thank you for contributing:
 - SRI International's CSE group (for the excellent SVG support).
 - And all our [contributors](https://github.com/reymond-group/smilesDrawer/graphs/contributors) on GitHub!
-
-
-
-[basic-examples]:     <https://github.com/reymond-group/smilesDrawer/tree/master/docs/basic>
-[advanced-examples]:  <https://github.com/reymond-group/smilesDrawer/tree/master/docs/advanced>
-[framework-examples]: <https://github.com/reymond-group/smilesDrawer/tree/master/docs/frameworks>
-[playground]:         <https://reymond-group.github.io/smilesDrawer/docs/tools/playground.html>
-[theme-gallery]:      <https://reymond-group.github.io/smilesDrawer/docs/tools/theme-gallery.html>
