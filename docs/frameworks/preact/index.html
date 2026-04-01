@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../common.css" />
+    <title>SmilesDrawer in Preact</title>
+    <script type="text/javascript" src="../../../dist/smiles-drawer.min.js"></script>
+    <script type="module" defer>
+      import {h, render}         from 'https://esm.sh/preact';
+      import {useEffect, useRef} from 'https://esm.sh/preact/hooks';
+
+      // Show version numbers in the header:
+      const version = document.getElementById('version');
+      version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
+
+      // This is a HACK to get the version of Preact we're using!
+      fetch('https://esm.sh/preact', {method: 'HEAD'}).then((response) => {
+        const esmpath = response.headers.get('x-esm-path');
+        const match   = esmpath.match(/\/preact@([^/]+)\//);
+        const version = (match)? match[1] : '???';
+
+        const vdiv = document.getElementById('version');
+        vdiv.innerText += ` + Preact v${version}`;
+      }).catch((error) => {
+        console.warn(error);
+      });
+
+      // A component that renders a single molecule.
+      function Molecule({smiles, options={}, theme='light'}) {
+        const canvas = useRef(null);
+
+        useEffect(() => {
+          if (!smiles || !canvas.current) {
+            // Nothing to draw (or nowhere to draw to).
+            return;
+          }
+
+          SmilesDrawer.parse(smiles, (tree) => {
+            const drawer = new SmilesDrawer.Drawer(options);
+            drawer.draw(tree, canvas.current, theme);
+          }, (error) => {
+            // Handle parse errors (invalid SMILES) here.
+            console.warn(error);
+          });
+        }, [smiles, options, theme]);
+
+        return h('canvas', {ref: canvas});
+      }
+
+      // An "app" that displays some hydrocarbons.
+      function App() {
+        const options = {width: 300, height: 200};
+
+        return h('div', {}, [
+          h(Molecule, {options: options, smiles: 'C'}),
+          h(Molecule, {options: options, smiles: 'CC'}),
+          h(Molecule, {options: options, smiles: 'CCC'}),
+          h(Molecule, {options: options, smiles: 'CCCC'})
+        ]);
+      }
+
+      // Attach to the DOM to kick things off:
+      const root = document.getElementById('root');
+      render(h(App), root);
+    </script>
+  </head>
+  <body>
+    <header>
+      <div id="version"></div>
+      <h1>SmilesDrawer in Preact</h1>
+    </header>
+    <content id="root"></content>
+  </body>
+</html>

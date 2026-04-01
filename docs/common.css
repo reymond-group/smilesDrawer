@@ -1,0 +1,39 @@
+/* This file contains styles for the standard SmilesDrawer header used in the JS
+ * examples.  It doesn't affect how the molecules are drawn.  If an example uses
+ * custom CSS, that can be found in the example folder (usually in the HTML).
+ */
+
+body {
+  background-color: #eee;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #345;
+  height: 48px;
+  line-height: 48px;
+  margin: 0;
+  padding: 0 12px;
+}
+
+header h1 {
+  color: #ddd;
+  font-size: 26px;
+  font-weight: normal;
+  margin: 0;
+}
+
+header #version {
+  color: #888;
+  float: right;
+  line-height: 48px;
+}
+
+content {
+  display: block;
+  overflow: auto;
+  padding: 12px;
+  padding-top: 24px;
+}

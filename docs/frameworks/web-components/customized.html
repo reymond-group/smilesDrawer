@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../common.css" />
+    <title>SmilesDrawer as a Web Component</title>
+    <script type="text/javascript" src="../../../dist/smiles-drawer.min.js"></script>
+    <script type="text/javascript">
+      class SmilesDrawerCanvas extends HTMLCanvasElement {
+        // Call attributeChangedCallback() when any of these are set:
+        static get observedAttributes() {
+          return ['smiles', 'width', 'height', 'theme'];
+        }
+
+        constructor() {
+          super();
+
+          this.blockDrawing = true;
+          this.modified = false;
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+          if(oldValue !== newValue) {
+            this.modified = true;
+            this.draw();
+          }
+        }
+
+        connectedCallback() {
+          if (this.blockDrawing) {
+            this.setAttribute('width',  this.width);
+            this.setAttribute('height', this.height);
+            this.blockDrawing = false;
+            this.draw();
+          }
+        }
+
+        delayDrawing(callback) {
+          this.blockDrawing = true;
+          callback();
+
+          this.blockDrawing = false;
+          if (this.modified) {
+            this.draw();
+          }
+        }
+
+        draw() {
+          if (this.blockDrawing) {
+            return;
+          }
+
+          const smiles = this.getAttribute('smiles');
+          SmilesDrawer.parse(smiles, (tree) => {
+            const options = {width: this.width, height: this.height};
+            const theme   = this.getAttribute('theme') || 'light';
+            const drawer  = new SmilesDrawer.Drawer(options);
+
+            // console.log('Drawing...');
+            drawer.draw(tree, this, theme);
+          }, (error) => {
+            // Handle parse errors (invalid SMILES) here.
+            console.warn(error);
+          });
+
+          this.modified = false;
+        }
+      }
+
+      // Register our new element type:
+      customElements.define('smiles-drawer', SmilesDrawerCanvas, {extends: 'canvas'});
+    </script>
+  </head>
+  <body>
+    <header>
+      <div id="version"></div>
+      <h1>SmilesDrawer as a Web Component</h1>
+    </header>
+    <content>
+      <canvas is="smiles-drawer" smiles="C" width="300" height="200"></canvas>
+      <canvas is="smiles-drawer" smiles="CC" width="300" height="200"></canvas>
+      <canvas is="smiles-drawer" smiles="CCC" width="300" height="200"></canvas>
+      <canvas is="smiles-drawer" smiles="CCCC" width="300" height="200"></canvas>
+    </content>
+    <script type="text/javascript">
+      // Show version numbers in the header:
+      const version = document.getElementById('version');
+      version.innerText = `Using SmilesDrawer v${SmilesDrawer.Version}`;
+    </script>
+  </body>
+</html>
