@@ -723,9 +723,12 @@ export default class DrawerBase {
                                 let stepAngle = MathHelper.centralAngle(ring.getSize());
                                 let maxSteps = Math.max(1, Math.floor(ring.getSize() / 2));
 
+                                // TODO: speedup by rotating by stepAngle each iteration instead
+                                // of resetting to origin and rotating by step*stepAngle. Then do
+                                // one final rotation to the best position. (See PR #237 review.)
                                 for (let step = 1; step <= maxSteps; step++) {
                                     let angle = stepAngle * step;
-                                    
+
                                     // Try roatation in one direction 
                                     this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
 
@@ -988,15 +991,15 @@ export default class DrawerBase {
 
         recurse(ringId);
 
-        // The recurse() above only follows bridge connections (3+ shared atoms).
-        // But fused rings (2 shared atoms) adjacent to the bridged system also
-        // share vertices that Kamada-Kawai will position. If we don't include
-        // them, those shared atoms get placed by two different layout algorithms
-        // (KK vs regular ring layout) which produces distorted drawings.
-        //
-        // any ring sharing 2+ atoms with an already-involved
-        // ring is pulled in. Repeat until no new rings are added (fixed-point).
-        // Skip spiro connections (1 shared atom), those can be laid out independently.
+        // recurse() is only used for BRIDGED connections (rings that share 3+ atoms)
+        // but FUSED rings (exactly 2 shared atoms, like in naphtahlene) are left out. 
+        // THis causes issues if the bridged system is laid out by KK. If a fused ring
+        // shares 2 atoms with the bridges system but isn't included, those 2 atoms
+        // get positioned by KK, while the rest of the fused rings gets positioned by the
+        // normal layout algorithm. Both algos fight producing distored drawings
+        // TODO: change recurse() by making it always recurse when there are two or more 
+        // shared vertices and use a Set instead of indexOf on an array. 
+        // (See PR#237 review)
         let changed = true;
         while (changed) {
             changed = false;
@@ -2132,7 +2135,14 @@ export default class DrawerBase {
             const vA = edge.sourceId;
             const vB = edge.targetId;
 
-            // Skip double bonds where both atoms are in rings
+            // Skip double bonds where both alkene atoms are part of ring
+            // fix works after layout by mirroring one movable branch across the
+            // double-bond axis. That is safe when one side is a free subtree, but not
+            // when both sides are locked into ring geometry.
+            // In ring-ring cases such as N1CCCCC1=C2CCCCN2, the current layout may still
+            // draw one orientation, but we do not actively enforce the SMILES E/Z here.
+            // Supporting those cases requires ring layout itself to place the alkene
+            // with the correct configuration. See issue#247.
             if (graph.vertices[vA].value.rings.length > 0 &&
                 graph.vertices[vB].value.rings.length > 0) {
                 continue;
@@ -3182,7 +3192,6 @@ export default class DrawerBase {
             }
 
             let ring = this.getRing(neighbourA.value.rings[0]);
-            // Safety check in case ring data is missing or was not restored as expected.
             if (!ring) {
                 continue;
             }
@@ -3190,11 +3199,11 @@ export default class DrawerBase {
             let bestAngle = 0.0;
             let bestOverlap = currentOverlap;
             let bestMinimumDistance = currentMinimumDistance;
-            // Try sensible orientations based on ring geometry
-            // e.g., a six-membered ring is tested in 60 degree increments
             let stepAngle = MathHelper.centralAngle(ring.getSize());
             let maxSteps = Math.max(1, Math.floor(ring.getSize() / 2));
 
+            // TODO: same 2x speedup as the rotation loop in processGraph().
+            // Rotate incrementally instead of resetting each iteration. (See PR#237 review.)
             for (let step = 1; step <= maxSteps; step++) {
                 let baseAngle = stepAngle * step;
 

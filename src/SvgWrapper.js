@@ -835,6 +835,10 @@ export default class SvgWrapper {
     static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
         const element = document.createElement('canvas');
         const ctx = element.getContext('2d');
+        // In some environments (Node.js, JSDOM, CI runners) the canvas element
+        // exists but there is no graphics backend behind it causing getContext('2d') 
+        // to return null
+        // Fall back to arithmetic estimation so the layout doesn't break
         if (!ctx) {
             return SvgWrapper.estimateTextSize(text, fontSize, lineHeight);
         }

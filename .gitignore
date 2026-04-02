@@ -9,26 +9,9 @@ practice/
 # Internal docs (not part of the distributed library)
 docs/internal/
 
-# Debug & trace test files (local development only)
-test/debug-*
-test/*-trace*.test.js
-test/*-debug*.test.js
-test/trace-*.test.js
-
-# Investigation / one-off test files
-test/cip-validation/
-test/morphine-debug.test.js
-test/stereo-determinant.test.js
-test/stereo-investigation.test.js
-test/stereo-render.test.js
-test/stereo-wedge-trace.test.js
-test/verify-molecules.test.js
-test/sssr-bugs-demo.test.js
-test/smiles.txt
-
-# Visual test pages (local use only)
-test/acs-comparison.html
-test/visual-regression.html
+# test files ()use this directory
+# for debug scripts etc.) 
+test/local/
 
 # Temp planning docs
 TODO.md
