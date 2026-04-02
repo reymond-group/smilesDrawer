@@ -58,6 +58,11 @@ export default class Graph {
         atom.ringbonds = node.ringbonds;
         atom.bracket = node.atom.element ? node.atom : null;
         atom.class = node.atom.class;
+        atom.smilesOrder = order;
+        atom.smilesBranchCount = node.branchCount || 0;
+        atom.smilesRingbondCount = node.ringbondCount || 0;
+        atom.smilesHasNext = !!node.hasNext;
+        atom.smilesIsBranchBond = !!isBranch;
 
         let vertex = new Vertex(atom);
         let parentVertex = this.vertices[parentVertexId];
@@ -455,6 +460,66 @@ export default class Graph {
     }
 
     /**
+     * Returns the perimeter order of a bridged ring after removing interior bridge atoms.
+     * Falls back to the unsorted perimeter vertices when the remaining subgraph is not a simple cycle.
+     *
+     * @param {Number[]} vertexIds The bridged-ring vertex ids.
+     * @param {Ring} ring The bridged ring.
+     * @param {Number} startVertexId A preferred starting vertex id.
+     * @returns {Number[]} The ordered perimeter vertex ids.
+     */
+    getBridgedRingPerimeter(vertexIds, ring, startVertexId) {
+        let insiderSet = new Set(ring.insiders || []);
+        let perimeter = vertexIds.filter(id => !insiderSet.has(id));
+
+        if (perimeter.length < 3) {
+            return perimeter;
+        }
+
+        let perimeterSet = new Set(perimeter);
+        let adjacency = new Map();
+
+        for (let i = 0; i < perimeter.length; i++) {
+            let id = perimeter[i];
+            let neighbours = this.vertices[id].neighbours.filter(neighbourId => perimeterSet.has(neighbourId));
+            adjacency.set(id, neighbours);
+
+            if (neighbours.length !== 2) {
+                return perimeter;
+            }
+        }
+
+        let start = perimeterSet.has(startVertexId) ? startVertexId : perimeter[0];
+        let ordered = [start];
+        let previous = null;
+        let current = start;
+
+        while (ordered.length < perimeter.length) {
+            let neighbours = adjacency.get(current).filter(neighbourId => neighbourId !== previous);
+
+            if (previous === null) {
+                neighbours.sort((a, b) => this.vertices[a].value.smilesOrder - this.vertices[b].value.smilesOrder);
+            }
+
+            if (neighbours.length === 0) {
+                return perimeter;
+            }
+
+            let next = neighbours[0];
+
+            if (next === start) {
+                return perimeter;
+            }
+
+            ordered.push(next);
+            previous = current;
+            current = next;
+        }
+
+        return adjacency.get(current).includes(start) ? ordered : perimeter;
+    }
+
+    /**
      * Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
      *
      * @returns {Number[]} An array containing the edge ids of the bridges.
@@ -604,13 +669,99 @@ export default class Graph {
         let arrPositionX = new Float32Array(length);
         let arrPositionY = new Float32Array(length);
         let arrPositioned = Array(length);
+        let insiderSet = new Set(ring.insiders || []);
+        let perimeter = this.getBridgedRingPerimeter(vertexIds, ring, startVertexId);
+        let perimeterSet = new Set(perimeter);
+        let perimeterCount = perimeter.length;
+        let perimeterRadius = perimeterCount > 2
+            ? MathHelper.polyCircumradius(bondLength, perimeterCount)
+            : radius;
+        let perimeterAngle = perimeterCount > 0
+            ? Math.PI * 2.0 / perimeterCount
+            : angle;
+        let perimeterOffset = 0.0;
+        let initialPositions = new Map();
+
+        if (perimeterSet.has(startVertexId)) {
+            let startVertexIndex = perimeter.indexOf(startVertexId);
+            let startVertex = this.vertices[startVertexId];
+
+            if (startVertex.positioned) {
+                perimeterOffset = Vector2.subtract(startVertex.position, center).angle() - startVertexIndex * perimeterAngle;
+            }
+        }
+
+        for (let i = 0; i < perimeter.length; i++) {
+            let id = perimeter[i];
+            let vertex = this.vertices[id];
+
+            if (vertex.positioned) {
+                initialPositions.set(id, vertex.position.clone());
+            }
+            else {
+                let point = new Vector2(
+                    center.x + Math.cos(perimeterOffset + i * perimeterAngle) * perimeterRadius,
+                    center.y + Math.sin(perimeterOffset + i * perimeterAngle) * perimeterRadius
+                );
+                initialPositions.set(id, point);
+            }
+        }
+
+        let insiders = vertexIds.filter(id => insiderSet.has(id));
+        let innerRadius = Math.max(bondLength * 0.35, perimeterRadius * 0.35);
+
+        for (let i = 0; i < insiders.length; i++) {
+            let id = insiders[i];
+            let vertex = this.vertices[id];
+
+            if (vertex.positioned) {
+                initialPositions.set(id, vertex.position.clone());
+                continue;
+            }
+
+            let neighbours = vertex.neighbours.filter(neighbourId => perimeterSet.has(neighbourId));
+            let point = new Vector2(center.x, center.y);
+
+            if (neighbours.length > 0) {
+                point = new Vector2(0.0, 0.0);
+
+                for (let j = 0; j < neighbours.length; j++) {
+                    point.add(initialPositions.get(neighbours[j]));
+                }
+
+                point.divide(neighbours.length);
+
+                let direction = Vector2.subtract(point, center);
+                if (direction.lengthSq() < 1e-4) {
+                    direction = new Vector2(Math.cos(i * perimeterAngle), Math.sin(i * perimeterAngle));
+                }
+                else {
+                    direction.normalize();
+                }
+
+                point = direction.multiplyScalar(innerRadius).add(center.clone());
+            }
+            else {
+                point.x += Math.cos(i * perimeterAngle) * innerRadius;
+                point.y += Math.sin(i * perimeterAngle) * innerRadius;
+            }
+
+            initialPositions.set(id, point);
+        }
 
         var i = length;
         while (i--) {
             let vertex = this.vertices[vertexIds[i]];
             if (!vertex.positioned) {
-                arrPositionX[i] = center.x + Math.cos(a) * radius;
-                arrPositionY[i] = center.y + Math.sin(a) * radius;
+                let initial = initialPositions.get(vertex.id);
+                if (initial) {
+                    arrPositionX[i] = initial.x;
+                    arrPositionY[i] = initial.y;
+                }
+                else {
+                    arrPositionX[i] = center.x + Math.cos(a) * radius;
+                    arrPositionY[i] = center.y + Math.sin(a) * radius;
+                }
             }
             else {
                 arrPositionX[i] = vertex.position.x;
@@ -784,9 +935,9 @@ export default class Graph {
                 // Store old energies
                 let prevEx = arrE[i][0];
                 let prevEy = arrE[i][1];
-                let denom = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
-                dx = arrK[i] * ((ux - vx) - arrL[i] * (ux - vx) * denom);
-                dy = arrK[i] * ((uy - vy) - arrL[i] * (uy - vy) * denom);
+                let invDist = 1.0 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
+                dx = arrK[i] * ((ux - vx) - arrL[i] * (ux - vx) * invDist);
+                dy = arrK[i] * ((uy - vy) - arrL[i] * (uy - vy) * invDist);
 
                 arrE[i] = [dx, dy];
                 dEX += dx;
