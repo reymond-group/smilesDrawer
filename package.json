@@ -26,7 +26,7 @@
     "release":   "echo Not yet implemented...",
     "test:ci":   "npm run test:unit && npm run test:stereo",
     "test:stereo":"vitest run test/stereo-reference/stereo-vs-rdkit.test.js test/stereo-reference/stereo-inversion-baseline.test.js",
-    "test:unit": "vitest run test/unit test/regression/smiles-parsing.test.js",
+    "test:unit": "vitest run test/unit test/regression",
     "typecheck": "tsc --noEmit",
     "watch":     "node ./scripts/watch.mjs"
   }
