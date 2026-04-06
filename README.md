@@ -114,7 +114,7 @@ changes:
 - See  [SmilesDrawer in Other Frameworks](docs/frameworks) for examples of using
   SmilesDrawer in various JavaScript frameworks.
 
-- See the [Documentation Index](docs/manual) for many other topics.
+- See the [Documentation Index](docs/manual#readme) for many other topics.
 
 
 
@@ -174,7 +174,7 @@ the Customization guide.
 
 ## Further Reading
 
-For more detailed documentation, see the [SmilesDrawer Manual](docs/manual).
+For more detailed documentation, see the [SmilesDrawer Manual](docs/manual#readme).
 
 
 ## Please Cite
