@@ -11,6 +11,7 @@
     "@stylistic/eslint-plugin": "^5.6.1",
     "esbuild":                  "^0.25.0",
     "eslint":                   "^9.39.1",
+    "jsdom":                    "^26.1.0",
     "typescript":               "^5.8.2",
     "typescript-eslint":        "^8.48.1",
     "vitest":                   "^4.0.18"
@@ -26,7 +27,8 @@
     "typecheck": "npm exec -- tsc --noEmit",
     "watch":     "node ./scripts/watch.mjs",
 
-    "test:ci":     "npm run test:unit",
-    "test:unit":   "npm exec -- vitest run test/unit test/regression/smiles-parsing.test.js"
+    "test:ci":     "npm run test:unit && npm run test:stereo",
+    "test:stereo": "npm exec -- vitest run test/stereo-reference/stereo-vs-rdkit.test.js test/stereo-reference/stereo-inversion-baseline.test.js",
+    "test:unit":   "npm exec -- vitest run test/unit test/regression"
   }
 }
