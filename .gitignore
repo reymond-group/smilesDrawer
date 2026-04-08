@@ -1,2 +1,20 @@
 node_modules/
 yarn-error.log
+.DS_Store
+CLAUDE.md
+
+# Personal / learning files
+practice/
+
+# Internal docs (not part of the distributed library)
+docs/internal/
+
+# test files ()use this directory
+# for debug scripts etc.) 
+test/local/
+
+# Temp planning docs
+TODO.md
+TODO.docx
+ROADMAP.md
+STEREO_FIX_HANDOFF.md

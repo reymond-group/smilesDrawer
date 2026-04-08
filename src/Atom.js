@@ -73,6 +73,14 @@ export default class Atom {
         this.subtreeDepth = 1;
         this.hasHydrogen = false;
         this.class = undefined;
+        // These fields record where this atom appeared in the original SMILES
+        // string. They only exist to support _shouldInvertStereoParity() in
+        // DrawerBase.js — see the comment there for why this is transitional.
+        this.smilesOrder = 0;
+        this.smilesBranchCount = 0;
+        this.smilesRingbondCount = 0;
+        this.smilesHasNext = false;
+        this.smilesIsBranchBond = false;
     }
 
     /**
