@@ -32,6 +32,7 @@
 ## Tools
 
 - [Molecule Viewer](https://reymond-group.github.io/smilesDrawer/tools/viewer.html)
+- [Multi-Molecule Viewer](https://reymond-group.github.io/smilesDrawer/tools/multi-viewer.html)
 - [Theme Gallery](https://reymond-group.github.io/smilesDrawer/tools/theme-gallery.html)
 - [The Playground](https://reymond-group.github.io/smilesDrawer/tools/playground.html)
 

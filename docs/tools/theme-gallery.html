@@ -34,7 +34,7 @@
   </head>
   <body>
     <header>
-      <div id="version"></div>
+      <div id="top-right"><span id="version"></span></div>
       <h1>SmilesDrawer Theme Gallery</h1>
     </header>
     <content id="themes"></content>
@@ -52,12 +52,9 @@
         'Halothane':  'BrC(Cl)C(F)(F)F',
       }
 
-      const drawer = new SmilesDrawer.Drawer({width: 300, height: 200})
+      const drawer = new SmilesDrawer.SmiDrawer({width: 300, height: 200})
       async function draw(smiles, target, theme) {
-        SmilesDrawer.parse(smiles, tree => {
-          console.log(tree)
-          drawer.draw(tree, target, theme)
-        })
+        drawer.draw(smiles, target, theme)
       }
 
       const themes = document.getElementById('themes')
@@ -82,25 +79,24 @@
 
         for (const [name, smiles] of Object.entries(EXAMPLES)) {
           const frame  = document.createElement('div')
-          const canvas = document.createElement('canvas')
-          const label  = document.createElement('div')
-
           frame.classList.add('frame')
           frame.style.backgroundColor = accent
-
-          canvas.setAttribute('width', '300')
-          canvas.setAttribute('height', '200')
-          canvas.setAttribute('data-smiles', smiles)
-          canvas.setAttribute('data-theme', theme)
-          canvas.style.backgroundColor = colors.BACKGROUND
-
-          label.innerText = name
-
-          frame.append(canvas)
-          frame.append(label)
           div.append(frame)
 
-          draw(smiles, canvas, theme)
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+          svg.setAttributeNS(null, 'width', '300')
+          svg.setAttributeNS(null, 'height', '200')
+          svg.setAttributeNS(null, 'data-smiles', smiles)
+          svg.setAttributeNS(null, 'data-theme', theme)
+          svg.style.backgroundColor = colors.BACKGROUND
+          frame.append(svg)
+
+          const label  = document.createElement('div')
+          label.innerText = name
+          frame.append(label)
+
+          draw(smiles, svg, theme)
         }
 
         themes.append(div)

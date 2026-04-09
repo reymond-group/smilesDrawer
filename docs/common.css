@@ -11,10 +11,17 @@ body {
 }
 
 header {
-  background-color: #345;
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  right: 0;
   height: 48px;
+
+  background-color: #345;
   line-height: 48px;
   margin: 0;
+  overflow: hidden;
   padding: 0 12px;
 }
 
@@ -25,14 +32,21 @@ header h1 {
   margin: 0;
 }
 
-header #version {
+header #top-right {
   color: #888;
   float: right;
+  height: 48px;
   line-height: 48px;
 }
 
 content {
-  display: block;
+  position: fixed;
+
+  top: 48px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
   overflow: auto;
   padding: 12px;
   padding-top: 24px;
