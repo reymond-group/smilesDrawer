@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../common.css" />
+    <link rel="stylesheet" type="text/css" href="./common.css" />
+    <title>SmilesDrawer Molecule Viewer</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+    <script type="text/javascript" src="./common.js"></script>
+    <style type="text/css">
+      #smiles {
+        position: fixed;
+
+        top: 52px;
+        left: 4px;
+        right: 4px;
+        height: 30px;
+
+        border: 1px solid #456;
+        border-radius: 5px;
+        box-sizing: border-box;
+
+        padding: 0 5px;
+      }
+
+      #output {
+        position: fixed;
+
+        top: 86px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #message {
+        position: absolute;
+        right: 5px;
+        bottom: 5px;
+
+        font-size: small;
+      }
+      #message.error {
+        color: #800000;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div id="top-right">
+        <span id="version"></span>
+        <button id="options" command="show-modal" commandfor="options-modal">Options</button>
+        <button id="export"  command="show-modal" commandfor="export-modal">Export</button>
+      </div>
+      <h1>SmilesDrawer Molecule Viewer</h1>
+    </header>
+    <input id="smiles" type="string" placeholder="Your SMILES here..." value="Cn1cnc2c1C(=O)N(C(=O)N2C)C" autofocus />
+    <div id="output">
+      <svg id="target"></svg>
+      <div id="message">Enter a SMILES string to see the molecule!</div>
+    </div>
+
+    <dialog id="options-modal" closedby="any">
+      <h2>Options</h2>
+      <div class="formlike">
+        <label><input name="fullscreen"        type="checkbox" />Fullscreen Mode</label>
+        <label><input name="width"             type="number" />Width</label>
+        <label><input name="height"            type="number" />Height</label>
+        <label><input name="padding"           type="number" />Padding</label>
+        <label><input name="terminalCarbons"   type="checkbox" />Show Terminal Carbons</label>
+        <label><input name="explicitHydrogens" type="checkbox" />Show Explicit Hydrogens</label>
+        <label><input name="compactDrawing"    type="checkbox" />Compact Drawing</label>
+      </div>
+      <div class="buttons">
+        <button command="close" commandfor="options-modal">Close</button>
+      </div>
+    </dialog>
+
+    <dialog id="export-modal" closedby="any">
+      <h2>Export</h2>
+      <div class="button-list">
+        <button id="copy-png">Copy PNG</button>
+        <button id="copy-svg">Copy SVG</button>
+        <button id="copy-xml">Copy SVG Source</button>
+        <button id="save-png">Download PNG</button>
+        <button id="save-svg">Download SVG</button>
+      </div>
+      <div class="buttons">
+        <button command="close" commandfor="export-modal">Close</button>
+      </div>
+    </dialog>
+
+    <script type="text/javascript">
+      const version = document.getElementById('version');
+      version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
+
+      const output  = document.getElementById('output');
+      const target  = document.getElementById('target');
+      const smiles  = document.getElementById('smiles');
+      const message = document.getElementById('message');
+
+      const OPTIONS = {
+        fullscreen: true,
+        width:      360,
+        height:     240,
+        padding:     10,
+
+        terminalCarbons:   false,
+        explicitHydrogens: false,
+        compactDrawing:    false
+      };
+
+      // Prevent redraw on arrow keys, etc.
+      let last_smiles = undefined;
+
+      function render() {
+        last_smiles = smiles.value;
+
+        const a = performance.now();
+        const drawer = new SmilesDrawer.SmiDrawer(OPTIONS);
+        drawer.draw(smiles.value, target, 'light', (svg) => {
+          const z = performance.now();
+          message.innerText = `Rendered in ${z-a}ms.`
+          message.classList.remove('error');
+        }, (error) => {
+          message.classList.add('error');
+          message.innerText = error;
+        });
+
+        if (OPTIONS.fullscreen) {
+          target.setAttribute('width',  output.offsetWidth);
+          target.setAttribute('height', output.offsetHeight);
+        }
+        else {
+          target.setAttribute('width',  OPTIONS.width);
+          target.setAttribute('height', OPTIONS.height);
+        }
+      }
+
+      smiles.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter' || smiles.value !== last_smiles) {
+          render();
+        }
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.target.tagName === 'INPUT') {
+          // Don't steal keystrokes from inputs!
+          return;
+        }
+
+        if (event.key === '/') {
+          event.preventDefault();
+          smiles.focus();
+        }
+        else if (event.key === 'o') {
+          document.getElementById('options-modal').showModal();
+        }
+        else if (event.key === 'x') {
+          document.getElementById('export-modal').showModal();
+        }
+      });
+
+      window.addEventListener('resize', (event) => {
+        if (OPTIONS.fullscreen) {
+          target.setAttribute('width',  output.offsetWidth);
+          target.setAttribute('height', output.offsetHeight);
+        }
+      });
+
+      // Activate the Copy and Download buttons:
+      installExporters(() => target);
+
+      const options_modal = document.getElementById('options-modal');
+      installOptions(options_modal, OPTIONS, (event, name, value) => {
+        render();
+      });
+
+      function load_smiles() {
+        const params = new URLSearchParams(window.location.search);
+        const smiles = params.get('smiles');
+        if(smiles) {
+          const input = document.getElementById('smiles');
+          input.value = smiles;
+        }
+      }
+
+      load_smiles();
+      render();
+    </script>
+  </body>
+</html>

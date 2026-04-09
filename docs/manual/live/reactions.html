@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../common.css" />
+    <title>SmilesDrawer Examples: Reactions</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <div id="top-right"><span id="version"></span></div>
+      <h1>SmilesDrawer Examples: Reactions</h1>
+    </header>
+    <content>
+      <div><svg id="reaction1" data-smiles="FC(F)(F)CCl>>FC(F)(F)C(Br)Cl"></svg></div>
+      <div><svg id="reaction2"></svg></div>
+      <div><svg id="reaction3"></svg></div>
+    </content>
+    <script type="text/javascript">
+      // Show the SmilesDrawer version in the header:
+      const version = document.getElementById('version');
+      version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
+
+      // Use the same options for all three drawings:
+      const molecule_opts = {width: 500, height: 150};
+      const reaction_opts = {};
+
+      function useApply() {
+        SmilesDrawer.SmiDrawer.apply(molecule_opts, reaction_opts);
+      }
+
+      function useDraw() {
+        const smiles = 'c1ccccc1NNc2ccccc2>[H+]>c1cc(N)ccc1c2ccc(N)cc2';
+        const drawer = new SmilesDrawer.SmiDrawer(molecule_opts, reaction_opts);
+        drawer.draw(smiles, '#reaction2');
+      }
+
+      function useParseThenDraw() {
+        const smiles = 'c1c([R])cccc1S(=O)(=O)C.c1ncccc1B(CC)CC>Na>c1ncccc1c2cccc(S(=O)(=O)C)c2';
+        const drawer = new SmilesDrawer.ReactionDrawer(reaction_opts, molecule_opts);
+
+        SmilesDrawer.parseReaction(smiles, (result) => {
+          drawer.draw(result, 'reaction3', 'light', null, 'Pd(PPh₃)₄', 'Bu₄NBr + K₂CO₃');
+        }, (error) => {
+          console.error(error);
+        });
+      }
+
+      useApply();
+      useDraw();
+      useParseThenDraw();
+    </script>
+  </body>
+</html>

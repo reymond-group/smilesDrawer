@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../common.css" />
+    <link rel="stylesheet" type="text/css" href="./common.css" />
+    <title>SmilesDrawer Multi-Molecule Viewer</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+    <script type="text/javascript" src="./common.js"></script>
+    <style type="text/css">
+      content {
+        padding: 12px;
+      }
+
+      .row.fixed-width {
+        white-space: nowrap;
+      }
+
+      .frame {
+        display: inline-block;
+
+        background-color: #ddd;
+        border-radius: 4px;
+
+        margin: 4px;
+        padding: 4px;
+      }
+      .frame.error {
+        background-color: #f88;
+      }
+      .frame .label {
+        font-size: 16px;
+        height: 19px;
+        line-height: 19px;
+        text-align: center;
+
+        box-sizing: border-box;
+        padding: 0 4px;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .frame svg {
+        background-color: #fff;
+      }
+
+      #edit-modal[open] {
+        width: 50%;
+        height: 50%;
+
+        display: flex;
+        flex-direction: column;
+      }
+      #smiles-text {
+        flex-grow: 1;
+        resize: none;
+
+        white-space: pre;
+        overflow-wrap: normal;
+        overflow: scroll;
+      }
+      #edit-modal button {
+        min-width: 80px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div id="top-right">
+        <span id="version"></span>
+        <button id="edit"    command="show-modal" commandfor="edit-modal">Edit</button>
+        <button id="options" command="show-modal" commandfor="options-modal">Options</button>
+        <button id="export"  command="show-modal" commandfor="export-modal">Export</button>
+      </div>
+      <h1>SmilesDrawer Multi-Molecule Viewer</h1>
+    </header>
+    <content id="content"></content>
+
+    <dialog id="edit-modal" closedby="any">
+      <h2>Edit</h2>
+        <textarea id="smiles-text">C Methane
+CC Ethane
+CCC
+CCCC</textarea>
+      <div class="buttons">
+        <button id="upload-button">Upload</button>
+        <input type="file" id="upload-input" accept=".smi,.smiles,chemical/x-daylight-smiles" style="display:none" />
+        <button command="close" commandfor="edit-modal">Close</button>
+      </div>
+    </dialog>
+
+    <dialog id="options-modal" closedby="any">
+      <h2>Options</h2>
+      <div class="formlike">
+        <label><input type="number"   name="width" />Width</label>
+        <label><input type="number"   name="height" />Height</label>
+        <label><input type="number"   name="padding" />Padding</label>
+        <label><input type="number"   name="columns" min="0" placeholder="Auto" />Columns</label>
+        <label><input type="checkbox" name="terminalCarbons" />Show Terminal Carbons</label>
+        <label><input type="checkbox" name="explicitHydrogens" />Show Explicit Hydrogens</label>
+        <label><input type="checkbox" name="compactDrawing" />Compact Drawing</label>
+      </div>
+      <div class="buttons">
+        <button command="close" commandfor="options-modal">Close</button>
+      </div>
+    </dialog>
+
+    <dialog id="export-modal" closedby="any">
+      <h2>Export</h2>
+      <div class="button-list">
+        <button id="copy-png">Copy PNG</button>
+        <button id="copy-svg">Copy SVG</button>
+        <button id="copy-xml">Copy SVG Source</button>
+        <button id="save-png">Download PNG</button>
+        <button id="save-svg">Download SVG</button>
+      </div>
+      <div class="buttons">
+        <button command="close" commandfor="export-modal">Close</button>
+      </div>
+    </dialog>
+
+    <script type="text/javascript">
+      const version = document.getElementById('version');
+      version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
+
+      function e(type, attrs, children) {
+        const element = document.createElement(type);
+        for (const [name, value] of Object.entries(attrs || {})) {
+          if (name === 'text') {
+            element.innerText = value;
+          }
+          else {
+            element.setAttribute(name, value);
+          }
+        }
+
+        for (const child of children || []) {
+          element.appendChild(child);
+        }
+
+        return element;
+      }
+
+      function indexOfSpace(string) {
+        const s = string.indexOf(' ');
+        const t = string.indexOf('\t');
+
+        if (s < 0) return t;
+        if (t < 0) return s;
+        return Math.min(s, t);
+      }
+
+      const OPTIONS = {
+        width:      240,
+        height:     180,
+        padding:     10,
+        columns:    NaN,
+
+        terminalCarbons:   false,
+        explicitHydrogens: false,
+        compactDrawing:    false
+      };
+
+      function draw_one(drawer, smiles, name) {
+        const frame = document.createElement('div');
+        frame.classList.add('frame');
+
+        try {
+          const svg = drawer.draw(SmilesDrawer.Parser.parse(smiles), 'svg');
+          frame.appendChild(svg);
+        }
+        catch (error) {
+          frame.setAttribute('title', error);
+          frame.classList.add('error');
+
+          // Draw a big red (well, pink) X to show that there was an error...
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+          svg.setAttributeNS(null, 'width',   OPTIONS.width);
+          svg.setAttributeNS(null, 'height',  OPTIONS.height);
+          svg.setAttributeNS(null, 'viewBox', '0 0 1 1');
+          frame.appendChild(svg);
+
+          const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line1.setAttributeNS(null, 'stroke',       '#f88');
+          line1.setAttributeNS(null, 'stroke-width',  0.12);
+          line1.setAttributeNS(null, 'x1', 0.25);
+          line1.setAttributeNS(null, 'y1', 0.25);
+          line1.setAttributeNS(null, 'x2', 0.75);
+          line1.setAttributeNS(null, 'y2', 0.75);
+          svg.appendChild(line1);
+
+          const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line2.setAttributeNS(null, 'stroke',       '#f88');
+          line2.setAttributeNS(null, 'stroke-width',  0.12);
+          line2.setAttributeNS(null, 'x1', 0.25);
+          line2.setAttributeNS(null, 'y1', 0.75);
+          line2.setAttributeNS(null, 'x2', 0.75);
+          line2.setAttributeNS(null, 'y2', 0.25);
+          svg.appendChild(line2);
+        }
+
+        const label = document.createElement('div');
+        label.style.maxWidth = `${OPTIONS.width}px`;
+        label.classList.add('label');
+        label.innerText = name;
+        frame.appendChild(label);
+
+        return frame;
+      }
+
+      function make_row() {
+        const row = document.createElement('div');
+        row.classList.toggle('fixed-width', OPTIONS.columns >= 1);
+        row.classList.add('row');
+        return row;
+      }
+
+      function draw_all(drawer, text) {
+        const content = document.getElementById('content');
+        while (content.firstChild) {
+          content.firstChild.remove();
+        }
+
+        let row = make_row();
+        let col = 0;
+
+        text.split(/\r?\n/g).forEach((line) => {
+          line = line.trim();
+          const i = indexOfSpace(line);
+          if (i >= 0) {
+            var smiles = line.slice(0, i);
+            var label  = line.slice(i).trim();
+          }
+          else {
+            var smiles = line;
+            var label  = line;
+          }
+
+          if (smiles) {
+            const element = draw_one(drawer, smiles, label);
+            row.appendChild(element);
+          }
+          // TODO: Placeholder?
+
+          col += 1;
+          if (OPTIONS.columns >= 1 && col >= OPTIONS.columns) {
+            content.appendChild(row);
+            row = make_row();
+            col = 0;
+          }
+        });
+
+        content.appendChild(row);
+      }
+
+      function draw() {
+        const drawer = new SmilesDrawer.SvgDrawer(OPTIONS);
+        const text   = document.getElementById('smiles-text').value;
+        draw_all(drawer, text);
+      }
+
+      function buildSvg(cols) {
+        const margin      =  4;
+        const padding     =  4;
+        const line_height = 19;
+        const font_size   = 16;
+        const radius      =  4;
+
+        const dw = OPTIONS.width  + 2 * margin + 2 * padding;
+        const dh = OPTIONS.height + 2 * margin + 2 * padding + line_height;
+
+        if (OPTIONS.columns >= 1) {
+          var cols = OPTIONS.columns;
+        }
+        else {
+          // Mimic the screen; the 24 accounts for the 12px padding on <content>.
+          const width = document.getElementById('content').clientWidth;
+          var   cols  = Math.floor((width - 24) / dw);
+        }
+
+        let max_row = 0;
+        let max_col = 0;
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+        const content = document.getElementById('content');
+        content.querySelectorAll('.frame').forEach((child, i) => {
+          const row = Math.trunc(i / cols);
+          const col = i % cols;
+
+          const x = dw * col + margin;
+          const y = dh * row + margin;
+
+          max_row = Math.max(row, max_row);
+          max_col = Math.max(col, max_col);
+
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.setAttributeNS(null, 'transform', `translate(${x}, ${y})`);
+          svg.appendChild(g);
+
+          const frame = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          frame.setAttributeNS(null, 'fill',   child.classList.contains('error')? '#f88' : '#ddd');
+          frame.setAttributeNS(null, 'width',  OPTIONS.width  + 2 * padding);
+          frame.setAttributeNS(null, 'height', OPTIONS.height + 2 * padding + line_height);
+          frame.setAttributeNS(null, 'rx',     radius);
+          frame.setAttributeNS(null, 'ry',     radius);
+          g.appendChild(frame);
+
+          const background = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          background.setAttributeNS(null, 'fill',  '#fff');
+          background.setAttributeNS(null, 'x',      padding);
+          background.setAttributeNS(null, 'y',      padding);
+          background.setAttributeNS(null, 'width',  OPTIONS.width);
+          background.setAttributeNS(null, 'height', OPTIONS.height);
+          g.appendChild(background);
+
+          // We have to put this padding/2 lower than I'd expect to make it look right...
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttributeNS(null, 'fill',         '#000');
+          text.setAttributeNS(null, 'x',             padding + OPTIONS.width / 2);
+          text.setAttributeNS(null, 'y',             padding + OPTIONS.height + (line_height + padding) / 2);
+          text.setAttributeNS(null, 'font-family',  'Arial, Helvetica, sans-serif');
+          text.setAttributeNS(null, 'font-size',     font_size);
+          text.setAttributeNS(null, 'text-anchor',       'middle');
+          text.setAttributeNS(null, 'dominant-baseline', 'central');
+
+          // Truncate (approximately) to the image width..
+          let   name = child.children[1].textContent;
+          const maxc = OPTIONS.width / (0.5 * font_size);
+          if (name.length > maxc) {
+            name = name.slice(0, maxc - 3).trim() + '...';
+          }
+
+          text.textContent = name;
+          g.appendChild(text);
+
+          const sub = child.firstElementChild.cloneNode(true);
+          sub.setAttributeNS(null, 'x',      padding);
+          sub.setAttributeNS(null, 'y',      padding);
+          sub.setAttributeNS(null, 'width',  OPTIONS.width);
+          sub.setAttributeNS(null, 'height', OPTIONS.height);
+          g.appendChild(sub);
+        });
+
+        const w = (max_col + 1) * dw;
+        const h = (max_row + 1) * dh;
+
+        svg.setAttributeNS(null, 'width',  w);
+        svg.setAttributeNS(null, 'height', h);
+        svg.setAttributeNS(null, 'viewbox', `0 0 ${w} ${h}`);
+        return svg;
+      }
+
+      // Activate the Copy and Download buttons:
+      installExporters(() => buildSvg(2));
+
+      installOptions(document.getElementById('options-modal'), OPTIONS, (event, name, value) => {
+        draw();
+      })
+
+      // Redraw when the data editor window closes.
+      document.getElementById('edit-modal').addEventListener('close', (event) => {
+        draw();
+      });
+
+      // Extra hotkeys for closing the editor: Cmd+Enter and Ctrl+Enter.
+      document.getElementById('smiles-text').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+          document.getElementById('edit-modal').close();
+          event.preventDefault();
+        }
+      });
+
+      document.getElementById('upload-button').addEventListener('click', (event) => {
+        document.getElementById('upload-input').click();
+      });
+
+      document.getElementById('upload-input').addEventListener('change', (event) => {
+        const input   = event.target;
+        const reader  = new FileReader();
+        reader.onload = (read) => {
+          document.getElementById('smiles-text').value = read.target.result;
+          input.value = null;
+        };
+
+        reader.readAsText(input.files[0]);
+      });
+
+      draw();
+    </script>
+  </body>
+</html>

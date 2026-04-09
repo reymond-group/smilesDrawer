@@ -55,7 +55,7 @@ of whether or not it has been passing historically.
 There are also automated tests.  To run these, run:
 
 ```sh
-npm run test
+npm run test:ci
 ```
 
 If you contribute a new feature, please add tests for it as well!
@@ -91,14 +91,16 @@ make progress on cleaning up the code.
 Regular contributors should not do this!  This is for the maintainers to do when
 they decide it's time to release a new version of SmilesDrawer.
 
-1. Make a new branch to contain your version update.
+1. Make a new branch off of `master` to contain your version update.
 2. Update the version number in `package.json` and `app.js`.  It may also appear
    in  `README.md` or other documentation.  Use `grep` with the `-r` (recursive)
    flag to make sure you've found them all.
-3. Rebuild the official bundles by running `npm run release`.
-4. Commit your changes and push them to GitHub.  Make a pull request.
-5. Once the pull request is merged, create a "release" on GitHub. Tag the latest
+3. Update `package-lock.json` by running `npm install`.  This can also be a good
+   time to run `npm audit` and pull in any security updates.
+4. Rebuild the official bundles by running `npm run release`.
+5. Commit your changes and push them to GitHub.  Make a pull request.
+6. Once the pull request is merged, create a "release" on GitHub. Tag the latest
    commit  (the one that was created by the merge)  as `vX.Y.Z`, where `X`, `Y`,
-   and `Z` are the major, minor, and patch version numbers (e.g. `v1.2.3`).
-6. Publish the package to NPM.  This is currently blocked, but should be handled
-   automatically once GitHub Actions is set up correctly.
+   and `Z` are the major, minor, and patch version numbers (e.g. `v1.2.3`). This
+   will automatically update the package on NPM  via GitHub Actions  (the script
+   that does this can be found in `.github/workflows/publish.yml`).

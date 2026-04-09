@@ -1,0 +1,122 @@
+dialog {
+  background-color: #fff;
+  border: 1px solid #456;
+  border-radius: 10px;
+
+  box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 50%);
+
+  padding: 10px;
+  padding-bottom: 7px;
+}
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+dialog > h2 {
+  color: #456;
+  font-size: 20px;
+  border-bottom: 1px solid #ddd;
+
+  margin: 0;
+  margin-bottom: 7px;
+  text-align: center;
+}
+dialog .buttons {
+  margin-top: 10px;
+  text-align: center;
+}
+dialog .buttons button {
+  background-color: #456;
+  border-radius: 5px;
+  border: none;
+  box-sizing: border-box;
+  color: #ddd;
+  cursor: pointer;
+  font-size: 16px;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+}
+dialog .buttons button:hover {
+  background-color: #345;
+}
+
+
+#top-right #version {
+  margin-right: 5px;
+}
+#top-right button {
+  box-sizing: border-box;
+  display: inline-block;
+
+  background-color: #eee;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  height: 30px;
+  line-height: 30px;
+  min-width: 75px;
+  padding: 0 10px;
+}
+#top-right button:hover {
+  background-color: #fff;
+}
+
+
+.formlike {
+  min-width: 250px;
+}
+.formlike label {
+  display: block;
+  overflow: auto;
+
+  height: 24px;
+  line-height: 24px;
+  margin-bottom: 3px;
+}
+.formlike input {
+  float: right;
+}
+.formlike select,
+.formlike input:not([type=checkbox]) {
+  float: right;
+
+  box-sizing: border-box;
+  height: 24px;
+  width: 100px;
+}
+
+
+.button-list button {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 5px;
+  height: 24px;
+  width: 200px;
+
+  background-color: #ddd;
+  border-radius: 5px;
+  border: none;
+  box-sizing: border-box;
+  color: #456;
+  cursor: pointer;
+}
+.button-list button:hover {
+  background-color: #ccc;
+}
+.button-list button:disabled {
+  background-color: #aaa;
+  color: #888;
+  cursor: auto;
+}
+
+
+@keyframes flash-animation {
+  from {background: #f80;}
+  to   {background: default;}
+}
+.flash {
+  animation-duration: 0.5s;
+  animation-name: flash-animation;
+  animation-timing-function: ease-in-out;
+}

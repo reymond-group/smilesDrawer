@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../common.css" />
+    <title>SmilesDrawer Examples: draw()</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+    <style type="text/css">
+      input {width: 500px};
+    </style>
+  </head>
+  <body>
+    <header>
+      <div id="top-right"><span id="version"></span></div>
+      <h1>SmilesDrawer Examples: draw()</h1>
+    </header>
+    <content>
+      <div>
+        <input id="smiles" value="CN(C)c1ccc2c(c1)sc-3cc(=[N+](C)C)ccc3n2.[Cl-]" placeholder="Your SMILES here..." />
+      </div>
+      <div>
+        <canvas id="output"></canvas>
+      </div>
+    </content>
+    <script type="text/javascript">
+      // Show the SmilesDrawer version in the header:
+      const version = document.getElementById('version');
+      version.innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version;
+
+      const drawer = new SmilesDrawer.SmiDrawer({width: 500, height: 400});
+      const input  = document.getElementById('smiles');
+
+      // This fires on every keystroke.
+      input.addEventListener('change', (event) => {
+        drawer.draw(input.value, '#output', 'light');
+      })
+
+      // The first render, for when the page loads.
+      drawer.draw(input.value, '#output', 'light');
+    </script>
+  </body>
+</html>
