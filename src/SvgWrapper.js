@@ -801,6 +801,14 @@ export default class SvgWrapper {
     static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
         const element = document.createElement('canvas');
         const ctx = element.getContext('2d');
+        // In some environments (Node.js, JSDOM, CI runners) the canvas element
+        // exists but there is no graphics backend behind it causing getContext('2d') 
+        // to return null
+        // Fall back to arithmetic estimation so the layout doesn't break
+        if (!ctx) {
+            return SvgWrapper.estimateTextSize(text, fontSize, lineHeight);
+        }
+
         ctx.font = `${fontSize}pt ${fontFamily}`;
         let textMetrics = ctx.measureText(text);
 
@@ -808,6 +816,33 @@ export default class SvgWrapper {
         return {
             width:  textMetrics.width > compWidth ? textMetrics.width : compWidth,
             height: (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight,
+        };
+    }
+
+    static estimateTextSize(text, fontSize, lineHeight = 0.9) {
+        let width = 0;
+
+        for (const char of String(text)) {
+            if (char === ' ') {
+                width += fontSize * 0.35;
+            }
+            else if (/[A-Z]/.test(char)) {
+                width += fontSize * 0.68;
+            }
+            else if (/[a-z]/.test(char)) {
+                width += fontSize * 0.56;
+            }
+            else if (/[0-9]/.test(char)) {
+                width += fontSize * 0.55;
+            }
+            else {
+                width += fontSize * 0.45;
+            }
+        }
+
+        return {
+            width,
+            height: fontSize * 2 * lineHeight,
         };
     }
 

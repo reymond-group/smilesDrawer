@@ -44,19 +44,8 @@ export default class SSSR {
                 }
             }
 
+            // Cyclomatic number: the size of the minimum cycle basis
             let nSssr = nEdges - ccAdjacencyMatrix.length + 1;
-
-            // If all vertices have 3 incident edges, calculate with different formula (see Euler)
-            let allThree = true;
-            for (let j = 0; j < arrBondCount.length; j++) {
-                if (arrBondCount[j] !== 3) {
-                    allThree = false;
-                }
-            }
-
-            if (allThree) {
-                nSssr = 2.0 + nEdges - ccAdjacencyMatrix.length;
-            }
 
             // All vertices are part of one ring if theres only one ring.
             if (nSssr === 1) {
@@ -364,7 +353,7 @@ export default class SSSR {
                         allBonds = allBonds.concat(bonds);
                     }
 
-                    if (cSssr.length > nsssr) {
+                    if (cSssr.length >= nsssr) {
                         return cSssr;
                     }
                 }
@@ -386,7 +375,7 @@ export default class SSSR {
                         allBonds = allBonds.concat(bonds);
                     }
 
-                    if (cSssr.length > nsssr) {
+                    if (cSssr.length >= nsssr) {
                         return cSssr;
                     }
                 }
