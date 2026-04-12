@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../../common.css" />
+    <title>SmilesDrawer in React</title>
+    <script type="text/javascript" src="../../../dist/smiles-drawer.min.js"></script>
+    <script type="module" defer>
+      import React    from 'https://esm.sh/react@19';
+      import ReactDOM from 'https://esm.sh/react-dom@19/client';
+
+      // Show version numbers in the header:
+      const version = document.getElementById('version');
+      version.innerText = `Using SmilesDrawer v${SmilesDrawer.Version} + React v${React.version}`;
+
+      // A component that renders a single molecule.
+      function Molecule({smiles, options={}, theme='light'}) {
+        const canvas = React.useRef(null);
+
+        React.useEffect(() => {
+          if (!smiles || !canvas.current) {
+            // Nothing to draw (or nowhere to draw to).
+            return;
+          }
+
+          SmilesDrawer.parse(smiles, (tree) => {
+            const drawer = new SmilesDrawer.Drawer(options);
+            drawer.draw(tree, canvas.current, theme);
+          }, (error) => {
+            // Handle parse errors (invalid SMILES) here.
+            console.warn(error);
+          });
+        }, [smiles, options, theme]);
+
+        // Use createElement() so we don't have to mess around with JSX:
+        return React.createElement('canvas', {ref: canvas});
+      }
+
+      // An "app" that displays some hydrocarbons.
+      function App() {
+        const options = {width: 300, height: 200};
+
+        return React.createElement('div', {}, [
+          React.createElement(Molecule, {options: options, smiles: 'C'}),
+          React.createElement(Molecule, {options: options, smiles: 'CC'}),
+          React.createElement(Molecule, {options: options, smiles: 'CCC'}),
+          React.createElement(Molecule, {options: options, smiles: 'CCCC'})
+        ]);
+      }
+
+      // Attach to the DOM to kick things off:
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(React.createElement(App));
+    </script>
+  </head>
+  <body>
+    <header>
+      <div id="top-right"><span id="version"></span></div>
+      <h1>SmilesDrawer in React</h1>
+    </header>
+    <content id="root"></content>
+  </body>
+</html>

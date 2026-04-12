@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="../common.css" />
+    <link rel="stylesheet" type="text/css" href="./common.css" />
+    <title>SmilesDrawer Playground</title>
+    <script type="text/javascript" src="../../dist/smiles-drawer.min.js"></script>
+    <script type="text/javascript" src="./common.js"></script>
+    <style type="text/css">
+      #smiles {
+        position: fixed;
+
+        top: 52px;
+        left: 4px;
+        right: 285px;
+        height: 30px;
+
+        border: 1px solid #456;
+        border-radius: 5px;
+        box-sizing: border-box;
+
+        padding: 0 5px;
+      }
+
+      #options {
+        position: fixed;
+        background-color: #ccc;
+        border-left: 1px solid #345;
+
+        top: 48px;
+        right: 0;
+        bottom: 0;
+        width: 280px;
+
+        overflow-y: auto;
+        scroll-behavior: smooth;
+      }
+
+      #viewer {
+        position: fixed;
+
+        top: 86px;
+        left: 0;
+        right: 280px;
+        bottom: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+      }
+
+      #viewer svg {
+        background-color: #fff;
+        box-shadow: 0 1px 5px 5px rgb(0, 0, 0, 0.10);
+        flex-shrink: 0;
+      }
+
+      #message {
+        position: fixed;
+        right: 286px;
+        bottom: 5px;
+
+        font-size: small;
+      }
+
+      #message.error {
+        color: #800;
+      }
+
+      #options details {
+        background-color: #eee;
+        border-radius: 3px;
+
+        border: 1px solid #345;
+        margin: 4pt 4pt 6pt 4pt;
+        padding: 4pt;
+      }
+
+      #options summary {
+        color: #345;
+        cursor: pointer;
+        font-weight: bold;
+        height: 24px;
+        line-height: 24px;
+      }
+
+      #options summary .info {
+        cursor: help;
+        float: right;
+      }
+
+      #options details[open] {
+        padding-bottom: 1pt;
+      }
+
+      #options details[open] summary {
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 6pt;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div id="top-right">
+        <span id="version"></span>
+        <button command="show-modal" commandfor="export-modal">Export</button>
+      </div>
+      <h1>SmilesDrawer Playground</h1>
+    </header>
+    <input type="text" id="smiles" placeholder="Your SMILES here..." value="Cn1cnc2c1C(=O)N(C(=O)N2C)C" />
+    <div id="viewer">
+      <svg id="target"></svg>
+      <div id="message"></div>
+    </div>
+    <div id="options">
+      <details open>
+        <summary>Image Dimensions</summary>
+        <div class="formlike">
+          <label><input type="number" name="width" min="0" />Width</label>
+          <label><input type="number" name="height" min="0" />Height</label>
+          <label><input type="number" name="padding" min="0" />Padding</label>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Atom Visualization</summary>
+        <div class="formlike">
+          <label><select id="color-scheme" name="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="oldschool">Oldschool</option>
+            <option value="oldschool-dark">Oldschool Dark</option>
+            <option value="solarized">Solarized</option>
+            <option value="solarized-dark">Solarized Dark</option>
+            <option value="matrix">Matrix</option>
+            <option value="github">GitHub</option>
+            <option value="carbon">Carbon</option>
+            <option value="cyberpunk">Cyberpunk</option>
+            <option value="gruvbox">Gruvbox</option>
+            <option value="gruvbox-dark">Gruvbox Dark</option>
+            <option value="custom">Custom</option>
+          </select>Theme</label>
+          <label><select name="atomVisualization">
+            <option value="default">Default</option>
+            <option value="balls">Balls</option>
+            <option value="none">None</option>
+          </select>Atom Style</label>
+          <label><input type="number" name="fontSizeLarge" />Large Font Size</label>
+          <label><input type="number" name="fontSizeSmall" />Small Font Size</label>
+          <label><input type="checkbox" name="terminalCarbons" />Show Terminal Carbons</label>
+          <label><input type="checkbox" name="explicitHydrogens" />Show Explicit Hydrogens</label>
+          <label><input type="checkbox" name="compactDrawing" />Compact Drawing</label>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Bond Visualization</summary>
+        <div class="formlike">
+          <label><input type="number" name="bondLength" />Bond Length</label>
+          <label><input type="number" name="shortBondLength" min="0" step="0.01" />Short Bond Length</label>
+          <label><input type="number" name="bondThickness" min="0" step="0.1" />Bond Thickness</label>
+          <label><input type="number" name="bondSpacing" min="0" step="0.1" />Bond Spacing</label>
+          <label><input type="checkbox" name="isomeric" />Show Stereochemistry</label>
+        </div>
+      </details>
+
+      <details id="custom-colors">
+        <summary><span class="info" title="Select the Custom theme under Atom Visualization to use these colors.">ⓘ</span>Custom Theme</summary>
+        <div class="formlike">
+          <label><select id="copy-color-scheme">
+            <option value="">Select</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="oldschool">Oldschool</option>
+            <option value="oldschool-dark">Oldschool Dark</option>
+            <option value="solarized">Solarized</option>
+            <option value="solarized-dark">Solarized Dark</option>
+            <option value="matrix">Matrix</option>
+            <option value="github">GitHub</option>
+            <option value="carbon">Carbon</option>
+            <option value="cyberpunk">Cyberpunk</option>
+            <option value="gruvbox">Gruvbox</option>
+            <option value="gruvbox-dark">Gruvbox Dark</option>
+          </select>Copy from...</label>
+          <label style="display:none"><input type="color" name="FOREGROUND" />Foreground</label>
+          <label><input type="color" name="BACKGROUND" />Background</label>
+          <label><input type="color" name="C" />Carbon</label>
+          <label><input type="color" name="H" />Hydrogen</label>
+          <label><input type="color" name="O" />Oxygen</label>
+          <label><input type="color" name="N" />Nitrogen</label>
+          <label><input type="color" name="F" />Fluorine</label>
+          <label><input type="color" name="CL" />Chlorine</label>
+          <label><input type="color" name="BR" />Bromine</label>
+          <label><input type="color" name="I" />Iodine</label>
+          <label><input type="color" name="P" />Phosphorous</label>
+          <label><input type="color" name="S" />Sulphur</label>
+          <label><input type="color" name="B" />Boron</label>
+          <label><input type="color" name="SI" />Silicon</label>
+        </div>
+      </details>
+
+      <details>
+        <summary>Advanced</summary>
+        <div class="formlike">
+          <label><input type="number" name="overlapSensitivity" min="0" step="0.01" />Overlap Sensitivity</label>
+          <label><input type="number" name="overlapResolutionIterations" min="0" />Overlap Iterations</label>
+          <label><input type="checkbox" name="experimentalSSSR" />Experimental SSSR</label>
+          <label><input type="checkbox" name="debug" />Debug Labels</label>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="info" title="Parameters for the Kamada-Kawai force-based graph layout algorithm, used when the standard layout algorithm fails.">ⓘ</span>Force-Based Layout</summary>
+        <div class="formlike">
+          <label><input type="number" name="kkThreshold" min="0" step="0.01" />Threshold</label>
+          <label><input type="number" name="kkInnerThreshold" min="0" step="0.01" />Inner Threshold</label>
+          <label><input type="number" name="kkMaxIteration" min="0" />Max Iterations</label>
+          <label><input type="number" name="kkMaxInnerIteration" min="0" />Max Inner Iterations</label>
+          <label><input type="number" name="kkMaxEnergy" min="0" />Max Energy</label>
+        </div>
+      </details>
+    </div>
+
+    <dialog id="export-modal" closedby="any">
+      <h2>Export</h2>
+      <div class="button-list">
+        <div style="margin-bottom:12px">
+          <button id="copy-options">Copy Options</button>
+          <button id="copy-custom-colors">Copy Custom Colors</button>
+        </div>
+        <div style="margin-bottom:12px">
+          <button id="copy-png">Copy PNG</button>
+          <button id="copy-svg">Copy SVG</button>
+          <button id="copy-xml">Copy SVG Source</button>
+        </div>
+        <div style="margin-bottom:12px">
+          <button id="save-png">Download PNG</button>
+          <button id="save-svg">Download SVG</button>
+        </div>
+      </div>
+      <div class="buttons">
+        <button command="close" commandfor="export-modal">Close</button>
+      </div>
+    </dialog>
+    <script type="text/javascript">
+      // Show the version number in the header:
+      document.getElementById('version').innerText = 'Using SmilesDrawer v' + SmilesDrawer.Version
+
+      const COLORS  = {
+        FOREGROUND: '#000000',
+        BACKGROUND: '#ffffff',
+
+        C:  '#222222',
+        H:  '#666666',
+        O:  '#e74c3c',
+        N:  '#3498db',
+        F:  '#27ae60',
+        CL: '#16a085',
+        BR: '#d35400',
+        I:  '#8e44ad',
+        P:  '#d35400',
+        S:  '#f1c40f',
+        B:  '#e67e22',
+        SI: '#e67e22'
+      }
+
+      // These aren't in a constant at the moment, so make a dummy object...
+      const DEFAULTS = new SmilesDrawer.SvgDrawer().preprocessor.defaultOptions;
+      DEFAULTS.themes.custom = COLORS;
+
+      // Copy the object (we mess with the theme/themes keys).
+      const OPTIONS = Object.assign({theme: 'light'}, DEFAULTS);
+
+      const SVG = document.getElementById('target');
+
+      // Prevent redraws on arrow keys, etc.
+      let last_smiles = undefined;
+
+      function render() {
+        const message = document.getElementById('message');
+        const smiles  = document.getElementById('smiles').value;
+        const drawer  = new SmilesDrawer.SmiDrawer(OPTIONS);
+        const bgcolor = DEFAULTS.themes[OPTIONS.theme].BACKGROUND;
+        target.style.backgroundColor = bgcolor;
+
+        last_smiles = smiles;
+
+        const a = performance.now();
+        drawer.draw(smiles, SVG, OPTIONS.theme, svg => {
+          const z = performance.now();
+
+          message.innerText = `Rendered in ${z-a}ms.`;
+          message.classList.remove('error');
+        }, error => {
+          message.classList.add('error');
+          message.innerText = error;
+        });
+
+        SVG.setAttribute('width',  OPTIONS.width);
+        SVG.setAttribute('height', OPTIONS.height);
+      }
+
+      const options_element = document.getElementById('options');
+      installOptions(options_element, OPTIONS, (event, name, value) => {
+        render();
+      });
+
+      const colors_element = document.getElementById('custom-colors');
+      installOptions(colors_element, COLORS, (event, name, value) => {
+        // Don't let this bubble to the #options handler!
+        event.stopPropagation();
+
+        // Make sure we're using the custom color scheme:
+        document.getElementById('color-scheme').value = 'custom';
+        OPTIONS['theme'] = 'custom';
+
+        render();
+      });
+
+      // The draw() call uses the light theme by default.
+      const theme = document.getElementById('color-scheme').value = 'light';
+
+      // Activate the Copy and Download buttons:
+      installExporters(() => SVG);
+
+      document.getElementById('smiles').addEventListener('keyup', (event) => {
+        if (event.target.value !== last_smiles) {
+          render();
+        }
+      });
+
+      document.getElementById('copy-options').addEventListener('click', async (event) => {
+        const options = Object.assign({}, OPTIONS);
+        if (options.theme === 'custom') {
+          options.themes = {custom: COLORS};
+        }
+        else {
+          // This blocks access to the built-in themes!
+          delete options.themes;
+        }
+
+        // TODO: delete options.theme?
+        await navigator.clipboard.writeText(JSON.stringify(options, null, 2));
+        flash(event.target);
+      });
+
+      document.getElementById('copy-custom-colors').addEventListener('click', async (event) => {
+        await navigator.clipboard.writeText(JSON.stringify(COLORS, null, 2));
+        flash(event.target);
+      });
+
+      let first_custom = true;
+      document.getElementById('color-scheme').addEventListener('change', (event) => {
+        if (event.target.value === 'custom' && first_custom) {
+          const section = document.getElementById('custom-colors');
+          section.open = true;
+          section.scrollIntoView();
+          first_custom = false;
+        }
+      });
+
+      document.getElementById('copy-color-scheme').addEventListener('change', (event) => {
+        // Don't let this bubble to the #options handler!
+        event.stopPropagation();
+
+        const colors = DEFAULTS.themes[event.target.value];
+        if (colors) {
+          Object.assign(COLORS, colors);
+          setOptions(colors_element, COLORS);
+        }
+
+        // Make sure we're using the custom color scheme:
+        document.getElementById('color-scheme').value = 'custom';
+        OPTIONS['theme'] = 'custom';
+
+        // Reset the "Copy From..." selector.
+        event.target.value = '';
+
+        render();
+      });
+
+      function load_smiles() {
+        const params = new URLSearchParams(window.location.search)
+        const smiles = params.get('smiles');
+        if (smiles) {
+          const input = document.getElementById('smiles');
+          input.value = smiles;
+        }
+      }
+
+      load_smiles();
+      render();
+    </script>
+  </body>
+</html>
