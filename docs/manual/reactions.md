@@ -52,7 +52,7 @@ See the function reference for more details:
   `textBelowArrow`; then add two more underscores.  Any apostrophes (`'`) in the
   JSON will be converted to double quotes (`"`) before parsing.  Example:
   ```js
-  "[Pb]>>[Au] __{textAboveArrow: 'MAGIC', textBelowArrow: '42°C'}__"
+  "[Pb]>>[Au] __{'textAboveArrow': 'MAGIC', 'textBelowArrow': '42°C'}__"
   ```
 
 

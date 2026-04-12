@@ -124,7 +124,7 @@ This function supports several magic HTML attributes:
   `textBelowArrow`; then add two more underscores.  Any apostrophes (`'`) in the
   JSON will be converted to double quotes (`"`) before parsing.  Example:
   ```js
-  "[Pb]>>[Au] __{textAboveArrow: 'as above', textBelowArrow: 'so below'}__"
+  "[Pb]>>[Au] __{'textAboveArrow': 'as above', 'textBelowArrow': 'so below'}__"
   ```
 
 
