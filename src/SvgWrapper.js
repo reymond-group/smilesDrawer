@@ -949,7 +949,7 @@ export default class SvgWrapper {
         style.appendChild(document.createTextNode(`
             .text {
                 font: ${fontSize}pt ${fontFamily};
-                dominant-baseline: ideographic;
+                dominant-baseline: alphabetic;
             }
         `));
         svg.appendChild(style);
@@ -957,74 +957,52 @@ export default class SvgWrapper {
         let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textElem.setAttributeNS(null, 'class', 'text');
 
-        let maxLineWidth = 0.0;
-        let totalHeight = 0.0;
-
         let lines = [];
-
         text.split('\n').forEach((line) => {
             let dims = SvgWrapper.measureText(line, fontSize, fontFamily);
             if (dims.width >= maxWidth) {
-                let totalWordsWidth = 0.0;
-                let maxWordsHeight = 0.0;
-                let words = line.split(' ');
-                let offset = 0;
+                const words  = line.split(' ');
+                let   offset = 0;
 
                 for (let i = 0; i < words.length; i++) {
-                    let wordDims = SvgWrapper.measureText(words[i], fontSize, fontFamily);
+                    const part     = words.slice(offset, i + 1).join(' ');
+                    const partDims = SvgWrapper.measureText(part, fontSize, fontFamily);
 
-                    if (totalWordsWidth + wordDims.width > maxWidth) {
-                        lines.push({
-                            text:   words.slice(offset, i).join(' '),
-                            width:  totalWordsWidth,
-                            height: maxWordsHeight,
-                        });
-
-                        totalWordsWidth = 0.0;
-                        maxWordsHeight = 0.0;
+                    if (partDims.width > maxWidth && i > offset) {
+                        lines.push(words.slice(offset, i).join(' '));
                         offset = i;
                     }
-
-                    if (wordDims.height > maxWordsHeight) {
-                        maxWordsHeight = wordDims.height;
-                    }
-
-                    totalWordsWidth += wordDims.width;
                 }
 
                 if (offset < words.length) {
-                    lines.push({
-                        text:   words.slice(offset, words.length).join(' '),
-                        width:  totalWordsWidth,
-                        height: maxWordsHeight,
-                    });
+                    lines.push(words.slice(offset, words.length).join(' '));
                 }
             }
             else {
-                lines.push({
-                    text:   line,
-                    width:  dims.width,
-                    height: dims.height,
-                });
+                lines.push(line);
             }
         });
 
-        lines.forEach((line) => {
-            totalHeight += line.height;
+        let maxLineWidth = 0.0;
+        lines.forEach((line, i) => {
             let tspanElem = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
             tspanElem.setAttributeNS(null, 'fill', themeManager.getColor('C'));
-            tspanElem.textContent = line.text;
+            tspanElem.textContent = line;
             tspanElem.setAttributeNS(null, 'x', '0px');
-            tspanElem.setAttributeNS(null, 'y', `${totalHeight}px`);
+            tspanElem.setAttributeNS(null, 'y', `${i + 1}em`);
             textElem.appendChild(tspanElem);
 
-            if (line.width > maxLineWidth) {
-                maxLineWidth = line.width;
-            }
+            const dims = SvgWrapper.measureText(line, fontSize, fontFamily);
+            maxLineWidth = Math.max(maxLineWidth, dims.width);
         });
+
+        textElem.setAttributeNS(null, 'transform',   `translate(${maxLineWidth / 2}, 0)`);
+        textElem.setAttributeNS(null, 'text-anchor', 'middle');
 
         svg.appendChild(textElem);
 
-        return {svg: svg, width: maxLineWidth, height: totalHeight};
+        // The extra 0.4 here it to account for any subscripts on the bottom line.
+        // The factor of 4 / 3 is to convert from points to CSS pixels (1in = 72pt = 96px).
+        return {svg: svg, width: maxLineWidth, height: (lines.length + 0.4) * fontSize * 4 / 3};
     }
 }
