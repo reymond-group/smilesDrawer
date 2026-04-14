@@ -832,51 +832,56 @@ export default class SvgWrapper {
         return text;
     }
 
-    static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
+    static measureText(text, fontSize, fontFamily) {
         const element = document.createElement('canvas');
         const ctx = element.getContext('2d');
         // In some environments (Node.js, JSDOM, CI runners) the canvas element
-        // exists but there is no graphics backend behind it causing getContext('2d') 
+        // exists but there is no graphics backend behind it causing getContext('2d')
         // to return null
         // Fall back to arithmetic estimation so the layout doesn't break
         if (!ctx) {
-            return SvgWrapper.estimateTextSize(text, fontSize, lineHeight);
+            return SvgWrapper.estimateTextSize(text, fontSize);
         }
 
-        ctx.font = `${fontSize}pt ${fontFamily}`;
-        let textMetrics = ctx.measureText(text);
+        // In Firefox, the measureText() function is inconsistent at small font sizes.
+        // So measure a large(ish) font, then scale the measurements later.
+        const scale = fontSize / 16;
+        ctx.font = `16pt ${fontFamily}`;
+        const textMetrics = ctx.measureText(text);
 
-        let compWidth = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
+        const w = Math.abs(textMetrics.actualBoundingBoxLeft)   + Math.abs(textMetrics.actualBoundingBoxRight);
+        const h = Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxDescent);
+
         return {
-            width:  textMetrics.width > compWidth ? textMetrics.width : compWidth,
-            height: (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight,
+            width:  w * scale,
+            height: h * scale,
         };
     }
 
-    static estimateTextSize(text, fontSize, lineHeight = 0.9) {
+    static estimateTextSize(text, fontSize) {
         let width = 0;
 
         for (const char of String(text)) {
             if (char === ' ') {
-                width += fontSize * 0.35;
+                width += 0.35;
             }
             else if (/[A-Z]/.test(char)) {
-                width += fontSize * 0.68;
+                width += 0.68;
             }
             else if (/[a-z]/.test(char)) {
-                width += fontSize * 0.56;
+                width += 0.56;
             }
             else if (/[0-9]/.test(char)) {
-                width += fontSize * 0.55;
+                width += 0.55;
             }
             else {
-                width += fontSize * 0.45;
+                width += 0.45;
             }
         }
 
         return {
-            width,
-            height: fontSize * 2 * lineHeight,
+            width:  fontSize * width,
+            height: fontSize,
         };
     }
 
@@ -954,16 +959,16 @@ export default class SvgWrapper {
 
         let lines = [];
         text.split('\n').forEach((line) => {
-            let dims = SvgWrapper.measureText(line, fontSize, fontFamily, 1.0);
+            let dims = SvgWrapper.measureText(line, fontSize, fontFamily);
             if (dims.width >= maxWidth) {
                 const words  = line.split(' ');
                 let   offset = 0;
 
                 for (let i = 0; i < words.length; i++) {
-                    const part = words.slice(offset, i + 1).join(' ');
-                    const dims = SvgWrapper.measureText(part, fontSize, fontFamily);
+                    const part     = words.slice(offset, i + 1).join(' ');
+                    const partDims = SvgWrapper.measureText(part, fontSize, fontFamily);
 
-                    if (dims.width > maxWidth && i > offset) {
+                    if (partDims.width > maxWidth && i > offset) {
                         lines.push(words.slice(offset, i).join(' '));
                         offset = i;
                     }
@@ -984,7 +989,7 @@ export default class SvgWrapper {
             tspanElem.setAttributeNS(null, 'fill', themeManager.getColor('C'));
             tspanElem.textContent = line;
             tspanElem.setAttributeNS(null, 'x', '0px');
-            tspanElem.setAttributeNS(null, 'y', `${i+1}em`);
+            tspanElem.setAttributeNS(null, 'y', `${i + 1}em`);
             textElem.appendChild(tspanElem);
 
             const dims = SvgWrapper.measureText(line, fontSize, fontFamily);
