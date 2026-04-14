@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="./visual-tests.css" />
+    <script type="text/javascript" src="./visual-tests.js"></script>
+    <script type="text/javascript" src="../../dist/smiles-drawer.dev.js"></script>
+    <title>Text Alignment Tests</title>
+    <script type="module" defer>
+      const TESTS = [
+        {
+          desc: 'The subscripts on the reaction arrow text should be fully visible.',
+          cause: 'The height calculation in SvgWrapper.writeText() didn\'t account for descenders/subscripts.',
+          status: 'passing',
+          smiles: [
+            '[Pb]>[OH3]>[Au] __{"textBelowArrow": "C₂H₆"}__',
+          ],
+          links: [
+            'https://github.com/reymond-group/smilesDrawer/issues/241'
+          ]
+        },
+
+        {
+          desc: 'Long lines of reaction arrow text should wrap at about the arrow length.',
+          cause: 'The width calculation in SvgWrapper.writeText() didn\'t account for spaces, so lines could be too long.',
+          status: 'passing',
+          smiles: [
+            '[Pb]>OS(=O)(=O)O>[Au] __{"textAboveArrow": "a a a a a a a a a a a a a a a a a a a a a a a", "textBelowArrow": "b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b "}__',
+          ],
+        },
+
+        {
+          desc: 'Extra-long lines of reaction text should not be cut off (but might overlap the molecules).',
+          cause: 'ReactionDrawer used to cap the text size to the length of the reaction arrow, so long lines would be cut off.',
+          status: 'passing',
+          smiles: [
+            '[Pb]>OS(=O)(=O)O>[Au] __{"textBelowArrow": "Humuhumunukunukuāpuaʻa", "textAboveArrow": "Lauwiliwilinukunukuʻoiʻoi"}__',
+            '[Pb]>OS(=O)(=O)O>[Au] __{"textBelowArrow": "antidisestablishmentarianism is the first word", "textAboveArrow": "antidisestablishmentarianism is the first word"}__',
+            '[Pb]>OS(=O)(=O)O>[Au] __{"textBelowArrow": "there is antidisestablishmentarianism in the middle", "textAboveArrow": "there is antidisestablishmentarianism in the middle"}__',
+            '[Pb]>OS(=O)(=O)O>[Au] __{"textBelowArrow": "the last word is antidisestablishmentarianism", "textAboveArrow": "the last word is antidisestablishmentarianism"}__',
+          ],
+        },
+
+        {
+          desc: 'The formula for oil of vitriol (sulphuric acid) should have two hydrogens.',
+          cause: undefined,
+          status: 'failing',
+          smiles: [
+            '[Pb]>OS(=O)(=O)O>[Au]',
+          ],
+          links: [
+            'https://github.com/reymond-group/smilesDrawer/issues/262'
+          ]
+        },
+      ];
+
+      // await loadSmilesDrawer();
+      const container = document.getElementById('tests');
+      loadTests(container, TESTS);
+    </script>
+  </head>
+  <body>
+    <h1>Text Alignment Tests</h1>
+    <div id="tests"></div>
+  </body>
+</html>
