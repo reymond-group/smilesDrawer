@@ -435,22 +435,48 @@ export default class SvgDrawer {
             return;
         }
 
-        if (weights.every(w => w === 0)) {
-            return;
-        }
-
         if (weights.length !== this.preprocessor.graph.atomIdxToVertexId.length) {
             throw new Error('The number of weights supplied must be equal to the number of (heavy) atoms in the molecule.');
         }
 
+        let min = 0;
+        let max = 0;
+        for (let i = 0; i < weights.length; ++i) {
+            const weight = weights[i];
+            if (!weight) continue;
+
+            if (weight < min) min = weight;
+            if (weight > max) max = weight;
+        }
+
+        if (min === 0 && max === 0) {
+            return;
+        }
+
+        if (this.opts.experimentalWeights) {
+            const points = this.preprocessor.graph.atomIdxToVertexId.map((vid) => {
+                return this.preprocessor.graph.vertices[vid].position;
+            });
+
+            let scale = this.opts.weights.opacity;
+            if (!weightsNormalized) {
+                scale /= Math.max(-min, max);
+            }
+
+            return this.svgWrapper.drawWeights(weights, points, scale);
+        }
+
         let points = [];
+
+        const minX = this.svgWrapper.minX;
+        const minY = this.svgWrapper.minY;
 
         for (const atomIdx of this.preprocessor.graph.atomIdxToVertexId) {
             let vertex = this.preprocessor.graph.vertices[atomIdx];
             points.push(new Vector2(
-                vertex.position.x - this.svgWrapper.minX,
-                vertex.position.y - this.svgWrapper.minY)
-            );
+                vertex.position.x - minX,
+                vertex.position.y - minY,
+            ));
         }
 
         let gd = new GaussDrawer(
@@ -460,7 +486,9 @@ export default class SvgDrawer {
         );
 
         gd.draw();
-        this.svgWrapper.addLayer(gd.getSVG());
+        const background = gd.getSVG();
+        background.firstChild.setAttributeNS(null, 'transform', `translate(${minX},${minY})`);
+        this.svgWrapper.addLayer(background);
     }
 
     /**
