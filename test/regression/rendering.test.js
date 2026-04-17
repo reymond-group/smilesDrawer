@@ -127,4 +127,25 @@ describe('Rendering: polymer repeat overlay', () => {
         const textValues = Array.from(svg.querySelectorAll('text')).map((el) => el.textContent || '');
         expect(textValues.some((value) => value.includes('*'))).toBe(true);
     });
+
+    it('does not apply overlay with a single wildcard endpoint', () => {
+        const svg = renderToSVG('[*]CC(C(=O)OC)', {polymerDisplayMode: 'bracket-n'});
+        const textValues = Array.from(svg.querySelectorAll('text')).map((el) => el.textContent || '');
+        expect(textValues).not.toContain('n');
+        expect(textValues.some((value) => value.includes('*'))).toBe(true);
+    });
+
+    it('does not apply overlay when wildcard is not terminal', () => {
+        const svg = renderToSVG('C[*]CC[*]', {polymerDisplayMode: 'bracket-n'});
+        const textValues = Array.from(svg.querySelectorAll('text')).map((el) => el.textContent || '');
+        expect(textValues).not.toContain('n');
+        expect(textValues.some((value) => value.includes('*'))).toBe(true);
+    });
+
+    it('does not apply overlay when there are more than two wildcards', () => {
+        const svg = renderToSVG('[*]C([*])C[*]', {polymerDisplayMode: 'bracket-n'});
+        const textValues = Array.from(svg.querySelectorAll('text')).map((el) => el.textContent || '');
+        expect(textValues).not.toContain('n');
+        expect(textValues.some((value) => value.includes('*'))).toBe(true);
+    });
 });

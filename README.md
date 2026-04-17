@@ -266,7 +266,7 @@ The default options are defined as follows:
 
 When `showAllCarbonLabels` is `true`, carbon atoms are always rendered with explicit labels (`C`, `CH`, `CH2`, `CH3`) instead of being omitted by skeletal display rules.
 If `showAllCarbonLabelsExcludeRings` is also `true`, carbons that are part of rings keep the default skeletal style while acyclic carbons remain explicitly labeled.
-`polymerDisplayMode: 'bracket-n'` enables a display-only `[ ]n` overlay for structures using wildcard (`*`) repeat endpoints.
+`polymerDisplayMode: 'bracket-n'` enables a display-only `[ ]n` overlay for strict repeat-endpoint patterns (exactly two wildcard `*` atoms, each terminal, and appearing at the first/last atom positions in SMILES order). Other wildcard usages keep the default rendering.
 
 ### Usage
 

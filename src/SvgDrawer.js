@@ -17,6 +17,10 @@ export default class SvgDrawer {
         this.opts = this.preprocessor.opts;
         this.clear = clear;
         this.svgWrapper = null;
+        this.polymerOverlayState = {
+            enabled: false,
+            wildcardVertexIds: new Set(),
+        };
     }
 
     /**
@@ -68,6 +72,8 @@ export default class SvgDrawer {
         // Set the canvas to the appropriate size
         this.svgWrapper.determineDimensions(preprocessor.graph.vertices);
 
+        this.polymerOverlayState = this.getPolymerOverlayState();
+
         // Do the actual drawing
         this.drawAtomHighlights(preprocessor.opts.debug);
         this.drawEdges(preprocessor.opts.debug);
@@ -98,22 +104,69 @@ export default class SvgDrawer {
     }
 
     /**
+     * Return whether polymer overlay should be enabled and which wildcard vertices are involved.
+     * Overlay is intentionally strict to avoid false positives in generic wildcard-containing SMILES.
+     */
+    getPolymerOverlayState() {
+        if (this.opts.polymerDisplayMode !== 'bracket-n') {
+            return {enabled: false, wildcardVertexIds: new Set()};
+        }
+
+        const graph = this.preprocessor.graph;
+        const wildcardVertices = graph.vertices.filter((vertex) => vertex.value.element === '*');
+        if (wildcardVertices.length !== 2) {
+            return {enabled: false, wildcardVertexIds: new Set()};
+        }
+
+        const smilesOrders = graph.vertices.map((vertex) => vertex.value.smilesOrder);
+        if (smilesOrders.some((order) => typeof order !== 'number')) {
+            return {enabled: false, wildcardVertexIds: new Set()};
+        }
+
+        const minOrder = Math.min(...smilesOrders);
+        const maxOrder = Math.max(...smilesOrders);
+        const wildcardOrders = wildcardVertices.map((vertex) => vertex.value.smilesOrder);
+        if (!wildcardOrders.includes(minOrder) || !wildcardOrders.includes(maxOrder)) {
+            return {enabled: false, wildcardVertexIds: new Set()};
+        }
+
+        const wildcardIds = new Set(wildcardVertices.map((vertex) => vertex.id));
+
+        for (const wildcard of wildcardVertices) {
+            // Wildcards should be simple terminal endpoints.
+            if (wildcard.getNeighbourCount() !== 1) {
+                return {enabled: false, wildcardVertexIds: new Set()};
+            }
+
+            if (wildcard.value.rings && wildcard.value.rings.length > 0) {
+                return {enabled: false, wildcardVertexIds: new Set()};
+            }
+
+            const attachedId = wildcard.neighbours[0];
+            const attached = graph.vertices[attachedId];
+            if (!attached || attached.value.element === '*') {
+                return {enabled: false, wildcardVertexIds: new Set()};
+            }
+        }
+
+        return {enabled: true, wildcardVertexIds: wildcardIds};
+    }
+
+    /**
      * Draw a polymer repeat-unit [ ]n overlay for wildcard endpoints (*).
      * This is a display-only overlay and does not alter chemical graph semantics.
      */
     drawPolymerRepeatOverlay() {
-        if (this.opts.polymerDisplayMode !== 'bracket-n') {
+        if (!this.polymerOverlayState.enabled) {
             return;
         }
 
         const vertices = this.preprocessor.graph.vertices.filter((vertex) => {
             if (!vertex.value.isDrawn) return false;
-            if (vertex.value.element === '*') return false;
+            if (this.polymerOverlayState.wildcardVertexIds.has(vertex.id)) return false;
             return true;
         });
-
-        const wildcardCount = this.preprocessor.graph.vertices.filter((vertex) => vertex.value.element === '*').length;
-        if (wildcardCount < 2 || vertices.length < 2) {
+        if (vertices.length < 2) {
             return;
         }
 
@@ -266,7 +319,7 @@ export default class SvgDrawer {
             // Create a point on each side of the line
             sides = ArrayHelper.clone(normals);
 
-        if (this.opts.polymerDisplayMode === 'bracket-n' && (elementA === '*' || elementB === '*')) {
+        if (this.polymerOverlayState.enabled && (elementA === '*' || elementB === '*')) {
             return;
         }
 
@@ -421,7 +474,7 @@ export default class SvgDrawer {
         for (let i = 0; i < graph.vertices.length; i++) {
             let vertex = graph.vertices[i];
             let atom = vertex.value;
-            if (opts.polymerDisplayMode === 'bracket-n' && atom.element === '*') {
+            if (this.polymerOverlayState.enabled && atom.element === '*') {
                 continue;
             }
             let charge = 0;
