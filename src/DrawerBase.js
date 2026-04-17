@@ -53,6 +53,7 @@ export default class DrawerBase {
             isomeric:                    true,
             debug:                       false,
             terminalCarbons:             false,
+            showAllCarbonLabels:         false,
             explicitHydrogens:           true,
             overlapSensitivity:          0.42,
             overlapResolutionIterations: 1,
@@ -1797,6 +1798,11 @@ export default class DrawerBase {
             let dir = vertex.getTextDirection(this.graph.vertices);
             let isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
             let isCarbon = atom.element === 'C';
+
+            if (this.opts.showAllCarbonLabels && element === 'C') {
+                isCarbon = false;
+                isTerminal = true;
+            }
             // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
             // should be the most common state. This has to be fixed by kekulization
             if (atom.element === 'N' && atom.isPartOfAromaticRing) {

@@ -193,6 +193,7 @@ The following options are available:
 | Padding                                                         | padding                     | number                              | 20.0          |
 | Use experimental features                                       | experimental                | boolean                             | false         |
 | Show Terminal Carbons (CH3)                                     | terminalCarbons             | boolean                             | false         |
+| Show all carbon labels (C/CH/CH2/CH3)                          | showAllCarbonLabels         | boolean                             | false         |
 | Show explicit hydrogens                                         | explicitHydrogens           | boolean                             | false         |
 | Overlap sensitivity                                             | overlapSensitivity          | number                              | 0.42          |
 | # of overlap resolution iterations                              | overlapResolutionIterations | number                              | 1             |
@@ -215,6 +216,7 @@ The default options are defined as follows:
     isomeric: true,
     debug: false,
     terminalCarbons: false,
+    showAllCarbonLabels: false,
     explicitHydrogens: false,
     overlapSensitivity: 0.42,
     overlapResolutionIterations: 1,
@@ -257,6 +259,8 @@ The default options are defined as follows:
     }
 };
 ```
+
+When `showAllCarbonLabels` is `true`, carbon atoms are always rendered with explicit labels (`C`, `CH`, `CH2`, `CH3`) instead of being omitted by skeletal display rules.
 
 ### Usage
 
