@@ -361,8 +361,13 @@ export default class SvgDrawer {
             let isCarbon = atom.element === 'C';
 
             if (opts.showAllCarbonLabels && element === 'C') {
-                isCarbon = false;
-                isTerminal = true;
+                const isRingCarbon = atom.rings && atom.rings.length > 0;
+                const shouldLabel = !(opts.showAllCarbonLabelsExcludeRings && isRingCarbon);
+
+                if (shouldLabel) {
+                    isCarbon = false;
+                    isTerminal = true;
+                }
             }
 
             // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
