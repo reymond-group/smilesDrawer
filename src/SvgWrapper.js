@@ -470,6 +470,27 @@ export default class SvgWrapper {
     }
 
     /**
+     * Draws an annotation text in regular molecule color.
+     *
+     * @param {Number} x The x coordinate.
+     * @param {Number} y The y coordinate.
+     * @param {String} text The text to draw.
+     * @param {String} [anchor='middle'] Text anchor.
+     */
+    drawAnnotationText(x, y, text, anchor = 'middle') {
+        let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textElem.setAttributeNS(null, 'x', x);
+        textElem.setAttributeNS(null, 'y', y);
+        textElem.setAttributeNS(null, 'fill', this.themeManager.getColor('C'));
+        textElem.setAttributeNS(null, 'text-anchor', anchor);
+        textElem.setAttributeNS(null, 'style', `
+                font: ${this.opts.fontSizeLarge + 2}pt ${this.opts.fontFamily};
+            `);
+        textElem.appendChild(document.createTextNode(text));
+        this.vertices.push(textElem);
+    }
+
+    /**
      * Draws a ring.
      *
      * @param {x} x The x coordinate of the ring.

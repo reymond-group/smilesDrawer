@@ -195,6 +195,7 @@ The following options are available:
 | Show Terminal Carbons (CH3)                                     | terminalCarbons             | boolean                             | false         |
 | Show all carbon labels (C/CH/CH2/CH3)                          | showAllCarbonLabels         | boolean                             | false         |
 | Exclude ring carbons when showing all carbon labels             | showAllCarbonLabelsExcludeRings | boolean                          | false         |
+| Polymer repeat-unit overlay for wildcard endpoints              | polymerDisplayMode          | string ['none', 'bracket-n']        | 'none'        |
 | Show explicit hydrogens                                         | explicitHydrogens           | boolean                             | false         |
 | Overlap sensitivity                                             | overlapSensitivity          | number                              | 0.42          |
 | # of overlap resolution iterations                              | overlapResolutionIterations | number                              | 1             |
@@ -219,6 +220,7 @@ The default options are defined as follows:
     terminalCarbons: false,
     showAllCarbonLabels: false,
     showAllCarbonLabelsExcludeRings: false,
+    polymerDisplayMode: 'none',
     explicitHydrogens: false,
     overlapSensitivity: 0.42,
     overlapResolutionIterations: 1,
@@ -264,6 +266,7 @@ The default options are defined as follows:
 
 When `showAllCarbonLabels` is `true`, carbon atoms are always rendered with explicit labels (`C`, `CH`, `CH2`, `CH3`) instead of being omitted by skeletal display rules.
 If `showAllCarbonLabelsExcludeRings` is also `true`, carbons that are part of rings keep the default skeletal style while acyclic carbons remain explicitly labeled.
+`polymerDisplayMode: 'bracket-n'` enables a display-only `[ ]n` overlay for structures using wildcard (`*`) repeat endpoints.
 
 ### Usage
 

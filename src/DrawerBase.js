@@ -55,6 +55,7 @@ export default class DrawerBase {
             terminalCarbons:             false,
             showAllCarbonLabels:         false,
             showAllCarbonLabelsExcludeRings: false,
+            polymerDisplayMode:          'none',
             explicitHydrogens:           true,
             overlapSensitivity:          0.42,
             overlapResolutionIterations: 1,

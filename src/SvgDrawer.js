@@ -72,6 +72,7 @@ export default class SvgDrawer {
         this.drawAtomHighlights(preprocessor.opts.debug);
         this.drawEdges(preprocessor.opts.debug);
         this.drawVertices(preprocessor.opts.debug);
+        this.drawPolymerRepeatOverlay();
 
         if (weights !== null) {
             this.drawWeights(weights, weightsNormalized);
@@ -94,6 +95,71 @@ export default class SvgDrawer {
         }
 
         return target;
+    }
+
+    /**
+     * Draw a polymer repeat-unit [ ]n overlay for wildcard endpoints (*).
+     * This is a display-only overlay and does not alter chemical graph semantics.
+     */
+    drawPolymerRepeatOverlay() {
+        if (this.opts.polymerDisplayMode !== 'bracket-n') {
+            return;
+        }
+
+        const vertices = this.preprocessor.graph.vertices.filter((vertex) => {
+            if (!vertex.value.isDrawn) return false;
+            if (vertex.value.element === '*') return false;
+            return true;
+        });
+
+        const wildcardCount = this.preprocessor.graph.vertices.filter((vertex) => vertex.value.element === '*').length;
+        if (wildcardCount < 2 || vertices.length < 2) {
+            return;
+        }
+
+        let minX = Number.MAX_VALUE;
+        let maxX = -Number.MAX_VALUE;
+        let minY = Number.MAX_VALUE;
+        let maxY = -Number.MAX_VALUE;
+
+        for (const vertex of vertices) {
+            minX = Math.min(minX, vertex.position.x);
+            maxX = Math.max(maxX, vertex.position.x);
+            minY = Math.min(minY, vertex.position.y);
+            maxY = Math.max(maxY, vertex.position.y);
+        }
+
+        // Use generous horizontal padding because text labels (e.g. H3C/CH3)
+        // extend beyond atom coordinates and would otherwise overlap brackets.
+        const labelPadding = this.opts.fontSizeLarge * 2.2;
+        const padX = this.opts.bondLength * 1.1 + labelPadding;
+        const padY = this.opts.bondLength * 0.5;
+        const leftX = minX - padX;
+        const rightX = maxX + padX;
+        const topY = minY - padY;
+        const bottomY = maxY + padY;
+        const arm = this.opts.bondLength * 0.35;
+
+        // Extend drawing bounds so brackets/text outside atom coordinates are not clipped.
+        this.svgWrapper.minX = Math.min(this.svgWrapper.minX, leftX - arm * 1.2);
+        this.svgWrapper.maxX = Math.max(this.svgWrapper.maxX, rightX + arm * 2.2);
+        this.svgWrapper.minY = Math.min(this.svgWrapper.minY, topY - arm * 0.8);
+        this.svgWrapper.maxY = Math.max(this.svgWrapper.maxY, bottomY + arm * 1.8);
+
+        const bracketLines = [
+            [new Vector2(leftX, topY), new Vector2(leftX + arm, topY)],
+            [new Vector2(leftX, topY), new Vector2(leftX, bottomY)],
+            [new Vector2(leftX, bottomY), new Vector2(leftX + arm, bottomY)],
+            [new Vector2(rightX - arm, topY), new Vector2(rightX, topY)],
+            [new Vector2(rightX, topY), new Vector2(rightX, bottomY)],
+            [new Vector2(rightX - arm, bottomY), new Vector2(rightX, bottomY)],
+        ];
+
+        for (const [start, end] of bracketLines) {
+            this.svgWrapper.drawLine(new Line(start, end, 'C', 'C'), false, null, 'square');
+        }
+
+        this.svgWrapper.drawAnnotationText(rightX + arm * 0.6, bottomY + arm * 0.9, 'n', 'start');
     }
 
     /**
@@ -199,6 +265,10 @@ export default class SvgDrawer {
             normals = preprocessor.getEdgeNormals(edge),
             // Create a point on each side of the line
             sides = ArrayHelper.clone(normals);
+
+        if (this.opts.polymerDisplayMode === 'bracket-n' && (elementA === '*' || elementB === '*')) {
+            return;
+        }
 
         sides[0].multiplyScalar(10).add(a);
         sides[1].multiplyScalar(10).add(a);
@@ -351,6 +421,9 @@ export default class SvgDrawer {
         for (let i = 0; i < graph.vertices.length; i++) {
             let vertex = graph.vertices[i];
             let atom = vertex.value;
+            if (opts.polymerDisplayMode === 'bracket-n' && atom.element === '*') {
+                continue;
+            }
             let charge = 0;
             let isotope = 0;
             let bondCount = vertex.value.bondCount;

@@ -33,6 +33,21 @@ function assertRendersToSVG(smiles) {
     expect(pp.graph.vertices.length).toBeGreaterThan(0);
 }
 
+function renderToSVG(smiles, options = {}) {
+    setupDOM();
+    const svg = dom.window.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttributeNS(null, 'id', 'test-svg');
+    dom.window.document.body.appendChild(svg);
+
+    const tree = Parser.parse(smiles);
+    expect(tree).toBeDefined();
+
+    const drawer = new SvgDrawer({isomeric: true, ...options});
+    drawer.draw(tree, svg, 'light', false);
+
+    return svg;
+}
+
 // Basic structural motifs one representative per category
 describe('Rendering: structural motifs', () => {
     const cases = [
@@ -95,4 +110,21 @@ describe('Rendering: complex molecules', () => {
     for (const [name, smiles] of cases) {
         it(`${name}: ${smiles}`, () => assertRendersToSVG(smiles));
     }
+});
+
+describe('Rendering: polymer repeat overlay', () => {
+    it('draws [ ]n overlay for wildcard endpoints', () => {
+        const svg = renderToSVG('[*]CC(C(=O)OC)[*]', {polymerDisplayMode: 'bracket-n'});
+
+        const textValues = Array.from(svg.querySelectorAll('text')).map((el) => el.textContent || '');
+        expect(textValues).toContain('n');
+        expect(textValues.some((value) => value.includes('*'))).toBe(false);
+    });
+
+    it('keeps wildcard markers when overlay is disabled', () => {
+        const svg = renderToSVG('[*]CC(C(=O)OC)[*]', {polymerDisplayMode: 'none'});
+
+        const textValues = Array.from(svg.querySelectorAll('text')).map((el) => el.textContent || '');
+        expect(textValues.some((value) => value.includes('*'))).toBe(true);
+    });
 });
