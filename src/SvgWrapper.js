@@ -654,6 +654,10 @@ export default class SvgWrapper {
         const pos  = (cmap == null) ? '#4d9221' : cmap[cmap.length - 1];
         const neg  = (cmap == null) ? '#c51b7d' : cmap[0];
 
+        // This uses a CSS blur because it's simple and because different browsers
+        // interpret feGaussianBlur's stdDeviation attribute differently (σ vs 2σ).
+        // TODO: Test this in other rendering engines, and if they can't handle it,
+        // add feGaussianBlur back as a fallback / configuration option.
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttributeNS(null, 'style', `filter:blur(${sigma / 2}px)`);
         this.backgroundItems.push(g);
