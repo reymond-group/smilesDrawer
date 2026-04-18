@@ -53,6 +53,7 @@ export default class DrawerBase {
             isomeric:                    true,
             debug:                       false,
             terminalCarbons:             false,
+            polymerDisplayMode:          'none',
             explicitHydrogens:           true,
             overlapSensitivity:          0.42,
             overlapResolutionIterations: 1,

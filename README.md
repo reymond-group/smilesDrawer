@@ -193,6 +193,7 @@ The following options are available:
 | Padding                                                         | padding                     | number                              | 20.0          |
 | Use experimental features                                       | experimental                | boolean                             | false         |
 | Show Terminal Carbons (CH3)                                     | terminalCarbons             | boolean                             | false         |
+| Polymer repeat-unit overlay for wildcard endpoints              | polymerDisplayMode          | string ['none', 'bracket-n']        | 'none'        |
 | Show explicit hydrogens                                         | explicitHydrogens           | boolean                             | false         |
 | Overlap sensitivity                                             | overlapSensitivity          | number                              | 0.42          |
 | # of overlap resolution iterations                              | overlapResolutionIterations | number                              | 1             |
@@ -215,6 +216,7 @@ The default options are defined as follows:
     isomeric: true,
     debug: false,
     terminalCarbons: false,
+    polymerDisplayMode: 'none',
     explicitHydrogens: false,
     overlapSensitivity: 0.42,
     overlapResolutionIterations: 1,
@@ -257,6 +259,8 @@ The default options are defined as follows:
     }
 };
 ```
+
+`polymerDisplayMode: 'bracket-n'` enables a display-only `[ ]n` overlay for strict repeat-endpoint patterns (exactly two wildcard `*` atoms, each terminal, SMILES starting with `*` on the parse-tree root, and ending the main chain with `*`). Other wildcard usages keep the default rendering. Example renders: [`readme/polymer/`](./readme/polymer/) (regenerate with `npm run figures:pr`).
 
 ### Usage
 

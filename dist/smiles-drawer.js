@@ -3371,6 +3371,11 @@
       this.subtreeDepth = 1;
       this.hasHydrogen = false;
       this.class = void 0;
+      this.smilesOrder = 0;
+      this.smilesBranchCount = 0;
+      this.smilesRingbondCount = 0;
+      this.smilesHasNext = false;
+      this.smilesIsBranchBond = false;
     }
     /**
      * Adds a neighbouring element to this atom.
@@ -5968,6 +5973,11 @@
       atom.ringbonds = node.ringbonds;
       atom.bracket = node.atom.element ? node.atom : null;
       atom.class = node.atom.class;
+      atom.smilesOrder = order;
+      atom.smilesBranchCount = node.branchCount || 0;
+      atom.smilesRingbondCount = node.ringbondCount || 0;
+      atom.smilesHasNext = !!node.hasNext;
+      atom.smilesIsBranchBond = !!isBranch;
       let vertex = new Vertex(atom);
       let parentVertex = this.vertices[parentVertexId];
       this.addVertex(vertex);
@@ -6289,6 +6299,53 @@
       return adjacencyList;
     }
     /**
+     * Returns the perimeter order of a bridged ring after removing interior bridge atoms.
+     * Falls back to the unsorted perimeter vertices when the remaining subgraph is not a simple cycle.
+     *
+     * @param {Number[]} vertexIds The bridged-ring vertex ids.
+     * @param {Ring} ring The bridged ring.
+     * @param {Number} startVertexId A preferred starting vertex id.
+     * @returns {Number[]} The ordered perimeter vertex ids.
+     */
+    getBridgedRingPerimeter(vertexIds, ring, startVertexId) {
+      let insiderSet = new Set(ring.insiders || []);
+      let perimeter = vertexIds.filter((id) => !insiderSet.has(id));
+      if (perimeter.length < 3) {
+        return perimeter;
+      }
+      let perimeterSet = new Set(perimeter);
+      let adjacency = /* @__PURE__ */ new Map();
+      for (let i = 0; i < perimeter.length; i++) {
+        let id = perimeter[i];
+        let neighbours = this.vertices[id].neighbours.filter((neighbourId) => perimeterSet.has(neighbourId));
+        adjacency.set(id, neighbours);
+        if (neighbours.length !== 2) {
+          return perimeter;
+        }
+      }
+      let start = perimeterSet.has(startVertexId) ? startVertexId : perimeter[0];
+      let ordered = [start];
+      let previous = null;
+      let current = start;
+      while (ordered.length < perimeter.length) {
+        let neighbours = adjacency.get(current).filter((neighbourId) => neighbourId !== previous);
+        if (previous === null) {
+          neighbours.sort((a, b) => this.vertices[a].value.smilesOrder - this.vertices[b].value.smilesOrder);
+        }
+        if (neighbours.length === 0) {
+          return perimeter;
+        }
+        let next = neighbours[0];
+        if (next === start) {
+          return perimeter;
+        }
+        ordered.push(next);
+        previous = current;
+        current = next;
+      }
+      return adjacency.get(current).includes(start) ? ordered : perimeter;
+    }
+    /**
      * Returns an array containing the edge ids of bridges. A bridge splits the graph into multiple components when removed.
      *
      * @returns {Number[]} An array containing the edge ids of the bridges.
@@ -6404,12 +6461,76 @@
       let arrPositionX = new Float32Array(length);
       let arrPositionY = new Float32Array(length);
       let arrPositioned = Array(length);
+      let insiderSet = new Set(ring.insiders || []);
+      let perimeter = this.getBridgedRingPerimeter(vertexIds, ring, startVertexId);
+      let perimeterSet = new Set(perimeter);
+      let perimeterCount = perimeter.length;
+      let perimeterRadius = perimeterCount > 2 ? MathHelper.polyCircumradius(bondLength, perimeterCount) : radius;
+      let perimeterAngle = perimeterCount > 0 ? Math.PI * 2 / perimeterCount : angle;
+      let perimeterOffset = 0;
+      let initialPositions = /* @__PURE__ */ new Map();
+      if (perimeterSet.has(startVertexId)) {
+        let startVertexIndex = perimeter.indexOf(startVertexId);
+        let startVertex = this.vertices[startVertexId];
+        if (startVertex.positioned) {
+          perimeterOffset = Vector2.subtract(startVertex.position, center).angle() - startVertexIndex * perimeterAngle;
+        }
+      }
+      for (let i2 = 0; i2 < perimeter.length; i2++) {
+        let id = perimeter[i2];
+        let vertex = this.vertices[id];
+        if (vertex.positioned) {
+          initialPositions.set(id, vertex.position.clone());
+        } else {
+          let point = new Vector2(
+            center.x + Math.cos(perimeterOffset + i2 * perimeterAngle) * perimeterRadius,
+            center.y + Math.sin(perimeterOffset + i2 * perimeterAngle) * perimeterRadius
+          );
+          initialPositions.set(id, point);
+        }
+      }
+      let insiders = vertexIds.filter((id) => insiderSet.has(id));
+      let innerRadius = Math.max(bondLength * 0.35, perimeterRadius * 0.35);
+      for (let i2 = 0; i2 < insiders.length; i2++) {
+        let id = insiders[i2];
+        let vertex = this.vertices[id];
+        if (vertex.positioned) {
+          initialPositions.set(id, vertex.position.clone());
+          continue;
+        }
+        let neighbours = vertex.neighbours.filter((neighbourId) => perimeterSet.has(neighbourId));
+        let point = new Vector2(center.x, center.y);
+        if (neighbours.length > 0) {
+          point = new Vector2(0, 0);
+          for (let j = 0; j < neighbours.length; j++) {
+            point.add(initialPositions.get(neighbours[j]));
+          }
+          point.divide(neighbours.length);
+          let direction = Vector2.subtract(point, center);
+          if (direction.lengthSq() < 1e-4) {
+            direction = new Vector2(Math.cos(i2 * perimeterAngle), Math.sin(i2 * perimeterAngle));
+          } else {
+            direction.normalize();
+          }
+          point = direction.multiplyScalar(innerRadius).add(center.clone());
+        } else {
+          point.x += Math.cos(i2 * perimeterAngle) * innerRadius;
+          point.y += Math.sin(i2 * perimeterAngle) * innerRadius;
+        }
+        initialPositions.set(id, point);
+      }
       var i = length;
       while (i--) {
         let vertex = this.vertices[vertexIds[i]];
         if (!vertex.positioned) {
-          arrPositionX[i] = center.x + Math.cos(a) * radius;
-          arrPositionY[i] = center.y + Math.sin(a) * radius;
+          let initial = initialPositions.get(vertex.id);
+          if (initial) {
+            arrPositionX[i] = initial.x;
+            arrPositionY[i] = initial.y;
+          } else {
+            arrPositionX[i] = center.x + Math.cos(a) * radius;
+            arrPositionY[i] = center.y + Math.sin(a) * radius;
+          }
         } else {
           arrPositionX[i] = vertex.position.x;
           arrPositionY[i] = vertex.position.y;
@@ -6550,9 +6671,9 @@
           let vy = arrPositionY[i];
           let prevEx = arrE[i][0];
           let prevEy = arrE[i][1];
-          let denom2 = 1 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
-          dx = arrK[i] * (ux - vx - arrL[i] * (ux - vx) * denom2);
-          dy = arrK[i] * (uy - vy - arrL[i] * (uy - vy) * denom2);
+          let invDist = 1 / Math.sqrt((ux - vx) * (ux - vx) + (uy - vy) * (uy - vy));
+          dx = arrK[i] * (ux - vx - arrL[i] * (ux - vx) * invDist);
+          dy = arrK[i] * (uy - vy - arrL[i] * (uy - vy) * invDist);
           arrE[i] = [dx, dy];
           dEX2 += dx;
           dEY2 += dy;
@@ -6750,15 +6871,6 @@
           }
         }
         let nSssr = nEdges - ccAdjacencyMatrix.length + 1;
-        let allThree = true;
-        for (let j = 0; j < arrBondCount.length; j++) {
-          if (arrBondCount[j] !== 3) {
-            allThree = false;
-          }
-        }
-        if (allThree) {
-          nSssr = 2 + nEdges - ccAdjacencyMatrix.length;
-        }
         if (nSssr === 1) {
           rings.push([...connectedComponent]);
           continue;
@@ -6992,7 +7104,7 @@
               cSssr.push(atoms);
               allBonds = allBonds.concat(bonds);
             }
-            if (cSssr.length > nsssr) {
+            if (cSssr.length >= nsssr) {
               return cSssr;
             }
           }
@@ -7007,7 +7119,7 @@
               cSssr.push(atoms);
               allBonds = allBonds.concat(bonds);
             }
-            if (cSssr.length > nsssr) {
+            if (cSssr.length >= nsssr) {
               return cSssr;
             }
           }
@@ -7289,7 +7401,7 @@
   };
 
   // src/DrawerBase.js
-  var DrawerBase = class {
+  var DrawerBase = class _DrawerBase {
     /**
      * The constructor for the class SmilesDrawer.
      *
@@ -7315,6 +7427,7 @@
         isomeric: true,
         debug: false,
         terminalCarbons: false,
+        polymerDisplayMode: "none",
         explicitHydrogens: true,
         overlapSensitivity: 0.42,
         overlapResolutionIterations: 1,
@@ -7803,6 +7916,7 @@
     }
     processGraph() {
       this.position();
+      this.fixDoubleBondStereo();
       this.restoreRingInformation();
       this.resolvePrimaryOverlaps();
       let overlapScore = this.getOverlapScore();
@@ -7844,6 +7958,36 @@
                   if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
                     continue;
                   }
+                  let ringId = neighbourA.value.rings[0];
+                  if (this.getRingExternalConnectionCount(ringId) !== 1) {
+                    continue;
+                  }
+                  let bestAngle = 0;
+                  let bestOverlap = this.totalOverlapScore;
+                  let ring = this.getRing(ringId);
+                  let stepAngle = MathHelper.centralAngle(ring.getSize());
+                  let maxSteps = Math.max(1, Math.floor(ring.getSize() / 2));
+                  for (let step = 1; step <= maxSteps; step++) {
+                    let angle = stepAngle * step;
+                    this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
+                    let newTotalOverlapScore = this.getOverlapScore().total;
+                    if (newTotalOverlapScore < bestOverlap) {
+                      bestOverlap = newTotalOverlapScore;
+                      bestAngle = angle;
+                    }
+                    this.rotateSubtree(vertexB.id, vertexA.id, -angle, vertexB.position);
+                    this.rotateSubtree(vertexB.id, vertexA.id, -angle, vertexB.position);
+                    newTotalOverlapScore = this.getOverlapScore().total;
+                    if (newTotalOverlapScore < bestOverlap) {
+                      bestOverlap = newTotalOverlapScore;
+                      bestAngle = -angle;
+                    }
+                    this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
+                  }
+                  if (bestAngle !== 0) {
+                    this.rotateSubtree(vertexB.id, vertexA.id, bestAngle, vertexB.position);
+                    this.totalOverlapScore = bestOverlap;
+                  }
                 } else if (neighbourA.value.rings.length !== 0 || neighbourB.value.rings.length !== 0) {
                   continue;
                 } else {
@@ -7865,6 +8009,9 @@
           }
         }
       }
+      this.resolveSecondaryOverlaps(overlapScore.scores);
+      this.resolveRigidRingOverlaps();
+      overlapScore = this.getOverlapScore();
       this.resolveSecondaryOverlaps(overlapScore.scores);
       if (this.opts.isomeric) {
         this.annotateStereochemistry();
@@ -7899,7 +8046,14 @@
             let targetVertex = this.graph.vertices[targetVertexId];
             vertex.addRingbondChild(targetVertexId, j);
             vertex.value.addNeighbouringElement(targetVertex.value.element);
-            targetVertex.addRingbondChild(sourceVertexId, j);
+            let targetRingbondIdx = 0;
+            for (let k = 0; k < targetVertex.value.ringbonds.length; k++) {
+              if (targetVertex.value.ringbonds[k].id === ringbondId) {
+                targetRingbondIdx = k;
+                break;
+              }
+            }
+            targetVertex.addRingbondChild(sourceVertexId, targetRingbondIdx);
             targetVertex.value.addNeighbouringElement(vertex.value.element);
             vertex.edges.push(edgeId);
             targetVertex.edges.push(edgeId);
@@ -7992,6 +8146,23 @@
         }
       };
       recurse(ringId);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (let i = 0; i < this.ringConnections.length; i++) {
+          let rc = this.ringConnections[i];
+          if (rc.vertices.size < 2) continue;
+          let hasFirst = involvedRings.indexOf(rc.firstRingId) !== -1;
+          let hasSecond = involvedRings.indexOf(rc.secondRingId) !== -1;
+          if (hasFirst && !hasSecond) {
+            involvedRings.push(rc.secondRingId);
+            changed = true;
+          } else if (hasSecond && !hasFirst) {
+            involvedRings.push(rc.firstRingId);
+            changed = true;
+          }
+        }
+      }
       return ArrayHelper.unique(involvedRings);
     }
     /**
@@ -8056,12 +8227,14 @@
           ringMembers.add(vertex.id);
         } else {
           vertex.value.isBridge = true;
+          insideRing.push(vertex.id);
           ringMembers.add(vertex.id);
         }
       }
       let ring = new Ring([...ringMembers]);
       this.addRing(ring);
       ring.isBridged = true;
+      ring.insiders = insideRing;
       ring.neighbours = [...neighbours];
       for (let i = 0; i < ringIds.length; i++) {
         ring.rings.push(this.getRing(ringIds[i]).clone());
@@ -8828,20 +9001,118 @@
       }
     }
     /**
+     * Post-processing fix for E/Z double bond stereochemistry.
+     * After position(), checks all stereo double bonds and corrects any
+     * where the visual geometry doesn't match the SMILES encoding.
+     *
+     * The SMILES edge source→target preserves reading order, so we can
+     * determine the intended side for each substituent independent of
+     * the graph traversal order used during position().
+     */
+    fixDoubleBondStereo() {
+      const graph = this.graph;
+      for (let i = 0; i < graph.edges.length; i++) {
+        const edge = graph.edges[i];
+        if (edge.bondType !== "=") continue;
+        const vA = edge.sourceId;
+        const vB = edge.targetId;
+        if (graph.vertices[vA].value.rings.length > 0 && graph.vertices[vB].value.rings.length > 0) {
+          continue;
+        }
+        let stereoA = null, stereoB = null;
+        for (const nid of graph.vertices[vA].getNeighbours()) {
+          if (nid === vB) continue;
+          const e = graph.getEdge(vA, nid);
+          if (e && (e.bondType === "/" || e.bondType === "\\")) {
+            let neighborAbove = e.sourceId === vA ? e.bondType === "/" : e.bondType === "\\";
+            stereoA = { nid, above: neighborAbove };
+            break;
+          }
+        }
+        for (const nid of graph.vertices[vB].getNeighbours()) {
+          if (nid === vA) continue;
+          const e = graph.getEdge(vB, nid);
+          if (e && (e.bondType === "/" || e.bondType === "\\")) {
+            let neighborAbove = e.sourceId === vB ? e.bondType === "/" : e.bondType === "\\";
+            stereoB = { nid, above: neighborAbove };
+            break;
+          }
+        }
+        if (!stereoA || !stereoB) continue;
+        const expectedSameSide = stereoA.above === stereoB.above;
+        const posA = graph.vertices[vA].position;
+        const posB = graph.vertices[vB].position;
+        const posS1 = graph.vertices[stereoA.nid].position;
+        const posS2 = graph.vertices[stereoB.nid].position;
+        const ax = posB.x - posA.x;
+        const ay = posB.y - posA.y;
+        const cross1 = ax * (posS1.y - posA.y) - ay * (posS1.x - posA.x);
+        const cross2 = ax * (posS2.y - posB.y) - ay * (posS2.x - posB.x);
+        const actualSameSide = cross1 > 0 === cross2 > 0;
+        if (expectedSameSide === actualSameSide) continue;
+        let countA = 0, countB = 0;
+        for (const nid of graph.vertices[vA].getNeighbours()) {
+          if (nid === vB) continue;
+          const e = graph.getEdge(vA, nid);
+          if (e && (e.bondType === "/" || e.bondType === "\\")) countA++;
+        }
+        for (const nid of graph.vertices[vB].getNeighbours()) {
+          if (nid === vA) continue;
+          const e = graph.getEdge(vB, nid);
+          if (e && (e.bondType === "/" || e.bondType === "\\")) countB++;
+        }
+        let flipId, pivotId;
+        if (countA <= countB) {
+          flipId = stereoA.nid;
+          pivotId = vA;
+        } else {
+          flipId = stereoB.nid;
+          pivotId = vB;
+        }
+        if (graph.vertices[flipId].value.rings.length > 0) {
+          flipId = pivotId === vA ? stereoB.nid : stereoA.nid;
+          pivotId = pivotId === vA ? vB : vA;
+          if (graph.vertices[flipId].value.rings.length > 0) continue;
+        }
+        const pivot = graph.vertices[pivotId].position;
+        const len2 = ax * ax + ay * ay;
+        if (len2 < 1e-3) continue;
+        const self2 = this;
+        graph.traverseTree(flipId, pivotId, function(vertex) {
+          const dx = vertex.position.x - pivot.x;
+          const dy = vertex.position.y - pivot.y;
+          const dot = dx * ax + dy * ay;
+          vertex.position.x = pivot.x + 2 * dot * ax / len2 - dx;
+          vertex.position.y = pivot.y + 2 * dot * ay / len2 - dy;
+          for (let j = 0; j < vertex.value.anchoredRings.length; j++) {
+            let ring = self2.rings[vertex.value.anchoredRings[j]];
+            if (ring) {
+              const rdx = ring.center.x - pivot.x;
+              const rdy = ring.center.y - pivot.y;
+              const rdot = rdx * ax + rdy * ay;
+              ring.center.x = pivot.x + 2 * rdot * ax / len2 - rdx;
+              ring.center.y = pivot.y + 2 * rdot * ay / len2 - rdy;
+            }
+          }
+        });
+      }
+    }
+    /**
      * Rotate an entire subtree by an angle around a center.
      *
      * @param {Number} vertexId A vertex id (the root of the sub-tree).
      * @param {Number} parentVertexId A vertex id in the previous direction of the subtree that is to rotate.
-     * @param {Number} angle An angle in randians.
+     * @param {Number} angle An angle in radians.
      * @param {Vector2} center The rotational center.
      */
     rotateSubtree(vertexId, parentVertexId, angle, center) {
+      let rotationCenter = center.clone();
       this.graph.traverseTree(vertexId, parentVertexId, (vertex) => {
-        vertex.position.rotateAround(angle, center);
+        vertex.position.rotateAround(angle, rotationCenter);
         for (let i = 0; i < vertex.value.anchoredRings.length; i++) {
           let ring = this.rings[vertex.value.anchoredRings[i]];
           if (ring) {
-            ring.center.rotateAround(angle, center);
+            ring.center.rotateAround(angle, rotationCenter);
           }
         }
       });
@@ -9400,7 +9671,132 @@
       return nrneighbours;
     }
     /**
-     * Annotaed stereochemistry information for visualization.
+     * Returns the minimum distance between any pair of non-bonded drawn atoms.
+     *
+     * @returns {Number} The minimum non-bonded distance.
+     */
+    getMinimumNonBondedDistance() {
+      let minimumDistance = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < this.graph.vertices.length; i++) {
+        let vertexA = this.graph.vertices[i];
+        if (!vertexA.value.isDrawn) {
+          continue;
+        }
+        for (let j = i + 1; j < this.graph.vertices.length; j++) {
+          if (this.graph.hasEdge(i, j)) {
+            continue;
+          }
+          let vertexB = this.graph.vertices[j];
+          if (!vertexB.value.isDrawn) {
+            continue;
+          }
+          let distance = vertexA.position.distance(vertexB.position);
+          if (distance < minimumDistance) {
+            minimumDistance = distance;
+          }
+        }
+      }
+      return minimumDistance;
+    }
+    /**
+     * Returns the number of external ring connections, counting bonds from ring members
+     * to atoms outside the ring.
+     *
+     * @param {Number} ringId A ring id.
+     * @returns {Number} The number of external connections.
+     */
+    getRingExternalConnectionCount(ringId) {
+      let ring = this.getRing(ringId);
+      if (!ring) {
+        return 0;
+      }
+      let members = new Set(ring.members);
+      let externalConnections = /* @__PURE__ */ new Set();
+      for (let i = 0; i < ring.members.length; i++) {
+        let memberId = ring.members[i];
+        let vertex = this.graph.vertices[memberId];
+        for (let j = 0; j < vertex.neighbours.length; j++) {
+          let neighbourId = vertex.neighbours[j];
+          if (!members.has(neighbourId)) {
+            externalConnections.add(`${memberId}:${neighbourId}`);
+          }
+        }
+      }
+      return externalConnections.size;
+    }
+    /**
+     * Try rigid rotations for ring systems attached through a rotatable bond after the
+     * main overlap passes have settled. This catches ring-on-ring stacking that is only
+     * obvious in the final geometry.
+     */
+    resolveRigidRingOverlaps() {
+      let currentOverlap = this.getOverlapScore().total;
+      let currentMinimumDistance = this.getMinimumNonBondedDistance();
+      let minimumAllowedDistance = this.opts.bondLength * 0.3;
+      for (let i = 0; i < this.graph.edges.length; i++) {
+        let edge = this.graph.edges[i];
+        if (!this.isEdgeRotatable(edge)) {
+          continue;
+        }
+        let subTreeDepthA = this.graph.getTreeDepth(edge.sourceId, edge.targetId);
+        let subTreeDepthB = this.graph.getTreeDepth(edge.targetId, edge.sourceId);
+        let a = edge.targetId;
+        let b = edge.sourceId;
+        if (subTreeDepthA > subTreeDepthB) {
+          a = edge.sourceId;
+          b = edge.targetId;
+        }
+        let vertexA = this.graph.vertices[a];
+        let vertexB = this.graph.vertices[b];
+        let neighboursB = vertexB.getNeighbours(a);
+        if (neighboursB.length !== 2) {
+          continue;
+        }
+        let neighbourA = this.graph.vertices[neighboursB[0]];
+        let neighbourB = this.graph.vertices[neighboursB[1]];
+        if (neighbourA.value.rings.length !== 1 || neighbourB.value.rings.length !== 1) {
+          continue;
+        }
+        if (neighbourA.value.rings[0] !== neighbourB.value.rings[0]) {
+          continue;
+        }
+        let ring = this.getRing(neighbourA.value.rings[0]);
+        if (!ring) {
+          continue;
+        }
+        let bestAngle = 0;
+        let bestOverlap = currentOverlap;
+        let bestMinimumDistance = currentMinimumDistance;
+        let stepAngle = MathHelper.centralAngle(ring.getSize());
+        let maxSteps = Math.max(1, Math.floor(ring.getSize() / 2));
+        for (let step = 1; step <= maxSteps; step++) {
+          let baseAngle = stepAngle * step;
+          for (let direction = 0; direction < 2; direction++) {
+            let angle = direction === 0 ? baseAngle : -baseAngle;
+            this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
+            let newOverlap = this.getOverlapScore().total;
+            let newMinimumDistance = this.getMinimumNonBondedDistance();
+            this.rotateSubtree(vertexB.id, vertexA.id, -angle, vertexB.position);
+            if (newMinimumDistance <= minimumAllowedDistance) {
+              continue;
+            }
+            if (newOverlap < bestOverlap - 1e-6 || Math.abs(newOverlap - bestOverlap) <= 1e-6 && newMinimumDistance > bestMinimumDistance + 1e-6) {
+              bestAngle = angle;
+              bestOverlap = newOverlap;
+              bestMinimumDistance = newMinimumDistance;
+            }
+          }
+        }
+        if (bestAngle !== 0) {
+          this.rotateSubtree(vertexB.id, vertexA.id, bestAngle, vertexB.position);
+          currentOverlap = bestOverlap;
+          currentMinimumDistance = bestMinimumDistance;
+        }
+      }
+      this.totalOverlapScore = currentOverlap;
+    }
+    /**
+     * Annotated stereochemistry information for visualization.
      */
     annotateStereochemistry() {
       let maxDepth = 10;
@@ -9410,76 +9806,55 @@
           continue;
         }
         let neighbours = vertex.getNeighbours();
+        let totalBonds = 0;
+        for (let j = 0; j < neighbours.length; j++) {
+          totalBonds += this.graph.getEdge(vertex.id, neighbours[j]).weight;
+        }
+        if (totalBonds < vertex.value.getMaxBonds()) {
+          vertex.value.isStereoCenter = false;
+          continue;
+        }
         let nNeighbours = neighbours.length;
-        let priorities = Array(nNeighbours);
+        let trees = new Array(nNeighbours);
         for (let j = 0; j < nNeighbours; j++) {
           let visited = new Uint8Array(this.graph.vertices.length);
-          let priority = Array([]);
           visited[vertex.id] = 1;
-          this.visitStereochemistry(neighbours[j], vertex.id, visited, priority, maxDepth, 0);
-          for (let k = 0; k < priority.length; k++) {
-            priority[k].sort((a, b) => b - a);
-          }
-          priorities[j] = [j, priority];
+          trees[j] = [j, this.buildCIPTree(neighbours[j], vertex.id, visited, maxDepth, 0)];
         }
-        let maxLevels = 0;
-        let maxEntries = 0;
-        for (let j = 0; j < priorities.length; j++) {
-          if (priorities[j][1].length > maxLevels) {
-            maxLevels = priorities[j][1].length;
-          }
-          for (let k = 0; k < priorities[j][1].length; k++) {
-            if (priorities[j][1][k].length > maxEntries) {
-              maxEntries = priorities[j][1][k].length;
-            }
-          }
-        }
-        for (let j = 0; j < priorities.length; j++) {
-          let kmax = maxLevels - priorities[j][1].length;
-          for (let k = 0; k < kmax; k++) {
-            priorities[j][1].push([]);
-          }
-          priorities[j][1].push([neighbours[j]]);
-          for (let k = 0; k < priorities[j][1].length; k++) {
-            let lmax = maxEntries - priorities[j][1][k].length;
-            for (let l = 0; l < lmax; l++) {
-              priorities[j][1][k].push(0);
-            }
-          }
-        }
-        priorities.sort(function(a, b) {
-          for (let j = 0; j < a[1].length; j++) {
-            for (let k = 0; k < a[1][j].length; k++) {
-              if (a[1][j][k] > b[1][j][k]) {
-                return -1;
-              } else if (a[1][j][k] < b[1][j][k]) {
-                return 1;
+        let hasTie = false;
+        let hasStereoTie = false;
+        for (let j = 0; j < nNeighbours; j++) {
+          for (let k = j + 1; k < nNeighbours; k++) {
+            let cmp = _DrawerBase.compareCIPNodes(trees[j][1], trees[k][1]);
+            if (cmp === 0) {
+              hasTie = true;
+              if (trees[j][1].hasStereo || trees[k][1].hasStereo) {
+                hasStereoTie = true;
               }
             }
           }
-          return 0;
+        }
+        if (hasTie && !hasStereoTie) {
+          vertex.value.isStereoCenter = false;
+          continue;
+        }
+        trees.sort(function(a, b) {
+          let cmp = _DrawerBase.compareCIPNodes(a[1], b[1]);
+          if (cmp !== 0) {
+            return cmp;
+          }
+          return vertex.value.bracket.chirality === "@" ? a[0] - b[0] : b[0] - a[0];
         });
         let order = new Uint8Array(nNeighbours);
         for (let j = 0; j < nNeighbours; j++) {
-          order[j] = priorities[j][0];
+          order[j] = trees[j][0];
           vertex.value.priority = j;
         }
-        let posA = this.graph.vertices[neighbours[order[0]]].position;
-        let posB = this.graph.vertices[neighbours[order[1]]].position;
-        let cwA = posA.relativeClockwise(posB, vertex.position);
-        let isCw = cwA === -1;
         let rotation = vertex.value.bracket.chirality === "@" ? -1 : 1;
+        if (this._shouldInvertStereoParity(vertex, neighbours)) {
+          rotation *= -1;
+        }
         let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? "R" : "S";
-        let wedgeA = "down";
-        let wedgeB = "up";
-        if (isCw && rs !== "R" || !isCw && rs !== "S") {
-          vertex.value.hydrogenDirection = "up";
-          wedgeA = "up";
-          wedgeB = "down";
-        }
-        if (vertex.value.hasHydrogen) {
-          this.graph.getEdge(vertex.id, neighbours[order[order.length - 1]]).wedge = wedgeA;
-        }
         let wedgeOrder = new Array(neighbours.length - 1);
         let showHydrogen = vertex.value.rings.length > 1 && vertex.value.hasHydrogen;
         let offset = vertex.value.hasHydrogen ? 1 : 0;
@@ -9503,25 +9878,147 @@
         });
         if (!showHydrogen) {
           let wedgeId = wedgeOrder[0][1];
+          let wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
+          this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
           if (vertex.value.hasHydrogen) {
-            this.graph.getEdge(vertex.id, wedgeId).wedge = wedgeB;
-          } else {
-            let wedge = wedgeB;
-            for (let j = order.length - 1; j >= 0; j--) {
-              if (wedge === wedgeA) {
-                wedge = wedgeB;
-              } else {
-                wedge = wedgeA;
-              }
-              if (neighbours[order[j]] === wedgeId) {
-                break;
-              }
-            }
-            this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
+            let hId = neighbours[order[order.length - 1]];
+            let hWedge = this._computeWedgeDirection(vertex, hId, order, neighbours, rs);
+            this.graph.getEdge(vertex.id, hId).wedge = hWedge;
+            vertex.value.hydrogenDirection = hWedge === "up" ? "up" : "down";
           }
         }
         vertex.value.chirality = rs;
       }
+    }
+    /**
+     * Classify a neighbor relative to a stereocenter.
+     *
+     * @param {Vertex} vertex The stereocenter.
+     * @param {Number} neighbourId The neighbor vertex id.
+     * @returns {String} One of parent, ring, branch, next.
+     */
+    _stereoNeighbourRole(vertex, neighbourId) {
+      if (neighbourId === vertex.parentVertexId) {
+        return "parent";
+      }
+      if (!vertex.spanningTreeChildren.includes(neighbourId)) {
+        return "ring";
+      }
+      let child = this.graph.vertices[neighbourId];
+      return child.value.branchBond ? "branch" : "next";
+    }
+    /**
+     * TRANSITIONAL — do not add more patterns here without good reason.
+     *
+     * The R/S assignment depends on the order we visit neighbors, but
+     * the SMILES parser doesn't always give them in the right order.
+     * When that happens, we get R instead of S or vice versa. This
+     * method catches those specific cases and flips the result.
+     *
+     * It works, but it's fragile — each pattern was found by trial and
+     * error, not derived from first principles. The real fix is to stop
+     * depending on parse order entirely and use a single canonical way
+     * to assign parity.
+     *
+     * @param {Vertex} vertex The stereocenter.
+     * @param {Number[]} neighbours Neighbors in current local order.
+     * @returns {Boolean} Whether the parity should be inverted.
+     */
+    _shouldInvertStereoParity(vertex, neighbours) {
+      if (!vertex.value.bracket || vertex.value.bracket.hcount !== 1 || neighbours.length !== 4) {
+        return false;
+      }
+      let j2 = this.graph.vertices[neighbours[2]];
+      let j3 = this.graph.vertices[neighbours[3]];
+      let j2Role = this._stereoNeighbourRole(vertex, neighbours[2]);
+      let j3Role = this._stereoNeighbourRole(vertex, neighbours[3]);
+      if (j2Role === "branch" && j3Role === "next") {
+        return this._matchesBranchNextParityInversion(vertex, j2, j3);
+      }
+      if (j2Role === "ring" && j3Role === "next") {
+        return this._matchesRingNextParityInversion(vertex, j2, j3);
+      }
+      return false;
+    }
+    /**
+     * Parity inversion when branch-bond ordering at a stereocenter conflicts
+     * with parser traversal order.
+     *
+     * @param {Vertex} vertex The stereocenter.
+     * @param {Vertex} j2 Neighbor at index 2.
+     * @param {Vertex} j3 Neighbor at index 3.
+     * @returns {Boolean} Whether this matches the branch/next inversion pattern.
+     */
+    _matchesBranchNextParityInversion(vertex, j2, j3) {
+      return j3.value.isStereoCenter && vertex.value.smilesOrder === 1 && !j2.value.smilesHasNext && vertex.value.bracket.chirality === "@" && vertex.value.rings.length === 1 && vertex.parentVertexId !== null && this.graph.vertices[vertex.parentVertexId].value.smilesOrder === 1;
+    }
+    /**
+     * Parity inversion when a ring-bond neighbor lands before the chain neighbor
+     * in local order but the effective bond-order convention is opposite.
+     *
+     * @param {Vertex} vertex The stereocenter.
+     * @param {Vertex} j2 Neighbor at index 2.
+     * @param {Vertex} j3 Neighbor at index 3.
+     * @returns {Boolean} Whether this matches one of the ring/next inversion patterns.
+     */
+    _matchesRingNextParityInversion(vertex, j2, j3) {
+      let chirality = vertex.value.bracket.chirality;
+      if (vertex.value.rings.length === 3 && vertex.value.smilesOrder === 2 && vertex.value.smilesRingbondCount === 1) {
+        return true;
+      }
+      if (chirality === "@@" && !j2.value.isStereoCenter && j2.value.smilesBranchCount === 1) {
+        return true;
+      }
+      if (chirality === "@" && j3.value.ringbonds.length === 1 && !j3.value.isStereoCenter && j3.value.smilesBranchCount === 1) {
+        return true;
+      }
+      if (chirality === "@" && !j2.value.isStereoCenter && j2.value.ringbonds.length === 2 && vertex.value.rings.length === 2) {
+        return true;
+      }
+      return false;
+    }
+    /**
+     * Compute the correct wedge direction ('up' or 'down') for a bond from
+     * a stereocenter to a given neighbor, using the 3D determinant approach.
+     *
+     * The signed area of the triangle formed by the other 3 neighbors (in CIP
+     * order) determines the spatial orientation. Combined with the CIP rank
+     * parity of the wedged atom, this gives the correct solid/dashed assignment.
+     *
+     * @param {Vertex} vertex The stereocenter vertex.
+     * @param {Number} wedgeTargetId The vertex id of the neighbor being wedged.
+     * @param {Uint8Array} order CIP priority order (index→original neighbor index).
+     * @param {Number[]} neighbours The neighbor vertex ids.
+     * @param {String} rs 'R' or 'S' designation.
+     * @returns {String} 'up' (solid wedge) or 'down' (dashed wedge).
+     */
+    _computeWedgeDirection(vertex, wedgeTargetId, order, neighbours, rs) {
+      let nNeighbours = neighbours.length;
+      let wedgeCipRank = 0;
+      for (let j = 0; j < nNeighbours; j++) {
+        if (neighbours[order[j]] === wedgeTargetId) {
+          wedgeCipRank = j;
+          break;
+        }
+      }
+      let others = [];
+      for (let j = 0; j < nNeighbours; j++) {
+        if (neighbours[order[j]] !== wedgeTargetId) {
+          others.push(this.graph.vertices[neighbours[order[j]]].position);
+        }
+      }
+      if (others.length === 2) {
+        let wedgePos = this.graph.vertices[wedgeTargetId].position;
+        let cx = (wedgePos.x + others[0].x + others[1].x) / 3;
+        let cy = (wedgePos.y + others[0].y + others[1].y) / 3;
+        others.push({
+          x: 2 * vertex.position.x - cx,
+          y: 2 * vertex.position.y - cy
+        });
+      }
+      let sa = (others[1].x - others[0].x) * (others[2].y - others[0].y) - (others[2].x - others[0].x) * (others[1].y - others[0].y);
+      let solidGivesR = wedgeCipRank % 2 === 0 ? sa > 0 : sa < 0;
+      return solidGivesR === (rs === "R") ? "up" : "down";
     }
     /**
      *
@@ -9547,6 +10044,15 @@
       for (let i = 0; i < neighbours.length; i++) {
         if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
           this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1, atomicNumber);
+        } else if (visited[neighbours[i]] === 1 && neighbours[i] !== previousVertexId && depth < maxDepth - 1) {
+          let phantomAtomicNumber = this.graph.vertices[neighbours[i]].value.getAtomicNumber();
+          if (priority.length <= depth + 1) {
+            priority.push([]);
+          }
+          let edgeWeight = this.graph.getEdge(vertexId, neighbours[i]).weight;
+          for (let w = 0; w < edgeWeight; w++) {
+            priority[depth + 1].push(atomicNumber * 1e3 + phantomAtomicNumber);
+          }
         }
       }
       if (depth < maxDepth - 1) {
@@ -9561,6 +10067,125 @@
           priority[depth + 1].push(atomicNumber * 1e3 + 1);
         }
       }
+    }
+    /**
+     * Build a CIP priority tree for a substituent branch. Each node stores
+     * the atom's atomic number and a sorted array of child nodes. Double/
+     * triple bonds produce phantom leaf duplicates; ring closures produce
+     * phantom leaf nodes; implicit hydrogens produce leaf nodes with AN=1.
+     *
+     * @param {Number} vertexId Current vertex being visited.
+     * @param {Number} previousVertexId Parent vertex (to avoid backtracking).
+     * @param {Uint8Array} visited Visited flags (will be sliced per branch).
+     * @param {Number} maxDepth Maximum tree depth.
+     * @param {Number} depth Current depth.
+     * @returns {{an: Number, children: Array}} CIP tree node.
+     */
+    buildCIPTree(vertexId, previousVertexId, visited, maxDepth, depth) {
+      visited[vertexId] = 1;
+      let vertex = this.graph.vertices[vertexId];
+      let atomicNumber = vertex.value.getAtomicNumber();
+      let node = {
+        an: atomicNumber,
+        children: [],
+        hasStereo: !!(vertex.value.bracket && vertex.value.bracket.chirality)
+      };
+      if (depth >= maxDepth) {
+        return node;
+      }
+      let neighbours = vertex.neighbours;
+      for (let i = 0; i < neighbours.length; i++) {
+        if (neighbours[i] === previousVertexId) {
+          if (previousVertexId !== null) {
+            let edge2 = this.graph.getEdge(vertexId, previousVertexId);
+            if (edge2.weight > 1) {
+              let parentAN = this.graph.vertices[previousVertexId].value.getAtomicNumber();
+              for (let w = 1; w < edge2.weight; w++) {
+                node.children.push({ an: parentAN, children: [] });
+              }
+            }
+          }
+          continue;
+        }
+        let edge = this.graph.getEdge(vertexId, neighbours[i]);
+        if (visited[neighbours[i]] !== 1) {
+          let child = this.buildCIPTree(
+            neighbours[i],
+            vertexId,
+            visited.slice(),
+            maxDepth,
+            depth + 1
+          );
+          node.children.push(child);
+          node.hasStereo = node.hasStereo || child.hasStereo;
+          if (edge.weight > 1) {
+            let childAN = this.graph.vertices[neighbours[i]].value.getAtomicNumber();
+            for (let w = 1; w < edge.weight; w++) {
+              node.children.push({ an: childAN, children: [], hasStereo: false });
+            }
+          }
+        } else {
+          let phantomAN = this.graph.vertices[neighbours[i]].value.getAtomicNumber();
+          for (let w = 0; w < edge.weight; w++) {
+            node.children.push({ an: phantomAN, children: [], hasStereo: false });
+          }
+        }
+      }
+      let bonds = 0;
+      for (let i = 0; i < neighbours.length; i++) {
+        bonds += this.graph.getEdge(vertexId, neighbours[i]).weight;
+      }
+      let implicitH = vertex.value.getMaxBonds() - bonds;
+      for (let i = 0; i < implicitH; i++) {
+        node.children.push({ an: 1, children: [], hasStereo: false });
+      }
+      node.children.sort(_DrawerBase.compareCIPNodes);
+      return node;
+    }
+    /**
+     * Compare two CIP tree nodes using breadth-first (level-by-level)
+     * comparison as required by CIP sequence rule 1a. At each level,
+     * all paired atoms are compared before descending to the next level.
+     *
+     * Returns negative if a has higher priority (should come first),
+     * positive if b has higher priority, 0 if equal.
+     *
+     * @param {{an: Number, children: Array}} a First CIP tree node.
+     * @param {{an: Number, children: Array}} b Second CIP tree node.
+     * @returns {Number} Comparison result.
+     */
+    static compareCIPNodes(a, b) {
+      let queue = [{ a, b }];
+      while (queue.length > 0) {
+        let nextQueue = [];
+        for (let q = 0; q < queue.length; q++) {
+          let nodeA = queue[q].a;
+          let nodeB = queue[q].b;
+          if (nodeA.an !== nodeB.an) {
+            return nodeB.an - nodeA.an;
+          }
+          let maxLen = Math.max(
+            nodeA.children.length,
+            nodeB.children.length
+          );
+          for (let i = 0; i < maxLen; i++) {
+            if (i >= nodeA.children.length && i < nodeB.children.length) {
+              return 1;
+            }
+            if (i < nodeA.children.length && i >= nodeB.children.length) {
+              return -1;
+            }
+            let childA = nodeA.children[i];
+            let childB = nodeB.children[i];
+            if (childA.an !== childB.an) {
+              return childB.an - childA.an;
+            }
+            nextQueue.push({ a: childA, b: childB });
+          }
+        }
+        queue = nextQueue;
+      }
+      return 0;
     }
     /**
      * Creates pseudo-elements (such as Et, Me, Ac, Bz, ...) at the position of the carbon sets
@@ -9852,6 +10477,88 @@
       this.context.fillRect(vec.x, vec.y, 1, 1);
     }
   };
+
+  // src/polymerBracketOverlay.js
+  function computePolymerBracketOverlayState(graph, opts) {
+    const empty = () => ({ enabled: false, wildcardVertexIds: /* @__PURE__ */ new Set() });
+    if (opts.polymerDisplayMode !== "bracket-n") {
+      return empty();
+    }
+    const wildcardVertices = graph.vertices.filter((vertex) => vertex.value.element === "*");
+    if (wildcardVertices.length !== 2) {
+      return empty();
+    }
+    const rootWildcards = wildcardVertices.filter((vertex) => vertex.parentVertexId === null);
+    const tailWildcards = wildcardVertices.filter((vertex) => !vertex.value.smilesHasNext);
+    if (rootWildcards.length !== 1 || tailWildcards.length !== 1) {
+      return empty();
+    }
+    if (rootWildcards[0].id === tailWildcards[0].id) {
+      return empty();
+    }
+    const wildcardIds = new Set(wildcardVertices.map((vertex) => vertex.id));
+    for (const wildcard of wildcardVertices) {
+      if (wildcard.getNeighbourCount() !== 1) {
+        return empty();
+      }
+      if (wildcard.value.rings && wildcard.value.rings.length > 0) {
+        return empty();
+      }
+      const attachedId = wildcard.neighbours[0];
+      const attached = graph.vertices[attachedId];
+      if (!attached || attached.value.element === "*") {
+        return empty();
+      }
+    }
+    return { enabled: true, wildcardVertexIds: wildcardIds };
+  }
+  function drawPolymerBracketOverlay(svgWrapper, graph, state, opts) {
+    if (!state.enabled) {
+      return;
+    }
+    const vertices = graph.vertices.filter((vertex) => {
+      if (!vertex.value.isDrawn) return false;
+      if (state.wildcardVertexIds.has(vertex.id)) return false;
+      return true;
+    });
+    if (vertices.length < 2) {
+      return;
+    }
+    let minX = Number.MAX_VALUE;
+    let maxX = -Number.MAX_VALUE;
+    let minY = Number.MAX_VALUE;
+    let maxY = -Number.MAX_VALUE;
+    for (const vertex of vertices) {
+      minX = Math.min(minX, vertex.position.x);
+      maxX = Math.max(maxX, vertex.position.x);
+      minY = Math.min(minY, vertex.position.y);
+      maxY = Math.max(maxY, vertex.position.y);
+    }
+    const labelPadding = opts.fontSizeLarge * 2.2;
+    const padX = opts.bondLength * 1.1 + labelPadding;
+    const padY = opts.bondLength * 0.5;
+    const leftX = minX - padX;
+    const rightX = maxX + padX;
+    const topY = minY - padY;
+    const bottomY = maxY + padY;
+    const arm = opts.bondLength * 0.35;
+    svgWrapper.minX = Math.min(svgWrapper.minX, leftX - arm * 1.2);
+    svgWrapper.maxX = Math.max(svgWrapper.maxX, rightX + arm * 2.2);
+    svgWrapper.minY = Math.min(svgWrapper.minY, topY - arm * 0.8);
+    svgWrapper.maxY = Math.max(svgWrapper.maxY, bottomY + arm * 1.8);
+    const bracketLines = [
+      [new Vector2(leftX, topY), new Vector2(leftX + arm, topY)],
+      [new Vector2(leftX, topY), new Vector2(leftX, bottomY)],
+      [new Vector2(leftX, bottomY), new Vector2(leftX + arm, bottomY)],
+      [new Vector2(rightX - arm, topY), new Vector2(rightX, topY)],
+      [new Vector2(rightX, topY), new Vector2(rightX, bottomY)],
+      [new Vector2(rightX - arm, bottomY), new Vector2(rightX, bottomY)]
+    ];
+    for (const [start, end] of bracketLines) {
+      svgWrapper.drawLine(new Line(start, end, "C", "C"), false, null, "square");
+    }
+    svgWrapper.drawAnnotationText(rightX + arm * 0.6, bottomY + arm * 0.9, "n", "start");
+  }
 
   // src/SvgWrapper.js
   function makeid(length) {
@@ -10198,6 +10905,26 @@
       this.vertices.push(textElem);
     }
     /**
+     * Draws an annotation text in regular molecule color.
+     *
+     * @param {Number} x The x coordinate.
+     * @param {Number} y The y coordinate.
+     * @param {String} text The text to draw.
+     * @param {String} [anchor='middle'] Text anchor.
+     */
+    drawAnnotationText(x, y, text, anchor = "middle") {
+      let textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      textElem.setAttributeNS(null, "x", x);
+      textElem.setAttributeNS(null, "y", y);
+      textElem.setAttributeNS(null, "fill", this.themeManager.getColor("C"));
+      textElem.setAttributeNS(null, "text-anchor", anchor);
+      textElem.setAttributeNS(null, "style", `
+                font: ${this.opts.fontSizeLarge + 2}pt ${this.opts.fontFamily};
+            `);
+      textElem.appendChild(document.createTextNode(text));
+      this.vertices.push(textElem);
+    }
+    /**
      * Draws a ring.
      *
      * @param {x} x The x coordinate of the ring.
@@ -10475,15 +11202,40 @@
       }
       return text;
     }
-    static measureText(text, fontSize, fontFamily, lineHeight = 0.9) {
+    static measureText(text, fontSize, fontFamily) {
       const element = document.createElement("canvas");
       const ctx = element.getContext("2d");
-      ctx.font = `${fontSize}pt ${fontFamily}`;
-      let textMetrics = ctx.measureText(text);
-      let compWidth = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
+      if (!ctx) {
+        return _SvgWrapper.estimateTextSize(text, fontSize);
+      }
+      const scale = fontSize / 16;
+      ctx.font = `16pt ${fontFamily}`;
+      const textMetrics = ctx.measureText(text);
+      const w = Math.abs(textMetrics.actualBoundingBoxLeft) + Math.abs(textMetrics.actualBoundingBoxRight);
+      const h = Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxDescent);
       return {
-        width: textMetrics.width > compWidth ? textMetrics.width : compWidth,
-        height: (Math.abs(textMetrics.actualBoundingBoxAscent) + Math.abs(textMetrics.actualBoundingBoxAscent)) * lineHeight
+        width: w * scale,
+        height: h * scale
+      };
+    }
+    static estimateTextSize(text, fontSize) {
+      let width = 0;
+      for (const char of String(text)) {
+        if (char === " ") {
+          width += 0.35;
+        } else if (/[A-Z]/.test(char)) {
+          width += 0.68;
+        } else if (/[a-z]/.test(char)) {
+          width += 0.56;
+        } else if (/[0-9]/.test(char)) {
+          width += 0.55;
+        } else {
+          width += 0.45;
+        }
+      }
+      return {
+        width: fontSize * width,
+        height: fontSize
       };
     }
     /**
@@ -10543,68 +11295,48 @@
       style.appendChild(document.createTextNode(`
             .text {
                 font: ${fontSize}pt ${fontFamily};
-                dominant-baseline: ideographic;
+                dominant-baseline: alphabetic;
             }
         `));
       svg.appendChild(style);
       let textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
       textElem.setAttributeNS(null, "class", "text");
-      let maxLineWidth = 0;
-      let totalHeight = 0;
       let lines = [];
       text.split("\n").forEach((line) => {
-        let dims = _SvgWrapper.measureText(line, fontSize, fontFamily, 1);
+        let dims = _SvgWrapper.measureText(line, fontSize, fontFamily);
         if (dims.width >= maxWidth) {
-          let totalWordsWidth = 0;
-          let maxWordsHeight = 0;
-          let words = line.split(" ");
+          const words = line.split(" ");
           let offset = 0;
           for (let i = 0; i < words.length; i++) {
-            let wordDims = _SvgWrapper.measureText(words[i], fontSize, fontFamily, 1);
-            if (totalWordsWidth + wordDims.width > maxWidth) {
-              lines.push({
-                text: words.slice(offset, i).join(" "),
-                width: totalWordsWidth,
-                height: maxWordsHeight
-              });
-              totalWordsWidth = 0;
-              maxWordsHeight = 0;
+            const part = words.slice(offset, i + 1).join(" ");
+            const partDims = _SvgWrapper.measureText(part, fontSize, fontFamily);
+            if (partDims.width > maxWidth && i > offset) {
+              lines.push(words.slice(offset, i).join(" "));
               offset = i;
             }
-            if (wordDims.height > maxWordsHeight) {
-              maxWordsHeight = wordDims.height;
-            }
-            totalWordsWidth += wordDims.width;
           }
           if (offset < words.length) {
-            lines.push({
-              text: words.slice(offset, words.length).join(" "),
-              width: totalWordsWidth,
-              height: maxWordsHeight
-            });
+            lines.push(words.slice(offset, words.length).join(" "));
           }
         } else {
-          lines.push({
-            text: line,
-            width: dims.width,
-            height: dims.height
-          });
+          lines.push(line);
         }
       });
-      lines.forEach((line) => {
-        totalHeight += line.height;
+      let maxLineWidth = 0;
+      lines.forEach((line, i) => {
         let tspanElem = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
         tspanElem.setAttributeNS(null, "fill", themeManager.getColor("C"));
-        tspanElem.textContent = line.text;
+        tspanElem.textContent = line;
         tspanElem.setAttributeNS(null, "x", "0px");
-        tspanElem.setAttributeNS(null, "y", `${totalHeight}px`);
+        tspanElem.setAttributeNS(null, "y", `${i + 1}em`);
         textElem.appendChild(tspanElem);
-        if (line.width > maxLineWidth) {
-          maxLineWidth = line.width;
-        }
+        const dims = _SvgWrapper.measureText(line, fontSize, fontFamily);
+        maxLineWidth = Math.max(maxLineWidth, dims.width);
       });
+      textElem.setAttributeNS(null, "transform", `translate(${maxLineWidth / 2}, 0)`);
+      textElem.setAttributeNS(null, "text-anchor", "middle");
       svg.appendChild(textElem);
-      return { svg, width: maxLineWidth, height: totalHeight };
+      return { svg, width: maxLineWidth, height: (lines.length + 0.4) * fontSize * 4 / 3 };
     }
   };
 
@@ -10615,6 +11347,10 @@
       this.opts = this.preprocessor.opts;
       this.clear = clear;
       this.svgWrapper = null;
+      this.polymerOverlayState = {
+        enabled: false,
+        wildcardVertexIds: /* @__PURE__ */ new Set()
+      };
     }
     /**
      * Draws the parsed smiles data to an svg element.
@@ -10654,9 +11390,11 @@
       }
       preprocessor.processGraph();
       this.svgWrapper.determineDimensions(preprocessor.graph.vertices);
+      this.polymerOverlayState = this.getPolymerOverlayState();
       this.drawAtomHighlights(preprocessor.opts.debug);
       this.drawEdges(preprocessor.opts.debug);
       this.drawVertices(preprocessor.opts.debug);
+      this.drawPolymerRepeatOverlay();
       if (weights !== null) {
         this.drawWeights(weights, weightsNormalized);
       }
@@ -10673,6 +11411,20 @@
         this.opts.compactDrawing = optionBackup.padding;
       }
       return target;
+    }
+    /**
+     * Return whether polymer overlay should be enabled and which wildcard vertices are involved.
+     * @see computePolymerBracketOverlayState in ./polymerBracketOverlay.js
+     */
+    getPolymerOverlayState() {
+      return computePolymerBracketOverlayState(this.preprocessor.graph, this.opts);
+    }
+    /**
+     * Draw a polymer repeat-unit [ ]n overlay for wildcard endpoints (*).
+     * @see drawPolymerBracketOverlay in ./polymerBracketOverlay.js
+     */
+    drawPolymerRepeatOverlay() {
+      drawPolymerBracketOverlay(this.svgWrapper, this.preprocessor.graph, this.polymerOverlayState, this.opts);
     }
     /**
      * Draws the parsed smiles data to a canvas element.
@@ -10749,6 +11501,9 @@
         return;
       }
       let a = vertexA.position, b = vertexB.position, normals = preprocessor.getEdgeNormals(edge), sides = ArrayHelper.clone(normals);
+      if (this.polymerOverlayState.enabled && (elementA === "*" || elementB === "*")) {
+        return;
+      }
       sides[0].multiplyScalar(10).add(a);
       sides[1].multiplyScalar(10).add(a);
       if (edge.bondType === "=" || preprocessor.getRingbondType(vertexA, vertexB) === "=" || edge.isPartOfAromaticRing && preprocessor.bridgedRing) {
@@ -10845,6 +11600,9 @@
       for (let i = 0; i < graph.vertices.length; i++) {
         let vertex = graph.vertices[i];
         let atom = vertex.value;
+        if (this.polymerOverlayState.enabled && atom.element === "*") {
+          continue;
+        }
         let charge = 0;
         let isotope = 0;
         let bondCount = vertex.value.bondCount;
@@ -11002,7 +11760,7 @@
       if (element instanceof HTMLCanvasElement) {
         canvas = element;
       } else {
-        throw Error("First argument was not a canvas or the ID of a canvas.");
+        throw Error("Second argument was not a canvas or the ID of a canvas.");
       }
       let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -12585,13 +13343,15 @@
     /**
      * The constructor for the class ReactionDrawer.
      *
-     * @param {Object} options An object containing reaction drawing specitic options.
+     * @param {Object} reactionOptions An object containing reaction drawing specific options.
      * @param {Object} moleculeOptions An object containing molecule drawing specific options.
      */
-    constructor(options, moleculeOptions) {
+    constructor(reactionOptions, moleculeOptions) {
+      this.drawer = new SvgDrawer(moleculeOptions);
+      this.molOpts = this.drawer.opts;
       this.defaultOptions = {
-        scale: moleculeOptions.scale > 0 ? moleculeOptions.scale : 1,
-        fontSize: moleculeOptions.fontSizeLarge * 0.8,
+        scale: this.molOpts.scale > 0 ? this.molOpts.scale : 1,
+        fontSize: this.molOpts.fontSizeLarge * 0.8,
         fontFamily: "Arial, Helvetica, sans-serif",
         spacing: 10,
         plus: {
@@ -12599,7 +13359,7 @@
           thickness: 1
         },
         arrow: {
-          length: moleculeOptions.bondLength * 4,
+          length: this.molOpts.bondLength * 4,
           headSize: 6,
           thickness: 1,
           margin: 3
@@ -12608,9 +13368,7 @@
           normalize: false
         }
       };
-      this.opts = Options.extend(true, this.defaultOptions, options);
-      this.drawer = new SvgDrawer(moleculeOptions);
-      this.molOpts = this.drawer.opts;
+      this.opts = Options.extend(true, this.defaultOptions, reactionOptions);
     }
     /**
     * Draws the parsed reaction smiles data to a canvas element.
@@ -12761,7 +13519,7 @@
       elements.push({
         svg: topText.svg,
         height: topText.height,
-        width: this.opts.arrow.length * this.opts.scale,
+        width: topText.width,
         offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
         offsetY: -(topText.height / 2) - this.opts.arrow.margin,
         position: "relative"
@@ -12777,7 +13535,7 @@
       elements.push({
         svg: bottomText.svg,
         height: bottomText.height,
-        width: this.opts.arrow.length * this.opts.scale,
+        width: bottomText.width,
         offsetX: -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
         offsetY: bottomText.height / 2 + this.opts.arrow.margin,
         position: "relative"
