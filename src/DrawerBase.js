@@ -517,40 +517,13 @@ export default class DrawerBase {
         for (let i = 0; i < graph.vertices.length; i++) {
             let atom = graph.vertices[i].value;
 
-            if (counts.has(atom.element)) {
-                counts.set(atom.element, counts.get(atom.element) + 1);
-            }
-            else {
-                counts.set(atom.element, 1);
-            }
+            const a = counts.get(atom.element) || 0;
+            counts.set(atom.element, a + 1);
 
-            // Hydrogens attached to a chiral center were added as vertices,
-            // those in non chiral brackets are added here
-            if (atom.bracket && !atom.bracket.chirality) {
-                if (counts.has('H')) {
-                    counts.set('H', counts.get('H') + atom.bracket.hcount);
-                }
-                else {
-                    counts.set('H', atom.bracket.hcount);
-                }
-            }
-
-            // Add the implicit hydrogens according to valency, exclude
-            // bracket atoms as they were handled and always have the number
-            // of hydrogens specified explicitly
-            if (!atom.bracket) {
-                let nHydrogens = Atom.maxBonds[atom.element] - atom.bondCount;
-
-                if (atom.isPartOfAromaticRing) {
-                    nHydrogens--;
-                }
-
-                if (counts.has('H')) {
-                    counts.set('H', counts.get('H') + nHydrogens);
-                }
-                else {
-                    counts.set('H', nHydrogens);
-                }
+            const hydrogens = atom.countHydrogens();
+            if (hydrogens) {
+                const h = counts.get('H') || 0;
+                counts.set('H', h + hydrogens);
             }
         }
 
@@ -1791,9 +1764,8 @@ export default class DrawerBase {
             let atom = vertex.value;
             let charge = 0;
             let isotope = 0;
-            let bondCount = vertex.value.bondCount;
             let element = atom.element;
-            let hydrogens = Atom.maxBonds[element] - bondCount;
+            let hydrogens = atom.countHydrogens();
             let dir = vertex.getTextDirection(this.graph.vertices);
             let isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
             let isCarbon = atom.element === 'C';
@@ -3611,13 +3583,8 @@ export default class DrawerBase {
 
         // Valences are filled with hydrogens and passed to the next level.
         if (depth < maxDepth - 1) {
-            let bonds = 0;
-
-            for (let i = 0; i < neighbours.length; i++) {
-                bonds += this.graph.getEdge(vertexId, neighbours[i]).weight;
-            }
-
-            for (let i = 0; i < vertex.value.getMaxBonds() - bonds; i++) {
+            const hydrogens = vertex.value.countHydrogens();
+            for (let i = 0; i < hydrogens; i++) {
                 if (priority.length <= depth + 1) {
                     priority.push([]);
                 }
@@ -3701,11 +3668,7 @@ export default class DrawerBase {
         }
 
         // Implicit hydrogens
-        let bonds = 0;
-        for (let i = 0; i < neighbours.length; i++) {
-            bonds += this.graph.getEdge(vertexId, neighbours[i]).weight;
-        }
-        let implicitH = vertex.value.getMaxBonds() - bonds;
+        const implicitH = vertex.value.countHydrogens();
         for (let i = 0; i < implicitH; i++) {
             node.children.push({an: 1, children: [], hasStereo: false});
         }
@@ -3851,11 +3814,11 @@ export default class DrawerBase {
 
                 neighbour.value.isDrawn = false;
 
-                let hydrogens = Atom.maxBonds[neighbour.value.element] - neighbour.value.bondCount;
+                let hydrogens = neighbour.value.countHydrogens();
+                console.log(neighbour.value.element, hydrogens);
                 let charge = '';
 
                 if (neighbour.value.bracket) {
-                    hydrogens = neighbour.value.bracket.hcount;
                     charge = neighbour.value.bracket.charge || 0;
                 }
 

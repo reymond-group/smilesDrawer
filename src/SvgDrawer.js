@@ -353,9 +353,8 @@ export default class SvgDrawer {
             let atom = vertex.value;
             let charge = 0;
             let isotope = 0;
-            let bondCount = vertex.value.bondCount;
             let element = atom.element;
-            let hydrogens = Atom.maxBonds[element] - bondCount;
+            let hydrogens = atom.countHydrogens();
             let dir = vertex.getTextDirection(graph.vertices, atom.hasAttachedPseudoElements);
             let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
             let isCarbon = atom.element === 'C';

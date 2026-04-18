@@ -262,6 +262,36 @@ export default class Atom {
     }
 
     /**
+     * Counts the implicit hydrogens attached to this atom.
+     *
+     * This function deals with hydrogens specified in SMILES brackets
+     * and inferred based on bond counts and normal valences (see the
+     * VALENCES constant below).  It does NOT count any hydrogens that
+     * are attached as separate atoms in the SMILES string ([H]Cl).
+     *
+     * @returns {number} The number of implicit hydrogens attached to this atom.
+     */
+    countHydrogens() {
+        if (this.bracket) {
+            return this.bracket.hcount || 0;
+        }
+
+        let bonds = this.bondCount;
+        if (this.isPartOfAromaticRing) {
+            // TODO: This is definitely a hacky workaround for something...
+            // Figure out what and fix the real issue!
+            bonds += 1;
+        }
+
+        const valences = Atom.VALENCES[this.element];
+        const valence  = valences.find(n => (n >= bonds));
+
+        if (valence !== undefined) {
+            return valence - bonds;
+        }
+    }
+
+    /**
      * A map mapping element symbols to their maximum bonds.
      */
     static get maxBonds() {
@@ -279,6 +309,22 @@ export default class Atom {
             Br: 1,
         };
     }
+
+    // Possible valences according to OpenSMILES
+    // http://opensmiles.org/opensmiles.html#orgsbst
+    static VALENCES = {
+        H:  [1],
+        B:  [3],
+        C:  [4],
+        N:  [3, 5],
+        O:  [2],
+        F:  [1],
+        P:  [3, 5],
+        S:  [2, 4, 6],
+        Cl: [1],
+        Br: [1],
+        I:  [1],
+    };
 
     /**
      * A map mapping element symbols to the atomic number.
