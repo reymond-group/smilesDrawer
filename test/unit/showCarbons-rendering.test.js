@@ -30,21 +30,58 @@ function getAtomLabels(smiles, drawerOptions) {
 }
 
 describe('showCarbons rendering (SVG)', () => {
-    it("with mode 'none', propane omits CH₂ / CH₃ style labels (no hydrogen subscripts)", () => {
+    it("with mode 'none', propane doesn't show any explicit carbons", () => {
         const html = getAtomLabels('CCC', {showCarbons: 'none'});
         expect(html).not.toMatch(/C/);
     });
+
+    it("with mode 'none', methylcyclohexane doesn't show any explicit carbons", () => {
+        const html = getAtomLabels('CC1CCCCC1', {showCarbons: 'none'});
+        expect(html).not.toMatch(/C/);
+    });
+
+    it("with mode 'none', ethylbenzene doesn't show any explicit carbons", () => {
+        const html = getAtomLabels('CCc1ccccc1', {showCarbons: 'none'});
+        expect(html).not.toMatch(/C/);
+    });
+
 
     it("with mode 'default', propane doesn't show any explicit carbons", () => {
         const html = getAtomLabels('CCC', {showCarbons: 'default'});
         expect(html).not.toMatch(/C/);
     });
 
-    it("with mode 'terminal' and 'terminalCarbons' set, propane shows CH₃ but not CH₂", () => {
-        const html = getAtomLabels('CCC', {showCarbons: 'terminal', terminalCarbons: true});
+    it("with mode 'default', methylcyclohexane doesn't show any explicit carbons", () => {
+        const html = getAtomLabels('CC1CCCCC1', {showCarbons: 'default'});
+        expect(html).not.toMatch(/C/);
+    });
+
+    it("with mode 'default', ethylbenzene doesn't show any explicit carbons", () => {
+        const html = getAtomLabels('CCc1ccccc1', {showCarbons: 'default'});
+        expect(html).not.toMatch(/C/);
+    });
+
+
+    it("with mode 'default' and 'terminalCarbons' set, propane shows CH₃ but not CH₂", () => {
+        const html = getAtomLabels('CCC', {showCarbons: 'default', terminalCarbons: true});
         expect(html).toMatch(/CH₃/);
         expect(html).not.toMatch(/CH₂/);
     });
+
+    it("with mode 'default' and 'terminalCarbons' set, methylcyclohexane shows CH₃ but not CH₂ or CH", () => {
+        const html = getAtomLabels('CC1CCCCC1', {showCarbons: 'default', terminalCarbons: true});
+        expect(html).toMatch(/CH₃/);
+        expect(html).not.toMatch(/CH₂/);
+        expect(html).not.toMatch(/CH /);
+    });
+
+    it("with mode 'default' and 'terminalCarbons' set, ethylbenzene shows CH₃ but not CH₂ or CH", () => {
+        const html = getAtomLabels('CCc1ccccc1', {showCarbons: 'default', terminalCarbons: true});
+        expect(html).toMatch(/CH₃/);
+        expect(html).not.toMatch(/CH₂/);
+        expect(html).not.toMatch(/CH /);
+    });
+
 
     it("with mode 'terminal', propane shows CH₃ but not CH₂", () => {
         const html = getAtomLabels('CCC', {showCarbons: 'terminal'});
@@ -52,18 +89,41 @@ describe('showCarbons rendering (SVG)', () => {
         expect(html).not.toMatch(/CH₂/);
     });
 
+    it("with mode 'terminal', methylcyclohexane shows CH₃ but not CH₂ or CH", () => {
+        const html = getAtomLabels('CC1CCCCC1', {showCarbons: 'terminal'});
+        expect(html).toMatch(/CH₃/);
+        expect(html).not.toMatch(/CH₂/);
+        expect(html).not.toMatch(/CH /);
+    });
+
+    it("with mode 'terminal', ethylbenzene shows CH₃ but not CH₂ or CH", () => {
+        const html = getAtomLabels('CCc1ccccc1', {showCarbons: 'terminal'});
+        expect(html).toMatch(/CH₃/);
+        expect(html).not.toMatch(/CH₂/);
+        expect(html).not.toMatch(/CH /);
+    });
+
+
     it("with mode 'acyclic', propane shows both CH₃ and CH₂", () => {
         const html = getAtomLabels('CCC', {showCarbons: 'acyclic'});
         expect(html).toMatch(/CH₃/);
         expect(html).toMatch(/CH₂/);
     });
 
-    it("with mode 'acyclic', toluene shows CH₃ but not CH₂ or CH", () => {
-        const html = getAtomLabels('Cc1ccccc1', {showCarbons: 'acyclic'});
+    it("with mode 'acyclic', methylcyclohexane shows CH₃ but not CH₂ or CH", () => {
+        const html = getAtomLabels('CC1CCCCC1', {showCarbons: 'acyclic'});
         expect(html).toMatch(/CH₃/);
         expect(html).not.toMatch(/CH₂/);
         expect(html).not.toMatch(/CH /);
     });
+
+    it("with mode 'acyclic', ethylbenzene shows CH₃ and CH₂ but not CH", () => {
+        const html = getAtomLabels('CCc1ccccc1', {showCarbons: 'acyclic'});
+        expect(html).toMatch(/CH₃/);
+        expect(html).toMatch(/CH₂/);
+        expect(html).not.toMatch(/CH /);
+    });
+
 
     it("with mode 'all', propane shows both CH₃ and CH₂", () => {
         const html = getAtomLabels('CCC', {showCarbons: 'all'});
@@ -71,9 +131,18 @@ describe('showCarbons rendering (SVG)', () => {
         expect(html).toMatch(/CH₂/);
     });
 
-    it("with mode 'all', toluene shows both CH₃ and CH", () => {
-        const html = getAtomLabels('Cc1ccccc1', {showCarbons: 'all'});
+    it("with mode 'all', methylcyclohexane shows CH₃, CH₂, and CH", () => {
+        const html = getAtomLabels('CC1CCCCC1', {showCarbons: 'all'});
         expect(html).toMatch(/CH₃/);
+        expect(html).toMatch(/CH₂/);
         expect(html).toMatch(/CH /);
+    });
+
+    it("with mode 'all', ethylbenzene shows CH₃, CH₂, CH, and C", () => {
+        const html = getAtomLabels('CCc1ccccc1', {showCarbons: 'all'});
+        expect(html).toMatch(/CH₃/);
+        expect(html).toMatch(/CH₂/);
+        expect(html).toMatch(/CH /);
+        expect(html).toMatch(/ C /);
     });
 });
