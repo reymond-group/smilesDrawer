@@ -5,38 +5,13 @@
  * Carbon counts in labels use Unicode subscripts (e.g. CH\u2082), not ASCII "CH2".
  */
 import {afterEach, describe, expect, it} from 'vitest';
-import {JSDOM} from 'jsdom';
-import Parser from '../../src/Parser.js';
+import {createJSDOM}                     from './helpers';
+
+import Parser    from '../../src/Parser.js';
 import SvgDrawer from '../../src/SvgDrawer.js';
 
-let restoreGetContext = null;
-
-function setupDom() {
-    const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
-    global.document = dom.window.document;
-    global.window = dom.window;
-    return dom;
-}
-
-function disableCanvasContext(dom) {
-    const proto = dom.window.HTMLCanvasElement.prototype;
-    const original = proto.getContext;
-    proto.getContext = () => null;
-    restoreGetContext = () => {
-        proto.getContext = original;
-    };
-}
-
-afterEach(() => {
-    if (restoreGetContext) {
-        restoreGetContext();
-        restoreGetContext = null;
-    }
-});
-
 function renderInnerHtml(smiles, drawerOptions) {
-    const dom = setupDom();
-    disableCanvasContext(dom);
+    const dom = createJSDOM();
 
     const svg = dom.window.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttributeNS(null, 'id', 'test-svg-showcarbons');
