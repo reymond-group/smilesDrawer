@@ -271,15 +271,17 @@ export default class Atom {
      *
      * @returns {number} The number of implicit hydrogens attached to this atom.
      */
-    countHydrogens() {
-        if (this.bracket) {
+    countImplicitHydrogens() {
+        // Hydrogens in brackets are implicit, UNLESS the atom
+        // is a chiral center, in which case they're explicit.
+        if (this.bracket && !this.bracket.chirality) {
             return this.bracket.hcount || 0;
         }
 
         let bonds = this.bondCount;
         if (this.isPartOfAromaticRing) {
-            // TODO: This is definitely a hacky workaround for something...
-            // Figure out what and fix the real issue!
+            // This is definitely a hacky workaround for something...
+            // TODO: Figure out what and fix the real issue!
             bonds += 1;
         }
 
@@ -289,6 +291,8 @@ export default class Atom {
         if (valence !== undefined) {
             return valence - bonds;
         }
+
+        return 0;
     }
 
     /**

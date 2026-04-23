@@ -374,8 +374,98 @@
       }
     ]
   },
+  "CN1CC[C@]23[C@@H]4[C@H]1Cc5c2c(c(cc5)OC)O[C@H]3[C@H](C=C4)O": {
+    "name": "Codeine v1",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CN1CC[C@]23[C@@H]4[C@H]1CC5=C2C(=C(C=C5)OC)O[C@H]3[C@H](C=C4)O": {
+    "name": "Codeine v2",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "CN1CC[C@]23[C@@H]4[C@H]1CC5C2=C(C(=CC=5)OC)O[C@H]3[C@H](C=C4)O": {
+    "name": "Codeine v3",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
   "COc1ccc2C[C@@H]3N(C)CC[C@]45[C@@H]3Oc1c2[C@@H]4O[C@H]5CC=C": {
-    "name": "Codeine",
+    "name": "Not Codeine v1",
     "centers": [
       {
         "atomIdx": 7,
@@ -954,6 +1044,56 @@
       }
     ]
   },
+  "[H][C@]89CN(CCc1c([nH]c2ccccc12)[C@@](C(=O)OC)(c3cc4c(cc3OC)N(C)[C@@]5([H])[C@@](O)(C(=O)OC)[C@H](OC(C)=O)[C@]7(CC)C=CCN6CC[C@]45[C@@]67[H])C8)C[C@](O)(CC)C9": {
+    "name": "Vinblastine",
+    "centers": [
+      {
+        "atomIdx": 0,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 29,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 30,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 36,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 41,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 50,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 51,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 54,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
   "O=C1C[C@H]2OCC=C3C[C@H]4[C@@H](N5CC[C@@]61[C@@H]5C=CC4)N3C6=CC=C2": {
     "name": "Strychnine",
     "centers": [
@@ -999,6 +1139,16 @@
       }
     ]
   },
+  "CC(=O)N[C@H]1CCC2=CC(=C(C(=C2C3=CC=C(C(=O)C=C13)OC)OC)OC)OC": {
+    "name": "Colchicine",
+    "centers": [
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
   "CC(C)c1n(CC[C@@H](O)C[C@@H](O)CC(=O)O)c(c2ccc(F)cc2)c(c1c1ccccc1)C(=O)Nc1ccccc1": {
     "name": "Atorvastatin",
     "centers": [
@@ -1030,7 +1180,7 @@
       {
         "atomIdx": 16,
         "element": "C",
-        "cip": "R"
+        "cip": "S"
       },
       {
         "atomIdx": 18,
@@ -1070,7 +1220,7 @@
       {
         "atomIdx": 15,
         "element": "C",
-        "cip": "R"
+        "cip": "S"
       },
       {
         "atomIdx": 17,
@@ -1284,12 +1434,12 @@
       {
         "atomIdx": 4,
         "element": "C",
-        "cip": "S"
+        "cip": "R"
       },
       {
         "atomIdx": 6,
         "element": "C",
-        "cip": "S"
+        "cip": "R"
       }
     ]
   },
@@ -1369,7 +1519,92 @@
     ]
   },
   "C[C@]12CC[C@H]3[C@@H](CCc4cc(O)ccc43)[C@@H]1CC[C@@H]2O": {
-    "name": "Estradiol",
+    "name": "Estradiol v1",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "Oc1ccc2[C@H]3CC[C@]4(C)[C@]5(CC[C@H]4[C@@H]3CCc2c1).O5": {
+    "name": "Estradiol v2",
+    "centers": [
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 14,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "C[C@]12CC[C@H]3[C@@H](CCC4=CC(O)=CC=C43)[C@@H]1CC[C@@H]2O": {
+    "name": "Estradiol v3",
+    "centers": [
+      {
+        "atomIdx": 1,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 4,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 18,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "C[C@]12CC[C@H]3[C@@H](CCC4C=C(O)C=CC=43)[C@@H]1CC[C@@H]2O": {
+    "name": "Estradiol v4",
     "centers": [
       {
         "atomIdx": 1,
@@ -1668,7 +1903,7 @@
     ]
   },
   "CC(=O)N[C@@H]1[C@@H](O)C[C@@](O)(OC1[C@H](O)[C@H](O)CO)C(=O)O": {
-    "name": "N-Acetylneuraminic acid",
+    "name": "N-Acetylneuraminic acid v1",
     "centers": [
       {
         "atomIdx": 4,
@@ -1697,8 +1932,43 @@
       }
     ]
   },
+  "OC(=O)[C@@]1(O)C[C@H](O)[C@@H](NC(C)=O)[C@@H](O1)[C@H](O)[C@H](O)CO": {
+    "name": "N-Acetylneuraminic acid v2",
+    "centers": [
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
   "OC[C@H]1OC(O[C@@H]2OC(CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O": {
-    "name": "Trehalose",
+    "name": "Trehalose v1",
     "centers": [
       {
         "atomIdx": 2,
@@ -1739,6 +2009,111 @@
         "atomIdx": 21,
         "element": "C",
         "cip": "S"
+      }
+    ]
+  },
+  "OC[C@H]1OC(O[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O": {
+    "name": "Trehalose v2",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 8,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 11,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 21,
+        "element": "C",
+        "cip": "S"
+      }
+    ]
+  },
+  "OC[C@@H]1[C@@H](O)[C@H](O)[C@@H](O)[C@H](O1)O[C@@H]2[C@H](O)[C@@H](O)[C@H](O)[C@H](O2)CO": {
+    "name": "Trehalose v3",
+    "centers": [
+      {
+        "atomIdx": 2,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 3,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 5,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 7,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 9,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 12,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 13,
+        "element": "C",
+        "cip": "R"
+      },
+      {
+        "atomIdx": 15,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 17,
+        "element": "C",
+        "cip": "S"
+      },
+      {
+        "atomIdx": 19,
+        "element": "C",
+        "cip": "R"
       }
     ]
   },
@@ -1789,6 +2164,26 @@
         "atomIdx": 25,
         "element": "C",
         "cip": "R"
+      }
+    ]
+  },
+  "FOOC(CCl)[C@H](F)C(CF)OOCl": {
+    "name": "Priority Test v1",
+    "centers": [
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "R"
+      }
+    ]
+  },
+  "FOOC(CCl)[C@@H](F)C(CF)OOCl": {
+    "name": "Priorirt Test v2",
+    "centers": [
+      {
+        "atomIdx": 6,
+        "element": "C",
+        "cip": "S"
       }
     ]
   }

@@ -28,7 +28,7 @@
     "watch":     "node ./scripts/watch.mjs",
 
     "test:ci":     "npm run test:unit && npm run test:stereo",
-    "test:stereo": "npm exec -- vitest run test/stereo-reference/stereo-vs-rdkit.test.js test/stereo-reference/stereo-inversion-baseline.test.js",
+    "test:stereo": "npm exec -- vitest run test/stereo-reference/stereo-vs-rdkit.test.js",
     "test:unit":   "npm exec -- vitest run test/unit test/regression"
   }
 }

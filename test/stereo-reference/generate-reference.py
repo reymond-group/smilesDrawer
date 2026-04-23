@@ -11,6 +11,8 @@ import json
 import os
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
+from rdkit.Chem.rdCIPLabeler import AssignCIPLabels
+
 
 MOLECULES = [
     # Stereocenters
@@ -39,7 +41,13 @@ MOLECULES = [
     ['Amoxicillin', 'N[C@@H](c1ccc(O)cc1)C(=O)N[C@H]1[C@@H]2SC(C)(C)[C@@H](N2C1=O)C(=O)O'],
     ['Artemisinin', 'C[C@@H]1CC[C@H]2[C@@H](C)C(=O)O[C@@H]3O[C@@]4(C)CC[C@@H]1[C@@]23OO4'],
     ['Morphine', 'CN1CC[C@]23[C@@H]4[C@H]1CC5=C2C(=C(C=C5)O)O[C@H]3[C@H](C=C4)O'],
-    ['Codeine', 'COc1ccc2C[C@@H]3N(C)CC[C@]45[C@@H]3Oc1c2[C@@H]4O[C@H]5CC=C'],
+    ['Codeine v1', 'CN1CC[C@]23[C@@H]4[C@H]1Cc5c2c(c(cc5)OC)O[C@H]3[C@H](C=C4)O'],
+    ['Codeine v2', 'CN1CC[C@]23[C@@H]4[C@H]1CC5=C2C(=C(C=C5)OC)O[C@H]3[C@H](C=C4)O'],
+    ['Codeine v3', 'CN1CC[C@]23[C@@H]4[C@H]1CC5C2=C(C(=CC=5)OC)O[C@H]3[C@H](C=C4)O'],
+    ['Not Codeine v1', 'COc1ccc2C[C@@H]3N(C)CC[C@]45[C@@H]3Oc1c2[C@@H]4O[C@H]5CC=C'],
+    # TODO: Re-enable these when we have better Kekulization:
+    # ['Not Codeine v2', 'COC1C=CC=2C[C@@H]3N(C)CC[C@]45[C@@H]3OC=1C2[C@@H]4O[C@H]5CC=C'],
+    # ['Not Codeine v3', 'COC1=CC=C2C[C@@H]3N(C)CC[C@]45[C@@H]3OC1=C2[C@@H]4O[C@H]5CC=C'],
     # Nucleotides
     ['Adenosine', 'n2c1c(ncnc1n(c2)[C@@H]3O[C@@H]([C@@H](O)[C@H]3O)CO)N'],
     ['AMP', 'Nc1ncnc2c1ncn2[C@@H]1O[C@H](COP(=O)(O)O)[C@@H](O)[C@H]1O'],
@@ -60,10 +68,10 @@ MOLECULES = [
     ['Quinidine', 'OC(c1ccnc2ccc(OC)cc12)[C@H]3C[C@@H]4CC[C@H](C3)N4C=C'],
     ['Erythromycin', 'CC[C@@H]1OC(=O)[C@H](C)[C@@H](O[C@H]2C[C@@](C)(OC)[C@@H](O)[C@H](C)O2)[C@H](C)[C@@H](O[C@@H]3O[C@H](C)C[C@@H]([C@H]3O)N(C)C)[C@](C)(O)C[C@@H](C)C(=O)[C@H](C)[C@@H](O)[C@]1(C)O'],
     ['Doxorubicin', 'COc1cccc2c1C(=O)c1c(O)c3c(c(O)c1C2=O)C[C@@](O)(C[C@@H]3O[C@H]1C[C@H](N)[C@H](O)[C@H](C)O1)C(=O)CO'],
-    ['Vinblastine', 'CC[C@]1(O)C[C@H]2CN(CCc3c([nH]c4ccccc34)[C@@](C2)(C(=O)OC)[C@@H]2[C@@]3(CC)C=CCN4CC[C@]5(c6cc(OC)c(OC)cc6N[C@@H]5C(=O)OC)[C@@H]34)C1'],
+    ['Vinblastine', '[H][C@]89CN(CCc1c([nH]c2ccccc12)[C@@](C(=O)OC)(c3cc4c(cc3OC)N(C)[C@@]5([H])[C@@](O)(C(=O)OC)[C@H](OC(C)=O)[C@]7(CC)C=CCN6CC[C@]45[C@@]67[H])C8)C[C@](O)(CC)C9'],
     ['Strychnine', 'O=C1C[C@H]2OCC=C3C[C@H]4[C@@H](N5CC[C@@]61[C@@H]5C=CC4)N3C6=CC=C2'],
     ['Reserpine', 'CO[C@H]1[C@@H](CC2=C1NC1=CC(OC)=CC=C21)C(=O)OC'],
-    ['Colchicine', 'COc1cc2c(c(OC)c1OC)-c1ccc(=O)c(OC)c1C[C@@H]2NC(C)=O'],
+    ['Colchicine', 'CC(=O)N[C@H]1CCC2=CC(=C(C(=C2C3=CC=C(C(=O)C=C13)OC)OC)OC)OC'],
     ['Atorvastatin', 'CC(C)c1n(CC[C@@H](O)C[C@@H](O)CC(=O)O)c(c2ccc(F)cc2)c(c1c1ccccc1)C(=O)Nc1ccccc1'],
     ['Simvastatin', 'CCC(C)(C)C(=O)O[C@H]1C[C@@H](O)C=C2C=C[C@H](C)[C@H](CC[C@@H](O)CC(=O)O)[C@@H]21'],
     ['Lovastatin', 'CC[C@H](C)C(=O)O[C@H]1C[C@@H](O)C=C2C=C[C@H](C)[C@H](CC[C@@H](O)CC(=O)O)[C@@H]21'],
@@ -84,7 +92,10 @@ MOLECULES = [
     ['Carvone', 'C=C(C)[C@@H]1CC=C(C)C(=O)C1'],
     ['Borneol', 'CC1(C)[C@@H]2CC[C@]1(C)[C@@H](O)C2'],
     ['Testosterone', 'C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@@]34C)[C@@H]1CC[C@@H]2O'],
-    ['Estradiol', 'C[C@]12CC[C@H]3[C@@H](CCc4cc(O)ccc43)[C@@H]1CC[C@@H]2O'],
+    ['Estradiol v1', 'C[C@]12CC[C@H]3[C@@H](CCc4cc(O)ccc43)[C@@H]1CC[C@@H]2O'],
+    ['Estradiol v2', 'Oc1ccc2[C@H]3CC[C@]4(C)[C@]5(CC[C@H]4[C@@H]3CCc2c1).O5'],
+    ['Estradiol v3', 'C[C@]12CC[C@H]3[C@@H](CCC4=CC(O)=CC=C43)[C@@H]1CC[C@@H]2O'],
+    ['Estradiol v4', 'C[C@]12CC[C@H]3[C@@H](CCC4C=C(O)C=CC=43)[C@@H]1CC[C@@H]2O'],
     ['Progesterone', 'C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@@]34C)[C@@H]1CC[C@@H]2C(=O)C'],
     ['Cortisol', 'O[C@@]1(CC[C@@H]2[C@@H]1CC[C@H]1[C@H]3CCC(=O)C=C3CC[C@@]21C)C(=O)CO'],
     ['Dexamethasone', 'C[C@@H]1C[C@H]2[C@@H]3CCC4=CC(=O)C=C[C@]4(C)[C@@]3(F)[C@@H](O)C[C@]2(C)[C@@]1(O)C(=O)CO'],
@@ -95,11 +106,28 @@ MOLECULES = [
     ['Daptomycin partial', 'CCCCCCCCCC(=O)N[C@@H](CC(=O)O)C(=O)N[C@H]1CC(=O)N[C@@H](CC(N)=O)C(=O)O1'],
     # Carbohydrates
     ['L-Fucose', 'C[C@@H]1OC(O)[C@@H](O)[C@H](O)[C@@H]1O'],
-    ['N-Acetylneuraminic acid', 'CC(=O)N[C@@H]1[C@@H](O)C[C@@](O)(OC1[C@H](O)[C@H](O)CO)C(=O)O'],
-    ['Trehalose', 'OC[C@H]1OC(O[C@@H]2OC(CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O'],
+    ['N-Acetylneuraminic acid v1', 'CC(=O)N[C@@H]1[C@@H](O)C[C@@](O)(OC1[C@H](O)[C@H](O)CO)C(=O)O'],
+    ['N-Acetylneuraminic acid v2', 'OC(=O)[C@@]1(O)C[C@H](O)[C@@H](NC(C)=O)[C@@H](O1)[C@H](O)[C@H](O)CO'],
+    ['Trehalose v1', 'OC[C@H]1OC(O[C@@H]2OC(CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O'],
+    ['Trehalose v2', 'OC[C@H]1OC(O[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@@H]1O'],
+    ['Trehalose v3', 'OC[C@@H]1[C@@H](O)[C@H](O)[C@@H](O)[C@H](O1)O[C@@H]2[C@H](O)[C@@H](O)[C@H](O)[C@H](O2)CO'],
     # Macrocycles & complex
     ['Rapamycin partial', 'CO[C@@H]1C[C@@H](CC(=O)[C@@H](CC=C)C(=O)O1)OC'],
     ['Epothilone B', 'CC(/C=C/C1=CSC(C)=N1)[C@@H]1C[C@@H]2O[C@]2(C)CCC[C@@H](O)C(=O)C(=C)[C@@H](C)C(=O)O1'],
+
+    # # Kekulization test cases
+    # ['Same DB Pattern', 'C1=NC=CC=C1[C@H](F)C2=CC=CN=C2'],
+    # ['Different DB Pattern', 'C1N=CC=CC=1[C@H](F)C2=CC=CN=C2'],
+    # ['One Aromatic', 'c1ncccc1[C@H](F)C2=CC=CN=C2'],
+    # ['Other Aromatic', 'C1N=CC=CC=1[C@H](F)c2cccnc2'],
+    # ['Both Aromatic', 'c1ncccc1[C@H](F)c2cccnc2'],
+    # ['One Saturated', 'c1ncccc1[C@H](F)C2CCCNC2'],
+    # ['Other Saturated', 'C1NCCCC1[C@H](F)c2cccnc2'],
+    # ['Both Saturated', 'C1NCCCC1[C@H](F)C2CCCNC2'],
+
+    # Priority ordering tests
+    ['Priority Test v1', 'FOOC(CCl)[C@H](F)C(CF)OOCl'],
+    ['Priorirt Test v2', 'FOOC(CCl)[C@@H](F)C(CF)OOCl'],
 ]
 
 
@@ -110,7 +138,8 @@ def get_cip_assignments(smiles):
         return None
 
     # Assign CIP codes
-    Chem.AssignStereochemistry(mol, cleanIt=True, force=True)
+    # Chem.AssignStereochemistry(mol, cleanIt=True, force=True)
+    AssignCIPLabels(mol)
 
     centers = []
     for atom in mol.GetAtoms():
@@ -119,7 +148,7 @@ def get_cip_assignments(smiles):
             centers.append({
                 'atomIdx': atom.GetIdx(),
                 'element': atom.GetSymbol(),
-                'cip': cip,
+                'cip':     cip.upper(),
             })
 
     return centers

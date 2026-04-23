@@ -354,7 +354,7 @@ export default class SvgDrawer {
             let charge = 0;
             let isotope = 0;
             let element = atom.element;
-            let hydrogens = atom.countHydrogens();
+            let hydrogens = atom.countImplicitHydrogens();
             let dir = vertex.getTextDirection(graph.vertices, atom.hasAttachedPseudoElements);
             let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
             let isCarbon = atom.element === 'C';
