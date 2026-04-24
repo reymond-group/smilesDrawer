@@ -303,7 +303,7 @@ export default class SvgDrawer {
 
         if (debug) {
             let midpoint = Vector2.midpoint(a, b);
-            svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
+            svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e' + edgeId, '#0c0');
         }
     }
 
@@ -403,19 +403,16 @@ export default class SvgDrawer {
             }
 
             if (debug) {
-                let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
+                const value = 'v' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
                 svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
             }
-            // else {
-            //   svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
-            // }
         }
 
         // Draw the ring centers for debug purposes
         if (opts.debug) {
             for (let i = 0; i < rings.length; i++) {
                 let center = rings[i].center;
-                svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
+                svgWrapper.drawDebugPoint(center.x, center.y, 'r' + rings[i].id, '#00f');
             }
         }
     }
@@ -429,18 +426,23 @@ export default class SvgDrawer {
             return;
         }
 
+        let vertex_ids = this.preprocessor.graph.atomIdxToVertexId;
+        if (weights.length < vertex_ids.length) {
+            vertex_ids = vertex_ids.slice(0, weights.length);
+        }
+        else if (weights.length > vertex_ids.length) {
+            console.warn(`More weights (${weights.length}) than heavy atoms (${vertex_ids.length}); truncating.`);
+            weights = weights.slice(0, vertex_ids.length);
+        }
+
         if (weights.every(w => w === 0)) {
             return;
         }
 
-        if (weights.length !== this.preprocessor.graph.atomIdxToVertexId.length) {
-            throw new Error('The number of weights supplied must be equal to the number of (heavy) atoms in the molecule.');
-        }
-
         let points = [];
 
-        for (const atomIdx of this.preprocessor.graph.atomIdxToVertexId) {
-            let vertex = this.preprocessor.graph.vertices[atomIdx];
+        for (const vertex_id of vertex_ids) {
+            let vertex = this.preprocessor.graph.vertices[vertex_id];
             points.push(new Vector2(
                 vertex.position.x - this.svgWrapper.minX,
                 vertex.position.y - this.svgWrapper.minY)
