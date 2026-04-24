@@ -1,13 +1,10 @@
 import {describe, it, expect} from 'vitest';
-import {JSDOM} from 'jsdom';
-import {readFileSync} from 'fs';
-import {join, dirname} from 'path';
-import {fileURLToPath} from 'url';
-import Parser from '../../src/Parser.js';
+import {createJSDOM}          from '../helpers';
+
+import Parser    from '../../src/Parser.js';
 import SvgDrawer from '../../src/SvgDrawer.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const reference = JSON.parse(readFileSync(join(__dirname, 'reference.json'), 'utf-8'));
+import reference from './reference.json' with {type: 'json'};
 
 const INVERSION_BASELINE_IDS = [
     'Codeine:v19',
@@ -24,9 +21,7 @@ function subtractSorted(a, b) {
 }
 
 function render(smiles) {
-    const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
-    global.document = dom.window.document;
-    global.window = dom.window;
+    const dom = createJSDOM();
 
     const svg = dom.window.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttributeNS(null, 'id', 'test-svg');

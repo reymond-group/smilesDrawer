@@ -194,6 +194,8 @@ export default class SvgDrawer {
             return;
         }
 
+        const color = svgWrapper.getBondColor(vertexA, vertexB);
+
         let a = vertexA.position,
             b = vertexB.position,
             normals = preprocessor.getEdgeNormals(edge),
@@ -233,17 +235,9 @@ export default class SvgDrawer {
 
                 line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
 
-                // The shortened edge
-                if (edge.isPartOfAromaticRing) {
-                    // preprocessor.canvasWrapper.drawLine(line, true);
-                    svgWrapper.drawLine(line, true);
-                }
-                else {
-                    // preprocessor.canvasWrapper.drawLine(line);
-                    svgWrapper.drawLine(line);
-                }
-
-                svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+                // Set dashed to true if the edge is part of an aromatic ring:
+                svgWrapper.drawLine(line, edge.isPartOfAromaticRing, color);
+                svgWrapper.drawLine(new Line(a, b, elementA, elementB), false, color);
             }
             else if (edge.center
                 || (vertexA.isTerminal() && vertexB.isTerminal())
@@ -255,8 +249,8 @@ export default class SvgDrawer {
                 let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB),
                     lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-                svgWrapper.drawLine(lineA);
-                svgWrapper.drawLine(lineB);
+                svgWrapper.drawLine(lineA, false, color);
+                svgWrapper.drawLine(lineB, false, color);
             }
             else if ((s.sideCount[0] > s.sideCount[1]) || (s.totalSideCount[0] > s.totalSideCount[1])) {
                 this.multiplyNormals(normals, opts.bondSpacing);
@@ -265,8 +259,8 @@ export default class SvgDrawer {
 
                 line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
 
-                svgWrapper.drawLine(line);
-                svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+                svgWrapper.drawLine(line, false, color);
+                svgWrapper.drawLine(new Line(a, b, elementA, elementB), false, color);
             }
             else if ((s.sideCount[0] < s.sideCount[1]) || (s.totalSideCount[0] <= s.totalSideCount[1])) {
                 this.multiplyNormals(normals, opts.bondSpacing);
@@ -274,8 +268,8 @@ export default class SvgDrawer {
                 let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
                 line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
-                svgWrapper.drawLine(line);
-                svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+                svgWrapper.drawLine(line, false, color);
+                svgWrapper.drawLine(new Line(a, b, elementA, elementB), false, color);
             }
         }
         else if (edge.bondType === '#') {
@@ -285,9 +279,9 @@ export default class SvgDrawer {
             let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
             let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-            svgWrapper.drawLine(lineA);
-            svgWrapper.drawLine(lineB);
-            svgWrapper.drawLine(new Line(a, b, elementA, elementB));
+            svgWrapper.drawLine(lineA, false, color);
+            svgWrapper.drawLine(lineB, false, color);
+            svgWrapper.drawLine(new Line(a, b, elementA, elementB), false, color);
         }
         else if (edge.bondType === '.') {
             // TODO: Something... maybe... version 2?
@@ -297,19 +291,19 @@ export default class SvgDrawer {
             let isChiralCenterB = vertexB.value.isStereoCenter;
 
             if (edge.wedge === 'up') {
-                svgWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+                svgWrapper.drawWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB), color);
             }
             else if (edge.wedge === 'down') {
-                svgWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+                svgWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB), color);
             }
             else {
-                svgWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB));
+                svgWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB), false, color);
             }
         }
 
         if (debug) {
             let midpoint = Vector2.midpoint(a, b);
-            svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
+            svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e' + edgeId, '#0c0');
         }
     }
 
@@ -409,19 +403,16 @@ export default class SvgDrawer {
             }
 
             if (debug) {
-                let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
+                const value = 'v' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
                 svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
             }
-            // else {
-            //   svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
-            // }
         }
 
         // Draw the ring centers for debug purposes
         if (opts.debug) {
             for (let i = 0; i < rings.length; i++) {
                 let center = rings[i].center;
-                svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
+                svgWrapper.drawDebugPoint(center.x, center.y, 'r' + rings[i].id, '#00f');
             }
         }
     }
@@ -435,8 +426,13 @@ export default class SvgDrawer {
             return;
         }
 
-        if (weights.length !== this.preprocessor.graph.atomIdxToVertexId.length) {
-            throw new Error('The number of weights supplied must be equal to the number of (heavy) atoms in the molecule.');
+        let vertex_ids = this.preprocessor.graph.atomIdxToVertexId;
+        if (weights.length < vertex_ids.length) {
+            vertex_ids = vertex_ids.slice(0, weights.length);
+        }
+        else if (weights.length > vertex_ids.length) {
+            console.warn(`More weights (${weights.length}) than heavy atoms (${vertex_ids.length}); truncating.`);
+            weights = weights.slice(0, vertex_ids.length);
         }
 
         let min = 0;
@@ -454,7 +450,7 @@ export default class SvgDrawer {
         }
 
         if (this.opts.experimentalWeights) {
-            const points = this.preprocessor.graph.atomIdxToVertexId.map((vid) => {
+            const points = vertex_ids.map((vid) => {
                 return this.preprocessor.graph.vertices[vid].position;
             });
 
@@ -466,18 +462,12 @@ export default class SvgDrawer {
             return this.svgWrapper.drawWeights(weights, points, scale);
         }
 
-        let points = [];
-
         const minX = this.svgWrapper.minX;
         const minY = this.svgWrapper.minY;
-
-        for (const atomIdx of this.preprocessor.graph.atomIdxToVertexId) {
-            let vertex = this.preprocessor.graph.vertices[atomIdx];
-            points.push(new Vector2(
-                vertex.position.x - minX,
-                vertex.position.y - minY,
-            ));
-        }
+        const points = vertex_ids.map((vid) => {
+            const vertex = this.preprocessor.graph.vertices[vid];
+            return new Vector2(vertex.position.x - minX, vertex.position.y - minY);
+        });
 
         let gd = new GaussDrawer(
             points, weights, this.svgWrapper.drawingWidth, this.svgWrapper.drawingHeight,
