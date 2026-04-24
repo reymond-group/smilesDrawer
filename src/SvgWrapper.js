@@ -26,6 +26,8 @@ export default class SvgWrapper {
         this.uid = makeid(5);
         this.gradientId = 0;
 
+        this.defaultGradients = new Map();
+
         // maintain a list of line elements and their corresponding gradients
         // maintain a list of vertex elements
         // maintain a list of highlighting elements
@@ -163,42 +165,113 @@ export default class SvgWrapper {
     }
 
     /**
-     * Create a linear gradient to apply to a line
+     * Get the color or gradient URL for a line.
      *
-     * @param {Line} line the line to apply the gradiation to.
+     * @param {Vertex} vertex1 - The vertex on one end of the bond.
+     * @param {Vertex} vertex2 - The vertex on the other end of the bond.
+     * @returns {string} A string that can be used as a stroke or fill.
      */
-    createGradient(line) {
-    // create the gradient and add it
-        let gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'),
-            gradientUrl = this.uid + `-line-${this.gradientId++}`,
-            l = line.getLeftVector(),
-            r = line.getRightVector(),
-            fromX = l.x,
-            fromY = l.y,
-            toX = r.x,
-            toY = r.y;
+    getBondColor(vertex1, vertex2) {
+        const c1 = this.themeManager.getColor(vertex1.value.element);
+        const c2 = this.themeManager.getColor(vertex2.value.element);
 
-        gradient.setAttributeNS(null, 'id', gradientUrl);
+        if (c1 === c2) {
+            return c1;
+        }
+
+        const cc = this.themeManager.getColor('C');
+        const d  = vertex1.position.distance(vertex2.position) / this.opts.bondLength;
+
+        if (d > 0.9 && d < 1.1) {
+            // Bonds of a typical length with carbon on one end can share a radial gradient.
+            if (c1 === cc) return this.getDefaultGradient(vertex2, c2, cc);
+            if (c2 === cc) return this.getDefaultGradient(vertex1, c1, cc);
+        }
+
+        return this.createLinearGradient(vertex1.position, vertex2.position, [
+            ['20%', c1],
+            ['80%', c2],
+        ]);
+    }
+
+    /**
+     * Gets or creates a defaut atom-to-carbon radial gradient around a vertex.
+     *
+     * @param {Vertex}  vertex - The vertex.
+     * @param {?string} color1 - The color of the vertex (uses the color of the atom by default).
+     * @param {?string} color2 - The color at the radiuis (uses the color of carbon by default).
+     * @returns {string} A "url(#gradient-id)" string that can be used as a stroke or fill.
+     */
+    getDefaultGradient(vertex, color1, color2) {
+        let gradientUrl = this.defaultGradients.get(vertex);
+        if (gradientUrl) return gradientUrl;
+
+        gradientUrl = this.createRadialGradient(vertex.position, this.opts.bondLength, [
+            ['20%', color1 || this.themeManager.getColor(vertex.value.element)],
+            ['80%', color2 || this.themeManager.getColor('C')],
+        ]);
+
+        this.defaultGradients.set(vertex, gradientUrl);
+        return gradientUrl;
+    }
+
+    /**
+     * Create a radial gradient around a point.
+     *
+     * @param {Vector2} point  - The central point.
+     * @param {number}  radius - A radius around that point.
+     * @param {Array}   stops  - An array of (offset, color) pairs.
+     * @returns {string} A "url(#gradient-id)" string that can be used as a stroke or fill.
+     */
+    createRadialGradient(point, radius, stops) {
+        const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+        const gradientId = this.uid + `-atom-${this.gradientId++}`;
+
+        gradient.setAttributeNS(null, 'id', gradientId);
         gradient.setAttributeNS(null, 'gradientUnits', 'userSpaceOnUse');
-        gradient.setAttributeNS(null, 'x1', fromX);
-        gradient.setAttributeNS(null, 'y1', fromY);
-        gradient.setAttributeNS(null, 'x2', toX);
-        gradient.setAttributeNS(null, 'y2', toY);
+        gradient.setAttributeNS(null, 'cx', point.x);
+        gradient.setAttributeNS(null, 'cy', point.y);
+        gradient.setAttributeNS(null, 'r',  radius);
 
-        let firstStop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        firstStop.setAttributeNS(null, 'stop-color', this.themeManager.getColor(line.getLeftElement()) || this.themeManager.getColor('C'));
-        firstStop.setAttributeNS(null, 'offset', '20%');
-
-        let secondStop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        secondStop.setAttributeNS(null, 'stop-color', this.themeManager.getColor(line.getRightElement() || this.themeManager.getColor('C')));
-        secondStop.setAttributeNS(null, 'offset', '100%');
-
-        gradient.appendChild(firstStop);
-        gradient.appendChild(secondStop);
+        for (const [offset, color] of stops) {
+            const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop.setAttributeNS(null, 'offset',     offset);
+            stop.setAttributeNS(null, 'stop-color', color);
+            gradient.appendChild(stop);
+        }
 
         this.gradients.push(gradient);
+        return `url(#${gradientId})`;
+    }
 
-        return gradientUrl;
+    /**
+     * Create a linear gradient between two points.
+     *
+     * @param {Vector2} point1 - The first point.
+     * @param {Vector2} point2 - The second point.
+     * @param {Array}   stops  - An array of (offset, color) pairs.
+     * @returns {string} A "url(#gradient-id)" string that can be used as a stroke or fill.
+     */
+    createLinearGradient(point1, point2, stops) {
+        const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+        const gradientId = this.uid + `-bond-${this.gradientId++}`;
+
+        gradient.setAttributeNS(null, 'id', gradientId);
+        gradient.setAttributeNS(null, 'gradientUnits', 'userSpaceOnUse');
+        gradient.setAttributeNS(null, 'x1', point1.x);
+        gradient.setAttributeNS(null, 'y1', point1.y);
+        gradient.setAttributeNS(null, 'x2', point2.x);
+        gradient.setAttributeNS(null, 'y2', point2.y);
+
+        for (const [offset, color] of stops) {
+            const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop.setAttributeNS(null, 'offset',     offset);
+            stop.setAttributeNS(null, 'stop-color', color);
+            gradient.appendChild(stop);
+        }
+
+        this.gradients.push(gradient);
+        return `url(#${gradientId})`;
     }
 
     /**
@@ -331,9 +404,10 @@ export default class SvgWrapper {
     }
 
     /**
-     * @param {Line} line the line object to create the wedge from
+     * @param {Line}   line  - The line object to create the wedge from.
+     * @param {string} color - A CSS color or url(#gradient-id) (defaults to black).
      */
-    drawWedge(line) {
+    drawWedge(line, color = '#000') {
         let l = line.getLeftVector().clone(),
             r = line.getRightVector().clone();
 
@@ -357,10 +431,9 @@ export default class SvgWrapper {
             v = Vector2.add(end, Vector2.multiplyScalar(normals[1], 3.0 + this.opts.fontSizeLarge / 4.0)),
             w = Vector2.add(start, Vector2.multiplyScalar(normals[1], this.halfBondThickness));
 
-        let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon'),
-            gradient = this.createGradient(line, l.x, l.y, r.x, r.y);
+        const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         polygon.setAttributeNS(null, 'points', `${t.x},${t.y} ${u.x},${u.y} ${v.x},${v.y} ${w.x},${w.y}`);
-        polygon.setAttributeNS(null, 'fill', `url('#${gradient}')`);
+        polygon.setAttributeNS(null, 'fill',   color);
         this.paths.push(polygon);
     }
 
@@ -383,10 +456,12 @@ export default class SvgWrapper {
     /**
      * Draw a dashed wedge on the canvas.
      *
-     * @param {Line} line A line.
+     * @param {Line}   line  - A line.
+     * @param {string} color - A CSS color or url(#gradient-id) (defaults to black).
      */
-    drawDashedWedge(line) {
+    drawDashedWedge(line, color = '#000') {
         if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
+            console.error('Invalid line passed to SvgWrapper.drawDashedWedge()!', line);
             return;
         }
 
@@ -414,8 +489,6 @@ export default class SvgWrapper {
             length = line.getLength(),
             step = 1.25 / (length / (this.opts.bondLength / 10.0));
 
-        let gradient = this.createGradient(line);
-
         for (let t = 0.0; t < 1.0; t += step) {
             let to = Vector2.multiplyScalar(dir, t * length),
                 startDash = Vector2.add(start, to),
@@ -426,7 +499,7 @@ export default class SvgWrapper {
             let endDash = startDash.clone();
             endDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
 
-            this.drawLine(new Line(startDash, endDash), null, gradient);
+            this.drawLine(new Line(startDash, endDash), false, color);
         }
     }
 
@@ -445,7 +518,7 @@ export default class SvgWrapper {
         point.setAttributeNS(null, 'r', '2');
         point.setAttributeNS(null, 'fill', color);
         this.vertices.push(point);
-        this.drawDebugText(x, y, debugText);
+        this.drawDebugText(x + 2, y - 2, debugText, color);
     }
 
     /**
@@ -455,15 +528,13 @@ export default class SvgWrapper {
      * @param {Number} y The y coordinate.
      * @param {String} text The debug text.
      */
-    drawDebugText(x, y, text) {
+    drawDebugText(x, y, text, color = '#f00') {
         let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textElem.setAttributeNS(null, 'x', x);
         textElem.setAttributeNS(null, 'y', y);
         textElem.setAttributeNS(null, 'class', 'debug');
-        textElem.setAttributeNS(null, 'fill', '#ff0000');
-        textElem.setAttributeNS(null, 'style', `
-                font: 5px Droid Sans, sans-serif;
-            `);
+        textElem.setAttributeNS(null, 'fill', color);
+        textElem.setAttributeNS(null, 'style', 'font: 5px sans-serif');
         textElem.appendChild(document.createTextNode(text));
 
         this.vertices.push(textElem);
@@ -491,37 +562,33 @@ export default class SvgWrapper {
     /**
      * Draws a line.
      *
-     * @param {Line} line A line.
-     * @param {Boolean} dashed defaults to false.
-     * @param {String} gradient gradient url. Defaults to null.
+     * @param {Line}    line    - A line.
+     * @param {boolean} dashed  - Defaults to false.
+     * @param {string}  color   - A CSS color or url(#gradient-id).
+     * @param {string}  linecap - Defaults to round.
+     *
+     * TODO: Promote `color` to be the second argument, and maybe make it required.
+     * If we make it required, we should do that for other drawing functions as well.
+     * This is API-changing, so save it for v3.0...
      */
-    drawLine(line, dashed = false, gradient = null, linecap = 'round') {
-        let stylesArr = [
-                ['stroke-width', this.opts.bondThickness],
-                ['stroke-linecap', linecap],
-                ['stroke-dasharray', dashed ? '5, 5' : 'none'],
-            ],
-            l = line.getLeftVector(),
-            r = line.getRightVector(),
-            fromX = l.x,
-            fromY = l.y,
-            toX = r.x,
-            toY = r.y;
+    drawLine(line, dashed = false, color = '#000', linecap = 'round') {
+        const l = line.getLeftVector();
+        const r = line.getRightVector();
 
-        let styles = stylesArr.map(sub => sub.join(':')).join(';'),
-            lineElem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const lineElem = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        lineElem.setAttributeNS(null, 'x1', l.x);
+        lineElem.setAttributeNS(null, 'y1', l.y);
+        lineElem.setAttributeNS(null, 'x2', r.x);
+        lineElem.setAttributeNS(null, 'y2', r.y);
 
-        lineElem.setAttributeNS(null, 'x1', fromX);
-        lineElem.setAttributeNS(null, 'y1', fromY);
-        lineElem.setAttributeNS(null, 'x2', toX);
-        lineElem.setAttributeNS(null, 'y2', toY);
-        lineElem.setAttributeNS(null, 'style', styles);
-        this.paths.push(lineElem);
-
-        if (gradient == null) {
-            gradient = this.createGradient(line, fromX, fromY, toX, toY);
+        lineElem.setAttributeNS(null, 'stroke',         color);
+        lineElem.setAttributeNS(null, 'stroke-width',   this.opts.bondThickness);
+        lineElem.setAttributeNS(null, 'stroke-linecap', linecap);
+        if (dashed) {
+            lineElem.setAttributeNS(null, 'stroke-dasharray', '5,5');
         }
-        lineElem.setAttributeNS(null, 'stroke', `url('#${gradient}')`);
+
+        this.paths.push(lineElem);
     }
 
     /**
