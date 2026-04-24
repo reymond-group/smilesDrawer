@@ -445,7 +445,7 @@ export default class SvgWrapper {
         point.setAttributeNS(null, 'r', '2');
         point.setAttributeNS(null, 'fill', color);
         this.vertices.push(point);
-        this.drawDebugText(x, y, debugText);
+        this.drawDebugText(x + 2, y - 2, debugText, color);
     }
 
     /**
@@ -455,15 +455,13 @@ export default class SvgWrapper {
      * @param {Number} y The y coordinate.
      * @param {String} text The debug text.
      */
-    drawDebugText(x, y, text) {
+    drawDebugText(x, y, text, color = '#f00') {
         let textElem = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textElem.setAttributeNS(null, 'x', x);
         textElem.setAttributeNS(null, 'y', y);
         textElem.setAttributeNS(null, 'class', 'debug');
-        textElem.setAttributeNS(null, 'fill', '#ff0000');
-        textElem.setAttributeNS(null, 'style', `
-                font: 5px Droid Sans, sans-serif;
-            `);
+        textElem.setAttributeNS(null, 'fill', color);
+        textElem.setAttributeNS(null, 'style', 'font: 5px sans-serif');
         textElem.appendChild(document.createTextNode(text));
 
         this.vertices.push(textElem);
