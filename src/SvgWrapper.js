@@ -405,9 +405,9 @@ export default class SvgWrapper {
 
     /**
      * @param {Line}   line  - The line object to create the wedge from.
-     * @param {string} color - A CSS color or url(#gradient-id).
+     * @param {string} color - A CSS color or url(#gradient-id) (defaults to black).
      */
-    drawWedge(line, color) {
+    drawWedge(line, color = '#000') {
         let l = line.getLeftVector().clone(),
             r = line.getRightVector().clone();
 
@@ -457,9 +457,9 @@ export default class SvgWrapper {
      * Draw a dashed wedge on the canvas.
      *
      * @param {Line}   line  - A line.
-     * @param {string} color - A CSS color or url(#gradient-id).
+     * @param {string} color - A CSS color or url(#gradient-id) (defaults to black).
      */
-    drawDashedWedge(line, color) {
+    drawDashedWedge(line, color = '#000') {
         if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
             console.error('Invalid line passed to SvgWrapper.drawDashedWedge()!', line);
             return;
@@ -499,7 +499,7 @@ export default class SvgWrapper {
             let endDash = startDash.clone();
             endDash.add(Vector2.multiplyScalar(dashOffset, 2.0));
 
-            this.drawLine(new Line(startDash, endDash), color);
+            this.drawLine(new Line(startDash, endDash), false, color);
         }
     }
 
@@ -565,11 +565,15 @@ export default class SvgWrapper {
      * Draws a line.
      *
      * @param {Line}    line    - A line.
-     * @param {string}  color   - A CSS color or url(#gradient-id).
      * @param {boolean} dashed  - Defaults to false.
+     * @param {string}  color   - A CSS color or url(#gradient-id).
      * @param {string}  linecap - Defaults to round.
+     *
+     * TODO: Promote `color` to be the second argument, and maybe make it required.
+     * If we make it required, we should do that for other drawing functions as well.
+     * This is API-changing, so save it for v3.0...
      */
-    drawLine(line, color, dashed = false, linecap = 'round') {
+    drawLine(line, dashed = false, color = '#000', linecap = 'round') {
         const l = line.getLeftVector();
         const r = line.getRightVector();
 

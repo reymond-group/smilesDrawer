@@ -236,8 +236,8 @@ export default class SvgDrawer {
                 line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
 
                 // Set dashed to true if the edge is part of an aromatic ring:
-                svgWrapper.drawLine(line, color, edge.isPartOfAromaticRing);
-                svgWrapper.drawLine(new Line(a, b, elementA, elementB), color);
+                svgWrapper.drawLine(line, edge.isPartOfAromaticRing, color);
+                svgWrapper.drawLine(new Line(a, b, elementA, elementB), false, color);
             }
             else if (edge.center
                 || (vertexA.isTerminal() && vertexB.isTerminal())
@@ -249,8 +249,8 @@ export default class SvgDrawer {
                 let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB),
                     lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-                svgWrapper.drawLine(lineA, color);
-                svgWrapper.drawLine(lineB, color);
+                svgWrapper.drawLine(lineA, false, color);
+                svgWrapper.drawLine(lineB, false, color);
             }
             else if ((s.sideCount[0] > s.sideCount[1]) || (s.totalSideCount[0] > s.totalSideCount[1])) {
                 this.multiplyNormals(normals, opts.bondSpacing);
@@ -259,8 +259,8 @@ export default class SvgDrawer {
 
                 line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
 
-                svgWrapper.drawLine(line, color);
-                svgWrapper.drawLine(new Line(a, b, elementA, elementB), color);
+                svgWrapper.drawLine(line, false, color);
+                svgWrapper.drawLine(new Line(a, b, elementA, elementB), false, color);
             }
             else if ((s.sideCount[0] < s.sideCount[1]) || (s.totalSideCount[0] <= s.totalSideCount[1])) {
                 this.multiplyNormals(normals, opts.bondSpacing);
@@ -268,8 +268,8 @@ export default class SvgDrawer {
                 let line = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
                 line.shorten(opts.bondLength - opts.shortBondLength * opts.bondLength);
-                svgWrapper.drawLine(line, color);
-                svgWrapper.drawLine(new Line(a, b, elementA, elementB), color);
+                svgWrapper.drawLine(line, false, color);
+                svgWrapper.drawLine(new Line(a, b, elementA, elementB), false, color);
             }
         }
         else if (edge.bondType === '#') {
@@ -279,9 +279,9 @@ export default class SvgDrawer {
             let lineA = new Line(Vector2.add(a, normals[0]), Vector2.add(b, normals[0]), elementA, elementB);
             let lineB = new Line(Vector2.add(a, normals[1]), Vector2.add(b, normals[1]), elementA, elementB);
 
-            svgWrapper.drawLine(lineA, color);
-            svgWrapper.drawLine(lineB, color);
-            svgWrapper.drawLine(new Line(a, b, elementA, elementB), color);
+            svgWrapper.drawLine(lineA, false, color);
+            svgWrapper.drawLine(lineB, false, color);
+            svgWrapper.drawLine(new Line(a, b, elementA, elementB), false, color);
         }
         else if (edge.bondType === '.') {
             // TODO: Something... maybe... version 2?
@@ -297,7 +297,7 @@ export default class SvgDrawer {
                 svgWrapper.drawDashedWedge(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB), color);
             }
             else {
-                svgWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB), color);
+                svgWrapper.drawLine(new Line(a, b, elementA, elementB, isChiralCenterA, isChiralCenterB), false, color);
             }
         }
 
