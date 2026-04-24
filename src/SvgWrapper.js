@@ -626,11 +626,12 @@ export default class SvgWrapper {
 
             text.push([pe_display, pe.element]);
 
-            if (pe.hydrogenCount === 1) {
+            const hcount = pe.hydrogenCount * pe.count;
+            if (hcount === 1) {
                 text.push(['H', 'H']);
             }
-            else if (pe.hydrogenCount > 1) {
-                text.push(['H' + SvgWrapper.createUnicodeSubscript(pe.hydrogenCount), 'H']);
+            else if (hcount > 1) {
+                text.push(['H' + SvgWrapper.createUnicodeSubscript(hcount), 'H']);
             }
         }
 
