@@ -309,7 +309,7 @@ export default class SvgDrawer {
 
         if (debug) {
             let midpoint = Vector2.midpoint(a, b);
-            svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e: ' + edgeId);
+            svgWrapper.drawDebugText(midpoint.x, midpoint.y, 'e' + edgeId, '#0c0');
         }
     }
 
@@ -426,19 +426,16 @@ export default class SvgDrawer {
             }
 
             if (debug) {
-                let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
+                const value = 'v' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
                 svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
             }
-            // else {
-            //   svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
-            // }
         }
 
         // Draw the ring centers for debug purposes
         if (opts.debug) {
             for (let i = 0; i < rings.length; i++) {
                 let center = rings[i].center;
-                svgWrapper.drawDebugPoint(center.x, center.y, 'r: ' + rings[i].id);
+                svgWrapper.drawDebugPoint(center.x, center.y, 'r' + rings[i].id, '#00f');
             }
         }
     }
