@@ -47,9 +47,6 @@ export class CIPTree {
     /* eslint-enable @stylistic/key-spacing */
 
     static build(graph: Graph, vertex: Vertex): CIPTree {
-        // const visited = new Map();
-        // visited.set(vertex, 1);
-
         const root = new CIPTree(graph, vertex, null, new Map());
         root.findChildren();
         root.sortChildren();
