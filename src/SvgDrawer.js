@@ -366,7 +366,6 @@ export default class SvgDrawer {
             }
 
             if (atom.bracket) {
-                hydrogens = atom.bracket.hcount;
                 charge = atom.bracket.charge;
                 isotope = atom.bracket.isotope;
             }
