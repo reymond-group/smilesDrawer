@@ -189,6 +189,14 @@ export class CIPTree {
             this.visited    = null;
             this.children   = [];
             this.sorted     = true;
+
+            // Only real nodes should contribute to stereo ties!
+            // This prevents a copy of an actually-not-chiral root node from
+            // incorrectly causing a stereo tie (e.g. C1CC[C@]2(CC1)CCCC2).
+            this.stereocenter = false;
+
+            // TODO: For full robustness, we may need a way to prevent OTHER (non-root)
+            // not-actually-stereocenters from reporting false stereo ties...
         }
     }
 

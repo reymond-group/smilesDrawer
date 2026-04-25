@@ -2186,5 +2186,13 @@
         "cip": "S"
       }
     ]
+  },
+  "[C@H]2(O)CCCC2": {
+    "name": "False Stereo Tie v1",
+    "centers": []
+  },
+  "C1CC[C@]2(CC1)CCCC2": {
+    "name": "False Stereo Tie v2",
+    "centers": []
   }
 }

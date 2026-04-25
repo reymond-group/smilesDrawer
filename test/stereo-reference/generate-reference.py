@@ -128,6 +128,10 @@ MOLECULES = [
     # Priority ordering tests
     ['Priority Test v1', 'FOOC(CCl)[C@H](F)C(CF)OOCl'],
     ['Priorirt Test v2', 'FOOC(CCl)[C@@H](F)C(CF)OOCl'],
+
+    # False stereo ties
+    ['False Stereo Tie v1', '[C@H]2(O)CCCC2'],
+    ['False Stereo Tie v2', 'C1CC[C@]2(CC1)CCCC2'],
 ]
 
 
