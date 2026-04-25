@@ -24,6 +24,19 @@ function countBits(word){
     }
 /**
  * A fixed-size bit vector backed by Uint32Array.
+ *
+ * SIZE NOTE 
+ * -------------
+ * All binary operations (`xor`, `and`, `or`, `orWith`) assume that `this` and
+ * `other` have the same `size` (and therefore the same `words.length`).
+ *
+ * Within Vismara's cycle-perception pipeline this invariant always holds: every
+ * BitSet is allocated with `size = nEdges` for the graph being processed, so
+ * cycle vectors and basis-coverage vectors live in the same coordinate system.
+ *
+ * Mixing BitSets of different sizes will silently drop bits (xor / or / orWith
+ * iterate `this.words.length` only) or, for `and`, treat the missing high
+ * words as zero. 
  */
 export default class BitSet {
     /**
@@ -45,15 +58,36 @@ export default class BitSet {
 
     /** @param {number} i @returns {boolean} */
     get(i) {
-        // word & (1 <<< n)                             //return boolean 
+        // word & (1 <<< n)                             //return boolean
         return (this.words[ i >>> 5] & (1 << (i & 31))) !== 0;
     }
 
+    /**
+     * Enforces the SIZE NOTE contract above: every binary op must be called
+     * with a same-size BitSet. We compare `size` (bits) rather than
+     * `words.length` (32-bit chunks) because two BitSets can share a word
+     * count while differing in bit length — e.g. size 33 and size 64 both
+     * round up to 2 words, but mixing them would still be a coordinate
+     * mismatch in the cycle algorithm.
+     *
+     * @param {BitSet} other
+     * @param {string} op operation name, used in the error message
+     */
+    _assertSameSize(other, op) {
+        if (this.size !== other.size) {
+            throw new Error(
+                'BitSet.' + op + ': size mismatch (' + this.size + ' vs ' + other.size + '). ' +
+                'See SIZE NOTE in BitSet doc — operands must share the same bit length.'
+            );
+        }
+    }
+
     /** XOR between two BitSet
-     * @param {BitSet} other  
+     * @param {BitSet} other
      * @returns {BitSet} new bitset = this XOR other */
     xor(other) {
         // Needed for addition: Merge two cycles (cancel shared edges)
+        this._assertSameSize(other, 'xor');
         const result = new BitSet(this.size);
         for (let i = 0; i < this.words.length; i++){
             result.words[i] = this.words[i] ^ other.words[i];
@@ -64,6 +98,7 @@ export default class BitSet {
     /** @param {BitSet} other @returns {BitSet} new bitset = this AND other */
     and(other) {
         // Needed to see what edges two cycles share
+        this._assertSameSize(other, 'and');
         const result = new BitSet(this.size);
         for (let i = 0; i < this.words.length; i++){
             result.words[i] = this.words[i] & other.words[i];
@@ -74,6 +109,7 @@ export default class BitSet {
     /** @param {BitSet} other @returns {BitSet} new bitset = this OR other */
     or(other) {
         // For checking what edges are covered by the basis so far
+        this._assertSameSize(other, 'or');
         const result = new BitSet(this.size);
         for (let i = 0; i < this.words.length; i++){
             result.words[i] = this.words[i] | other.words[i];
@@ -83,9 +119,10 @@ export default class BitSet {
 
     /** @param {BitSet} other Mutating OR: this |= other */
     orWith(other) {
-        // Check what edges are covered by the basis so far 
+        // Check what edges are covered by the basis so far
         //orWith is a mutation union: A <- A u B; modifies A in place
         // Used in GreedyBasis to accumulate the basis's edge coverage without allocating a new BitSet each time.
+        this._assertSameSize(other, 'orWith');
         for (let i = 0; i < this.words.length; i++){
             this.words[i] |= other.words[i]
         };
@@ -276,6 +313,134 @@ export function shortestPaths(graph, start, limit, ordering) {
 
 }
 
+
+/**
+ * Check if two paths from a common root only intersect at the root.
+ * Paths are BFS shortest paths so vertex at index i is at distance i.
+ * Used in Vismara;s Algorithm 1 Line 8 
+ * @param {number[]} p first path
+ * @param {number[]} q second path
+ * @returns {boolean}
+ */
+function singletonIntersect(p, q) {
+    let n = p.length;
+    for (let i = 1; i < n; i++) {
+        if (p[i] === q[i]) return false;
+    }
+    return true;
+}
+
+
+/**
+ * Join two paths end-on-end for an odd cycle: pathToY forward, pathToZ reversed.
+ * pathToY = [r, ..., y], pathToZ = [r, ..., z]
+ * result = [r, ..., y, z, ..., r_neighbor] (closed by adjacency y-z)
+ *
+ * @param {number[]} pathToY
+ * @param {number[]} pathToZ
+ * @returns {number[]}
+ */
+function joinOdd(pathToY, pathToZ) {
+    let path = new Array(pathToY.length + pathToZ.length);
+    for (let i = 0; i < pathToY.length; i++) {
+        path[i] = pathToY[i];
+    }
+    let j = path.length - 1;
+    for (let i = 0; i < pathToZ.length; i++) {
+        path[j--] = pathToZ[i];
+    }
+    return path;
+}
+
+/**
+ * Join two paths through a vertex y for an even cycle.
+ * pathToP = [r, ..., p], pathToQ = [r, ..., q]
+ * result = [r, ..., p, y, q, ..., r_neighbor]
+ *
+ * @param {number[]} pathToP
+ * @param {number} y
+ * @param {number[]} pathToQ
+ * @returns {number[]}
+ */
+function joinEven(pathToP, y, pathToQ) {
+    let path = new Array(pathToP.length + 1 + pathToQ.length);
+    for (let i = 0; i < pathToP.length; i++) {
+        path[i] = pathToP[i];
+    }
+    path[pathToP.length] = y;
+    let j = path.length - 1;
+    for (let i = 0; i < pathToQ.length; i++) {
+        path[j--] = pathToQ[i];
+    }
+    return path;
+}
+
+/**
+ * translates a vertex-path representation of a cycle into a bit-vector representation 
+ * over the edge set, which is the form Gaussian elimination needs
+ *
+ * @param {number[]} path vertex path where path[0] connects to path[last]
+ * @param {Map<string,number>} edgeIndex edge index map
+ * @param {number} nEdges total number of edges
+ * @returns {BitSet}
+ */
+function pathToEdgeVector(path, edgeIndex, nEdges) {
+    let bs = new BitSet(nEdges);
+    let len = path.length - 1;
+    for (let i = 0; i < len; i++) {
+        let u = path[i], v = path[i + 1];
+
+        //normalize key = (u < v) ? "u,v" : "v,u" because edges are undirected, 
+        // so the algorithm might traverse (0, 9) or (9, 0) depending on which way around 
+        // the cycle you walk.
+        //   Normalizing to lower-vertex-first guarantees both encodings hit the same bit
+        let key = (u < v) ? u + ',' + v : v + ',' + u;
+        bs.set(/** @type {number} */ (edgeIndex.get(key))); 
+    // Input:  path = [9, 0, 1, 2, 3, 4, 9]    closed cycle, first==last
+    // edgeIndex = { "0,1":0, "1,2":1, "2,3":2, "3,4":3, ... }
+    // nEdges = 11
+
+    //   Process:
+    //     bs = empty BitSet of length 11
+    //     len = path.length - 1 = 6   (number of edges)
+    //     iterate i = 0..5:
+    //       i=0: u=9, v=0 → key "0,9"  → set bit edgeIndex["0,9"]
+    //       i=1: u=0, v=1 → key "0,1"  → set bit edgeIndex["0,1"]
+    //       ...
+    //       i=5: u=4, v=9 → key "4,9"  → set bit edgeIndex["4,9"]
+
+    }
+    return bs;
+}
+
+/**
+ * Index all edges in the graph. Each undirected edge (u,v) with u < v
+ * gets a unique integer index.
+ *
+ * @param {number[][]} graph adjacency list
+ * @returns {{toIndex: Map<string,number>, count: number}}
+ */
+function indexEdges(graph) {
+    let toIndex = new Map();
+    let n = graph.length;
+
+    for (let v = 0; v < n; v++) {
+        for (let k = 0; k < graph[v].length; k++) {
+            let w = graph[v][k];
+            if (w > v) {
+                let key = v + ',' + w;
+                if (!toIndex.has(key)) {
+                    toIndex.set(key, toIndex.size);
+                }
+            }
+        }
+    }
+
+    return {toIndex, count: toIndex.size};
+}
+
+
+    
 /**
  * Compute vertex ordering by degree (ascending), using counting sort.
  * π(x) < π(y) => deg(x) ≤ deg(y).
@@ -326,3 +491,100 @@ export function computeOrdering(graph) {
 // follow with vertex with higher degree (vertex 1 and 2)
 // assign rank again by index order (1 -> 3; 2 -> 4)
 // result vertex 0,1,2,3,4 get rank (0, 3, 4, 1, 2)
+
+
+/**
+ * Compute the initial cycle set C'_I using Vismara's algorithm (Algorithm 1).
+ *
+ * @param {number[][]} graph adjacency list
+ * @returns {{cycles: Map<number, Array<{path: number[], edgeVector: BitSet}>>, edgeIndex: Map<string,number>, nEdges: number}}
+ */
+export function computeInitialCycles(graph) {
+    let n = graph.length;
+    let ordering = computeOrdering(graph); //assign pi rank
+    
+    let s = new Array(n) // Set 'S' for collecting vertices adjacent to y 
+    // with distance to (z) + 1 ==== dist (y) (line 4)
+
+    // cycles grouped by length
+    /**
+     * @type {Map<number, Array<{path: number[], edgeVector: BitSet}>>} 
+     */
+    let cycles = new Map();
+    
+    let {toIndex: edgeIndex, count: nEdges} = indexEdges(graph);
+
+    let vertices = new Array(n);
+    for (let v = 0; v < n; v++) {
+        vertices[ordering[v]] = v;
+    }
+    
+    function addCycle(path) {
+        let edgeVector = pathToEdgeVector(path, edgeIndex, nEdges);
+        let len = path.length - 1; // number of edges = cycle length
+        let group = cycles.get(len);
+        if (!group){
+            group = [];
+            cycles.set(len, group);
+        }
+        group.push({path, edgeVector});
+    }
+
+    
+    let first = 2; // smllest cycle is 3 vertices, we can skip first 2 ordered vertices
+
+    for (let i = first; i< n; i++){ // for all vertices 
+        let r = vertices[i];
+        //compute Vr (subset of shortest paths from vertex to r)
+        // limit to n/2 is simply because the shortest path for any relevant cycle
+        // can be at most n/2  (Vismara Lemma 2)
+        let paths = shortestPaths(graph, r, Math.floor(n / 2), ordering);
+
+
+        // for all y /in Vr do: 
+        for (let j= 0; j < i; j++){
+            let y = vertices[j];
+            if (!paths.isPrecedingPathTo(y)) continue; // only those respecting pi order
+
+            let sizeOfS = 0;
+
+            // for all z in Vr...
+            for (let k =0; k < graph[y].length; k++){
+                let z = graph[y][k]; //...such that z is adjacent to y (i.e. neighbor)
+                if (!paths.isPrecedingPathTo(z)) continue;
+                
+                // if d(r,z) + d(z,y) = d(r,y) (line 6)
+                // here we write d(z,y) instead of w(z,y) because weight is always 1 for our case
+                let distToZ = paths.distTo[z];
+                let distToY = paths.distTo[y];
+                // d(z,y) = 1 because they are adjacent
+
+                if (distToZ + 1 === distToY){
+                    s[sizeOfS++] = z;
+                }
+                //elseif d(r, z) != d(r, y) + d(z, y) and π(z) < π(y) and P(r, y) ∩ P(r, z) = {r}
+                // Line 8 
+                else if (distToZ === distToY && ordering[z] < ordering[y]) {
+                    let pathToY = paths.pathTo(y);
+                    let pathToZ = paths.pathTo(z);
+                    if (singletonIntersect(pathToZ, pathToY)) {
+                        addCycle(joinOdd(pathToY, pathToZ));
+                    }
+                }
+            } 
+
+            // Check pairs in s for even cycles
+            for (let k = 0; k < sizeOfS; k++) {
+                for (let l = k + 1; l < sizeOfS; l++) {
+                    let pathToP = paths.pathTo(s[k]);
+                    let pathToQ = paths.pathTo(s[l]);
+                    if (singletonIntersect(pathToP, pathToQ)) {
+                        addCycle(joinEven(pathToP, y, pathToQ));
+                    }
+                }
+            }
+        }
+    }
+
+    return {cycles, edgeIndex, nEdges};
+}
