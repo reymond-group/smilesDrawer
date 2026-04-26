@@ -136,9 +136,6 @@ export default class SvgWrapper {
 
         this.updateViewbox(this.opts.scale);
 
-        // Position the background
-        background.setAttributeNS(null, 'style', `transform: translateX(${this.minX}px) translateY(${this.minY}px)`);
-
         if (this.svg) {
             this.svg.appendChild(defs);
             this.svg.appendChild(masks);
@@ -703,6 +700,51 @@ export default class SvgWrapper {
         }
 
         this.write(text, direction, x, y, totalVertices === 1);
+    }
+
+    /**
+     * Draw highlights under the heavy atoms (blurred using a CSS filter).
+     *
+     * @param {number[]}  weights - An array of weights, one for each heavy atom.
+     * @param {Vector2[]} points  - An array of points, one for each heavy atom.
+     * @param {number}    scale   - A multiplier used to normalize the weights (typically 1/max(abs(weights))).
+     */
+    drawWeights(weights, points, scale) {
+        // NOTE: This calculates the highlight circle radius and the blur radius
+        // based on opts.weights.sigma and tries to mimic the existing (GaussDrawer)
+        // output.  We'll eventually want dedicated options for those instead.
+        const sigma = this.opts.weights.sigma;
+
+        // Use the first and last colors in the color map, if given.
+        // Default to the same values as GaussDrawer (https://loading.io/color/feature/PiYG-11/).
+        // TODO: Suport a full color map and the option to disable opacity scaling.
+        const cmap = this.opts.weights.colormap;
+        const pos  = (cmap == null) ? '#4d9221' : cmap[cmap.length - 1];
+        const neg  = (cmap == null) ? '#c51b7d' : cmap[0];
+
+        // This uses a CSS blur because it's simple and because different browsers
+        // interpret feGaussianBlur's stdDeviation attribute differently (σ vs 2σ).
+        // TODO: Test this in other rendering engines, and if they can't handle it,
+        // add feGaussianBlur back as a fallback / configuration option.
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttributeNS(null, 'style', `filter:blur(${sigma / 2}px)`);
+        this.backgroundItems.push(g);
+
+        for (let i = 0; i < weights.length; ++i) {
+            const weight = weights[i];
+            const point  = points[i];
+            if (!weight) continue;
+
+            let color = (weight > 0) ? pos : neg;
+            color = `rgb(from ${color} r g b / ${Math.abs(weight) * scale})`;
+
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttributeNS(null, 'cx',   point.x);
+            circle.setAttributeNS(null, 'cy',   point.y);
+            circle.setAttributeNS(null, 'r',    sigma);
+            circle.setAttributeNS(null, 'fill', color);
+            g.appendChild(circle);
+        }
     }
 
     write(text, direction, x, y, singleVertex) {

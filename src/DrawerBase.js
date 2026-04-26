@@ -63,6 +63,7 @@ export default class DrawerBase {
             fontSizeSmall:               3,
             padding:                     10.0,
             experimentalSSSR:            false,
+            experimentalWeights:         false,
             kkThreshold:                 0.1,
             kkInnerThreshold:            0.1,
             kkMaxIteration:              20000,
