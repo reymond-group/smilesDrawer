@@ -479,9 +479,9 @@ export function computeOrdering(graph) {
 // let this graph be the example
 //     0
 //    / \
-//   1───2
+//   1--─2
 //   |   |
-//   3───4
+//   3--─4
 
 // graph = [[1,2], [0,2,3], [0,1,4], [1,4], [2,3]] adjacency list 
 // degrees: [2, 3, 3, 2, 2] (i.e number of bonds)
@@ -519,6 +519,7 @@ export function computeInitialCycles(graph) {
         vertices[ordering[v]] = v;
     }
     
+    /** @param {any} path  */
     function addCycle(path) {
         let edgeVector = pathToEdgeVector(path, edgeIndex, nEdges);
         let len = path.length - 1; // number of edges = cycle length
@@ -588,3 +589,422 @@ export function computeInitialCycles(graph) {
 
     return {cycles, edgeIndex, nEdges};
 }
+
+
+// BitMatrix (GF(2) elimination) 
+// GF(2) is essentially the same as the Gauss-Jordan over the real numbers from linear algebra
+// The algorithm can be summarize as
+//   for each column x = 0, 1, 2, ... (the pivot column):
+//       find the first row at-or-below current row y whose bit x is 1
+//       if none: move to next column, same y
+//       else:    swap that row up to position y (it's the pivot row)
+//                for every row below y that has bit x set:  row ^= pivot_row
+//                y += 1   (move to next row)
+
+// BitMatrix helps to keep independence between cycle basis. Let's say we already have 
+// two bases c1 and c2 and now Vismara hands a candidate cycle c3 
+// question becomes if we should add c3 to the basis. Only if it's linearly independent of {c1, c2}. 
+// again, very similar to linear algebra with vector basis
+// to see what cycle basis are check vismara page 5
+//
+
+// For example for graph formed by two fused triangles
+//   0 --- 1
+//   | \   | 
+//   |   \ | 
+//   2  -- 3
+//  edges: e0=(0,1), e1=(0,2), e2=(0,3), e3=(1,3), e4=(2,3)
+// The bit matrix is 
+//                     e0 e1 e2 e3 e4   original index
+//   row 0 (c1):        1  0  1  1  0   j=0
+//   row 1 (c2):        0  1  1  0  1   j=1
+//   row 2 (c3):        1  1  0  1  1   j=2
+// rank=2 and by GF(2) elimination we realize c3 is dependent 
+
+export class BitMatrix {
+    /**
+     * @param {number} columns
+     * @param {number} maxRows
+     */
+    constructor(columns, maxRows) {
+        this._n = columns;
+        this._max = maxRows;
+        /** @type {BitSet[]} */
+        this._rows = new Array(maxRows);
+        this._indices = new Int32Array(maxRows);
+        this._m = 0;
+    }
+
+    /** @param {BitSet} row */
+    add(row) {
+        this._rows[this._m] = row;
+        // we need _indices to keep track after swaping rows
+        // otherwise we cannot track if our added basis is eliminiated
+        // or not
+        this._indices[this._m] = this._m;
+        this._m++;
+    }
+
+    /**
+     * Swap rows i and j, tracking original indices.
+     * @param {number} i
+     * @param {number} j
+     */
+    swap(i, j) {
+        let tmpRow = this._rows[i];
+        let tmpIdx = this._indices[i];
+        this._rows[i] = this._rows[j];
+        this._indices[i] = this._indices[j];
+        this._rows[j] = tmpRow;
+        this._indices[j] = tmpIdx;
+    }
+
+    /**
+     * Find current position of original row j.
+     * @param {number} j
+     * @returns {number}
+     */
+    _rowIndex(j) {
+        for (let i = 0; i < this._m; i++) {
+            if (this._indices[i] === j) return i;
+        }
+        return -1;
+    }
+
+    /**
+     * Check if the row originally added at index j was eliminated to zero.
+     * @param {number} j
+     * @returns {boolean}
+     */
+    eliminated(j) {
+        return this._rows[this._rowIndex(j)].isEmpty();
+    }
+
+    /**
+     * Gaussian elimination over GF(2). Returns the rank.
+     * @returns {number}
+     */
+    eliminate() {
+        return this._eliminate(0, 0);
+    }
+
+    /**
+     * @param {number} x column index
+     * @param {number} y row index
+     * @returns {number} rank
+     */
+    _eliminate(x, y) {
+        while (x < this._n && y < this._m) {
+            // Find first row >= y with bit x set
+            let i = -1;
+            for (let j = y; j < this._m; j++) {
+                if (this._rows[j].get(x)) {
+                    i = j;
+                    break;
+                }
+            }
+
+            if (i < 0) return this._eliminate(x + 1, y);
+
+            if (i !== y) this.swap(i, y);
+
+            // XOR row y into all rows below that have bit x set
+            for (let j = y + 1; j < this._m; j++) {
+                if (this._rows[j].get(x)) {
+                    this._rows[j] = this._rows[j].xor(this._rows[y]);
+                }
+            }
+
+            y++;
+        }
+        return y;
+    }
+}
+
+
+// sort cycles by lenght, ascending
+// for each cycle c (in that order):
+//  if c is independent of the basis so far: 
+    //    add c 
+    // if basis is full (E - V + 1):
+    //    stop 
+export class GreedyBasis{
+    /**
+     * @param {number} nEdges number of edges in the graph 
+     */
+    constructor(nEdges){
+        /** @type {Array<{path: number[], edgeVector: BitSet}>} */
+        this._members = [];
+        this._edgesOfBasis = new BitSet(nEdges);
+        this._nEdges = nEdges;
+    }
+
+    /** @param {{path: number[], edgeVector: BitSet}} cycle */
+    add(cycle) {
+        this._members.push(cycle);
+        // Add what edges are covered by the basis so far
+        this._edgesOfBasis.orWith(cycle.edgeVector) // orWith is a union 
+    }
+
+    /** @returns {Array<{path: number[], edgeVector: BitSet}>} */
+    members() {
+        return this._members;
+    }
+
+    /** @returns {number} */
+    size() {
+        return this._members.length;
+    }
+
+    /**
+     * check if all edges of the cycle already in the basis
+     * @param {{path: number[], edgeVector: BitSet}} cycle
+     * @returns {boolean}
+     */
+    isSubsetOfBasis(cycle) {
+
+        // this is an optimized way of checking if c.edges is a subset of edgesOfBasis
+        // and makes the BitSet class worth it
+        // naive would iterate every bit of c.edgeVector and verify it's set in _edgesOfBasis
+        // but we can use cardinality identity | A n B |  = |A| iff A ⊆ B
+        
+        let intersection = this._edgesOfBasis.and(cycle.edgeVector).cardinality()
+        return intersection === cycle.edgeVector.cardinality();
+
+        // Example;
+        //  _edgesOfBasis  =  1 1 1 1 0   (basis covers e0, e1, e2, e3)
+        //   candidate c    =  1 0 1 0 1   (uses e0, e2, e4)
+        //   intersection   =  1 0 1 0 0   cardinality 2 !== c.cardinality (3)
+        // therefore c is not subset of basis
+        }
+
+    /**
+     * Full independence check via GF(2) Gaussian elimination.
+     * @param {{path: number[], edgeVector: BitSet}} candidate
+     * @returns {boolean}
+     */
+    isIndependent(candidate){
+        //cheap path
+        // if the candidate has any edge outside union, it cannot possibly be
+        // a XOR  (addition) of basis cycles (because XOR can never invent an edge that none of the basis has)
+        // So it's independent - faster than doing the full GF(2) eliminitatino which requires building the matrix etc.
+
+        if (this._members.length ===0 || !this.isSubsetOfBasis(candidate)){
+            return true;
+        }
+
+        // expensive path, check via GF(2) 
+        let matrix = new BitMatrix(this._nEdges, this._members.length + 1);
+        for (let i = 0; i < this._members.length; i++){
+            matrix.add(this._members[i].edgeVector.clone());
+        }
+        matrix.add(candidate.edgeVector.clone())
+        matrix.eliminate()
+        // After eliminate(), check whether the row originally added at index members.length got removed 
+        // If it did, candidate is dependent. If not, independent.
+
+        return !matrix.eliminated(this._members.length) // check last row 
+        // it is important to add candidate last because that way we now its index is members length!
+    }
+}
+
+// ----------- Public API ----------
+// Compute Minicum Cycle Basis and RelevantCycle 
+// To understand why we need both see end of this file
+
+/**
+ * Compute the Minimum Cycle Basis (MCB a.k.a SSSR) of a graph.
+ * Returns exactly E - V + 1 linearly independent cycles per connected component.
+ *
+ * This is Horton's algorithm (1987) which extracts a cycle basis from an inital set of cycles (C_I)
+ * which we get from Algorithm 1 (computeInitialCycles)
+ * @param {number[][]} adjList adjacency list (adjList[v] = array of neighbor vertex indices)
+ * @returns {number[][]} array of cycles, each cycle is a closed vertex path [v0, v1, ..., vn, v0]
+ */
+export function minimumCycleBasis(adjList) {
+    // MCB ("smallest set of smallest rings", SSSR):
+    // give me ANY linearly independent set of nSssr = E - V + 1 cycles,
+    // picked greedily by length. arbitrary ties are broken by input order.
+
+    let n = adjList.length;
+    if (n < 3) return []; // minimum cycle is 3
+
+    let {cycles: initialCycles, nEdges} = computeInitialCycles(adjList);
+    let basis = new GreedyBasis(nEdges);
+
+    // Compute the expected number of independent cycles
+    let nSssr = nEdges - n + 1;    
+    // TODO: patch nSssr for disconnected graphs
+    // this assumes connected graph, 
+    // for a graph with C connected components its nEdges - n + C
+    
+    // sort initialCycles by lengths in ascending order (shortest cycles first)
+    let sortedCycles = [...initialCycles.keys()].sort((a,b) => a - b);
+
+    for (let li = 0; li < sortedCycles.length; li++){
+
+        let group = initialCycles.get(sortedCycles[li]);
+        
+        // @ts-ignore
+        for (let ci = 0; ci < group.length; ci++) {
+            if (basis.size() >= nSssr) 
+                break;
+            // @ts-ignore
+            if (basis.isIndependent(group[ci])) {
+                // @ts-ignore
+                basis.add(group[ci]);
+            }
+        }
+    }
+
+    return basis.members().map(c => c.path);
+}
+
+
+/**
+ * Compute the Relevant Cycles of a graph: i.e. the union of all possible MCBs.
+ * This set is unique and contains all minimum-weight cycles needed for
+ * unambiguous depiction of symmetric ring systems.
+ *
+ * @param {number[][]} adjList adjacency list
+ * @returns {number[][]} array of cycles, each cycle is a closed vertex path [v0, v1, ..., vn, v0]
+ */
+export function relevantCycles(adjList) {
+    // RC ("relevant cycles"):
+    // give me the UNION of all MCBs i.e. every cycle that some MCB
+    // could legitimately have chosen. always unique, always a superset
+    // of any single MCB.
+
+    let n = adjList.length;
+    if (n < 3) return []; // minimum cycle is 3
+
+    let {cycles: initialCycles, nEdges} = computeInitialCycles(adjList);
+    let basis = new GreedyBasis(nEdges);
+
+    // accumulate the relevant cycles separately;
+    let relevant = [];
+
+    // sort initialCycles by lengths in ascending order (shortest cycles first).
+    // RC, like MCB, is greedy in length 
+    let sortedCycles = [...initialCycles.keys()].sort((a,b) => a - b);
+
+    // process one length class at a time. the key invariant: when we test a
+    // cycle C of length L, the basis must contain ONLY cycles strictly shorter
+    // than L. that is what makes "independent" mean "not a sum of strictly
+    // shorter cycles"  which is the definition of relevant. see vismara
+    for (let li = 0; li < sortedCycles.length; li++) {
+        let group = initialCycles.get(sortedCycles[li]);
+
+        // pending = the cycles of THIS length that turn out to be relevant.
+        // we collect them all before touching the basis, because we do NOT
+        // want adding the first relevant cycle of length L to disqualify a
+        // sibling cycle of the same length L. equal-length cycles can be
+        // pairwise dependent on each other modulo shorter cycles, and RC
+        // keeps them all (this is exactly where RC differs from MCB 
+        // MCB picks one while RC keeps both).
+        let pending = [];
+
+        // @ts-ignore bc group is always defined here (key came from .keys())
+        for (let ci = 0; ci < group.length; ci++) {
+            // independence is checked against the basis as it stands right
+            // now, which only contains cycles of length < L. so this is
+            // really asking: "is C expressible as a XOR-sum of strictly
+            // shorter cycles?" if not C is relevant.
+            // note: NO early-exit on basis.size() here. unlike MCB we don't
+            // know the final size of RC up front (it can exceed nSssr), and
+            // stopping early would silently drop relevant cycles.
+            if (basis.isIndependent(group[ci])) {
+                pending.push(group[ci]);
+                relevant.push(group[ci].path);
+            }
+        }
+
+        // bulk-commit AFTER the length class is fully scanned. now the basis
+        // grows by all relevant cycles of length L at once, so that the next
+        // length class (L+1) sees them as "shorter". any subsequent same-length
+        // dependencies among them are irrelevant and we already decided they
+        // were all relevant against the strictly-shorter basis, which is the
+        // only check that matters for RC.
+        for (let ci = 0; ci < pending.length; ci++) {
+            basis.add(pending[ci]);
+        }
+    }
+
+    return relevant;
+}
+
+
+
+/**
+ * Convert an adjacency matrix to an adjacency list.
+ *
+ * @param {number[][]} matrix square adjacency matrix
+ * @returns {number[][]} adjacency list
+ */
+export function matrixToAdjList(matrix) {
+    let n = matrix.length;
+    let adj = new Array(n);
+    for (let i = 0; i < n; i++) {
+        adj[i] = [];
+        for (let j = 0; j < n; j++) {
+            if (matrix[i][j] === 1) adj[i].push(j);
+        }
+    }
+    return adj;
+}
+
+// Why are MCB (SSSR) and RC necessary 
+// They differ only when two or more equal-length cycles are pairwise
+// dependent on each other but jointly independent of all strictly-shorter
+// cycles. MCB picks one (whichever the input order happened to put first);
+// RC keeps all of them.
+//
+// example: cubane (C8H8) which has 8 vertices, 12 edges, nSssr = 12 - 8 + 1 = 5
+//
+//        7 ----- 6
+//       /|      /|
+//      4 ----─ 5 |
+//      | │     │ |
+//      | 3  --─│─2          six 4-membered faces:
+//      |/      │/              top:    {4,5,6,7}
+//      0 ---- 1                bottom: {0,1,2,3}
+//                              front:  {0,1,5,4}
+//                              back:   {3,2,6,7}
+//                              left:   {0,3,7,4}
+//                              right:  {1,2,6,5}
+//
+//   MCB(cubane) = 5 of the 6 faces (the 6th = XOR of the others).
+//                 which 5? whichever 5 the greedy loop encountered first
+//                 not chemically meaningful.
+//   RC(cubane)  = all 6 faces. depicts the cube symmetrically.
+//
+// Why we need BOTH in a drawing pipeline:
+//
+//   - MCB is the right input for layout/coordinate generation. The cycle
+//     space has dimension nSssr; trying to lay out 6 faces of a cube as if
+//     they were independent over-constrains the embedder. You want exactly
+//     a basis, no more.
+//
+//   - RC is the right input for *perception* (aromaticity, ring membership,
+//     "is atom X in a ring of size 4?"). An MCB can omit a chemically real
+//     ring just because it happened to be the dependent one. RC never does.
+//     Drawing cubane with only 5 faces visible would be wrong; perceiving
+//     atom 0 as "in three 4-rings" requires RC, not MCB.
+//
+// Equality cases (MCB == RC):
+//   - Naphthalene: two 6-rings sharing an edge. Independent over GF(2),
+//     nothing dependent at equal length -> MCB = RC = {ring1, ring2}.
+//   - Norbornane: two 5-rings + one 6-ring. The 6-ring IS the XOR of the
+//     two 5-rings, but it's strictly longer, so RC excludes it ("not a
+//     sum of strictly shorter cycles" fails - it IS such a sum, just at
+//     greater length). MCB = RC = the two 5-rings.
+//
+// Inequality cases (MCB ⊊ RC):
+//   - Cubane (above): MCB has 5, RC has 6.
+//   - Bicyclo[2.2.2]octane (DABCO skeleton): three 6-rings sharing two
+//     bridgeheads. nSssr = 2. MCB picks any 2; RC keeps all 3.
+//   - K4 (tetrahedron): four 3-faces, nSssr = 3. MCB picks any 3; RC = 4.
+//
+// Rule of thumb: if the molecule has a symmetric polycyclic system
+// (cage, fused-bridged), MCB ≠ RC and you need RC to depict it faithfully.
+//
