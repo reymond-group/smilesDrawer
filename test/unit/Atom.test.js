@@ -84,6 +84,104 @@ describe('Atom', () => {
         });
     });
 
+    describe('countImplicitHydrogens()', () => {
+        it('should return the expected values for lone atoms in the "organic subset"', () => {
+            expect(new Atom('B' ).countImplicitHydrogens()).toEqual(3);
+            expect(new Atom('C' ).countImplicitHydrogens()).toEqual(4);
+            expect(new Atom('N' ).countImplicitHydrogens()).toEqual(3);
+            expect(new Atom('O' ).countImplicitHydrogens()).toEqual(2);
+            expect(new Atom('F' ).countImplicitHydrogens()).toEqual(1);
+            expect(new Atom('P' ).countImplicitHydrogens()).toEqual(3);
+            expect(new Atom('S' ).countImplicitHydrogens()).toEqual(2);
+            expect(new Atom('Cl').countImplicitHydrogens()).toEqual(1);
+            expect(new Atom('Br').countImplicitHydrogens()).toEqual(1);
+            expect(new Atom('I' ).countImplicitHydrogens()).toEqual(1);
+        });
+
+        it('should return smaller values for atoms with bonds', () => {
+            const atom1 = new Atom('C');
+            atom1.bondCount = 3;
+            expect(atom1.countImplicitHydrogens()).toEqual(1);
+
+            const atom2 = new Atom('O');
+            atom2.bondCount = 2;
+            expect(atom2.countImplicitHydrogens()).toEqual(0);
+        });
+
+        // TODO: This is a HACK and should eventually be reworked.
+        it('should return smaller values for atoms in aromatic rings', () => {
+            const atom1 = new Atom('C');
+            atom1.bondCount = 2;
+            atom1.isPartOfAromaticRing = true;
+            expect(atom1.countImplicitHydrogens()).toEqual(1);
+
+            const atom2 = new Atom('N');
+            atom2.bondCount = 2;
+            atom2.isPartOfAromaticRing = true;
+            expect(atom2.countImplicitHydrogens()).toEqual(0);
+        });
+
+        it('should correctly handle atoms with multiple possible valences', () => {
+            function test(element, bonds, hydrogens) {
+                const atom = new Atom(element);
+                atom.bondCount = bonds;
+                expect(atom.countImplicitHydrogens()).toEqual(hydrogens);
+            }
+
+            test('N', 0, 3);
+            test('N', 1, 2);
+            test('N', 2, 1);
+            test('N', 3, 0);
+            test('N', 4, 1);
+            test('N', 5, 0);
+
+            test('S', 0, 2);
+            test('S', 1, 1);
+            test('S', 2, 0);
+            test('S', 3, 1);
+            test('S', 4, 0);
+            test('S', 5, 1);
+            test('S', 6, 0);
+
+            test('P', 0, 3);
+            test('P', 1, 2);
+            test('P', 2, 1);
+            test('P', 3, 0);
+            test('P', 4, 1);
+            test('P', 5, 0);
+        });
+
+        it('should return zero for atoms with more bonds than expected', () => {
+            const atom1 = new Atom('O');
+            atom1.bondCount = 42;
+            expect(atom1.countImplicitHydrogens()).toEqual(0);
+
+            const atom2 = new Atom('C');
+            atom2.bondCount = 5;
+            expect(atom2.countImplicitHydrogens()).toEqual(0);
+        });
+
+        it('should return zero for unknown and invalid atoms', () => {
+            expect(new Atom('Be').countImplicitHydrogens()).toEqual(0);
+            expect(new Atom('W' ).countImplicitHydrogens()).toEqual(0);
+            expect(new Atom('Rb').countImplicitHydrogens()).toEqual(0);
+            expect(new Atom('X' ).countImplicitHydrogens()).toEqual(0);
+        });
+
+        it('should return the user-specified value for non-chiral bracket atoms', () => {
+            const atom = new Atom('C');
+            atom.bracket = {hcount: 3};
+            expect(atom.countImplicitHydrogens()).toEqual(3);
+        });
+
+        it('should return a calculated value for chiral bracket atoms', () => {
+            const atom = new Atom('C');
+            atom.bracket = {hcount: 1, chirality: '@'};
+            atom.bondCount = 4; // Any H will be explicit in this case.
+            expect(atom.countImplicitHydrogens()).toEqual(0);
+        });
+    });
+
     describe('neighbouringElements', () => {
         it('should track neighbours', () => {
             const atom = new Atom('C');
@@ -107,15 +205,6 @@ describe('Atom', () => {
             expect(Atom.atomicNumbers['N']).toBe(7);
             expect(Atom.atomicNumbers['O']).toBe(8);
             expect(Atom.atomicNumbers['Fe']).toBe(26);
-        });
-    });
-
-    describe('maxBonds', () => {
-        it('should return correct max bonds', () => {
-            expect(Atom.maxBonds['C']).toBe(4);
-            expect(Atom.maxBonds['N']).toBe(3);
-            expect(Atom.maxBonds['O']).toBe(2);
-            expect(Atom.maxBonds['H']).toBe(1);
         });
     });
 
