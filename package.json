@@ -27,8 +27,9 @@
     "typecheck": "npm exec -- tsc --noEmit",
     "watch":     "node ./scripts/watch.mjs",
 
-    "test:ci":     "npm run test:unit && npm run test:stereo",
-    "test:stereo": "npm exec -- vitest run test/stereo-reference/stereo-vs-rdkit.test.js",
-    "test:unit":   "npm exec -- vitest run test/unit test/regression"
+    "test:ci":       "npm exec -- vitest run test/unit test/regression test/formula-reference test/stereo-reference",
+    "test:formulae": "npm exec -- vitest run test/formula-reference",
+    "test:stereo":   "npm exec -- vitest run test/stereo-reference",
+    "test:unit":     "npm exec -- vitest run test/unit test/regression"
   }
 }

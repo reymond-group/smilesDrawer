@@ -255,15 +255,26 @@ export default class Atom {
      * @returns {number} The number of implicit hydrogens attached to this atom.
      */
     countImplicitHydrogens() {
-        // Hydrogens in brackets are implicit, UNLESS the atom
-        // is a chiral center, in which case they're explicit.
-        if (this.bracket && !this.bracket.chirality) {
-            return this.bracket.hcount || 0;
+        if (this.bracket) {
+            if (this.bracket.chirality) {
+                // We add hydrogens to chiral atoms explicitly.
+                return 0;
+            }
+            else {
+                // But otherwise, the bracket count is accurate.
+                return this.bracket.hcount || 0;
+            }
         }
 
         let bonds = this.bondCount;
         if (this.isPartOfAromaticRing) {
-            // This is definitely a hacky workaround for something...
+            if (this.element !== 'C') {
+                // This is a HACK to set heteroatoms to a sensible default.
+                // TODO: The correct fix for this is kekulization.
+                return 0;
+            }
+
+            // This is also definitely a HACK for something...
             // TODO: Figure out what and fix the real issue!
             bonds += 1;
         }
