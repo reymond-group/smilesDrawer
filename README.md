@@ -15,7 +15,7 @@ Current Version: **2.2.1**
             <td><a href="https://reymond-group.github.io/smilesDrawer/playground"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/playground.png"></a></td>
         </tr>
         <tr>
-            <td><a href="https://reymond-group.github.io/smilesDrawer/playground">Playground - batch rendering</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/playground/?mode=batch">Playground - batch rendering</a></td>
             <td><a href="https://reymond-group.github.io/smilesDrawer/getting-started/">Documentation</a></td>
         </tr>
         <tr>
