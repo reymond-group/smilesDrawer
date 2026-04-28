@@ -11,16 +11,16 @@ Current Version: **2.2.1**
             <td><a href="https://reymond-group.github.io/smilesDrawer/playground">Playground - single molecule</a></td>
         </tr>
         <tr>
-            <td><a href="https://reymond-group.github.io/smilesDrawer/"><img src="readme/website.png"></a></td>
-            <td><a href="https://reymond-group.github.io/smilesDrawer/playground"><img src="readme/playground.png"></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/website.png"></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/playground"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/playground.png"></a></td>
         </tr>
         <tr>
             <td><a href="https://reymond-group.github.io/smilesDrawer/playground">Playground - batch rendering</a></td>
-            <td><a href="https://reymond-group.github.io/smilesDrawer/docs">Documentation</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/getting-started/">Documentation</a></td>
         </tr>
         <tr>
-            <td><a href="https://reymond-group.github.io/smilesDrawer/playground"><img src="readme/batch.png"></a></td>
-            <td><a href="https://reymond-group.github.io/smilesDrawer/docs"><img src="readme/docs.png"></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/playground"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/batch.png"></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/getting-started/"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/docs.png"></a></td>
         </tr>
     </tbody>
 </table>
@@ -301,3 +301,4 @@ Thank you for contributing:
 - [ohardy](https://github.com/ohardy)
 - [Kevin Burk](https://github.com/xavierholt)
 - [Alejandro Flores](https://github.com/afloresep)
+- [Daniel Probst](https://github.com/daenuprobst)
