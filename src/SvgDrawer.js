@@ -350,8 +350,31 @@ export default class SvgDrawer {
             let element = atom.element;
             let hydrogens = atom.countImplicitHydrogens();
             let dir = vertex.getTextDirection(graph.vertices, atom.hasAttachedPseudoElements);
-            let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
+            const showCarbonsMode = DrawerBase.getEffectiveShowCarbonsMode(opts);
+            let isTerminal = (showCarbonsMode === 'terminal' || element !== 'C' || atom.hasAttachedPseudoElements) ? vertex.isTerminal() : false;
             let isCarbon = atom.element === 'C';
+
+            if (element === 'C') {
+                const isRingCarbon = atom.rings && atom.rings.length > 0;
+                if (showCarbonsMode === 'none') {
+                    isCarbon = true;
+                    isTerminal = false;
+                }
+                else if (showCarbonsMode === 'all') {
+                    isCarbon = false;
+                    isTerminal = true;
+                }
+                else if (showCarbonsMode === 'acyclic' && !isRingCarbon) {
+                    isCarbon = false;
+                    isTerminal = true;
+                }
+            }
+
+            // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
+            // should be the most common state. This has to be fixed by kekulization
+            if (atom.element === 'N' && atom.isPartOfAromaticRing) {
+                hydrogens = 0;
+            }
 
             if (atom.bracket) {
                 charge = atom.bracket.charge;

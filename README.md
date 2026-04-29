@@ -185,14 +185,15 @@ The following options are available:
 | Drawing height                                                  | height                      | number                              | 500           |
 | Bond thickness                                                  | bondThickness               | number                              | 1.0           |
 | Bond length                                                     | bondLength                  | number                              | 30            |
-| Short bond length (e.g. double bonds) in fraction of bond length | shortBondLength            | number                              | 0.8           |
+| Short bond length (e.g. double bonds) as a fraction of bond length | shortBondLength            | number                              | 0.8           |
 | Bond spacing (e.g. space between double bonds)                  | bondSpacing                 | number                              | 0.17 \* 30    |
 | Atom Visualization                                              | atomVisualization           | string ['default', 'balls', 'none'] | 'default'     |
 | Large Font Size (in pt for elements)                            | fontSizeLarge               | number                              | 11            |
 | Small Font Size (in pt for numbers)                             | fontSizeSmall               | number                              | 3             |
 | Padding                                                         | padding                     | number                              | 10.0          |
 | Use experimental SSSR                                           | experimentalSSSR            | boolean                             | false         |
-| Show Terminal Carbons (CH3)                                     | terminalCarbons             | boolean                             | false         |
+| Show explicit carbons                                           | showCarbons                 | string ['none', 'default', 'terminal', 'acyclic', 'all'] | 'default'     |
+| Show terminal carbons (deprecated; use `showCarbons`)           | terminalCarbons             | boolean                             | false         |
 | Show explicit hydrogens                                         | explicitHydrogens           | boolean                             | true          |
 | Overlap sensitivity                                             | overlapSensitivity          | number                              | 0.42          |
 | # of overlap resolution iterations                              | overlapResolutionIterations | number                              | 1             |
@@ -214,6 +215,7 @@ The default options are defined as follows:
     atomVisualization: 'default',
     isomeric: true,
     debug: false,
+    showCarbons: 'default',
     terminalCarbons: false,
     explicitHydrogens: true,
     overlapSensitivity: 0.42,
@@ -260,6 +262,16 @@ The default options are defined as follows:
 ```
 
 Additional built-in themes include `oldschool`, `solarized`, and `solarized-dark`.
+
+`showCarbons` controls when explicit carbon labels are drawn:
+- `"none"` never labels plain carbons;
+- `"default"` is the usual skeletal notation;
+- `"terminal"` matches the former `terminalCarbons: true` behavior (explicit labels on terminal carbons such as methyl groups);
+- `"acyclic"` labels every carbon that is not part of a ring;
+- `"all"` labels every carbon, including ring atoms.
+
+If `showCarbons` is `"default"` and `terminalCarbons` is `true`, the effective mode is `"terminal"` (legacy compatibility until v3.0).
+
 
 ### Usage
 
