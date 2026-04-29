@@ -19,7 +19,7 @@ Current Version: **2.2.1**
             <td><a href="https://reymond-group.github.io/smilesDrawer/getting-started/">Documentation</a></td>
         </tr>
         <tr>
-            <td><a href="https://reymond-group.github.io/smilesDrawer/playground"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/batch.png"></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/playground/?mode=batch"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/batch.png"></a></td>
             <td><a href="https://reymond-group.github.io/smilesDrawer/getting-started/"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/docs.png"></a></td>
         </tr>
     </tbody>
