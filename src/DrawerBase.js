@@ -2,6 +2,7 @@
 import ArrayHelper    from './ArrayHelper';
 import Atom           from './Atom';
 import CanvasWrapper  from './CanvasWrapper';
+import CIP            from './CIP';
 import Edge           from './Edge';
 import Graph          from './Graph';
 import Line           from './Line';
@@ -62,6 +63,7 @@ export default class DrawerBase {
             fontSizeSmall:               3,
             padding:                     10.0,
             experimentalSSSR:            false,
+            experimentalWeights:         false,
             kkThreshold:                 0.1,
             kkInnerThreshold:            0.1,
             kkMaxIteration:              20000,
@@ -517,40 +519,13 @@ export default class DrawerBase {
         for (let i = 0; i < graph.vertices.length; i++) {
             let atom = graph.vertices[i].value;
 
-            if (counts.has(atom.element)) {
-                counts.set(atom.element, counts.get(atom.element) + 1);
-            }
-            else {
-                counts.set(atom.element, 1);
-            }
+            const a = counts.get(atom.element) || 0;
+            counts.set(atom.element, a + 1);
 
-            // Hydrogens attached to a chiral center were added as vertices,
-            // those in non chiral brackets are added here
-            if (atom.bracket && !atom.bracket.chirality) {
-                if (counts.has('H')) {
-                    counts.set('H', counts.get('H') + atom.bracket.hcount);
-                }
-                else {
-                    counts.set('H', atom.bracket.hcount);
-                }
-            }
-
-            // Add the implicit hydrogens according to valency, exclude
-            // bracket atoms as they were handled and always have the number
-            // of hydrogens specified explicitly
-            if (!atom.bracket) {
-                let nHydrogens = Atom.maxBonds[atom.element] - atom.bondCount;
-
-                if (atom.isPartOfAromaticRing) {
-                    nHydrogens--;
-                }
-
-                if (counts.has('H')) {
-                    counts.set('H', counts.get('H') + nHydrogens);
-                }
-                else {
-                    counts.set('H', nHydrogens);
-                }
+            const hydrogens = atom.countImplicitHydrogens();
+            if (hydrogens) {
+                const h = counts.get('H') || 0;
+                counts.set('H', h + hydrogens);
             }
         }
 
@@ -1791,9 +1766,8 @@ export default class DrawerBase {
             let atom = vertex.value;
             let charge = 0;
             let isotope = 0;
-            let bondCount = vertex.value.bondCount;
             let element = atom.element;
-            let hydrogens = Atom.maxBonds[element] - bondCount;
+            let hydrogens = atom.countImplicitHydrogens();
             let dir = vertex.getTextDirection(this.graph.vertices);
             let isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
             let isCarbon = atom.element === 'C';
@@ -3253,79 +3227,31 @@ export default class DrawerBase {
      * Annotated stereochemistry information for visualization.
      */
     annotateStereochemistry() {
-        let maxDepth = 10;
-
         // For each stereo-center
         for (let i = 0; i < this.graph.vertices.length; i++) {
-            let vertex = this.graph.vertices[i];
-
+            const vertex = this.graph.vertices[i];
             if (!vertex.value.isStereoCenter) {
                 continue;
             }
 
-            let neighbours = vertex.getNeighbours();
-
+            const neighbours = vertex.neighbours;
             // Validate: a tetrahedral stereocenter needs exactly 4 bonds.
-            // Count total bond order (explicit edges + implicit H from bracket).
-            let totalBonds = 0;
-            for (let j = 0; j < neighbours.length; j++) {
-                totalBonds += this.graph.getEdge(vertex.id, neighbours[j]).weight;
-            }
-            if (totalBonds < vertex.value.getMaxBonds()) {
-                // Not enough substituents for a true stereocenter
-                vertex.value.isStereoCenter = false;
-                continue;
-            }
-            let nNeighbours = neighbours.length;
-            let trees = new Array(nNeighbours);
-            for (let j = 0; j < nNeighbours; j++) {
-                let visited = new Uint8Array(this.graph.vertices.length);
-                visited[vertex.id] = 1;
-                trees[j] = [j, this.buildCIPTree(neighbours[j], vertex.id, visited, maxDepth, 0)];
-            }
-
-            let hasTie = false;
-            let hasStereoTie = false;
-            for (let j = 0; j < nNeighbours; j++) {
-                for (let k = j + 1; k < nNeighbours; k++) {
-                    let cmp = DrawerBase.compareCIPNodes(trees[j][1], trees[k][1]);
-                    if (cmp === 0) {
-                        hasTie = true;
-                        if (trees[j][1].hasStereo || trees[k][1].hasStereo) {
-                            hasStereoTie = true;
-                        }
-                    }
-                }
-            }
-
-            // If tied substituent trees contain no stereochemical information,
-            // this is an achiral center (e.g. duplicate alkyl groups).
-            if (hasTie && !hasStereoTie) {
+            if (neighbours.length + vertex.value.countImplicitHydrogens() !== 4) {
                 vertex.value.isStereoCenter = false;
                 continue;
             }
 
-            trees.sort(function(a, b) {
-                let cmp = DrawerBase.compareCIPNodes(a[1], b[1]);
-                if (cmp !== 0) {
-                    return cmp;
-                }
-                // Keep legacy tie direction for @@, but invert for @.
-                // This matches RDKit for unresolved stereo-containing ties.
-                return vertex.value.bracket.chirality === '@' ? a[0] - b[0] : b[0] - a[0];
-            });
-
-            let order = new Uint8Array(nNeighbours);
-            for (let j = 0; j < nNeighbours; j++) {
-                order[j] = trees[j][0];
-                vertex.value.priority = j;
+            // This will return undefined if two branches are exactly equal.
+            const order = CIP.getOrderArray(this.graph, vertex);
+            if (order === undefined) {
+                vertex.value.isStereoCenter = false;
+                continue;
             }
 
-            let rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
-            if (this._shouldInvertStereoParity(vertex, neighbours)) {
-                rotation *= -1;
-            }
-            let rs = MathHelper.parityOfPermutation(order) * rotation === 1 ? 'R' : 'S';
+            const parity   = MathHelper.parityOfPermutation(order);
+            const rotation = vertex.value.bracket.chirality === '@' ? -1 : 1;
+            const rs       = (parity === rotation) ? 'R' : 'S';
+            vertex.value.chirality = rs;
 
             // Pick best neighbor to draw wedge on.
             // Priority: non-stereocenter > outside ring > heteroatom > shortest subtree
@@ -3344,15 +3270,7 @@ export default class DrawerBase {
                 wedgeOrder[j][1] = neighbours[order[j]];
             }
 
-            wedgeOrder.sort(function(a, b) {
-                if (a[0] > b[0]) {
-                    return -1;
-                }
-                else if (a[0] < b[0]) {
-                    return 1;
-                }
-                return 0;
-            });
+            wedgeOrder.sort((a, b) => b[0] - a[0]);
 
             if (!showHydrogen) {
                 let wedgeId = wedgeOrder[0][1];
@@ -3366,143 +3284,7 @@ export default class DrawerBase {
                     vertex.value.hydrogenDirection = hWedge === 'up' ? 'up' : 'down';
                 }
             }
-
-            vertex.value.chirality = rs;
         }
-    }
-
-    /**
-     * Classify a neighbor relative to a stereocenter.
-     *
-     * @param {Vertex} vertex The stereocenter.
-     * @param {Number} neighbourId The neighbor vertex id.
-     * @returns {String} One of parent, ring, branch, next.
-     */
-    _stereoNeighbourRole(vertex, neighbourId) {
-        if (neighbourId === vertex.parentVertexId) {
-            return 'parent';
-        }
-
-        if (!vertex.spanningTreeChildren.includes(neighbourId)) {
-            return 'ring';
-        }
-
-        let child = this.graph.vertices[neighbourId];
-        return child.value.branchBond ? 'branch' : 'next';
-    }
-
-    /**
-     * TRANSITIONAL — do not add more patterns here without good reason.
-     *
-     * The R/S assignment depends on the order we visit neighbors, but
-     * the SMILES parser doesn't always give them in the right order.
-     * When that happens, we get R instead of S or vice versa. This
-     * method catches those specific cases and flips the result.
-     *
-     * It works, but it's fragile — each pattern was found by trial and
-     * error, not derived from first principles. The real fix is to stop
-     * depending on parse order entirely and use a single canonical way
-     * to assign parity.
-     *
-     * @param {Vertex} vertex The stereocenter.
-     * @param {Number[]} neighbours Neighbors in current local order.
-     * @returns {Boolean} Whether the parity should be inverted.
-     */
-    _shouldInvertStereoParity(vertex, neighbours) {
-        if (!vertex.value.bracket || vertex.value.bracket.hcount !== 1 || neighbours.length !== 4) {
-            return false;
-        }
-
-        let j2 = this.graph.vertices[neighbours[2]];
-        let j3 = this.graph.vertices[neighbours[3]];
-        let j2Role = this._stereoNeighbourRole(vertex, neighbours[2]);
-        let j3Role = this._stereoNeighbourRole(vertex, neighbours[3]);
-
-        // Keep the inversion scope narrow to parser-order contexts observed to
-        // disagree with RDKit bond-order conventions.
-        if (j2Role === 'branch' && j3Role === 'next') {
-            return this._matchesBranchNextParityInversion(vertex, j2, j3);
-        }
-
-        if (j2Role === 'ring' && j3Role === 'next') {
-            return this._matchesRingNextParityInversion(vertex, j2, j3);
-        }
-
-        return false;
-    }
-
-    /**
-     * Parity inversion when branch-bond ordering at a stereocenter conflicts
-     * with parser traversal order.
-     *
-     * @param {Vertex} vertex The stereocenter.
-     * @param {Vertex} j2 Neighbor at index 2.
-     * @param {Vertex} j3 Neighbor at index 3.
-     * @returns {Boolean} Whether this matches the branch/next inversion pattern.
-     */
-    _matchesBranchNextParityInversion(vertex, j2, j3) {
-        return (
-            j3.value.isStereoCenter &&
-            vertex.value.smilesOrder === 1 &&
-            !j2.value.smilesHasNext &&
-            vertex.value.bracket.chirality === '@' &&
-            vertex.value.rings.length === 1 &&
-            vertex.parentVertexId !== null &&
-            this.graph.vertices[vertex.parentVertexId].value.smilesOrder === 1
-        );
-    }
-
-    /**
-     * Parity inversion when a ring-bond neighbor lands before the chain neighbor
-     * in local order but the effective bond-order convention is opposite.
-     *
-     * @param {Vertex} vertex The stereocenter.
-     * @param {Vertex} j2 Neighbor at index 2.
-     * @param {Vertex} j3 Neighbor at index 3.
-     * @returns {Boolean} Whether this matches one of the ring/next inversion patterns.
-     */
-    _matchesRingNextParityInversion(vertex, j2, j3) {
-        let chirality = vertex.value.bracket.chirality;
-
-        // Bridged-ring pattern.
-        if (
-            vertex.value.rings.length === 3 &&
-            vertex.value.smilesOrder === 2 &&
-            vertex.value.smilesRingbondCount === 1
-        ) {
-            return true;
-        }
-
-        // Ring-opening pattern.
-        if (
-            chirality === '@@' &&
-            !j2.value.isStereoCenter &&
-            j2.value.smilesBranchCount === 1
-        ) {
-            return true;
-        }
-
-        // Ring-closure pattern.
-        if (
-            chirality === '@' &&
-            j3.value.ringbonds.length === 1 &&
-            !j3.value.isStereoCenter &&
-            j3.value.smilesBranchCount === 1
-        ) {
-            return true;
-        }
-
-        // Fused-ring pattern.
-        if (
-            chirality === '@' &&
-            !j2.value.isStereoCenter &&
-            j2.value.ringbonds.length === 2 &&
-            vertex.value.rings.length === 2
-        ) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -3564,211 +3346,6 @@ export default class DrawerBase {
         let solidGivesR = (wedgeCipRank % 2 === 0) ? (sa > 0) : (sa < 0);
 
         return (solidGivesR === (rs === 'R')) ? 'up' : 'down';
-    }
-
-    /**
-     *
-     *
-     * @param {Number} vertexId The id of a vertex.
-     * @param {(Number|null)} previousVertexId The id of the parent vertex of the vertex.
-     * @param {Uint8Array} visited An array containing the visited flag for all vertices in the graph.
-     * @param {Array} priority An array of arrays storing the atomic numbers for each level.
-     * @param {Number} maxDepth The maximum depth.
-     * @param {Number} depth The current depth.
-     */
-    visitStereochemistry(vertexId, previousVertexId, visited, priority, maxDepth, depth, parentAtomicNumber = 0) {
-        visited[vertexId] = 1;
-        let vertex = this.graph.vertices[vertexId];
-        let atomicNumber = vertex.value.getAtomicNumber();
-
-        if (priority.length <= depth) {
-            priority.push([]);
-        }
-
-        for (let i = 0; i < this.graph.getEdge(vertexId, previousVertexId).weight; i++) {
-            priority[depth].push(parentAtomicNumber * 1000 + atomicNumber);
-        }
-
-        let neighbours = this.graph.vertices[vertexId].neighbours;
-
-        for (let i = 0; i < neighbours.length; i++) {
-            if (visited[neighbours[i]] !== 1 && depth < maxDepth - 1) {
-                this.visitStereochemistry(neighbours[i], vertexId, visited.slice(), priority, maxDepth, depth + 1, atomicNumber);
-            }
-            else if (visited[neighbours[i]] === 1 && neighbours[i] !== previousVertexId && depth < maxDepth - 1) {
-                // CIP phantom atom: at ring closures, count the atom's atomic
-                // number but do not recurse into its subtree.
-                let phantomAtomicNumber = this.graph.vertices[neighbours[i]].value.getAtomicNumber();
-                if (priority.length <= depth + 1) {
-                    priority.push([]);
-                }
-                let edgeWeight = this.graph.getEdge(vertexId, neighbours[i]).weight;
-                for (let w = 0; w < edgeWeight; w++) {
-                    priority[depth + 1].push(atomicNumber * 1000 + phantomAtomicNumber);
-                }
-            }
-        }
-
-        // Valences are filled with hydrogens and passed to the next level.
-        if (depth < maxDepth - 1) {
-            let bonds = 0;
-
-            for (let i = 0; i < neighbours.length; i++) {
-                bonds += this.graph.getEdge(vertexId, neighbours[i]).weight;
-            }
-
-            for (let i = 0; i < vertex.value.getMaxBonds() - bonds; i++) {
-                if (priority.length <= depth + 1) {
-                    priority.push([]);
-                }
-
-                priority[depth + 1].push(atomicNumber * 1000 + 1);
-            }
-        }
-    }
-
-    /**
-     * Build a CIP priority tree for a substituent branch. Each node stores
-     * the atom's atomic number and a sorted array of child nodes. Double/
-     * triple bonds produce phantom leaf duplicates; ring closures produce
-     * phantom leaf nodes; implicit hydrogens produce leaf nodes with AN=1.
-     *
-     * @param {Number} vertexId Current vertex being visited.
-     * @param {Number} previousVertexId Parent vertex (to avoid backtracking).
-     * @param {Uint8Array} visited Visited flags (will be sliced per branch).
-     * @param {Number} maxDepth Maximum tree depth.
-     * @param {Number} depth Current depth.
-     * @returns {{an: Number, children: Array}} CIP tree node.
-     */
-    buildCIPTree(vertexId, previousVertexId, visited, maxDepth, depth) {
-        visited[vertexId] = 1;
-        let vertex = this.graph.vertices[vertexId];
-        let atomicNumber = vertex.value.getAtomicNumber();
-        let node = {
-            an: atomicNumber,
-            children: [],
-            hasStereo: !!(vertex.value.bracket && vertex.value.bracket.chirality),
-        };
-
-        if (depth >= maxDepth) {
-            return node;
-        }
-
-        let neighbours = vertex.neighbours;
-        for (let i = 0; i < neighbours.length; i++) {
-            if (neighbours[i] === previousVertexId) {
-                // Back-phantom for multiple bonds to parent (CIP digraph rule):
-                // for A=B traversed as parent(A)→child(B), B gets (weight-1)
-                // phantom copies of A as leaf children.
-                if (previousVertexId !== null) {
-                    let edge = this.graph.getEdge(vertexId, previousVertexId);
-                    if (edge.weight > 1) {
-                        let parentAN = this.graph.vertices[previousVertexId].value.getAtomicNumber();
-                        for (let w = 1; w < edge.weight; w++) {
-                            node.children.push({an: parentAN, children: []});
-                        }
-                    }
-                }
-                continue;
-            }
-
-            let edge = this.graph.getEdge(vertexId, neighbours[i]);
-
-            if (visited[neighbours[i]] !== 1) {
-                // Real subtree
-                let child = this.buildCIPTree(
-                    neighbours[i], vertexId, visited.slice(),
-                    maxDepth, depth + 1
-                );
-                node.children.push(child);
-                node.hasStereo = node.hasStereo || child.hasStereo;
-
-                // For double/triple bonds, add (weight-1) phantom leaf copies
-                if (edge.weight > 1) {
-                    let childAN = this.graph.vertices[neighbours[i]].value.getAtomicNumber();
-                    for (let w = 1; w < edge.weight; w++) {
-                        node.children.push({an: childAN, children: [], hasStereo: false});
-                    }
-                }
-            }
-            else {
-                // Ring closure: phantom leaf nodes
-                let phantomAN = this.graph.vertices[neighbours[i]].value.getAtomicNumber();
-                for (let w = 0; w < edge.weight; w++) {
-                    node.children.push({an: phantomAN, children: [], hasStereo: false});
-                }
-            }
-        }
-
-        // Implicit hydrogens
-        let bonds = 0;
-        for (let i = 0; i < neighbours.length; i++) {
-            bonds += this.graph.getEdge(vertexId, neighbours[i]).weight;
-        }
-        let implicitH = vertex.value.getMaxBonds() - bonds;
-        for (let i = 0; i < implicitH; i++) {
-            node.children.push({an: 1, children: [], hasStereo: false});
-        }
-
-        // Sort children by CIP priority (highest first) using BFS comparison
-        node.children.sort(DrawerBase.compareCIPNodes);
-
-        return node;
-    }
-
-    /**
-     * Compare two CIP tree nodes using breadth-first (level-by-level)
-     * comparison as required by CIP sequence rule 1a. At each level,
-     * all paired atoms are compared before descending to the next level.
-     *
-     * Returns negative if a has higher priority (should come first),
-     * positive if b has higher priority, 0 if equal.
-     *
-     * @param {{an: Number, children: Array}} a First CIP tree node.
-     * @param {{an: Number, children: Array}} b Second CIP tree node.
-     * @returns {Number} Comparison result.
-     */
-    static compareCIPNodes(a, b) {
-        // BFS level-by-level comparison
-        let queue = [{a: a, b: b}];
-
-        while (queue.length > 0) {
-            let nextQueue = [];
-
-            for (let q = 0; q < queue.length; q++) {
-                let nodeA = queue[q].a;
-                let nodeB = queue[q].b;
-
-                // Compare atomic numbers at this position
-                if (nodeA.an !== nodeB.an) {
-                    return nodeB.an - nodeA.an;
-                }
-
-                // Pair children (both already sorted highest-first)
-                let maxLen = Math.max(
-                    nodeA.children.length,
-                    nodeB.children.length
-                );
-                for (let i = 0; i < maxLen; i++) {
-                    if (i >= nodeA.children.length && i < nodeB.children.length) {
-                        return 1; // b has more children → b wins
-                    }
-                    if (i < nodeA.children.length && i >= nodeB.children.length) {
-                        return -1; // a has more children → a wins
-                    }
-                    let childA = nodeA.children[i];
-                    let childB = nodeB.children[i];
-                    if (childA.an !== childB.an) {
-                        return childB.an - childA.an;
-                    }
-                    nextQueue.push({a: childA, b: childB});
-                }
-            }
-
-            queue = nextQueue;
-        }
-
-        return 0;
     }
 
     /**
@@ -3851,11 +3428,10 @@ export default class DrawerBase {
 
                 neighbour.value.isDrawn = false;
 
-                let hydrogens = Atom.maxBonds[neighbour.value.element] - neighbour.value.bondCount;
+                let hydrogens = neighbour.value.countImplicitHydrogens();
                 let charge = '';
 
                 if (neighbour.value.bracket) {
-                    hydrogens = neighbour.value.bracket.hcount;
                     charge = neighbour.value.bracket.charge || 0;
                 }
 

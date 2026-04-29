@@ -1,16 +1,9 @@
 import {describe, it, expect} from 'vitest';
-import {JSDOM} from 'jsdom';
-import Parser from '../../src/Parser.js';
+import {createJSDOM}          from '../helpers';
+
+import Parser    from '../../src/Parser.js';
 import SvgDrawer from '../../src/SvgDrawer.js';
-import Vector2 from '../../src/Vector2.js';
-
-function setupDOM() {
-    const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
-    global.document = dom.window.document;
-    global.window = dom.window;
-
-    return dom;
-}
+import Vector2   from '../../src/Vector2.js';
 
 function averagePosition(vertices) {
     let center = new Vector2(0, 0);
@@ -23,7 +16,8 @@ function averagePosition(vertices) {
 }
 
 function expectBridgeAtomInside(smiles) {
-    const dom = setupDOM();
+    const dom = createJSDOM();
+
     const svg = dom.window.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     dom.window.document.body.appendChild(svg);
 

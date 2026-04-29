@@ -1,0 +1,160 @@
+<!DOCTYPE html><html lang="en"> <head><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-DWK15V0MRS"></script><script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-DWK15V0MRS');
+    </script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Draw molecules from SMILES strings. Pure JavaScript, runs in the browser."><link rel="icon" type="image/svg+xml" href="/smilesDrawer/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><title>Home | SmilesDrawer</title><!-- SmilesDrawer library + shared rendering helpers --><script src="/smilesDrawer/js/smiles-drawer.min.js"></script><script src="/smilesDrawer/js/smiles-website.js"></script><link rel="stylesheet" href="/smilesDrawer/_astro/examples.7q3mxKxv.css"></head> <body class="min-h-screen flex flex-col"> <header class="sticky top-0 z-40 bg-paper border-b border-ink"> <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4"> <a href="/smilesDrawer" class="flex items-baseline gap-2 no-underline"> <span class="text-[14px] font-extrabold tracking-tight text-ink">SMILESDRAWER</span> <span class="text-[10px] font-medium text-ink-hint uppercase tracking-[0.1em]">v2.2.1</span> </a> <nav class="flex items-center gap-7"> <a href="/smilesDrawer/getting-started" class="btn-ghost "> <span class="text-[9px] text-ink-faint font-semibold">01</span> <span>Docs</span> </a> <a href="/smilesDrawer/playground" class="btn-ghost "> <span class="text-[9px] text-ink-faint font-semibold">02</span> <span>Playground</span> </a> <a href="/smilesDrawer/examples" class="btn-ghost "> <span class="text-[9px] text-ink-faint font-semibold">03</span> <span>Examples</span> </a> <a href="https://github.com/reymond-group/smilesDrawer" target="_blank" rel="noopener" class="btn-ghost"> <span class="text-[9px] text-ink-faint font-semibold">04</span> <span>GitHub ↗</span> </a> </nav> </div> </header> <main class="flex-1">   <section class="max-w-7xl mx-auto px-6 py-14 sm:py-20"> <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] items-start"> <div> <div class="eyebrow mb-5">Open source · MIT</div> <h1 class="text-[44px] sm:text-[52px] leading-[0.98] font-extrabold tracking-[-0.03em] text-ink">
+Draw molecules from <mark class="bg-mint-tint text-ink px-1.5 rounded-sm">SMILES</mark> strings. In the browser.
+</h1> <p class="mt-5 max-w-xl text-[15px] leading-relaxed text-ink-muted">
+A pure JavaScript library for rendering chemical structures. No server, no images, no dependencies. Just SMILES.
+</p> <div class="mt-8 flex flex-wrap gap-2"> <a href="/smilesDrawer/getting-started" class="btn-primary">Read the docs →</a> <a href="/smilesDrawer/playground" class="btn-secondary">Open playground</a> </div> <div class="mt-10 pt-8 border-t border-rule"> <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-ink-faint mb-4">Presets · try one</div> <div class="flex flex-wrap gap-1.5"> <button class="hero-example-btn inline-flex items-baseline gap-1.5 text-[11px] px-2.5 py-1 rounded-sm border border-rule text-ink hover:border-mint hover:bg-mint-tint transition-colors" data-smiles="CC(=O)Oc1ccccc1C(=O)O" data-name="Aspirin" type="button"> <span class="text-[9px] uppercase tracking-[0.08em] text-ink-hint">NSAID</span> <span class="font-semibold">Aspirin</span> </button><button class="hero-example-btn inline-flex items-baseline gap-1.5 text-[11px] px-2.5 py-1 rounded-sm border border-rule text-ink hover:border-mint hover:bg-mint-tint transition-colors" data-smiles="CN1C=NC2=C1C(=O)N(C(=O)N2C)C" data-name="Caffeine" type="button"> <span class="text-[9px] uppercase tracking-[0.08em] text-ink-hint">Alkaloid</span> <span class="font-semibold">Caffeine</span> </button><button class="hero-example-btn inline-flex items-baseline gap-1.5 text-[11px] px-2.5 py-1 rounded-sm border border-rule text-ink hover:border-mint hover:bg-mint-tint transition-colors" data-smiles="CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)Cc3ccccc3)C(=O)O)C" data-name="Penicillin G" type="button"> <span class="text-[9px] uppercase tracking-[0.08em] text-ink-hint">Beta-lactam</span> <span class="font-semibold">Penicillin G</span> </button><button class="hero-example-btn inline-flex items-baseline gap-1.5 text-[11px] px-2.5 py-1 rounded-sm border border-rule text-ink hover:border-mint hover:bg-mint-tint transition-colors" data-smiles="C1COCC(=O)N1C2=CC=C(C=C2)N3C[C@@H](OC3=O)CNC(=O)C4=CC=C(S4)Cl" data-name="Rivaroxaban" type="button"> <span class="text-[9px] uppercase tracking-[0.08em] text-ink-hint">Anticoagulant</span> <span class="font-semibold">Rivaroxaban</span> </button><button class="hero-example-btn inline-flex items-baseline gap-1.5 text-[11px] px-2.5 py-1 rounded-sm border border-rule text-ink hover:border-mint hover:bg-mint-tint transition-colors" data-smiles="C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C" data-name="Cholesterol" type="button"> <span class="text-[9px] uppercase tracking-[0.08em] text-ink-hint">Steroid</span> <span class="font-semibold">Cholesterol</span> </button><button class="hero-example-btn inline-flex items-baseline gap-1.5 text-[11px] px-2.5 py-1 rounded-sm border border-rule text-ink hover:border-mint hover:bg-mint-tint transition-colors" data-smiles="COC1=CC(C(=O)O)=C2C3=NC(C)=CC=C3COC2=C1O" data-name="Phochrodine D" type="button"> <span class="text-[9px] uppercase tracking-[0.08em] text-ink-hint">Alkaloid</span> <span class="font-semibold">Phochrodine D</span> </button><button class="hero-example-btn inline-flex items-baseline gap-1.5 text-[11px] px-2.5 py-1 rounded-sm border border-rule text-ink hover:border-mint hover:bg-mint-tint transition-colors" data-smiles="OB(O)c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1.Br  __{'textAboveArrow': 'Pd(PPh3)4', 'textBelowArrow': 'K2CO3'}__" data-name="Suzuki coupling" type="button"> <span class="text-[9px] uppercase tracking-[0.08em] text-ink-hint">Reaction</span> <span class="font-semibold">Suzuki coupling</span> </button><button class="hero-example-btn inline-flex items-baseline gap-1.5 text-[11px] px-2.5 py-1 rounded-sm border border-rule text-ink hover:border-mint hover:bg-mint-tint transition-colors" data-smiles="c1ccccc1.BrBr>>Brc1ccccc1.Br  __{'textAboveArrow': 'FeBr3'}__" data-name="Bromination" type="button"> <span class="text-[9px] uppercase tracking-[0.08em] text-ink-hint">Reaction</span> <span class="font-semibold">Bromination</span> </button> </div> </div> </div> <div> <div class="border border-ink rounded-md bg-white overflow-hidden"> <div class="flex items-center justify-between px-4 py-2 border-b border-rule text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-hint"> <span class="flex items-center gap-2"> <span class="w-2 h-2 rounded-full bg-mint"></span>
+LIVE PREVIEW
+</span> <span>RENDER ENGINE · SVG</span> </div> <div id="hero-preview-panel" class="grid-paper flex items-center justify-center p-6" style="min-height: 320px;"> <div id="hero-svg-wrap" class="flex items-center justify-center w-full"> <svg id="hero-molecule-svg" class="w-full" style="max-width: 520px; max-height: 280px;"></svg> </div> </div> <div id="hero-error" class="hidden px-4 py-2 text-[11px] text-red-600 bg-red-50 border-t border-red-200"></div> <label class="group flex items-stretch border-t border-rule cursor-text focus-within:ring-2 focus-within:ring-mint focus-within:ring-inset"> <span class="flex items-center px-4 border-r border-rule bg-paper text-[9px] font-bold uppercase tracking-[0.14em] text-ink-hint">SMILES</span> <input id="hero-smiles-input" type="text" value="CC(=O)Oc1ccccc1C(=O)O" placeholder="Type a SMILES string…" class="flex-1 min-w-0 px-4 py-3 font-mono text-[13px] text-ink bg-white outline-none placeholder:text-ink-hint group-hover:bg-mint-tint/40 focus:bg-white transition-colors" spellcheck="false" autocomplete="off"> <span class="flex items-center pr-4 text-ink-hint group-hover:text-mint-deep transition-colors pointer-events-none" aria-hidden="true"> <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path></svg> </span> </label> <div class="flex border-t border-rule"> <button id="hero-copy-smiles" type="button" class="flex-1 py-3 text-[11px] font-semibold text-ink border-r border-rule hover:bg-paper"> <span class="text-mint-deep mr-1">⎘</span> Copy SMILES
+</button> <button id="hero-download-svg" type="button" class="flex-1 py-3 text-[11px] font-semibold text-ink border-r border-rule hover:bg-paper"> <span class="text-mint-deep mr-1">↓</span> Download SVG
+</button> <a id="hero-open-playground" href="/smilesDrawer/playground" class="flex-1 py-3 text-[11px] font-semibold text-ink text-center hover:bg-paper no-underline"> <span class="text-mint-deep mr-1">→</span> Open in playground
+</a> </div> </div> <script>(function(){const renderOverrides = {"C=CCBr.[Na+].[I-]>CC(=O)C>C=CCI.[Na+].[Br-]  __{'textAboveArrow': 'acetone', 'textBelowArrow': '90%'}__":{"bondLength":16.8,"fontSizeLarge":5.4,"padding":20},"CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)Cc3ccccc3)C(=O)O)C":{"bondLength":15.4,"fontSizeLarge":5.2,"padding":8},"C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C":{"bondLength":16.2,"fontSizeLarge":5.4,"padding":8},"OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O":{"bondLength":17.8,"fontSizeLarge":5.6,"padding":8},"C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@@]34C)[C@@H]1CC[C@@H]2O":{"bondLength":16,"fontSizeLarge":5.3,"padding":8},"c1nc(c2c(n1)n(cn2)[C@@H]3[C@@H]([C@@H]([C@H](O3)COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O)O)N":{"bondLength":13,"fontSizeLarge":4.9,"padding":8}};
+
+document.addEventListener('DOMContentLoaded', function() {
+    var site = window.SmilesWebsite;
+    var input = document.getElementById('hero-smiles-input');
+    var svg = document.getElementById('hero-molecule-svg');
+    var errorEl = document.getElementById('hero-error');
+    var downloadBtn = document.getElementById('hero-download-svg');
+    var copyBtn = document.getElementById('hero-copy-smiles');
+    var openBtn = document.getElementById('hero-open-playground');
+    var openBaseHref = openBtn ? openBtn.getAttribute('href') : null;
+    var previewPanel = document.getElementById('hero-preview-panel');
+    var svgWrap = document.getElementById('hero-svg-wrap');
+    var exampleButtons = document.querySelectorAll('.hero-example-btn');
+
+    if (!site || !input || !svg) return;
+
+    function syncOpenPlaygroundHref() {
+        if (!openBtn || !openBaseHref) return;
+        var smiles = input.value.trim();
+        openBtn.href = smiles
+            ? openBaseHref + '?smiles=' + encodeURIComponent(smiles)
+            : openBaseHref;
+    }
+
+    function syncActiveExamples() {
+        var current = input.value.trim();
+        exampleButtons.forEach(function(btn) {
+            var active = btn.getAttribute('data-smiles') === current;
+            btn.classList.toggle('border-mint', active);
+            btn.classList.toggle('bg-mint-tint', active);
+        });
+    }
+
+    function syncPreviewHeight(smiles) {
+        if (!svgWrap) return;
+        svgWrap.style.minHeight = site.isReaction(smiles) ? '220px' : '280px';
+    }
+
+    function getPreviewWidth() {
+        if (svgWrap && svgWrap.clientWidth) return svgWrap.clientWidth;
+        if (previewPanel && previewPanel.clientWidth) return previewPanel.clientWidth;
+        return 0;
+    }
+
+    function getBaseOptions() {
+        var defaults = site.getDefaultRenderOptions();
+        return {
+            width: defaults.width,
+            height: defaults.height,
+            padding: defaults.padding,
+            explicitHydrogens: false,
+            bondLength: defaults.bondLength,
+            bondThickness: defaults.bondThickness,
+            shortBondLength: defaults.shortBondLength,
+            bondSpacing: defaults.bondSpacing,
+            fontSizeLarge: defaults.fontSizeLarge,
+            scale: defaults.scale
+        };
+    }
+
+    function drawHero() {
+        var smiles = input.value.trim();
+        if (!smiles) return;
+        var isReaction = site.isReaction(smiles);
+        syncActiveExamples();
+        syncOpenPlaygroundHref();
+        syncPreviewHeight(smiles);
+        svg = site.renderSmiles({
+            adaptive: true,
+            baseOptions: getBaseOptions(),
+            layout: {
+                containerWidth: isReaction ? getPreviewWidth() : Math.min(getPreviewWidth(), site.getDefaultRenderOptions().width),
+                minHeight: isReaction ? 220 : 0
+            },
+            onError: function(err, kind, nextSvg) {
+                svg = nextSvg;
+                errorEl.textContent = (kind === 'reaction' ? 'Invalid reaction SMILES: ' : 'Invalid SMILES: ') + err;
+                errorEl.classList.remove('hidden');
+            },
+            onSuccess: function(result) {
+                svg = result.svg;
+                errorEl.classList.add('hidden');
+            },
+            renderConfig: renderOverrides[smiles],
+            smiles: smiles,
+            svg: svg,
+            svgId: 'hero-molecule-svg',
+            themeName: 'light'
+        }).svg;
+    }
+
+    var debounceTimer;
+    input.addEventListener('input', function() {
+        syncActiveExamples();
+        syncOpenPlaygroundHref();
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(drawHero, 200);
+    });
+
+    exampleButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            input.value = btn.getAttribute('data-smiles');
+            drawHero();
+        });
+    });
+
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if (input.value.trim()) drawHero();
+        }, 120);
+    });
+
+    site.waitForFonts(drawHero);
+
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            var svgData = new XMLSerializer().serializeToString(svg);
+            var blob = new Blob([svgData], {type: 'image/svg+xml'});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'smilesdrawer.svg';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    }
+
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            if (!navigator.clipboard) return;
+            navigator.clipboard.writeText(input.value).then(function() {
+                var orig = copyBtn.innerHTML;
+                copyBtn.innerHTML = copyBtn.innerHTML.replace('Copy SMILES', 'Copied!');
+                setTimeout(function() { copyBtn.innerHTML = orig; }, 1500);
+            });
+        });
+    }
+});
+})();</script> </div> </div> </section>  <section class="border-y border-ink"> <div class="max-w-7xl mx-auto grid md:grid-cols-3 md:divide-x md:divide-rule"> <a href="/smilesDrawer/getting-started" class="group block p-8 lg:p-10 border-b md:border-b-0 border-rule transition-colors hover:bg-mint-tint"> <div class="num-label">01 / DOCUMENTATION</div> <h3 class="mt-3 text-[24px] font-extrabold tracking-[-0.02em] text-ink">Get started</h3> <p class="mt-2 text-[14px] leading-relaxed text-ink-muted max-w-[38ch]">Install, render your first molecule, and learn the API.</p> <div class="mt-4 text-[13px] font-semibold text-mint-deep">Read the docs →</div> </a> <a href="/smilesDrawer/playground" class="group block p-8 lg:p-10 border-b md:border-b-0 border-rule transition-colors hover:bg-mint-tint"> <div class="num-label">02 / PLAYGROUND</div> <h3 class="mt-3 text-[24px] font-extrabold tracking-[-0.02em] text-ink">Try it live</h3> <p class="mt-2 text-[14px] leading-relaxed text-ink-muted max-w-[38ch]">Tweak every option. Batch render. Export for publication.</p> <div class="mt-4 text-[13px] font-semibold text-mint-deep">Open playground →</div> </a> <a href="/smilesDrawer/examples" class="group block p-8 lg:p-10 transition-colors hover:bg-mint-tint"> <div class="num-label">03 / EXAMPLES</div> <h3 class="mt-3 text-[24px] font-extrabold tracking-[-0.02em] text-ink">Reference renders</h3> <p class="mt-2 text-[14px] leading-relaxed text-ink-muted max-w-[38ch]">Molecules, reactions, atom highlights, themes.</p> <div class="mt-4 text-[13px] font-semibold text-mint-deep">Browse examples →</div> </a> </div> </section>  <section class="max-w-7xl mx-auto px-6 py-16 text-center"> <div class="num-label">CONTINUE</div> <p class="mt-2 text-[15px] text-ink-muted">Read the docs, open the playground, or browse examples.</p> </section>  </main> <footer class="border-t border-rule bg-paper"> <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between gap-3 px-6 py-6 text-[11px] text-ink-hint tracking-wide"> <span> <strong class="text-ink font-semibold">SMILESDRAWER</strong> <span class="mx-2 text-ink-faint">·</span>
+MIT
+<span class="mx-2 text-ink-faint">·</span>
+Pure JavaScript
+</span> <span class="flex items-center gap-4"> <a href="https://doi.org/10.1021/acs.jcim.7b00425" target="_blank" rel="noopener" class="text-mint-deep font-semibold no-underline hover:underline">CITE ↗</a> <a href="https://github.com/reymond-group/smilesDrawer" target="_blank" rel="noopener" class="text-mint-deep font-semibold no-underline hover:underline">GITHUB ↗</a> <a href="https://www.npmjs.com/package/smiles-drawer" target="_blank" rel="noopener" class="text-mint-deep font-semibold no-underline hover:underline">NPM ↗</a> <a href="https://github.com/reymond-group/smilesDrawer/issues" target="_blank" rel="noopener" class="text-mint-deep font-semibold no-underline hover:underline">REPORT ISSUE ↗</a> </span> </div> </footer> </body></html>

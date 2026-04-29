@@ -217,7 +217,7 @@ export default class ReactionDrawer {
         elements.push({
             svg:      topText.svg,
             height:   topText.height,
-            width:    this.opts.arrow.length * this.opts.scale,
+            width:    topText.width,
             offsetX:  -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
             offsetY:  -(topText.height / 2.0) - this.opts.arrow.margin,
             position: 'relative',
@@ -237,7 +237,7 @@ export default class ReactionDrawer {
         elements.push({
             svg:      bottomText.svg,
             height:   bottomText.height,
-            width:    this.opts.arrow.length * this.opts.scale,
+            width:    bottomText.width,
             offsetX:  -(this.opts.arrow.length * this.opts.scale + this.opts.spacing) + centerOffsetX,
             offsetY:  bottomText.height / 2.0 + this.opts.arrow.margin,
             position: 'relative',

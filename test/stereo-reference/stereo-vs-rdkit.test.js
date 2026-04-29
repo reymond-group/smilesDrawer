@@ -12,20 +12,15 @@
  * Run:  npm test -- test/stereo-reference/stereo-vs-rdkit.test.js
  */
 import {describe, it, expect} from 'vitest';
-import {JSDOM} from 'jsdom';
-import {readFileSync} from 'fs';
-import {join, dirname} from 'path';
-import {fileURLToPath} from 'url';
-import Parser from '../../src/Parser.js';
+import {createJSDOM}          from '../helpers';
+
+import Parser    from '../../src/Parser.js';
 import SvgDrawer from '../../src/SvgDrawer.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const reference = JSON.parse(readFileSync(join(__dirname, 'reference.json'), 'utf-8'));
+import reference from './reference.json' with {type: 'json'};
 
 function renderAndGetStereo(smiles) {
-    const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
-    global.document = dom.window.document;
-    global.window = dom.window;
+    const dom = createJSDOM();
 
     const svg = dom.window.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttributeNS(null, 'id', 'test-svg');
@@ -72,6 +67,7 @@ describe('Stereochemistry: SmilesDrawer vs RDKit', () => {
             expect(actual.length, `Stereocenter count: RDKit=${expected.length} vs SD=${actual.length}`).toBe(expected.length);
 
             // Match 1-to-1 by order of appearance (both sorted by atomIdx)
+            const mismatches = [];
             for (let i = 0; i < expected.length; i++) {
                 const exp = expected[i];
                 const act = actual[i];
@@ -81,11 +77,12 @@ describe('Stereochemistry: SmilesDrawer vs RDKit', () => {
 
                 // The actual test: R/S must agree
                 if (act.cip !== exp.cip) {
-                    console.log(`  ${name} center #${i + 1}: R/S MISMATCH`);
-                    console.log(`    RDKit: atom ${exp.atomIdx}(${exp.element}) = ${exp.cip}`);
-                    console.log(`    SD:    atom ${act.atomIdx}(${act.element}) = ${act.cip}`);
+                    mismatches.push(` - Atom ${act.atomIdx} (${act.element}): Expected ${exp.cip} but got ${act.cip}`);
                 }
-                expect(act.cip, `Center #${i + 1} (${act.element}): RDKit=${exp.cip} vs SD=${act.cip}`).toBe(exp.cip);
+            }
+
+            if (mismatches.length > 0) {
+                expect.fail(`Incorrect stereochemistry in ${name}:\n` + mismatches.join('\n'));
             }
         });
     }

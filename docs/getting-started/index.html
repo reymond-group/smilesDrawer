@@ -1,0 +1,622 @@
+<!DOCTYPE html><html lang="en"> <head><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-DWK15V0MRS"></script><script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-DWK15V0MRS');
+    </script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="SmilesDrawer docs covering installation, basic drawing, reactions, weights, themes, and framework integration."><link rel="icon" type="image/svg+xml" href="/smilesDrawer/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><title>Getting Started | SmilesDrawer</title><!-- SmilesDrawer library + shared rendering helpers --><script src="/smilesDrawer/js/smiles-drawer.min.js"></script><script src="/smilesDrawer/js/smiles-website.js"></script><link rel="stylesheet" href="/smilesDrawer/_astro/examples.7q3mxKxv.css"></head> <body class="min-h-screen flex flex-col"> <header class="sticky top-0 z-40 bg-paper border-b border-ink"> <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4"> <a href="/smilesDrawer" class="flex items-baseline gap-2 no-underline"> <span class="text-[14px] font-extrabold tracking-tight text-ink">SMILESDRAWER</span> <span class="text-[10px] font-medium text-ink-hint uppercase tracking-[0.1em]">v2.2.1</span> </a> <nav class="flex items-center gap-7"> <a href="/smilesDrawer/getting-started" class="btn-ghost text-mint-deep"> <span class="text-[9px] text-ink-faint font-semibold">01</span> <span>Docs</span> </a> <a href="/smilesDrawer/playground" class="btn-ghost "> <span class="text-[9px] text-ink-faint font-semibold">02</span> <span>Playground</span> </a> <a href="/smilesDrawer/examples" class="btn-ghost "> <span class="text-[9px] text-ink-faint font-semibold">03</span> <span>Examples</span> </a> <a href="https://github.com/reymond-group/smilesDrawer" target="_blank" rel="noopener" class="btn-ghost"> <span class="text-[9px] text-ink-faint font-semibold">04</span> <span>GitHub ↗</span> </a> </nav> </div> </header> <main class="flex-1">  <section class="border-b border-ink bg-paper"> <div class="max-w-7xl mx-auto px-6 py-10"> <div class="eyebrow mb-2">01 / DOCUMENTATION</div> <h1 class="text-[34px] sm:text-[40px] font-extrabold tracking-[-0.025em] text-ink">Get started.</h1> <p class="mt-3 max-w-2xl text-[14px] text-ink-muted">
+Start with the smallest working setup, then use the examples and playground when you need reactions, highlighting, or rendering tweaks for denser structures.
+</p> </div> </section> <div class="max-w-7xl mx-auto px-6 py-12 grid gap-10 lg:grid-cols-[220px_minmax(0,1fr)]"> <aside class="hidden lg:block"> <nav class="sticky top-24 border-l border-rule pl-4"> <div class="num-label mb-3">CONTENTS</div> <ul class="space-y-2"> <li><a href="#installation" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">01</span>Installation</a></li> <li><a href="#simple-drawing" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">02</span>Basic drawing</a></li> <li><a href="#reactions" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">03</span>Reactions</a></li> <li><a href="#weights" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">04</span>Weights</a></li> <li><a href="#reaction-weights" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">05</span>Reaction weights</a></li> <li><a href="#atom-highlighting" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">06</span>Atom highlighting</a></li> <li><a href="#customization" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">07</span>Customization</a></li> <li><a href="#frameworks" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">08</span>Frameworks</a></li> <li><a href="#api-reference" class="flex items-baseline gap-2 text-[12px] text-ink-muted hover:text-mint-deep"><span class="text-[9px] text-ink-faint font-semibold">09</span>API reference</a></li> </ul> </nav> </aside> <div class="min-w-0"> <section id="installation" class="scroll-mt-24 mb-14"> <div class="grid gap-4 md:grid-cols-3"> <div class="card p-5"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Package Manager</div> <h2 class="mt-2 text-xl font-semibold text-gray-900 dark:text-white">Install from NPM</h2> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Available as <code class="ic">smiles-drawer</code> and works with <code class="ic">npm</code>, <code class="ic">pnpm</code>, and <code class="ic">yarn</code>.</p> <div class="mt-4 rounded-xl border border-ink bg-ink px-3 py-2 font-mono text-sm text-white">npm install smiles-drawer</div> </div> <div class="card p-5"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">CDN</div> <h2 class="mt-2 text-xl font-semibold text-gray-900 dark:text-white">Drop in a script tag</h2> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">For browser-only rendering, the CDN build is enough.</p> <div class="mt-4 rounded-xl border border-ink bg-ink px-3 py-2 font-mono text-xs text-white break-all">https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js</div> </div> <div class="card p-5"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Tools</div> <h2 class="mt-2 text-xl font-semibold text-gray-900 dark:text-white">Use the site itself</h2> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Compare the docs, examples, and playground side by side.</p> <div class="mt-4 flex flex-wrap gap-2"> <a href="/smilesDrawer/playground" class="btn-secondary text-xs">Playground</a> <a href="/smilesDrawer/examples" class="btn-secondary text-xs">Examples</a> </div> </div> </div> </section> <section id="simple-drawing" class="scroll-mt-24 mb-14"> <div class="max-w-3xl mb-6"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Basic Drawing</div> <h2 class="mt-2 text-2xl sm:text-3xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">Choose between <code class="ic">apply()</code>, <code class="ic">draw()</code>, and <code class="ic">parse()</code> depending on how much control you need.</h2> <p class="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-400"> <code class="ic">apply()</code> is the fastest start, <code class="ic">draw()</code> is the default for dynamic UIs, and <code class="ic">parse()</code> is only needed when you want the parse tree.
+</p> </div> <div class="grid gap-6 lg:grid-cols-2"> <div class="card p-5 sm:p-6"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Apply static molecules</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Use this when all SMILES strings are known at page load and every drawing can share the same dimensions.</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">index.html</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">html</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>&lt;script src=&quot;https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;canvas data-smiles=&quot;CN1C=NC2=C1C(=O)N(C(=O)N2C)C&quot;&gt;&lt;/canvas&gt;
+&lt;canvas data-smiles=&quot;c1(C=O)cc(OC)c(O)cc1&quot;&gt;&lt;/canvas&gt;
+
+&lt;script&gt;
+    SmilesDrawer.apply({ width: 550, height: 450 });
+&lt;/script&gt;</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="<script src=&#34;https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js&#34;></script>
+
+<canvas data-smiles=&#34;CN1C=NC2=C1C(=O)N(C(=O)N2C)C&#34;></canvas>
+<canvas data-smiles=&#34;c1(C=O)cc(OC)c(O)cc1&#34;></canvas>
+
+<script>
+    SmilesDrawer.apply({ width: 550, height: 450 });
+</script>">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">Use <code class="ic">apply()</code> when you want a minimal setup and don’t need per-target sizing.</p> </div> <div class="card p-5 sm:p-6"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Draw dynamically</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Create a <code class="ic">SmiDrawer</code> when user input changes or when molecules and reactions need different targets.</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">app.html</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">html</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>&lt;input id=&quot;input&quot; value=&quot;O=C(O)CNCP(=O)(O)O&quot; /&gt;
+&lt;svg id=&quot;output&quot;&gt;&lt;/svg&gt;
+
+&lt;script src=&quot;https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    var drawer = new SmilesDrawer.SmiDrawer({ width: 550, height: 450 });
+    var input = document.getElementById(&#39;input&#39;);
+
+    function render(smiles) {
+        drawer.draw(smiles, &#39;#output&#39;);
+    }
+
+    input.addEventListener(&#39;input&#39;, function() {
+        render(input.value);
+    });
+
+    render(input.value);
+&lt;/script&gt;</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="<input id=&#34;input&#34; value=&#34;O=C(O)CNCP(=O)(O)O&#34; />
+<svg id=&#34;output&#34;></svg>
+
+<script src=&#34;https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js&#34;></script>
+<script>
+    var drawer = new SmilesDrawer.SmiDrawer({ width: 550, height: 450 });
+    var input = document.getElementById('input');
+
+    function render(smiles) {
+        drawer.draw(smiles, '#output');
+    }
+
+    input.addEventListener('input', function() {
+        render(input.value);
+    });
+
+    render(input.value);
+</script>">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">The default for application UIs, playgrounds, and framework components.</p> </div> </div> <div class="card p-5 sm:p-6 mt-6"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Parse then draw</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Use <code class="ic">SmilesDrawer.parse()</code> when you need the parse result before rendering, or when you want to choose between <code class="ic">Drawer</code> and <code class="ic">SvgDrawer</code> yourself.</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">parse.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>var drawer = new SmilesDrawer.SvgDrawer({ width: 550, height: 450 });
+
+SmilesDrawer.parse(smiles, function(result) {
+    drawer.draw(result, document.getElementById(&#39;output&#39;), &#39;light&#39;);
+}, function(error) {
+    console.error(error);
+});</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="var drawer = new SmilesDrawer.SvgDrawer({ width: 550, height: 450 });
+
+SmilesDrawer.parse(smiles, function(result) {
+    drawer.draw(result, document.getElementById('output'), 'light');
+}, function(error) {
+    console.error(error);
+});">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> </div> </section> <section id="reactions" class="scroll-mt-24 mb-14"> <div class="grid gap-6 lg:grid-cols-2"> <div class="card p-5 sm:p-6"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Reactions</div> <h2 class="mt-2 text-2xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">Reaction SMILES use <code class="ic">reactants&gt;reagents&gt;products</code>.</h2> <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">Use <code class="ic">SmilesDrawer.SmiDrawer.apply()</code> or <code class="ic">drawer.draw()</code> when you want the library to parse and render the reaction in one step.</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">reaction.html</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">html</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>&lt;svg data-smiles=&quot;[Pb]&gt;&gt;[Au]&quot;&gt;&lt;/svg&gt;
+
+&lt;script src=&quot;https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+    SmilesDrawer.SmiDrawer.apply();
+&lt;/script&gt;</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="<svg data-smiles=&#34;[Pb]>>[Au]&#34;></svg>
+
+<script src=&#34;https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js&#34;></script>
+<script>
+    SmilesDrawer.SmiDrawer.apply();
+</script>">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+To label the reaction arrow, append a JSON-in-SMILES tail to the reaction string wrapped in <code class="ic">__…__</code>. The library strips and parses it before rendering. Example:
+</p> <div class="mt-3"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">labeled-reaction.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>drawer.draw(
+    &quot;[Pb]&gt;&gt;[Au]  __{&#39;textAboveArrow&#39;: &#39;MAGIC&#39;, &#39;textBelowArrow&#39;: &#39;42°C&#39;}__&quot;,
+    &#39;#output&#39;
+);</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="drawer.draw(
+    &#34;[Pb]>>[Au]  __{'textAboveArrow': 'MAGIC', 'textBelowArrow': '42°C'}__&#34;,
+    '#output'
+);">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> </div> <div class="card p-5 sm:p-6"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Weights</div> <h2 class="mt-2 text-2xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">Weighted overlays take one numeric value per heavy atom.</h2> <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">Positive values render green, negative values render red, and the intensity scales with the magnitude of the weight.</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">weights.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>var drawer = new SmilesDrawer.SmiDrawer({ width: 550, height: 450 });
+
+drawer.draw(
+    &#39;CCCCCCN&#39;,
+    &#39;#weights-output&#39;,
+    &#39;light&#39;,
+    null,
+    null,
+    [-3, -2, -1, 0, 1, 2, 3]
+);</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="var drawer = new SmilesDrawer.SmiDrawer({ width: 550, height: 450 });
+
+drawer.draw(
+    'CCCCCCN',
+    '#weights-output',
+    'light',
+    null,
+    null,
+    [-3, -2, -1, 0, 1, 2, 3]
+);">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">For SVG output, weights look best on a light background.</p> </div> </div> </section> <section id="reaction-weights" class="scroll-mt-24 mb-14"> <div class="card p-5 sm:p-6"> <div class="max-w-3xl"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Reaction Weights</div> <h2 class="mt-2 text-2xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">Weight reactants and products separately in a single reaction.</h2> <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+Instead of a flat array, reaction weights take an object keyed by <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">reactants</code>, <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">reagents</code>, and <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">products</code>. Each value is an array of arrays: one inner array per molecule in that category, with one weight per heavy atom.
+</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">reaction-weights.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>var weights = {
+    reactants: [[1, 0], [0, -1, 0]],
+    products:  [[1, -1, 0], [0, 0]]
+};
+
+var drawer = new SmilesDrawer.SmiDrawer({ width: 550, height: 450 });
+drawer.draw(&#39;CF.FC#N&gt;&gt;CC#N.FF&#39;, &#39;#output&#39;, &#39;light&#39;, null, null, weights);</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="var weights = {
+    reactants: [[1, 0], [0, -1, 0]],
+    products:  [[1, -1, 0], [0, 0]]
+};
+
+var drawer = new SmilesDrawer.SmiDrawer({ width: 550, height: 450 });
+drawer.draw('CF.FC#N>>CC#N.FF', '#output', 'light', null, null, weights);">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+The <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">apply()</code> path uses the attributes <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">data-smiles-reactant-weights</code> and <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">data-smiles-product-weights</code>, separating per-molecule weight arrays with semicolons and per-atom values with commas. Reagents accept the same shape but aren't drawn as structures, so weights on them have no visible effect. Draw to SVG on a light background.
+</p> </div> </div> <div class="mt-6 max-w-3xl mx-auto flex flex-col gap-3"> <div class="group border border-ink rounded-md bg-white overflow-hidden flex flex-col transition-colors" data-smiles="CF.FC#N>>CC#N.FF"> <div class="grid-paper flex items-center justify-center p-4 aspect-[3/1]" data-theme-surface="true"> <svg id="mol-reaction-with-weights" data-smiles="CF.FC#N>>CC#N.FF" class="molecule-svg w-full h-full weight-svg" data-smiles-reaction-weights="{&#34;reactants&#34;:[[1,0],[0,-1,0]],&#34;products&#34;:[[1,-1,0],[0,0]]}"></svg> </div> <div class="px-4 py-3 border-t border-rule"> <div class="text-[12px] font-semibold text-ink truncate">Reaction with Weights</div> <div class="font-mono text-[10px] text-ink-hint truncate mt-0.5" title="CF.FC#N>>CC#N.FF">CF.FC#N&gt;&gt;CC#N.FF</div> </div>  </div> <p class="text-xs text-gray-500 dark:text-gray-400 px-1 text-center">
+Reactants and products get independent weight arrays; red is negative, green is positive.
+</p> </div> </section> <section id="atom-highlighting" class="scroll-mt-24 mb-14"> <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start"> <div class="card p-5 sm:p-6"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Atom Highlighting</div> <h2 class="mt-2 text-2xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">Class-based color circles under individual atoms.</h2> <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+Unlike weights (which visualize per-atom magnitudes), highlights are categorical. Attach a class number to an atom in the SMILES with the <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">:N</code> syntax, then pass an array of <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">[class, color]</code> pairs when you draw.
+</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">highlights.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>var smiles = &#39;CCCC[CH2:1][CH2:2]CC[NH2:2]&#39;;
+var highlights = [[1, &#39;#ffd34d&#39;], [2, &#39;#6fdc8c&#39;]];
+
+SmilesDrawer.parse(smiles, function(tree) {
+    var drawer = new SmilesDrawer.SvgDrawer({ width: 550, height: 450 });
+    drawer.draw(tree, &#39;#output&#39;, &#39;light&#39;, null, false, highlights);
+});</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="var smiles = 'CCCC[CH2:1][CH2:2]CC[NH2:2]';
+var highlights = [[1, '#ffd34d'], [2, '#6fdc8c']];
+
+SmilesDrawer.parse(smiles, function(tree) {
+    var drawer = new SmilesDrawer.SvgDrawer({ width: 550, height: 450 });
+    drawer.draw(tree, '#output', 'light', null, false, highlights);
+});">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+For canvas, pass the highlight array as the fifth argument to <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">Drawer.draw()</code> instead. Highlights require the parse-then-draw path and don't apply to reactions.
+</p> </div> <div class="flex flex-col gap-3"> <div class="group border border-ink rounded-md bg-white overflow-hidden flex flex-col transition-colors" data-smiles="CCCC[CH2:1][CH2:2]CC[NH2:2]"> <div class="grid-paper flex items-center justify-center p-4 aspect-square" data-theme-surface="true"> <svg id="mol-highlighted-amine" data-smiles="CCCC[CH2:1][CH2:2]CC[NH2:2]" class="molecule-svg w-full h-full" data-smiles-highlights="[[1,&#34;#ffd34d&#34;],[2,&#34;#6fdc8c&#34;]]"></svg> </div> <div class="px-4 py-3 border-t border-rule"> <div class="text-[12px] font-semibold text-ink truncate">Highlighted Amine</div> <div class="font-mono text-[10px] text-ink-hint truncate mt-0.5" title="CCCC[CH2:1][CH2:2]CC[NH2:2]">CCCC[CH2:1][CH2:2]CC[NH2:2]</div> </div>  </div> <p class="text-xs text-gray-500 dark:text-gray-400 px-1">
+Classes from the SMILES: <code class="text-[10px] bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">[CH2:1]</code> is yellow, <code class="text-[10px] bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">[CH2:2]</code> and <code class="text-[10px] bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">[NH2:2]</code> share green.
+</p> </div> </div> </section> <section id="customization" class="scroll-mt-24 mb-14"> <div class="max-w-3xl mb-6"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Customization</div> <h2 class="mt-2 text-2xl sm:text-3xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">Most of the site’s rendering fixes come down to a small set of options.</h2> <p class="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-400">For this site, the biggest levers are <code class="ic">bondLength</code>, <code class="ic">fontSizeLarge</code>, <code class="ic">padding</code>, and whether <code class="ic">compactDrawing</code> or <code class="ic">explicitHydrogens</code> are enabled.</p> </div> <div class="card p-5 sm:p-6 mb-6"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Site default render preset</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">These are the starting values used on the website and in the playground because they hold up better for most molecules than the larger legacy baseline.</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">site-defaults.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>var options = {
+    scale: 0,
+    width: 550,
+    height: 450,
+    bondLength: 19,
+    bondThickness: 1.1,
+    shortBondLength: 0.6,
+    bondSpacing: 3.2,
+    fontSizeLarge: 6.3
+};</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="var options = {
+    scale: 0,
+    width: 550,
+    height: 450,
+    bondLength: 19,
+    bondThickness: 1.1,
+    shortBondLength: 0.6,
+    bondSpacing: 3.2,
+    fontSizeLarge: 6.3
+};">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> </div> <div class="card overflow-hidden"> <div class="p-5 sm:p-6 pb-0"> <p class="text-xs text-gray-500 dark:text-gray-400">
+Library defaults are shown below. The site preset above overrides the numeric ones so denser structures stay legible.
+</p> </div> <div class="overflow-x-auto p-5 sm:p-6"> <table class="w-full text-sm"> <thead> <tr class="border-b border-gray-200 dark:border-gray-700"> <th class="text-left py-3 pr-4 font-medium text-gray-900 dark:text-white">Option</th> <th class="text-left py-3 pr-4 font-medium text-gray-900 dark:text-white">Default</th> <th class="text-left py-3 font-medium text-gray-900 dark:text-white">Description</th> </tr> </thead> <tbody class="text-gray-600 dark:text-gray-400"> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">width / height</td> <td class="py-2 pr-4 font-mono text-xs">500 / 500</td> <td class="py-2">Drawing dimensions in pixels.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">padding</td> <td class="py-2 pr-4 font-mono text-xs">10</td> <td class="py-2">Whitespace inside the drawing bounds.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">bondLength</td> <td class="py-2 pr-4 font-mono text-xs">30.0</td> <td class="py-2">Main scale control for how large the structure feels.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">bondThickness</td> <td class="py-2 pr-4 font-mono text-xs">1.0</td> <td class="py-2">Stroke width for bonds.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">shortBondLength</td> <td class="py-2 pr-4 font-mono text-xs">0.8</td> <td class="py-2">Relative length for shortened bonds (e.g. inner double bonds).</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">bondSpacing</td> <td class="py-2 pr-4 font-mono text-xs">5.1</td> <td class="py-2">Spacing between double and triple bonds.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">fontSizeLarge</td> <td class="py-2 pr-4 font-mono text-xs">11</td> <td class="py-2">Large font size in pt, used for element labels.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">fontSizeSmall</td> <td class="py-2 pr-4 font-mono text-xs">3</td> <td class="py-2">Small font size in pt, reserved for subscripts and numbers.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">atomVisualization</td> <td class="py-2 pr-4 font-mono text-xs">'default'</td> <td class="py-2"><code class="ic">'default'</code>, <code class="ic">'balls'</code>, or <code class="ic">'allballs'</code>.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">compactDrawing</td> <td class="py-2 pr-4 font-mono text-xs">true</td> <td class="py-2">Abbreviates terminals and pseudo-elements when possible.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">terminalCarbons</td> <td class="py-2 pr-4 font-mono text-xs">false</td> <td class="py-2">Show terminal carbon labels such as CH3.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">explicitHydrogens</td> <td class="py-2 pr-4 font-mono text-xs">true</td> <td class="py-2">Render explicit hydrogens from the SMILES input.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">isomeric</td> <td class="py-2 pr-4 font-mono text-xs">true</td> <td class="py-2">Draw stereochemistry when the input describes it.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">overlapSensitivity</td> <td class="py-2 pr-4 font-mono text-xs">0.42</td> <td class="py-2">Threshold that controls how aggressively atom overlaps get resolved.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">overlapResolutionIterations</td> <td class="py-2 pr-4 font-mono text-xs">1</td> <td class="py-2">Number of layout passes dedicated to resolving overlapping atoms.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">experimentalSSSR</td> <td class="py-2 pr-4 font-mono text-xs">false</td> <td class="py-2">Alternative ring detection for stretched or awkward large rings.</td> </tr> <tr class="border-b border-gray-100 dark:border-gray-800"> <td class="py-2 pr-4 font-mono text-xs">themes</td> <td class="py-2 pr-4 font-mono text-xs">built-ins</td> <td class="py-2">Custom color schemes keyed by name. See the custom themes card below.</td> </tr> <tr> <td class="py-2 pr-4 font-mono text-xs">debug</td> <td class="py-2 pr-4 font-mono text-xs">false</td> <td class="py-2">Draw debug labels on atoms and bonds.</td> </tr> </tbody> </table> </div> </div> <div class="grid gap-4 md:grid-cols-3 mt-6"> <div class="card p-5"> <h3 class="text-base font-semibold text-gray-900 dark:text-white">Too much abbreviation</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Set <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">compactDrawing</code> to <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">false</code>.</p> </div> <div class="card p-5"> <h3 class="text-base font-semibold text-gray-900 dark:text-white">Unwanted hydrogens</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Set <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">explicitHydrogens</code> to <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">false</code>.</p> </div> <div class="card p-5"> <h3 class="text-base font-semibold text-gray-900 dark:text-white">Large ring issues</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Try <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">experimentalSSSR</code> when rings stretch or overlap badly.</p> </div> </div> <div class="grid gap-6 lg:grid-cols-2 mt-6"> <div class="card p-5 sm:p-6"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Built-in themes</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Pass a theme name as the final argument to <code class="ic">apply()</code> or <code class="ic">draw()</code>.</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">themes.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>SmilesDrawer.apply(options, &#39;canvas[data-smiles]&#39;, &#39;matrix&#39;);
+
+var drawer = new SmilesDrawer.SmiDrawer(options);
+drawer.draw(smiles, &#39;#output&#39;, &#39;solarized&#39;);</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="SmilesDrawer.apply(options, 'canvas[data-smiles]', 'matrix');
+
+var drawer = new SmilesDrawer.SmiDrawer(options);
+drawer.draw(smiles, '#output', 'solarized');">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> </div> <div class="card p-5 sm:p-6"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Custom themes</h3> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Provide a <code class="ic">themes</code> object in your options, then draw with the custom name like any built-in preset.</p> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">custom-theme.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>var options = {
+    width: 550,
+    height: 450,
+    themes: {
+        &#39;my-theme&#39;: {
+            C: &#39;#1f2937&#39;,
+            O: &#39;#dc2626&#39;,
+            N: &#39;#2563eb&#39;,
+            H: &#39;#6b7280&#39;,
+            BACKGROUND: &#39;#ffffff&#39;
+        }
+    }
+};</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="var options = {
+    width: 550,
+    height: 450,
+    themes: {
+        'my-theme': {
+            C: '#1f2937',
+            O: '#dc2626',
+            N: '#2563eb',
+            H: '#6b7280',
+            BACKGROUND: '#ffffff'
+        }
+    }
+};">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> </div> </div> </section> <section id="frameworks" class="scroll-mt-24 mb-14"> <div class="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]"> <div class="card p-5 sm:p-6"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Frameworks</div> <h2 class="mt-2 text-2xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">The integration pattern is the same everywhere.</h2> <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">Create a render target, draw when the component mounts, and redraw when the SMILES string or relevant options change.</p> <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400"> <div><span class="font-medium text-gray-900 dark:text-white">Preact</span>: component + ref + redraw on prop changes</div> <div><span class="font-medium text-gray-900 dark:text-white">React</span>: <code class="ic">useEffect</code> around a persistent SVG ref</div> <div><span class="font-medium text-gray-900 dark:text-white">Svelte</span>: bind the SVG element and redraw after updates</div> <div><span class="font-medium text-gray-900 dark:text-white">Vue</span>: ref + watcher pattern</div> <div><span class="font-medium text-gray-900 dark:text-white">Web Components</span>: custom element lifecycle + redraw on attribute changes</div> </div> </div> <div class="card p-5 sm:p-6"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Wrapper pattern</h3> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">MoleculeFigure.jsx</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">jsx</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>import { useEffect, useRef } from &#39;react&#39;;
+import SmilesDrawer from &#39;smiles-drawer&#39;;
+
+export default function MoleculeFigure({ smiles, theme = &#39;light&#39; }) {
+    const svgRef = useRef(null);
+
+    useEffect(() =&gt; {
+        if (!svgRef.current || !smiles) return;
+
+        const drawer = new SmilesDrawer.SmiDrawer({ width: 320, height: 220 });
+        drawer.draw(smiles, svgRef.current, theme);
+    }, [smiles, theme]);
+
+    return &lt;svg ref={svgRef} /&gt;;
+}</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="import { useEffect, useRef } from 'react';
+import SmilesDrawer from 'smiles-drawer';
+
+export default function MoleculeFigure({ smiles, theme = 'light' }) {
+    const svgRef = useRef(null);
+
+    useEffect(() => {
+        if (!svgRef.current || !smiles) return;
+
+        const drawer = new SmilesDrawer.SmiDrawer({ width: 320, height: 220 });
+        drawer.draw(smiles, svgRef.current, theme);
+    }, [smiles, theme]);
+
+    return <svg ref={svgRef} />;
+}">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> </div> </div> <div class="flex flex-col gap-6 mt-6"> <div class="card p-5 sm:p-6"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Web Components</div> <h3 class="mt-2 text-lg font-semibold text-gray-900 dark:text-white">Custom elements come with a few gotchas.</h3> <ul class="mt-3 space-y-2 text-sm text-gray-600 dark:text-gray-400 list-disc pl-5"> <li><code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">attributeChangedCallback</code> fires on construction too, so guard drawing behind a <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">blockDrawing</code> flag and draw in <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">connectedCallback</code>.</li> <li>SmilesDrawer sets the canvas <code class="ic">width</code>/<code class="ic">height</code> during draw, which would re-trigger the callback. Skipping draws when values are unchanged prevents the infinite loop.</li> <li>Expose a <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">delayDrawing(fn)</code> helper so callers can batch attribute updates into one redraw.</li> <li>Autonomous elements are <code class="ic">display: inline</code> by default and pick up a few stray pixels of height from line-height. Set <code class="ic">display: inline-block</code> and <code class="ic">line-height: 0</code>.</li> </ul> <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+The customized built-in variant (<code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">extends: 'canvas'</code>) uses the same lifecycle but skips the shadow DOM, so you can write <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">&lt;canvas is=&quot;smiles-drawer&quot;&gt;</code>. Safari doesn't support it natively, so polyfill if you need it.
+</p> </div> <div class="card p-5 sm:p-6"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Autonomous custom element</h3> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">smiles-drawer-element.js</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">javascript</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>class SmilesDrawerElement extends HTMLElement {
+    static get observedAttributes() {
+        return [&#39;smiles&#39;, &#39;width&#39;, &#39;height&#39;, &#39;theme&#39;];
+    }
+
+    constructor() {
+        super();
+        this.blockDrawing = true;
+        const shadow = this.attachShadow({ mode: &#39;open&#39; });
+        shadow.appendChild(document.createElement(&#39;canvas&#39;));
+    }
+
+    connectedCallback() {
+        if (this.blockDrawing) {
+            this.blockDrawing = false;
+            this.draw();
+        }
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue !== newValue) {
+            this.modified = true;
+            this.draw();
+        }
+    }
+
+    delayDrawing(callback) {
+        this.blockDrawing = true;
+        callback();
+        this.blockDrawing = false;
+        if (this.modified) this.draw();
+    }
+
+    draw() {
+        if (this.blockDrawing) return;
+        SmilesDrawer.parse(this.getAttribute(&#39;smiles&#39;), (tree) =&gt; {
+            const canvas = this.shadowRoot.firstElementChild;
+            const drawer = new SmilesDrawer.Drawer({
+                width:  parseInt(this.getAttribute(&#39;width&#39;))  || 500,
+                height: parseInt(this.getAttribute(&#39;height&#39;)) || 500
+            });
+            drawer.draw(tree, canvas, this.getAttribute(&#39;theme&#39;) || &#39;light&#39;);
+        });
+        this.modified = false;
+    }
+}
+
+customElements.define(&#39;smiles-drawer&#39;, SmilesDrawerElement);</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="class SmilesDrawerElement extends HTMLElement {
+    static get observedAttributes() {
+        return ['smiles', 'width', 'height', 'theme'];
+    }
+
+    constructor() {
+        super();
+        this.blockDrawing = true;
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.appendChild(document.createElement('canvas'));
+    }
+
+    connectedCallback() {
+        if (this.blockDrawing) {
+            this.blockDrawing = false;
+            this.draw();
+        }
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue !== newValue) {
+            this.modified = true;
+            this.draw();
+        }
+    }
+
+    delayDrawing(callback) {
+        this.blockDrawing = true;
+        callback();
+        this.blockDrawing = false;
+        if (this.modified) this.draw();
+    }
+
+    draw() {
+        if (this.blockDrawing) return;
+        SmilesDrawer.parse(this.getAttribute('smiles'), (tree) => {
+            const canvas = this.shadowRoot.firstElementChild;
+            const drawer = new SmilesDrawer.Drawer({
+                width:  parseInt(this.getAttribute('width'))  || 500,
+                height: parseInt(this.getAttribute('height')) || 500
+            });
+            drawer.draw(tree, canvas, this.getAttribute('theme') || 'light');
+        });
+        this.modified = false;
+    }
+}
+
+customElements.define('smiles-drawer', SmilesDrawerElement);">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> <div class="mt-4"> <div class="border border-ink rounded-md overflow-hidden bg-ink"> <div class="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-[#0f0f0f]"> <span class="font-mono text-[11px] text-white/80">page.html</span> <span class="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/40">html</span> </div> <div class="relative"> <pre class="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-white bg-ink m-0"><code>&lt;style&gt;
+    smiles-drawer { display: inline-block; line-height: 0; }
+&lt;/style&gt;
+
+&lt;smiles-drawer smiles=&quot;CCCC&quot; width=&quot;300&quot; height=&quot;200&quot;&gt;&lt;/smiles-drawer&gt;</code></pre> <button type="button" class="code-copy-btn absolute top-3 right-3 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.06em] bg-mint text-ink border border-mint hover:bg-mint-deep hover:text-white rounded-sm transition-colors" data-code="<style>
+    smiles-drawer { display: inline-block; line-height: 0; }
+</style>
+
+<smiles-drawer smiles=&#34;CCCC&#34; width=&#34;300&#34; height=&#34;200&#34;></smiles-drawer>">
+COPY
+</button> </div> </div> <script>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.code-copy-btn');
+    if (!btn) return;
+    var code = btn.getAttribute('data-code');
+    if (!code || !navigator.clipboard) return;
+    navigator.clipboard.writeText(code).then(function() {
+        var original = btn.textContent;
+        btn.textContent = 'COPIED';
+        setTimeout(function() { btn.textContent = original; }, 1500);
+    });
+});
+</script> </div> </div> </div> </section> <section id="api-reference" class="scroll-mt-24 mb-14"> <div class="max-w-3xl mb-6"> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">API Reference</div> <h2 class="mt-2 text-2xl sm:text-3xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">Pick the right entrypoint when you need more control than the quick start.</h2> <p class="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-400">
+SmilesDrawer exposes several drawer classes. These are the ones worth calling directly; the rest are internal helpers or deprecated. For the full catalog, see
+<a href="https://github.com/reymond-group/smilesDrawer/tree/master/src" target="_blank" rel="noopener noreferrer" class="text-accent hover:opacity-80 transition-opacity">the source</a>.
+</p> </div> <div class="grid gap-6"> <div class="card p-5 sm:p-6"> <div class="flex items-baseline gap-3 mb-4 flex-wrap"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Apply</h3> <div class="text-xs text-gray-500 dark:text-gray-400">Query elements, read their SMILES, draw them all.</div> </div> <div class="space-y-5"> <div> <pre class="text-xs sm:text-sm font-mono bg-ink border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-white whitespace-pre-wrap break-words"><code>SmilesDrawer.apply(options, selector = "canvas[data-smiles]", themeName = "light", onError = null)</code></pre> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">The smallest entrypoint. Canvas-only, single molecules, no reactions. Reads <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">data-smiles</code> from each matching element.</p> </div> <div> <pre class="text-xs sm:text-sm font-mono bg-ink border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-white whitespace-pre-wrap break-words"><code>new SmilesDrawer.SmiDrawer(moleculeOptions, reactionOptions).apply(attribute = "data-smiles", theme = "light", onSuccess, onError)</code></pre> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">The more capable apply. Handles molecules and reactions, and picks up the attributes <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">data-smiles-theme</code>, <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">data-smiles-options</code>, <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">data-smiles-weights</code>, and the reaction-weight attributes.</p> <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">A current bug prevents this from drawing to canvas elements. Target svgs instead.</p> </div> </div> </div> <div class="card p-5 sm:p-6"> <div class="flex items-baseline gap-3 mb-4 flex-wrap"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Draw</h3> <div class="text-xs text-gray-500 dark:text-gray-400">Render something that you already have.</div> </div> <div class="space-y-5"> <div> <pre class="text-xs sm:text-sm font-mono bg-ink border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-white whitespace-pre-wrap break-words"><code>new SmilesDrawer.SmiDrawer(moleculeOptions, reactionOptions).draw(smiles, target, theme = "light", onSuccess, onError, weights = null)</code></pre> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">The recommended draw. Accepts both molecule and reaction SMILES. <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">target</code> can be an element, <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">"svg" / "canvas" / "img"</code> to create a new element, a CSS selector, or <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">null</code> for a new SVG.</p> <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">Passing an <code class="text-[10px] bg-amber-100/60 dark:bg-amber-950/60 px-1 py-0.5 rounded">HTMLCanvasElement</code> directly doesn't currently work. Pass a selector instead.</p> </div> <div> <pre class="text-xs sm:text-sm font-mono bg-ink border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-white whitespace-pre-wrap break-words"><code>new SmilesDrawer.SvgDrawer(options).draw(data, target, themeName = "light", weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false)</code></pre> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Low-level SVG renderer. Takes a parsed molecule (from <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">SmilesDrawer.parse()</code>) and draws to an existing svg. This is where molecule weights and atom highlighting run.</p> </div> <div> <pre class="text-xs sm:text-sm font-mono bg-ink border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-white whitespace-pre-wrap break-words"><code>new SmilesDrawer.Drawer(options).draw(data, target, themeName = "light", infoOnly = false, highlight_atoms = [])</code></pre> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Canvas equivalent of SvgDrawer. Internally delegates to SvgDrawer and copies the result.</p> </div> <div> <pre class="text-xs sm:text-sm font-mono bg-ink border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-white whitespace-pre-wrap break-words"><code>new SmilesDrawer.ReactionDrawer(reactionOptions, moleculeOptions).draw(reaction, target, theme = "light", weights = null, textAbove, textBelow, infoOnly)</code></pre> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Renders a pre-parsed reaction. Note the constructor argument order: reaction options come <em>before</em> molecule options here. There's currently no way to control the overall drawing size from here.</p> </div> </div> </div> <div class="card p-5 sm:p-6"> <div class="flex items-baseline gap-3 mb-4 flex-wrap"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Parse</h3> <div class="text-xs text-gray-500 dark:text-gray-400">Build parse trees to hand off to a drawer class.</div> </div> <div class="space-y-5"> <div> <pre class="text-xs sm:text-sm font-mono bg-ink border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-white whitespace-pre-wrap break-words"><code>SmilesDrawer.parse(smiles, onSuccess, onError)</code></pre> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Parse a single molecule. The result arrives through <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">onSuccess</code>. Hand it to <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">SvgDrawer.draw()</code> or <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">Drawer.draw()</code>. This is the path needed for atom highlighting.</p> </div> <div> <pre class="text-xs sm:text-sm font-mono bg-ink border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-white whitespace-pre-wrap break-words"><code>SmilesDrawer.parseReaction(smiles, onSuccess, onError)</code></pre> <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Parse a reaction SMILES into a reaction object. Hand it to <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">ReactionDrawer.draw()</code>.</p> </div> </div> </div> </div> </section> <section> <div class="card p-6 sm:p-8"> <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end"> <div> <div class="text-[11px] uppercase tracking-[0.22em] text-gray-400 dark:text-gray-500">Further Reading</div> <h2 class="mt-2 text-2xl font-semibold tracking-[-0.03em] text-gray-900 dark:text-white">Next steps</h2> <p class="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-400 max-w-2xl">
+Use the playground to tune your own structures, compare against the examples page when something looks off, and keep the API reference nearby if you need framework integration.
+</p> </div> <div class="flex flex-wrap gap-3"> <a href="/smilesDrawer/playground" class="btn-primary">Playground</a> <a href="/smilesDrawer/examples" class="btn-secondary">Examples</a> </div> </div> <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-sm"> <a href="/smilesDrawer/examples" class="rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 hover:border-accent transition-colors">Browse example molecules</a> <a href="/smilesDrawer/examples#reactions" class="rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 hover:border-accent transition-colors">Reactions gallery</a> <a href="https://github.com/reymond-group/smilesDrawer" target="_blank" rel="noopener noreferrer" class="rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 hover:border-accent transition-colors">Library source on GitHub</a> </div> <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
+If you use SmilesDrawer in research, cite
+<a href="https://doi.org/10.1021/acs.jcim.7b00425" target="_blank" rel="noopener noreferrer" class="text-accent hover:opacity-80 transition-opacity">10.1021/acs.jcim.7b00425</a>.
+</p> </div> </section> </div> <script>
+        (function() {
+            var site = window.SmilesWebsite;
+            if (!site) return;
+
+            var themePresets = {
+                light: {FOREGROUND: '#0f172a', BACKGROUND: '#ffffff', C: '#0f172a', O: '#dc2626', N: '#2563eb', F: '#16a34a', CL: '#16a34a', BR: '#c2410c', I: '#a21caf', P: '#f59e0b', S: '#d97706', B: '#ea580c', SI: '#ea580c', H: '#475569'},
+                dark: {FOREGROUND: '#f8fafc', BACKGROUND: '#020617', C: '#f8fafc', O: '#f87171', N: '#60a5fa', F: '#4ade80', CL: '#4ade80', BR: '#fb923c', I: '#e879f9', P: '#fbbf24', S: '#fcd34d', B: '#fb923c', SI: '#fb923c', H: '#94a3b8'}
+            };
+
+            function parseHighlights(value) {
+                if (!value) return null;
+                try {
+                    var parsed = JSON.parse(value);
+                    return parsed && parsed.length ? parsed : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function parseReactionWeights(value) {
+                if (!value) return null;
+                try {
+                    return JSON.parse(value);
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function renderAll() {
+                var theme = site.getPageTheme();
+
+                document.querySelectorAll('[data-theme-surface="true"]').forEach(function(surface) {
+                    site.applyThemeSurface(surface, theme, themePresets, {light: 'light', dark: 'dark'});
+                });
+
+                document.querySelectorAll('.molecule-svg').forEach(function(svg) {
+                    var smiles = svg.getAttribute('data-smiles');
+                    var highlights = parseHighlights(svg.getAttribute('data-smiles-highlights'));
+                    var reactionWeights = parseReactionWeights(svg.getAttribute('data-smiles-reaction-weights'));
+                    var surface = svg.closest('[data-theme-surface]');
+                    var defaults = site.getDefaultRenderOptions();
+
+                    if (!smiles) return;
+
+                    site.renderSmiles({
+                        adaptive: true,
+                        baseOptions: {
+                            width: defaults.width,
+                            height: defaults.height,
+                            explicitHydrogens: false,
+                            padding: defaults.padding,
+                            bondLength: defaults.bondLength,
+                            bondThickness: defaults.bondThickness,
+                            shortBondLength: defaults.shortBondLength,
+                            bondSpacing: defaults.bondSpacing,
+                            fontSizeLarge: defaults.fontSizeLarge,
+                            scale: defaults.scale,
+                            themes: themePresets
+                        },
+                        layout: {
+                            containerWidth: surface && surface.clientWidth ? surface.clientWidth : 0,
+                            minHeight: site.isReaction(smiles) ? 160 : 0
+                        },
+                        onError: function() {},
+                        renderConfig: site.getRenderConfig(svg),
+                        smiles: smiles,
+                        svg: svg,
+                        themeName: theme,
+                        highlights: highlights,
+                        reactionWeights: reactionWeights
+                    });
+                });
+            }
+
+            site.waitForFonts(renderAll);
+
+            new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        renderAll();
+                    }
+                });
+            }).observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
+
+            var resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(renderAll, 120);
+            });
+        })();
+    </script> </div>  </main> <footer class="border-t border-rule bg-paper"> <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between gap-3 px-6 py-6 text-[11px] text-ink-hint tracking-wide"> <span> <strong class="text-ink font-semibold">SMILESDRAWER</strong> <span class="mx-2 text-ink-faint">·</span>
+MIT
+<span class="mx-2 text-ink-faint">·</span>
+Pure JavaScript
+</span> <span class="flex items-center gap-4"> <a href="https://doi.org/10.1021/acs.jcim.7b00425" target="_blank" rel="noopener" class="text-mint-deep font-semibold no-underline hover:underline">CITE ↗</a> <a href="https://github.com/reymond-group/smilesDrawer" target="_blank" rel="noopener" class="text-mint-deep font-semibold no-underline hover:underline">GITHUB ↗</a> <a href="https://www.npmjs.com/package/smiles-drawer" target="_blank" rel="noopener" class="text-mint-deep font-semibold no-underline hover:underline">NPM ↗</a> <a href="https://github.com/reymond-group/smilesDrawer/issues" target="_blank" rel="noopener" class="text-mint-deep font-semibold no-underline hover:underline">REPORT ISSUE ↗</a> </span> </div> </footer> </body></html>

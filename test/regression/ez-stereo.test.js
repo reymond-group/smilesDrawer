@@ -10,17 +10,18 @@
  *     - opposite signs = opposite sides = E (trans)
  */
 import {describe, it, expect} from 'vitest';
-import {JSDOM} from 'jsdom';
-import Parser from '../../src/Parser.js';
+import {createJSDOM}          from '../helpers';
+
+import Parser    from '../../src/Parser.js';
 import SvgDrawer from '../../src/SvgDrawer.js';
 
 function render(smiles) {
-    const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
-    global.document = dom.window.document;
-    global.window = dom.window;
+    const dom = createJSDOM();
+
     const svg = dom.window.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttributeNS(null, 'id', 'test-svg');
     dom.window.document.body.appendChild(svg);
+
     const tree = Parser.parse(smiles);
     const drawer = new SvgDrawer({isomeric: true});
     drawer.draw(tree, svg, 'light', false);
