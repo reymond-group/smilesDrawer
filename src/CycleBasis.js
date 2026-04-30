@@ -6,6 +6,7 @@
 //            The Electronic Journal of Combinatorics, Vol. 4, No. 1, R9, 1997.
 //
 // CDK source is LGPL-2.1; this is a port of the algorithms.
+// For a more in depth explanation of what vismara solves see EOF
 
 const MAX_INT = 0x7FFFFFFF; // not reachable (for BFS) 
 
@@ -834,7 +835,7 @@ export function minimumCycleBasis(adjList) {
 
     // Compute the expected number of independent cycles
     let nSssr = nEdges - n + 1;    
-    // TODO: patch nSssr for disconnected graphs
+    // patching nSssr for disconnected graphs (is done in SSSR.js)
     // this assumes connected graph, 
     // for a graph with C connected components its nEdges - n + C
     
@@ -953,13 +954,25 @@ export function matrixToAdjList(matrix) {
     return adj;
 }
 
-// Why are MCB (SSSR) and RC necessary 
-// They differ only when two or more equal-length cycles are pairwise
-// dependent on each other but jointly independent of all strictly-shorter
-// cycles. MCB picks one (whichever the input order happened to put first);
-// RC keeps all of them.
-//
-// example: cubane (C8H8) which has 8 vertices, 12 edges, nSssr = 12 - 8 + 1 = 5
+
+// Why we need both MCB and RC and what Vismara gives us
+// -----------------------------------------------------------------------
+// The whole issue starts with what SSSR is versus what we need it to be. 
+// The concept of SSSR traces back to graph theory and is more or less the same as 
+// minimum-cycle-basis (MCB). The MCB for a cycle is the set of minimum number of 
+// cycle basis we need to represent a cycle through addition (XOR) of the bases. 
+// Pretty similar to what (vector) basis are in algebra. They need to be independent 
+// from each other in order to be part of the basis. If any of them could be represented as the XOR 
+// of two other members, it would be redundant and wouldn't belong in the basis. Thats it.
+
+
+// The way SmilesDrawer and other engines render is by drawing each of the rings in the
+// MCB (SSSR) individually and call it a day. Problem with this is:
+// A) There's multiple MCB for the same cycle space 
+// B) Some molecules (cage-like mostly) need more rings to be drawn accurately than 
+// what they hold in their MCB. 
+
+// Take cubane (C8H8) 8 vertices, 12 edges, 6 square faces.
 //
 //        7 ----- 6
 //       /|      /|
@@ -973,38 +986,55 @@ export function matrixToAdjList(matrix) {
 //                              left:   {0,3,7,4}
 //                              right:  {1,2,6,5}
 //
+// Geometrically: 6 faces. Period. No ambiguity. A kid could count it. 
+// Algebraically though, the cycle space has dimension \mu = E - V + 1 = 5. 
+// Pick any 5 faces; the 6th equals their XOR. In other words, the sixth face
+// is not part of the the MCB (SSSR) set. Or to be more accurate the 6th cubane face is 
+// in the cycle space (it's a valid cycle). It's just not in any particular basis we picked
+// because it can be represented by the addition of other bases in the set. 
+// That's a graph-theory fact, not a chemistry fact. So if you trust your engine
+// to only draw SSSR faces you will have issues when drawing cage-like systems. And 
+// if you try to fix it by adding patches then things start to fall appart and break
+
+// ----- The fix ------ 
+// Besides the MCB there's another interesting set called RC (Relevant Cycles)
+// Again MCB (Minimum Cycle Basis, a.k.a. SSSR) can be more formally defined as: 
+// a basis of μ minimum-weight cycles or "a minimum-cardinality set of cycles 
+// spanning the cycle space. There are multiple MCBs. (A + B = C and  A + C = B)
+// 
+// On the other hand, RC (Relevant Cycles):
+// can be defined as the union of all possible MCBs, every cycle that some MCB 
+// could have picked. Unique, deterministic, always a superset of any single MCB.
+// (A + B + C) for cubane this means all 6 faces.
+
+// At this point hopefully is clear Why we need both:
+//
+//   - MCB / `getRings` for chemistry. Aromaticity perception, ring-count
+//     queries, fingerprints. This is what the SSSR cheminformatics
+//     literature is written against; switching to RC would break legacy
+//     callers that assume |rings| = \mu.
+//
+//   - RC / `getRingsForLayout` - depiction. SmilesDrawer places ring
+//     polygons one face at a time. Drawing cubane with only 5 faces leaves
+//     the 6th face's atoms with no polygon to anchor against, and overlap
+//     resolution shoves them somewhere ugly. RC gives every face explicit
+//     geometry, so symmetric cages render symmetrically.
+//
+// So for the example of the cubane: 
 //   MCB(cubane) = 5 of the 6 faces (the 6th = XOR of the others).
 //                 which 5? whichever 5 the greedy loop encountered first
 //                 not chemically meaningful.
 //   RC(cubane)  = all 6 faces. depicts the cube symmetrically.
+// It is important to note also that MCB == RC whenever no two equal-length cycles 
+// are jointly relevant but pairwise dependent i.e. every non-cage, 
+// non-symmetric-bridged molecule.
+// E.g. Naphthalene, steroids, indole: MCB = RC, so the distinction is invisible.
 //
-// Why we need BOTH in a drawing pipeline:
-//
-//   - MCB is the right input for layout/coordinate generation. The cycle
-//     space has dimension nSssr; trying to lay out 6 faces of a cube as if
-//     they were independent over-constrains the embedder. You want exactly
-//     a basis, no more.
-//
-//   - RC is the right input for *perception* (aromaticity, ring membership,
-//     "is atom X in a ring of size 4?"). An MCB can omit a chemically real
-//     ring just because it happened to be the dependent one. RC never does.
-//     Drawing cubane with only 5 faces visible would be wrong; perceiving
-//     atom 0 as "in three 4-rings" requires RC, not MCB.
-//
-// Equality cases (MCB == RC):
-//   - Naphthalene: two 6-rings sharing an edge. Independent over GF(2),
-//     nothing dependent at equal length -> MCB = RC = {ring1, ring2}.
-//   - Norbornane: two 5-rings + one 6-ring. The 6-ring IS the XOR of the
-//     two 5-rings, but it's strictly longer, so RC excludes it ("not a
-//     sum of strictly shorter cycles" fails - it IS such a sum, just at
-//     greater length). MCB = RC = the two 5-rings.
-//
-// Inequality cases (MCB ⊊ RC):
-//   - Cubane (above): MCB has 5, RC has 6.
-//   - Bicyclo[2.2.2]octane (DABCO skeleton): three 6-rings sharing two
-//     bridgeheads. nSssr = 2. MCB picks any 2; RC keeps all 3.
-//   - K4 (tetrahedron): four 3-faces, nSssr = 3. MCB picks any 3; RC = 4.
-//
-// Rule of thumb: if the molecule has a symmetric polycyclic system
-// (cage, fused-bridged), MCB ≠ RC and you need RC to depict it faithfully.
-//
+// What Vismara solves is giving efficiently both MCB and RC. 
+// Naive enumeration of all simple cycles is exponential. The trick in
+// Vismara (1997) is to build a polynomial-size candidate set C_I that's
+// just big enough to contain every relevant cycle and no bigger
+// (see `computeInitialCycles`, Algorithm 1). From the same C_I:
+//  - greedily pick μ independent cycles by length -> MCB
+//  - keep every cycle independent of strictly-shorter ones -> RC
+// One cycle-generation pass, both ring sets out the other side.
