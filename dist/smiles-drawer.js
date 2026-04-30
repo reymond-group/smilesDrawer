@@ -11558,9 +11558,6 @@
             isTerminal = true;
           }
         }
-        if (atom.element === "N" && atom.isPartOfAromaticRing) {
-          hydrogens = 0;
-        }
         if (atom.bracket) {
           charge = atom.bracket.charge;
           isotope = atom.bracket.isotope;
@@ -13530,17 +13527,12 @@
           maxHeight = element.height;
         }
       }
-      let minY = 0;
-      let maxY = 0;
       let totalWidth = 0;
       elements.forEach((element) => {
         let offsetX = element.offsetX || 0;
         let offsetY = element.offsetY || 0;
-        const y = (maxHeight - element.height) / 2 + offsetY;
-        maxY = Math.max(maxY, y + element.height);
-        minY = Math.min(minY, y);
         element.svg.setAttributeNS(null, "x", Math.round(totalWidth + offsetX));
-        element.svg.setAttributeNS(null, "y", Math.round(y));
+        element.svg.setAttributeNS(null, "y", Math.round((maxHeight - element.height) / 2 + offsetY));
         element.svg.setAttributeNS(null, "width", Math.round(element.width));
         element.svg.setAttributeNS(null, "height", Math.round(element.height));
         svg.appendChild(element.svg);
@@ -13548,8 +13540,7 @@
           totalWidth += Math.round(element.width + this.opts.spacing + offsetX);
         }
       });
-      const height = Math.max(maxHeight, maxY - minY);
-      svg.setAttributeNS(null, "viewBox", `0 ${minY} ${totalWidth} ${height}`);
+      svg.setAttributeNS(null, "viewBox", `0 0 ${totalWidth} ${maxHeight}`);
       svg.style.width = totalWidth + "px";
       svg.style.height = maxHeight + "px";
       return svg;
