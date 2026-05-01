@@ -1,5 +1,4 @@
 // @ts-check
-import ArrayHelper    from './ArrayHelper';
 import Atom           from './Atom';
 import CanvasWrapper  from './CanvasWrapper';
 import CIP            from './CIP';
@@ -973,17 +972,17 @@ export default class DrawerBase {
      * @returns {Number[]} An array containing all ring ids of rings part of a bridged ring system.
      */
     getBridgedRingRings(ringId) {
-        let involvedRings = [];
+        const involvedRings = new Set();
 
         let recurse = (r) => {
             let ring = this.getRing(r);
 
-            involvedRings.push(r);
+            involvedRings.add(r);
 
             for (let i = 0; i < ring.neighbours.length; i++) {
                 let n = ring.neighbours[i];
 
-                if (involvedRings.indexOf(n) === -1 && n !== r && RingConnection.isBridge(this.ringConnections, this.graph.vertices, r, n)) {
+                if (!involvedRings.has(n) && n !== r && RingConnection.isBridge(this.ringConnections, this.graph.vertices, r, n)) {
                     recurse(n);
                 }
             }
@@ -998,7 +997,7 @@ export default class DrawerBase {
         // get positioned by KK, while the rest of the fused rings gets positioned by the
         // normal layout algorithm. Both algos fight producing distored drawings
         // TODO: change recurse() by making it always recurse when there are two or more 
-        // shared vertices and use a Set instead of indexOf on an array. 
+        // shared vertices.
         // (See PR#237 review)
         let changed = true;
         while (changed) {
@@ -1006,21 +1005,21 @@ export default class DrawerBase {
             for (let i = 0; i < this.ringConnections.length; i++) {
                 let rc = this.ringConnections[i];
                 if (rc.vertices.size < 2) continue;
-                let hasFirst = involvedRings.indexOf(rc.firstRingId) !== -1;
-                let hasSecond = involvedRings.indexOf(rc.secondRingId) !== -1;
+                let hasFirst  = involvedRings.has(rc.firstRingId);
+                let hasSecond = involvedRings.has(rc.secondRingId);
 
                 if (hasFirst && !hasSecond) {
-                    involvedRings.push(rc.secondRingId);
+                    involvedRings.add(rc.secondRingId);
                     changed = true;
                 }
                 else if (hasSecond && !hasFirst) {
-                    involvedRings.push(rc.firstRingId);
+                    involvedRings.add(rc.firstRingId);
                     changed = true;
                 }
             }
         }
 
-        return ArrayHelper.unique(involvedRings);
+        return [...involvedRings];
     }
 
     /**
@@ -1075,7 +1074,7 @@ export default class DrawerBase {
 
         for (let id of vertices) {
             let vertex = this.graph.vertices[id];
-            let intersection = ArrayHelper.intersection(ringIds, vertex.value.rings);
+            let intersection = vertex.value.rings.filter(rid => ringIds.includes(rid));
 
             if (vertex.value.rings.length === 1 || intersection.length === 1) {
                 ringMembers.add(vertex.id);
@@ -1137,7 +1136,7 @@ export default class DrawerBase {
         // Remove former rings from members of the bridged ring and add the bridged ring
         for (let id of ringMembers) {
             let vertex = this.graph.vertices[id];
-            vertex.value.rings = ArrayHelper.removeAll(vertex.value.rings, ringIds);
+            vertex.value.rings = vertex.value.rings.filter(rid => !ringIds.includes(rid));
             vertex.value.rings.push(ring.id);
         }
 
@@ -1496,11 +1495,9 @@ export default class DrawerBase {
     // Get all the vertices connected to the both ends
         let an = vertexA.getNeighbours(vertexB.id);
         let bn = vertexB.getNeighbours(vertexA.id);
-        let anCount = an.length;
-        let bnCount = bn.length;
 
         // All vertices connected to the edge vertexA to vertexB
-        let tn = ArrayHelper.merge(an, bn);
+        const tn = an.concat(bn);
 
         // Only considering the connected vertices
         let sideCount = [0, 0];
@@ -1536,8 +1533,8 @@ export default class DrawerBase {
             totalPosition:  totalSideCount[0] > totalSideCount[1] ? 0 : 1,
             sideCount:      sideCount,
             position:       sideCount[0] > sideCount[1] ? 0 : 1,
-            anCount:        anCount,
-            bnCount:        bnCount,
+            anCount:        an.length,
+            bnCount:        bn.length,
         };
     }
 
@@ -1638,10 +1635,10 @@ export default class DrawerBase {
         let normals = this.getEdgeNormals(edge);
 
         // Create a point on each side of the line
-        let sides = ArrayHelper.clone(normals);
-
-        sides[0].multiplyScalar(10).add(a);
-        sides[1].multiplyScalar(10).add(a);
+        const sides = [
+            Vector2.multiplyScalar(normals[0], 10).add(a),
+            Vector2.multiplyScalar(normals[1], 10).add(a),
+        ];
 
         if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || (edge.isPartOfAromaticRing && this.bridgedRing)) {
             // Always draw double bonds inside the ring
@@ -1855,8 +1852,8 @@ export default class DrawerBase {
             }
 
             if (debug) {
-                let value = 'v: ' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
-                this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
+                const rbonds = atom.ringbonds.length ? ` (${atom.ringbonds.join(', ')})` : '';
+                this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, `v${vertex.id}${rbonds}`);
             }
             else {
                 // this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
@@ -2605,7 +2602,8 @@ export default class DrawerBase {
                 if (previousVertex.value.bridgedRing === null && previousVertex.value.rings.length > 1) {
                     for (let i = 0; i < neighbours.length; i++) {
                         let neighbour = this.graph.vertices[neighbours[i]];
-                        if (ArrayHelper.containsAll(neighbour.value.rings, previousVertex.value.rings)) {
+                        if (previousVertex.value.rings.every(rid => neighbour.value.rings.includes(rid))) {
+                            // The previous vertex's rings are a subset of neighbour's rings.
                             joinedVertex = neighbour;
                             break;
                         }
@@ -2716,7 +2714,7 @@ export default class DrawerBase {
 
             // Remove the previous vertex (which has already been drawn)
             if (previousVertex) {
-                neighbours = ArrayHelper.remove(neighbours, previousVertex.id);
+                neighbours = neighbours.filter(nid => nid !== previousVertex.id);
             }
 
             let previousAngle = vertex.getAngle();
@@ -2947,7 +2945,8 @@ export default class DrawerBase {
         for (let i = 0; i < neighbours.length; i++) {
             let neighbour = this.graph.vertices[neighbours[i]];
 
-            if (ArrayHelper.containsAll(neighbour.value.rings, vertex.value.rings)) {
+            if (vertex.value.rings.every(rid => neighbour.value.rings.includes(rid))) {
+                // This vertex's rings are a subset of neighbour's rings.
                 return neighbour;
             }
         }
@@ -3073,9 +3072,9 @@ export default class DrawerBase {
 
         for (let i = 0; i < neighbours.length; i++) {
             let neighbour = this.graph.vertices[neighbours[i]];
-            let nIntersections = ArrayHelper.intersection(vertex.value.rings, neighbour.value.rings).length;
+            let intersects = vertex.value.rings.some(rid => neighbour.value.rings.includes(rid));
 
-            if (nIntersections === 0 && neighbour.value.isBridge == false) {
+            if (!intersects && neighbour.value.isBridge == false) {
                 nrneighbours.push(neighbour);
             }
         }
