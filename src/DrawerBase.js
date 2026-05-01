@@ -55,6 +55,7 @@ export default class DrawerBase {
             debug:                       false,
             terminalCarbons:             false,
             showCarbons:                 'default',
+            polymerRepeatUnitStyle:      'none',
             explicitHydrogens:           true,
             overlapSensitivity:          0.42,
             overlapResolutionIterations: 1,
@@ -292,6 +293,10 @@ export default class DrawerBase {
         const allowedShowCarbons = ['none', 'default', 'terminal', 'acyclic', 'all'];
         if (allowedShowCarbons.indexOf(this.opts.showCarbons) === -1) {
             this.opts.showCarbons = 'default';
+        }
+        const allowedPolymerRepeatUnitStyles = ['none', 'bracket-n'];
+        if (allowedPolymerRepeatUnitStyles.indexOf(this.opts.polymerRepeatUnitStyle) === -1) {
+            this.opts.polymerRepeatUnitStyle = 'none';
         }
 
         this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;

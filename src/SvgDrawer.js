@@ -6,6 +6,7 @@ import Atom         from './Atom';
 import DrawerBase   from './DrawerBase';
 import GaussDrawer  from './GaussDrawer';
 import Line         from './Line';
+import {computePolymerRepeatUnitOverlayState, drawPolymerRepeatUnitOverlay} from './polymerRepeatUnitOverlay';
 import Ring         from './Ring';
 import SvgWrapper   from './SvgWrapper';
 import ThemeManager from './ThemeManager';
@@ -17,6 +18,10 @@ export default class SvgDrawer {
         this.opts = this.preprocessor.opts;
         this.clear = clear;
         this.svgWrapper = null;
+        this.polymerOverlayState = {
+            enabled: false,
+            wildcardVertexIds: new Set(),
+        };
     }
 
     /**
@@ -67,11 +72,13 @@ export default class SvgDrawer {
 
         // Set the canvas to the appropriate size
         this.svgWrapper.determineDimensions(preprocessor.graph.vertices);
+        this.polymerOverlayState = this.getPolymerOverlayState();
 
         // Do the actual drawing
         this.drawAtomHighlights(preprocessor.opts.debug);
         this.drawEdges(preprocessor.opts.debug);
         this.drawVertices(preprocessor.opts.debug);
+        this.drawPolymerRepeatOverlay();
 
         if (weights !== null) {
             this.drawWeights(weights, weightsNormalized);
@@ -94,6 +101,22 @@ export default class SvgDrawer {
         }
 
         return target;
+    }
+
+    /**
+     * Return whether polymer overlay should be enabled and which wildcard vertices are involved.
+     * @see computePolymerRepeatUnitOverlayState in ./polymerRepeatUnitOverlay.js
+     */
+    getPolymerOverlayState() {
+        return computePolymerRepeatUnitOverlayState(this.preprocessor.graph, this.opts);
+    }
+
+    /**
+     * Draw a polymer repeat-unit [ ]n overlay for wildcard endpoints (*).
+     * @see drawPolymerRepeatUnitOverlay in ./polymerRepeatUnitOverlay.js
+     */
+    drawPolymerRepeatOverlay() {
+        drawPolymerRepeatUnitOverlay(this.svgWrapper, this.preprocessor.graph, this.polymerOverlayState, this.opts);
     }
 
     /**
@@ -201,6 +224,10 @@ export default class SvgDrawer {
             normals = preprocessor.getEdgeNormals(edge),
             // Create a point on each side of the line
             sides = ArrayHelper.clone(normals);
+
+        if (this.polymerOverlayState.enabled && (elementA === '*' || elementB === '*')) {
+            return;
+        }
 
         sides[0].multiplyScalar(10).add(a);
         sides[1].multiplyScalar(10).add(a);
@@ -345,6 +372,9 @@ export default class SvgDrawer {
         for (let i = 0; i < graph.vertices.length; i++) {
             let vertex = graph.vertices[i];
             let atom = vertex.value;
+            if (this.polymerOverlayState.enabled && atom.element === '*') {
+                continue;
+            }
             let charge = 0;
             let isotope = 0;
             let element = atom.element;
