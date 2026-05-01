@@ -194,6 +194,7 @@ The following options are available:
 | Use experimental SSSR                                           | experimentalSSSR            | boolean                             | false         |
 | Show explicit carbons                                           | showCarbons                 | string ['none', 'default', 'terminal', 'acyclic', 'all'] | 'default'     |
 | Show terminal carbons (deprecated; use `showCarbons`)           | terminalCarbons             | boolean                             | false         |
+| Polymer repeat-unit rendering style for wildcard endpoints      | polymerRepeatUnitStyle      | string ['none', 'bracket-n']        | 'none'        |
 | Show explicit hydrogens                                         | explicitHydrogens           | boolean                             | true          |
 | Overlap sensitivity                                             | overlapSensitivity          | number                              | 0.42          |
 | # of overlap resolution iterations                              | overlapResolutionIterations | number                              | 1             |
@@ -217,6 +218,7 @@ The default options are defined as follows:
     debug: false,
     showCarbons: 'default',
     terminalCarbons: false,
+    polymerRepeatUnitStyle: 'none',
     explicitHydrogens: true,
     overlapSensitivity: 0.42,
     overlapResolutionIterations: 1,
@@ -271,6 +273,8 @@ Additional built-in themes include `oldschool`, `solarized`, and `solarized-dark
 - `"all"` labels every carbon, including ring atoms.
 
 If `showCarbons` is `"default"` and `terminalCarbons` is `true`, the effective mode is `"terminal"` (legacy compatibility until v3.0).
+
+`polymerRepeatUnitStyle: 'bracket-n'` enables a display-only polymer repeat notation for strict repeat-endpoint patterns (exactly two wildcard `*` atoms, each terminal, SMILES starting with `*` on the parse-tree root, and ending the main chain with `*`). It draws `[ ]n`, hides wildcard labels, and adds decorative continuation stubs across the brackets. Other wildcard usages keep default rendering.
 
 
 ### Usage
