@@ -9,8 +9,8 @@
  *     - same sign = same side = Z (cis)
  *     - opposite signs = opposite sides = E (trans)
  */
-import {describe, it, expect} from 'vitest';
-import {createJSDOM}          from '../helpers';
+import {describe, it, expect, test} from 'vitest';
+import {createJSDOM}                from '../helpers';
 
 import Parser    from '../../src/Parser.js';
 import SvgDrawer from '../../src/SvgDrawer.js';
@@ -89,6 +89,7 @@ describe('E/Z double bond visual geometry', () => {
 
     // Branched double bond with ring substituent
     it('C/C(=C\\C(=O)OC)/C1=CC=C(C=C1)C(C)(F)F has correct E geometry', () => {
+        // https://github.com/reymond-group/smilesDrawer/issues/217
         const pp = render('C/C(=C\\C(=O)OC)/C1=CC=C(C=C1)C(C)(F)F');
         const db = findNonRingDoubleBond(pp.graph);
         expect(db).not.toBeNull();
@@ -128,6 +129,7 @@ describe('E/Z double bond visual geometry', () => {
 
     // Ring-connected double bond
     it('C/C=C/1\\CCC[C@@]2(C1CC2)C has correct geometry', () => {
+        // https://github.com/reymond-group/smilesDrawer/issues/217
         const pp = render('C/C=C/1\\CCC[C@@]2(C1CC2)C');
         // Double bond: atom 1 = atom 2
         // atom 0 (methyl) on atom 1's side, atoms 3 and 7 on atom 2's side
@@ -155,19 +157,73 @@ describe('E/Z double bond visual geometry', () => {
         }
     });
 
-    // CID molecules — must parse/render without errors
-    it('CID 153456993 renders', () => {
+    it('CID 153456993 renders with the correct stereochemistry', () => {
+        // https://github.com/reymond-group/smilesDrawer/issues/217
+        // https://github.com/reymond-group/smilesDrawer/issues/276
         const pp = render('C1=CC(=CC=C1CS)/C=C\\2/C(=O)N(C(=O)S2)CC(=O)O');
-        expect(pp.graph.vertices.length).toBeGreaterThan(0);
+        expect(getVisualEZ(pp, 8, 9, 2, 10)).toBe('E');
+        expect(getVisualEZ(pp, 8, 9, 2, 15)).toBe('Z');
     });
 
-    it('CID 102485436 renders', () => {
+    it('CID 102485436 renders with the correct stereochemistry', () => {
+        // https://github.com/reymond-group/smilesDrawer/issues/217
         const pp = render('CN(C)CCCN/C(=C\\C(=O)C1=CC=CC=C1)/C2=CC=CC=C2');
-        expect(pp.graph.vertices.length).toBeGreaterThan(0);
+        expect(getVisualEZ(pp, 7, 8, 9,  6)).toBe('Z');
+        expect(getVisualEZ(pp, 7, 8, 9, 17)).toBe('E');
     });
 
-    it('CID 173497121 renders', () => {
+    it('CID 173497121 renders with the correct stereochemistry', () => {
+        // https://github.com/reymond-group/smilesDrawer/issues/217
+        // https://github.com/reymond-group/smilesDrawer/issues/276
         const pp = render('CC(/C(=C(/C(C)OC1=CC=C(C=C1)O)\\O)/C(O)OC)O');
-        expect(pp.graph.vertices.length).toBeGreaterThan(0);
+        expect(getVisualEZ(pp, 2, 3,  4,  1)).toBe('E');
+        expect(getVisualEZ(pp, 2, 3,  4, 15)).toBe('Z');
+        expect(getVisualEZ(pp, 2, 3, 14,  1)).toBe('Z');
+        expect(getVisualEZ(pp, 2, 3, 14, 15)).toBe('E');
+    });
+
+    it('should handle E/Z double bonds between rings', () => {
+        // https://github.com/reymond-group/smilesDrawer/issues/247
+        let pp = render('N1CCCC/C1=C2/CCCCN2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('E');
+
+        pp = render('N1CCCC/C1=C2\\CCCCN2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('Z');
+
+        pp = render('N1CCCC\\C1=C2/CCCCN2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('Z');
+
+        pp = render('N1CCCC\\C1=C2\\CCCCN2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('E');
+    });
+
+    test.fails('should handle E/Z markers at forward links', () => {
+        // https://github.com/reymond-group/smilesDrawer/issues/280
+        let pp = render('N1CCCC/C1=C/2CCCCN2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('Z');
+
+        pp = render('N1CCCC/C1=C\\2CCCCN2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('E');
+
+        pp = render('N1CCCC\\C1=C/2CCCCN2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('E');
+
+        pp = render('N1CCCC\\C1=C\\2CCCCN2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('Z');
+    });
+
+    test.fails('should handle E/Z markers at backward links', () => {
+        // https://github.com/reymond-group/smilesDrawer/issues/280
+        let pp = render('N1CCCC/C1=C2CCCCN/2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('E');
+
+        pp = render('N1CCCC/C1=C2CCCCN\\2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('Z');
+
+        pp = render('N1CCCC\\C1=C2CCCCN/2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('Z');
+
+        pp = render('N1CCCC\\C1=C2CCCCN\\2');
+        expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('E');
     });
 });

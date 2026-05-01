@@ -2151,16 +2151,9 @@ export default class DrawerBase {
             const vA = edge.sourceId;
             const vB = edge.targetId;
 
-            // Skip double bonds where both alkene atoms are part of ring
-            // fix works after layout by mirroring one movable branch across the
-            // double-bond axis. That is safe when one side is a free subtree, but not
-            // when both sides are locked into ring geometry.
-            // In ring-ring cases such as N1CCCCC1=C2CCCCN2, the current layout may still
-            // draw one orientation, but we do not actively enforce the SMILES E/Z here.
-            // Supporting those cases requires ring layout itself to place the alkene
-            // with the correct configuration. See issue#247.
-            if (graph.vertices[vA].value.rings.length > 0 &&
-                graph.vertices[vB].value.rings.length > 0) {
+            if (this.areVerticesInSameRing(graph.vertices[vA], graph.vertices[vB])) {
+                // These had better be in the right place by default,
+                // because there's no clean fix if they're not...
                 continue;
             }
 
@@ -2174,8 +2167,8 @@ export default class DrawerBase {
                     // '/' means source is below, target is above
                     // So neighbor's side depends on whether it's source or target
                     let neighborAbove = (e.sourceId === vA)
-                        ? (e.bondType === '/')    // A→N: '/' = N above
-                        : (e.bondType === '\\');  // N→A: '\\' = N above
+                        ? (e.bondType === '/')    // B=A/N: N above
+                        : (e.bondType === '\\');  // N\A=B: N above
                     stereoA = {nid, above: neighborAbove};
                     break;
                 }
@@ -2228,22 +2221,8 @@ export default class DrawerBase {
                 if (e && (e.bondType === '/' || e.bondType === '\\')) countB++;
             }
 
-            let flipId, pivotId;
-            if (countA <= countB) {
-                flipId = stereoA.nid;
-                pivotId = vA;
-            }
-            else {
-                flipId = stereoB.nid;
-                pivotId = vB;
-            }
-
-            // Don't flip ring members; try the other side
-            if (graph.vertices[flipId].value.rings.length > 0) {
-                flipId = (pivotId === vA) ? stereoB.nid : stereoA.nid;
-                pivotId = (pivotId === vA) ? vB : vA;
-                if (graph.vertices[flipId].value.rings.length > 0) continue;
-            }
+            const flipId  = (countA <= countB) ? vA : vB;
+            const pivotId = (countA <= countB) ? vB : vA;
 
             // Reflect subtree across the line through pivot in direction (ax, ay)
             const pivot = graph.vertices[pivotId].position;
