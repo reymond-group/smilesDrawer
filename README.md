@@ -2,25 +2,25 @@
 
 No server, no images, no templates, just a SMILES 😊
 
-Current Version: **2.2.1**
+Current Version: **2.3.0**
 
 <table style="width: 100%; table-layout: fixed">
     <tbody>
         <tr>
-            <td><a href="https://smilesdrawer.rocks">Molecules</a></td>
-            <td><a href="https://smilesdrawer.rocks">Reactions & Highlights</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/">Home - live preview & presets</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/playground">Playground - single molecule</a></td>
         </tr>
         <tr>
-            <td><a href="https://smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/main.png"></img></a></td>
-            <td><a href="https://smilesdrawer.rocks"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/rxn_highlight.png"></img></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/website.png"></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/playground"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/playground.png"></a></td>
         </tr>
         <tr>
-            <td><a href="https://smilesdrawer.surge.sh/use.html">Learn & Copy-Paste</a></td>
-            <td><a href="https://smilesdrawer.surge.sh/playground.html">Style & Customize</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/playground/?mode=batch">Playground - batch rendering</a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/getting-started/">Documentation</a></td>
         </tr>
         <tr>
-            <td><a href="https://smilesdrawer.surge.sh/use.html"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/learn.png"></img></a></td>
-            <td><a href="https://smilesdrawer.surge.sh/playground.html"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/style.png"></img></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/playground/?mode=batch"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/batch.png"></a></td>
+            <td><a href="https://reymond-group.github.io/smilesDrawer/getting-started/"><img src="https://github.com/reymond-group/smilesDrawer/raw/master/readme/docs.png"></a></td>
         </tr>
     </tbody>
 </table>
@@ -94,7 +94,7 @@ A very simple JSFiddle example can be found [here](https://jsfiddle.net/zjdtkL57
 
 ### Experimental Features
 
-If you experience problems with the drawing of complex ring systems (including very long bonds), please enable experimental features (see options).
+If you experience problems with the drawing of complex ring systems (including very long bonds), enable the `experimentalSSSR` option.
 
 ### "Installation"
 
@@ -103,7 +103,7 @@ You can find the latest release in the `dist` folder.
 <!--SmilesDrawer is available from the unpkg content delivery network:
 
 ```
-https://unpkg.com/smiles-drawer@1.2.0/dist/smiles-drawer.min.js
+https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js
 ```
 
 You can easily get smiles-drawer using yarn:
@@ -142,7 +142,7 @@ In order to have nice consistent font rendering you have to include the droid sa
     <input id="example-input" name="example-input" />
     <canvas id="example-canvas" width="500" height="500"></canvas>
 
-    <script src="https://unpkg.com/smiles-drawer@1.0.10/dist/smiles-drawer.min.js"></script>
+    <script src="https://unpkg.com/smiles-drawer@2/dist/smiles-drawer.min.js"></script>
     <script>
       let input = document.getElementById("example-input");
       let options = {};
@@ -174,7 +174,7 @@ The options are supplied to the constructor as shown in the example above.
 
 ```javascript
 let options = { ... };
-let smilesDrawer = new SmilesDrawer(options);
+let smilesDrawer = new SmilesDrawer.Drawer(options);
 ```
 
 The following options are available:
@@ -183,21 +183,22 @@ The following options are available:
 | --------------------------------------------------------------- | --------------------------- | ----------------------------------- | ------------- |
 | Drawing width                                                   | width                       | number                              | 500           |
 | Drawing height                                                  | height                      | number                              | 500           |
-| Bond thickness                                                  | bondThickness               | number                              | 0.6           |
-| Bond length                                                     | bondLength                  | number                              | 15            |
-| Short bond length (e.g. double bonds) in percent of bond length | shortBondLength             | number                              | 0.85          |
-| Bond spacing (e.g. space between double bonds)                  | bondSpacing                 | number                              | 0.18 \* 15    |
+| Bond thickness                                                  | bondThickness               | number                              | 1.0           |
+| Bond length                                                     | bondLength                  | number                              | 30            |
+| Short bond length (e.g. double bonds) as a fraction of bond length | shortBondLength            | number                              | 0.8           |
+| Bond spacing (e.g. space between double bonds)                  | bondSpacing                 | number                              | 0.17 \* 30    |
 | Atom Visualization                                              | atomVisualization           | string ['default', 'balls', 'none'] | 'default'     |
-| Large Font Size (in pt for elements)                            | fontSizeLarge               | number                              | 6             |
-| Small Font Size (in pt for numbers)                             | fontSizeSmall               | number                              | 4             |
-| Padding                                                         | padding                     | number                              | 20.0          |
-| Use experimental features                                       | experimental                | boolean                             | false         |
-| Show Terminal Carbons (CH3)                                     | terminalCarbons             | boolean                             | false         |
-| Show explicit hydrogens                                         | explicitHydrogens           | boolean                             | false         |
+| Large Font Size (in pt for elements)                            | fontSizeLarge               | number                              | 11            |
+| Small Font Size (in pt for numbers)                             | fontSizeSmall               | number                              | 3             |
+| Padding                                                         | padding                     | number                              | 10.0          |
+| Use experimental SSSR                                           | experimentalSSSR            | boolean                             | false         |
+| Show explicit carbons                                           | showCarbons                 | string ['none', 'default', 'terminal', 'acyclic', 'all'] | 'default'     |
+| Show terminal carbons (deprecated; use `showCarbons`)           | terminalCarbons             | boolean                             | false         |
+| Show explicit hydrogens                                         | explicitHydrogens           | boolean                             | true          |
 | Overlap sensitivity                                             | overlapSensitivity          | number                              | 0.42          |
 | # of overlap resolution iterations                              | overlapResolutionIterations | number                              | 1             |
 | Draw concatenated terminals and pseudo elements                 | compactDrawing              | boolean                             | true          |
-| Draw isometric SMILES if available                              | isometric                   | boolean                             | true          |
+| Draw isomeric SMILES if available                               | isomeric                    | boolean                             | true          |
 | Debug (draw debug information to canvas)                        | debug                       | boolean                             | false         |
 | Color themes                                                    | themes                      | object                              | see below     |
 
@@ -207,25 +208,27 @@ The default options are defined as follows:
 {
     width: 500,
     height: 500,
-    bondThickness: 0.6,
-    bondLength: 15,
-    shortBondLength: 0.85,
-    bondSpacing: 0.18 * 15,
+    bondThickness: 1.0,
+    bondLength: 30,
+    shortBondLength: 0.8,
+    bondSpacing: 0.17 * 30,
     atomVisualization: 'default',
     isomeric: true,
     debug: false,
+    showCarbons: 'default',
     terminalCarbons: false,
-    explicitHydrogens: false,
+    explicitHydrogens: true,
     overlapSensitivity: 0.42,
     overlapResolutionIterations: 1,
     compactDrawing: true,
-    fontSizeLarge: 5,
+    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontSizeLarge: 11,
     fontSizeSmall: 3,
-    padding: 20.0,
-    experimental: false,
+    padding: 10.0,
+    experimentalSSSR: false,
     themes: {
         dark: {
-            C: '#fff',
+            C: '#ffffff',
             O: '#e74c3c',
             N: '#3498db',
             F: '#27ae60',
@@ -236,11 +239,11 @@ The default options are defined as follows:
             S: '#f1c40f',
             B: '#e67e22',
             SI: '#e67e22',
-            H: '#fff',
+            H: '#aaaaaa',
             BACKGROUND: '#141414'
         },
         light: {
-            C: '#222',
+            C: '#222222',
             O: '#e74c3c',
             N: '#3498db',
             F: '#27ae60',
@@ -251,12 +254,24 @@ The default options are defined as follows:
             S: '#f1c40f',
             B: '#e67e22',
             SI: '#e67e22',
-            H: '#222',
-            BACKGROUND: '#fff'
+            H: '#666666',
+            BACKGROUND: '#ffffff'
         }
     }
 };
 ```
+
+Additional built-in themes include `oldschool`, `solarized`, and `solarized-dark`.
+
+`showCarbons` controls when explicit carbon labels are drawn:
+- `"none"` never labels plain carbons;
+- `"default"` is the usual skeletal notation;
+- `"terminal"` matches the former `terminalCarbons: true` behavior (explicit labels on terminal carbons such as methyl groups);
+- `"acyclic"` labels every carbon that is not part of a ring;
+- `"all"` labels every carbon, including ring atoms.
+
+If `showCarbons` is `"default"` and `terminalCarbons` is `true`, the effective mode is `"terminal"` (legacy compatibility until v3.0).
+
 
 ### Usage
 
@@ -293,5 +308,9 @@ Bridged rings are positioned using the Kamada–Kawai algorithm. If there is a b
 ### Contributors
 
 Thank you for contributing:
+
 - SRI International's CSE group (For the excellent SVG support)
 - [ohardy](https://github.com/ohardy)
+- [Kevin Burk](https://github.com/xavierholt)
+- [Alejandro Flores](https://github.com/afloresep)
+- [Daniel Probst](https://github.com/daenuprobst)

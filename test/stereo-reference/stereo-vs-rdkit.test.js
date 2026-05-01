@@ -67,6 +67,7 @@ describe('Stereochemistry: SmilesDrawer vs RDKit', () => {
             expect(actual.length, `Stereocenter count: RDKit=${expected.length} vs SD=${actual.length}`).toBe(expected.length);
 
             // Match 1-to-1 by order of appearance (both sorted by atomIdx)
+            const mismatches = [];
             for (let i = 0; i < expected.length; i++) {
                 const exp = expected[i];
                 const act = actual[i];
@@ -76,11 +77,12 @@ describe('Stereochemistry: SmilesDrawer vs RDKit', () => {
 
                 // The actual test: R/S must agree
                 if (act.cip !== exp.cip) {
-                    console.log(`  ${name} center #${i + 1}: R/S MISMATCH`);
-                    console.log(`    RDKit: atom ${exp.atomIdx}(${exp.element}) = ${exp.cip}`);
-                    console.log(`    SD:    atom ${act.atomIdx}(${act.element}) = ${act.cip}`);
+                    mismatches.push(` - Atom ${act.atomIdx} (${act.element}): Expected ${exp.cip} but got ${act.cip}`);
                 }
-                expect(act.cip, `Center #${i + 1} (${act.element}): RDKit=${exp.cip} vs SD=${act.cip}`).toBe(exp.cip);
+            }
+
+            if (mismatches.length > 0) {
+                expect.fail(`Incorrect stereochemistry in ${name}:\n` + mismatches.join('\n'));
             }
         });
     }

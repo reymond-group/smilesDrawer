@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["es6", "dom"],
+    "lib": ["es2019", "dom"],
     "target": "es2015",
     "allowJs": true
   },

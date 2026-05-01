@@ -347,21 +347,30 @@ export default class SvgDrawer {
             let atom = vertex.value;
             let charge = 0;
             let isotope = 0;
-            let bondCount = vertex.value.bondCount;
             let element = atom.element;
-            let hydrogens = Atom.maxBonds[element] - bondCount;
+            let hydrogens = atom.countImplicitHydrogens();
             let dir = vertex.getTextDirection(graph.vertices, atom.hasAttachedPseudoElements);
-            let isTerminal = opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
+            const showCarbonsMode = DrawerBase.getEffectiveShowCarbonsMode(opts);
+            let isTerminal = (showCarbonsMode === 'terminal' || element !== 'C' || atom.hasAttachedPseudoElements) ? vertex.isTerminal() : false;
             let isCarbon = atom.element === 'C';
 
-            // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
-            // should be the most common state. This has to be fixed by kekulization
-            if (atom.element === 'N' && atom.isPartOfAromaticRing) {
-                hydrogens = 0;
+            if (element === 'C') {
+                const isRingCarbon = atom.rings && atom.rings.length > 0;
+                if (showCarbonsMode === 'none') {
+                    isCarbon = true;
+                    isTerminal = false;
+                }
+                else if (showCarbonsMode === 'all') {
+                    isCarbon = false;
+                    isTerminal = true;
+                }
+                else if (showCarbonsMode === 'acyclic' && !isRingCarbon) {
+                    isCarbon = false;
+                    isTerminal = true;
+                }
             }
 
             if (atom.bracket) {
-                hydrogens = atom.bracket.hcount;
                 charge = atom.bracket.charge;
                 isotope = atom.bracket.isotope;
             }

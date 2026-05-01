@@ -73,14 +73,6 @@ export default class Atom {
         this.subtreeDepth = 1;
         this.hasHydrogen = false;
         this.class = undefined;
-        // These fields record where this atom appeared in the original SMILES
-        // string. They only exist to support _shouldInvertStereoParity() in
-        // DrawerBase.js — see the comment there for why this is transitional.
-        this.smilesOrder = 0;
-        this.smilesBranchCount = 0;
-        this.smilesRingbondCount = 0;
-        this.smilesHasNext = false;
-        this.smilesIsBranchBond = false;
     }
 
     /**
@@ -253,32 +245,68 @@ export default class Atom {
     }
 
     /**
-     * Get the maximum number of bonds for this atom.
+     * Counts the implicit hydrogens attached to this atom.
      *
-     * @returns {Number} The maximum number of bonds of this atom.
+     * This function deals with hydrogens specified in SMILES brackets
+     * and inferred based on bond counts and normal valences (see the
+     * VALENCES constant below).  It does NOT count any hydrogens that
+     * are attached as separate atoms in the SMILES string ([H]Cl).
+     *
+     * @returns {number} The number of implicit hydrogens attached to this atom.
      */
-    getMaxBonds() {
-        return Atom.maxBonds[this.element];
+    countImplicitHydrogens() {
+        if (this.bracket) {
+            if (this.bracket.chirality) {
+                // We add hydrogens to chiral atoms explicitly.
+                return 0;
+            }
+            else {
+                // But otherwise, the bracket count is accurate.
+                return this.bracket.hcount || 0;
+            }
+        }
+
+        let bonds = this.bondCount;
+        if (this.isPartOfAromaticRing) {
+            if (this.element !== 'C') {
+                // This is a HACK to set heteroatoms to a sensible default.
+                // TODO: The correct fix for this is kekulization.
+                return 0;
+            }
+
+            // This is also definitely a HACK for something...
+            // TODO: Figure out what and fix the real issue!
+            bonds += 1;
+        }
+
+        const valences = Atom.VALENCES[this.element];
+        if (valences === undefined) {
+            return 0;
+        }
+
+        const valence = valences.find(n => (n >= bonds));
+        if (valence !== undefined) {
+            return valence - bonds;
+        }
+
+        return 0;
     }
 
-    /**
-     * A map mapping element symbols to their maximum bonds.
-     */
-    static get maxBonds() {
-        return {
-            H:  1,
-            C:  4,
-            N:  3,
-            O:  2,
-            P:  3,
-            S:  2,
-            B:  3,
-            F:  1,
-            I:  1,
-            Cl: 1,
-            Br: 1,
-        };
-    }
+    // Possible valences according to OpenSMILES
+    // http://opensmiles.org/opensmiles.html#orgsbst
+    static VALENCES = {
+        H:  [1],
+        B:  [3],
+        C:  [4],
+        N:  [3, 5],
+        O:  [2],
+        F:  [1],
+        P:  [3, 5],
+        S:  [2, 4, 6],
+        Cl: [1],
+        Br: [1],
+        I:  [1],
+    };
 
     /**
      * A map mapping element symbols to the atomic number.
