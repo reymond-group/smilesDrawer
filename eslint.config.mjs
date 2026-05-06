@@ -43,6 +43,18 @@ export default defineConfig([
             // Keep the original semicolon style...
             '@stylistic/semi': ['error', 'always'],
 
+            // To match the original semicolon style...
+            '@stylistic/member-delimiter-style': ['error', {
+                multiline: {
+                    delimiter:   'semi',
+                    requireLast: true,
+                },
+                singleline: {
+                    delimiter:   'semi',
+                    requireLast: false,
+                },
+            }],
+
             // Enforce consistent indentation and line breaks...
             '@stylistic/brace-style':       ['error', 'stroustrup'],
             '@stylistic/indent':            ['error', 4],

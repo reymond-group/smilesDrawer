@@ -54,7 +54,7 @@ export default class ReactionDrawer {
    * @param {?Object} weights=null The weights for reactants, agents, and products.
    * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
    *
-   * @returns {SVGElement} The svg element
+   * @returns {SVGSVGElement} The svg element
    */
     draw(reaction, target, themeName = 'light', weights = null, textAbove = '{reagents}', textBelow = '', infoOnly = false) {
         this.themeManager = new ThemeManager(this.molOpts.themes, themeName);

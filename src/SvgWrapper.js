@@ -871,7 +871,7 @@ export default class SvgWrapper {
      * @param {HTMLCanvasElement} canvas The canvas element to draw the svg to.
      */
     toCanvas(canvas, width, height) {
-        const cavas = DomHelper.getDrawable(canvas);
+        const canvas = DomHelper.getDrawable(canvas);
         DomHelper.svgToCanvas(this.svg, canvas);
     }
 
