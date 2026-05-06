@@ -1852,11 +1852,9 @@ export default class DrawerBase {
             }
 
             if (debug) {
-                const rbonds = atom.ringbonds.length ? ` (${atom.ringbonds.join(', ')})` : '';
-                this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, `v${vertex.id}${rbonds}`);
-            }
-            else {
-                // this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, vertex.value.chirality);
+                const bond_ids = atom.ringbonds.map(bond => bond.id);
+                const bond_str = bond_ids.length ? ` (${bond_ids.join(', ')})` : '';
+                this.canvasWrapper.drawDebugText(vertex.position.x, vertex.position.y, `v${vertex.id}${bond_str}`);
             }
         }
 

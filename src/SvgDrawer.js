@@ -411,8 +411,9 @@ export default class SvgDrawer {
             }
 
             if (debug) {
-                const rbonds = atom.ringbonds.length ? ` (${atom.ringbonds.join(', ')})` : '';
-                svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, `v${vertex.id}${rbonds}`);
+                const bond_ids = atom.ringbonds.map(bond => bond.id);
+                const bond_str = bond_ids.length ? ` (${bond_ids.join(', ')})` : '';
+                svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, `v${vertex.id}${bond_str}`);
             }
         }
 
