@@ -32,7 +32,6 @@ import ArrayHelper from './ArrayHelper';
  * @property {String} chirality The chirality of this atom if it is a stereocenter (R or S).
  * @property {Number} priority The priority of this atom acording to the CIP rules, where 0 is the highest priority.
  * @property {Boolean} mainChain A boolean indicating whether or not this atom is part of the main chain (used for chirality).
- * @property {String} hydrogenDirection The direction of the hydrogen, either up or down. Only for stereocenters with and explicit hydrogen.
  * @property {Number} subtreeDepth The depth of the subtree coming from a stereocenter.
  * @property {Number} class
  */
@@ -69,9 +68,7 @@ export default class Atom {
         this.isStereoCenter = false;
         this.priority = 0;
         this.mainChain = false;
-        this.hydrogenDirection = 'down';
         this.subtreeDepth = 1;
-        this.hasHydrogen = false;
         this.class = undefined;
     }
 
