@@ -808,7 +808,7 @@ export default class DrawerBase {
      * Inverts an E/Z bond marker; leaves other bonds unchanged.
      *
      * @param {?string} bond - The bond marker to invert.
-     * @returns The (possibly) inverted bond marker.
+     * @returns The bond marker, inverted if it was an E/Z bond.
      */
     static flipEZ(bond) {
         if (bond === '/')  return '\\';
@@ -829,8 +829,8 @@ export default class DrawerBase {
      * @returns A bond marker, with correct E/Z stereochemistry.
      */
     static getRingbondType(fwd, rev) {
-        if (fwd !== '-') return fwd;
-        if (rev !== '-') return DrawerBase.flipEZ(rev);
+        if (fwd && fwd !== '-') return fwd;
+        if (rev && rev !== '-') return DrawerBase.flipEZ(rev);
         return '-';
     }
 
