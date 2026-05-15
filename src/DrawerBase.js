@@ -906,6 +906,8 @@ export default class DrawerBase {
             this.graph.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
         }
 
+        this.markCageRingSystems();
+
         // Backup the ring information to restore after placing the bridged ring.
         // This is needed in order to identify aromatic rings and stuff like this in
         // rings that are member of the superring.
@@ -1037,6 +1039,181 @@ export default class DrawerBase {
         }
 
         return false;
+    }
+
+    /**
+     * Detect cage-like fused ring systems and route them through bridged-ring
+     * layout.
+     *
+     * logic:
+     * Check one fused ring component at a time. Rings are fused when they
+     * share two or more atoms.
+     *  A cage should have several rings fused on three or more sides.
+     * Every atom in the cage skeleton should have three neighbours inside
+     * the same fused component.
+     * Most ring edges should be shared by two rings. A small boundary is
+     *allowed because the SSSR can miss one face of a cage (see cubane example)
+     * This rejects polycyclic aromatic hydrocarbons (PAHs) which are an exception to the rule
+     *  check https://en.wikipedia.org/wiki/Polycyclic_aromatic_hydrocarbon
+     * PAHs have outer atoms with only two neighbours inside the fused system.
+     */
+    markCageRingSystems() {
+        // Count fused connections (vertices.size >= 2) per ring and build a
+        // ring -> fused-neighbour adjacency list.
+        let fusedCount = new Map();
+        let fusedNeighbours = new Map();
+        for (let i = 0; i < this.rings.length; i++) {
+            fusedCount.set(this.rings[i].id, 0);
+            fusedNeighbours.set(this.rings[i].id, []);
+        }
+
+        for (let i = 0; i < this.ringConnections.length; i++) {
+            let rc = this.ringConnections[i];
+            if (rc.vertices.size < 2) continue;
+            fusedCount.set(rc.firstRingId, fusedCount.get(rc.firstRingId) + 1);
+            fusedCount.set(rc.secondRingId, fusedCount.get(rc.secondRingId) + 1);
+            fusedNeighbours.get(rc.firstRingId).push(rc.secondRingId);
+            fusedNeighbours.get(rc.secondRingId).push(rc.firstRingId);
+        }
+
+        let visited = new Set();
+        let cagedRings = new Set();
+
+        for (let i = 0; i < this.rings.length; i++) {
+            let rootId = this.rings[i].id;
+            if (visited.has(rootId)) continue;
+
+            let component = [];
+            let queue = [rootId];
+            visited.add(rootId);
+            while (queue.length > 0) {
+                let cur = queue.shift();
+                component.push(cur);
+                let neighbours = fusedNeighbours.get(cur);
+                for (let j = 0; j < neighbours.length; j++) {
+                    let n = neighbours[j];
+                    if (!visited.has(n)) {
+                        visited.add(n);
+                        queue.push(n);
+                    }
+                }
+            }
+
+            if (this.isCageRingComponent(component, fusedCount)) {
+                for (let j = 0; j < component.length; j++) {
+                    cagedRings.add(component[j]);
+                }
+            }
+        }
+
+        if (cagedRings.size === 0) return;
+
+        // Force every fused connection internal to a caged component to act
+        // as a bridge so RingConnection.isBridge() reports true and the
+        // bridged-ring collapse picks it up.
+        for (let i = 0; i < this.ringConnections.length; i++) {
+            let rc = this.ringConnections[i];
+            if (rc.vertices.size < 2) continue;
+            if (cagedRings.has(rc.firstRingId) && cagedRings.has(rc.secondRingId)) {
+                rc.isForcedBridge = true;
+            }
+        }
+    }
+
+    /**
+     * Check whether a fused ring component looks like a closed cage.
+     *
+     * @param {Number[]} ringIds Ring ids in one fused component.
+     * @param {Map<Number, Number>} fusedCount Number of fused neighbours per ring.
+     * @returns {Boolean} Whether this component should use bridged-ring layout.
+     */
+    isCageRingComponent(ringIds, fusedCount) {
+        let seedCount = 0;
+        for (let i = 0; i < ringIds.length; i++) {
+            if (fusedCount.get(ringIds[i]) >= 3) {
+                seedCount++;
+            }
+        }
+
+        if (seedCount < 2) {
+            return false;
+        }
+
+        let stats = this.getRingSystemStats(ringIds);
+
+        return (
+            stats.atomCount > 0
+            && stats.edgeCount > 0
+            && stats.nonCageAtomCount === 0
+            && stats.boundaryEdgeRatio <= 0.5
+        );
+    }
+
+    /**
+     * Collect simple graph stats for a fused ring component.
+     *
+     * @param {Number[]} ringIds Ring ids in one fused component.
+     * @returns {Object} Ring-system atom and edge stats.
+     */
+    getRingSystemStats(ringIds) {
+        let ringMemberSets = new Map();
+        let atoms = new Set();
+        let degreeByAtom = new Map();
+
+        for (let i = 0; i < ringIds.length; i++) {
+            let ring = this.getRing(ringIds[i]);
+            let members = new Set(ring.members);
+            ringMemberSets.set(ringIds[i], members);
+
+            for (let j = 0; j < ring.members.length; j++) {
+                atoms.add(ring.members[j]);
+                degreeByAtom.set(ring.members[j], 0);
+            }
+        }
+
+        let edgeCount = 0;
+        let boundaryEdgeCount = 0;
+
+        for (let i = 0; i < this.graph.edges.length; i++) {
+            let edge = this.graph.edges[i];
+            if (!atoms.has(edge.sourceId) || !atoms.has(edge.targetId)) {
+                continue;
+            }
+
+            let ringCount = 0;
+            for (let j = 0; j < ringIds.length; j++) {
+                let members = ringMemberSets.get(ringIds[j]);
+                if (members.has(edge.sourceId) && members.has(edge.targetId)) {
+                    ringCount++;
+                }
+            }
+
+            if (ringCount === 0) {
+                continue;
+            }
+
+            edgeCount++;
+            degreeByAtom.set(edge.sourceId, degreeByAtom.get(edge.sourceId) + 1);
+            degreeByAtom.set(edge.targetId, degreeByAtom.get(edge.targetId) + 1);
+
+            if (ringCount === 1) {
+                boundaryEdgeCount++;
+            }
+        }
+
+        let nonCageAtomCount = 0;
+        for (let degree of degreeByAtom.values()) {
+            if (degree !== 3) {
+                nonCageAtomCount++;
+            }
+        }
+
+        return {
+            atomCount:         atoms.size,
+            edgeCount:         edgeCount,
+            nonCageAtomCount:  nonCageAtomCount,
+            boundaryEdgeRatio: edgeCount === 0 ? 1 : boundaryEdgeCount / edgeCount,
+        };
     }
 
     /**

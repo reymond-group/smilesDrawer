@@ -162,11 +162,14 @@ export default class SvgDrawer {
         });
 
         // Draw ring for implicitly defined aromatic rings
+        //Skip for bridged ring systems (cage molecules) bc these draw
+        // aromatic bonds as double bonds instead of circles.
         if (!preprocessor.bridgedRing) {
             for (let i = 0; i < rings.length; i++) {
                 let ring = rings[i];
 
-                // TODO: uses canvas ctx to draw... need to update this to SVG
+                if (ring.isPartOfBridged) continue;
+
                 if (preprocessor.isRingAromatic(ring)) {
                     this.drawAromaticityRing(ring);
                 }
