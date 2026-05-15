@@ -161,9 +161,15 @@ export default class SvgDrawer {
             }
         });
 
-        // Draw ring for implicitly defined aromatic rings
-        //Skip for bridged ring systems (cage molecules) bc these draw
-        // aromatic bonds as double bonds instead of circles.
+        // Draw the inner circle that marks an aromatic ring (benzene as
+        // hexagon + circle). Skipped for rings that are part of a bridged
+        // system: the circle assumes a flat regular polygon and does not
+        // sit inside the ring on a 2D projection of a non-planar skeleton.
+        // The fallback is Kekulé form (explicit alternating double bonds),
+        // but the parser does not currently kekulise aromatic input for
+        // bridged systems, so aromatic bridged molecules render with all
+        // single bonds today.
+        // TODO: add kekulisation for bridged aromatic rings.
         if (!preprocessor.bridgedRing) {
             for (let i = 0; i < rings.length; i++) {
                 let ring = rings[i];
