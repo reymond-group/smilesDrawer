@@ -3270,18 +3270,20 @@ export default class DrawerBase {
             const rs       = (parity === rotation) ? 'R' : 'S';
             vertex.value.chirality = rs;
 
-            // Pick best neighbor to draw wedge on.
-            // Priority: non-stereocenter > outside ring > heteroatom > shortest subtree
+            // Pick the best neighbor to draw a wedge to.
+            // Priority: non-stereocenter > not in same ring > visible > heteroatom > shortest subtree
+            // Note that the sort order is reversed, so higher scores get priority.
             const wedgeOrder = order.map((o) => {
                 const nid       = neighbours[o];
                 const neighbour = this.graph.vertices[nid];
 
                 let rank = 0;
-                rank += neighbour.value.isStereoCenter ? 0 : 100000;
-                rank += this.areVerticesInSameRing(neighbour, vertex) ? 0 : 10000;
-                rank += neighbour.value.isHeteroAtom() ? 1000 : 0;
-                rank -= neighbour.value.subtreeDepth === 0 ? 1000 : 0;
-                rank += 1000 - neighbour.value.subtreeDepth;
+                rank -= neighbour.value.isStereoCenter ? 1000000 : 0;
+                rank -= this.areVerticesInSameRing(neighbour, vertex) ? 100000 : 0;
+                rank += neighbour.value.isDrawn ? 10000 : 0;
+                // rank += neighbour.isTerminal() ? 1000 : 0;
+                rank += neighbour.value.element !== 'C' ? 100 : 0;
+                rank -= this.graph.getTreeDepth(nid, vertex.id);
 
                 return [rank, nid];
             }).sort((a, b) => {
@@ -3292,13 +3294,7 @@ export default class DrawerBase {
             const wedgeId = wedgeOrder[0][1];
             const wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
             this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
-
-            // If there's a hydrogen, give it a wedge, too.
-            const hId = neighbours[order[order.length - 1]];
-            if (this.graph.vertices[hId].value.element === 'H') {
-                const hWedge = this._computeWedgeDirection(vertex, hId, order, neighbours, rs);
-                this.graph.getEdge(vertex.id, hId).wedge = hWedge;
-            }
+            this.graph.vertices[wedgeId].value.isDrawn = true;
         }
     }
 
