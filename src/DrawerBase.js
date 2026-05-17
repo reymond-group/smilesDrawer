@@ -805,6 +805,36 @@ export default class DrawerBase {
     }
 
     /**
+     * Inverts an E/Z bond marker; leaves other bonds unchanged.
+     *
+     * @param {?string} bond - The bond marker to invert.
+     * @returns The bond marker, inverted if it was an E/Z bond.
+     */
+    static flipEZ(bond) {
+        if (bond === '/')  return '\\';
+        if (bond === '\\') return '/';
+        return bond;
+    }
+
+    /**
+     * Gets the bond type of a ringbond given the bond markers at either end.
+     *
+     * This is necessary because some code elsewhere (Graph?) sets these markers
+     * to '-' if they aren't specified.  This returns the first bond that differs
+     * from the default.  It flips E/Z specification of the reverse bond (if any)
+     * to make sure the stereochemistry is correct.
+     *
+     * @param {?string} fwd - The forward bond marker.
+     * @param {?string} rev - The reverse bond marker.
+     * @returns A bond marker, with correct E/Z stereochemistry.
+     */
+    static getRingbondType(fwd, rev) {
+        if (fwd && fwd !== '-') return fwd;
+        if (rev && rev !== '-') return DrawerBase.flipEZ(rev);
+        return '-';
+    }
+
+    /**
      * Initializes rings and ringbonds for the current molecule.
      */
     initRings() {
@@ -834,7 +864,11 @@ export default class DrawerBase {
                     let targetVertexId = openBonds.get(ringbondId)[0];
                     let targetRingbondBond = openBonds.get(ringbondId)[1];
                     let edge = new Edge(sourceVertexId, targetVertexId, 1);
-                    edge.setBondType(targetRingbondBond || ringbondBond || '-');
+
+                    // The new edge goes from this vertex to the other vertex,
+                    // so the bond from openBonds is the "reverse" bond.
+                    edge.setBondType(DrawerBase.getRingbondType(ringbondBond, targetRingbondBond));
+
                     let edgeId = this.graph.addEdge(edge);
                     let targetVertex = this.graph.vertices[targetVertexId];
 

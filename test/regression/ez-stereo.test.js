@@ -197,7 +197,7 @@ describe('E/Z double bond visual geometry', () => {
         expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('E');
     });
 
-    test.fails('should handle E/Z markers at forward links', () => {
+    it('should handle E/Z markers at forward links', () => {
         // https://github.com/reymond-group/smilesDrawer/issues/280
         let pp = render('N1CCCC/C1=C/2CCCCN2');
         expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('Z');
@@ -212,7 +212,7 @@ describe('E/Z double bond visual geometry', () => {
         expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('Z');
     });
 
-    test.fails('should handle E/Z markers at backward links', () => {
+    it('should handle E/Z markers at backward links', () => {
         // https://github.com/reymond-group/smilesDrawer/issues/280
         let pp = render('N1CCCC/C1=C2CCCCN/2');
         expect(getVisualEZ(pp, 5, 6, 0, 11)).toBe('E');
