@@ -162,24 +162,23 @@ export default class SvgDrawer {
         });
 
         // Draw the inner circle that marks an aromatic ring (benzene as
-        // hexagon + circle). Skipped for rings that are part of a bridged
-        // system: the circle assumes a flat regular polygon and does not
-        // sit inside the ring on a 2D projection of a non-planar skeleton.
-        // The fallback is Kekulé form (explicit alternating double bonds),
-        // but the parser does not currently kekulise aromatic input for
-        // bridged systems, so aromatic bridged molecules render with all
-        // single bonds today.
-        // TODO: add kekulisation for bridged aromatic rings.
-        if (!preprocessor.bridgedRing) {
-            for (let i = 0; i < rings.length; i++) {
-                let ring = rings[i];
+        // hexagon + circle) rings that are part of a bridged system still
+        // get the circle as long as their 2D projection is close enough to
+        // a regular polygon (e.g a flat pyrrole face of a bridged bicyclic).
+        // If the projection is distorted (i.e. not close to a regular polygone), we
+        // skip the circle here and let drawEdge fall back to dashed bonds
+        // long term fix is to kekulise aromatic input for bridged systems in
+        // the parser so the fallback is no longer needed
+        for (let i = 0; i < rings.length; i++) {
+            let ring = rings[i];
 
-                if (ring.isPartOfBridged) continue;
+            if (!preprocessor.isRingAromatic(ring)) continue;
 
-                if (preprocessor.isRingAromatic(ring)) {
-                    this.drawAromaticityRing(ring);
-                }
+            if (ring.isPartOfBridged && !preprocessor.isRingRegularPolygon(ring)) {
+                continue;
             }
+
+            this.drawAromaticityRing(ring);
         }
     }
 
@@ -215,18 +214,24 @@ export default class SvgDrawer {
         sides[1].multiplyScalar(10).add(a);
 
         // The third condition handles aromatic bonds inside a bridged ring
-        // system. The aromatic circle we'd normally draw assumes a flat
-        // regular polygon, which doesn't line up with the 2D projection of
-        // a non-planar bridged skeleton. So we draw those bonds as a solid
-        // line with a dashed parallel inside the ring instead. 
-        // the long-term fix is to  kekulise aromatic input for bridged
+        // system whose 2D projection is too distorted for the usual
+        // aromatic circle (e.g. paracyclophane, triptycene). Those bonds
+        // get drawn as a solid line with a dashed parallel inside the ring.
+        // If the aromatic ring is still close to a regular polygon (e.g.
+        // a flat pyrrole on a bridged bicyclic) we skip this branch and let
+        // drawEdges draw the circle as usual.
+        // The long-term fix is to kekulise aromatic input for bridged
         // systems in the parser (explicit single/double) so the fallback
-        // is no longer needed. 
+        // is no longer needed.
+        let aromaticRing = (edge.isPartOfAromaticRing
+            && vertexA.value.bridgedRing !== null
+            && vertexB.value.bridgedRing !== null)
+            ? preprocessor.getLargestOrAromaticCommonRing(vertexA, vertexB)
+            : null;
+
         if (edge.bondType === '='
             || preprocessor.getRingbondType(vertexA, vertexB) === '='
-            || (edge.isPartOfAromaticRing
-                && vertexA.value.bridgedRing !== null
-                && vertexB.value.bridgedRing !== null)
+            || (aromaticRing && !preprocessor.isRingRegularPolygon(aromaticRing))
         ) {
             // Always draw double bonds inside the ring
             let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);

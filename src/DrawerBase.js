@@ -1815,15 +1815,21 @@ export default class DrawerBase {
             }
         });
 
-        // Draw ring for implicitly defined aromatic rings
-        if (!this.bridgedRing) {
-            for (let i = 0; i < this.rings.length; i++) {
-                let ring = this.rings[i];
+        // Draw the aromatic-ring circle. Bridged aromatic rings still get
+        // a circle as long as their 2D projection is close to a regular
+        // polygon (e.g. a flat pyrrole on a bridged bicyclic). Distorted
+        // ones (paracyclophane, triptycene) are skipped here and fall
+        // back to dashed bonds in drawEdge. Mirrors SvgDrawer.drawEdges.
+        for (let i = 0; i < this.rings.length; i++) {
+            let ring = this.rings[i];
 
-                if (this.isRingAromatic(ring)) {
-                    this.canvasWrapper.drawAromaticityRing(ring);
-                }
+            if (!this.isRingAromatic(ring)) continue;
+
+            if (ring.isPartOfBridged && !this.isRingRegularPolygon(ring)) {
+                continue;
             }
+
+            this.canvasWrapper.drawAromaticityRing(ring);
         }
     }
 
@@ -1855,14 +1861,21 @@ export default class DrawerBase {
         sides[1].multiplyScalar(10).add(a);
 
         // The third condition handles aromatic bonds inside a bridged ring
-        // system. The aromatic circle we'd normally draw assumes a flat
-        // regular polygon, which doesn't line up with the 2D projection of
-        // a non-planar bridged skeleton. So we draw those bonds as a solid
-        // line with a dashed parallel inside the ring instead. 
-        // the long-term fix is to  kekulise aromatic input for bridged
-        // systems in the parser (explicit single/double) so the fallback
-        // is no longer needed. Mirrors the same fix in SvgDrawer.drawEdge.
-        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || (edge.isPartOfAromaticRing && vertexA.value.bridgedRing !== null && vertexB.value.bridgedRing !== null)) {
+        // system wher the 2D projection is too distorted for the
+        // aromatic circle too look good (e.g triptycene). Those bonds
+        // get drawn as a solid line with a dashed parallel inside the ring
+        // If the aromatic ring is still close to a regular polygon (e.g.
+        // a flat pyrrole on a bridged bicyclic) we skip this branch and
+        // let drawEdges draw the circle as usual becuase it looks better. 
+        // the long term fix is to kekulise aromatic input for bridged systems in
+        //the parser (explicit single/double) Mirrors SvgDrawer.drawEdge.
+        let aromaticRing = (edge.isPartOfAromaticRing
+            && vertexA.value.bridgedRing !== null
+            && vertexB.value.bridgedRing !== null)
+            ? this.getLargestOrAromaticCommonRing(vertexA, vertexB)
+            : null;
+
+        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || (aromaticRing && !this.isRingRegularPolygon(aromaticRing))) {
             // Always draw double bonds inside the ring
             let inRing = this.areVerticesInSameRing(vertexA, vertexB);
             let s = this.chooseSide(vertexA, vertexB, sides);
@@ -3240,6 +3253,44 @@ export default class DrawerBase {
         }
 
         return true;
+    }
+
+    /**
+     * Check whether the ring's 2D projection is close enough to a regular
+     * polygon that the aromatic-circle indicator will sit correctly inside
+     * it. Used to decide whether an aromatic ring that has been absorbed
+     * into a bridged super-ring can still use a circle, or needs the
+     * dashed-bond fallback.
+     *
+     * Heuristic: every vertex of a regular N-gon is the same distance
+     * from the centre. We accept the ring as regular when the longest
+     * radius is no more than `tolerance` times the shortest.
+     *
+     * @param {Ring}   ring             A ring.
+     * @param {Number} [tolerance=1.15] Max acceptable max/min radius ratio.
+     * @returns {Boolean}
+     */
+    isRingRegularPolygon(ring, tolerance = 1.15) {
+        if (ring.members.length < 3) {
+            return false;
+        }
+
+        let positions = ring.getPolygon(this.graph.vertices);
+        let center    = ring.center;
+        let minR      = Infinity;
+        let maxR      = -Infinity;
+
+        for (let i = 0; i < positions.length; i++) {
+            let r = positions[i].distance(center);
+            if (r < minR) minR = r;
+            if (r > maxR) maxR = r;
+        }
+
+        if (minR < 1e-6) {
+            return false;
+        }
+
+        return (maxR / minR) < tolerance;
     }
 
     /**
