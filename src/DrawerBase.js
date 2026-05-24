@@ -1854,7 +1854,15 @@ export default class DrawerBase {
         sides[0].multiplyScalar(10).add(a);
         sides[1].multiplyScalar(10).add(a);
 
-        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || (edge.isPartOfAromaticRing && this.bridgedRing)) {
+        // The third condition handles aromatic bonds inside a bridged ring
+        // system. The aromatic circle we'd normally draw assumes a flat
+        // regular polygon, which doesn't line up with the 2D projection of
+        // a non-planar bridged skeleton. So we draw those bonds as a solid
+        // line with a dashed parallel inside the ring instead. 
+        // the long-term fix is to  kekulise aromatic input for bridged
+        // systems in the parser (explicit single/double) so the fallback
+        // is no longer needed. Mirrors the same fix in SvgDrawer.drawEdge.
+        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || (edge.isPartOfAromaticRing && vertexA.value.bridgedRing !== null && vertexB.value.bridgedRing !== null)) {
             // Always draw double bonds inside the ring
             let inRing = this.areVerticesInSameRing(vertexA, vertexB);
             let s = this.chooseSide(vertexA, vertexB, sides);

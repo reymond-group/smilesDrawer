@@ -214,9 +214,19 @@ export default class SvgDrawer {
         sides[0].multiplyScalar(10).add(a);
         sides[1].multiplyScalar(10).add(a);
 
+        // The third condition handles aromatic bonds inside a bridged ring
+        // system. The aromatic circle we'd normally draw assumes a flat
+        // regular polygon, which doesn't line up with the 2D projection of
+        // a non-planar bridged skeleton. So we draw those bonds as a solid
+        // line with a dashed parallel inside the ring instead. 
+        // the long-term fix is to  kekulise aromatic input for bridged
+        // systems in the parser (explicit single/double) so the fallback
+        // is no longer needed. 
         if (edge.bondType === '='
             || preprocessor.getRingbondType(vertexA, vertexB) === '='
-            || (edge.isPartOfAromaticRing && preprocessor.bridgedRing)
+            || (edge.isPartOfAromaticRing
+                && vertexA.value.bridgedRing !== null
+                && vertexB.value.bridgedRing !== null)
         ) {
             // Always draw double bonds inside the ring
             let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);
