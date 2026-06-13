@@ -66,12 +66,22 @@ export default class SmilesDrawer {
             if (element.hasAttribute('data-smiles-options') || element.hasAttribute('data-smiles-reaction-options')) {
                 let moleculeOptions = {};
                 if (element.hasAttribute('data-smiles-options')) {
-                    moleculeOptions = JSON.parse(element.getAttribute('data-smiles-options').replace(/'/g, '"'));
+                    const attr = element.getAttribute('data-smiles-options');
+                    try {
+                        moleculeOptions = JSON.parse(attr);
+                    } catch (e) {
+                        moleculeOptions = JSON.parse(attr.replace(/'/g, '"'));
+                    }
                 }
 
                 let reactionOptions = {};
                 if (element.hasAttribute('data-smiles-reaction-options')) {
-                    reactionOptions = JSON.parse(element.getAttribute('data-smiles-reaction-options').replace(/'/g, '"'));
+                    const attr = element.getAttribute('data-smiles-reaction-options');
+                    try {
+                        reactionOptions = JSON.parse(attr);
+                    } catch (e) {
+                        reactionOptions = JSON.parse(attr.replace(/'/g, '"'));
+                    }
                 }
 
                 let smilesDrawer = new SmilesDrawer(moleculeOptions, reactionOptions);
@@ -85,12 +95,12 @@ export default class SmilesDrawer {
 
     /**
      * Draw the smiles to the target.
-     * @param {String} smiles The SMILES to be depicted.
-     * @param {*} target The target element.
-     * @param {String} theme The theme.
-     * @param {?CallableFunction} successCallback The function called on success.
-     * @param {?CallableFunction} errorCallback The function called on error.
-     * @param {?Number[]|Object} weights The weights for the gaussians.
+     * @scripts/params.mjs {String} smiles The SMILES to be depicted.
+     * @scripts/params.mjs {*} target The target element.
+     * @scripts/params.mjs {String} theme The theme.
+     * @scripts/params.mjs {?CallableFunction} successCallback The function called on success.
+     * @scripts/params.mjs {?CallableFunction} errorCallback The function called on error.
+     * @scripts/params.mjs {?Number[]|Object} weights The weights for the gaussians.
      */
     draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null, weights = null) {
         // get the settings
@@ -106,7 +116,11 @@ export default class SmilesDrawer {
                 info.lastIndexOf('__')
             );
 
-            settings = JSON.parse(settingsString.replace(/'/g, '"'));
+            try {
+                settings = JSON.parse(settingsString);
+            } catch (e) {
+                settings = JSON.parse(settingsString.replace(/'/g, '"'));
+            }
         }
 
         let defaultSettings = {
@@ -304,8 +318,8 @@ export default class SmilesDrawer {
 
     /**
      *
-     * @param {HTMLImageElement|HTMLCanvasElement|SVGElement} element
-     * @param {SVGElement} svg
+     * @scripts/params.mjs {HTMLImageElement|HTMLCanvasElement|SVGElement} element
+     * @scripts/params.mjs {SVGElement} svg
      * @returns {{w: Number, h: Number}} The width and height.
      */
     getDimensions(element, svg = null) {
