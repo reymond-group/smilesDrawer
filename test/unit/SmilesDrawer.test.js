@@ -19,40 +19,46 @@ describe('SmilesDrawer', () => {
     });
 
     it('should parse valid JSON options', () => {
+        document.getElementById('target').remove();
         const element = document.createElement('div');
         element.setAttribute('data-smiles', 'C');
-        element.setAttribute('data-smiles-options', '{"width": 500}');
+        element.setAttribute('data-smiles-options', '{"width": 1234}');
         document.body.appendChild(element);
 
         const drawSpy = vi.spyOn(SmilesDrawer.prototype, 'draw');
+        drawSpy.mockClear();
         const drawer = new SmilesDrawer();
         drawer.apply('data-smiles');
 
         const instance = drawSpy.mock.instances[0];
-        expect(instance.drawer.opts.width).toBe(500);
+        expect(instance.drawer.opts.width).toBe(1234);
     });
 
     it('should parse JSON options with single quotes as fallback', () => {
+        document.getElementById('target').remove();
         const element = document.createElement('div');
         element.setAttribute('data-smiles', 'C');
-        element.setAttribute('data-smiles-options', "{'width': 500}");
+        element.setAttribute('data-smiles-options', "{'width': 1234}");
         document.body.appendChild(element);
 
         const drawSpy = vi.spyOn(SmilesDrawer.prototype, 'draw');
+        drawSpy.mockClear();
         const drawer = new SmilesDrawer();
         drawer.apply('data-smiles');
 
         const instance = drawSpy.mock.instances[0];
-        expect(instance.drawer.opts.width).toBe(500);
+        expect(instance.drawer.opts.width).toBe(1234);
     });
 
     it('should parse valid JSON containing an apostrophe without corruption', () => {
+        document.getElementById('target').remove();
         const element = document.createElement('div');
         element.setAttribute('data-smiles', 'C');
         element.setAttribute('data-smiles-options', '{"label": "John\'s"}');
         document.body.appendChild(element);
 
         const drawSpy = vi.spyOn(SmilesDrawer.prototype, 'draw');
+        drawSpy.mockClear();
         const drawer = new SmilesDrawer();
         drawer.apply('data-smiles');
 
