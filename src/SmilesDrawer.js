@@ -95,12 +95,12 @@ export default class SmilesDrawer {
 
     /**
      * Draw the smiles to the target.
-     * @scripts/params.mjs {String} smiles The SMILES to be depicted.
-     * @scripts/params.mjs {*} target The target element.
-     * @scripts/params.mjs {String} theme The theme.
-     * @scripts/params.mjs {?CallableFunction} successCallback The function called on success.
-     * @scripts/params.mjs {?CallableFunction} errorCallback The function called on error.
-     * @scripts/params.mjs {?Number[]|Object} weights The weights for the gaussians.
+     * @param {String} smiles The SMILES to be depicted.
+     * @param {*} target The target element.
+     * @param {String} theme The theme.
+     * @param {?CallableFunction} successCallback The function called on success.
+     * @param {?CallableFunction} errorCallback The function called on error.
+     * @param {?Number[]|Object} weights The weights for the gaussians.
      */
     draw(smiles, target, theme = 'light', successCallback = null, errorCallback = null, weights = null) {
         // get the settings
@@ -318,8 +318,8 @@ export default class SmilesDrawer {
 
     /**
      *
-     * @scripts/params.mjs {HTMLImageElement|HTMLCanvasElement|SVGElement} element
-     * @scripts/params.mjs {SVGElement} svg
+     * @param {HTMLImageElement|HTMLCanvasElement|SVGElement} element
+     * @param {SVGElement} svg
      * @returns {{w: Number, h: Number}} The width and height.
      */
     getDimensions(element, svg = null) {
