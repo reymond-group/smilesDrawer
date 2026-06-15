@@ -66,12 +66,22 @@ export default class SmilesDrawer {
             if (element.hasAttribute('data-smiles-options') || element.hasAttribute('data-smiles-reaction-options')) {
                 let moleculeOptions = {};
                 if (element.hasAttribute('data-smiles-options')) {
-                    moleculeOptions = JSON.parse(element.getAttribute('data-smiles-options').replace(/'/g, '"'));
+                    const attr = element.getAttribute('data-smiles-options');
+                    try {
+                        moleculeOptions = JSON.parse(attr);
+                    } catch (e) {
+                        moleculeOptions = JSON.parse(attr.replace(/'/g, '"'));
+                    }
                 }
 
                 let reactionOptions = {};
                 if (element.hasAttribute('data-smiles-reaction-options')) {
-                    reactionOptions = JSON.parse(element.getAttribute('data-smiles-reaction-options').replace(/'/g, '"'));
+                    const attr = element.getAttribute('data-smiles-reaction-options');
+                    try {
+                        reactionOptions = JSON.parse(attr);
+                    } catch (e) {
+                        reactionOptions = JSON.parse(attr.replace(/'/g, '"'));
+                    }
                 }
 
                 let smilesDrawer = new SmilesDrawer(moleculeOptions, reactionOptions);
@@ -106,7 +116,11 @@ export default class SmilesDrawer {
                 info.lastIndexOf('__')
             );
 
-            settings = JSON.parse(settingsString.replace(/'/g, '"'));
+            try {
+                settings = JSON.parse(settingsString);
+            } catch (e) {
+                settings = JSON.parse(settingsString.replace(/'/g, '"'));
+            }
         }
 
         let defaultSettings = {
