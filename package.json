@@ -1,6 +1,6 @@
 {
   "name": "smiles-drawer",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "A SMILES drawer and parser. Generate molecular structure depictions in pure JavaScript.",
   "main": "./app.js",
   "repository": "https://github.com/reymond-group/smilesDrawer.git",
@@ -9,7 +9,7 @@
   "private": false,
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.6.1",
-    "esbuild":                  "^0.25.0",
+    "esbuild":                  "^0.28.1",
     "eslint":                   "^9.39.1",
     "jsdom":                    "^26.1.0",
     "typescript":               "^5.8.2",

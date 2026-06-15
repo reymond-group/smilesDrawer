@@ -54,6 +54,7 @@ export default class DrawerBase {
             isomeric:                    true,
             debug:                       false,
             terminalCarbons:             false,
+            showCarbons:                 'default',
             explicitHydrogens:           true,
             overlapSensitivity:          0.42,
             overlapResolutionIterations: 1,
@@ -287,6 +288,12 @@ export default class DrawerBase {
         };
 
         this.opts = Options.extend(true, this.defaultOptions, options);
+
+        const allowedShowCarbons = ['none', 'default', 'terminal', 'acyclic', 'all'];
+        if (allowedShowCarbons.indexOf(this.opts.showCarbons) === -1) {
+            this.opts.showCarbons = 'default';
+        }
+
         this.opts.halfBondSpacing = this.opts.bondSpacing / 2.0;
         this.opts.bondLengthSq = this.opts.bondLength * this.opts.bondLength;
         this.opts.halfFontSizeLarge = this.opts.fontSizeLarge / 2.0;
@@ -295,6 +302,24 @@ export default class DrawerBase {
 
         // Set the default theme.
         this.theme = this.opts.themes.dark;
+    }
+
+    /**
+     * Resolves carbon label display mode, including legacy `terminalCarbons` when `showCarbons` is `'default'`.
+     *
+     * @param {Object} opts Merged drawer options.
+     * @returns {'none'|'default'|'terminal'|'acyclic'|'all'}
+     */
+    static getEffectiveShowCarbonsMode(opts) {
+        const allowed = ['none', 'default', 'terminal', 'acyclic', 'all'];
+        let mode = opts.showCarbons;
+        if (mode === undefined || mode === null || allowed.indexOf(mode) === -1) {
+            mode = 'default';
+        }
+        if (mode === 'default' && opts.terminalCarbons) {
+            return 'terminal';
+        }
+        return mode;
     }
 
     /**
@@ -780,6 +805,36 @@ export default class DrawerBase {
     }
 
     /**
+     * Inverts an E/Z bond marker; leaves other bonds unchanged.
+     *
+     * @param {?string} bond - The bond marker to invert.
+     * @returns The bond marker, inverted if it was an E/Z bond.
+     */
+    static flipEZ(bond) {
+        if (bond === '/')  return '\\';
+        if (bond === '\\') return '/';
+        return bond;
+    }
+
+    /**
+     * Gets the bond type of a ringbond given the bond markers at either end.
+     *
+     * This is necessary because some code elsewhere (Graph?) sets these markers
+     * to '-' if they aren't specified.  This returns the first bond that differs
+     * from the default.  It flips E/Z specification of the reverse bond (if any)
+     * to make sure the stereochemistry is correct.
+     *
+     * @param {?string} fwd - The forward bond marker.
+     * @param {?string} rev - The reverse bond marker.
+     * @returns A bond marker, with correct E/Z stereochemistry.
+     */
+    static getRingbondType(fwd, rev) {
+        if (fwd && fwd !== '-') return fwd;
+        if (rev && rev !== '-') return DrawerBase.flipEZ(rev);
+        return '-';
+    }
+
+    /**
      * Initializes rings and ringbonds for the current molecule.
      */
     initRings() {
@@ -809,7 +864,11 @@ export default class DrawerBase {
                     let targetVertexId = openBonds.get(ringbondId)[0];
                     let targetRingbondBond = openBonds.get(ringbondId)[1];
                     let edge = new Edge(sourceVertexId, targetVertexId, 1);
-                    edge.setBondType(targetRingbondBond || ringbondBond || '-');
+
+                    // The new edge goes from this vertex to the other vertex,
+                    // so the bond from openBonds is the "reverse" bond.
+                    edge.setBondType(DrawerBase.getRingbondType(ringbondBond, targetRingbondBond));
+
                     let edgeId = this.graph.addEdge(edge);
                     let targetVertex = this.graph.vertices[targetVertexId];
 
@@ -1769,8 +1828,25 @@ export default class DrawerBase {
             let element = atom.element;
             let hydrogens = atom.countImplicitHydrogens();
             let dir = vertex.getTextDirection(this.graph.vertices);
-            let isTerminal = this.opts.terminalCarbons || element !== 'C' || atom.hasAttachedPseudoElements ? vertex.isTerminal() : false;
+            const showCarbonsMode = DrawerBase.getEffectiveShowCarbonsMode(this.opts);
+            let isTerminal = (showCarbonsMode === 'terminal' || element !== 'C' || atom.hasAttachedPseudoElements) ? vertex.isTerminal() : false;
             let isCarbon = atom.element === 'C';
+
+            if (element === 'C') {
+                const isRingCarbon = atom.rings && atom.rings.length > 0;
+                if (showCarbonsMode === 'none') {
+                    isCarbon = true;
+                    isTerminal = false;
+                }
+                else if (showCarbonsMode === 'all') {
+                    isCarbon = false;
+                    isTerminal = true;
+                }
+                else if (showCarbonsMode === 'acyclic' && !isRingCarbon) {
+                    isCarbon = false;
+                    isTerminal = true;
+                }
+            }
             // This is a HACK to remove all hydrogens from nitrogens in aromatic rings, as this
             // should be the most common state. This has to be fixed by kekulization
             if (atom.element === 'N' && atom.isPartOfAromaticRing) {
@@ -2109,16 +2185,9 @@ export default class DrawerBase {
             const vA = edge.sourceId;
             const vB = edge.targetId;
 
-            // Skip double bonds where both alkene atoms are part of ring
-            // fix works after layout by mirroring one movable branch across the
-            // double-bond axis. That is safe when one side is a free subtree, but not
-            // when both sides are locked into ring geometry.
-            // In ring-ring cases such as N1CCCCC1=C2CCCCN2, the current layout may still
-            // draw one orientation, but we do not actively enforce the SMILES E/Z here.
-            // Supporting those cases requires ring layout itself to place the alkene
-            // with the correct configuration. See issue#247.
-            if (graph.vertices[vA].value.rings.length > 0 &&
-                graph.vertices[vB].value.rings.length > 0) {
+            if (this.areVerticesInSameRing(graph.vertices[vA], graph.vertices[vB])) {
+                // These had better be in the right place by default,
+                // because there's no clean fix if they're not...
                 continue;
             }
 
@@ -2132,8 +2201,8 @@ export default class DrawerBase {
                     // '/' means source is below, target is above
                     // So neighbor's side depends on whether it's source or target
                     let neighborAbove = (e.sourceId === vA)
-                        ? (e.bondType === '/')    // A→N: '/' = N above
-                        : (e.bondType === '\\');  // N→A: '\\' = N above
+                        ? (e.bondType === '/')    // B=A/N: N above
+                        : (e.bondType === '\\');  // N\A=B: N above
                     stereoA = {nid, above: neighborAbove};
                     break;
                 }
@@ -2186,22 +2255,8 @@ export default class DrawerBase {
                 if (e && (e.bondType === '/' || e.bondType === '\\')) countB++;
             }
 
-            let flipId, pivotId;
-            if (countA <= countB) {
-                flipId = stereoA.nid;
-                pivotId = vA;
-            }
-            else {
-                flipId = stereoB.nid;
-                pivotId = vB;
-            }
-
-            // Don't flip ring members; try the other side
-            if (graph.vertices[flipId].value.rings.length > 0) {
-                flipId = (pivotId === vA) ? stereoB.nid : stereoA.nid;
-                pivotId = (pivotId === vA) ? vB : vA;
-                if (graph.vertices[flipId].value.rings.length > 0) continue;
-            }
+            const flipId  = (countA <= countB) ? vA : vB;
+            const pivotId = (countA <= countB) ? vB : vA;
 
             // Reflect subtree across the line through pivot in direction (ax, ay)
             const pivot = graph.vertices[pivotId].position;
