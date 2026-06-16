@@ -2741,11 +2741,11 @@ export default class DrawerBase {
                 if (prevEdge && nextEdge && prevEdge.weight + nextEdge.weight >= 4) {
                     prevEdge.center = true;
                     nextEdge.center = true;
-
-                    // TODO: One of these is on value, but the other isn't?
-                    vertex.value.drawExplicit = false;
-                    nextVertex.drawExplicit = true;
                     nextVertex.angle = 0.0;
+
+                    if (prevEdge.weight === nextEdge.weight) {
+                        vertex.value.drawExplicit = true;
+                    }
 
                     this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
                 }
