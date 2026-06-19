@@ -976,26 +976,22 @@ export default class DrawerBase {
     }
 
     initHydrogens() {
-    // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
-        if (!this.opts.explicitHydrogens) {
-            for (let i = 0; i < this.graph.vertices.length; i++) {
-                let vertex = this.graph.vertices[i];
+        if (this.opts.explicitHydrogens) {
+            return;
+        }
 
-                if (vertex.value.element !== 'H') {
-                    continue;
-                }
+        for (const vertex of this.graph.vertices) {
+            if (vertex.value.element !== 'H' || vertex.neighbours.length !== 1) {
+                continue;
+            }
 
-                // Hydrogens should have only one neighbour, so just take the first
-                // Also set hasHydrogen true on connected atom
-                let neighbour = this.graph.vertices[vertex.neighbours[0]];
-                neighbour.value.hasHydrogen = true;
-
-                if (!neighbour.value.isStereoCenter
-                    || (neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing)
-                    || (neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2)
-                ) {
-                    vertex.value.isDrawn = false;
-                }
+            const neighbour = this.graph.vertices[vertex.neighbours[0]];
+            if (!neighbour.value.isStereoCenter
+                || (neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing)
+                || (neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2)
+            ) {
+                // This vertex can be safely hidden.
+                vertex.value.isDrawn = false;
             }
         }
     }
@@ -2745,11 +2741,11 @@ export default class DrawerBase {
                 if (prevEdge && nextEdge && prevEdge.weight + nextEdge.weight >= 4) {
                     prevEdge.center = true;
                     nextEdge.center = true;
-
-                    // TODO: One of these is on value, but the other isn't?
-                    vertex.value.drawExplicit = false;
-                    nextVertex.drawExplicit = true;
                     nextVertex.angle = 0.0;
+
+                    if (prevEdge.weight === nextEdge.weight) {
+                        vertex.value.drawExplicit = true;
+                    }
 
                     this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
                 }
@@ -3308,37 +3304,31 @@ export default class DrawerBase {
             const rs       = (parity === rotation) ? 'R' : 'S';
             vertex.value.chirality = rs;
 
-            // Pick best neighbor to draw wedge on.
-            // Priority: non-stereocenter > outside ring > heteroatom > shortest subtree
-            let wedgeOrder = new Array(neighbours.length - 1);
-            let showHydrogen = vertex.value.rings.length > 1 && vertex.value.hasHydrogen;
-            let offset = vertex.value.hasHydrogen ? 1 : 0;
+            // Pick the best neighbor to draw a wedge to.
+            // Priority: non-stereocenter > not in same ring > visible > heteroatom > shortest subtree
+            // Note that the sort order is reversed, so higher scores get priority.
+            const wedgeOrder = order.map((o) => {
+                const nid       = neighbours[o];
+                const neighbour = this.graph.vertices[nid];
 
-            for (let j = 0; j < order.length - offset; j++) {
-                wedgeOrder[j] = new Uint32Array(2);
-                let neighbour = this.graph.vertices[neighbours[order[j]]];
-                wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 100000;
-                wedgeOrder[j][0] += this.areVerticesInSameRing(neighbour, vertex) ? 0 : 10000;
-                wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 1000 : 0;
-                wedgeOrder[j][0] -= neighbour.value.subtreeDepth === 0 ? 1000 : 0;
-                wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
-                wedgeOrder[j][1] = neighbours[order[j]];
-            }
+                let rank = 0;
+                rank -= neighbour.value.isStereoCenter ? 1000000 : 0;
+                rank -= this.areVerticesInSameRing(neighbour, vertex) ? 100000 : 0;
+                rank += neighbour.value.isDrawn ? 10000 : 0;
+                // rank += neighbour.isTerminal() ? 1000 : 0;
+                rank += neighbour.value.element !== 'C' ? 100 : 0;
+                rank -= this.graph.getTreeDepth(nid, vertex.id);
 
-            wedgeOrder.sort((a, b) => b[0] - a[0]);
+                return [rank, nid];
+            }).sort((a, b) => {
+                return b[0] - a[0];
+            });
 
-            if (!showHydrogen) {
-                let wedgeId = wedgeOrder[0][1];
-                let wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
-                this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
-
-                if (vertex.value.hasHydrogen) {
-                    let hId = neighbours[order[order.length - 1]];
-                    let hWedge = this._computeWedgeDirection(vertex, hId, order, neighbours, rs);
-                    this.graph.getEdge(vertex.id, hId).wedge = hWedge;
-                    vertex.value.hydrogenDirection = hWedge === 'up' ? 'up' : 'down';
-                }
-            }
+            // Set the wedge direction.
+            const wedgeId = wedgeOrder[0][1];
+            const wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
+            this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
+            this.graph.vertices[wedgeId].value.isDrawn = true;
         }
     }
 
