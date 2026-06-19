@@ -1111,7 +1111,7 @@ export default class SvgWrapper {
 
         svg.appendChild(textElem);
 
-        // The extra 0.4 here it to account for any subscripts on the bottom line.
+        // The extra 0.4 here is to account for any subscripts on the bottom line.
         // The factor of 4 / 3 is to convert from points to CSS pixels (1in = 72pt = 96px).
         return {svg: svg, width: maxLineWidth, height: (lines.length + 0.4) * fontSize * 4 / 3};
     }

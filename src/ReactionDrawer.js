@@ -282,14 +282,20 @@ export default class ReactionDrawer {
             }
         }
 
+        let minY = 0;
+        let maxY = 0;
         let totalWidth = 0.0;
 
         elements.forEach((element) => {
             let offsetX = element.offsetX || 0.0;
             let offsetY = element.offsetY || 0.0;
 
+            const y = ((maxHeight - element.height) / 2.0) + offsetY;
+            maxY = Math.max(maxY, y + element.height);
+            minY = Math.min(minY, y);
+
             element.svg.setAttributeNS(null, 'x', Math.round(totalWidth + offsetX));
-            element.svg.setAttributeNS(null, 'y', Math.round(((maxHeight - element.height) / 2.0) + offsetY));
+            element.svg.setAttributeNS(null, 'y', Math.round(y));
             element.svg.setAttributeNS(null, 'width', Math.round(element.width));
             element.svg.setAttributeNS(null, 'height', Math.round(element.height));
             svg.appendChild(element.svg);
@@ -299,7 +305,8 @@ export default class ReactionDrawer {
             }
         });
 
-        svg.setAttributeNS(null, 'viewBox', `0 0 ${totalWidth} ${maxHeight}`);
+        const height = Math.max(maxHeight, maxY - minY);
+        svg.setAttributeNS(null, 'viewBox', `0 ${minY} ${totalWidth} ${height}`);
         svg.style.width = totalWidth + 'px';
         svg.style.height = maxHeight + 'px';
 
