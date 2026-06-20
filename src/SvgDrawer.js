@@ -1,7 +1,6 @@
 // @ts-check
 // we use the drawer to do all the preprocessing. then we take over the drawing
 // portion to output to svg
-import ArrayHelper  from './ArrayHelper';
 import Atom         from './Atom';
 import DrawerBase   from './DrawerBase';
 import GaussDrawer  from './GaussDrawer';
@@ -200,10 +199,10 @@ export default class SvgDrawer {
             b = vertexB.position,
             normals = preprocessor.getEdgeNormals(edge),
             // Create a point on each side of the line
-            sides = ArrayHelper.clone(normals);
-
-        sides[0].multiplyScalar(10).add(a);
-        sides[1].multiplyScalar(10).add(a);
+            sides = [
+                Vector2.multiplyScalar(normals[0], 10).add(a),
+                Vector2.multiplyScalar(normals[1], 10).add(a),
+            ];
 
         if (edge.bondType === '='
             || preprocessor.getRingbondType(vertexA, vertexB) === '='
@@ -412,8 +411,9 @@ export default class SvgDrawer {
             }
 
             if (debug) {
-                const value = 'v' + vertex.id + ' ' + ArrayHelper.print(atom.ringbonds);
-                svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, value);
+                const bond_ids = atom.ringbonds.map(bond => bond.id);
+                const bond_str = bond_ids.length ? ` (${bond_ids.join(', ')})` : '';
+                svgWrapper.drawDebugText(vertex.position.x, vertex.position.y, `v${vertex.id}${bond_str}`);
             }
         }
 

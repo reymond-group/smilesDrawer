@@ -1,5 +1,4 @@
 // @ts-check
-import ArrayHelper    from './ArrayHelper';
 import RingConnection from './RingConnection';
 import Vector2        from './Vector2';
 import Vertex         from './Vertex';
@@ -54,11 +53,13 @@ export default class Ring {
         let clone = new Ring(this.members);
 
         clone.id = this.id;
-        clone.insiders = ArrayHelper.clone(this.insiders);
-        clone.neighbours = ArrayHelper.clone(this.neighbours);
+        clone.insiders = this.insiders.slice();
+        clone.neighbours = this.neighbours.slice();
         clone.positioned = this.positioned;
         clone.center = this.center.clone();
-        clone.rings = ArrayHelper.clone(this.rings);
+        // NOTE: This was changed from a deep copy to a shallow one...
+        // Make sure that doesn't end up causing any problems!
+        clone.rings = this.rings.slice();
         clone.isBridged = this.isBridged;
         clone.isPartOfBridged = this.isPartOfBridged;
         clone.isSpiro = this.isSpiro;

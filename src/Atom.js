@@ -1,5 +1,4 @@
 // @ts-check
-import ArrayHelper from './ArrayHelper';
 
 /**
  * A class representing an atom.
@@ -154,7 +153,7 @@ export default class Atom {
      * @param {Number} ringId A ring id.
      */
     addAnchoredRing(ringId) {
-        if (!ArrayHelper.contains(this.anchoredRings, {value: ringId})) {
+        if (!this.anchoredRings.includes(ringId)) {
             this.anchoredRings.push(ringId);
         }
     }
