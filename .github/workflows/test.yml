@@ -34,7 +34,10 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm clean-install
 
       - name: Run CI tests
         run: npm run test:ci
+
+      - name: Run Typecheck
+        run: npm run typecheck
