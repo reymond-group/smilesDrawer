@@ -649,15 +649,15 @@ export default class Graph {
      * Used by kkLayout to seed cage like ring systems where a plain
      * circular start sends Kamada-Kawai into a local minimum. Classical
      * MDS gives a single global answer in closed form, so KK starts somewhere
-     * sensible. An visual example of having MDS+KK vs only KK difference is on dodecahedrane 
-     * check https://math.mit.edu/~urschel/publications/p2021e.pdf Figure 5 (last page) for 
+     * sensible. A visual example of having MDS+KK vs only KK difference is on dodecahedrane
+     * check https://math.mit.edu/~urschel/publications/p2021e.pdf Figure 5 (last page) for
      * a very close example of how KK vs MDS+KK looks like in dodecahedrane
      *
      * The algorithm is classical MDS, also called Torgerson scaling or
      * Principal Coordinates Analysis (Torgerson, "Multidimensional scaling: I.
      * Theory and method", Psychometrika 17, 1952). Given an n x n distance
      * matrix D it returns the 2D point set whose pairwise Euclidean distances
-     * best match D in least-squares sense. 
+     * best match D in least-squares sense.
      *
      *   1. Square the distances element-wise:           D2[i][j] = D[i][j]^2
      *   2. Double-centre to get a Gram-like matrix:     B = -1/2 H D2 H
@@ -668,7 +668,7 @@ export default class Graph {
      *
      *  The final rescale (lines below) sizes the layout so that the largest
      * pairwise distance is roughly bondLength * sqrt(n), which puts the result
-     * on the same scale as the rest of the drawing 
+     * on the same scale as the rest of the drawing.
      *
      * @param {Array[]} matDist Graph-distance matrix (shortest paths in bonds).
      * @param {number} n Number of vertices.
@@ -837,28 +837,26 @@ export default class Graph {
 
         // Pick the starting positions for KK based on the shape of the ring system.
         // KK refines from these positions, but it can only find a local minimum,
-        // so a bad start gives a poor outptu (see dodecahedrane)
-        //however with MDS-based init it lays out as better dodecahedron
-        // projection
+        // so a bad start gives a poor output (see dodecahedrane); with MDS-based
+        // init it lays out as a better dodecahedron projection.
         //
-        //Three cases:
-        // 1. A small bridged ring with 1-2 atoms in the interior
-        //Place the outer ring as a regular polygon, then drop
-        // the interior atom(s) at the centroid of their neighbours on the
-        // perimeter. This is the original SmilesDrawer strategy and still
-        // gives the best result for these molecules.
+        // Three cases:
+        // 1. A small bridged ring with 1-2 atoms in the interior. Place the outer
+        //    ring as a regular polygon, then drop the interior atom(s) at the
+        //    centroid of their neighbours on the perimeter. This is the original
+        //    SmilesDrawer strategy and still gives the best result for these
+        //    molecules.
         //
-        //2. A cage or a ring system with many interior atoms (cubane,
-        //dodecahedrane, fullerenes, cyclophanes). The "drop interior atoms
-        //at the centroid" trick from case 1 fails here because it stacks
-        //many atoms on top of each other in the middle. Instead we use
-        //MDS to compute a 2D layout from the graph-distance matrix in one
-        //shot. See Graph.mdsLayout below for details.
+        // 2. A cage or a ring system with many interior atoms (cubane,
+        //    dodecahedrane, fullerenes, cyclophanes). The "drop interior atoms at
+        //    the centroid" trick from case 1 fails here because it stacks many
+        //    atoms on top of each other in the middle. Instead we use MDS to
+        //    compute a 2D layout from the graph-distance matrix in one shot. See
+        //    Graph.mdsLayout below for details.
         //
-        //3. Anything else  the system is too small for MDS to help, or
-        //some atoms have already been placed by a previous layout stage.
-        //Fall back to a simple circle as the starting guess and KK takes it
-        //from there.
+        // 3. Anything else: the system is too small for MDS to help, or some atoms
+        //    have already been placed by a previous layout stage. Fall back to a
+        //    simple circle as the starting guess and KK takes it from there.
         if (insiders.length > 0 && insiders.length <= 2) {
             let perimeter = this.getBridgedRingPerimeter(vertexIds, ring, startVertexId);
             let perimeterSet = new Set(perimeter);
@@ -962,10 +960,10 @@ export default class Graph {
         }
         else if (!anyPositioned && length >= 6) {
             let mds = Graph.mdsLayout(matDist, length, bondLength);
-            for (let i = 0; i < length; i++) {
-                arrPositionX[i] = center.x + mds.xs[i];
-                arrPositionY[i] = center.y + mds.ys[i];
-                arrPositioned[i] = false;
+            for (let idx = 0; idx < length; idx++) {
+                arrPositionX[idx] = center.x + mds.xs[idx];
+                arrPositionY[idx] = center.y + mds.ys[idx];
+                arrPositioned[idx] = false;
             }
         }
         else {
