@@ -16,7 +16,7 @@
 // result vertex 0,1,2,3,4 get rank (0, 3, 4, 1, 2)
 import {describe, it, expect} from 'vitest';
   import {computeOrdering, shortestPaths, computeInitialCycles, BitMatrix, GreedyBasis, minimumCycleBasis, relevantCycles} from '../../src/CycleBasis.js';
-  import BitSet from '../../src/CycleBasis.js';
+  import BitSet from '../../src/BitSet';
 
   // Small helper: build a BitSet of the given size with the listed bits set.
   function bits(size, indices) {
@@ -48,10 +48,10 @@ import {describe, it, expect} from 'vitest';
       });
   });
 
-  // BitSet 
+  // BitSet
   // These exercise the operations Vismara's pipeline relies on: set/get for
   // edge-vector construction, xor for GF(2) addition (symmetric difference of
-  // cycles), and cardinality for "edges in this cycle" counts.
+  // cycles), and popcount for "edges in this cycle" counts.
 
   describe('BitSet', () => {
       it('constructor with size 0 allocates no words (no 512 MB trap)', () => {
@@ -77,7 +77,7 @@ import {describe, it, expect} from 'vitest';
           a.set(2); a.set(5); a.set(9);
           let r = a.xor(a);
           expect(r.isEmpty()).toBe(true);
-          expect(r.cardinality()).toBe(0);
+          expect(r.popcount()).toBe(0);
       });
 
       it('xor of two cycles = symmetric difference (cycle-space addition)', () => {
@@ -93,7 +93,7 @@ import {describe, it, expect} from 'vitest';
           expect(r.get(2)).toBe(true);
           expect(r.get(3)).toBe(true);
           expect(r.get(4)).toBe(true);
-          expect(r.cardinality()).toBe(4);
+          expect(r.popcount()).toBe(4);
       });
 
       it('and isolates the shared edges between two cycles', () => {
@@ -105,7 +105,7 @@ import {describe, it, expect} from 'vitest';
           expect(r.get(0)).toBe(true);
           expect(r.get(1)).toBe(false);
           expect(r.get(2)).toBe(true);
-          expect(r.cardinality()).toBe(2);
+          expect(r.popcount()).toBe(2);
       });
 
       it('orWith mutates in place; or returns a fresh set', () => {
@@ -115,12 +115,12 @@ import {describe, it, expect} from 'vitest';
           b.set(2); b.set(7);
 
           let fresh = a.or(b);
-          expect(fresh.cardinality()).toBe(3);
+          expect(fresh.popcount()).toBe(3);
           // a unchanged by `or`
-          expect(a.cardinality()).toBe(2);
+          expect(a.popcount()).toBe(2);
 
           a.orWith(b);
-          expect(a.cardinality()).toBe(3);
+          expect(a.popcount()).toBe(3);
           expect(a.get(7)).toBe(true);
       });
 
@@ -134,21 +134,36 @@ import {describe, it, expect} from 'vitest';
           expect(c.get(3)).toBe(true);
       });
 
-      it('cardinality counts set bits (Brian Kernighan loop)', () => {
+      it('popcount counts set bits (Brian Kernighan loop)', () => {
           let b = new BitSet(64);
           for (let i = 0; i < 64; i += 2) b.set(i);
-          expect(b.cardinality()).toBe(32);
+          expect(b.popcount()).toBe(32);
       });
 
-      it('isEmpty / length on empty and on highest-bit-only', () => {
+      it('isEmpty / clz on empty and on highest-bit-only', () => {
           let e = new BitSet(64);
           expect(e.isEmpty()).toBe(true);
-          expect(e.length()).toBe(0);
+          expect(e.clz()).toBe(64); // all 64 bits zero -> 64 leading zeros
 
           let b = new BitSet(64);
           b.set(40);
           expect(b.isEmpty()).toBe(false);
-          expect(b.length()).toBe(41); // highest set bit + 1
+          expect(b.clz()).toBe(23);            // bits 41..63 sit above the highest set bit
+          expect(b.size - b.clz()).toBe(41);   // old length() == highest set bit + 1
+      });
+
+      it('isSubsetOf detects subset, self, empty, and non-subset (same size)', () => {
+          let basis = new BitSet(8);
+          basis.set(0); basis.set(1); basis.set(2); basis.set(3);
+          let sub = new BitSet(8);
+          sub.set(1); sub.set(3);
+          let notSub = new BitSet(8);
+          notSub.set(3); notSub.set(7);
+
+          expect(sub.isSubsetOf(basis)).toBe(true);
+          expect(notSub.isSubsetOf(basis)).toBe(false); // bit 7 not in basis
+          expect(basis.isSubsetOf(basis)).toBe(true);    // a set is a subset of itself
+          expect(new BitSet(8).isSubsetOf(basis)).toBe(true); // empty subset of anything
       });
 
       it('binary ops throw on size mismatch (SIZE NOTE contract enforced)', () => {
@@ -257,7 +272,7 @@ import {describe, it, expect} from 'vitest';
           let group = /** @type {NonNullable<ReturnType<typeof cycles.get>>} */ (cycles.get(5));
           expect(group.length).toBe(1);
           // The cycle's edge-vector should mark all 5 edges
-          expect(group[0].edgeVector.cardinality()).toBe(5);
+          expect(group[0].edgeVector.popcount()).toBe(5);
           // Closed-path convention: first === last
           let path = group[0].path;
           expect(path[0]).toBe(path[path.length - 1]);
@@ -272,7 +287,7 @@ import {describe, it, expect} from 'vitest';
           expect([...cycles.keys()]).toEqual([6]);
           let group = /** @type {NonNullable<ReturnType<typeof cycles.get>>} */ (cycles.get(6));
           expect(group.length).toBe(1);
-          expect(group[0].edgeVector.cardinality()).toBe(6);
+          expect(group[0].edgeVector.popcount()).toBe(6);
       });
 
       it('naphthalene emits exactly two length-6 even cycles (and no perimeter)', () => {
@@ -291,7 +306,7 @@ import {describe, it, expect} from 'vitest';
           let group = /** @type {NonNullable<ReturnType<typeof cycles.get>>} */ (cycles.get(6));
           expect(group.length).toBe(2);
           for (let c of group) {
-              expect(c.edgeVector.cardinality()).toBe(6);
+              expect(c.edgeVector.popcount()).toBe(6);
               // Each ring uses 6 distinct vertices + duplicated endpoint
               expect(c.path.length).toBe(7);
               expect(c.path[0]).toBe(c.path[6]);
@@ -299,7 +314,7 @@ import {describe, it, expect} from 'vitest';
           // The two rings must use DIFFERENT edge sets (they share only the
           // bridge edge 4-9, so XOR should give the 10-edge perimeter).
           let xor = group[0].edgeVector.xor(group[1].edgeVector);
-          expect(xor.cardinality()).toBe(10);
+          expect(xor.popcount()).toBe(10);
       });
   });
 
@@ -530,8 +545,8 @@ import {describe, it, expect} from 'vitest';
               if (basis.isIndependent(c)) basis.add(c);
           }
           expect(basis.size()).toBe(2);
-          expect(basis.members()[0].edgeVector.cardinality()).toBe(3);
-          expect(basis.members()[1].edgeVector.cardinality()).toBe(3);
+          expect(basis.members()[0].edgeVector.popcount()).toBe(3);
+          expect(basis.members()[1].edgeVector.popcount()).toBe(3);
       });
   });
 

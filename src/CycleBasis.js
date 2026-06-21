@@ -8,164 +8,10 @@
 // CDK source is LGPL-2.1; this is a port of the algorithms.
 // For a more in depth explanation of what vismara solves see EOF
 
+import BitSet from './BitSet';
+
 const MAX_INT = 0x7FFFFFFF; // not reachable (for BFS) 
 
-/**
- * 
- * @param {number} word 
- * @returns {number} number of bits
- */
-function countBits(word){
-        let count = 0;
-        while (word !== 0){ 
-            word = word & (word - 1);
-            count++;
-        }
-        return count;
-    }
-/**
- * A fixed-size bit vector backed by Uint32Array.
- *
- * SIZE NOTE 
- * -------------
- * All binary operations (`xor`, `and`, `or`, `orWith`) assume that `this` and
- * `other` have the same `size` (and therefore the same `words.length`).
- *
- * Within Vismara's cycle-perception pipeline this invariant always holds: every
- * BitSet is allocated with `size = nEdges` for the graph being processed, so
- * cycle vectors and basis-coverage vectors live in the same coordinate system.
- *
- * Mixing BitSets of different sizes will silently drop bits (xor / or / orWith
- * iterate `this.words.length` only) or, for `and`, treat the missing high
- * words as zero. 
- */
-export default class BitSet {
-    /**
-     * @param {number} size Number of bits this set can hold.
-     */
-    constructor(size) {
-        this.size = size;
-        // wordIndex = i >>> 5; 
-        const numWords = size ===0 ? 0: ((size - 1)>>>5) + 1;
-        this.words = new Uint32Array(numWords);
-    }
-
-    /** @param {number} i */
-    set(i) {
-        // word | (1 <<< n) 
-        // n = which bit inside the word (i &32)
-        this.words[ i >>> 5] |= (1 << (i & 31));
-    }
-
-    /** @param {number} i @returns {boolean} */
-    get(i) {
-        // word & (1 <<< n)                             //return boolean
-        return (this.words[ i >>> 5] & (1 << (i & 31))) !== 0;
-    }
-
-    /**
-     * Enforces the SIZE NOTE contract above: every binary op must be called
-     * with a same-size BitSet. We compare `size` (bits) rather than
-     * `words.length` (32-bit chunks) because two BitSets can share a word
-     * count while differing in bit length — e.g. size 33 and size 64 both
-     * round up to 2 words, but mixing them would still be a coordinate
-     * mismatch in the cycle algorithm.
-     *
-     * @param {BitSet} other
-     * @param {string} op operation name, used in the error message
-     */
-    _assertSameSize(other, op) {
-        if (this.size !== other.size) {
-            throw new Error(
-                'BitSet.' + op + ': size mismatch (' + this.size + ' vs ' + other.size + '). ' +
-                'See SIZE NOTE in BitSet doc — operands must share the same bit length.'
-            );
-        }
-    }
-
-    /** XOR between two BitSet
-     * @param {BitSet} other
-     * @returns {BitSet} new bitset = this XOR other */
-    xor(other) {
-        // Needed for addition: Merge two cycles (cancel shared edges)
-        this._assertSameSize(other, 'xor');
-        const result = new BitSet(this.size);
-        for (let i = 0; i < this.words.length; i++){
-            result.words[i] = this.words[i] ^ other.words[i];
-        };
-        return result;
-    }
-
-    /** @param {BitSet} other @returns {BitSet} new bitset = this AND other */
-    and(other) {
-        // Needed to see what edges two cycles share
-        this._assertSameSize(other, 'and');
-        const result = new BitSet(this.size);
-        for (let i = 0; i < this.words.length; i++){
-            result.words[i] = this.words[i] & other.words[i];
-        };
-        return result;
-    }
-
-    /** @param {BitSet} other @returns {BitSet} new bitset = this OR other */
-    or(other) {
-        // For checking what edges are covered by the basis so far
-        this._assertSameSize(other, 'or');
-        const result = new BitSet(this.size);
-        for (let i = 0; i < this.words.length; i++){
-            result.words[i] = this.words[i] | other.words[i];
-        };
-        return result;
-    }
-
-    /** @param {BitSet} other Mutating OR: this |= other */
-    orWith(other) {
-        // Check what edges are covered by the basis so far
-        //orWith is a mutation union: A <- A u B; modifies A in place
-        // Used in GreedyBasis to accumulate the basis's edge coverage without allocating a new BitSet each time.
-        this._assertSameSize(other, 'orWith');
-        for (let i = 0; i < this.words.length; i++){
-            this.words[i] |= other.words[i]
-        };
-    }
-
-    /** @returns {BitSet} deep copy */
-    clone() {
-        const result = new BitSet(this.size);
-        for (let i = 0; i < this.words.length; i++){
-            result.words[i] = this.words[i]
-        }
-        return result
-    }
-
-    /** @returns {boolean} true iff no bits are set */
-    isEmpty() {
-        for (let i = 0; i < this.words.length; i++){
-            if (this.words[i] !== 0) return false;
-        }
-        return true;
-    }
-
-    /** @returns {number} number of set bits (popcount) */
-    cardinality() {
-        let count = 0;
-        // To check how long is a this cycle
-        for (let i = 0; i < this.words.length; i++){
-            count += countBits(this.words[i])
-        }
-        return count;
-        }
-
-    /** @returns {number} index of highest set bit + 1, or 0 if empty */
-    length() {
-       for (let i = this.words.length -1; i >=0; i--) {
-        if (this.words[i] !==0){
-            return i * 32 + (32 - Math.clz32(this.words[i]));
-        }
-       }
-       return 0;
-    }
-}
 
 
 /**
@@ -763,21 +609,9 @@ export class GreedyBasis{
      * @returns {boolean}
      */
     isSubsetOfBasis(cycle) {
-
-        // this is an optimized way of checking if c.edges is a subset of edgesOfBasis
-        // and makes the BitSet class worth it
-        // naive would iterate every bit of c.edgeVector and verify it's set in _edgesOfBasis
-        // but we can use cardinality identity | A n B |  = |A| iff A ⊆ B
-        
-        let intersection = this._edgesOfBasis.and(cycle.edgeVector).cardinality()
-        return intersection === cycle.edgeVector.cardinality();
-
-        // Example;
-        //  _edgesOfBasis  =  1 1 1 1 0   (basis covers e0, e1, e2, e3)
-        //   candidate c    =  1 0 1 0 1   (uses e0, e2, e4)
-        //   intersection   =  1 0 1 0 0   cardinality 2 !== c.cardinality (3)
-        // therefore c is not subset of basis
-        }
+        // c.edges subset of edgesOfBasis? single pass with early-exit, no allocation.
+        return cycle.edgeVector.isSubsetOf(this._edgesOfBasis);
+    }
 
     /**
      * Full independence check via GF(2) Gaussian elimination.
