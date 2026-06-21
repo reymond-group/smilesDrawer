@@ -711,16 +711,14 @@ export default class Graph {
         let eval1 = Graph._rayleigh(B, eigvec1, n);
 
         // B' = B - eval1 * v1 * v1^T
-        let B2 = new Array(n);
         for (let i = 0; i < n; i++) {
-            B2[i] = new Float64Array(n);
             for (let j = 0; j < n; j++) {
-                B2[i][j] = B[i][j] - eval1 * eigvec1[i] * eigvec1[j];
+                B[i][j] -= eval1 * eigvec1[i] * eigvec1[j];
             }
         }
 
-        let eigvec2 = Graph._powerIteration(B2, n, 200);
-        let eval2 = Graph._rayleigh(B2, eigvec2, n);
+        let eigvec2 = Graph._powerIteration(B, n, 200);
+        let eval2 = Graph._rayleigh(B, eigvec2, n);
 
         // Step 3: Coordinates = eigvec * sqrt(eigenvalue) * bondLength
         let scale1 = eval1 > 0 ? Math.sqrt(eval1) : 0;
@@ -735,14 +733,17 @@ export default class Graph {
             ys[i] = eigvec2[i] * scale2;
         }
 
-        // Scale to match bondLength
-        let maxDist = 0;
+        // Scale to match bondLength.
+        let maxDistSq = 0;
         for (let i = 0; i < n; i++) {
             for (let j = i + 1; j < n; j++) {
-                let d = Math.sqrt((xs[i] - xs[j]) * (xs[i] - xs[j]) + (ys[i] - ys[j]) * (ys[i] - ys[j]));
-                if (d > maxDist) maxDist = d;
+                let dx = xs[i] - xs[j];
+                let dy = ys[i] - ys[j];
+                let dSq = dx * dx + dy * dy;
+                if (dSq > maxDistSq) maxDistSq = dSq;
             }
         }
+        let maxDist = Math.sqrt(maxDistSq);
         if (maxDist > 0) {
             let targetSize = bondLength * Math.max(2, Math.sqrt(n));
             let s = targetSize / maxDist;
@@ -769,8 +770,8 @@ export default class Graph {
             v[i] = 1.0 + 0.1 * i;
         }
 
+        let w = new Float64Array(n);
         for (let iter = 0; iter < maxIter; iter++) {
-            let w = new Float64Array(n);
             for (let i = 0; i < n; i++) {
                 let s = 0;
                 for (let j = 0; j < n; j++) s += mat[i][j] * v[j];
