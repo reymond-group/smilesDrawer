@@ -671,56 +671,56 @@ export default class Graph {
      * on the same scale as the rest of the drawing 
      *
      * @param {Array[]} matDist Graph-distance matrix (shortest paths in bonds).
-     * @param {number} length Number of vertices.
+     * @param {number} n Number of vertices.
      * @param {number} bondLength Target bond length, used as the output scale.
-     * @returns {{x: Float32Array, y: Float32Array}} 2D coordinates centred at 0.
+     * @returns {{xs: Float32Array, ys: Float32Array}} 2D coordinates centred at 0.
      */
-    static mdsLayout(matDist, length, bondLength) {
+    static mdsLayout(matDist, n, bondLength) {
         // Step 1: Compute B = -0.5 * H * D^2 * H (double-centered squared distances)
         // H = I - (1/n) * 11^T
-        let dsq = new Array(length);
-        for (let i = 0; i < length; i++) {
-            dsq[i] = new Float64Array(length);
-            for (let j = 0; j < length; j++) {
+        let dsq = new Array(n);
+        for (let i = 0; i < n; i++) {
+            dsq[i] = new Float64Array(n);
+            for (let j = 0; j < n; j++) {
                 dsq[i][j] = matDist[i][j] * matDist[i][j];
             }
         }
 
         // Row means, column means, grand mean
-        let rowMean = new Float64Array(length);
+        let rowMean = new Float64Array(n);
         let grandMean = 0;
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < n; i++) {
             let s = 0;
-            for (let j = 0; j < length; j++) s += dsq[i][j];
-            rowMean[i] = s / length;
+            for (let j = 0; j < n; j++) s += dsq[i][j];
+            rowMean[i] = s / n;
             grandMean += s;
         }
-        grandMean /= (length * length);
+        grandMean /= (n * n);
 
         // B[i][j] = -0.5 * (D^2[i][j] - rowMean[i] - rowMean[j] + grandMean)
-        let B = new Array(length);
-        for (let i = 0; i < length; i++) {
-            B[i] = new Float64Array(length);
-            for (let j = 0; j < length; j++) {
+        let B = new Array(n);
+        for (let i = 0; i < n; i++) {
+            B[i] = new Float64Array(n);
+            for (let j = 0; j < n; j++) {
                 B[i][j] = -0.5 * (dsq[i][j] - rowMean[i] - rowMean[j] + grandMean);
             }
         }
 
         // Step 2: Power iteration to find top 2 eigenvectors of B
-        let eigvec1 = Graph._powerIteration(B, length, 200);
-        let eval1 = Graph._rayleigh(B, eigvec1, length);
+        let eigvec1 = Graph._powerIteration(B, n, 200);
+        let eval1 = Graph._rayleigh(B, eigvec1, n);
 
         // B' = B - eval1 * v1 * v1^T
-        let B2 = new Array(length);
-        for (let i = 0; i < length; i++) {
-            B2[i] = new Float64Array(length);
-            for (let j = 0; j < length; j++) {
+        let B2 = new Array(n);
+        for (let i = 0; i < n; i++) {
+            B2[i] = new Float64Array(n);
+            for (let j = 0; j < n; j++) {
                 B2[i][j] = B[i][j] - eval1 * eigvec1[i] * eigvec1[j];
             }
         }
 
-        let eigvec2 = Graph._powerIteration(B2, length, 200);
-        let eval2 = Graph._rayleigh(B2, eigvec2, length);
+        let eigvec2 = Graph._powerIteration(B2, n, 200);
+        let eval2 = Graph._rayleigh(B2, eigvec2, n);
 
         // Step 3: Coordinates = eigvec * sqrt(eigenvalue) * bondLength
         let scale1 = eval1 > 0 ? Math.sqrt(eval1) : 0;
@@ -728,31 +728,31 @@ export default class Graph {
 
         // Normalize so max distance between any pair ~= diameter of a polygon
         // with this many vertices at bondLength spacing
-        let x = new Float32Array(length);
-        let y = new Float32Array(length);
-        for (let i = 0; i < length; i++) {
-            x[i] = eigvec1[i] * scale1;
-            y[i] = eigvec2[i] * scale2;
+        let xs = new Float32Array(n);
+        let ys = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+            xs[i] = eigvec1[i] * scale1;
+            ys[i] = eigvec2[i] * scale2;
         }
 
         // Scale to match bondLength
         let maxDist = 0;
-        for (let i = 0; i < length; i++) {
-            for (let j = i + 1; j < length; j++) {
-                let d = Math.sqrt((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j]));
+        for (let i = 0; i < n; i++) {
+            for (let j = i + 1; j < n; j++) {
+                let d = Math.sqrt((xs[i] - xs[j]) * (xs[i] - xs[j]) + (ys[i] - ys[j]) * (ys[i] - ys[j]));
                 if (d > maxDist) maxDist = d;
             }
         }
         if (maxDist > 0) {
-            let targetSize = bondLength * Math.max(2, Math.sqrt(length));
+            let targetSize = bondLength * Math.max(2, Math.sqrt(n));
             let s = targetSize / maxDist;
-            for (let i = 0; i < length; i++) {
-                x[i] *= s;
-                y[i] *= s;
+            for (let i = 0; i < n; i++) {
+                xs[i] *= s;
+                ys[i] *= s;
             }
         }
 
-        return {x, y};
+        return {xs, ys};
     }
 
     /**
@@ -962,8 +962,8 @@ export default class Graph {
         else if (!anyPositioned && length >= 6) {
             let mds = Graph.mdsLayout(matDist, length, bondLength);
             for (let i = 0; i < length; i++) {
-                arrPositionX[i] = center.x + mds.x[i];
-                arrPositionY[i] = center.y + mds.y[i];
+                arrPositionX[i] = center.x + mds.xs[i];
+                arrPositionY[i] = center.y + mds.ys[i];
                 arrPositioned[i] = false;
             }
         }
