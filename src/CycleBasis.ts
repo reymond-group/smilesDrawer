@@ -1,62 +1,79 @@
-// @ts-check
 //
 // Vismara-based cycle perception for molecular graphs.
 //
 // Reference: P. Vismara, "Union of all the minimum cycle bases of a graph",
 //            The Electronic Journal of Combinatorics, Vol. 4, No. 1, R9, 1997.
-//
-// CDK source is LGPL-2.1; this is a port of the algorithms.
-// For a more in depth explanation of what vismara solves see EOF
+// This is an independent implementation written directly from Vismara's paper.
 
 import BitSet from './BitSet';
 
-const MAX_INT = 0x7FFFFFFF; // not reachable (for BFS) 
+const MAX_INT = 0x7FFFFFFF; // not reachable (for BFS)
 
-
+/** A cycle: a closed vertex path together with its edge-set bit vector. */
+type Cycle = {path: number[], edgeVector: BitSet};
 
 /**
- * BFS shortest paths from a single source vertex, with vertex ordering
+ * A node in a BFS route tree, used to reconstruct shortest paths lazily: a
+ * `source` root, a `seq` step that points back at its parent, or a `branch`
+ * recording two equally-short alternative routes to the same vertex.
+ */
+type SourceRoute = {type: 'source', vertex: number};
+type SeqRoute = {type: 'seq', parent: Route, vertex: number, dist: number};
+type BranchRoute = {type: 'branch', left: Route, right: Route};
+type Route = SourceRoute | SeqRoute | BranchRoute;
+
+/** Distances from a BFS source plus lazy path reconstructors (see shortestPaths). */
+export interface ShortestPaths {
+    distTo:   Int32Array
+    nPathsTo: Int32Array
+    precedes: boolean[]
+    pathTo(end: number): number[]
+    pathsTo(end: number): number[][]
+    isPrecedingPathTo(end: number): boolean
+}
+
+/**
+ * BFS shortest paths from a single source vertex, with the vertex-ordering
  * constraint for Vismara's algorithm.
  *
- * Routes are stored as a tree of {type, ...} objects for lazy path
- * reconstruction, following CDK's Source/SequentialRoute/Branch pattern.
+ * Routes are stored as a tree of Route nodes for lazy path reconstruction
+ * (source root / sequential step / branch).
  *
- * @param {number[][]} graph adjacency list
- * @param {number} start source vertex
- * @param {number} limit maximum BFS depth
- * @param {number[]} ordering vertex ordering (π)
- * @returns {{distTo: Int32Array, nPathsTo: Int32Array, precedes: boolean[], pathTo: function(number): number[], pathsTo: function(number): number[][], isPrecedingPathTo: function(number): boolean}}
+ * @param graph adjacency list
+ * @param start source vertex
+ * @param limit maximum BFS depth
+ * @param ordering vertex ordering (π)
  */
-export function shortestPaths(graph, start, limit, ordering) {
-    let n = graph.length;
-    let distTo = new Int32Array(n).fill(MAX_INT);
-    let precedes = new Array(n).fill(false);
-    let routeTo = new Array(n).fill(null);
-    let nPathsTo = new Int32Array(n);
+export function shortestPaths(graph: number[][], start: number, limit: number, ordering: number[]): ShortestPaths {
+    const n = graph.length;
+    const distTo = new Int32Array(n).fill(MAX_INT);
+    const precedes = new Array(n).fill(false);
+    const routeTo: (Route | null)[] = new Array(n).fill(null);
+    const nPathsTo = new Int32Array(n);
 
     distTo[start] = 0;
     precedes[start] = true;
     nPathsTo[start] = 1;
     routeTo[start] = {type: 'source', vertex: start};
 
-    let queue = [start];
+    const queue = [start];
     let qLen = 1; // qLen method is faster than queue.shift() method (O(n))
 
     for (let i = 0; i < qLen; i++) {
-        let v = queue[i];
-        let dist = distTo[v] + 1;
+        const v = queue[i];
+        const dist = distTo[v] + 1;
         if (dist > limit) continue;
 
         // iterate through v neighbors
         for (let k = 0; k < graph[v].length; k++) {
-            let w = graph[v][k];
+            const w = graph[v][k];
 
             if (dist < distTo[w]) { // if shortest path append
                 distTo[w] = dist;
                 // each seq stores v (which vertex), dist (vertex distance from start), parent (route)
-                routeTo[w] = {type: 'seq',
-                    parent: routeTo[v],  // point at route to v and not v itself. necessary to walk backwards through the tree
-                    vertex: w, dist: dist};
+                routeTo[w] = {type:   'seq',
+                    parent: routeTo[v]!,  // point at route to v and not v itself. necessary to walk backwards through the tree
+                    vertex: w, dist:   dist};
                 // Definition 4: check Vismara paper (is there a shortest path passing
                 // only through vertices with π < π(r)?)
                 precedes[w] = precedes[v] && ordering[w] < ordering[start];
@@ -67,11 +84,11 @@ export function shortestPaths(graph, start, limit, ordering) {
                 // if respects pi priority  skip ties whose new path violates the π constraint
                 if (!(precedes[v] && ordering[w] < ordering[start])) continue;
 
-                let newSeq = {type: 'seq', parent: routeTo[v], vertex: w, dist: dist};
+                const newSeq: Route = {type: 'seq', parent: routeTo[v]!, vertex: w, dist: dist};
 
                 if (precedes[w]) {
                     // merge: w already had a low-π witness; record this as an alternative
-                    routeTo[w] = {type: 'branch', left: routeTo[w], right: newSeq};
+                    routeTo[w] = {type: 'branch', left: routeTo[w]!, right: newSeq};
                     nPathsTo[w] += nPathsTo[v];
                 }
                 else {
@@ -83,48 +100,46 @@ export function shortestPaths(graph, start, limit, ordering) {
             }
         }
     }
-   /**
+    /**
      * Walk a route tree backwards to one shortest path.
-     * @param {any} route
-     * @param {number} n
-     * @returns {number[]}
+     * @param route route-tree node
+     * @param len length of the path to allocate
      */
-    function routeToPath(route, n) { 
-        if (!route) return []; 
-        let path = new Array(n);
-        let cur = route;
-        while (cur){ 
-            if (cur.type === 'source'){
+    function routeToPath(route: Route, len: number): number[] {
+        if (!route) return [];
+        const path = new Array(len);
+        let cur: Route = route;
+        while (cur) {
+            if (cur.type === 'source') {
                 path[0] = cur.vertex;
                 break;
             }
-            else if (cur.type === 'seq'){
+            else if (cur.type === 'seq') {
                 path[cur.dist] = cur.vertex;
                 cur = cur.parent;
             }
-            else{
+            else {
                 // branch: use left as first path
                 cur = cur.left;
             }
         }
         return path;
     }
-    
+
     /**
      * Walk a route tree backwards to all shortest paths (cartesian over branches).
-     * @param {any} route
-     * @param {number} n
-     * @returns {number[][]}
+     * @param route route-tree node
+     * @param len length of each path to allocate
      */
-    function routeToPaths(route, n) {
+    function routeToPaths(route: Route, len: number): number[][] {
         if (!route) return [];
         if (route.type === 'source') {
-            let path = new Array(n);
+            const path = new Array(len);
             path[0] = route.vertex;
             return [path];
         }
         else if (route.type === 'seq') {
-            let parentPaths = routeToPaths(route.parent, n);
+            const parentPaths = routeToPaths(route.parent, len);
             for (let j = 0; j < parentPaths.length; j++) {
                 parentPaths[j][route.dist] = route.vertex;
             }
@@ -132,9 +147,9 @@ export function shortestPaths(graph, start, limit, ordering) {
         }
         else {
             // branch
-            let leftPaths = routeToPaths(route.left, n);
-            let rightPaths = routeToPaths(route.right, n);
-            let combined = new Array(leftPaths.length + rightPaths.length);
+            const leftPaths = routeToPaths(route.left, len);
+            const rightPaths = routeToPaths(route.right, len);
+            const combined = new Array(leftPaths.length + rightPaths.length);
             for (let j = 0; j < leftPaths.length; j++) combined[j] = leftPaths[j];
             for (let j = 0; j < rightPaths.length; j++) combined[leftPaths.length + j] = rightPaths[j];
             return combined;
@@ -147,48 +162,40 @@ export function shortestPaths(graph, start, limit, ordering) {
         precedes: precedes,
         pathTo(end) {
             if (end < 0 || end >= n || !routeTo[end]) return [];
-            return routeToPath(routeTo[end], distTo[end] + 1);
+            return routeToPath(routeTo[end]!, distTo[end] + 1);
         },
         pathsTo(end) {
             if (end < 0 || end >= n || !routeTo[end]) return [];
-            return routeToPaths(routeTo[end], distTo[end] + 1);
+            return routeToPaths(routeTo[end]!, distTo[end] + 1);
         },
         isPrecedingPathTo(end) {
             return end >= 0 && end < n && precedes[end];
-        }
+        },
     };
-
 }
-
 
 /**
  * Check if two paths from a common root only intersect at the root.
  * Paths are BFS shortest paths so vertex at index i is at distance i.
- * Used in Vismara;s Algorithm 1 Line 8 
- * @param {number[]} p first path
- * @param {number[]} q second path
- * @returns {boolean}
+ * Used in Vismara;s Algorithm 1 Line 8
+ * @param p first path
+ * @param q second path
  */
-function singletonIntersect(p, q) {
-    let n = p.length;
+function singletonIntersect(p: number[], q: number[]): boolean {
+    const n = p.length;
     for (let i = 1; i < n; i++) {
         if (p[i] === q[i]) return false;
     }
     return true;
 }
 
-
 /**
  * Join two paths end-on-end for an odd cycle: pathToY forward, pathToZ reversed.
  * pathToY = [r, ..., y], pathToZ = [r, ..., z]
  * result = [r, ..., y, z, ..., r_neighbor] (closed by adjacency y-z)
- *
- * @param {number[]} pathToY
- * @param {number[]} pathToZ
- * @returns {number[]}
  */
-function joinOdd(pathToY, pathToZ) {
-    let path = new Array(pathToY.length + pathToZ.length);
+function joinOdd(pathToY: number[], pathToZ: number[]): number[] {
+    const path = new Array(pathToY.length + pathToZ.length);
     for (let i = 0; i < pathToY.length; i++) {
         path[i] = pathToY[i];
     }
@@ -203,14 +210,9 @@ function joinOdd(pathToY, pathToZ) {
  * Join two paths through a vertex y for an even cycle.
  * pathToP = [r, ..., p], pathToQ = [r, ..., q]
  * result = [r, ..., p, y, q, ..., r_neighbor]
- *
- * @param {number[]} pathToP
- * @param {number} y
- * @param {number[]} pathToQ
- * @returns {number[]}
  */
-function joinEven(pathToP, y, pathToQ) {
-    let path = new Array(pathToP.length + 1 + pathToQ.length);
+function joinEven(pathToP: number[], y: number, pathToQ: number[]): number[] {
+    const path = new Array(pathToP.length + 1 + pathToQ.length);
     for (let i = 0; i < pathToP.length; i++) {
         path[i] = pathToP[i];
     }
@@ -223,39 +225,37 @@ function joinEven(pathToP, y, pathToQ) {
 }
 
 /**
- * translates a vertex-path representation of a cycle into a bit-vector representation 
+ * translates a vertex-path representation of a cycle into a bit-vector representation
  * over the edge set, which is the form Gaussian elimination needs
  *
- * @param {number[]} path vertex path where path[0] connects to path[last]
- * @param {Map<string,number>} edgeIndex edge index map
- * @param {number} nEdges total number of edges
- * @returns {BitSet}
+ * @param path vertex path where path[0] connects to path[last]
+ * @param edgeIndex edge index map
+ * @param nEdges total number of edges
  */
-function pathToEdgeVector(path, edgeIndex, nEdges) {
-    let bs = new BitSet(nEdges);
-    let len = path.length - 1;
+function pathToEdgeVector(path: number[], edgeIndex: Map<string, number>, nEdges: number): BitSet {
+    const bs = new BitSet(nEdges);
+    const len = path.length - 1;
     for (let i = 0; i < len; i++) {
-        let u = path[i], v = path[i + 1];
+        const u = path[i], v = path[i + 1];
 
-        //normalize key = (u < v) ? "u,v" : "v,u" because edges are undirected, 
-        // so the algorithm might traverse (0, 9) or (9, 0) depending on which way around 
+        // normalize key = (u < v) ? "u,v" : "v,u" because edges are undirected,
+        // so the algorithm might traverse (0, 9) or (9, 0) depending on which way around
         // the cycle you walk.
         //   Normalizing to lower-vertex-first guarantees both encodings hit the same bit
-        let key = (u < v) ? u + ',' + v : v + ',' + u;
-        bs.set(/** @type {number} */ (edgeIndex.get(key))); 
-    // Input:  path = [9, 0, 1, 2, 3, 4, 9]    closed cycle, first==last
-    // edgeIndex = { "0,1":0, "1,2":1, "2,3":2, "3,4":3, ... }
-    // nEdges = 11
+        const key = (u < v) ? u + ',' + v : v + ',' + u;
+        bs.set(edgeIndex.get(key)!);
+        // Input:  path = [9, 0, 1, 2, 3, 4, 9]    closed cycle, first==last
+        // edgeIndex = { "0,1":0, "1,2":1, "2,3":2, "3,4":3, ... }
+        // nEdges = 11
 
-    //   Process:
-    //     bs = empty BitSet of length 11
-    //     len = path.length - 1 = 6   (number of edges)
-    //     iterate i = 0..5:
-    //       i=0: u=9, v=0 → key "0,9"  → set bit edgeIndex["0,9"]
-    //       i=1: u=0, v=1 → key "0,1"  → set bit edgeIndex["0,1"]
-    //       ...
-    //       i=5: u=4, v=9 → key "4,9"  → set bit edgeIndex["4,9"]
-
+        //   Process:
+        //     bs = empty BitSet of length 11
+        //     len = path.length - 1 = 6   (number of edges)
+        //     iterate i = 0..5:
+        //       i=0: u=9, v=0 → key "0,9"  → set bit edgeIndex["0,9"]
+        //       i=1: u=0, v=1 → key "0,1"  → set bit edgeIndex["0,1"]
+        //       ...
+        //       i=5: u=4, v=9 → key "4,9"  → set bit edgeIndex["4,9"]
     }
     return bs;
 }
@@ -264,18 +264,17 @@ function pathToEdgeVector(path, edgeIndex, nEdges) {
  * Index all edges in the graph. Each undirected edge (u,v) with u < v
  * gets a unique integer index.
  *
- * @param {number[][]} graph adjacency list
- * @returns {{toIndex: Map<string,number>, count: number}}
+ * @param graph adjacency list
  */
-function indexEdges(graph) {
-    let toIndex = new Map();
-    let n = graph.length;
+function indexEdges(graph: number[][]): {toIndex: Map<string, number>, count: number} {
+    const toIndex = new Map<string, number>();
+    const n = graph.length;
 
     for (let v = 0; v < n; v++) {
         for (let k = 0; k < graph[v].length; k++) {
-            let w = graph[v][k];
+            const w = graph[v][k];
             if (w > v) {
-                let key = v + ',' + w;
+                const key = v + ',' + w;
                 if (!toIndex.has(key)) {
                     toIndex.set(key, toIndex.size);
                 }
@@ -286,43 +285,40 @@ function indexEdges(graph) {
     return {toIndex, count: toIndex.size};
 }
 
-
-    
 /**
  * Compute vertex ordering by degree (ascending), using counting sort.
  * π(x) < π(y) => deg(x) ≤ deg(y).
- * 
  *
- * @param {number[][]} graph adjacency list
- * @returns {number[]} ordering[v] = rank of vertex v
+ *
+ * @param graph adjacency list
+ * @returns ordering[v] = rank of vertex v
  */
-export function computeOrdering(graph) {
-    let n = graph.length;
-    let maxDeg = 0; 
-    let order = new Array(n);
+export function computeOrdering(graph: number[][]): number[] {
+    const n = graph.length;
+    let maxDeg = 0;
+    const order = new Array(n);
 
     // get max degree
-    for (let i =0; i < n; i++){
+    for (let i = 0; i < n; i++) {
         if (graph[i].length > maxDeg) maxDeg = graph[i].length;
     }
     // create buckets (one per degree)
     const buckets = new Array(maxDeg + 1);
-    for (let d=0; d <= maxDeg; d++) buckets[d] = []
+    for (let d = 0; d <= maxDeg; d++) buckets[d] = [];
 
     // populate buckets
-    for (let v = 0; v < n; v++){
-        buckets[graph[v].length].push(v)
+    for (let v = 0; v < n; v++) {
+        buckets[graph[v].length].push(v);
     }
     let rank = 0;
-    // rank 
-    for (let d = 0; d <= maxDeg; d++){
+    // rank
+    for (let d = 0; d <= maxDeg; d++) {
         for (const v of buckets[d])
             order[v] = rank++;
-
     }
     return order;
 }
-// An example of what computeOrdering is supposed to be doing: 
+// An example of what computeOrdering is supposed to be doing:
 // let this graph be the example
 //     0
 //    / \
@@ -330,7 +326,7 @@ export function computeOrdering(graph) {
 //   |   |
 //   3--─4
 
-// graph = [[1,2], [0,2,3], [0,1,4], [1,4], [2,3]] adjacency list 
+// graph = [[1,2], [0,2,3], [0,1,4], [1,4], [2,3]] adjacency list
 // degrees: [2, 3, 3, 2, 2] (i.e number of bonds)
 // ordering = [0, 3, 4, 1, 2]  (output: rank (π))
 // first assign rank to the ones with lower degree (0, 3 and 4)
@@ -339,93 +335,85 @@ export function computeOrdering(graph) {
 // assign rank again by index order (1 -> 3; 2 -> 4)
 // result vertex 0,1,2,3,4 get rank (0, 3, 4, 1, 2)
 
-
 /**
  * Compute the initial cycle set C'_I using Vismara's algorithm (Algorithm 1).
  *
- * @param {number[][]} graph adjacency list
- * @returns {{cycles: Map<number, Array<{path: number[], edgeVector: BitSet}>>, edgeIndex: Map<string,number>, nEdges: number}}
+ * @param graph adjacency list
  */
-export function computeInitialCycles(graph) {
-    let n = graph.length;
-    let ordering = computeOrdering(graph); //assign pi rank
-    
-    let s = new Array(n) // Set 'S' for collecting vertices adjacent to y 
+export function computeInitialCycles(graph: number[][]): {cycles: Map<number, Cycle[]>, edgeIndex: Map<string, number>, nEdges: number} {
+    const n = graph.length;
+    const ordering = computeOrdering(graph); // assign pi rank
+
+    const s = new Array(n); // Set 'S' for collecting vertices adjacent to y
     // with distance to (z) + 1 ==== dist (y) (line 4)
 
     // cycles grouped by length
-    /**
-     * @type {Map<number, Array<{path: number[], edgeVector: BitSet}>>} 
-     */
-    let cycles = new Map();
-    
-    let {toIndex: edgeIndex, count: nEdges} = indexEdges(graph);
+    const cycles = new Map<number, Cycle[]>();
 
-    let vertices = new Array(n);
+    const {toIndex: edgeIndex, count: nEdges} = indexEdges(graph);
+
+    const vertices = new Array(n);
     for (let v = 0; v < n; v++) {
         vertices[ordering[v]] = v;
     }
-    
-    /** @param {any} path  */
-    function addCycle(path) {
-        let edgeVector = pathToEdgeVector(path, edgeIndex, nEdges);
-        let len = path.length - 1; // number of edges = cycle length
+
+    function addCycle(path: number[]) {
+        const edgeVector = pathToEdgeVector(path, edgeIndex, nEdges);
+        const len = path.length - 1; // number of edges = cycle length
         let group = cycles.get(len);
-        if (!group){
+        if (!group) {
             group = [];
             cycles.set(len, group);
         }
         group.push({path, edgeVector});
     }
 
-    
-    let first = 2; // smllest cycle is 3 vertices, we can skip first 2 ordered vertices
+    const first = 2; // smllest cycle is 3 vertices, we can skip first 2 ordered vertices
 
-    for (let i = first; i< n; i++){ // for all vertices 
-        let r = vertices[i];
-        //compute Vr (subset of shortest paths from vertex to r)
+    for (let i = first; i < n; i++) { // for all vertices
+        const r = vertices[i];
+        // compute Vr (subset of shortest paths from vertex to r)
         // limit to n/2 is simply because the shortest path for any relevant cycle
         // can be at most n/2  (Vismara Lemma 2)
-        let paths = shortestPaths(graph, r, Math.floor(n / 2), ordering);
+        const paths = shortestPaths(graph, r, Math.floor(n / 2), ordering);
 
-
-        // for all y /in Vr do: 
-        for (let j= 0; j < i; j++){
-            let y = vertices[j];
+        // for all y /in Vr do:
+        for (let j = 0; j < i; j++) {
+            const y = vertices[j];
             if (!paths.isPrecedingPathTo(y)) continue; // only those respecting pi order
 
             let sizeOfS = 0;
 
             // for all z in Vr...
-            for (let k =0; k < graph[y].length; k++){
-                let z = graph[y][k]; //...such that z is adjacent to y (i.e. neighbor)
+            for (let k = 0; k < graph[y].length; k++) {
+                const z = graph[y][k]; // ...such that z is adjacent to y (i.e. neighbor)
                 if (!paths.isPrecedingPathTo(z)) continue;
-                
+
                 // if d(r,z) + d(z,y) = d(r,y) (line 6)
                 // here we write d(z,y) instead of w(z,y) because weight is always 1 for our case
-                let distToZ = paths.distTo[z];
-                let distToY = paths.distTo[y];
+                const distToZ = paths.distTo[z];
+                const distToY = paths.distTo[y];
                 // d(z,y) = 1 because they are adjacent
 
-                if (distToZ + 1 === distToY){
+                if (distToZ + 1 === distToY) {
                     s[sizeOfS++] = z;
                 }
-                //elseif d(r, z) != d(r, y) + d(z, y) and π(z) < π(y) and P(r, y) ∩ P(r, z) = {r}
-                // Line 8 
+                // elseif d(r, z) != d(r, y) + d(z, y) and π(z) < π(y) and P(r, y) ∩ P(r, z) = {r}
+                // Line 8
                 else if (distToZ === distToY && ordering[z] < ordering[y]) {
-                    let pathToY = paths.pathTo(y);
-                    let pathToZ = paths.pathTo(z);
+                    const pathToY = paths.pathTo(y);
+                    const pathToZ = paths.pathTo(z);
                     if (singletonIntersect(pathToZ, pathToY)) {
                         addCycle(joinOdd(pathToY, pathToZ));
                     }
                 }
-            } 
+            }
 
             // Check pairs in s for even cycles
             for (let k = 0; k < sizeOfS; k++) {
                 for (let l = k + 1; l < sizeOfS; l++) {
-                    let pathToP = paths.pathTo(s[k]);
-                    let pathToQ = paths.pathTo(s[l]);
+                    const pathToP = paths.pathTo(s[k]);
+                    const pathToQ = paths.pathTo(s[l]);
                     if (singletonIntersect(pathToP, pathToQ)) {
                         addCycle(joinEven(pathToP, y, pathToQ));
                     }
@@ -437,8 +425,7 @@ export function computeInitialCycles(graph) {
     return {cycles, edgeIndex, nEdges};
 }
 
-
-// BitMatrix (GF(2) elimination) 
+// BitMatrix (GF(2) elimination)
 // GF(2) is essentially the same as the Gauss-Jordan over the real numbers from linear algebra
 // The algorithm can be summarize as
 //   for each column x = 0, 1, 2, ... (the pivot column):
@@ -448,42 +435,47 @@ export function computeInitialCycles(graph) {
 //                for every row below y that has bit x set:  row ^= pivot_row
 //                y += 1   (move to next row)
 
-// BitMatrix helps to keep independence between cycle basis. Let's say we already have 
-// two bases c1 and c2 and now Vismara hands a candidate cycle c3 
-// question becomes if we should add c3 to the basis. Only if it's linearly independent of {c1, c2}. 
+// BitMatrix helps to keep independence between cycle basis. Let's say we already have
+// two bases c1 and c2 and now Vismara hands a candidate cycle c3
+// question becomes if we should add c3 to the basis. Only if it's linearly independent of {c1, c2}.
 // again, very similar to linear algebra with vector basis
 // to see what cycle basis are check vismara page 5
 //
 
 // For example for graph formed by two fused triangles
 //   0 --- 1
-//   | \   | 
-//   |   \ | 
+//   | \   |
+//   |   \ |
 //   2  -- 3
 //  edges: e0=(0,1), e1=(0,2), e2=(0,3), e3=(1,3), e4=(2,3)
-// The bit matrix is 
+// The bit matrix is
 //                     e0 e1 e2 e3 e4   original index
 //   row 0 (c1):        1  0  1  1  0   j=0
 //   row 1 (c2):        0  1  1  0  1   j=1
 //   row 2 (c3):        1  1  0  1  1   j=2
-// rank=2 and by GF(2) elimination we realize c3 is dependent 
+// rank=2 and by GF(2) elimination we realize c3 is dependent
 
 export class BitMatrix {
+    _n:       number;
+    _max:     number;
+    _rows:    BitSet[];
+    _indices: Int32Array;
+    _m:       number;
+
     /**
-     * @param {number} columns
-     * @param {number} maxRows
+     * @param columns number of columns (edges)
+     * @param maxRows maximum number of rows (cycles)
      */
-    constructor(columns, maxRows) {
+    constructor(columns: number, maxRows: number) {
         this._n = columns;
         this._max = maxRows;
-        /** @type {BitSet[]} */
         this._rows = new Array(maxRows);
         this._indices = new Int32Array(maxRows);
         this._m = 0;
     }
 
-    /** @param {BitSet} row */
-    add(row) {
+    /** @param row a cycle's edge vector */
+    add(row: BitSet) {
         this._rows[this._m] = row;
         // we need _indices to keep track after swaping rows
         // otherwise we cannot track if our added basis is eliminiated
@@ -494,12 +486,12 @@ export class BitMatrix {
 
     /**
      * Swap rows i and j, tracking original indices.
-     * @param {number} i
-     * @param {number} j
+     * @param i row index
+     * @param j row index
      */
-    swap(i, j) {
-        let tmpRow = this._rows[i];
-        let tmpIdx = this._indices[i];
+    swap(i: number, j: number) {
+        const tmpRow = this._rows[i];
+        const tmpIdx = this._indices[i];
         this._rows[i] = this._rows[j];
         this._indices[i] = this._indices[j];
         this._rows[j] = tmpRow;
@@ -508,10 +500,9 @@ export class BitMatrix {
 
     /**
      * Find current position of original row j.
-     * @param {number} j
-     * @returns {number}
+     * @param j original row index
      */
-    _rowIndex(j) {
+    _rowIndex(j: number): number {
         for (let i = 0; i < this._m; i++) {
             if (this._indices[i] === j) return i;
         }
@@ -520,27 +511,25 @@ export class BitMatrix {
 
     /**
      * Check if the row originally added at index j was eliminated to zero.
-     * @param {number} j
-     * @returns {boolean}
+     * @param j original row index
      */
-    eliminated(j) {
+    eliminated(j: number): boolean {
         return this._rows[this._rowIndex(j)].isEmpty();
     }
 
     /**
      * Gaussian elimination over GF(2). Returns the rank.
-     * @returns {number}
      */
-    eliminate() {
+    eliminate(): number {
         return this._eliminate(0, 0);
     }
 
     /**
-     * @param {number} x column index
-     * @param {number} y row index
-     * @returns {number} rank
+     * @param x column index
+     * @param y row index
+     * @returns rank
      */
-    _eliminate(x, y) {
+    _eliminate(x: number, y: number): number {
         while (x < this._n && y < this._m) {
             // Find first row >= y with bit x set
             let i = -1;
@@ -568,83 +557,81 @@ export class BitMatrix {
     }
 }
 
-
 // sort cycles by lenght, ascending
 // for each cycle c (in that order):
-//  if c is independent of the basis so far: 
-    //    add c 
-    // if basis is full (E - V + 1):
-    //    stop 
-export class GreedyBasis{
+//  if c is independent of the basis so far:
+//    add c
+// if basis is full (E - V + 1):
+//    stop
+export class GreedyBasis {
+    _members:      Cycle[];
+    _edgesOfBasis: BitSet;
+    _nEdges:       number;
+
     /**
-     * @param {number} nEdges number of edges in the graph 
+     * @param nEdges number of edges in the graph
      */
-    constructor(nEdges){
-        /** @type {Array<{path: number[], edgeVector: BitSet}>} */
+    constructor(nEdges: number) {
         this._members = [];
         this._edgesOfBasis = new BitSet(nEdges);
         this._nEdges = nEdges;
     }
 
-    /** @param {{path: number[], edgeVector: BitSet}} cycle */
-    add(cycle) {
+    /** @param cycle a cycle to add to the basis */
+    add(cycle: Cycle) {
         this._members.push(cycle);
         // Add what edges are covered by the basis so far
-        this._edgesOfBasis.orWith(cycle.edgeVector) // orWith is a union 
+        this._edgesOfBasis.orWith(cycle.edgeVector); // orWith is a union
     }
 
-    /** @returns {Array<{path: number[], edgeVector: BitSet}>} */
-    members() {
+    members(): Cycle[] {
         return this._members;
     }
 
-    /** @returns {number} */
-    size() {
+    size(): number {
         return this._members.length;
     }
 
     /**
-     * check if all edges of the cycle already in the basis
-     * @param {{path: number[], edgeVector: BitSet}} cycle
-     * @returns {boolean}
+     * Check whether all edges of the cycle are already covered by the basis.
+     * @param cycle candidate cycle
      */
-    isSubsetOfBasis(cycle) {
+    isSubsetOfBasis(cycle: Cycle): boolean {
         // c.edges subset of edgesOfBasis? single pass with early-exit, no allocation.
         return cycle.edgeVector.isSubsetOf(this._edgesOfBasis);
     }
 
     /**
      * Full independence check via GF(2) Gaussian elimination.
-     * @param {{path: number[], edgeVector: BitSet}} candidate
-     * @returns {boolean}
+     * @param candidate candidate cycle
      */
-    isIndependent(candidate){
-        //cheap path
+    isIndependent(candidate: Cycle): boolean {
+        // cheap path
         // if the candidate has any edge outside union, it cannot possibly be
         // a XOR  (addition) of basis cycles (because XOR can never invent an edge that none of the basis has)
         // So it's independent - faster than doing the full GF(2) eliminitatino which requires building the matrix etc.
 
-        if (this._members.length ===0 || !this.isSubsetOfBasis(candidate)){
+        if (this._members.length === 0 || !this.isSubsetOfBasis(candidate)) {
             return true;
         }
 
-        // expensive path, check via GF(2) 
-        let matrix = new BitMatrix(this._nEdges, this._members.length + 1);
-        for (let i = 0; i < this._members.length; i++){
+        // expensive path, check via GF(2)
+        const matrix = new BitMatrix(this._nEdges, this._members.length + 1);
+        for (let i = 0; i < this._members.length; i++) {
             matrix.add(this._members[i].edgeVector.clone());
         }
-        matrix.add(candidate.edgeVector.clone())
-        matrix.eliminate()
-        // After eliminate(), check whether the row originally added at index members.length got removed 
+        matrix.add(candidate.edgeVector.clone());
+        matrix.eliminate();
+        // After eliminate(), check whether the row originally added at index members.length got removed
         // If it did, candidate is dependent. If not, independent.
 
-        return !matrix.eliminated(this._members.length) // check last row 
+        return !matrix.eliminated(this._members.length); // check last row
         // it is important to add candidate last because that way we now its index is members length!
     }
 }
 
 // ----------- Public API ----------
-// Compute Minicum Cycle Basis and RelevantCycle 
+// Compute Minicum Cycle Basis and RelevantCycle
 // To understand why we need both see end of this file
 
 /**
@@ -653,40 +640,36 @@ export class GreedyBasis{
  *
  * This is Horton's algorithm (1987) which extracts a cycle basis from an inital set of cycles (C_I)
  * which we get from Algorithm 1 (computeInitialCycles)
- * @param {number[][]} adjList adjacency list (adjList[v] = array of neighbor vertex indices)
- * @returns {number[][]} array of cycles, each cycle is a closed vertex path [v0, v1, ..., vn, v0]
+ * @param adjList adjacency list (adjList[v] = array of neighbor vertex indices)
+ * @returns array of cycles, each cycle is a closed vertex path [v0, v1, ..., vn, v0]
  */
-export function minimumCycleBasis(adjList) {
+export function minimumCycleBasis(adjList: number[][]): number[][] {
     // MCB ("smallest set of smallest rings", SSSR):
     // give me ANY linearly independent set of nSssr = E - V + 1 cycles,
     // picked greedily by length. arbitrary ties are broken by input order.
 
-    let n = adjList.length;
+    const n = adjList.length;
     if (n < 3) return []; // minimum cycle is 3
 
-    let {cycles: initialCycles, nEdges} = computeInitialCycles(adjList);
-    let basis = new GreedyBasis(nEdges);
+    const {cycles: initialCycles, nEdges} = computeInitialCycles(adjList);
+    const basis = new GreedyBasis(nEdges);
 
     // Compute the expected number of independent cycles
-    let nSssr = nEdges - n + 1;    
+    const nSssr = nEdges - n + 1;
     // patching nSssr for disconnected graphs (is done in SSSR.js)
-    // this assumes connected graph, 
+    // this assumes connected graph,
     // for a graph with C connected components its nEdges - n + C
-    
+
     // sort initialCycles by lengths in ascending order (shortest cycles first)
-    let sortedCycles = [...initialCycles.keys()].sort((a,b) => a - b);
+    const sortedCycles = [...initialCycles.keys()].sort((a, b) => a - b);
 
-    for (let li = 0; li < sortedCycles.length; li++){
+    for (let li = 0; li < sortedCycles.length; li++) {
+        const group = initialCycles.get(sortedCycles[li])!;
 
-        let group = initialCycles.get(sortedCycles[li]);
-        
-        // @ts-ignore
         for (let ci = 0; ci < group.length; ci++) {
-            if (basis.size() >= nSssr) 
+            if (basis.size() >= nSssr)
                 break;
-            // @ts-ignore
             if (basis.isIndependent(group[ci])) {
-                // @ts-ignore
                 basis.add(group[ci]);
             }
         }
@@ -695,51 +678,49 @@ export function minimumCycleBasis(adjList) {
     return basis.members().map(c => c.path);
 }
 
-
 /**
  * Compute the Relevant Cycles of a graph: i.e. the union of all possible MCBs.
  * This set is unique and contains all minimum-weight cycles needed for
  * unambiguous depiction of symmetric ring systems.
  *
- * @param {number[][]} adjList adjacency list
- * @returns {number[][]} array of cycles, each cycle is a closed vertex path [v0, v1, ..., vn, v0]
+ * @param adjList adjacency list
+ * @returns array of cycles, each cycle is a closed vertex path [v0, v1, ..., vn, v0]
  */
-export function relevantCycles(adjList) {
+export function relevantCycles(adjList: number[][]): number[][] {
     // RC ("relevant cycles"):
     // give me the UNION of all MCBs i.e. every cycle that some MCB
     // could legitimately have chosen. always unique, always a superset
     // of any single MCB.
 
-    let n = adjList.length;
+    const n = adjList.length;
     if (n < 3) return []; // minimum cycle is 3
 
-    let {cycles: initialCycles, nEdges} = computeInitialCycles(adjList);
-    let basis = new GreedyBasis(nEdges);
+    const {cycles: initialCycles, nEdges} = computeInitialCycles(adjList);
+    const basis = new GreedyBasis(nEdges);
 
     // accumulate the relevant cycles separately;
-    let relevant = [];
+    const relevant: number[][] = [];
 
     // sort initialCycles by lengths in ascending order (shortest cycles first).
-    // RC, like MCB, is greedy in length 
-    let sortedCycles = [...initialCycles.keys()].sort((a,b) => a - b);
+    // RC, like MCB, is greedy in length
+    const sortedCycles = [...initialCycles.keys()].sort((a, b) => a - b);
 
     // process one length class at a time. the key invariant: when we test a
     // cycle C of length L, the basis must contain ONLY cycles strictly shorter
     // than L. that is what makes "independent" mean "not a sum of strictly
     // shorter cycles"  which is the definition of relevant. see vismara
     for (let li = 0; li < sortedCycles.length; li++) {
-        let group = initialCycles.get(sortedCycles[li]);
+        const group = initialCycles.get(sortedCycles[li])!;
 
         // pending = the cycles of THIS length that turn out to be relevant.
         // we collect them all before touching the basis, because we do NOT
         // want adding the first relevant cycle of length L to disqualify a
         // sibling cycle of the same length L. equal-length cycles can be
         // pairwise dependent on each other modulo shorter cycles, and RC
-        // keeps them all (this is exactly where RC differs from MCB 
+        // keeps them all (this is exactly where RC differs from MCB
         // MCB picks one while RC keeps both).
-        let pending = [];
+        const pending: Cycle[] = [];
 
-        // @ts-ignore bc group is always defined here (key came from .keys())
         for (let ci = 0; ci < group.length; ci++) {
             // independence is checked against the basis as it stands right
             // now, which only contains cycles of length < L. so this is
@@ -768,17 +749,15 @@ export function relevantCycles(adjList) {
     return relevant;
 }
 
-
-
 /**
  * Convert an adjacency matrix to an adjacency list.
  *
- * @param {number[][]} matrix square adjacency matrix
- * @returns {number[][]} adjacency list
+ * @param matrix square adjacency matrix
+ * @returns adjacency list
  */
-export function matrixToAdjList(matrix) {
-    let n = matrix.length;
-    let adj = new Array(n);
+export function matrixToAdjList(matrix: number[][]): number[][] {
+    const n = matrix.length;
+    const adj: number[][] = new Array(n);
     for (let i = 0; i < n; i++) {
         adj[i] = [];
         for (let j = 0; j < n; j++) {
@@ -787,88 +766,3 @@ export function matrixToAdjList(matrix) {
     }
     return adj;
 }
-
-
-// Why we need both MCB and RC and what Vismara gives us
-// -----------------------------------------------------------------------
-// The whole issue starts with what SSSR is versus what we need it to be. 
-// The concept of SSSR traces back to graph theory and is more or less the same as 
-// minimum-cycle-basis (MCB). The MCB for a cycle is the set of minimum number of 
-// cycle basis we need to represent a cycle through addition (XOR) of the bases. 
-// Pretty similar to what (vector) basis are in algebra. They need to be independent 
-// from each other in order to be part of the basis. If any of them could be represented as the XOR 
-// of two other members, it would be redundant and wouldn't belong in the basis. Thats it.
-
-
-// The way SmilesDrawer and other engines render is by drawing each of the rings in the
-// MCB (SSSR) individually and call it a day. Problem with this is:
-// A) There's multiple MCB for the same cycle space 
-// B) Some molecules (cage-like mostly) need more rings to be drawn accurately than 
-// what they hold in their MCB. 
-
-// Take cubane (C8H8) 8 vertices, 12 edges, 6 square faces.
-//
-//        7 ----- 6
-//       /|      /|
-//      4 ----─ 5 |
-//      | │     │ |
-//      | 3  --─│─2          six 4-membered faces:
-//      |/      │/              top:    {4,5,6,7}
-//      0 ---- 1                bottom: {0,1,2,3}
-//                              front:  {0,1,5,4}
-//                              back:   {3,2,6,7}
-//                              left:   {0,3,7,4}
-//                              right:  {1,2,6,5}
-//
-// Geometrically: 6 faces. Period. No ambiguity. A kid could count it. 
-// Algebraically though, the cycle space has dimension \mu = E - V + 1 = 5. 
-// Pick any 5 faces; the 6th equals their XOR. In other words, the sixth face
-// is not part of the the MCB (SSSR) set. Or to be more accurate the 6th cubane face is 
-// in the cycle space (it's a valid cycle). It's just not in any particular basis we picked
-// because it can be represented by the addition of other bases in the set. 
-// That's a graph-theory fact, not a chemistry fact. So if you trust your engine
-// to only draw SSSR faces you will have issues when drawing cage-like systems. And 
-// if you try to fix it by adding patches then things start to fall appart and break
-
-// ----- The fix ------ 
-// Besides the MCB there's another interesting set called RC (Relevant Cycles)
-// Again MCB (Minimum Cycle Basis, a.k.a. SSSR) can be more formally defined as: 
-// a basis of μ minimum-weight cycles or "a minimum-cardinality set of cycles 
-// spanning the cycle space. There are multiple MCBs. (A + B = C and  A + C = B)
-// 
-// On the other hand, RC (Relevant Cycles):
-// can be defined as the union of all possible MCBs, every cycle that some MCB 
-// could have picked. Unique, deterministic, always a superset of any single MCB.
-// (A + B + C) for cubane this means all 6 faces.
-
-// At this point hopefully is clear Why we need both:
-//
-//   - MCB / `getRings` for chemistry. Aromaticity perception, ring-count
-//     queries, fingerprints. This is what the SSSR cheminformatics
-//     literature is written against; switching to RC would break legacy
-//     callers that assume |rings| = \mu.
-//
-//   - RC / `getRingsForLayout` - depiction. SmilesDrawer places ring
-//     polygons one face at a time. Drawing cubane with only 5 faces leaves
-//     the 6th face's atoms with no polygon to anchor against, and overlap
-//     resolution shoves them somewhere ugly. RC gives every face explicit
-//     geometry, so symmetric cages render symmetrically.
-//
-// So for the example of the cubane: 
-//   MCB(cubane) = 5 of the 6 faces (the 6th = XOR of the others).
-//                 which 5? whichever 5 the greedy loop encountered first
-//                 not chemically meaningful.
-//   RC(cubane)  = all 6 faces. depicts the cube symmetrically.
-// It is important to note also that MCB == RC whenever no two equal-length cycles 
-// are jointly relevant but pairwise dependent i.e. every non-cage, 
-// non-symmetric-bridged molecule.
-// E.g. Naphthalene, steroids, indole: MCB = RC, so the distinction is invisible.
-//
-// What Vismara solves is giving efficiently both MCB and RC. 
-// Naive enumeration of all simple cycles is exponential. The trick in
-// Vismara (1997) is to build a polynomial-size candidate set C_I that's
-// just big enough to contain every relevant cycle and no bigger
-// (see `computeInitialCycles`, Algorithm 1). From the same C_I:
-//  - greedily pick μ independent cycles by length -> MCB
-//  - keep every cycle independent of strictly-shorter ones -> RC
-// One cycle-generation pass, both ring sets out the other side.

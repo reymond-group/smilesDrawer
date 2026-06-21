@@ -101,8 +101,13 @@ export default class BitSet {
     isSubsetOf(other: BitSet): boolean {
         this._assertSameSize(other, 'isSubsetOf');
         for (let i = 0; i < this.words.length; i++) {
-            // A bit present in `this` but missing in `other` breaks the subset.
-            if ((this.words[i] & other.words[i]) !== this.words[i]) {
+            // A bit set in `this` but not in `other` breaks the subset.
+            // We test `this & ~other` instead of comparing `this & other` to
+            // `this`: JS `&` returns a *signed* int32 (negative once bit 31 is
+            // set), while a Uint32Array read is unsigned, so that comparison
+            // would wrongly report a non-subset for any word with bit 31/63/...
+            // set. Comparing against 0 sidesteps the signedness entirely.
+            if ((this.words[i] & ~other.words[i]) !== 0) {
                 return false;
             }
         }

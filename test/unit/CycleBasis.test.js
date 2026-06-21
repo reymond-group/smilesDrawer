@@ -166,6 +166,25 @@ import {describe, it, expect} from 'vitest';
           expect(new BitSet(8).isSubsetOf(basis)).toBe(true); // empty subset of anything
       });
 
+      it('isSubsetOf is correct for high bits (signed-AND trap at bit 31/63)', () => {
+          // Bit 31 sets a word's high bit, so a naive (this & other) === this
+          // check compares a signed AND result against an unsigned word and
+          // fails. These cases pin that behaviour down.
+          const hi = new BitSet(64);
+          hi.set(31); hi.set(63);
+          expect(hi.isSubsetOf(hi)).toBe(true); // self-subset must hold even with bit 31/63
+
+          const basis = new BitSet(64);
+          basis.set(0); basis.set(31); basis.set(63);
+          const sub = new BitSet(64);
+          sub.set(31);
+          expect(sub.isSubsetOf(basis)).toBe(true);
+
+          const notSub = new BitSet(64);
+          notSub.set(31); notSub.set(40); // 40 is not in basis
+          expect(notSub.isSubsetOf(basis)).toBe(false);
+      });
+
       it('binary ops throw on size mismatch (SIZE NOTE contract enforced)', () => {
           // Two BitSets with different bit lengths but identical word counts:
           // both round up to 2 words, yet mixing them is still a coordinate
