@@ -1007,7 +1007,7 @@ export default class Graph {
      * Returns the connected components of the graph.
      *
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Set[]} Connected components as sets.
+     * @returns {number[][]} Connected components as arrays of vertex ids.
      */
     static getConnectedComponents(adjacencyMatrix) {
         let length = adjacencyMatrix.length;

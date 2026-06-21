@@ -3342,7 +3342,7 @@ export default class DrawerBase {
      *
      * @param {Vertex} vertex The stereocenter vertex.
      * @param {Number} wedgeTargetId The vertex id of the neighbor being wedged.
-     * @param {Uint8Array} order CIP priority order (index→original neighbor index).
+     * @param {number[] | Uint8Array} order CIP priority order (index→original neighbor index).
      * @param {Number[]} neighbours The neighbor vertex ids.
      * @param {String} rs 'R' or 'S' designation.
      * @returns {String} 'up' (solid wedge) or 'down' (dashed wedge).

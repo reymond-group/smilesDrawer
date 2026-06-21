@@ -8,6 +8,6 @@
     "declarationDir": "./dist/types"
   },
   "files": [
-    "app.js"
+    "app.ts"
   ]
 }
