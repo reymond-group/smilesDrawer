@@ -1,26 +1,19 @@
-import {describe, it, expect, beforeEach, vi} from 'vitest';
-import {JSDOM} from 'jsdom';
+import {describe, it, expect, vi} from 'vitest';
+import {createJSDOM}              from '../helpers';
+
 import SmilesDrawer from '../../src/SmilesDrawer.js';
 
 describe('SmilesDrawer', () => {
-    beforeEach(() => {
-        const dom = new JSDOM('<!DOCTYPE html><html><body><div id="target" data-smiles="C"></div></body></html>');
-        global.document = dom.window.document;
-        global.window = dom.window;
-        global.HTMLElement = dom.window.HTMLElement;
-        global.HTMLImageElement = dom.window.HTMLImageElement;
-        global.HTMLCanvasElement = dom.window.HTMLCanvasElement;
-        global.SVGElement = dom.window.SVGElement;
-    });
-
     it('should be instantiable', () => {
         const drawer = new SmilesDrawer();
         expect(drawer).toBeDefined();
     });
 
     it('should parse valid JSON options', () => {
-        document.getElementById('target').remove();
-        const element = document.createElement('div');
+        createJSDOM();
+
+        // Canvases are kinda broken in JSDOM...
+        const element = document.createElement('img');
         element.setAttribute('data-smiles', 'C');
         element.setAttribute('data-smiles-options', '{"width": 1234}');
         document.body.appendChild(element);
@@ -35,8 +28,9 @@ describe('SmilesDrawer', () => {
     });
 
     it('should parse JSON options with single quotes as fallback', () => {
-        document.getElementById('target').remove();
-        const element = document.createElement('div');
+        createJSDOM();
+
+        const element = document.createElement('img');
         element.setAttribute('data-smiles', 'C');
         element.setAttribute('data-smiles-options', "{'width': 1234}");
         document.body.appendChild(element);
@@ -51,8 +45,9 @@ describe('SmilesDrawer', () => {
     });
 
     it('should parse valid JSON containing an apostrophe without corruption', () => {
-        document.getElementById('target').remove();
-        const element = document.createElement('div');
+        createJSDOM();
+
+        const element = document.createElement('img');
         element.setAttribute('data-smiles', 'C');
         element.setAttribute('data-smiles-options', '{"label": "John\'s"}');
         document.body.appendChild(element);

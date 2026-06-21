@@ -7,6 +7,12 @@ export function createJSDOM(options) {
     global.document = dom.window.document;
     global.window   = dom.window;
 
+    // Add the global types that we understand and can draw to:
+    global.HTMLImageElement  = dom.window.HTMLImageElement;
+    global.HTMLCanvasElement = dom.window.HTMLCanvasElement;
+    global.OffscreenCanvas   = dom.window.HTMLCanvasElement; // HACK! Not supported by JSDOM.
+    global.SVGElement        = dom.window.SVGElement;        // TODO: Use SVGSVGElement.
+
     if (options.patchCanvasGetContext !== false) {
         // Suppress the bajillion copies of this warning message that get written to stderr:
         // Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package

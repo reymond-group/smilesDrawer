@@ -3369,9 +3369,7 @@
       this.isStereoCenter = false;
       this.priority = 0;
       this.mainChain = false;
-      this.hydrogenDirection = "down";
       this.subtreeDepth = 1;
-      this.hasHydrogen = false;
       this.class = void 0;
     }
     /**
@@ -6132,7 +6130,7 @@
         if (cmp[0] === 0 && !cmp[1]) return void 0;
       }
       const nNeighbours = vertex.neighbours.length;
-      const order = new Uint8Array(nNeighbours);
+      const order = new Array(nNeighbours);
       for (let i = 0; i < nNeighbours; ++i) {
         const vid = root.children[i].vertex.id;
         order[i] = vertex.neighbours.findIndex((nid) => nid === vid);
@@ -8272,6 +8270,34 @@
       this.rotateDrawing();
     }
     /**
+     * Inverts an E/Z bond marker; leaves other bonds unchanged.
+     *
+     * @param {?string} bond - The bond marker to invert.
+     * @returns The bond marker, inverted if it was an E/Z bond.
+     */
+    static flipEZ(bond) {
+      if (bond === "/") return "\\";
+      if (bond === "\\") return "/";
+      return bond;
+    }
+    /**
+     * Gets the bond type of a ringbond given the bond markers at either end.
+     *
+     * This is necessary because some code elsewhere (Graph?) sets these markers
+     * to '-' if they aren't specified.  This returns the first bond that differs
+     * from the default.  It flips E/Z specification of the reverse bond (if any)
+     * to make sure the stereochemistry is correct.
+     *
+     * @param {?string} fwd - The forward bond marker.
+     * @param {?string} rev - The reverse bond marker.
+     * @returns A bond marker, with correct E/Z stereochemistry.
+     */
+    static getRingbondType(fwd, rev) {
+      if (fwd && fwd !== "-") return fwd;
+      if (rev && rev !== "-") return _DrawerBase.flipEZ(rev);
+      return "-";
+    }
+    /**
      * Initializes rings and ringbonds for the current molecule.
      */
     initRings() {
@@ -8291,7 +8317,7 @@
             let targetVertexId = openBonds.get(ringbondId)[0];
             let targetRingbondBond = openBonds.get(ringbondId)[1];
             let edge = new Edge(sourceVertexId, targetVertexId, 1);
-            edge.setBondType(targetRingbondBond || ringbondBond || "-");
+            edge.setBondType(_DrawerBase.getRingbondType(ringbondBond, targetRingbondBond));
             let edgeId = this.graph.addEdge(edge);
             let targetVertex = this.graph.vertices[targetVertexId];
             vertex.addRingbondChild(targetVertexId, j);
@@ -8363,17 +8389,16 @@
       }
     }
     initHydrogens() {
-      if (!this.opts.explicitHydrogens) {
-        for (let i = 0; i < this.graph.vertices.length; i++) {
-          let vertex = this.graph.vertices[i];
-          if (vertex.value.element !== "H") {
-            continue;
-          }
-          let neighbour = this.graph.vertices[vertex.neighbours[0]];
-          neighbour.value.hasHydrogen = true;
-          if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing || neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
-            vertex.value.isDrawn = false;
-          }
+      if (this.opts.explicitHydrogens) {
+        return;
+      }
+      for (const vertex of this.graph.vertices) {
+        if (vertex.value.element !== "H" || vertex.neighbours.length !== 1) {
+          continue;
+        }
+        const neighbour = this.graph.vertices[vertex.neighbours[0]];
+        if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing || neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
+          vertex.value.isDrawn = false;
         }
       }
     }
@@ -9279,7 +9304,7 @@
         if (edge.bondType !== "=") continue;
         const vA = edge.sourceId;
         const vB = edge.targetId;
-        if (graph.vertices[vA].value.rings.length > 0 && graph.vertices[vB].value.rings.length > 0) {
+        if (this.areVerticesInSameRing(graph.vertices[vA], graph.vertices[vB])) {
           continue;
         }
         let stereoA = null, stereoB = null;
@@ -9324,19 +9349,8 @@
           const e = graph.getEdge(vB, nid);
           if (e && (e.bondType === "/" || e.bondType === "\\")) countB++;
         }
-        let flipId, pivotId;
-        if (countA <= countB) {
-          flipId = stereoA.nid;
-          pivotId = vA;
-        } else {
-          flipId = stereoB.nid;
-          pivotId = vB;
-        }
-        if (graph.vertices[flipId].value.rings.length > 0) {
-          flipId = pivotId === vA ? stereoB.nid : stereoA.nid;
-          pivotId = pivotId === vA ? vB : vA;
-          if (graph.vertices[flipId].value.rings.length > 0) continue;
-        }
+        const flipId = countA <= countB ? vA : vB;
+        const pivotId = countA <= countB ? vB : vA;
         const pivot = graph.vertices[pivotId].position;
         const len2 = ax * ax + ay * ay;
         if (len2 < 1e-3) continue;
@@ -9691,9 +9705,10 @@
           if (prevEdge && nextEdge && prevEdge.weight + nextEdge.weight >= 4) {
             prevEdge.center = true;
             nextEdge.center = true;
-            vertex.value.drawExplicit = false;
-            nextVertex.drawExplicit = true;
             nextVertex.angle = 0;
+            if (prevEdge.weight === nextEdge.weight) {
+              vertex.value.drawExplicit = true;
+            }
             this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
           } else if (previousVertex && previousVertex.value.rings.length > 0) {
             let proposedAngleA = MathHelper.toRad(60);
@@ -10081,31 +10096,23 @@
         const rotation = vertex.value.bracket.chirality === "@" ? -1 : 1;
         const rs = parity === rotation ? "R" : "S";
         vertex.value.chirality = rs;
-        let wedgeOrder = new Array(neighbours.length - 1);
-        let showHydrogen = vertex.value.rings.length > 1 && vertex.value.hasHydrogen;
-        let offset = vertex.value.hasHydrogen ? 1 : 0;
-        for (let j = 0; j < order.length - offset; j++) {
-          wedgeOrder[j] = new Uint32Array(2);
-          let neighbour = this.graph.vertices[neighbours[order[j]]];
-          wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 1e5;
-          wedgeOrder[j][0] += this.areVerticesInSameRing(neighbour, vertex) ? 0 : 1e4;
-          wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 1e3 : 0;
-          wedgeOrder[j][0] -= neighbour.value.subtreeDepth === 0 ? 1e3 : 0;
-          wedgeOrder[j][0] += 1e3 - neighbour.value.subtreeDepth;
-          wedgeOrder[j][1] = neighbours[order[j]];
-        }
-        wedgeOrder.sort((a, b) => b[0] - a[0]);
-        if (!showHydrogen) {
-          let wedgeId = wedgeOrder[0][1];
-          let wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
-          this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
-          if (vertex.value.hasHydrogen) {
-            let hId = neighbours[order[order.length - 1]];
-            let hWedge = this._computeWedgeDirection(vertex, hId, order, neighbours, rs);
-            this.graph.getEdge(vertex.id, hId).wedge = hWedge;
-            vertex.value.hydrogenDirection = hWedge === "up" ? "up" : "down";
-          }
-        }
+        const wedgeOrder = order.map((o) => {
+          const nid = neighbours[o];
+          const neighbour = this.graph.vertices[nid];
+          let rank = 0;
+          rank -= neighbour.value.isStereoCenter ? 1e6 : 0;
+          rank -= this.areVerticesInSameRing(neighbour, vertex) ? 1e5 : 0;
+          rank += neighbour.value.isDrawn ? 1e4 : 0;
+          rank += neighbour.value.element !== "C" ? 100 : 0;
+          rank -= this.graph.getTreeDepth(nid, vertex.id);
+          return [rank, nid];
+        }).sort((a, b) => {
+          return b[0] - a[0];
+        });
+        const wedgeId = wedgeOrder[0][1];
+        const wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
+        this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
+        this.graph.vertices[wedgeId].value.isDrawn = true;
       }
     }
     /**
@@ -11214,7 +11221,7 @@
     static svgToCanvas(svg, canvas, width, height, callback = null) {
       svg.setAttributeNS(null, "width", width);
       svg.setAttributeNS(null, "height", height);
-      let image = new Image();
+      let image = document.createElement("img");
       image.onload = function() {
         canvas.width = width;
         canvas.height = height;
@@ -13527,12 +13534,17 @@
           maxHeight = element.height;
         }
       }
+      let minY = 0;
+      let maxY = 0;
       let totalWidth = 0;
       elements.forEach((element) => {
         let offsetX = element.offsetX || 0;
         let offsetY = element.offsetY || 0;
+        const y = (maxHeight - element.height) / 2 + offsetY;
+        maxY = Math.max(maxY, y + element.height);
+        minY = Math.min(minY, y);
         element.svg.setAttributeNS(null, "x", Math.round(totalWidth + offsetX));
-        element.svg.setAttributeNS(null, "y", Math.round((maxHeight - element.height) / 2 + offsetY));
+        element.svg.setAttributeNS(null, "y", Math.round(y));
         element.svg.setAttributeNS(null, "width", Math.round(element.width));
         element.svg.setAttributeNS(null, "height", Math.round(element.height));
         svg.appendChild(element.svg);
@@ -13540,7 +13552,8 @@
           totalWidth += Math.round(element.width + this.opts.spacing + offsetX);
         }
       });
-      svg.setAttributeNS(null, "viewBox", `0 0 ${totalWidth} ${maxHeight}`);
+      const height = Math.max(maxHeight, maxY - minY);
+      svg.setAttributeNS(null, "viewBox", `0 ${minY} ${totalWidth} ${height}`);
       svg.style.width = totalWidth + "px";
       svg.style.height = maxHeight + "px";
       return svg;
@@ -13727,11 +13740,21 @@
         if (element.hasAttribute("data-smiles-options") || element.hasAttribute("data-smiles-reaction-options")) {
           let moleculeOptions = {};
           if (element.hasAttribute("data-smiles-options")) {
-            moleculeOptions = JSON.parse(element.getAttribute("data-smiles-options").replace(/'/g, '"'));
+            const attr = element.getAttribute("data-smiles-options");
+            try {
+              moleculeOptions = JSON.parse(attr);
+            } catch (e) {
+              moleculeOptions = JSON.parse(attr.replace(/'/g, '"'));
+            }
           }
           let reactionOptions = {};
           if (element.hasAttribute("data-smiles-reaction-options")) {
-            reactionOptions = JSON.parse(element.getAttribute("data-smiles-reaction-options").replace(/'/g, '"'));
+            const attr = element.getAttribute("data-smiles-reaction-options");
+            try {
+              reactionOptions = JSON.parse(attr);
+            } catch (e) {
+              reactionOptions = JSON.parse(attr.replace(/'/g, '"'));
+            }
           }
           let smilesDrawer = new _SmilesDrawer(moleculeOptions, reactionOptions);
           smilesDrawer.draw(smiles, element, currentTheme, successCallback, errorCallback, weights);
@@ -13759,7 +13782,11 @@
           info.indexOf("__") + 2,
           info.lastIndexOf("__")
         );
-        settings = JSON.parse(settingsString.replace(/'/g, '"'));
+        try {
+          settings = JSON.parse(settingsString);
+        } catch (e) {
+          settings = JSON.parse(settingsString.replace(/'/g, '"'));
+        }
       }
       let defaultSettings = {
         textAboveArrow: "{reagents}",
@@ -13944,7 +13971,7 @@
 
   // app.js
   var SmilesDrawerNS = {
-    Version: "2.2.1",
+    Version: "2.3.1",
     Drawer,
     GaussDrawer,
     Parser: Parser_default,
