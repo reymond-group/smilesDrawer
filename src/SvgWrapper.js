@@ -1009,7 +1009,7 @@ export default class SvgWrapper {
         svg.setAttributeNS(null, 'width', width);
         svg.setAttributeNS(null, 'height', height);
 
-        let image = new Image();
+        let image = document.createElement('img');
         image.onload = function() {
             canvas.width = width;
             canvas.height = height;
