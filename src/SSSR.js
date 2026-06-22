@@ -87,11 +87,11 @@ export default class SSSR {
         // As I don't have time to fix this properly, it will stay in. I'm sorry next person who works
         // on it. At that point it might be best to reimplement the whole SSSR thing...
 
-        // The error is SSSR would compute the correct expected ring count but actually return fewer rings 
-        // than expected. Fix is add BFS post SSSR to recover via findMissingRings() -which is probably a better fix 
-        // than rewriting SSSR entirely at least for now-, it finds uncovered edges and use shortest cycle (BFS) to fill 
-        // the missing rings. 
-        
+        // The error is SSSR would compute the correct expected ring count but actually return fewer rings
+        // than expected. Fix is add BFS post SSSR to recover via findMissingRings() -which is probably a better fix
+        // than rewriting SSSR entirely at least for now-, it finds uncovered edges and use shortest cycle (BFS) to fill
+        // the missing rings.
+
         return rings;
     }
 
@@ -584,10 +584,10 @@ export default class SSSR {
      * containing that edge.
      *
      * @static
-     * @param {Array[]} adjacencyMatrix 
+     * @param {Array[]} adjacencyMatrix
      * @param {Set[]} existingRings The rings already found by the SSSR algorithm.
      * @param {Number} nSssr The expected number of rings.
-     * @returns {Set[]} newly found rings 
+     * @returns {Set[]} newly found rings
      */
     static findMissingRings(adjacencyMatrix, existingRings, nSssr) {
         let length = adjacencyMatrix.length;

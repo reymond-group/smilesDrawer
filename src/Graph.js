@@ -896,7 +896,8 @@ export default class Graph {
                 // Degenerate case: fall back to simple gradient descent
                 dx = -dEX * 0.1;
                 dy = -dEY * 0.1;
-            } else {
+            }
+            else {
                 dy = (dEX / dxx + dEY / dxy) / denom;
                 dx = -(dxy * dy + dEX) / dxx;
             }
