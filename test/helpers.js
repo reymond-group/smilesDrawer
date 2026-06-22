@@ -12,6 +12,7 @@ export function createJSDOM(options) {
     global.HTMLCanvasElement = dom.window.HTMLCanvasElement;
     global.OffscreenCanvas   = dom.window.HTMLCanvasElement; // HACK! Not supported by JSDOM.
     global.SVGElement        = dom.window.SVGElement;        // TODO: Use SVGSVGElement.
+    global.SVGSVGElement     = dom.window.SVGSVGElement;
 
     if (options.patchCanvasGetContext !== false) {
         // Suppress the bajillion copies of this warning message that get written to stderr:

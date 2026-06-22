@@ -45,6 +45,9 @@ export default class SvgDrawer {
         else if (typeof target === 'string') {
             svg = document.getElementById(target);
         }
+        else {
+            svg = target;
+        }
 
         if (!(svg instanceof SVGSVGElement)) {
             throw Error('Second argument was not an SVG or the ID of an SVG.');
@@ -68,7 +71,7 @@ export default class SvgDrawer {
         if (!infoOnly) {
             this.themeManager = new ThemeManager(this.opts.themes, themeName);
             if (this.svgWrapper === null || this.clear) {
-                this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+                this.svgWrapper = new SvgWrapper(this.themeManager, svg, this.opts, this.clear);
             }
         }
 
