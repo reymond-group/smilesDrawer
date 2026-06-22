@@ -3,8 +3,10 @@
   "version": "2.3.1",
   "description": "A SMILES drawer and parser. Generate molecular structure depictions in pure JavaScript.",
   "exports": {
-    ".":     "./dist/smiles-drawer.min.js",
-    "types": "./dist/types/app.d.ts"
+    ".": {
+      "types":   "./dist/types/app.d.ts",
+      "default": "./dist/smiles-drawer.min.js"
+    }
   },
   "repository": "https://github.com/reymond-group/smilesDrawer.git",
   "author": "Daniel Probst, Reymond Group, University of Berne",
