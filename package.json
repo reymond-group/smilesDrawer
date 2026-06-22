@@ -8,6 +8,7 @@
       "default": "./dist/smiles-drawer.min.js"
     }
   },
+  "main": "./dist/smiles-drawer.min.js",
   "repository": "https://github.com/reymond-group/smilesDrawer.git",
   "author": "Daniel Probst, Reymond Group, University of Berne",
   "license": "MIT",
