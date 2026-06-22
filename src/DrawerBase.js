@@ -693,7 +693,7 @@ export default class DrawerBase {
                             // Switch places / sides
                             // Here we only try to rotate a simple ring substituent.
                             // If both ends of the bond are already inside rings, this code gives up.
-                            // That means it will not help with a ring attached to another ring 
+                            // That means it will not help with a ring attached to another ring
                             // layouts, which is why a later dedicated pass was added
                             if (vertexB.value.rings.length !== 0 && vertexA.value.rings.length !== 0) {
                                 continue;
@@ -729,7 +729,7 @@ export default class DrawerBase {
                                 for (let step = 1; step <= maxSteps; step++) {
                                     let angle = stepAngle * step;
 
-                                    // Try roatation in one direction 
+                                    // Try roatation in one direction
                                     this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
 
                                     let newTotalOverlapScore = this.getOverlapScore().total;
@@ -1022,13 +1022,13 @@ export default class DrawerBase {
         recurse(ringId);
 
         // recurse() is only used for BRIDGED connections (rings that share 3+ atoms)
-        // but FUSED rings (exactly 2 shared atoms, like in naphtahlene) are left out. 
+        // but FUSED rings (exactly 2 shared atoms, like in naphtahlene) are left out.
         // THis causes issues if the bridged system is laid out by KK. If a fused ring
         // shares 2 atoms with the bridges system but isn't included, those 2 atoms
         // get positioned by KK, while the rest of the fused rings gets positioned by the
         // normal layout algorithm. Both algos fight producing distored drawings
-        // TODO: change recurse() by making it always recurse when there are two or more 
-        // shared vertices and use a Set instead of indexOf on an array. 
+        // TODO: change recurse() by making it always recurse when there are two or more
+        // shared vertices and use a Set instead of indexOf on an array.
         // (See PR#237 review)
         let changed = true;
         while (changed) {
@@ -2259,8 +2259,7 @@ export default class DrawerBase {
             const len2 = ax * ax + ay * ay;
             if (len2 < 0.001) continue;
 
-            const self = this;
-            graph.traverseTree(flipId, pivotId, function(vertex) {
+            graph.traverseTree(flipId, pivotId, (vertex) => {
                 const dx = vertex.position.x - pivot.x;
                 const dy = vertex.position.y - pivot.y;
                 const dot = dx * ax + dy * ay;
@@ -2270,7 +2269,7 @@ export default class DrawerBase {
 
                 // Also reflect anchored ring centers
                 for (let j = 0; j < vertex.value.anchoredRings.length; j++) {
-                    let ring = self.rings[vertex.value.anchoredRings[j]];
+                    let ring = this.rings[vertex.value.anchoredRings[j]];
                     if (ring) {
                         const rdx = ring.center.x - pivot.x;
                         const rdy = ring.center.y - pivot.y;
@@ -2638,7 +2637,8 @@ export default class DrawerBase {
                         let ring = null;
                         if (previousVertex.value.bridgedRing !== null) {
                             ring = this.getRing(previousVertex.value.bridgedRing);
-                        } else {
+                        }
+                        else {
                             ring = this.getRing(previousVertex.value.rings[0]);
                         }
                         if (ring && ring.center) {
@@ -2647,7 +2647,8 @@ export default class DrawerBase {
                             // away, so use center-to-vertex AFTER invert:
                             // pos = center - vertex → invert → vertex - center = away ✓
                             pos = Vector2.subtract(ring.center, previousVertex.position);
-                        } else {
+                        }
+                        else {
                             pos = new Vector2(1.0, 0.0);
                         }
                     }
@@ -3166,8 +3167,8 @@ export default class DrawerBase {
      * obvious in the final geometry.
      */
     resolveRigidRingOverlaps() {
-        let currentOverlap = this.getOverlapScore().total; //total overlap score
-        let currentMinimumDistance = this.getMinimumNonBondedDistance(); //to make sure we are 
+        let currentOverlap = this.getOverlapScore().total; // total overlap score
+        let currentMinimumDistance = this.getMinimumNonBondedDistance(); // to make sure we are
         // not creating a collision elsewhere
         let minimumAllowedDistance = this.opts.bondLength * 0.3;
 
@@ -3235,16 +3236,16 @@ export default class DrawerBase {
                 for (let direction = 0; direction < 2; direction++) {
                     let angle = direction === 0 ? baseAngle : -baseAngle;
 
-                    //rotate first by angle
+                    // rotate first by angle
                     this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
 
                     let newOverlap = this.getOverlapScore().total;
                     let newMinimumDistance = this.getMinimumNonBondedDistance();
 
-                    //undo rotation once we got the score
+                    // undo rotation once we got the score
                     this.rotateSubtree(vertexB.id, vertexA.id, -angle, vertexB.position);
 
-                    // reject if two non-bonded atoms come too close together 
+                    // reject if two non-bonded atoms come too close together
                     if (newMinimumDistance <= minimumAllowedDistance) {
                         continue;
                     }
@@ -3375,7 +3376,7 @@ export default class DrawerBase {
             let cy = (wedgePos.y + others[0].y + others[1].y) / 3;
             others.push({
                 x: 2 * vertex.position.x - cx,
-                y: 2 * vertex.position.y - cy
+                y: 2 * vertex.position.y - cy,
             });
             // H is always lowest CIP priority, so wedgeCipRank doesn't shift
         }
@@ -3383,7 +3384,7 @@ export default class DrawerBase {
         // Signed area of the triangle (others[0], others[1], others[2]).
         // In SVG coordinates (y-axis down), positive = clockwise winding.
         let sa = (others[1].x - others[0].x) * (others[2].y - others[0].y)
-               - (others[2].x - others[0].x) * (others[1].y - others[0].y);
+            - (others[2].x - others[0].x) * (others[1].y - others[0].y);
 
         // When the wedged atom has even CIP rank (0, 2), solid wedge gives R
         // when the remaining triangle winds CW (sa > 0). For odd rank (1, 3),
