@@ -146,13 +146,10 @@ export function shortestPaths(graph: number[][], start: number, limit: number, o
             return parentPaths;
         }
         else {
-            // branch
+            // branch: both sides are equally short, so concatenate their paths
             const leftPaths = routeToPaths(route.left, len);
             const rightPaths = routeToPaths(route.right, len);
-            const combined = new Array(leftPaths.length + rightPaths.length);
-            for (let j = 0; j < leftPaths.length; j++) combined[j] = leftPaths[j];
-            for (let j = 0; j < rightPaths.length; j++) combined[leftPaths.length + j] = rightPaths[j];
-            return combined;
+            return leftPaths.concat(rightPaths);
         }
     }
 
@@ -187,41 +184,6 @@ function singletonIntersect(p: number[], q: number[]): boolean {
         if (p[i] === q[i]) return false;
     }
     return true;
-}
-
-/**
- * Join two paths end-on-end for an odd cycle: pathToY forward, pathToZ reversed.
- * pathToY = [r, ..., y], pathToZ = [r, ..., z]
- * result = [r, ..., y, z, ..., r_neighbor] (closed by adjacency y-z)
- */
-function joinOdd(pathToY: number[], pathToZ: number[]): number[] {
-    const path = new Array(pathToY.length + pathToZ.length);
-    for (let i = 0; i < pathToY.length; i++) {
-        path[i] = pathToY[i];
-    }
-    let j = path.length - 1;
-    for (let i = 0; i < pathToZ.length; i++) {
-        path[j--] = pathToZ[i];
-    }
-    return path;
-}
-
-/**
- * Join two paths through a vertex y for an even cycle.
- * pathToP = [r, ..., p], pathToQ = [r, ..., q]
- * result = [r, ..., p, y, q, ..., r_neighbor]
- */
-function joinEven(pathToP: number[], y: number, pathToQ: number[]): number[] {
-    const path = new Array(pathToP.length + 1 + pathToQ.length);
-    for (let i = 0; i < pathToP.length; i++) {
-        path[i] = pathToP[i];
-    }
-    path[pathToP.length] = y;
-    let j = path.length - 1;
-    for (let i = 0; i < pathToQ.length; i++) {
-        path[j--] = pathToQ[i];
-    }
-    return path;
 }
 
 /**
@@ -266,23 +228,23 @@ function pathToEdgeVector(path: number[], edgeIndex: Map<string, number>, nEdges
  *
  * @param graph adjacency list
  */
-function indexEdges(graph: number[][]): {toIndex: Map<string, number>, count: number} {
+function indexEdges(graph: number[][]): Map<string, number> {
     const toIndex = new Map<string, number>();
     const n = graph.length;
 
     for (let v = 0; v < n; v++) {
         for (let k = 0; k < graph[v].length; k++) {
             const w = graph[v][k];
+            // Only key each undirected edge from its lower-numbered endpoint, so
+            // every edge is seen exactly once (the adjacency list is derived from
+            // a 0/1 matrix, so there are no duplicate neighbours).
             if (w > v) {
-                const key = v + ',' + w;
-                if (!toIndex.has(key)) {
-                    toIndex.set(key, toIndex.size);
-                }
+                toIndex.set(v + ',' + w, toIndex.size);
             }
         }
     }
 
-    return {toIndex, count: toIndex.size};
+    return toIndex;
 }
 
 /**
@@ -296,7 +258,9 @@ function indexEdges(graph: number[][]): {toIndex: Map<string, number>, count: nu
 export function computeOrdering(graph: number[][]): number[] {
     const n = graph.length;
     let maxDeg = 0;
-    const order = new Array(n);
+    // fill() so we start from a packed (non-sparse) array; every slot is then
+    // overwritten with the vertex's rank below.
+    const order = new Array(n).fill(0);
 
     // get max degree
     for (let i = 0; i < n; i++) {
@@ -344,13 +308,11 @@ export function computeInitialCycles(graph: number[][]): {cycles: Map<number, Cy
     const n = graph.length;
     const ordering = computeOrdering(graph); // assign pi rank
 
-    const s = new Array(n); // Set 'S' for collecting vertices adjacent to y
-    // with distance to (z) + 1 ==== dist (y) (line 4)
-
     // cycles grouped by length
     const cycles = new Map<number, Cycle[]>();
 
-    const {toIndex: edgeIndex, count: nEdges} = indexEdges(graph);
+    const edgeIndex = indexEdges(graph);
+    const nEdges = edgeIndex.size;
 
     const vertices = new Array(n);
     for (let v = 0; v < n; v++) {
@@ -367,6 +329,11 @@ export function computeInitialCycles(graph: number[][]): {cycles: Map<number, Cy
         }
         group.push({path, edgeVector});
     }
+
+    // Set 'S' (Vismara line 4): for each y, the neighbours z of y with
+    // d(r,z) + 1 == d(r,y). Allocated once and refilled per y (via sizeOfS)
+    // to avoid re-allocating inside the loop.
+    const s = new Array(n);
 
     const first = 2; // smllest cycle is 3 vertices, we can skip first 2 ordered vertices
 
@@ -404,7 +371,8 @@ export function computeInitialCycles(graph: number[][]): {cycles: Map<number, Cy
                     const pathToY = paths.pathTo(y);
                     const pathToZ = paths.pathTo(z);
                     if (singletonIntersect(pathToZ, pathToY)) {
-                        addCycle(joinOdd(pathToY, pathToZ));
+                        // odd cycle: [r..y] then reversed [r..z], closed by the y-z edge
+                        addCycle(pathToY.concat(pathToZ.reverse()));
                     }
                 }
             }
@@ -415,7 +383,8 @@ export function computeInitialCycles(graph: number[][]): {cycles: Map<number, Cy
                     const pathToP = paths.pathTo(s[k]);
                     const pathToQ = paths.pathTo(s[l]);
                     if (singletonIntersect(pathToP, pathToQ)) {
-                        addCycle(joinEven(pathToP, y, pathToQ));
+                        // even cycle: [r..p] then y then reversed [r..q]
+                        addCycle(pathToP.concat([y], pathToQ.reverse()));
                     }
                 }
             }
