@@ -329,9 +329,9 @@ export default class SvgDrawer {
     /**
      * Draw the highlights for atoms to the canvas.
      *
-     * @param {Boolean} debug
+     * @param {Boolean} _debug UNUSED
      */
-    drawAtomHighlights(debug) {
+    drawAtomHighlights(_debug) {
         let preprocessor = this.preprocessor;
         let graph = preprocessor.graph;
         let svgWrapper = this.svgWrapper;

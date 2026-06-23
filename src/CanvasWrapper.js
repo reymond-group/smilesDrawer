@@ -327,9 +327,9 @@ export default class CanvasWrapper {
      * Draw a wedge on the canvas.
      *
      * @param {Line} line A line.
-     * @param {Number} width The wedge width.
+     * @param {Number} _width The wedge width (UNUSED).
      */
-    drawWedge(line, width = 1.0) {
+    drawWedge(line, _width = 1.0) {
         if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
