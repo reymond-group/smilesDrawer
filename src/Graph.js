@@ -41,10 +41,11 @@ export default class Graph {
      * PRIVATE FUNCTION. Initializing the graph from the parse tree.
      *
      * @param {Object} node The current node in the parse tree.
+     * @param {Number} _order UNUSED
      * @param {?Number} parentVertexId=null The id of the previous vertex.
      * @param {Boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
      */
-    _init(node, order = 0, parentVertexId = null, isBranch = false) {
+    _init(node, _order = 0, parentVertexId = null, isBranch = false) {
     // Create a new vertex object
         const element = node.atom.element ? node.atom.element : node.atom;
         let atom = new Atom(element, node.bond);
@@ -1008,7 +1009,7 @@ export default class Graph {
      * Returns the connected components of the graph.
      *
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Set[]} Connected components as sets.
+     * @returns {number[][]} Connected components as arrays of vertex ids.
      */
     static getConnectedComponents(adjacencyMatrix) {
         let length = adjacencyMatrix.length;

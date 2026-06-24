@@ -23,22 +23,34 @@ export default class SvgDrawer {
      * Draws the parsed smiles data to an svg element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+     * @param {?(string|String|Element)} target The id of the HTML svg element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      *
-     * @returns {SVGElement} The svg element
+     * @returns {SVGSVGElement} The (possibly new) SVG element that was drawn to.
      */
     draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
+        let svg = null;
+
         if (target === null || target === 'svg') {
-            target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            target.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-            target.setAttributeNS(null, 'width', this.opts.width);
-            target.setAttributeNS(null, 'height', this.opts.height);
+            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+            svg.setAttributeNS(null, 'width', this.opts.width);
+            svg.setAttributeNS(null, 'height', this.opts.height);
         }
         else if (target instanceof String) {
-            target = document.getElementById(target);
+            svg = document.getElementById(target.valueOf());
+        }
+        else if (typeof target === 'string') {
+            svg = document.getElementById(target);
+        }
+        else {
+            svg = target;
+        }
+
+        if (!(svg instanceof SVGSVGElement)) {
+            throw Error('Second argument was not an SVG or the ID of an SVG.');
         }
 
         let optionBackup = {
@@ -59,7 +71,7 @@ export default class SvgDrawer {
         if (!infoOnly) {
             this.themeManager = new ThemeManager(this.opts.themes, themeName);
             if (this.svgWrapper === null || this.clear) {
-                this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+                this.svgWrapper = new SvgWrapper(this.themeManager, svg, this.opts, this.clear);
             }
         }
 
@@ -93,24 +105,31 @@ export default class SvgDrawer {
             this.opts.compactDrawing = optionBackup.padding;
         }
 
-        return target;
+        return svg;
     }
 
     /**
      * Draws the parsed smiles data to a canvas element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {(string|String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
     drawCanvas(data, target, themeName = 'light', infoOnly = false) {
         let canvas = null;
-        if (typeof target === 'string' || target instanceof String) {
+        if (target instanceof String) {
+            canvas = document.getElementById(target.valueOf());
+        }
+        else if (typeof target === 'string') {
             canvas = document.getElementById(target);
         }
         else {
             canvas = target;
+        }
+
+        if (!(canvas instanceof HTMLCanvasElement)) {
+            throw Error('Second argument was not a canvas or the ID of a canvas.');
         }
 
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -310,9 +329,9 @@ export default class SvgDrawer {
     /**
      * Draw the highlights for atoms to the canvas.
      *
-     * @param {Boolean} debug
+     * @param {Boolean} _debug UNUSED
      */
-    drawAtomHighlights(debug) {
+    drawAtomHighlights(_debug) {
         let preprocessor = this.preprocessor;
         let graph = preprocessor.graph;
         let svgWrapper = this.svgWrapper;
@@ -486,7 +505,7 @@ export default class SvgDrawer {
 
         gd.draw();
         const background = gd.getSVG();
-        background.firstChild.setAttributeNS(null, 'transform', `translate(${minX},${minY})`);
+        background.firstElementChild.setAttributeNS(null, 'transform', `translate(${minX},${minY})`);
         this.svgWrapper.addLayer(background);
     }
 

@@ -327,9 +327,9 @@ export default class CanvasWrapper {
      * Draw a wedge on the canvas.
      *
      * @param {Line} line A line.
-     * @param {Number} width The wedge width.
+     * @param {Number} _width The wedge width (UNUSED).
      */
-    drawWedge(line, width = 1.0) {
+    drawWedge(line, _width = 1.0) {
         if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
             return;
         }
@@ -571,9 +571,6 @@ export default class CanvasWrapper {
      * @param {Number} isotope The isotope number.
      * @param {Number} vertexCount The number of vertices in the molecular graph.
      * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
-     * @param {String} attachedPseudoElement.element The element symbol.
-     * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
-     * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
      */
     drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, vertexCount, attachedPseudoElement = {}) {
         let ctx = this.ctx;

@@ -1073,10 +1073,10 @@ export default class DrawerBase {
      * Creates a bridged ring.
      *
      * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
-     * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
+     * @param {Number} _sourceVertexId The vertex id to start the bridged ring discovery from (UNUSED).
      * @returns {Ring} The bridged ring.
      */
-    createBridgedRing(ringIds, sourceVertexId) {
+    createBridgedRing(ringIds, _sourceVertexId) {
         let ringMembers = new Set();
         let vertices = new Set();
         let neighbours = new Set();
@@ -3343,7 +3343,7 @@ export default class DrawerBase {
      *
      * @param {Vertex} vertex The stereocenter vertex.
      * @param {Number} wedgeTargetId The vertex id of the neighbor being wedged.
-     * @param {Uint8Array} order CIP priority order (index→original neighbor index).
+     * @param {number[] | Uint8Array} order CIP priority order (index→original neighbor index).
      * @param {Number[]} neighbours The neighbor vertex ids.
      * @param {String} rs 'R' or 'S' designation.
      * @returns {String} 'up' (solid wedge) or 'down' (dashed wedge).

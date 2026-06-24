@@ -114,5 +114,5 @@ export default function convertImage(img) {
     let dummyDiv = document.createElement('div');
     dummyDiv.innerHTML = output;
 
-    return dummyDiv.firstChild;
+    return dummyDiv.firstElementChild;
 }

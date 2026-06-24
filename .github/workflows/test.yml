@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22, 24]
+        node-version: [22, 24]
 
     steps:
       - name: Checkout
@@ -34,12 +34,12 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm clean-install
 
       - name: Run CI tests
         run: npm run test:ci
 
-  lint:
+  code-quality:
     runs-on: ubuntu-latest
     continue-on-error: true
 
@@ -54,7 +54,10 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm clean-install
 
       - name: Run lint
         run: npm run lint
+
+      - name: Run typecheck
+        run: npm run typecheck

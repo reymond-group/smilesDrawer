@@ -70,7 +70,7 @@ export default class SmilesDrawer {
                     try {
                         moleculeOptions = JSON.parse(attr);
                     }
-                    catch (e) {
+                    catch {
                         moleculeOptions = JSON.parse(attr.replace(/'/g, '"'));
                     }
                 }
@@ -81,7 +81,7 @@ export default class SmilesDrawer {
                     try {
                         reactionOptions = JSON.parse(attr);
                     }
-                    catch (e) {
+                    catch {
                         reactionOptions = JSON.parse(attr.replace(/'/g, '"'));
                     }
                 }
@@ -121,7 +121,7 @@ export default class SmilesDrawer {
             try {
                 settings = JSON.parse(settingsString);
             }
-            catch (e) {
+            catch {
                 settings = JSON.parse(settingsString.replace(/'/g, '"'));
             }
         }
