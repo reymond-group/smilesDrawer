@@ -1,5 +1,5 @@
 export const BASE = {
-    entryPoints: ['app.js'],
+    entryPoints: ['app.ts'],
     target:      ['chrome65'],
     sourcemap:   true,
     bundle:      true,
