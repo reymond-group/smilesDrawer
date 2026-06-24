@@ -180,16 +180,24 @@ export default class SvgDrawer {
             }
         });
 
-        // Draw ring for implicitly defined aromatic rings
-        if (!preprocessor.bridgedRing) {
-            for (let i = 0; i < rings.length; i++) {
-                let ring = rings[i];
+        // Draw the inner circle that marks an aromatic ring (benzene as
+        // hexagon + circle) rings that are part of a bridged system still
+        // get the circle as long as their 2D projection is close enough to
+        // a regular polygon (e.g a flat pyrrole face of a bridged bicyclic).
+        // If the projection is distorted (i.e. not close to a regular polygone), we
+        // skip the circle here and let drawEdge fall back to dashed bonds
+        // long term fix is to kekulise aromatic input for bridged systems in
+        // the parser so the fallback is no longer needed
+        for (let i = 0; i < rings.length; i++) {
+            let ring = rings[i];
 
-                // TODO: uses canvas ctx to draw... need to update this to SVG
-                if (preprocessor.isRingAromatic(ring)) {
-                    this.drawAromaticityRing(ring);
-                }
+            if (!preprocessor.isRingAromatic(ring)) continue;
+
+            if (ring.isPartOfBridged && !preprocessor.isRingRegularPolygon(ring)) {
+                continue;
             }
+
+            this.drawAromaticityRing(ring);
         }
     }
 
@@ -224,9 +232,25 @@ export default class SvgDrawer {
         sides[0].multiplyScalar(10).add(a);
         sides[1].multiplyScalar(10).add(a);
 
+        // The third condition handles aromatic bonds inside a bridged ring
+        // system whose 2D projection is too distorted for the usual
+        // aromatic circle (e.g. paracyclophane, triptycene). Those bonds
+        // get drawn as a solid line with a dashed parallel inside the ring.
+        // If the aromatic ring is still close to a regular polygon (e.g.
+        // a flat pyrrole on a bridged bicyclic) we skip this branch and let
+        // drawEdges draw the circle as usual.
+        // The long-term fix is to kekulise aromatic input for bridged
+        // systems in the parser (explicit single/double) so the fallback
+        // is no longer needed.
+        let aromaticRing = (edge.isPartOfAromaticRing
+            && vertexA.value.bridgedRing !== null
+            && vertexB.value.bridgedRing !== null)
+            ? preprocessor.getLargestOrAromaticCommonRing(vertexA, vertexB)
+            : null;
+
         if (edge.bondType === '='
             || preprocessor.getRingbondType(vertexA, vertexB) === '='
-            || (edge.isPartOfAromaticRing && preprocessor.bridgedRing)
+            || (aromaticRing && !preprocessor.isRingRegularPolygon(aromaticRing))
         ) {
             // Always draw double bonds inside the ring
             let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);
