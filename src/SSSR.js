@@ -1,13 +1,13 @@
-// SSSR.js is the adapter layer between DrawerBase and CycleBasis (Vismara's algortihm) instead of 
-// a full implementation on its own (previously was Floyd-Warshall algorihtm). 
+// SSSR.js is the adapter layer between DrawerBase and CycleBasis (Vismara's algortihm) instead of
+// a full implementation on its own (previously was Floyd-Warshall algorihtm).
 
-// In short, CycleBasis.js takes an adjacency list indexed for one connected component and returns 
-// cycles as closed vertex paths [v0, v1, ..., vn, V0]. 
+// In short, CycleBasis.js takes an adjacency list indexed for one connected component and returns
+// cycles as closed vertex paths [v0, v1, ..., vn, V0].
 // This is essentially a shim and could probably be dropped. Since DrawerBase calls SSSR.getRings
 // in a dozen places keeping this is probably more stable for now and thus avoiding changing those callers
 // TODO: Remove complete SSSR.js and adapt DrawerBase
 
-// To understand why we need both getRings(MCB) and getRingsForLayout(Relevant Cycles) check 
+// To understand why we need both getRings(MCB) and getRingsForLayout(Relevant Cycles) check
 // `CycleBasis.js`
 
 // @ts-check
@@ -21,10 +21,10 @@ export default class SSSR {
      * minimum cycle basis (MCB / SSSR) of the graph.
      *
      * @param {Graph} graph A Graph object.
-     * @param {Boolean} [experimental=false] Whether or not to use experimental SSSR.
+     * @param {Boolean} [_experimental=false] Whether or not to use experimental SSSR (UNUSED).
      * @returns {Array[]} An array containing arrays, each representing a ring.
      */
-    static getRings(graph, experimental = false) {
+    static getRings(graph, _experimental = false) {
         return SSSR._findRings(graph, false);
     }
 
@@ -36,10 +36,10 @@ export default class SSSR {
      * depiction; use getRings() for chemistry (aromaticity, ring membership).
      *
      * @param {Graph} graph A Graph object.
-     * @param {Boolean} [experimental=false] Whether or not to use experimental SSSR.
+     * @param {Boolean} [_experimental=false] Whether or not to use experimental SSSR (UNUSED).
      * @returns {Array[]} An array containing arrays, each representing a ring.
      */
-    static getRingsForLayout(graph, experimental = false) {
+    static getRingsForLayout(graph, _experimental = false) {
         return SSSR._findRings(graph, true);
     }
 
@@ -51,8 +51,7 @@ export default class SSSR {
      * @returns {Array[]} An array of rings (each ring is an array of vertex ids).
      */
     static _findRings(graph, forLayout) {
-
-        // Get the adjacency matrix of the graph with all bridges removed 
+        // Get the adjacency matrix of the graph with all bridges removed
         // this returns one set per connected component (e.g. 1 for benzene and 2 for [Na+].[Cl-])
         let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
         if (adjacencyMatrix.length === 0) {
@@ -60,15 +59,15 @@ export default class SSSR {
         }
 
         // Note: We get the matrix and not a list because that's what Graph.js exposes
-        // if (or when) we rewrite Graph we could change it as this code is 
-        // essentially transforming matrix -> list 
+        // if (or when) we rewrite Graph we could change it as this code is
+        // essentially transforming matrix -> list
         let connectedComponents = Graph.getConnectedComponents(adjacencyMatrix);
         let rings = [];
 
         for (let i = 0; i < connectedComponents.length; i++) {
             let connectedComponent = connectedComponents[i];
-            // extracts kxk submatrix for just the k vertices in i component 
-            // the index will be local (0 to N) and not global vertex IDs 
+            // extracts kxk submatrix for just the k vertices in i component
+            // the index will be local (0 to N) and not global vertex IDs
             // this becomes relevant later on because DrawerBase cosumes global vertex Ids
             let ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix([...connectedComponent]);
 
@@ -79,14 +78,14 @@ export default class SSSR {
             // Run the appropriate cycle finder
             let cyclePaths = forLayout
                 ? relevantCycles(adjList)
-                : minimumCycleBasis(adjList); 
+                : minimumCycleBasis(adjList);
 
             // Convert closed paths to vertex ID arrays, mapping local
             // component indices back to global vertex IDs (DrawerBase needs it)
             for (let j = 0; j < cyclePaths.length; j++) {
                 let path = cyclePaths[j];
                 // path is closed: [v0, v1, ..., vn, v0]. Extract unique vertices.
-                // path is closed because Vismara needs it 
+                // path is closed because Vismara needs it
                 let ring = [];
                 for (let k = 0; k < path.length - 1; k++) {
                     ring.push(connectedComponent[path[k]]);

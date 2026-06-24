@@ -1862,9 +1862,9 @@ export default class DrawerBase {
         // get drawn as a solid line with a dashed parallel inside the ring
         // If the aromatic ring is still close to a regular polygon (e.g.
         // a flat pyrrole on a bridged bicyclic) we skip this branch and
-        // let drawEdges draw the circle as usual becuase it looks better. 
+        // let drawEdges draw the circle as usual becuase it looks better.
         // the long term fix is to kekulise aromatic input for bridged systems in
-        //the parser (explicit single/double) Mirrors SvgDrawer.drawEdge.
+        // the parser (explicit single/double) Mirrors SvgDrawer.drawEdge.
         let aromaticRing = (edge.isPartOfAromaticRing
             && vertexA.value.bridgedRing !== null
             && vertexB.value.bridgedRing !== null)
