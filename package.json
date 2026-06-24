@@ -1,8 +1,14 @@
 {
   "name": "smiles-drawer",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "A SMILES drawer and parser. Generate molecular structure depictions in pure JavaScript.",
-  "main": "./app.js",
+  "exports": {
+    ".": {
+      "types":   "./dist/types/app.d.ts",
+      "default": "./dist/smiles-drawer.min.js"
+    }
+  },
+  "main": "./dist/smiles-drawer.min.js",
   "repository": "https://github.com/reymond-group/smilesDrawer.git",
   "author": "Daniel Probst, Reymond Group, University of Berne",
   "license": "MIT",
@@ -13,8 +19,8 @@
     "eslint":                   "^9.39.1",
     "jsdom":                    "^26.1.0",
     "typescript":               "^5.8.2",
-    "typescript-eslint":        "^8.48.1",
-    "vitest":                   "^4.0.18"
+    "typescript-eslint":        "^8.61.1",
+    "vitest":                   "^4.1.9"
   },
   "dependencies": {
     "chroma-js": "^2.4.2"
@@ -23,8 +29,9 @@
     "build":     "node ./scripts/build.mjs",
     "lint":      "npm exec -- eslint",
     "minify":    "node ./scripts/minify.mjs",
-    "release":   "node ./scripts/release.mjs",
+    "release":   "npm run typedefs && node ./scripts/release.mjs",
     "typecheck": "npm exec -- tsc --noEmit",
+    "typedefs":  "npm exec -- tsc --emitDeclarationOnly",
     "watch":     "node ./scripts/watch.mjs",
 
     "test:ci":       "npm exec -- vitest run test/unit test/regression test/formula-reference test/stereo-reference",

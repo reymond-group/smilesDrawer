@@ -69,7 +69,8 @@ export default class SmilesDrawer {
                     const attr = element.getAttribute('data-smiles-options');
                     try {
                         moleculeOptions = JSON.parse(attr);
-                    } catch (e) {
+                    }
+                    catch {
                         moleculeOptions = JSON.parse(attr.replace(/'/g, '"'));
                     }
                 }
@@ -79,7 +80,8 @@ export default class SmilesDrawer {
                     const attr = element.getAttribute('data-smiles-reaction-options');
                     try {
                         reactionOptions = JSON.parse(attr);
-                    } catch (e) {
+                    }
+                    catch {
                         reactionOptions = JSON.parse(attr.replace(/'/g, '"'));
                     }
                 }
@@ -118,7 +120,8 @@ export default class SmilesDrawer {
 
             try {
                 settings = JSON.parse(settingsString);
-            } catch (e) {
+            }
+            catch {
                 settings = JSON.parse(settingsString.replace(/'/g, '"'));
             }
         }

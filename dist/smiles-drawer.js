@@ -7,7 +7,11 @@
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __commonJS = (cb, mod) => function __require() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    try {
+      return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    } catch (e) {
+      throw mod = 0, e;
+    }
   };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
@@ -32,7 +36,7 @@
     "node_modules/chroma-js/chroma.js"(exports, module) {
       (function(global, factory) {
         typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.chroma = factory());
-      })(exports, function() {
+      })(exports, (function() {
         "use strict";
         var limit$2 = function(x, min2, max2) {
           if (min2 === void 0) min2 = 0;
@@ -3010,7 +3014,7 @@
         chroma2.brewer = colorbrewer_1;
         var chroma_js = chroma2;
         return chroma_js;
-      });
+      }));
     }
   });
 
@@ -5461,9 +5465,9 @@
      * Draw a wedge on the canvas.
      *
      * @param {Line} line A line.
-     * @param {Number} width The wedge width.
+     * @param {Number} _width The wedge width (UNUSED).
      */
-    drawWedge(line, width = 1) {
+    drawWedge(line, _width = 1) {
       if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
         return;
       }
@@ -5652,9 +5656,6 @@
      * @param {Number} isotope The isotope number.
      * @param {Number} vertexCount The number of vertices in the molecular graph.
      * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
-     * @param {String} attachedPseudoElement.element The element symbol.
-     * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
-     * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
      */
     drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, vertexCount, attachedPseudoElement = {}) {
       let ctx = this.ctx;
@@ -6206,10 +6207,11 @@
      * PRIVATE FUNCTION. Initializing the graph from the parse tree.
      *
      * @param {Object} node The current node in the parse tree.
+     * @param {Number} _order UNUSED
      * @param {?Number} parentVertexId=null The id of the previous vertex.
      * @param {Boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
      */
-    _init(node, order = 0, parentVertexId = null, isBranch = false) {
+    _init(node, _order = 0, parentVertexId = null, isBranch = false) {
       const element = node.atom.element ? node.atom.element : node.atom;
       let atom = new Atom(element, node.bond);
       if (element !== "H" || !node.hasNext && parentVertexId === null) {
@@ -6976,7 +6978,7 @@
      * Returns the connected components of the graph.
      *
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Set[]} Connected components as sets.
+     * @returns {number[][]} Connected components as arrays of vertex ids.
      */
     static getConnectedComponents(adjacencyMatrix) {
       let length = adjacencyMatrix.length;
@@ -7537,10 +7539,10 @@
      * containing that edge.
      *
      * @static
-     * @param {Array[]} adjacencyMatrix 
+     * @param {Array[]} adjacencyMatrix
      * @param {Set[]} existingRings The rings already found by the SSSR algorithm.
      * @param {Number} nSssr The expected number of rings.
-     * @returns {Set[]} newly found rings 
+     * @returns {Set[]} newly found rings
      */
     static findMissingRings(adjacencyMatrix, existingRings, nSssr) {
       let length = adjacencyMatrix.length;
@@ -8458,10 +8460,10 @@
      * Creates a bridged ring.
      *
      * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
-     * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
+     * @param {Number} _sourceVertexId The vertex id to start the bridged ring discovery from (UNUSED).
      * @returns {Ring} The bridged ring.
      */
-    createBridgedRing(ringIds, sourceVertexId) {
+    createBridgedRing(ringIds, _sourceVertexId) {
       let ringMembers = /* @__PURE__ */ new Set();
       let vertices = /* @__PURE__ */ new Set();
       let neighbours = /* @__PURE__ */ new Set();
@@ -9354,15 +9356,14 @@
         const pivot = graph.vertices[pivotId].position;
         const len2 = ax * ax + ay * ay;
         if (len2 < 1e-3) continue;
-        const self2 = this;
-        graph.traverseTree(flipId, pivotId, function(vertex) {
+        graph.traverseTree(flipId, pivotId, (vertex) => {
           const dx = vertex.position.x - pivot.x;
           const dy = vertex.position.y - pivot.y;
           const dot = dx * ax + dy * ay;
           vertex.position.x = pivot.x + 2 * dot * ax / len2 - dx;
           vertex.position.y = pivot.y + 2 * dot * ay / len2 - dy;
           for (let j = 0; j < vertex.value.anchoredRings.length; j++) {
-            let ring = self2.rings[vertex.value.anchoredRings[j]];
+            let ring = this.rings[vertex.value.anchoredRings[j]];
             if (ring) {
               const rdx = ring.center.x - pivot.x;
               const rdy = ring.center.y - pivot.y;
@@ -10125,7 +10126,7 @@
      *
      * @param {Vertex} vertex The stereocenter vertex.
      * @param {Number} wedgeTargetId The vertex id of the neighbor being wedged.
-     * @param {Uint8Array} order CIP priority order (index→original neighbor index).
+     * @param {number[] | Uint8Array} order CIP priority order (index→original neighbor index).
      * @param {Number[]} neighbours The neighbor vertex ids.
      * @param {String} rs 'R' or 'S' designation.
      * @returns {String} 'up' (solid wedge) or 'down' (dashed wedge).
@@ -10302,7 +10303,7 @@
     let output = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 ' + img.width + " " + img.height + '" shape-rendering="crispEdges"><g shape-rendering="crispEdges">' + paths + "</g></svg>";
     let dummyDiv = document.createElement("div");
     dummyDiv.innerHTML = output;
-    return dummyDiv.firstChild;
+    return dummyDiv.firstElementChild;
   }
 
   // src/GaussDrawer.js
@@ -11322,21 +11323,29 @@
      * Draws the parsed smiles data to an svg element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+     * @param {?(string|String|Element)} target The id of the HTML svg element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      *
-     * @returns {SVGElement} The svg element
+     * @returns {SVGSVGElement} The (possibly new) SVG element that was drawn to.
      */
     draw(data, target, themeName = "light", weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
+      let svg = null;
       if (target === null || target === "svg") {
-        target = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        target.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        target.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-        target.setAttributeNS(null, "width", this.opts.width);
-        target.setAttributeNS(null, "height", this.opts.height);
+        svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+        svg.setAttributeNS(null, "width", this.opts.width);
+        svg.setAttributeNS(null, "height", this.opts.height);
       } else if (target instanceof String) {
-        target = document.getElementById(target);
+        svg = document.getElementById(target.valueOf());
+      } else if (typeof target === "string") {
+        svg = document.getElementById(target);
+      } else {
+        svg = target;
+      }
+      if (!(svg instanceof SVGSVGElement)) {
+        throw Error("Second argument was not an SVG or the ID of an SVG.");
       }
       let optionBackup = {
         padding: this.opts.padding,
@@ -11351,7 +11360,7 @@
       if (!infoOnly) {
         this.themeManager = new ThemeManager(this.opts.themes, themeName);
         if (this.svgWrapper === null || this.clear) {
-          this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+          this.svgWrapper = new SvgWrapper(this.themeManager, svg, this.opts, this.clear);
         }
       }
       preprocessor.processGraph();
@@ -11374,22 +11383,27 @@
         this.opts.padding = optionBackup.padding;
         this.opts.compactDrawing = optionBackup.padding;
       }
-      return target;
+      return svg;
     }
     /**
      * Draws the parsed smiles data to a canvas element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {(string|String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
     drawCanvas(data, target, themeName = "light", infoOnly = false) {
       let canvas = null;
-      if (typeof target === "string" || target instanceof String) {
+      if (target instanceof String) {
+        canvas = document.getElementById(target.valueOf());
+      } else if (typeof target === "string") {
         canvas = document.getElementById(target);
       } else {
         canvas = target;
+      }
+      if (!(canvas instanceof HTMLCanvasElement)) {
+        throw Error("Second argument was not a canvas or the ID of a canvas.");
       }
       let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -11517,9 +11531,9 @@
     /**
      * Draw the highlights for atoms to the canvas.
      *
-     * @param {Boolean} debug
+     * @param {Boolean} _debug UNUSED
      */
-    drawAtomHighlights(debug) {
+    drawAtomHighlights(_debug) {
       let preprocessor = this.preprocessor;
       let graph = preprocessor.graph;
       let svgWrapper = this.svgWrapper;
@@ -11670,7 +11684,7 @@
       );
       gd.draw();
       const background = gd.getSVG();
-      background.firstChild.setAttributeNS(null, "transform", `translate(${minX},${minY})`);
+      background.firstElementChild.setAttributeNS(null, "transform", `translate(${minX},${minY})`);
       this.svgWrapper.addLayer(background);
     }
     /**
@@ -11759,7 +11773,7 @@
   };
 
   // src/Parser.js
-  var Parser_default = function() {
+  var Parser_default = (function() {
     "use strict";
     function peg$subclass(child, parent) {
       function ctor() {
@@ -13271,7 +13285,15 @@
       SyntaxError: peg$SyntaxError,
       parse: peg$parse
     };
-  }();
+  })();
+
+  // src/ParserWrapper.ts
+  var ParserWrapper = class {
+    static parse(smiles) {
+      return Parser_default.parse(smiles);
+    }
+  };
+  ParserWrapper.SyntaxError = Parser_default.SyntaxError;
 
   // src/FormulaToCommonName.js
   var FormulaToCommonName_default = {
@@ -13969,85 +13991,89 @@
     }
   };
 
-  // app.js
-  var SmilesDrawerNS = {
-    Version: "2.3.1",
-    Drawer,
-    GaussDrawer,
-    Parser: Parser_default,
-    ReactionDrawer,
-    ReactionParser,
-    SmiDrawer: SmilesDrawer,
-    SvgDrawer
-  };
-  SmilesDrawerNS.clean = function(smiles) {
-    return smiles.replace(/[^A-Za-z0-9@.+\-?!()[\]{}/\\=#$:*]/g, "");
-  };
-  SmilesDrawerNS.apply = function(options, selector = "canvas[data-smiles]", themeName = "light", onError = null) {
-    let smilesDrawer = new Drawer(options);
-    let elements = document.querySelectorAll(selector);
-    for (var i = 0; i < elements.length; i++) {
-      let element = elements[i];
-      SmilesDrawerNS.parse(element.getAttribute("data-smiles"), function(tree) {
-        smilesDrawer.draw(tree, element, themeName, false);
-      }, function(err) {
-        if (onError) {
-          onError(err);
+  // app.ts
+  var _SmilesDrawerNS = class _SmilesDrawerNS {
+    /**
+    * Cleans a SMILES string (by removing all non-valid characters)
+    *
+    * @param smiles - A SMILES string.
+    * @returns The clean SMILES string.
+    */
+    static clean(smiles) {
+      return smiles.replace(/[^A-Za-z0-9@.+\-?!()[\]{}/\\=#$:*]/g, "");
+    }
+    /**
+    * Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
+    *
+    * @param options   - SmilesDrawer options.
+    * @param selector  - A CSS selector that identifies drawable elements (default "canvas[data-smiles]").
+    * @param themeName - The theme to apply (default "light").
+    * @param onError   - An optional callback function that takes an error object (default null).
+    */
+    static apply(options, selector = "canvas[data-smiles]", themeName = "light", onError) {
+      const smilesDrawer = new Drawer(options);
+      const elements = document.querySelectorAll(selector);
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        _SmilesDrawerNS.parse(element.getAttribute("data-smiles"), function(tree) {
+          smilesDrawer.draw(tree, element, themeName, false);
+        }, function(err) {
+          if (onError) {
+            onError(err);
+          }
+        });
+      }
+    }
+    /**
+    * Parses a SMILES string.
+    *
+    * @param smiles          - A SMILES string.
+    * @param successCallback - A callback that is called on success with the parse tree.
+    * @param errorCallback   - A callback that is called with the error object on error.
+    */
+    static parse(smiles, successCallback, errorCallback) {
+      try {
+        if (successCallback) {
+          successCallback(ParserWrapper.parse(smiles));
         }
-      });
-    }
-  };
-  SmilesDrawerNS.parse = function(smiles, successCallback, errorCallback) {
-    try {
-      if (successCallback) {
-        successCallback(Parser_default.parse(smiles));
-      }
-    } catch (err) {
-      if (errorCallback) {
-        errorCallback(err);
+      } catch (err) {
+        if (errorCallback) {
+          errorCallback(err);
+        }
       }
     }
-  };
-  SmilesDrawerNS.parseReaction = function(reactionSmiles, successCallback, errorCallback) {
-    try {
-      if (successCallback) {
-        successCallback(ReactionParser.parse(reactionSmiles));
-      }
-    } catch (err) {
-      if (errorCallback) {
-        errorCallback(err);
+    /**
+    * Parses a reaction SMILES string.
+    *
+    * @param reactionSmiles  - A reaction SMILES string.
+    * @param successCallback - A callback that is called on success with the parse tree.
+    * @param errorCallback   - A callback that is called with the error object on error.
+    */
+    static parseReaction(reactionSmiles, successCallback, errorCallback) {
+      try {
+        if (successCallback) {
+          successCallback(ReactionParser.parse(reactionSmiles));
+        }
+      } catch (err) {
+        if (errorCallback) {
+          errorCallback(err);
+        }
       }
     }
   };
-  if (!Array.prototype.fill) {
-    let fill = function(value) {
-      if (this == null) {
-        throw new TypeError("this is null or not defined");
-      }
-      var O = Object(this);
-      var len = O.length >>> 0;
-      var start = arguments[1];
-      var relativeStart = start >> 0;
-      var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
-      var end = arguments[2];
-      var relativeEnd = end === void 0 ? len : end >> 0;
-      var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
-      while (k < final) {
-        O[k] = value;
-        k++;
-      }
-      return O;
-    };
-    Object.defineProperty(Array.prototype, "fill", {
-      value: fill,
-      writeable: false
-    });
-  }
+  _SmilesDrawerNS.Version = "2.3.2";
+  _SmilesDrawerNS.Drawer = Drawer;
+  _SmilesDrawerNS.GaussDrawer = GaussDrawer;
+  _SmilesDrawerNS.Parser = ParserWrapper;
+  _SmilesDrawerNS.ReactionDrawer = ReactionDrawer;
+  _SmilesDrawerNS.ReactionParser = ReactionParser;
+  _SmilesDrawerNS.SmiDrawer = SmilesDrawer;
+  _SmilesDrawerNS.SvgDrawer = SvgDrawer;
+  var SmilesDrawerNS = _SmilesDrawerNS;
   if (typeof window !== "undefined" && window.document && window.document.createElement) {
     window.SmilesDrawer = SmilesDrawerNS;
     window.SmiDrawer = SmilesDrawer;
   }
-  var app_default = SmilesDrawerNS;
 })();
 /*! Bundled license information:
 
