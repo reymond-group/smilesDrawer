@@ -14061,7 +14061,7 @@
       }
     }
   };
-  _SmilesDrawerNS.Version = "2.3.2";
+  _SmilesDrawerNS.Version = "2.3.3";
   _SmilesDrawerNS.Drawer = Drawer;
   _SmilesDrawerNS.GaussDrawer = GaussDrawer;
   _SmilesDrawerNS.Parser = ParserWrapper;

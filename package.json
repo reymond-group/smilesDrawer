@@ -1,6 +1,6 @@
 {
   "name": "smiles-drawer",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "A SMILES drawer and parser. Generate molecular structure depictions in pure JavaScript.",
   "exports": {
     ".": {
