@@ -13,7 +13,7 @@ import SvgDrawer      from './src/SvgDrawer';
  * @typicalname SmilesDrawer
  */
 export default class SmilesDrawerNS {
-    static Version = '2.4.0';
+    static Version = '2.4.1';
 
     static Drawer         = Drawer;
     static GaussDrawer    = GaussDrawer;
