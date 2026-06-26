@@ -13,7 +13,7 @@ import SvgDrawer      from './src/SvgDrawer';
  * @typicalname SmilesDrawer
  */
 export default class SmilesDrawerNS {
-    static Version = '2.4.0';
+    static Version = '2.4.1';
 
     static Drawer         = Drawer;
     static GaussDrawer    = GaussDrawer;
@@ -113,3 +113,15 @@ if (typeof window !== 'undefined' && window.document && window.document.createEl
     window.SmilesDrawer = SmilesDrawerNS;
     window.SmiDrawer    = SmiDrawer;
 }
+
+// If we've been required via CommonJS, export as the Romans do...
+// if (typeof module !== 'undefined' && module.exports && typeof require === 'function') {
+//     try {
+//         const commonjs   = module;
+//         commonjs.exports = SmilesDrawerNS;
+//     }
+//     catch {
+//         // TypeError: ESM module.exports only has a getter in Node.
+//         // I guess we're not in CommonJS after all...
+//     }
+// }

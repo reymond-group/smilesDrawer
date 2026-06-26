@@ -10,3 +10,4 @@ smiles-drawer.dev.min.js.map
 # Useful for local dev work, but not so much for production.
 # Real deployments will be using the minified bundle.
 smiles-drawer.js.map
+smiles-drawer.mjs.map
