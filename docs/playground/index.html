@@ -1019,6 +1019,10 @@ const themeSurfaceModes = {"light":"light","dark":"dark","oldschool":"light","so
                         smiles = right;
                     }
                 }
+                // Strip HTML-significant characters so user-supplied text can never
+                // be interpreted as markup if later rendered into the DOM.
+                name = name.replace(/[<>]/g, '');
+                smiles = smiles.replace(/[<>]/g, '');
                 batchData.push({ name: name, smiles: smiles, selected: false });
             });
             batchCurrentPage = 0;
