@@ -758,6 +758,20 @@ export default class SvgWrapper {
             bbox.width = fullBbox.width;
         }
 
+        const partWidths = text.map(part =>
+            SvgWrapper.measureText(part[0], this.opts.fontSizeLarge, this.opts.fontFamily).width);
+        const textWidth = partWidths.reduce((sum, width) => sum + width, 0);
+        const maxPartWidth = partWidths.reduce((max, width) => Math.max(max, width), 0);
+        const extentWidth = (direction === 'left' || direction === 'right')
+            ? textWidth
+            : maxPartWidth;
+        const textStart = direction === 'left'
+            ? x + bbox.width / 2.0 - extentWidth
+            : x - bbox.width / 2.0;
+        const textEnd = direction === 'left'
+            ? x + bbox.width / 2.0
+            : textStart + extentWidth;
+
         // Get the approximate width and height of text and add update max/min
         // to allow for narrower paddings
         if (singleVertex) {
@@ -766,6 +780,12 @@ export default class SvgWrapper {
             }
             if (x - bbox.width / 2.0 < this.minX) {
                 this.minX = x - bbox.width / 2.0;
+            }
+            if (textStart < this.minX) {
+                this.minX = textStart;
+            }
+            if (textEnd > this.maxX) {
+                this.maxX = textEnd;
             }
             if (y - bbox.height < this.minY) {
                 this.minY = y - bbox.height;
@@ -790,6 +810,13 @@ export default class SvgWrapper {
                 if (x - bbox.width / 2.0 < this.minX) {
                     this.minX = x - bbox.width / 2.0;
                 }
+            }
+
+            if (textStart < this.minX) {
+                this.minX = textStart;
+            }
+            if (textEnd > this.maxX) {
+                this.maxX = textEnd;
             }
 
             if (y - bbox.height < this.minY) {
