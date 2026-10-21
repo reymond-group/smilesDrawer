@@ -38,7 +38,7 @@ describe('SvgWrapper', () => {
 
         const tree = Parser.parse('[NH4+]');
         const drawer = new SvgDrawer({isomeric: true});
-        drawer.draw(tree, svg, 'light', false);
+        drawer.draw(tree, svg, 'light', null);
 
         const parts = Array.from(svg.querySelectorAll('text tspan'));
         expect(parts.length).toBeGreaterThan(0);

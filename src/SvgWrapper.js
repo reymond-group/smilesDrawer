@@ -748,18 +748,18 @@ export default class SvgWrapper {
     }
 
     write(text, direction, x, y, singleVertex) {
+        const partWidths = text.map(part =>
+            SvgWrapper.measureText(part[0], this.opts.fontSizeLarge, this.opts.fontFamily).width);
+
         // Measure element name only, without charge or isotope ...
         let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
 
         // For left-direction text with charges/isotopes, account for
         // the extra width from decorations without inflating the bbox
         if (direction === 'left' && text[0][0] !== text[0][1]) {
-            let fullBbox = SvgWrapper.measureText(text[0][0], this.opts.fontSizeLarge, this.opts.fontFamily);
-            bbox.width = fullBbox.width;
+            bbox.width = partWidths[0];
         }
 
-        const partWidths = text.map(part =>
-            SvgWrapper.measureText(part[0], this.opts.fontSizeLarge, this.opts.fontFamily).width);
         const textWidth = partWidths.reduce((sum, width) => sum + width, 0);
         const maxPartWidth = partWidths.reduce((max, width) => Math.max(max, width), 0);
         const extentWidth = (direction === 'left' || direction === 'right')
@@ -780,12 +780,6 @@ export default class SvgWrapper {
             }
             if (x - bbox.width / 2.0 < this.minX) {
                 this.minX = x - bbox.width / 2.0;
-            }
-            if (textStart < this.minX) {
-                this.minX = textStart;
-            }
-            if (textEnd > this.maxX) {
-                this.maxX = textEnd;
             }
             if (y - bbox.height < this.minY) {
                 this.minY = y - bbox.height;
@@ -812,13 +806,6 @@ export default class SvgWrapper {
                 }
             }
 
-            if (textStart < this.minX) {
-                this.minX = textStart;
-            }
-            if (textEnd > this.maxX) {
-                this.maxX = textEnd;
-            }
-
             if (y - bbox.height < this.minY) {
                 this.minY = y - bbox.height;
             }
@@ -838,6 +825,13 @@ export default class SvgWrapper {
                     this.minY = y - 0.8 * bbox.height * text.length;
                 }
             }
+        }
+
+        if (textStart < this.minX) {
+            this.minX = textStart;
+        }
+        if (textEnd > this.maxX) {
+            this.maxX = textEnd;
         }
 
         let cx = x;
