@@ -11426,11 +11426,16 @@ var SvgWrapper = class _SvgWrapper {
     }
   }
   write(text, direction, x, y, singleVertex) {
+    const partWidths = text.map((part) => _SvgWrapper.measureText(part[0], this.opts.fontSizeLarge, this.opts.fontFamily).width);
     let bbox = _SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
     if (direction === "left" && text[0][0] !== text[0][1]) {
-      let fullBbox = _SvgWrapper.measureText(text[0][0], this.opts.fontSizeLarge, this.opts.fontFamily);
-      bbox.width = fullBbox.width;
+      bbox.width = partWidths[0];
     }
+    const textWidth = partWidths.reduce((sum, width) => sum + width, 0);
+    const maxPartWidth = partWidths.reduce((max, width) => Math.max(max, width), 0);
+    const extentWidth = direction === "left" || direction === "right" ? textWidth : maxPartWidth;
+    const textStart = direction === "left" ? x + bbox.width / 2 - extentWidth : x - bbox.width / 2;
+    const textEnd = direction === "left" ? x + bbox.width / 2 : textStart + extentWidth;
     if (singleVertex) {
       if (x + bbox.width * text.length > this.maxX) {
         this.maxX = x + bbox.width * text.length;
@@ -11476,6 +11481,12 @@ var SvgWrapper = class _SvgWrapper {
           this.minY = y - 0.8 * bbox.height * text.length;
         }
       }
+    }
+    if (textStart < this.minX) {
+      this.minX = textStart;
+    }
+    if (textEnd > this.maxX) {
+      this.maxX = textEnd;
     }
     let cx = x;
     let cy = y;
@@ -14461,7 +14472,7 @@ var _SmilesDrawerNS = class _SmilesDrawerNS {
     }
   }
 };
-_SmilesDrawerNS.Version = "2.4.1";
+_SmilesDrawerNS.Version = "2.4.2";
 _SmilesDrawerNS.Drawer = Drawer;
 _SmilesDrawerNS.GaussDrawer = GaussDrawer;
 _SmilesDrawerNS.Parser = ParserWrapper;
