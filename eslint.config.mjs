@@ -34,8 +34,11 @@ export default defineConfig([
             'no-shadow':                    'off',
             '@typescript-eslint/no-shadow': 'error',
 
-            // TODO: Re-enable when we have real types (not just JSDoc):
-            '@typescript-eslint/no-unused-vars': 'warn',
+            // TODO: Make this an error when we have real types (not just JSDoc):
+            'no-unused-vars':                    'off',
+            '@typescript-eslint/no-unused-vars': ['warn', {
+                argsIgnorePattern: '^_',
+            }],
 
             // Aligning things improves readability!
             '@stylistic/no-multi-spaces': 'off',

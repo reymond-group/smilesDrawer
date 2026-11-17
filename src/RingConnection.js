@@ -22,6 +22,7 @@ export default class RingConnection {
         this.firstRingId = firstRing.id;
         this.secondRingId = secondRing.id;
         this.vertices = new Set();
+        this.isForcedBridge = false;
 
         for (let m = 0; m < firstRing.members.length; m++) {
             let c = firstRing.members[m];
@@ -77,6 +78,10 @@ export default class RingConnection {
      * @returns {Boolean} A boolean indicating whether or not this ring connection is a bridge.
      */
     isBridge(vertices) {
+        if (this.isForcedBridge) {
+            return true;
+        }
+
         if (this.vertices.size > 2) {
             return true;
         }

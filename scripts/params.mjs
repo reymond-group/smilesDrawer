@@ -1,5 +1,5 @@
 export const BASE = {
-    entryPoints: ['app.js'],
+    entryPoints: ['app.ts'],
     target:      ['chrome65'],
     sourcemap:   true,
     bundle:      true,
@@ -12,15 +12,5 @@ export const DEV_BUNDLE = Object.assign({}, BASE, {
 
 export const DEV_MINIFY = Object.assign({}, BASE, {
     outfile: 'dist/smiles-drawer.dev.min.js',
-    minify:  true,
-});
-
-// Targets for the official builds:
-export const BUNDLE = Object.assign({}, BASE, {
-    outfile: 'dist/smiles-drawer.js',
-});
-
-export const MINIFY = Object.assign({}, BASE, {
-    outfile: 'dist/smiles-drawer.min.js',
     minify:  true,
 });

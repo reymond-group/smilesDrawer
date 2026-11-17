@@ -748,15 +748,29 @@ export default class SvgWrapper {
     }
 
     write(text, direction, x, y, singleVertex) {
+        const partWidths = text.map(part =>
+            SvgWrapper.measureText(part[0], this.opts.fontSizeLarge, this.opts.fontFamily).width);
+
         // Measure element name only, without charge or isotope ...
         let bbox = SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
 
         // For left-direction text with charges/isotopes, account for
         // the extra width from decorations without inflating the bbox
         if (direction === 'left' && text[0][0] !== text[0][1]) {
-            let fullBbox = SvgWrapper.measureText(text[0][0], this.opts.fontSizeLarge, this.opts.fontFamily);
-            bbox.width = fullBbox.width;
+            bbox.width = partWidths[0];
         }
+
+        const textWidth = partWidths.reduce((sum, width) => sum + width, 0);
+        const maxPartWidth = partWidths.reduce((max, width) => Math.max(max, width), 0);
+        const extentWidth = (direction === 'left' || direction === 'right')
+            ? textWidth
+            : maxPartWidth;
+        const textStart = direction === 'left'
+            ? x + bbox.width / 2.0 - extentWidth
+            : x - bbox.width / 2.0;
+        const textEnd = direction === 'left'
+            ? x + bbox.width / 2.0
+            : textStart + extentWidth;
 
         // Get the approximate width and height of text and add update max/min
         // to allow for narrower paddings
@@ -811,6 +825,13 @@ export default class SvgWrapper {
                     this.minY = y - 0.8 * bbox.height * text.length;
                 }
             }
+        }
+
+        if (textStart < this.minX) {
+            this.minX = textStart;
+        }
+        if (textEnd > this.maxX) {
+            this.maxX = textEnd;
         }
 
         let cx = x;
@@ -1009,7 +1030,7 @@ export default class SvgWrapper {
         svg.setAttributeNS(null, 'width', width);
         svg.setAttributeNS(null, 'height', height);
 
-        let image = new Image();
+        let image = document.createElement('img');
         image.onload = function() {
             canvas.width = width;
             canvas.height = height;
@@ -1111,7 +1132,7 @@ export default class SvgWrapper {
 
         svg.appendChild(textElem);
 
-        // The extra 0.4 here it to account for any subscripts on the bottom line.
+        // The extra 0.4 here is to account for any subscripts on the bottom line.
         // The factor of 4 / 3 is to convert from points to CSS pixels (1in = 72pt = 96px).
         return {svg: svg, width: maxLineWidth, height: (lines.length + 0.4) * fontSize * 4 / 3};
     }

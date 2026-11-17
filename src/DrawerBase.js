@@ -692,7 +692,7 @@ export default class DrawerBase {
                             // Switch places / sides
                             // Here we only try to rotate a simple ring substituent.
                             // If both ends of the bond are already inside rings, this code gives up.
-                            // That means it will not help with a ring attached to another ring 
+                            // That means it will not help with a ring attached to another ring
                             // layouts, which is why a later dedicated pass was added
                             if (vertexB.value.rings.length !== 0 && vertexA.value.rings.length !== 0) {
                                 continue;
@@ -728,7 +728,7 @@ export default class DrawerBase {
                                 for (let step = 1; step <= maxSteps; step++) {
                                     let angle = stepAngle * step;
 
-                                    // Try roatation in one direction 
+                                    // Try roatation in one direction
                                     this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
 
                                     let newTotalOverlapScore = this.getOverlapScore().total;
@@ -804,6 +804,36 @@ export default class DrawerBase {
     }
 
     /**
+     * Inverts an E/Z bond marker; leaves other bonds unchanged.
+     *
+     * @param {?string} bond - The bond marker to invert.
+     * @returns The bond marker, inverted if it was an E/Z bond.
+     */
+    static flipEZ(bond) {
+        if (bond === '/')  return '\\';
+        if (bond === '\\') return '/';
+        return bond;
+    }
+
+    /**
+     * Gets the bond type of a ringbond given the bond markers at either end.
+     *
+     * This is necessary because some code elsewhere (Graph?) sets these markers
+     * to '-' if they aren't specified.  This returns the first bond that differs
+     * from the default.  It flips E/Z specification of the reverse bond (if any)
+     * to make sure the stereochemistry is correct.
+     *
+     * @param {?string} fwd - The forward bond marker.
+     * @param {?string} rev - The reverse bond marker.
+     * @returns A bond marker, with correct E/Z stereochemistry.
+     */
+    static getRingbondType(fwd, rev) {
+        if (fwd && fwd !== '-') return fwd;
+        if (rev && rev !== '-') return DrawerBase.flipEZ(rev);
+        return '-';
+    }
+
+    /**
      * Initializes rings and ringbonds for the current molecule.
      */
     initRings() {
@@ -833,7 +863,11 @@ export default class DrawerBase {
                     let targetVertexId = openBonds.get(ringbondId)[0];
                     let targetRingbondBond = openBonds.get(ringbondId)[1];
                     let edge = new Edge(sourceVertexId, targetVertexId, 1);
-                    edge.setBondType(targetRingbondBond || ringbondBond || '-');
+
+                    // The new edge goes from this vertex to the other vertex,
+                    // so the bond from openBonds is the "reverse" bond.
+                    edge.setBondType(DrawerBase.getRingbondType(ringbondBond, targetRingbondBond));
+
                     let edgeId = this.graph.addEdge(edge);
                     let targetVertex = this.graph.vertices[targetVertexId];
 
@@ -905,6 +939,8 @@ export default class DrawerBase {
             this.graph.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
         }
 
+        this.markCageRingSystems();
+
         // Backup the ring information to restore after placing the bridged ring.
         // This is needed in order to identify aromatic rings and stuff like this in
         // rings that are member of the superring.
@@ -941,26 +977,22 @@ export default class DrawerBase {
     }
 
     initHydrogens() {
-    // Do not draw hydrogens except when they are connected to a stereocenter connected to two or more rings.
-        if (!this.opts.explicitHydrogens) {
-            for (let i = 0; i < this.graph.vertices.length; i++) {
-                let vertex = this.graph.vertices[i];
+        if (this.opts.explicitHydrogens) {
+            return;
+        }
 
-                if (vertex.value.element !== 'H') {
-                    continue;
-                }
+        for (const vertex of this.graph.vertices) {
+            if (vertex.value.element !== 'H' || vertex.neighbours.length !== 1) {
+                continue;
+            }
 
-                // Hydrogens should have only one neighbour, so just take the first
-                // Also set hasHydrogen true on connected atom
-                let neighbour = this.graph.vertices[vertex.neighbours[0]];
-                neighbour.value.hasHydrogen = true;
-
-                if (!neighbour.value.isStereoCenter
-                    || (neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing)
-                    || (neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2)
-                ) {
-                    vertex.value.isDrawn = false;
-                }
+            const neighbour = this.graph.vertices[vertex.neighbours[0]];
+            if (!neighbour.value.isStereoCenter
+                || (neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing)
+                || (neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2)
+            ) {
+                // This vertex can be safely hidden.
+                vertex.value.isDrawn = false;
             }
         }
     }
@@ -991,7 +1023,7 @@ export default class DrawerBase {
         recurse(ringId);
 
         // recurse() is only used for BRIDGED connections (rings that share 3+ atoms)
-        // but FUSED rings (exactly 2 shared atoms, like in naphtahlene) are left out. 
+        // but FUSED rings (exactly 2 shared atoms, like in naphtahlene) are left out.
         // THis causes issues if the bridged system is laid out by KK. If a fused ring
         // shares 2 atoms with the bridges system but isn't included, those 2 atoms
         // get positioned by KK, while the rest of the fused rings gets positioned by the
@@ -1039,13 +1071,188 @@ export default class DrawerBase {
     }
 
     /**
+     * Detect cage-like fused ring systems and route them through bridged-ring
+     * layout.
+     *
+     * logic:
+     * Check one fused ring component at a time. Rings are fused when they
+     * share two or more atoms.
+     *  A cage should have several rings fused on three or more sides.
+     * Every atom in the cage skeleton should have three neighbours inside
+     * the same fused component.
+     * Most ring edges should be shared by two rings. A small boundary is
+     *allowed because the SSSR can miss one face of a cage (see cubane example)
+     * This rejects polycyclic aromatic hydrocarbons (PAHs) which are an exception to the rule
+     *  check https://en.wikipedia.org/wiki/Polycyclic_aromatic_hydrocarbon
+     * PAHs have outer atoms with only two neighbours inside the fused system.
+     */
+    markCageRingSystems() {
+        // Count fused connections (vertices.size >= 2) per ring and build a
+        // ring -> fused-neighbour adjacency list.
+        let fusedCount = new Map();
+        let fusedNeighbours = new Map();
+        for (let i = 0; i < this.rings.length; i++) {
+            fusedCount.set(this.rings[i].id, 0);
+            fusedNeighbours.set(this.rings[i].id, []);
+        }
+
+        for (let i = 0; i < this.ringConnections.length; i++) {
+            let rc = this.ringConnections[i];
+            if (rc.vertices.size < 2) continue;
+            fusedCount.set(rc.firstRingId, fusedCount.get(rc.firstRingId) + 1);
+            fusedCount.set(rc.secondRingId, fusedCount.get(rc.secondRingId) + 1);
+            fusedNeighbours.get(rc.firstRingId).push(rc.secondRingId);
+            fusedNeighbours.get(rc.secondRingId).push(rc.firstRingId);
+        }
+
+        let visited = new Set();
+        let cagedRings = new Set();
+
+        for (let i = 0; i < this.rings.length; i++) {
+            let rootId = this.rings[i].id;
+            if (visited.has(rootId)) continue;
+
+            let component = [];
+            let queue = [rootId];
+            visited.add(rootId);
+            while (queue.length > 0) {
+                let cur = queue.shift();
+                component.push(cur);
+                let neighbours = fusedNeighbours.get(cur);
+                for (let j = 0; j < neighbours.length; j++) {
+                    let n = neighbours[j];
+                    if (!visited.has(n)) {
+                        visited.add(n);
+                        queue.push(n);
+                    }
+                }
+            }
+
+            if (this.isCageRingComponent(component, fusedCount)) {
+                for (let j = 0; j < component.length; j++) {
+                    cagedRings.add(component[j]);
+                }
+            }
+        }
+
+        if (cagedRings.size === 0) return;
+
+        // Force every fused connection internal to a caged component to act
+        // as a bridge so RingConnection.isBridge() reports true and the
+        // bridged-ring collapse picks it up.
+        for (let i = 0; i < this.ringConnections.length; i++) {
+            let rc = this.ringConnections[i];
+            if (rc.vertices.size < 2) continue;
+            if (cagedRings.has(rc.firstRingId) && cagedRings.has(rc.secondRingId)) {
+                rc.isForcedBridge = true;
+            }
+        }
+    }
+
+    /**
+     * Check whether a fused ring component looks like a closed cage.
+     *
+     * @param {Number[]} ringIds Ring ids in one fused component.
+     * @param {Map<Number, Number>} fusedCount Number of fused neighbours per ring.
+     * @returns {Boolean} Whether this component should use bridged-ring layout.
+     */
+    isCageRingComponent(ringIds, fusedCount) {
+        let seedCount = 0;
+        for (let i = 0; i < ringIds.length; i++) {
+            if (fusedCount.get(ringIds[i]) >= 3) {
+                seedCount++;
+            }
+        }
+
+        if (seedCount < 2) {
+            return false;
+        }
+
+        let stats = this.getRingSystemStats(ringIds);
+
+        return (
+            stats.atomCount > 0
+            && stats.edgeCount > 0
+            && stats.nonCageAtomCount === 0
+            && stats.boundaryEdgeRatio <= 0.5
+        );
+    }
+
+    /**
+     * Collect simple graph stats for a fused ring component.
+     *
+     * @param {Number[]} ringIds Ring ids in one fused component.
+     * @returns {Object} Ring-system atom and edge stats.
+     */
+    getRingSystemStats(ringIds) {
+        let ringMemberSets = new Map();
+        let atoms = new Set();
+        let degreeByAtom = new Map();
+
+        for (let i = 0; i < ringIds.length; i++) {
+            let ring = this.getRing(ringIds[i]);
+            let members = new Set(ring.members);
+            ringMemberSets.set(ringIds[i], members);
+
+            for (let j = 0; j < ring.members.length; j++) {
+                atoms.add(ring.members[j]);
+                degreeByAtom.set(ring.members[j], 0);
+            }
+        }
+
+        let edgeCount = 0;
+        let boundaryEdgeCount = 0;
+
+        for (let i = 0; i < this.graph.edges.length; i++) {
+            let edge = this.graph.edges[i];
+            if (!atoms.has(edge.sourceId) || !atoms.has(edge.targetId)) {
+                continue;
+            }
+
+            let ringCount = 0;
+            for (let j = 0; j < ringIds.length; j++) {
+                let members = ringMemberSets.get(ringIds[j]);
+                if (members.has(edge.sourceId) && members.has(edge.targetId)) {
+                    ringCount++;
+                }
+            }
+
+            if (ringCount === 0) {
+                continue;
+            }
+
+            edgeCount++;
+            degreeByAtom.set(edge.sourceId, degreeByAtom.get(edge.sourceId) + 1);
+            degreeByAtom.set(edge.targetId, degreeByAtom.get(edge.targetId) + 1);
+
+            if (ringCount === 1) {
+                boundaryEdgeCount++;
+            }
+        }
+
+        let nonCageAtomCount = 0;
+        for (let degree of degreeByAtom.values()) {
+            if (degree !== 3) {
+                nonCageAtomCount++;
+            }
+        }
+
+        return {
+            atomCount:         atoms.size,
+            edgeCount:         edgeCount,
+            nonCageAtomCount:  nonCageAtomCount,
+            boundaryEdgeRatio: edgeCount === 0 ? 1 : boundaryEdgeCount / edgeCount,
+        };
+    }
+
+    /**
      * Creates a bridged ring.
      *
      * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
-     * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
+     * @param {Number} _sourceVertexId The vertex id to start the bridged ring discovery from (UNUSED).
      * @returns {Ring} The bridged ring.
      */
-    createBridgedRing(ringIds, sourceVertexId) {
+    createBridgedRing(ringIds, _sourceVertexId) {
         let ringMembers = new Set();
         let vertices = new Set();
         let neighbours = new Set();
@@ -1601,15 +1808,21 @@ export default class DrawerBase {
             }
         });
 
-        // Draw ring for implicitly defined aromatic rings
-        if (!this.bridgedRing) {
-            for (let i = 0; i < this.rings.length; i++) {
-                let ring = this.rings[i];
+        // Draw the aromatic-ring circle. Bridged aromatic rings still get
+        // a circle as long as their 2D projection is close to a regular
+        // polygon (e.g. a flat pyrrole on a bridged bicyclic). Distorted
+        // ones (paracyclophane, triptycene) are skipped here and fall
+        // back to dashed bonds in drawEdge. Mirrors SvgDrawer.drawEdges.
+        for (let i = 0; i < this.rings.length; i++) {
+            let ring = this.rings[i];
 
-                if (this.isRingAromatic(ring)) {
-                    this.canvasWrapper.drawAromaticityRing(ring);
-                }
+            if (!this.isRingAromatic(ring)) continue;
+
+            if (ring.isPartOfBridged && !this.isRingRegularPolygon(ring)) {
+                continue;
             }
+
+            this.canvasWrapper.drawAromaticityRing(ring);
         }
     }
 
@@ -1640,7 +1853,22 @@ export default class DrawerBase {
             Vector2.multiplyScalar(normals[1], 10).add(a),
         ];
 
-        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || (edge.isPartOfAromaticRing && this.bridgedRing)) {
+        // The third condition handles aromatic bonds inside a bridged ring
+        // system wher the 2D projection is too distorted for the
+        // aromatic circle too look good (e.g triptycene). Those bonds
+        // get drawn as a solid line with a dashed parallel inside the ring
+        // If the aromatic ring is still close to a regular polygon (e.g.
+        // a flat pyrrole on a bridged bicyclic) we skip this branch and
+        // let drawEdges draw the circle as usual becuase it looks better.
+        // the long term fix is to kekulise aromatic input for bridged systems in
+        // the parser (explicit single/double) Mirrors SvgDrawer.drawEdge.
+        let aromaticRing = (edge.isPartOfAromaticRing
+            && vertexA.value.bridgedRing !== null
+            && vertexB.value.bridgedRing !== null)
+            ? this.getLargestOrAromaticCommonRing(vertexA, vertexB)
+            : null;
+
+        if (edge.bondType === '=' || this.getRingbondType(vertexA, vertexB) === '=' || (aromaticRing && !this.isRingRegularPolygon(aromaticRing))) {
             // Always draw double bonds inside the ring
             let inRing = this.areVerticesInSameRing(vertexA, vertexB);
             let s = this.chooseSide(vertexA, vertexB, sides);
@@ -2146,16 +2374,9 @@ export default class DrawerBase {
             const vA = edge.sourceId;
             const vB = edge.targetId;
 
-            // Skip double bonds where both alkene atoms are part of ring
-            // fix works after layout by mirroring one movable branch across the
-            // double-bond axis. That is safe when one side is a free subtree, but not
-            // when both sides are locked into ring geometry.
-            // In ring-ring cases such as N1CCCCC1=C2CCCCN2, the current layout may still
-            // draw one orientation, but we do not actively enforce the SMILES E/Z here.
-            // Supporting those cases requires ring layout itself to place the alkene
-            // with the correct configuration. See issue#247.
-            if (graph.vertices[vA].value.rings.length > 0 &&
-                graph.vertices[vB].value.rings.length > 0) {
+            if (this.areVerticesInSameRing(graph.vertices[vA], graph.vertices[vB])) {
+                // These had better be in the right place by default,
+                // because there's no clean fix if they're not...
                 continue;
             }
 
@@ -2169,8 +2390,8 @@ export default class DrawerBase {
                     // '/' means source is below, target is above
                     // So neighbor's side depends on whether it's source or target
                     let neighborAbove = (e.sourceId === vA)
-                        ? (e.bondType === '/')    // A→N: '/' = N above
-                        : (e.bondType === '\\');  // N→A: '\\' = N above
+                        ? (e.bondType === '/')    // B=A/N: N above
+                        : (e.bondType === '\\');  // N\A=B: N above
                     stereoA = {nid, above: neighborAbove};
                     break;
                 }
@@ -2223,30 +2444,15 @@ export default class DrawerBase {
                 if (e && (e.bondType === '/' || e.bondType === '\\')) countB++;
             }
 
-            let flipId, pivotId;
-            if (countA <= countB) {
-                flipId = stereoA.nid;
-                pivotId = vA;
-            }
-            else {
-                flipId = stereoB.nid;
-                pivotId = vB;
-            }
-
-            // Don't flip ring members; try the other side
-            if (graph.vertices[flipId].value.rings.length > 0) {
-                flipId = (pivotId === vA) ? stereoB.nid : stereoA.nid;
-                pivotId = (pivotId === vA) ? vB : vA;
-                if (graph.vertices[flipId].value.rings.length > 0) continue;
-            }
+            const flipId  = (countA <= countB) ? vA : vB;
+            const pivotId = (countA <= countB) ? vB : vA;
 
             // Reflect subtree across the line through pivot in direction (ax, ay)
             const pivot = graph.vertices[pivotId].position;
             const len2 = ax * ax + ay * ay;
             if (len2 < 0.001) continue;
 
-            const self = this;
-            graph.traverseTree(flipId, pivotId, function(vertex) {
+            graph.traverseTree(flipId, pivotId, (vertex) => {
                 const dx = vertex.position.x - pivot.x;
                 const dy = vertex.position.y - pivot.y;
                 const dot = dx * ax + dy * ay;
@@ -2256,7 +2462,7 @@ export default class DrawerBase {
 
                 // Also reflect anchored ring centers
                 for (let j = 0; j < vertex.value.anchoredRings.length; j++) {
-                    let ring = self.rings[vertex.value.anchoredRings[j]];
+                    let ring = this.rings[vertex.value.anchoredRings[j]];
                     if (ring) {
                         const rdx = ring.center.x - pivot.x;
                         const rdy = ring.center.y - pivot.y;
@@ -2625,7 +2831,8 @@ export default class DrawerBase {
                         let ring = null;
                         if (previousVertex.value.bridgedRing !== null) {
                             ring = this.getRing(previousVertex.value.bridgedRing);
-                        } else {
+                        }
+                        else {
                             ring = this.getRing(previousVertex.value.rings[0]);
                         }
                         if (ring && ring.center) {
@@ -2634,7 +2841,8 @@ export default class DrawerBase {
                             // away, so use center-to-vertex AFTER invert:
                             // pos = center - vertex → invert → vertex - center = away ✓
                             pos = Vector2.subtract(ring.center, previousVertex.position);
-                        } else {
+                        }
+                        else {
                             pos = new Vector2(1.0, 0.0);
                         }
                     }
@@ -2728,11 +2936,11 @@ export default class DrawerBase {
                 if (prevEdge && nextEdge && prevEdge.weight + nextEdge.weight >= 4) {
                     prevEdge.center = true;
                     nextEdge.center = true;
-
-                    // TODO: One of these is on value, but the other isn't?
-                    vertex.value.drawExplicit = false;
-                    nextVertex.drawExplicit = true;
                     nextVertex.angle = 0.0;
+
+                    if (prevEdge.weight === nextEdge.weight) {
+                        vertex.value.drawExplicit = true;
+                    }
 
                     this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
                 }
@@ -3042,6 +3250,44 @@ export default class DrawerBase {
     }
 
     /**
+     * Check whether the ring's 2D projection is close enough to a regular
+     * polygon that the aromatic-circle indicator will sit correctly inside
+     * it. Used to decide whether an aromatic ring that has been absorbed
+     * into a bridged super-ring can still use a circle, or needs the
+     * dashed-bond fallback.
+     *
+     * Heuristic: every vertex of a regular N-gon is the same distance
+     * from the centre. We accept the ring as regular when the longest
+     * radius is no more than `tolerance` times the shortest.
+     *
+     * @param {Ring}   ring             A ring.
+     * @param {Number} [tolerance=1.15] Max acceptable max/min radius ratio.
+     * @returns {Boolean}
+     */
+    isRingRegularPolygon(ring, tolerance = 1.15) {
+        if (ring.members.length < 3) {
+            return false;
+        }
+
+        let positions = ring.getPolygon(this.graph.vertices);
+        let center    = ring.center;
+        let minR      = Infinity;
+        let maxR      = -Infinity;
+
+        for (let i = 0; i < positions.length; i++) {
+            let r = positions[i].distance(center);
+            if (r < minR) minR = r;
+            if (r > maxR) maxR = r;
+        }
+
+        if (minR < 1e-6) {
+            return false;
+        }
+
+        return (maxR / minR) < tolerance;
+    }
+
+    /**
      * Get the normals of an edge.
      *
      * @param {Edge} edge An edge.
@@ -3154,8 +3400,8 @@ export default class DrawerBase {
      * obvious in the final geometry.
      */
     resolveRigidRingOverlaps() {
-        let currentOverlap = this.getOverlapScore().total; //total overlap score
-        let currentMinimumDistance = this.getMinimumNonBondedDistance(); //to make sure we are 
+        let currentOverlap = this.getOverlapScore().total; // total overlap score
+        let currentMinimumDistance = this.getMinimumNonBondedDistance(); // to make sure we are
         // not creating a collision elsewhere
         let minimumAllowedDistance = this.opts.bondLength * 0.3;
 
@@ -3223,16 +3469,16 @@ export default class DrawerBase {
                 for (let direction = 0; direction < 2; direction++) {
                     let angle = direction === 0 ? baseAngle : -baseAngle;
 
-                    //rotate first by angle
+                    // rotate first by angle
                     this.rotateSubtree(vertexB.id, vertexA.id, angle, vertexB.position);
 
                     let newOverlap = this.getOverlapScore().total;
                     let newMinimumDistance = this.getMinimumNonBondedDistance();
 
-                    //undo rotation once we got the score
+                    // undo rotation once we got the score
                     this.rotateSubtree(vertexB.id, vertexA.id, -angle, vertexB.position);
 
-                    // reject if two non-bonded atoms come too close together 
+                    // reject if two non-bonded atoms come too close together
                     if (newMinimumDistance <= minimumAllowedDistance) {
                         continue;
                     }
@@ -3292,37 +3538,31 @@ export default class DrawerBase {
             const rs       = (parity === rotation) ? 'R' : 'S';
             vertex.value.chirality = rs;
 
-            // Pick best neighbor to draw wedge on.
-            // Priority: non-stereocenter > outside ring > heteroatom > shortest subtree
-            let wedgeOrder = new Array(neighbours.length - 1);
-            let showHydrogen = vertex.value.rings.length > 1 && vertex.value.hasHydrogen;
-            let offset = vertex.value.hasHydrogen ? 1 : 0;
+            // Pick the best neighbor to draw a wedge to.
+            // Priority: non-stereocenter > not in same ring > visible > heteroatom > shortest subtree
+            // Note that the sort order is reversed, so higher scores get priority.
+            const wedgeOrder = order.map((o) => {
+                const nid       = neighbours[o];
+                const neighbour = this.graph.vertices[nid];
 
-            for (let j = 0; j < order.length - offset; j++) {
-                wedgeOrder[j] = new Uint32Array(2);
-                let neighbour = this.graph.vertices[neighbours[order[j]]];
-                wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 100000;
-                wedgeOrder[j][0] += this.areVerticesInSameRing(neighbour, vertex) ? 0 : 10000;
-                wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 1000 : 0;
-                wedgeOrder[j][0] -= neighbour.value.subtreeDepth === 0 ? 1000 : 0;
-                wedgeOrder[j][0] += 1000 - neighbour.value.subtreeDepth;
-                wedgeOrder[j][1] = neighbours[order[j]];
-            }
+                let rank = 0;
+                rank -= neighbour.value.isStereoCenter ? 1000000 : 0;
+                rank -= this.areVerticesInSameRing(neighbour, vertex) ? 100000 : 0;
+                rank += neighbour.value.isDrawn ? 10000 : 0;
+                // rank += neighbour.isTerminal() ? 1000 : 0;
+                rank += neighbour.value.element !== 'C' ? 100 : 0;
+                rank -= this.graph.getTreeDepth(nid, vertex.id);
 
-            wedgeOrder.sort((a, b) => b[0] - a[0]);
+                return [rank, nid];
+            }).sort((a, b) => {
+                return b[0] - a[0];
+            });
 
-            if (!showHydrogen) {
-                let wedgeId = wedgeOrder[0][1];
-                let wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
-                this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
-
-                if (vertex.value.hasHydrogen) {
-                    let hId = neighbours[order[order.length - 1]];
-                    let hWedge = this._computeWedgeDirection(vertex, hId, order, neighbours, rs);
-                    this.graph.getEdge(vertex.id, hId).wedge = hWedge;
-                    vertex.value.hydrogenDirection = hWedge === 'up' ? 'up' : 'down';
-                }
-            }
+            // Set the wedge direction.
+            const wedgeId = wedgeOrder[0][1];
+            const wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
+            this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
+            this.graph.vertices[wedgeId].value.isDrawn = true;
         }
     }
 
@@ -3336,7 +3576,7 @@ export default class DrawerBase {
      *
      * @param {Vertex} vertex The stereocenter vertex.
      * @param {Number} wedgeTargetId The vertex id of the neighbor being wedged.
-     * @param {Uint8Array} order CIP priority order (index→original neighbor index).
+     * @param {number[] | Uint8Array} order CIP priority order (index→original neighbor index).
      * @param {Number[]} neighbours The neighbor vertex ids.
      * @param {String} rs 'R' or 'S' designation.
      * @returns {String} 'up' (solid wedge) or 'down' (dashed wedge).
@@ -3369,7 +3609,7 @@ export default class DrawerBase {
             let cy = (wedgePos.y + others[0].y + others[1].y) / 3;
             others.push({
                 x: 2 * vertex.position.x - cx,
-                y: 2 * vertex.position.y - cy
+                y: 2 * vertex.position.y - cy,
             });
             // H is always lowest CIP priority, so wedgeCipRank doesn't shift
         }
@@ -3377,7 +3617,7 @@ export default class DrawerBase {
         // Signed area of the triangle (others[0], others[1], others[2]).
         // In SVG coordinates (y-axis down), positive = clockwise winding.
         let sa = (others[1].x - others[0].x) * (others[2].y - others[0].y)
-               - (others[2].x - others[0].x) * (others[1].y - others[0].y);
+            - (others[2].x - others[0].x) * (others[1].y - others[0].y);
 
         // When the wedged atom has even CIP rank (0, 2), solid wedge gives R
         // when the remaining triangle winds CW (sa > 0). For odd rank (1, 3),

@@ -2,9 +2,15 @@
   "compilerOptions": {
     "lib": ["es2019", "dom"],
     "target": "es2015",
-    "allowJs": true
+    "allowJs": true,
+
+    "declaration": true,
+    "declarationDir": "./dist/types",
+
+    // Prevent weird errors when typechecking:
+    "skipLibCheck": true
   },
   "files": [
-    "app.js"
+    "app.ts"
   ]
 }

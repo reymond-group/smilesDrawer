@@ -330,7 +330,7 @@ export class CIPTree {
  * @see https://ursula.chem.yale.edu/~chem220/chem220js/STUDYAIDS/isomers/RS14272/pinene.html
  */
 export default class CIP {
-    static getOrderArray(graph: Graph, vertex: Vertex): Uint8Array | undefined {
+    static getOrderArray(graph: Graph, vertex: Vertex): Array<number> | undefined {
         const root = CIPTree.build(graph, vertex);
 
         // If there are any non-stereo ties, this isn't a stereocenter!
@@ -342,7 +342,7 @@ export default class CIP {
 
         // Build the ordering array expected by DrawerBase._computeWedgeDirection().
         const nNeighbours = vertex.neighbours.length;
-        const order = new Uint8Array(nNeighbours);
+        const order = new Array(nNeighbours);
         for (let i = 0; i < nNeighbours; ++i) {
             const vid = root.children[i].vertex.id;
             order[i] = vertex.neighbours.findIndex(nid => nid === vid);

@@ -3,7 +3,7 @@
  * (parser -> graph -> layout -> SVG) and cover structural motifs that
  * have caused bugs or are otherwise tricky.
  *
- * If a new bug is found, SMILES cna be added here before fixing it.
+ * If a new bug is found, SMILES can be added here before fixing it.
  */
 import {describe, it, expect} from 'vitest';
 import {createJSDOM}          from '../helpers';
@@ -26,6 +26,7 @@ function assertRendersToSVG(smiles) {
 
     const pp = drawer.preprocessor;
     expect(pp.graph.vertices.length).toBeGreaterThan(0);
+    return pp;
 }
 
 // Basic structural motifs one representative per category
@@ -78,7 +79,7 @@ describe('Rendering: regression cases', () => {
     }
 });
 
-// Complex molecules 
+// Complex molecules
 describe('Rendering: complex molecules', () => {
     const cases = [
         ['strychnine', 'O=C1CC2CC3CC4(OCC=C4CC3N2C5=CC=CC1=C5)C=O'],
@@ -90,4 +91,32 @@ describe('Rendering: complex molecules', () => {
     for (const [name, smiles] of cases) {
         it(`${name}: ${smiles}`, () => assertRendersToSVG(smiles));
     }
+});
+
+describe('Rendering: straight chains', () => {
+    it('should label carbons between pairs of double bonds', () => {
+        let pp = assertRendersToSVG('O=C=O');
+        expect(pp.graph.vertices[1].value.drawExplicit).toBe(true);
+
+        pp = assertRendersToSVG('C=C=C');
+        expect(pp.graph.vertices[1].value.drawExplicit).toBe(true);
+    });
+
+    it('should not label carbons at the ends of straight chains', () => {
+        let pp = assertRendersToSVG('C=C=C=CC');
+        expect(pp.graph.vertices[0].value.drawExplicit).toBe(false);
+        expect(pp.graph.vertices[3].value.drawExplicit).toBe(false);
+
+        pp = assertRendersToSVG('CC=C=C=C');
+        expect(pp.graph.vertices[1].value.drawExplicit).toBe(false);
+        expect(pp.graph.vertices[4].value.drawExplicit).toBe(false);
+    });
+
+    it('should not label carbons if the two bonds are of different orders', () => {
+        const pp = assertRendersToSVG('C#CC#C');
+        expect(pp.graph.vertices[0].value.drawExplicit).toBe(false);
+        expect(pp.graph.vertices[1].value.drawExplicit).toBe(false);
+        expect(pp.graph.vertices[2].value.drawExplicit).toBe(false);
+        expect(pp.graph.vertices[3].value.drawExplicit).toBe(false);
+    });
 });

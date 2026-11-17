@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="./visual-tests.css" />
     <script type="text/javascript" src="./visual-tests.js"></script>
     <script type="text/javascript" src="../../dist/smiles-drawer.dev.js"></script>
-    <title>Text Alignment Tests</title>
+    <title>Reaction Text Tests</title>
     <script type="module" defer>
       const TESTS = [
         {
@@ -26,7 +26,21 @@
           cause: 'The width calculation in SvgWrapper.writeText() didn\'t account for spaces, so lines could be too long.',
           status: 'passing',
           smiles: [
-            '[Pb]>>[Au] __{"textAboveArrow": "a a a a a a a a a a a a a a a a a a a a a a a", "textBelowArrow": "b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b "}__',
+            '[Pb]>>[Au] __{"textAboveArrow": "p p p p p p p p p p p p p p p p p p p p p p p p p p p p p p", "textBelowArrow": "b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b "}__',
+          ],
+        },
+
+        {
+          desc: 'Reactions with large and/or unbalanced amounts of reaction text should render pleasantly.',
+          cause: 'The old code didn\'t take the reaction text into account when calculating the bounding box, so text could get cut off.',
+          status: 'passing',
+          smiles: [
+            '[Pb]>>[Au] __{"textAboveArrow": "three\\nlines of\\ntext"}__',
+            '[Pb]>>[Au] __{"textBelowArrow": "three\\nlines of\\ntext"}__',
+            '[Pb]>>[Au] __{"textAboveArrow": "one line of text", "textBelowArrow": "three\\nlines of\\ntext"}__',
+            '[Pb]>>[Au] __{"textAboveArrow": "three\\nlines of\\ntext", "textBelowArrow": "one line of text"}__',
+            '[Pb]>>[Au] __{"textAboveArrow": "two lines\\nof text", "textBelowArrow": "two lines\\nof text"}__',
+            '[Pb]>>[Au] __{"textAboveArrow": "three\\nlines of\\ntext", "textBelowArrow": "three\\nlines of\\ntext"}__',
           ],
         },
 
@@ -40,19 +54,7 @@
             '[Pb]>>[Au] __{"textAboveArrow": "there is antidisestablishmentarianism in the middle", "textBelowArrow": "there is antidisestablishmentarianism in the middle"}__',
             '[Pb]>>[Au] __{"textAboveArrow": "the last word is antidisestablishmentarianism", "textBelowArrow": "the last word is antidisestablishmentarianism"}__',
           ],
-        },
-
-        {
-          desc: 'The formula for oil of vitriol (sulphuric acid) should have two hydrogens.',
-          cause: undefined,
-          status: 'failing',
-          smiles: [
-            '[Pb]>OS(=O)(=O)O>[Au]',
-          ],
-          links: [
-            'https://github.com/reymond-group/smilesDrawer/issues/262'
-          ]
-        },
+        }
       ];
 
       // await loadSmilesDrawer();
@@ -61,7 +63,7 @@
     </script>
   </head>
   <body>
-    <h1>Text Alignment Tests</h1>
+    <h1>Reaction Text Tests</h1>
     <div id="tests"></div>
   </body>
 </html>

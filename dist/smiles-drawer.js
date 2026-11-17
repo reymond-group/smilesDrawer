@@ -7,7 +7,11 @@
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __commonJS = (cb, mod) => function __require() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    try {
+      return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    } catch (e) {
+      throw mod = 0, e;
+    }
   };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
@@ -32,7 +36,7 @@
     "node_modules/chroma-js/chroma.js"(exports, module) {
       (function(global, factory) {
         typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, global.chroma = factory());
-      })(exports, function() {
+      })(exports, (function() {
         "use strict";
         var limit$2 = function(x, min2, max2) {
           if (min2 === void 0) min2 = 0;
@@ -3010,7 +3014,7 @@
         chroma2.brewer = colorbrewer_1;
         var chroma_js = chroma2;
         return chroma_js;
-      });
+      }));
     }
   });
 
@@ -3369,9 +3373,7 @@
       this.isStereoCenter = false;
       this.priority = 0;
       this.mainChain = false;
-      this.hydrogenDirection = "down";
       this.subtreeDepth = 1;
-      this.hasHydrogen = false;
       this.class = void 0;
     }
     /**
@@ -4913,6 +4915,7 @@
       this.firstRingId = firstRing.id;
       this.secondRingId = secondRing.id;
       this.vertices = /* @__PURE__ */ new Set();
+      this.isForcedBridge = false;
       for (let m = 0; m < firstRing.members.length; m++) {
         let c = firstRing.members[m];
         for (let n = 0; n < secondRing.members.length; n++) {
@@ -4960,6 +4963,9 @@
      * @returns {Boolean} A boolean indicating whether or not this ring connection is a bridge.
      */
     isBridge(vertices) {
+      if (this.isForcedBridge) {
+        return true;
+      }
       if (this.vertices.size > 2) {
         return true;
       }
@@ -5463,9 +5469,9 @@
      * Draw a wedge on the canvas.
      *
      * @param {Line} line A line.
-     * @param {Number} width The wedge width.
+     * @param {Number} _width The wedge width (UNUSED).
      */
-    drawWedge(line, width = 1) {
+    drawWedge(line, _width = 1) {
       if (isNaN(line.from.x) || isNaN(line.from.y) || isNaN(line.to.x) || isNaN(line.to.y)) {
         return;
       }
@@ -5654,9 +5660,6 @@
      * @param {Number} isotope The isotope number.
      * @param {Number} vertexCount The number of vertices in the molecular graph.
      * @param {Object} attachedPseudoElement A map with containing information for pseudo elements or concatinated elements. The key is comprised of the element symbol and the hydrogen count.
-     * @param {String} attachedPseudoElement.element The element symbol.
-     * @param {Number} attachedPseudoElement.count The number of occurences that match the key.
-     * @param {Number} attachedPseudoElement.hyrogenCount The number of hydrogens attached to each atom matching the key.
      */
     drawText(x, y, elementName, hydrogens, direction, isTerminal, charge, isotope, vertexCount, attachedPseudoElement = {}) {
       let ctx = this.ctx;
@@ -6132,7 +6135,7 @@
         if (cmp[0] === 0 && !cmp[1]) return void 0;
       }
       const nNeighbours = vertex.neighbours.length;
-      const order = new Uint8Array(nNeighbours);
+      const order = new Array(nNeighbours);
       for (let i = 0; i < nNeighbours; ++i) {
         const vid = root.children[i].vertex.id;
         order[i] = vertex.neighbours.findIndex((nid) => nid === vid);
@@ -6208,10 +6211,11 @@
      * PRIVATE FUNCTION. Initializing the graph from the parse tree.
      *
      * @param {Object} node The current node in the parse tree.
+     * @param {Number} _order UNUSED
      * @param {?Number} parentVertexId=null The id of the previous vertex.
      * @param {Boolean} isBranch=false Whether or not the bond leading to this vertex is a branch bond. Branches are represented by parentheses in smiles (e.g. CC(O)C).
      */
-    _init(node, order = 0, parentVertexId = null, isBranch = false) {
+    _init(node, _order = 0, parentVertexId = null, isBranch = false) {
       const element = node.atom.element ? node.atom.element : node.atom;
       let atom = new Atom(element, node.bond);
       if (element !== "H" || !node.hasNext && parentVertexId === null) {
@@ -6695,92 +6699,259 @@
      * @param {Number} startVertexId A vertex id. Should be the starting vertex - e.g. the first to be positioned and connected to a previously place vertex.
      * @param {Ring} ring The bridged ring associated with this force-based layout.
      */
+    /**
+     * Compute 2D starting positions for a ring system from its graph-distance
+     * matrix using classical multidimensional scaling (MDS).
+     *
+     * Used by kkLayout to seed cage like ring systems where a plain
+     * circular start sends Kamada-Kawai into a local minimum. Classical
+     * MDS gives a single global answer in closed form, so KK starts somewhere
+     * sensible. A visual example of having MDS+KK vs only KK difference is on dodecahedrane
+     * check https://math.mit.edu/~urschel/publications/p2021e.pdf Figure 5 (last page) for
+     * a very close example of how KK vs MDS+KK looks like in dodecahedrane
+     *
+     * The algorithm is classical MDS, also called Torgerson scaling or
+     * Principal Coordinates Analysis (Torgerson, "Multidimensional scaling: I.
+     * Theory and method", Psychometrika 17, 1952). Given an n x n distance
+     * matrix D it returns the 2D point set whose pairwise Euclidean distances
+     * best match D in least-squares sense.
+     *
+     *   1. Square the distances element-wise:           D2[i][j] = D[i][j]^2
+     *   2. Double-centre to get a Gram-like matrix:     B = -1/2 H D2 H
+     *      with H = I - (1/n) 1 1^T (centres rows and columns on zero).
+     *   3. Take the top two eigenvectors of B.
+     *   4. Coordinates: x_i = sqrt(lambda_1) v_1[i],
+     *                   y_i = sqrt(lambda_2) v_2[i].
+     *
+     *  The final rescale (lines below) sizes the layout so that the largest
+     * pairwise distance is roughly bondLength * sqrt(n), which puts the result
+     * on the same scale as the rest of the drawing.
+     *
+     * @param {Array[]} matDist Graph-distance matrix (shortest paths in bonds).
+     * @param {number} n Number of vertices.
+     * @param {number} bondLength Target bond length, used as the output scale.
+     * @returns {{xs: Float32Array, ys: Float32Array}} 2D coordinates centred at 0.
+     */
+    static mdsLayout(matDist, n, bondLength) {
+      let dsq = new Array(n);
+      for (let i = 0; i < n; i++) {
+        dsq[i] = new Float64Array(n);
+        for (let j = 0; j < n; j++) {
+          dsq[i][j] = matDist[i][j] * matDist[i][j];
+        }
+      }
+      let rowMean = new Float64Array(n);
+      let grandMean = 0;
+      for (let i = 0; i < n; i++) {
+        let s = 0;
+        for (let j = 0; j < n; j++) s += dsq[i][j];
+        rowMean[i] = s / n;
+        grandMean += s;
+      }
+      grandMean /= n * n;
+      let B = new Array(n);
+      for (let i = 0; i < n; i++) {
+        B[i] = new Float64Array(n);
+        for (let j = 0; j < n; j++) {
+          B[i][j] = -0.5 * (dsq[i][j] - rowMean[i] - rowMean[j] + grandMean);
+        }
+      }
+      let eigvec1 = _Graph._powerIteration(B, n, 200);
+      let eval1 = _Graph._rayleigh(B, eigvec1, n);
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          B[i][j] -= eval1 * eigvec1[i] * eigvec1[j];
+        }
+      }
+      let eigvec2 = _Graph._powerIteration(B, n, 200);
+      let eval2 = _Graph._rayleigh(B, eigvec2, n);
+      let scale1 = eval1 > 0 ? Math.sqrt(eval1) : 0;
+      let scale2 = eval2 > 0 ? Math.sqrt(eval2) : 0;
+      let xs = new Float32Array(n);
+      let ys = new Float32Array(n);
+      for (let i = 0; i < n; i++) {
+        xs[i] = eigvec1[i] * scale1;
+        ys[i] = eigvec2[i] * scale2;
+      }
+      let maxDistSq = 0;
+      for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+          let dx = xs[i] - xs[j];
+          let dy = ys[i] - ys[j];
+          let dSq = dx * dx + dy * dy;
+          if (dSq > maxDistSq) maxDistSq = dSq;
+        }
+      }
+      let maxDist = Math.sqrt(maxDistSq);
+      if (maxDist > 0) {
+        let targetSize = bondLength * Math.max(2, Math.sqrt(n));
+        let s = targetSize / maxDist;
+        for (let i = 0; i < n; i++) {
+          xs[i] *= s;
+          ys[i] *= s;
+        }
+      }
+      return { xs, ys };
+    }
+    /**
+     * Power iteration to find the dominant eigenvector of a symmetric matrix.
+     * @param {Array[]} mat The matrix.
+     * @param {number} n Size.
+     * @param {number} maxIter Maximum iterations.
+     * @returns {Float64Array} The normalized eigenvector.
+     */
+    static _powerIteration(mat, n, maxIter) {
+      let v = new Float64Array(n);
+      for (let i = 0; i < n; i++) {
+        v[i] = 1 + 0.1 * i;
+      }
+      let w = new Float64Array(n);
+      for (let iter = 0; iter < maxIter; iter++) {
+        for (let i = 0; i < n; i++) {
+          let s = 0;
+          for (let j = 0; j < n; j++) s += mat[i][j] * v[j];
+          w[i] = s;
+        }
+        let norm = 0;
+        for (let i = 0; i < n; i++) norm += w[i] * w[i];
+        norm = Math.sqrt(norm);
+        if (norm < 1e-12) break;
+        for (let i = 0; i < n; i++) v[i] = w[i] / norm;
+      }
+      return v;
+    }
+    /**
+     * Rayleigh quotient: v^T * A * v (for normalized v).
+     * @param {Array[]} mat The matrix.
+     * @param {Float64Array} v Normalized eigenvector.
+     * @param {number} n Size.
+     * @returns {number} The eigenvalue estimate.
+     */
+    static _rayleigh(mat, v, n) {
+      let r = 0;
+      for (let i = 0; i < n; i++) {
+        let s = 0;
+        for (let j = 0; j < n; j++) s += mat[i][j] * v[j];
+        r += v[i] * s;
+      }
+      return r;
+    }
     kkLayout(vertexIds, center, startVertexId, ring, bondLength, threshold = 0.1, innerThreshold = 0.1, maxIteration = 2e3, maxInnerIteration = 50, maxEnergy = 1e9) {
       let edgeStrength = bondLength;
       let matDist = this.getSubgraphDistanceMatrix(vertexIds);
       let length = vertexIds.length;
-      let radius = MathHelper.polyCircumradius(bondLength, length);
-      let angle = MathHelper.centralAngle(length);
-      let a = 0;
       let arrPositionX = new Float32Array(length);
       let arrPositionY = new Float32Array(length);
       let arrPositioned = Array(length);
+      let radius = MathHelper.polyCircumradius(bondLength, length);
+      let angle = MathHelper.centralAngle(length);
+      let a = 0;
       let insiderSet = new Set(ring.insiders || []);
-      let perimeter = this.getBridgedRingPerimeter(vertexIds, ring, startVertexId);
-      let perimeterSet = new Set(perimeter);
-      let perimeterCount = perimeter.length;
-      let perimeterRadius = perimeterCount > 2 ? MathHelper.polyCircumradius(bondLength, perimeterCount) : radius;
-      let perimeterAngle = perimeterCount > 0 ? Math.PI * 2 / perimeterCount : angle;
-      let perimeterOffset = 0;
-      let initialPositions = /* @__PURE__ */ new Map();
-      if (perimeterSet.has(startVertexId)) {
-        let startVertexIndex = perimeter.indexOf(startVertexId);
-        let startVertex = this.vertices[startVertexId];
-        if (startVertex.positioned) {
-          perimeterOffset = Vector2.subtract(startVertex.position, center).angle() - startVertexIndex * perimeterAngle;
+      let insiders = vertexIds.filter((id) => insiderSet.has(id));
+      let anyPositioned = false;
+      for (let i2 = 0; i2 < length; i2++) {
+        if (this.vertices[vertexIds[i2]].positioned) {
+          anyPositioned = true;
+          break;
         }
       }
-      for (let i2 = 0; i2 < perimeter.length; i2++) {
-        let id = perimeter[i2];
-        let vertex = this.vertices[id];
-        if (vertex.positioned) {
-          initialPositions.set(id, vertex.position.clone());
-        } else {
-          let point = new Vector2(
-            center.x + Math.cos(perimeterOffset + i2 * perimeterAngle) * perimeterRadius,
-            center.y + Math.sin(perimeterOffset + i2 * perimeterAngle) * perimeterRadius
-          );
+      if (insiders.length > 0 && insiders.length <= 2) {
+        let perimeter = this.getBridgedRingPerimeter(vertexIds, ring, startVertexId);
+        let perimeterSet = new Set(perimeter);
+        let perimeterCount = perimeter.length;
+        let perimeterRadius = perimeterCount > 2 ? MathHelper.polyCircumradius(bondLength, perimeterCount) : radius;
+        let perimeterAngle = perimeterCount > 0 ? Math.PI * 2 / perimeterCount : angle;
+        let perimeterOffset = 0;
+        let initialPositions = /* @__PURE__ */ new Map();
+        if (perimeterSet.has(startVertexId)) {
+          let startVertexIndex = perimeter.indexOf(startVertexId);
+          let startVertex = this.vertices[startVertexId];
+          if (startVertex.positioned) {
+            perimeterOffset = Vector2.subtract(startVertex.position, center).angle() - startVertexIndex * perimeterAngle;
+          }
+        }
+        for (let i2 = 0; i2 < perimeter.length; i2++) {
+          let id = perimeter[i2];
+          let vertex = this.vertices[id];
+          if (vertex.positioned) {
+            initialPositions.set(id, vertex.position.clone());
+          } else {
+            let point = new Vector2(
+              center.x + Math.cos(perimeterOffset + i2 * perimeterAngle) * perimeterRadius,
+              center.y + Math.sin(perimeterOffset + i2 * perimeterAngle) * perimeterRadius
+            );
+            initialPositions.set(id, point);
+          }
+        }
+        let innerRadius = Math.max(bondLength * 0.35, perimeterRadius * 0.35);
+        for (let i2 = 0; i2 < insiders.length; i2++) {
+          let id = insiders[i2];
+          let vertex = this.vertices[id];
+          if (vertex.positioned) {
+            initialPositions.set(id, vertex.position.clone());
+            continue;
+          }
+          let neighbours = vertex.neighbours.filter((neighbourId) => perimeterSet.has(neighbourId));
+          let point = new Vector2(center.x, center.y);
+          if (neighbours.length > 0) {
+            point = new Vector2(0, 0);
+            for (let j = 0; j < neighbours.length; j++) {
+              point.add(initialPositions.get(neighbours[j]));
+            }
+            point.divide(neighbours.length);
+            let direction = Vector2.subtract(point, center);
+            if (direction.lengthSq() < 1e-4) {
+              direction = new Vector2(Math.cos(i2 * perimeterAngle), Math.sin(i2 * perimeterAngle));
+            } else {
+              direction.normalize();
+            }
+            point = direction.multiplyScalar(innerRadius).add(center.clone());
+          } else {
+            point.x += Math.cos(i2 * perimeterAngle) * innerRadius;
+            point.y += Math.sin(i2 * perimeterAngle) * innerRadius;
+          }
           initialPositions.set(id, point);
         }
-      }
-      let insiders = vertexIds.filter((id) => insiderSet.has(id));
-      let innerRadius = Math.max(bondLength * 0.35, perimeterRadius * 0.35);
-      for (let i2 = 0; i2 < insiders.length; i2++) {
-        let id = insiders[i2];
-        let vertex = this.vertices[id];
-        if (vertex.positioned) {
-          initialPositions.set(id, vertex.position.clone());
-          continue;
-        }
-        let neighbours = vertex.neighbours.filter((neighbourId) => perimeterSet.has(neighbourId));
-        let point = new Vector2(center.x, center.y);
-        if (neighbours.length > 0) {
-          point = new Vector2(0, 0);
-          for (let j = 0; j < neighbours.length; j++) {
-            point.add(initialPositions.get(neighbours[j]));
-          }
-          point.divide(neighbours.length);
-          let direction = Vector2.subtract(point, center);
-          if (direction.lengthSq() < 1e-4) {
-            direction = new Vector2(Math.cos(i2 * perimeterAngle), Math.sin(i2 * perimeterAngle));
+        var i = length;
+        while (i--) {
+          let vertex = this.vertices[vertexIds[i]];
+          if (!vertex.positioned) {
+            let initial = initialPositions.get(vertex.id);
+            if (initial) {
+              arrPositionX[i] = initial.x;
+              arrPositionY[i] = initial.y;
+            } else {
+              arrPositionX[i] = center.x + Math.cos(a) * radius;
+              arrPositionY[i] = center.y + Math.sin(a) * radius;
+            }
           } else {
-            direction.normalize();
+            arrPositionX[i] = vertex.position.x;
+            arrPositionY[i] = vertex.position.y;
           }
-          point = direction.multiplyScalar(innerRadius).add(center.clone());
-        } else {
-          point.x += Math.cos(i2 * perimeterAngle) * innerRadius;
-          point.y += Math.sin(i2 * perimeterAngle) * innerRadius;
+          arrPositioned[i] = vertex.positioned;
+          a += angle;
         }
-        initialPositions.set(id, point);
-      }
-      var i = length;
-      while (i--) {
-        let vertex = this.vertices[vertexIds[i]];
-        if (!vertex.positioned) {
-          let initial = initialPositions.get(vertex.id);
-          if (initial) {
-            arrPositionX[i] = initial.x;
-            arrPositionY[i] = initial.y;
-          } else {
+      } else if (!anyPositioned && length >= 6) {
+        let mds = _Graph.mdsLayout(matDist, length, bondLength);
+        for (let idx = 0; idx < length; idx++) {
+          arrPositionX[idx] = center.x + mds.xs[idx];
+          arrPositionY[idx] = center.y + mds.ys[idx];
+          arrPositioned[idx] = false;
+        }
+      } else {
+        var i = length;
+        while (i--) {
+          let vertex = this.vertices[vertexIds[i]];
+          if (!vertex.positioned) {
             arrPositionX[i] = center.x + Math.cos(a) * radius;
             arrPositionY[i] = center.y + Math.sin(a) * radius;
+          } else {
+            arrPositionX[i] = vertex.position.x;
+            arrPositionY[i] = vertex.position.y;
           }
-        } else {
-          arrPositionX[i] = vertex.position.x;
-          arrPositionY[i] = vertex.position.y;
+          arrPositioned[i] = vertex.positioned;
+          a += angle;
         }
-        arrPositioned[i] = vertex.positioned;
-        a += angle;
       }
       let matLength = Array(length);
       i = length;
@@ -6978,7 +7149,7 @@
      * Returns the connected components of the graph.
      *
      * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Set[]} Connected components as sets.
+     * @returns {number[][]} Connected components as arrays of vertex ids.
      */
     static getConnectedComponents(adjacencyMatrix) {
       let length = adjacencyMatrix.length;
@@ -7080,16 +7251,549 @@
     }
   };
 
+  // src/BitSet.ts
+  var BitSet = class _BitSet {
+    /**
+     * @param size Number of bits this set can hold.
+     */
+    constructor(size) {
+      this.size = size;
+      const numWords = size === 0 ? 0 : (size - 1 >>> 5) + 1;
+      this.words = new Uint32Array(numWords);
+    }
+    set(i) {
+      this.words[i >>> 5] |= 1 << (i & 31);
+    }
+    get(i) {
+      return (this.words[i >>> 5] & 1 << (i & 31)) !== 0;
+    }
+    /**
+     * Throws unless `other` has the same bit length as `this`. We compare `size`
+     * (bits) rather than `words.length` (32-bit chunks) because two BitSets can
+     * share a word count while differing in bit length — e.g. size 33 and size 64
+     * both round up to 2 words, but mixing them would still be a coordinate
+     * mismatch in the cycle algorithm.
+     *
+     * @param op operation name, used in the error message
+     */
+    _assertSameSize(other, op) {
+      if (this.size !== other.size) {
+        throw new Error(
+          "BitSet." + op + ": size mismatch (" + this.size + " vs " + other.size + "). Operands must share the same bit length."
+        );
+      }
+    }
+    /** @returns a new bitset = this XOR other (merge two cycles, cancelling shared edges). */
+    xor(other) {
+      this._assertSameSize(other, "xor");
+      const result = new _BitSet(this.size);
+      for (let i = 0; i < this.words.length; i++) {
+        result.words[i] = this.words[i] ^ other.words[i];
+      }
+      return result;
+    }
+    /** @returns a new bitset = this AND other (the edges shared by two cycles). */
+    and(other) {
+      this._assertSameSize(other, "and");
+      const result = new _BitSet(this.size);
+      for (let i = 0; i < this.words.length; i++) {
+        result.words[i] = this.words[i] & other.words[i];
+      }
+      return result;
+    }
+    /** @returns a new bitset = this OR other (the edges covered by either). */
+    or(other) {
+      this._assertSameSize(other, "or");
+      const result = new _BitSet(this.size);
+      for (let i = 0; i < this.words.length; i++) {
+        result.words[i] = this.words[i] | other.words[i];
+      }
+      return result;
+    }
+    /**
+     * Mutating union: this |= other. Used to accumulate the basis's edge coverage
+     * without allocating a new BitSet each time.
+     */
+    orWith(other) {
+      this._assertSameSize(other, "orWith");
+      for (let i = 0; i < this.words.length; i++) {
+        this.words[i] |= other.words[i];
+      }
+    }
+    /**
+     * @returns true iff every bit set in `this` is also set in `other` (this ⊆ other).
+     * Single pass with an early exit, no allocation.
+     */
+    isSubsetOf(other) {
+      this._assertSameSize(other, "isSubsetOf");
+      for (let i = 0; i < this.words.length; i++) {
+        if ((this.words[i] & ~other.words[i]) !== 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+    /** @returns a deep copy. */
+    clone() {
+      const result = new _BitSet(this.size);
+      for (let i = 0; i < this.words.length; i++) {
+        result.words[i] = this.words[i];
+      }
+      return result;
+    }
+    /** @returns true iff no bits are set. */
+    isEmpty() {
+      for (let i = 0; i < this.words.length; i++) {
+        if (this.words[i] !== 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+    /** @returns the number of set bits (population count). */
+    popcount() {
+      let count = 0;
+      for (let i = 0; i < this.words.length; i++) {
+        let word = this.words[i];
+        while (word !== 0) {
+          word &= word - 1;
+          count++;
+        }
+      }
+      return count;
+    }
+    /**
+     * @returns the count of leading zeros: the number of zero bits above the
+     * highest set bit (mirrors `Math.clz32`). Returns `size` when no bit is set.
+     * The "index of the highest set bit + 1" value is `size - clz()`.
+     */
+    clz() {
+      for (let i = this.words.length - 1; i >= 0; i--) {
+        if (this.words[i] !== 0) {
+          const highestSetBit = i * 32 + (31 - Math.clz32(this.words[i]));
+          return this.size - 1 - highestSetBit;
+        }
+      }
+      return this.size;
+    }
+  };
+
+  // src/CycleBasis.ts
+  var MAX_INT = 2147483647;
+  function shortestPaths(graph, start, limit, ordering) {
+    const n = graph.length;
+    const distTo = new Int32Array(n).fill(MAX_INT);
+    const precedes = new Array(n).fill(false);
+    const routeTo = new Array(n).fill(null);
+    const nPathsTo = new Int32Array(n);
+    distTo[start] = 0;
+    precedes[start] = true;
+    nPathsTo[start] = 1;
+    routeTo[start] = { type: "source", vertex: start };
+    const queue = [start];
+    let qLen = 1;
+    for (let i = 0; i < qLen; i++) {
+      const v = queue[i];
+      const dist = distTo[v] + 1;
+      if (dist > limit) continue;
+      for (let k = 0; k < graph[v].length; k++) {
+        const w = graph[v][k];
+        if (dist < distTo[w]) {
+          distTo[w] = dist;
+          routeTo[w] = {
+            type: "seq",
+            parent: routeTo[v],
+            // point at route to v and not v itself. necessary to walk backwards through the tree
+            vertex: w,
+            dist
+          };
+          precedes[w] = precedes[v] && ordering[w] < ordering[start];
+          nPathsTo[w] = nPathsTo[v];
+          queue[qLen++] = w;
+        } else if (dist === distTo[w]) {
+          if (!(precedes[v] && ordering[w] < ordering[start])) continue;
+          const newSeq = { type: "seq", parent: routeTo[v], vertex: w, dist };
+          if (precedes[w]) {
+            routeTo[w] = { type: "branch", left: routeTo[w], right: newSeq };
+            nPathsTo[w] += nPathsTo[v];
+          } else {
+            precedes[w] = true;
+            routeTo[w] = newSeq;
+            nPathsTo[w] = nPathsTo[v];
+          }
+        }
+      }
+    }
+    function routeToPath(route, len) {
+      if (!route) return [];
+      const path = new Array(len);
+      let cur = route;
+      while (cur) {
+        if (cur.type === "source") {
+          path[0] = cur.vertex;
+          break;
+        } else if (cur.type === "seq") {
+          path[cur.dist] = cur.vertex;
+          cur = cur.parent;
+        } else {
+          cur = cur.left;
+        }
+      }
+      return path;
+    }
+    function routeToPaths(route, len) {
+      if (!route) return [];
+      if (route.type === "source") {
+        const path = new Array(len);
+        path[0] = route.vertex;
+        return [path];
+      } else if (route.type === "seq") {
+        const parentPaths = routeToPaths(route.parent, len);
+        for (let j = 0; j < parentPaths.length; j++) {
+          parentPaths[j][route.dist] = route.vertex;
+        }
+        return parentPaths;
+      } else {
+        const leftPaths = routeToPaths(route.left, len);
+        const rightPaths = routeToPaths(route.right, len);
+        return leftPaths.concat(rightPaths);
+      }
+    }
+    return {
+      distTo,
+      nPathsTo,
+      precedes,
+      pathTo(end) {
+        if (end < 0 || end >= n || !routeTo[end]) return [];
+        return routeToPath(routeTo[end], distTo[end] + 1);
+      },
+      pathsTo(end) {
+        if (end < 0 || end >= n || !routeTo[end]) return [];
+        return routeToPaths(routeTo[end], distTo[end] + 1);
+      },
+      isPrecedingPathTo(end) {
+        return end >= 0 && end < n && precedes[end];
+      }
+    };
+  }
+  function singletonIntersect(p, q) {
+    const n = p.length;
+    for (let i = 1; i < n; i++) {
+      if (p[i] === q[i]) return false;
+    }
+    return true;
+  }
+  function pathToEdgeVector(path, edgeIndex, nEdges) {
+    const bs = new BitSet(nEdges);
+    const len = path.length - 1;
+    for (let i = 0; i < len; i++) {
+      const u = path[i], v = path[i + 1];
+      const key = u < v ? u + "," + v : v + "," + u;
+      bs.set(edgeIndex.get(key));
+    }
+    return bs;
+  }
+  function indexEdges(graph) {
+    const toIndex = /* @__PURE__ */ new Map();
+    const n = graph.length;
+    for (let v = 0; v < n; v++) {
+      for (let k = 0; k < graph[v].length; k++) {
+        const w = graph[v][k];
+        if (w > v) {
+          toIndex.set(v + "," + w, toIndex.size);
+        }
+      }
+    }
+    return toIndex;
+  }
+  function computeOrdering(graph) {
+    const n = graph.length;
+    let maxDeg = 0;
+    const order = new Array(n).fill(0);
+    for (let i = 0; i < n; i++) {
+      if (graph[i].length > maxDeg) maxDeg = graph[i].length;
+    }
+    const buckets = new Array(maxDeg + 1);
+    for (let d = 0; d <= maxDeg; d++) buckets[d] = [];
+    for (let v = 0; v < n; v++) {
+      buckets[graph[v].length].push(v);
+    }
+    let rank = 0;
+    for (let d = 0; d <= maxDeg; d++) {
+      for (const v of buckets[d])
+        order[v] = rank++;
+    }
+    return order;
+  }
+  function computeInitialCycles(graph) {
+    const n = graph.length;
+    const ordering = computeOrdering(graph);
+    const cycles = /* @__PURE__ */ new Map();
+    const edgeIndex = indexEdges(graph);
+    const nEdges = edgeIndex.size;
+    const vertices = new Array(n);
+    for (let v = 0; v < n; v++) {
+      vertices[ordering[v]] = v;
+    }
+    function addCycle(path) {
+      const edgeVector = pathToEdgeVector(path, edgeIndex, nEdges);
+      const len = path.length - 1;
+      let group = cycles.get(len);
+      if (!group) {
+        group = [];
+        cycles.set(len, group);
+      }
+      group.push({ path, edgeVector });
+    }
+    const s = new Array(n);
+    const first = 2;
+    for (let i = first; i < n; i++) {
+      const r = vertices[i];
+      const paths = shortestPaths(graph, r, Math.floor(n / 2), ordering);
+      for (let j = 0; j < i; j++) {
+        const y = vertices[j];
+        if (!paths.isPrecedingPathTo(y)) continue;
+        let sizeOfS = 0;
+        for (let k = 0; k < graph[y].length; k++) {
+          const z = graph[y][k];
+          if (!paths.isPrecedingPathTo(z)) continue;
+          const distToZ = paths.distTo[z];
+          const distToY = paths.distTo[y];
+          if (distToZ + 1 === distToY) {
+            s[sizeOfS++] = z;
+          } else if (distToZ === distToY && ordering[z] < ordering[y]) {
+            const pathToY = paths.pathTo(y);
+            const pathToZ = paths.pathTo(z);
+            if (singletonIntersect(pathToZ, pathToY)) {
+              addCycle(pathToY.concat(pathToZ.reverse()));
+            }
+          }
+        }
+        for (let k = 0; k < sizeOfS; k++) {
+          for (let l = k + 1; l < sizeOfS; l++) {
+            const pathToP = paths.pathTo(s[k]);
+            const pathToQ = paths.pathTo(s[l]);
+            if (singletonIntersect(pathToP, pathToQ)) {
+              addCycle(pathToP.concat([y], pathToQ.reverse()));
+            }
+          }
+        }
+      }
+    }
+    return { cycles, edgeIndex, nEdges };
+  }
+  var BitMatrix = class {
+    /**
+     * @param columns number of columns (edges)
+     * @param maxRows maximum number of rows (cycles)
+     */
+    constructor(columns, maxRows) {
+      this._n = columns;
+      this._max = maxRows;
+      this._rows = new Array(maxRows);
+      this._indices = new Int32Array(maxRows);
+      this._m = 0;
+    }
+    /** @param row a cycle's edge vector */
+    add(row) {
+      this._rows[this._m] = row;
+      this._indices[this._m] = this._m;
+      this._m++;
+    }
+    /**
+     * Swap rows i and j, tracking original indices.
+     * @param i row index
+     * @param j row index
+     */
+    swap(i, j) {
+      const tmpRow = this._rows[i];
+      const tmpIdx = this._indices[i];
+      this._rows[i] = this._rows[j];
+      this._indices[i] = this._indices[j];
+      this._rows[j] = tmpRow;
+      this._indices[j] = tmpIdx;
+    }
+    /**
+     * Find current position of original row j.
+     * @param j original row index
+     */
+    _rowIndex(j) {
+      for (let i = 0; i < this._m; i++) {
+        if (this._indices[i] === j) return i;
+      }
+      return -1;
+    }
+    /**
+     * Check if the row originally added at index j was eliminated to zero.
+     * @param j original row index
+     */
+    eliminated(j) {
+      return this._rows[this._rowIndex(j)].isEmpty();
+    }
+    /**
+     * Gaussian elimination over GF(2). Returns the rank.
+     */
+    eliminate() {
+      return this._eliminate(0, 0);
+    }
+    /**
+     * @param x column index
+     * @param y row index
+     * @returns rank
+     */
+    _eliminate(x, y) {
+      while (x < this._n && y < this._m) {
+        let i = -1;
+        for (let j = y; j < this._m; j++) {
+          if (this._rows[j].get(x)) {
+            i = j;
+            break;
+          }
+        }
+        if (i < 0) return this._eliminate(x + 1, y);
+        if (i !== y) this.swap(i, y);
+        for (let j = y + 1; j < this._m; j++) {
+          if (this._rows[j].get(x)) {
+            this._rows[j] = this._rows[j].xor(this._rows[y]);
+          }
+        }
+        y++;
+      }
+      return y;
+    }
+  };
+  var GreedyBasis = class {
+    /**
+     * @param nEdges number of edges in the graph
+     */
+    constructor(nEdges) {
+      this._members = [];
+      this._edgesOfBasis = new BitSet(nEdges);
+      this._nEdges = nEdges;
+    }
+    /** @param cycle a cycle to add to the basis */
+    add(cycle) {
+      this._members.push(cycle);
+      this._edgesOfBasis.orWith(cycle.edgeVector);
+    }
+    members() {
+      return this._members;
+    }
+    size() {
+      return this._members.length;
+    }
+    /**
+     * Check whether all edges of the cycle are already covered by the basis.
+     * @param cycle candidate cycle
+     */
+    isSubsetOfBasis(cycle) {
+      return cycle.edgeVector.isSubsetOf(this._edgesOfBasis);
+    }
+    /**
+     * Full independence check via GF(2) Gaussian elimination.
+     * @param candidate candidate cycle
+     */
+    isIndependent(candidate) {
+      if (this._members.length === 0 || !this.isSubsetOfBasis(candidate)) {
+        return true;
+      }
+      const matrix = new BitMatrix(this._nEdges, this._members.length + 1);
+      for (let i = 0; i < this._members.length; i++) {
+        matrix.add(this._members[i].edgeVector.clone());
+      }
+      matrix.add(candidate.edgeVector.clone());
+      matrix.eliminate();
+      return !matrix.eliminated(this._members.length);
+    }
+  };
+  function minimumCycleBasis(adjList) {
+    const n = adjList.length;
+    if (n < 3) return [];
+    const { cycles: initialCycles, nEdges } = computeInitialCycles(adjList);
+    const basis = new GreedyBasis(nEdges);
+    const nSssr = nEdges - n + 1;
+    const sortedCycles = [...initialCycles.keys()].sort((a, b) => a - b);
+    for (let li = 0; li < sortedCycles.length; li++) {
+      const group = initialCycles.get(sortedCycles[li]);
+      for (let ci = 0; ci < group.length; ci++) {
+        if (basis.size() >= nSssr)
+          break;
+        if (basis.isIndependent(group[ci])) {
+          basis.add(group[ci]);
+        }
+      }
+    }
+    return basis.members().map((c) => c.path);
+  }
+  function relevantCycles(adjList) {
+    const n = adjList.length;
+    if (n < 3) return [];
+    const { cycles: initialCycles, nEdges } = computeInitialCycles(adjList);
+    const basis = new GreedyBasis(nEdges);
+    const relevant = [];
+    const sortedCycles = [...initialCycles.keys()].sort((a, b) => a - b);
+    for (let li = 0; li < sortedCycles.length; li++) {
+      const group = initialCycles.get(sortedCycles[li]);
+      const pending = [];
+      for (let ci = 0; ci < group.length; ci++) {
+        if (basis.isIndependent(group[ci])) {
+          pending.push(group[ci]);
+          relevant.push(group[ci].path);
+        }
+      }
+      for (let ci = 0; ci < pending.length; ci++) {
+        basis.add(pending[ci]);
+      }
+    }
+    return relevant;
+  }
+  function matrixToAdjList(matrix) {
+    const n = matrix.length;
+    const adj = new Array(n);
+    for (let i = 0; i < n; i++) {
+      adj[i] = [];
+      for (let j = 0; j < n; j++) {
+        if (matrix[i][j] === 1) adj[i].push(j);
+      }
+    }
+    return adj;
+  }
+
   // src/SSSR.js
   var SSSR = class _SSSR {
     /**
-     * Returns an array containing arrays, each representing a ring from the smallest set of smallest rings in the graph.
+     * Returns an array containing arrays, each representing a ring from the
+     * minimum cycle basis (MCB / SSSR) of the graph.
      *
      * @param {Graph} graph A Graph object.
-     * @param {Boolean} [experimental=false] Whether or not to use experimental SSSR.
-     * @returns {Array[]} An array containing arrays, each representing a ring from the smallest set of smallest rings in the group.
+     * @param {Boolean} [_experimental=false] Whether or not to use experimental SSSR (UNUSED).
+     * @returns {Array[]} An array containing arrays, each representing a ring.
      */
-    static getRings(graph, experimental = false) {
+    static getRings(graph, _experimental = false) {
+      return _SSSR._findRings(graph, false);
+    }
+    /**
+     * Returns a layout-oriented ring set (relevant cycles).
+     *
+     * This is the union of all minimum cycle bases — a unique, complete set of
+     * minimum-weight cycles that includes all symmetric faces. Use this for
+     * depiction; use getRings() for chemistry (aromaticity, ring membership).
+     *
+     * @param {Graph} graph A Graph object.
+     * @param {Boolean} [_experimental=false] Whether or not to use experimental SSSR (UNUSED).
+     * @returns {Array[]} An array containing arrays, each representing a ring.
+     */
+    static getRingsForLayout(graph, _experimental = false) {
+      return _SSSR._findRings(graph, true);
+    }
+    /**
+     * Internal ring finder shared by getRings and getRingsForLayout.
+     *
+     * @param {Graph} graph A Graph object.
+     * @param {Boolean} forLayout If true, return relevant cycles; otherwise MCB.
+     * @returns {Array[]} An array of rings (each ring is an array of vertex ids).
+     */
+    static _findRings(graph, forLayout) {
       let adjacencyMatrix = graph.getComponentsAdjacencyMatrix();
       if (adjacencyMatrix.length === 0) {
         return [];
@@ -7099,43 +7803,13 @@
       for (let i = 0; i < connectedComponents.length; i++) {
         let connectedComponent = connectedComponents[i];
         let ccAdjacencyMatrix = graph.getSubgraphAdjacencyMatrix([...connectedComponent]);
-        let arrBondCount = new Uint16Array(ccAdjacencyMatrix.length);
-        let arrRingCount = new Uint16Array(ccAdjacencyMatrix.length);
-        for (let j = 0; j < ccAdjacencyMatrix.length; j++) {
-          arrRingCount[j] = 0;
-          arrBondCount[j] = 0;
-          for (let k = 0; k < ccAdjacencyMatrix[j].length; k++) {
-            arrBondCount[j] += ccAdjacencyMatrix[j][k];
-          }
-        }
-        let nEdges = 0;
-        for (let j = 0; j < ccAdjacencyMatrix.length; j++) {
-          for (let k = j + 1; k < ccAdjacencyMatrix.length; k++) {
-            nEdges += ccAdjacencyMatrix[j][k];
-          }
-        }
-        let nSssr = nEdges - ccAdjacencyMatrix.length + 1;
-        if (nSssr === 1) {
-          rings.push([...connectedComponent]);
-          continue;
-        }
-        if (experimental) {
-          nSssr = 999;
-        }
-        let { d, pe, pe_prime } = _SSSR.getPathIncludedDistanceMatrices(ccAdjacencyMatrix);
-        let c = _SSSR.getRingCandidates(d, pe, pe_prime);
-        let sssr = _SSSR.getSSSR(c, d, ccAdjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nSssr);
-        if (sssr.length < nSssr) {
-          let missing = _SSSR.findMissingRings(ccAdjacencyMatrix, sssr, nSssr);
-          for (let j = 0; j < missing.length; j++) {
-            sssr.push(missing[j]);
-          }
-        }
-        for (let j = 0; j < sssr.length; j++) {
-          let ring = Array(sssr[j].size);
-          let index = 0;
-          for (let val of sssr[j]) {
-            ring[index++] = connectedComponent[val];
+        let adjList = matrixToAdjList(ccAdjacencyMatrix);
+        let cyclePaths = forLayout ? relevantCycles(adjList) : minimumCycleBasis(adjList);
+        for (let j = 0; j < cyclePaths.length; j++) {
+          let path = cyclePaths[j];
+          let ring = [];
+          for (let k = 0; k < path.length - 1; k++) {
+            ring.push(connectedComponent[path[k]]);
           }
           rings.push(ring);
         }
@@ -7157,348 +7831,6 @@
         str += "\n";
       }
       return str;
-    }
-    /**
-     * Returnes the two path-included distance matrices used to find the sssr.
-     *
-     * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Object} The path-included distance matrices. { p1, p2 }
-     */
-    static getPathIncludedDistanceMatrices(adjacencyMatrix) {
-      let length = adjacencyMatrix.length;
-      let d = Array(length);
-      let pe = Array(length);
-      let pe_prime = Array(length);
-      var i = 0;
-      var j = 0;
-      var k = 0;
-      var l = 0;
-      var m = 0;
-      var n = 0;
-      i = length;
-      while (i--) {
-        d[i] = Array(length);
-        pe[i] = Array(length);
-        pe_prime[i] = Array(length);
-        j = length;
-        while (j--) {
-          d[i][j] = i === j || adjacencyMatrix[i][j] === 1 ? adjacencyMatrix[i][j] : Number.POSITIVE_INFINITY;
-          if (d[i][j] === 1) {
-            pe[i][j] = [[[i, j]]];
-          } else {
-            pe[i][j] = [];
-          }
-          pe_prime[i][j] = [];
-        }
-      }
-      k = length;
-      while (k--) {
-        i = length;
-        while (i--) {
-          j = length;
-          while (j--) {
-            const previousPathLength = d[i][j];
-            const newPathLength = d[i][k] + d[k][j];
-            if (previousPathLength > newPathLength) {
-              if (previousPathLength === newPathLength + 1) {
-                pe_prime[i][j] = [pe[i][j].length];
-                l = pe[i][j].length;
-                while (l--) {
-                  pe_prime[i][j][l] = [pe[i][j][l].length];
-                  m = pe[i][j][l].length;
-                  while (m--) {
-                    pe_prime[i][j][l][m] = [pe[i][j][l][m].length];
-                    n = pe[i][j][l][m].length;
-                    while (n--) {
-                      pe_prime[i][j][l][m][n] = [pe[i][j][l][m][0], pe[i][j][l][m][1]];
-                    }
-                  }
-                }
-              } else {
-                pe_prime[i][j] = [];
-              }
-              d[i][j] = newPathLength;
-              pe[i][j] = [[]];
-              l = pe[i][k][0].length;
-              while (l--) {
-                pe[i][j][0].push(pe[i][k][0][l]);
-              }
-              l = pe[k][j][0].length;
-              while (l--) {
-                pe[i][j][0].push(pe[k][j][0][l]);
-              }
-            } else if (previousPathLength === newPathLength) {
-              if (pe[i][k].length && pe[k][j].length) {
-                if (pe[i][j].length) {
-                  let tmp = [];
-                  l = pe[i][k][0].length;
-                  while (l--) {
-                    tmp.push(pe[i][k][0][l]);
-                  }
-                  l = pe[k][j][0].length;
-                  while (l--) {
-                    tmp.push(pe[k][j][0][l]);
-                  }
-                  pe[i][j].push(tmp);
-                } else {
-                  let tmp = [];
-                  l = pe[i][k][0].length;
-                  while (l--) {
-                    tmp.push(pe[i][k][0][l]);
-                  }
-                  l = pe[k][j][0].length;
-                  while (l--) {
-                    tmp.push(pe[k][j][0][l]);
-                  }
-                  pe[i][j][0] = tmp;
-                }
-              }
-            } else if (previousPathLength === newPathLength - 1) {
-              if (pe_prime[i][j].length) {
-                let tmp = [];
-                l = pe[i][k][0].length;
-                while (l--) {
-                  tmp.push(pe[i][k][0][l]);
-                }
-                l = pe[k][j][0].length;
-                while (l--) {
-                  tmp.push(pe[k][j][0][l]);
-                }
-                pe_prime[i][j].push(tmp);
-              } else {
-                let tmp = [];
-                l = pe[i][k][0].length;
-                while (l--) {
-                  tmp.push(pe[i][k][0][l]);
-                }
-                l = pe[k][j][0].length;
-                while (l--) {
-                  tmp.push(pe[k][j][0][l]);
-                }
-                pe_prime[i][j][0] = tmp;
-              }
-            }
-          }
-        }
-      }
-      return {
-        d,
-        pe,
-        pe_prime
-      };
-    }
-    /**
-     * Get the ring candidates from the path-included distance matrices.
-     *
-     * @param {Array[]} d The distance matrix.
-     * @param {Array[]} pe A matrix containing the shortest paths.
-     * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
-     * @returns {Array[]} The ring candidates.
-     */
-    static getRingCandidates(d, pe, pe_prime) {
-      let length = d.length;
-      let candidates = [];
-      let c = 0;
-      for (let i = 0; i < length; i++) {
-        for (let j = 0; j < length; j++) {
-          if (d[i][j] === 0 || pe[i][j].length === 1 && pe_prime[i][j] === 0) {
-            continue;
-          } else {
-            if (pe_prime[i][j].length !== 0) {
-              c = 2 * (d[i][j] + 0.5);
-            } else {
-              c = 2 * d[i][j];
-            }
-            if (c !== Infinity) {
-              candidates.push([c, pe[i][j], pe_prime[i][j]]);
-            }
-          }
-        }
-      }
-      candidates.sort(function(a, b) {
-        return a[0] - b[0];
-      });
-      return candidates;
-    }
-    /**
-     * Searches the candidates for the smallest set of smallest rings.
-     *
-     * @param {Array[]} c The candidates.
-     * @param {Array[]} d The distance matrix.
-     * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @param {Array[]} pe A matrix containing the shortest paths.
-     * @param {Array[]} pe_prime A matrix containing the shortest paths + one vertex.
-     * @param {Uint16Array} arrBondCount A matrix containing the bond count of each vertex.
-     * @param {Uint16Array} arrRingCount A matrix containing the number of rings associated with each vertex.
-     * @param {Number} nsssr The theoretical number of rings in the graph.
-     * @returns {Set[]} The smallest set of smallest rings.
-     */
-    static getSSSR(c, d, adjacencyMatrix, pe, pe_prime, arrBondCount, arrRingCount, nsssr) {
-      let cSssr = [];
-      let allBonds = [];
-      for (let i = 0; i < c.length; i++) {
-        if (c[i][0] % 2 !== 0) {
-          for (let j = 0; j < c[i][2].length; j++) {
-            let bonds = c[i][1][0].concat(c[i][2][j]);
-            for (let k = 0; k < bonds.length; k++) {
-              if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
-            }
-            let atoms = _SSSR.bondsToAtoms(bonds);
-            if (_SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !_SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds, arrBondCount, arrRingCount)) {
-              cSssr.push(atoms);
-              allBonds = allBonds.concat(bonds);
-            }
-            if (cSssr.length >= nsssr) {
-              return cSssr;
-            }
-          }
-        } else {
-          for (let j = 0; j < c[i][1].length - 1; j++) {
-            let bonds = c[i][1][j].concat(c[i][1][j + 1]);
-            for (let k = 0; k < bonds.length; k++) {
-              if (bonds[k][0].constructor === Array) bonds[k] = bonds[k][0];
-            }
-            let atoms = _SSSR.bondsToAtoms(bonds);
-            if (_SSSR.getBondCount(atoms, adjacencyMatrix) === atoms.size && !_SSSR.pathSetsContain(cSssr, atoms, bonds, allBonds, arrBondCount, arrRingCount)) {
-              cSssr.push(atoms);
-              allBonds = allBonds.concat(bonds);
-            }
-            if (cSssr.length >= nsssr) {
-              return cSssr;
-            }
-          }
-        }
-      }
-      return cSssr;
-    }
-    /**
-     * Returns the number of edges in a graph defined by an adjacency matrix.
-     *
-     * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Number} The number of edges in the graph defined by the adjacency matrix.
-     */
-    static getEdgeCount(adjacencyMatrix) {
-      let edgeCount = 0;
-      let length = adjacencyMatrix.length;
-      var i = length - 1;
-      while (i--) {
-        var j = length;
-        while (j--) {
-          if (adjacencyMatrix[i][j] === 1) {
-            edgeCount++;
-          }
-        }
-      }
-      return edgeCount;
-    }
-    /**
-     * Returns an edge list constructed form an adjacency matrix.
-     *
-     * @param {Array[]} adjacencyMatrix An adjacency matrix.
-     * @returns {Array[]} An edge list. E.g. [ [ 0, 1 ], ..., [ 16, 2 ] ]
-     */
-    static getEdgeList(adjacencyMatrix) {
-      let length = adjacencyMatrix.length;
-      let edgeList = [];
-      var i = length - 1;
-      while (i--) {
-        var j = length;
-        while (j--) {
-          if (adjacencyMatrix[i][j] === 1) {
-            edgeList.push([i, j]);
-          }
-        }
-      }
-      return edgeList;
-    }
-    /**
-     * Return a set of vertex indices contained in an array of bonds.
-     *
-     * @param {Array} bonds An array of bonds. A bond is defined as [ sourceVertexId, targetVertexId ].
-     * @returns {Set<Number>} An array of vertices.
-     */
-    static bondsToAtoms(bonds) {
-      let atoms = /* @__PURE__ */ new Set();
-      var i = bonds.length;
-      while (i--) {
-        atoms.add(bonds[i][0]);
-        atoms.add(bonds[i][1]);
-      }
-      return atoms;
-    }
-    /**
-    * Returns the number of bonds within a set of atoms.
-    *
-    * @param {Set<Number>} atoms An array of atom ids.
-    * @param {Array[]} adjacencyMatrix An adjacency matrix.
-    * @returns {Number} The number of bonds in a set of atoms.
-    */
-    static getBondCount(atoms, adjacencyMatrix) {
-      let count = 0;
-      for (let u of atoms) {
-        for (let v of atoms) {
-          if (u === v) {
-            continue;
-          }
-          count += adjacencyMatrix[u][v];
-        }
-      }
-      return count / 2;
-    }
-    /**
-     * Checks whether or not a given path already exists in an array of paths.
-     *
-     * @param {Set[]} pathSets An array of sets each representing a path.
-     * @param {Set<Number>} pathSet A set representing a path.
-     * @param {Array[]} bonds The bonds associated with the current path.
-     * @param {Array[]} allBonds All bonds currently associated with rings in the SSSR set.
-     * @param {Uint16Array} arrBondCount A matrix containing the bond count of each vertex.
-     * @param {Uint16Array} arrRingCount A matrix containing the number of rings associated with each vertex.
-     * @returns {Boolean} A boolean indicating whether or not a give path is contained within a set.
-     */
-    static pathSetsContain(pathSets, pathSet, bonds, allBonds, arrBondCount, arrRingCount) {
-      var i = pathSets.length;
-      while (i--) {
-        if (_SSSR.isSupersetOf(pathSet, pathSets[i])) {
-          return true;
-        }
-        if (pathSets[i].size !== pathSet.size) {
-          continue;
-        }
-        if (_SSSR.areSetsEqual(pathSets[i], pathSet)) {
-          return true;
-        }
-      }
-      let count = 0;
-      let allContained = false;
-      i = bonds.length;
-      while (i--) {
-        var j = allBonds.length;
-        while (j--) {
-          if (bonds[i][0] === allBonds[j][0] && bonds[i][1] === allBonds[j][1] || bonds[i][1] === allBonds[j][0] && bonds[i][0] === allBonds[j][1]) {
-            count++;
-          }
-          if (count === bonds.length) {
-            allContained = true;
-          }
-        }
-      }
-      let specialCase = false;
-      if (allContained) {
-        for (let element of pathSet) {
-          if (arrRingCount[element] < arrBondCount[element]) {
-            specialCase = true;
-            break;
-          }
-        }
-      }
-      if (allContained && !specialCase) {
-        return true;
-      }
-      for (let element of pathSet) {
-        arrRingCount[element]++;
-      }
-      return false;
     }
     /**
      * Checks whether or not two sets are equal (contain the same elements).
@@ -7532,115 +7864,6 @@
         }
       }
       return true;
-    }
-    /**
-     * Find missing rings using BFS when the main SSSR algorithm falls short.
-     * For each edge not covered by existing rings, find the shortest cycle
-     * containing that edge.
-     *
-     * @static
-     * @param {Array[]} adjacencyMatrix 
-     * @param {Set[]} existingRings The rings already found by the SSSR algorithm.
-     * @param {Number} nSssr The expected number of rings.
-     * @returns {Set[]} newly found rings 
-     */
-    static findMissingRings(adjacencyMatrix, existingRings, nSssr) {
-      let length = adjacencyMatrix.length;
-      let newRings = [];
-      let coveredEdges = /* @__PURE__ */ new Set();
-      for (let ring of existingRings) {
-        let members = [...ring];
-        for (let k = 0; k < members.length; k++) {
-          for (let l = k + 1; l < members.length; l++) {
-            if (adjacencyMatrix[members[k]][members[l]] === 1) {
-              let a = Math.min(members[k], members[l]);
-              let b = Math.max(members[k], members[l]);
-              coveredEdges.add(a + "," + b);
-            }
-          }
-        }
-      }
-      for (let u = 0; u < length; u++) {
-        for (let v = u + 1; v < length; v++) {
-          if (adjacencyMatrix[u][v] !== 1) continue;
-          let edgeKey = u + "," + v;
-          if (coveredEdges.has(edgeKey)) continue;
-          let cycle = _SSSR.bfsShortestCycle(adjacencyMatrix, u, v, length);
-          if (cycle !== null) {
-            let ringSet = new Set(cycle);
-            let isDuplicate = false;
-            for (let existing of existingRings) {
-              if (_SSSR.areSetsEqual(ringSet, existing)) {
-                isDuplicate = true;
-                break;
-              }
-            }
-            for (let nr of newRings) {
-              if (_SSSR.areSetsEqual(ringSet, nr)) {
-                isDuplicate = true;
-                break;
-              }
-            }
-            if (!isDuplicate) {
-              newRings.push(ringSet);
-              let members = [...ringSet];
-              for (let k = 0; k < members.length; k++) {
-                for (let l = k + 1; l < members.length; l++) {
-                  if (adjacencyMatrix[members[k]][members[l]] === 1) {
-                    let a = Math.min(members[k], members[l]);
-                    let b = Math.max(members[k], members[l]);
-                    coveredEdges.add(a + "," + b);
-                  }
-                }
-              }
-              if (existingRings.length + newRings.length >= nSssr) {
-                return newRings;
-              }
-            }
-          }
-        }
-      }
-      return newRings;
-    }
-    /**
-     * BFS to find shortest path from u to v without using the direct u-v edge.
-     * Returns the cycle as an array of vertex indices, or null if no path exists.
-     *
-     * @static
-     * @param {Array[]} adjacencyMatrix The adjacency matrix.
-     * @param {Number} u Source vertex.
-     * @param {Number} v Target vertex.
-     * @param {Number} length Number of vertices.
-     * @returns {Number[]|null} The cycle vertices, or null.
-     */
-    static bfsShortestCycle(adjacencyMatrix, u, v, length) {
-      let visited = new Array(length).fill(false);
-      let parent = new Array(length).fill(-1);
-      let queue = [u];
-      visited[u] = true;
-      while (queue.length > 0) {
-        let current = queue.shift();
-        for (let neighbor = 0; neighbor < length; neighbor++) {
-          if (adjacencyMatrix[current][neighbor] !== 1) continue;
-          if (current === u && neighbor === v) continue;
-          if (current === v && neighbor === u) continue;
-          if (neighbor === v) {
-            let path = [v];
-            let node = current;
-            while (node !== -1) {
-              path.push(node);
-              node = parent[node];
-            }
-            return path;
-          }
-          if (!visited[neighbor]) {
-            visited[neighbor] = true;
-            parent[neighbor] = current;
-            queue.push(neighbor);
-          }
-        }
-      }
-      return null;
     }
   };
 
@@ -8272,6 +8495,34 @@
       this.rotateDrawing();
     }
     /**
+     * Inverts an E/Z bond marker; leaves other bonds unchanged.
+     *
+     * @param {?string} bond - The bond marker to invert.
+     * @returns The bond marker, inverted if it was an E/Z bond.
+     */
+    static flipEZ(bond) {
+      if (bond === "/") return "\\";
+      if (bond === "\\") return "/";
+      return bond;
+    }
+    /**
+     * Gets the bond type of a ringbond given the bond markers at either end.
+     *
+     * This is necessary because some code elsewhere (Graph?) sets these markers
+     * to '-' if they aren't specified.  This returns the first bond that differs
+     * from the default.  It flips E/Z specification of the reverse bond (if any)
+     * to make sure the stereochemistry is correct.
+     *
+     * @param {?string} fwd - The forward bond marker.
+     * @param {?string} rev - The reverse bond marker.
+     * @returns A bond marker, with correct E/Z stereochemistry.
+     */
+    static getRingbondType(fwd, rev) {
+      if (fwd && fwd !== "-") return fwd;
+      if (rev && rev !== "-") return _DrawerBase.flipEZ(rev);
+      return "-";
+    }
+    /**
      * Initializes rings and ringbonds for the current molecule.
      */
     initRings() {
@@ -8291,7 +8542,7 @@
             let targetVertexId = openBonds.get(ringbondId)[0];
             let targetRingbondBond = openBonds.get(ringbondId)[1];
             let edge = new Edge(sourceVertexId, targetVertexId, 1);
-            edge.setBondType(targetRingbondBond || ringbondBond || "-");
+            edge.setBondType(_DrawerBase.getRingbondType(ringbondBond, targetRingbondBond));
             let edgeId = this.graph.addEdge(edge);
             let targetVertex = this.graph.vertices[targetVertexId];
             vertex.addRingbondChild(targetVertexId, j);
@@ -8340,6 +8591,7 @@
         let ring = this.rings[i];
         this.graph.vertices[ring.members[0]].value.addAnchoredRing(ring.id);
       }
+      this.markCageRingSystems();
       this.backupRingInformation();
       while (this.rings.length > 0) {
         let id = -1;
@@ -8363,17 +8615,16 @@
       }
     }
     initHydrogens() {
-      if (!this.opts.explicitHydrogens) {
-        for (let i = 0; i < this.graph.vertices.length; i++) {
-          let vertex = this.graph.vertices[i];
-          if (vertex.value.element !== "H") {
-            continue;
-          }
-          let neighbour = this.graph.vertices[vertex.neighbours[0]];
-          neighbour.value.hasHydrogen = true;
-          if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing || neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
-            vertex.value.isDrawn = false;
-          }
+      if (this.opts.explicitHydrogens) {
+        return;
+      }
+      for (const vertex of this.graph.vertices) {
+        if (vertex.value.element !== "H" || vertex.neighbours.length !== 1) {
+          continue;
+        }
+        const neighbour = this.graph.vertices[vertex.neighbours[0]];
+        if (!neighbour.value.isStereoCenter || neighbour.value.rings.length < 2 && !neighbour.value.bridgedRing || neighbour.value.bridgedRing && neighbour.value.originalRings.length < 2) {
+          vertex.value.isDrawn = false;
         }
       }
     }
@@ -8430,13 +8681,155 @@
       return false;
     }
     /**
+     * Detect cage-like fused ring systems and route them through bridged-ring
+     * layout.
+     *
+     * logic:
+     * Check one fused ring component at a time. Rings are fused when they
+     * share two or more atoms.
+     *  A cage should have several rings fused on three or more sides.
+     * Every atom in the cage skeleton should have three neighbours inside
+     * the same fused component.
+     * Most ring edges should be shared by two rings. A small boundary is
+     *allowed because the SSSR can miss one face of a cage (see cubane example)
+     * This rejects polycyclic aromatic hydrocarbons (PAHs) which are an exception to the rule
+     *  check https://en.wikipedia.org/wiki/Polycyclic_aromatic_hydrocarbon
+     * PAHs have outer atoms with only two neighbours inside the fused system.
+     */
+    markCageRingSystems() {
+      let fusedCount = /* @__PURE__ */ new Map();
+      let fusedNeighbours = /* @__PURE__ */ new Map();
+      for (let i = 0; i < this.rings.length; i++) {
+        fusedCount.set(this.rings[i].id, 0);
+        fusedNeighbours.set(this.rings[i].id, []);
+      }
+      for (let i = 0; i < this.ringConnections.length; i++) {
+        let rc = this.ringConnections[i];
+        if (rc.vertices.size < 2) continue;
+        fusedCount.set(rc.firstRingId, fusedCount.get(rc.firstRingId) + 1);
+        fusedCount.set(rc.secondRingId, fusedCount.get(rc.secondRingId) + 1);
+        fusedNeighbours.get(rc.firstRingId).push(rc.secondRingId);
+        fusedNeighbours.get(rc.secondRingId).push(rc.firstRingId);
+      }
+      let visited = /* @__PURE__ */ new Set();
+      let cagedRings = /* @__PURE__ */ new Set();
+      for (let i = 0; i < this.rings.length; i++) {
+        let rootId = this.rings[i].id;
+        if (visited.has(rootId)) continue;
+        let component = [];
+        let queue = [rootId];
+        visited.add(rootId);
+        while (queue.length > 0) {
+          let cur = queue.shift();
+          component.push(cur);
+          let neighbours = fusedNeighbours.get(cur);
+          for (let j = 0; j < neighbours.length; j++) {
+            let n = neighbours[j];
+            if (!visited.has(n)) {
+              visited.add(n);
+              queue.push(n);
+            }
+          }
+        }
+        if (this.isCageRingComponent(component, fusedCount)) {
+          for (let j = 0; j < component.length; j++) {
+            cagedRings.add(component[j]);
+          }
+        }
+      }
+      if (cagedRings.size === 0) return;
+      for (let i = 0; i < this.ringConnections.length; i++) {
+        let rc = this.ringConnections[i];
+        if (rc.vertices.size < 2) continue;
+        if (cagedRings.has(rc.firstRingId) && cagedRings.has(rc.secondRingId)) {
+          rc.isForcedBridge = true;
+        }
+      }
+    }
+    /**
+     * Check whether a fused ring component looks like a closed cage.
+     *
+     * @param {Number[]} ringIds Ring ids in one fused component.
+     * @param {Map<Number, Number>} fusedCount Number of fused neighbours per ring.
+     * @returns {Boolean} Whether this component should use bridged-ring layout.
+     */
+    isCageRingComponent(ringIds, fusedCount) {
+      let seedCount = 0;
+      for (let i = 0; i < ringIds.length; i++) {
+        if (fusedCount.get(ringIds[i]) >= 3) {
+          seedCount++;
+        }
+      }
+      if (seedCount < 2) {
+        return false;
+      }
+      let stats = this.getRingSystemStats(ringIds);
+      return stats.atomCount > 0 && stats.edgeCount > 0 && stats.nonCageAtomCount === 0 && stats.boundaryEdgeRatio <= 0.5;
+    }
+    /**
+     * Collect simple graph stats for a fused ring component.
+     *
+     * @param {Number[]} ringIds Ring ids in one fused component.
+     * @returns {Object} Ring-system atom and edge stats.
+     */
+    getRingSystemStats(ringIds) {
+      let ringMemberSets = /* @__PURE__ */ new Map();
+      let atoms = /* @__PURE__ */ new Set();
+      let degreeByAtom = /* @__PURE__ */ new Map();
+      for (let i = 0; i < ringIds.length; i++) {
+        let ring = this.getRing(ringIds[i]);
+        let members = new Set(ring.members);
+        ringMemberSets.set(ringIds[i], members);
+        for (let j = 0; j < ring.members.length; j++) {
+          atoms.add(ring.members[j]);
+          degreeByAtom.set(ring.members[j], 0);
+        }
+      }
+      let edgeCount = 0;
+      let boundaryEdgeCount = 0;
+      for (let i = 0; i < this.graph.edges.length; i++) {
+        let edge = this.graph.edges[i];
+        if (!atoms.has(edge.sourceId) || !atoms.has(edge.targetId)) {
+          continue;
+        }
+        let ringCount = 0;
+        for (let j = 0; j < ringIds.length; j++) {
+          let members = ringMemberSets.get(ringIds[j]);
+          if (members.has(edge.sourceId) && members.has(edge.targetId)) {
+            ringCount++;
+          }
+        }
+        if (ringCount === 0) {
+          continue;
+        }
+        edgeCount++;
+        degreeByAtom.set(edge.sourceId, degreeByAtom.get(edge.sourceId) + 1);
+        degreeByAtom.set(edge.targetId, degreeByAtom.get(edge.targetId) + 1);
+        if (ringCount === 1) {
+          boundaryEdgeCount++;
+        }
+      }
+      let nonCageAtomCount = 0;
+      for (let degree of degreeByAtom.values()) {
+        if (degree !== 3) {
+          nonCageAtomCount++;
+        }
+      }
+      return {
+        atomCount: atoms.size,
+        edgeCount,
+        nonCageAtomCount,
+        boundaryEdgeRatio: edgeCount === 0 ? 1 : boundaryEdgeCount / edgeCount
+      };
+    }
+    /**
      * Creates a bridged ring.
      *
      * @param {Number[]} ringIds An array of ids of rings involved in the bridged ring.
-     * @param {Number} sourceVertexId The vertex id to start the bridged ring discovery from.
+     * @param {Number} _sourceVertexId The vertex id to start the bridged ring discovery from (UNUSED).
      * @returns {Ring} The bridged ring.
      */
-    createBridgedRing(ringIds, sourceVertexId) {
+    createBridgedRing(ringIds, _sourceVertexId) {
       let ringMembers = /* @__PURE__ */ new Set();
       let vertices = /* @__PURE__ */ new Set();
       let neighbours = /* @__PURE__ */ new Set();
@@ -8875,13 +9268,13 @@
           }
         }
       });
-      if (!this.bridgedRing) {
-        for (let i = 0; i < this.rings.length; i++) {
-          let ring = this.rings[i];
-          if (this.isRingAromatic(ring)) {
-            this.canvasWrapper.drawAromaticityRing(ring);
-          }
+      for (let i = 0; i < this.rings.length; i++) {
+        let ring = this.rings[i];
+        if (!this.isRingAromatic(ring)) continue;
+        if (ring.isPartOfBridged && !this.isRingRegularPolygon(ring)) {
+          continue;
         }
+        this.canvasWrapper.drawAromaticityRing(ring);
       }
     }
     /**
@@ -8905,7 +9298,8 @@
       let sides = ArrayHelper.clone(normals);
       sides[0].multiplyScalar(10).add(a);
       sides[1].multiplyScalar(10).add(a);
-      if (edge.bondType === "=" || this.getRingbondType(vertexA, vertexB) === "=" || edge.isPartOfAromaticRing && this.bridgedRing) {
+      let aromaticRing = edge.isPartOfAromaticRing && vertexA.value.bridgedRing !== null && vertexB.value.bridgedRing !== null ? this.getLargestOrAromaticCommonRing(vertexA, vertexB) : null;
+      if (edge.bondType === "=" || this.getRingbondType(vertexA, vertexB) === "=" || aromaticRing && !this.isRingRegularPolygon(aromaticRing)) {
         let inRing = this.areVerticesInSameRing(vertexA, vertexB);
         let s = this.chooseSide(vertexA, vertexB, sides);
         if (inRing) {
@@ -9279,7 +9673,7 @@
         if (edge.bondType !== "=") continue;
         const vA = edge.sourceId;
         const vB = edge.targetId;
-        if (graph.vertices[vA].value.rings.length > 0 && graph.vertices[vB].value.rings.length > 0) {
+        if (this.areVerticesInSameRing(graph.vertices[vA], graph.vertices[vB])) {
           continue;
         }
         let stereoA = null, stereoB = null;
@@ -9324,31 +9718,19 @@
           const e = graph.getEdge(vB, nid);
           if (e && (e.bondType === "/" || e.bondType === "\\")) countB++;
         }
-        let flipId, pivotId;
-        if (countA <= countB) {
-          flipId = stereoA.nid;
-          pivotId = vA;
-        } else {
-          flipId = stereoB.nid;
-          pivotId = vB;
-        }
-        if (graph.vertices[flipId].value.rings.length > 0) {
-          flipId = pivotId === vA ? stereoB.nid : stereoA.nid;
-          pivotId = pivotId === vA ? vB : vA;
-          if (graph.vertices[flipId].value.rings.length > 0) continue;
-        }
+        const flipId = countA <= countB ? vA : vB;
+        const pivotId = countA <= countB ? vB : vA;
         const pivot = graph.vertices[pivotId].position;
         const len2 = ax * ax + ay * ay;
         if (len2 < 1e-3) continue;
-        const self2 = this;
-        graph.traverseTree(flipId, pivotId, function(vertex) {
+        graph.traverseTree(flipId, pivotId, (vertex) => {
           const dx = vertex.position.x - pivot.x;
           const dy = vertex.position.y - pivot.y;
           const dot = dx * ax + dy * ay;
           vertex.position.x = pivot.x + 2 * dot * ax / len2 - dx;
           vertex.position.y = pivot.y + 2 * dot * ay / len2 - dy;
           for (let j = 0; j < vertex.value.anchoredRings.length; j++) {
-            let ring = self2.rings[vertex.value.anchoredRings[j]];
+            let ring = this.rings[vertex.value.anchoredRings[j]];
             if (ring) {
               const rdx = ring.center.x - pivot.x;
               const rdy = ring.center.y - pivot.y;
@@ -9691,9 +10073,10 @@
           if (prevEdge && nextEdge && prevEdge.weight + nextEdge.weight >= 4) {
             prevEdge.center = true;
             nextEdge.center = true;
-            vertex.value.drawExplicit = false;
-            nextVertex.drawExplicit = true;
             nextVertex.angle = 0;
+            if (prevEdge.weight === nextEdge.weight) {
+              vertex.value.drawExplicit = true;
+            }
             this.createNextBond(nextVertex, vertex, previousAngle + nextVertex.angle);
           } else if (previousVertex && previousVertex.value.rings.length > 0) {
             let proposedAngleA = MathHelper.toRad(60);
@@ -9903,6 +10286,39 @@
       return true;
     }
     /**
+     * Check whether the ring's 2D projection is close enough to a regular
+     * polygon that the aromatic-circle indicator will sit correctly inside
+     * it. Used to decide whether an aromatic ring that has been absorbed
+     * into a bridged super-ring can still use a circle, or needs the
+     * dashed-bond fallback.
+     *
+     * Heuristic: every vertex of a regular N-gon is the same distance
+     * from the centre. We accept the ring as regular when the longest
+     * radius is no more than `tolerance` times the shortest.
+     *
+     * @param {Ring}   ring             A ring.
+     * @param {Number} [tolerance=1.15] Max acceptable max/min radius ratio.
+     * @returns {Boolean}
+     */
+    isRingRegularPolygon(ring, tolerance = 1.15) {
+      if (ring.members.length < 3) {
+        return false;
+      }
+      let positions = ring.getPolygon(this.graph.vertices);
+      let center = ring.center;
+      let minR = Infinity;
+      let maxR = -Infinity;
+      for (let i = 0; i < positions.length; i++) {
+        let r = positions[i].distance(center);
+        if (r < minR) minR = r;
+        if (r > maxR) maxR = r;
+      }
+      if (minR < 1e-6) {
+        return false;
+      }
+      return maxR / minR < tolerance;
+    }
+    /**
      * Get the normals of an edge.
      *
      * @param {Edge} edge An edge.
@@ -10081,31 +10497,23 @@
         const rotation = vertex.value.bracket.chirality === "@" ? -1 : 1;
         const rs = parity === rotation ? "R" : "S";
         vertex.value.chirality = rs;
-        let wedgeOrder = new Array(neighbours.length - 1);
-        let showHydrogen = vertex.value.rings.length > 1 && vertex.value.hasHydrogen;
-        let offset = vertex.value.hasHydrogen ? 1 : 0;
-        for (let j = 0; j < order.length - offset; j++) {
-          wedgeOrder[j] = new Uint32Array(2);
-          let neighbour = this.graph.vertices[neighbours[order[j]]];
-          wedgeOrder[j][0] += neighbour.value.isStereoCenter ? 0 : 1e5;
-          wedgeOrder[j][0] += this.areVerticesInSameRing(neighbour, vertex) ? 0 : 1e4;
-          wedgeOrder[j][0] += neighbour.value.isHeteroAtom() ? 1e3 : 0;
-          wedgeOrder[j][0] -= neighbour.value.subtreeDepth === 0 ? 1e3 : 0;
-          wedgeOrder[j][0] += 1e3 - neighbour.value.subtreeDepth;
-          wedgeOrder[j][1] = neighbours[order[j]];
-        }
-        wedgeOrder.sort((a, b) => b[0] - a[0]);
-        if (!showHydrogen) {
-          let wedgeId = wedgeOrder[0][1];
-          let wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
-          this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
-          if (vertex.value.hasHydrogen) {
-            let hId = neighbours[order[order.length - 1]];
-            let hWedge = this._computeWedgeDirection(vertex, hId, order, neighbours, rs);
-            this.graph.getEdge(vertex.id, hId).wedge = hWedge;
-            vertex.value.hydrogenDirection = hWedge === "up" ? "up" : "down";
-          }
-        }
+        const wedgeOrder = order.map((o) => {
+          const nid = neighbours[o];
+          const neighbour = this.graph.vertices[nid];
+          let rank = 0;
+          rank -= neighbour.value.isStereoCenter ? 1e6 : 0;
+          rank -= this.areVerticesInSameRing(neighbour, vertex) ? 1e5 : 0;
+          rank += neighbour.value.isDrawn ? 1e4 : 0;
+          rank += neighbour.value.element !== "C" ? 100 : 0;
+          rank -= this.graph.getTreeDepth(nid, vertex.id);
+          return [rank, nid];
+        }).sort((a, b) => {
+          return b[0] - a[0];
+        });
+        const wedgeId = wedgeOrder[0][1];
+        const wedge = this._computeWedgeDirection(vertex, wedgeId, order, neighbours, rs);
+        this.graph.getEdge(vertex.id, wedgeId).wedge = wedge;
+        this.graph.vertices[wedgeId].value.isDrawn = true;
       }
     }
     /**
@@ -10118,7 +10526,7 @@
      *
      * @param {Vertex} vertex The stereocenter vertex.
      * @param {Number} wedgeTargetId The vertex id of the neighbor being wedged.
-     * @param {Uint8Array} order CIP priority order (index→original neighbor index).
+     * @param {number[] | Uint8Array} order CIP priority order (index→original neighbor index).
      * @param {Number[]} neighbours The neighbor vertex ids.
      * @param {String} rs 'R' or 'S' designation.
      * @returns {String} 'up' (solid wedge) or 'down' (dashed wedge).
@@ -10295,7 +10703,7 @@
     let output = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 ' + img.width + " " + img.height + '" shape-rendering="crispEdges"><g shape-rendering="crispEdges">' + paths + "</g></svg>";
     let dummyDiv = document.createElement("div");
     dummyDiv.innerHTML = output;
-    return dummyDiv.firstChild;
+    return dummyDiv.firstElementChild;
   }
 
   // src/GaussDrawer.js
@@ -11019,11 +11427,16 @@
       }
     }
     write(text, direction, x, y, singleVertex) {
+      const partWidths = text.map((part) => _SvgWrapper.measureText(part[0], this.opts.fontSizeLarge, this.opts.fontFamily).width);
       let bbox = _SvgWrapper.measureText(text[0][1], this.opts.fontSizeLarge, this.opts.fontFamily);
       if (direction === "left" && text[0][0] !== text[0][1]) {
-        let fullBbox = _SvgWrapper.measureText(text[0][0], this.opts.fontSizeLarge, this.opts.fontFamily);
-        bbox.width = fullBbox.width;
+        bbox.width = partWidths[0];
       }
+      const textWidth = partWidths.reduce((sum, width) => sum + width, 0);
+      const maxPartWidth = partWidths.reduce((max, width) => Math.max(max, width), 0);
+      const extentWidth = direction === "left" || direction === "right" ? textWidth : maxPartWidth;
+      const textStart = direction === "left" ? x + bbox.width / 2 - extentWidth : x - bbox.width / 2;
+      const textEnd = direction === "left" ? x + bbox.width / 2 : textStart + extentWidth;
       if (singleVertex) {
         if (x + bbox.width * text.length > this.maxX) {
           this.maxX = x + bbox.width * text.length;
@@ -11069,6 +11482,12 @@
             this.minY = y - 0.8 * bbox.height * text.length;
           }
         }
+      }
+      if (textStart < this.minX) {
+        this.minX = textStart;
+      }
+      if (textEnd > this.maxX) {
+        this.maxX = textEnd;
       }
       let cx = x;
       let cy = y;
@@ -11214,7 +11633,7 @@
     static svgToCanvas(svg, canvas, width, height, callback = null) {
       svg.setAttributeNS(null, "width", width);
       svg.setAttributeNS(null, "height", height);
-      let image = new Image();
+      let image = document.createElement("img");
       image.onload = function() {
         canvas.width = width;
         canvas.height = height;
@@ -11315,21 +11734,29 @@
      * Draws the parsed smiles data to an svg element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+     * @param {?(string|String|Element)} target The id of the HTML svg element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      *
-     * @returns {SVGElement} The svg element
+     * @returns {SVGSVGElement} The (possibly new) SVG element that was drawn to.
      */
     draw(data, target, themeName = "light", weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
+      let svg = null;
       if (target === null || target === "svg") {
-        target = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        target.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        target.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-        target.setAttributeNS(null, "width", this.opts.width);
-        target.setAttributeNS(null, "height", this.opts.height);
+        svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+        svg.setAttributeNS(null, "width", this.opts.width);
+        svg.setAttributeNS(null, "height", this.opts.height);
       } else if (target instanceof String) {
-        target = document.getElementById(target);
+        svg = document.getElementById(target.valueOf());
+      } else if (typeof target === "string") {
+        svg = document.getElementById(target);
+      } else {
+        svg = target;
+      }
+      if (!(svg instanceof SVGSVGElement)) {
+        throw Error("Second argument was not an SVG or the ID of an SVG.");
       }
       let optionBackup = {
         padding: this.opts.padding,
@@ -11344,7 +11771,7 @@
       if (!infoOnly) {
         this.themeManager = new ThemeManager(this.opts.themes, themeName);
         if (this.svgWrapper === null || this.clear) {
-          this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+          this.svgWrapper = new SvgWrapper(this.themeManager, svg, this.opts, this.clear);
         }
       }
       preprocessor.processGraph();
@@ -11367,22 +11794,27 @@
         this.opts.padding = optionBackup.padding;
         this.opts.compactDrawing = optionBackup.padding;
       }
-      return target;
+      return svg;
     }
     /**
      * Draws the parsed smiles data to a canvas element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {(string|String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
     drawCanvas(data, target, themeName = "light", infoOnly = false) {
       let canvas = null;
-      if (typeof target === "string" || target instanceof String) {
+      if (target instanceof String) {
+        canvas = document.getElementById(target.valueOf());
+      } else if (typeof target === "string") {
         canvas = document.getElementById(target);
       } else {
         canvas = target;
+      }
+      if (!(canvas instanceof HTMLCanvasElement)) {
+        throw Error("Second argument was not a canvas or the ID of a canvas.");
       }
       let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -11423,13 +11855,13 @@
           }
         }
       });
-      if (!preprocessor.bridgedRing) {
-        for (let i = 0; i < rings.length; i++) {
-          let ring = rings[i];
-          if (preprocessor.isRingAromatic(ring)) {
-            this.drawAromaticityRing(ring);
-          }
+      for (let i = 0; i < rings.length; i++) {
+        let ring = rings[i];
+        if (!preprocessor.isRingAromatic(ring)) continue;
+        if (ring.isPartOfBridged && !preprocessor.isRingRegularPolygon(ring)) {
+          continue;
         }
+        this.drawAromaticityRing(ring);
       }
     }
     /**
@@ -11447,7 +11879,8 @@
       let a = vertexA.position, b = vertexB.position, normals = preprocessor.getEdgeNormals(edge), sides = ArrayHelper.clone(normals);
       sides[0].multiplyScalar(10).add(a);
       sides[1].multiplyScalar(10).add(a);
-      if (edge.bondType === "=" || preprocessor.getRingbondType(vertexA, vertexB) === "=" || edge.isPartOfAromaticRing && preprocessor.bridgedRing) {
+      let aromaticRing = edge.isPartOfAromaticRing && vertexA.value.bridgedRing !== null && vertexB.value.bridgedRing !== null ? preprocessor.getLargestOrAromaticCommonRing(vertexA, vertexB) : null;
+      if (edge.bondType === "=" || preprocessor.getRingbondType(vertexA, vertexB) === "=" || aromaticRing && !preprocessor.isRingRegularPolygon(aromaticRing)) {
         let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);
         let s = preprocessor.chooseSide(vertexA, vertexB, sides);
         if (inRing) {
@@ -11510,9 +11943,9 @@
     /**
      * Draw the highlights for atoms to the canvas.
      *
-     * @param {Boolean} debug
+     * @param {Boolean} _debug UNUSED
      */
-    drawAtomHighlights(debug) {
+    drawAtomHighlights(_debug) {
       let preprocessor = this.preprocessor;
       let graph = preprocessor.graph;
       let svgWrapper = this.svgWrapper;
@@ -11663,7 +12096,7 @@
       );
       gd.draw();
       const background = gd.getSVG();
-      background.firstChild.setAttributeNS(null, "transform", `translate(${minX},${minY})`);
+      background.firstElementChild.setAttributeNS(null, "transform", `translate(${minX},${minY})`);
       this.svgWrapper.addLayer(background);
     }
     /**
@@ -11752,7 +12185,7 @@
   };
 
   // src/Parser.js
-  var Parser_default = function() {
+  var Parser_default = (function() {
     "use strict";
     function peg$subclass(child, parent) {
       function ctor() {
@@ -13264,7 +13697,15 @@
       SyntaxError: peg$SyntaxError,
       parse: peg$parse
     };
-  }();
+  })();
+
+  // src/ParserWrapper.ts
+  var ParserWrapper = class {
+    static parse(smiles) {
+      return Parser_default.parse(smiles);
+    }
+  };
+  ParserWrapper.SyntaxError = Parser_default.SyntaxError;
 
   // src/FormulaToCommonName.js
   var FormulaToCommonName_default = {
@@ -13527,12 +13968,17 @@
           maxHeight = element.height;
         }
       }
+      let minY = 0;
+      let maxY = 0;
       let totalWidth = 0;
       elements.forEach((element) => {
         let offsetX = element.offsetX || 0;
         let offsetY = element.offsetY || 0;
+        const y = (maxHeight - element.height) / 2 + offsetY;
+        maxY = Math.max(maxY, y + element.height);
+        minY = Math.min(minY, y);
         element.svg.setAttributeNS(null, "x", Math.round(totalWidth + offsetX));
-        element.svg.setAttributeNS(null, "y", Math.round((maxHeight - element.height) / 2 + offsetY));
+        element.svg.setAttributeNS(null, "y", Math.round(y));
         element.svg.setAttributeNS(null, "width", Math.round(element.width));
         element.svg.setAttributeNS(null, "height", Math.round(element.height));
         svg.appendChild(element.svg);
@@ -13540,7 +13986,8 @@
           totalWidth += Math.round(element.width + this.opts.spacing + offsetX);
         }
       });
-      svg.setAttributeNS(null, "viewBox", `0 0 ${totalWidth} ${maxHeight}`);
+      const height = Math.max(maxHeight, maxY - minY);
+      svg.setAttributeNS(null, "viewBox", `0 ${minY} ${totalWidth} ${height}`);
       svg.style.width = totalWidth + "px";
       svg.style.height = maxHeight + "px";
       return svg;
@@ -13727,11 +14174,21 @@
         if (element.hasAttribute("data-smiles-options") || element.hasAttribute("data-smiles-reaction-options")) {
           let moleculeOptions = {};
           if (element.hasAttribute("data-smiles-options")) {
-            moleculeOptions = JSON.parse(element.getAttribute("data-smiles-options").replace(/'/g, '"'));
+            const attr = element.getAttribute("data-smiles-options");
+            try {
+              moleculeOptions = JSON.parse(attr);
+            } catch (e) {
+              moleculeOptions = JSON.parse(attr.replace(/'/g, '"'));
+            }
           }
           let reactionOptions = {};
           if (element.hasAttribute("data-smiles-reaction-options")) {
-            reactionOptions = JSON.parse(element.getAttribute("data-smiles-reaction-options").replace(/'/g, '"'));
+            const attr = element.getAttribute("data-smiles-reaction-options");
+            try {
+              reactionOptions = JSON.parse(attr);
+            } catch (e) {
+              reactionOptions = JSON.parse(attr.replace(/'/g, '"'));
+            }
           }
           let smilesDrawer = new _SmilesDrawer(moleculeOptions, reactionOptions);
           smilesDrawer.draw(smiles, element, currentTheme, successCallback, errorCallback, weights);
@@ -13759,7 +14216,11 @@
           info.indexOf("__") + 2,
           info.lastIndexOf("__")
         );
-        settings = JSON.parse(settingsString.replace(/'/g, '"'));
+        try {
+          settings = JSON.parse(settingsString);
+        } catch (e) {
+          settings = JSON.parse(settingsString.replace(/'/g, '"'));
+        }
       }
       let defaultSettings = {
         textAboveArrow: "{reagents}",
@@ -13942,85 +14403,89 @@
     }
   };
 
-  // app.js
-  var SmilesDrawerNS = {
-    Version: "2.2.1",
-    Drawer,
-    GaussDrawer,
-    Parser: Parser_default,
-    ReactionDrawer,
-    ReactionParser,
-    SmiDrawer: SmilesDrawer,
-    SvgDrawer
-  };
-  SmilesDrawerNS.clean = function(smiles) {
-    return smiles.replace(/[^A-Za-z0-9@.+\-?!()[\]{}/\\=#$:*]/g, "");
-  };
-  SmilesDrawerNS.apply = function(options, selector = "canvas[data-smiles]", themeName = "light", onError = null) {
-    let smilesDrawer = new Drawer(options);
-    let elements = document.querySelectorAll(selector);
-    for (var i = 0; i < elements.length; i++) {
-      let element = elements[i];
-      SmilesDrawerNS.parse(element.getAttribute("data-smiles"), function(tree) {
-        smilesDrawer.draw(tree, element, themeName, false);
-      }, function(err) {
-        if (onError) {
-          onError(err);
+  // app.ts
+  var _SmilesDrawerNS = class _SmilesDrawerNS {
+    /**
+    * Cleans a SMILES string (by removing all non-valid characters)
+    *
+    * @param smiles - A SMILES string.
+    * @returns The clean SMILES string.
+    */
+    static clean(smiles) {
+      return smiles.replace(/[^A-Za-z0-9@.+\-?!()[\]{}/\\=#$:*]/g, "");
+    }
+    /**
+    * Applies the smiles drawer draw function to each canvas element that has a smiles string in the data-smiles attribute.
+    *
+    * @param options   - SmilesDrawer options.
+    * @param selector  - A CSS selector that identifies drawable elements (default "canvas[data-smiles]").
+    * @param themeName - The theme to apply (default "light").
+    * @param onError   - An optional callback function that takes an error object (default null).
+    */
+    static apply(options, selector = "canvas[data-smiles]", themeName = "light", onError) {
+      const smilesDrawer = new Drawer(options);
+      const elements = document.querySelectorAll(selector);
+      for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+        _SmilesDrawerNS.parse(element.getAttribute("data-smiles"), function(tree) {
+          smilesDrawer.draw(tree, element, themeName, false);
+        }, function(err) {
+          if (onError) {
+            onError(err);
+          }
+        });
+      }
+    }
+    /**
+    * Parses a SMILES string.
+    *
+    * @param smiles          - A SMILES string.
+    * @param successCallback - A callback that is called on success with the parse tree.
+    * @param errorCallback   - A callback that is called with the error object on error.
+    */
+    static parse(smiles, successCallback, errorCallback) {
+      try {
+        if (successCallback) {
+          successCallback(ParserWrapper.parse(smiles));
         }
-      });
-    }
-  };
-  SmilesDrawerNS.parse = function(smiles, successCallback, errorCallback) {
-    try {
-      if (successCallback) {
-        successCallback(Parser_default.parse(smiles));
-      }
-    } catch (err) {
-      if (errorCallback) {
-        errorCallback(err);
+      } catch (err) {
+        if (errorCallback) {
+          errorCallback(err);
+        }
       }
     }
-  };
-  SmilesDrawerNS.parseReaction = function(reactionSmiles, successCallback, errorCallback) {
-    try {
-      if (successCallback) {
-        successCallback(ReactionParser.parse(reactionSmiles));
-      }
-    } catch (err) {
-      if (errorCallback) {
-        errorCallback(err);
+    /**
+    * Parses a reaction SMILES string.
+    *
+    * @param reactionSmiles  - A reaction SMILES string.
+    * @param successCallback - A callback that is called on success with the parse tree.
+    * @param errorCallback   - A callback that is called with the error object on error.
+    */
+    static parseReaction(reactionSmiles, successCallback, errorCallback) {
+      try {
+        if (successCallback) {
+          successCallback(ReactionParser.parse(reactionSmiles));
+        }
+      } catch (err) {
+        if (errorCallback) {
+          errorCallback(err);
+        }
       }
     }
   };
-  if (!Array.prototype.fill) {
-    let fill = function(value) {
-      if (this == null) {
-        throw new TypeError("this is null or not defined");
-      }
-      var O = Object(this);
-      var len = O.length >>> 0;
-      var start = arguments[1];
-      var relativeStart = start >> 0;
-      var k = relativeStart < 0 ? Math.max(len + relativeStart, 0) : Math.min(relativeStart, len);
-      var end = arguments[2];
-      var relativeEnd = end === void 0 ? len : end >> 0;
-      var final = relativeEnd < 0 ? Math.max(len + relativeEnd, 0) : Math.min(relativeEnd, len);
-      while (k < final) {
-        O[k] = value;
-        k++;
-      }
-      return O;
-    };
-    Object.defineProperty(Array.prototype, "fill", {
-      value: fill,
-      writeable: false
-    });
-  }
+  _SmilesDrawerNS.Version = "2.4.2";
+  _SmilesDrawerNS.Drawer = Drawer;
+  _SmilesDrawerNS.GaussDrawer = GaussDrawer;
+  _SmilesDrawerNS.Parser = ParserWrapper;
+  _SmilesDrawerNS.ReactionDrawer = ReactionDrawer;
+  _SmilesDrawerNS.ReactionParser = ReactionParser;
+  _SmilesDrawerNS.SmiDrawer = SmilesDrawer;
+  _SmilesDrawerNS.SvgDrawer = SvgDrawer;
+  var SmilesDrawerNS = _SmilesDrawerNS;
   if (typeof window !== "undefined" && window.document && window.document.createElement) {
     window.SmilesDrawer = SmilesDrawerNS;
     window.SmiDrawer = SmilesDrawer;
   }
-  var app_default = SmilesDrawerNS;
 })();
 /*! Bundled license information:
 

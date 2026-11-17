@@ -22,22 +22,34 @@ export default class SvgDrawer {
      * Draws the parsed smiles data to an svg element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {?(String|SVGElement)} target The id of the HTML svg element the structure is drawn to - or the element itself.
+     * @param {?(string|String|Element)} target The id of the HTML svg element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      *
-     * @returns {SVGElement} The svg element
+     * @returns {SVGSVGElement} The (possibly new) SVG element that was drawn to.
      */
     draw(data, target, themeName = 'light', weights = null, infoOnly = false, highlight_atoms = [], weightsNormalized = false) {
+        let svg = null;
+
         if (target === null || target === 'svg') {
-            target = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            target.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            target.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-            target.setAttributeNS(null, 'width', this.opts.width);
-            target.setAttributeNS(null, 'height', this.opts.height);
+            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+            svg.setAttributeNS(null, 'width', this.opts.width);
+            svg.setAttributeNS(null, 'height', this.opts.height);
         }
         else if (target instanceof String) {
-            target = document.getElementById(target);
+            svg = document.getElementById(target.valueOf());
+        }
+        else if (typeof target === 'string') {
+            svg = document.getElementById(target);
+        }
+        else {
+            svg = target;
+        }
+
+        if (!(svg instanceof SVGSVGElement)) {
+            throw Error('Second argument was not an SVG or the ID of an SVG.');
         }
 
         let optionBackup = {
@@ -58,7 +70,7 @@ export default class SvgDrawer {
         if (!infoOnly) {
             this.themeManager = new ThemeManager(this.opts.themes, themeName);
             if (this.svgWrapper === null || this.clear) {
-                this.svgWrapper = new SvgWrapper(this.themeManager, target, this.opts, this.clear);
+                this.svgWrapper = new SvgWrapper(this.themeManager, svg, this.opts, this.clear);
             }
         }
 
@@ -92,24 +104,31 @@ export default class SvgDrawer {
             this.opts.compactDrawing = optionBackup.padding;
         }
 
-        return target;
+        return svg;
     }
 
     /**
      * Draws the parsed smiles data to a canvas element.
      *
      * @param {Object} data The tree returned by the smiles parser.
-     * @param {(String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
+     * @param {(string|String|HTMLCanvasElement)} target The id of the HTML canvas element the structure is drawn to - or the element itself.
      * @param {String} themeName='dark' The name of the theme to use. Built-in themes are 'light' and 'dark'.
      * @param {Boolean} infoOnly=false Only output info on the molecule without drawing anything to the canvas.
      */
     drawCanvas(data, target, themeName = 'light', infoOnly = false) {
         let canvas = null;
-        if (typeof target === 'string' || target instanceof String) {
+        if (target instanceof String) {
+            canvas = document.getElementById(target.valueOf());
+        }
+        else if (typeof target === 'string') {
             canvas = document.getElementById(target);
         }
         else {
             canvas = target;
+        }
+
+        if (!(canvas instanceof HTMLCanvasElement)) {
+            throw Error('Second argument was not a canvas or the ID of a canvas.');
         }
 
         let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -160,16 +179,24 @@ export default class SvgDrawer {
             }
         });
 
-        // Draw ring for implicitly defined aromatic rings
-        if (!preprocessor.bridgedRing) {
-            for (let i = 0; i < rings.length; i++) {
-                let ring = rings[i];
+        // Draw the inner circle that marks an aromatic ring (benzene as
+        // hexagon + circle) rings that are part of a bridged system still
+        // get the circle as long as their 2D projection is close enough to
+        // a regular polygon (e.g a flat pyrrole face of a bridged bicyclic).
+        // If the projection is distorted (i.e. not close to a regular polygone), we
+        // skip the circle here and let drawEdge fall back to dashed bonds
+        // long term fix is to kekulise aromatic input for bridged systems in
+        // the parser so the fallback is no longer needed
+        for (let i = 0; i < rings.length; i++) {
+            let ring = rings[i];
 
-                // TODO: uses canvas ctx to draw... need to update this to SVG
-                if (preprocessor.isRingAromatic(ring)) {
-                    this.drawAromaticityRing(ring);
-                }
+            if (!preprocessor.isRingAromatic(ring)) continue;
+
+            if (ring.isPartOfBridged && !preprocessor.isRingRegularPolygon(ring)) {
+                continue;
             }
+
+            this.drawAromaticityRing(ring);
         }
     }
 
@@ -204,9 +231,25 @@ export default class SvgDrawer {
                 Vector2.multiplyScalar(normals[1], 10).add(a),
             ];
 
+        // The third condition handles aromatic bonds inside a bridged ring
+        // system whose 2D projection is too distorted for the usual
+        // aromatic circle (e.g. paracyclophane, triptycene). Those bonds
+        // get drawn as a solid line with a dashed parallel inside the ring.
+        // If the aromatic ring is still close to a regular polygon (e.g.
+        // a flat pyrrole on a bridged bicyclic) we skip this branch and let
+        // drawEdges draw the circle as usual.
+        // The long-term fix is to kekulise aromatic input for bridged
+        // systems in the parser (explicit single/double) so the fallback
+        // is no longer needed.
+        let aromaticRing = (edge.isPartOfAromaticRing
+            && vertexA.value.bridgedRing !== null
+            && vertexB.value.bridgedRing !== null)
+            ? preprocessor.getLargestOrAromaticCommonRing(vertexA, vertexB)
+            : null;
+
         if (edge.bondType === '='
             || preprocessor.getRingbondType(vertexA, vertexB) === '='
-            || (edge.isPartOfAromaticRing && preprocessor.bridgedRing)
+            || (aromaticRing && !preprocessor.isRingRegularPolygon(aromaticRing))
         ) {
             // Always draw double bonds inside the ring
             let inRing = preprocessor.areVerticesInSameRing(vertexA, vertexB);
@@ -309,9 +352,9 @@ export default class SvgDrawer {
     /**
      * Draw the highlights for atoms to the canvas.
      *
-     * @param {Boolean} debug
+     * @param {Boolean} _debug UNUSED
      */
-    drawAtomHighlights(debug) {
+    drawAtomHighlights(_debug) {
         let preprocessor = this.preprocessor;
         let graph = preprocessor.graph;
         let svgWrapper = this.svgWrapper;
@@ -486,7 +529,7 @@ export default class SvgDrawer {
 
         gd.draw();
         const background = gd.getSVG();
-        background.firstChild.setAttributeNS(null, 'transform', `translate(${minX},${minY})`);
+        background.firstElementChild.setAttributeNS(null, 'transform', `translate(${minX},${minY})`);
         this.svgWrapper.addLayer(background);
     }
 
