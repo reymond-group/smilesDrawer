@@ -1028,7 +1028,7 @@ export default class DrawerBase {
         // shares 2 atoms with the bridges system but isn't included, those 2 atoms
         // get positioned by KK, while the rest of the fused rings gets positioned by the
         // normal layout algorithm. Both algos fight producing distored drawings
-        // TODO: change recurse() by making it always recurse when there are two or more 
+        // TODO: change recurse() by making it always recurse when there are two or more
         // shared vertices.
         // (See PR#237 review)
         let changed = true;
