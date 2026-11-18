@@ -1,5 +1,4 @@
 // @ts-check
-import ArrayHelper from './ArrayHelper';
 import Atom        from './Atom';
 import MathHelper  from './MathHelper';
 import Vector2     from './Vector2';
@@ -171,9 +170,9 @@ export default class Vertex {
         clone.id = this.id;
         clone.previousPosition = new Vector2(this.previousPosition.x, this.previousPosition.y);
         clone.parentVertexId = this.parentVertexId;
-        clone.children = ArrayHelper.clone(this.children);
-        clone.spanningTreeChildren = ArrayHelper.clone(this.spanningTreeChildren);
-        clone.edges = ArrayHelper.clone(this.edges);
+        clone.children = this.children.slice();
+        clone.spanningTreeChildren = this.spanningTreeChildren.slice();
+        clone.edges = this.edges.slice();
         clone.positioned = this.positioned;
         clone.angle = this.angle;
         clone.forcePositioned = this.forcePositioned;
@@ -353,7 +352,7 @@ export default class Vertex {
         let neighbours = this.getNeighbours();
 
         for (let i = 0; i < neighbours.length; i++) {
-            if (ArrayHelper.contains(vertices[neighbours[i]].value.rings, {value: ringId}) && neighbours[i] != previousVertexId) {
+            if (neighbours[i] !== previousVertexId && vertices[neighbours[i]].value.rings.includes(ringId)) {
                 return neighbours[i];
             }
         }
