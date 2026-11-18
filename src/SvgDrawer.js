@@ -528,9 +528,12 @@ export default class SvgDrawer {
         );
 
         gd.draw();
-        const background = gd.getSVG();
-        background.firstElementChild.setAttributeNS(null, 'transform', `translate(${minX},${minY})`);
-        this.svgWrapper.addLayer(background);
+        const background = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        background.setAttributeNS(null, 'href',      gd.getDataURL());
+        background.setAttributeNS(null, 'transform', `translate(${minX},${minY})`);
+        // To match the old path-based pixelated look, uncomment this line:
+        // background.setAttributeNS(null, 'image-rendering', 'pixelated');
+        this.svgWrapper.addBackgroundItem(background);
     }
 
     /**

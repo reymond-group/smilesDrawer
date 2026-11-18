@@ -156,9 +156,11 @@ export default class SvgWrapper {
 
     /**
      * Add a background to the svg.
+     *
+     * @param {SVGElement} item - An element to add to the background.
      */
-    addLayer(svg) {
-        this.backgroundItems.push(svg.firstChild);
+    addBackgroundItem(item) {
+        this.backgroundItems.push(item);
     }
 
     /**

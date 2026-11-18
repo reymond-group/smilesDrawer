@@ -28,9 +28,6 @@
     "typescript-eslint":        "^8.61.1",
     "vitest":                   "^4.1.9"
   },
-  "dependencies": {
-    "chroma-js": "^2.4.2"
-  },
   "scripts": {
     "build":     "node ./scripts/build.mjs",
     "lint":      "npm exec -- eslint",
