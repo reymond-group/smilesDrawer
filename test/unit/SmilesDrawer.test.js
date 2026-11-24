@@ -9,6 +9,42 @@ describe('SmilesDrawer', () => {
         expect(drawer).toBeDefined();
     });
 
+    it('draws molecules to a canvas element target', () => {
+        createJSDOM();
+
+        const canvas = document.createElement('canvas');
+        const drawer = new SmilesDrawer();
+        const conversion = vi.spyOn(drawer, 'svgToCanvas').mockImplementation((svg, target) => target);
+        const successCallback = vi.fn();
+        const errorCallback = vi.fn();
+
+        drawer.draw('C', canvas, 'light', successCallback, errorCallback);
+
+        expect(errorCallback.mock.calls.length).toBe(0);
+        expect(conversion.mock.calls.length).toBe(1);
+        expect(conversion.mock.calls[0][1] === canvas).toBe(true);
+        expect(successCallback.mock.calls.length).toBe(1);
+        expect(successCallback.mock.calls[0][0] === canvas).toBe(true);
+    });
+
+    it('draws reactions to a canvas element target', () => {
+        createJSDOM();
+
+        const canvas = document.createElement('canvas');
+        const drawer = new SmilesDrawer();
+        const conversion = vi.spyOn(drawer, 'svgToCanvas').mockImplementation((svg, target) => target);
+        const successCallback = vi.fn();
+        const errorCallback = vi.fn();
+
+        drawer.draw('[Pb]>>[Au]', canvas, 'light', successCallback, errorCallback);
+
+        expect(errorCallback.mock.calls.length).toBe(0);
+        expect(conversion.mock.calls.length).toBe(1);
+        expect(conversion.mock.calls[0][1] === canvas).toBe(true);
+        expect(successCallback.mock.calls.length).toBe(1);
+        expect(successCallback.mock.calls[0][0] === canvas).toBe(true);
+    });
+
     it('should parse valid JSON options', () => {
         createJSDOM();
 

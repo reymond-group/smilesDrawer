@@ -191,6 +191,12 @@ export default class SmilesDrawer {
                 callback(target);
             }
         }
+        else if (this.isCanvas(target)) {
+            this.svgToCanvas(this.drawer.draw(parseTree, null, theme, weights), target);
+            if (callback) {
+                callback(target);
+            }
+        }
         else if (target instanceof SVGElement) {
             this.drawer.draw(parseTree, target, theme, weights);
             if (callback) {
@@ -256,6 +262,12 @@ export default class SmilesDrawer {
                 callback(target);
             }
         }
+        else if (this.isCanvas(target)) {
+            this.svgToCanvas(this.reactionDrawer.draw(reaction, null, theme, weights, settings.textAboveArrow, settings.textBelowArrow), target);
+            if (callback) {
+                callback(target);
+            }
+        }
         else if (target instanceof SVGElement) {
             this.reactionDrawer.draw(reaction, target, theme, weights, settings.textAboveArrow, settings.textBelowArrow);
             if (callback) {
@@ -297,6 +309,11 @@ export default class SmilesDrawer {
         }
     }
 
+    isCanvas(element) {
+        return (typeof HTMLCanvasElement !== 'undefined' && element instanceof HTMLCanvasElement)
+            || (typeof OffscreenCanvas !== 'undefined' && element instanceof OffscreenCanvas);
+    }
+
     svgToCanvas(svg, canvas = null) {
         if (canvas === null) {
             canvas = document.createElement('canvas');
@@ -335,12 +352,14 @@ export default class SmilesDrawer {
                 if (h === null) h = element.height;
             }
 
-            if (element.style.width !== '') {
-                w = parseInt(element.style.width);
-            }
+            if (element.style) {
+                if (element.style.width !== '') {
+                    w = parseInt(element.style.width);
+                }
 
-            if (element.style.height !== '') {
-                h = parseInt(element.style.height);
+                if (element.style.height !== '') {
+                    h = parseInt(element.style.height);
+                }
             }
         }
         else if (svg) {
