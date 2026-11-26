@@ -1,7 +1,29 @@
-import convertImage from './PixelsToSvg';
-import Vector2      from './Vector2';
+import Vector2 from './Vector2';
 
-import chroma from 'chroma-js';
+/**
+ * Converts an array of CSS colors into an array of UInt8 RGBA 4-tuples.
+ *
+ * @param {string[]} colormap - An array of CSS color values.
+ * @returns {number[][]}      - An array of UInt8 RGBA 4-tuples.
+ */
+function buildChannelMap(colormap) {
+    const canvas  = document.createElement('canvas');
+    canvas.width  = colormap.length;
+    canvas.height = 1;
+    const context = canvas.getContext('2d', {alpha: true});
+
+    for (let i = 0; i < colormap.length; ++i) {
+        context.fillStyle = colormap[i];
+        context.fillRect(i, 0, 1, 1);
+    }
+
+    const buffer = context.getImageData(0, 0, colormap.length, 1, {
+        colorSpace:  'srgb',
+        pixelFormat: 'rgba-unorm8',
+    }).data;
+
+    return buffer.values().chunks(4).toArray();
+}
 
 export default class GaussDrawer {
     /**
@@ -13,8 +35,8 @@ export default class GaussDrawer {
     constructor(points, weights, width, height, sigma = 0.3, interval = 0, colormap = null, opacity = 1.0, normalized = false) {
         this.points = points;
         this.weights = weights;
-        this.width = width;
-        this.height = height;
+        this.width = Math.round(width);
+        this.height = Math.round(height);
         this.sigma = sigma;
         this.interval = interval;
         this.opacity = opacity;
@@ -30,21 +52,9 @@ export default class GaussDrawer {
         this.colormap = colormap;
 
         this.canvas = document.createElement('canvas');
-        this.context = this.canvas.getContext('2d');
+        this.context = this.canvas.getContext('2d', {alpha: true});
         this.canvas.width = this.width;
         this.canvas.height = this.height;
-    }
-
-    setFromArray(arr_points, arr_weights) {
-        this.points = [];
-        arr_points.forEach((a) => {
-            this.points.push(new Vector2(a[0], a[1]));
-        });
-
-        this.weights = [];
-        arr_weights.forEach((w) => {
-            this.weights.push(w);
-        });
     }
 
     /**
@@ -53,12 +63,8 @@ export default class GaussDrawer {
     draw() {
         let m = [];
 
-        for (let x = 0; x < this.width; x++) {
-            let row = [];
-            for (let y = 0; y < this.height; y++) {
-                row.push(0.0);
-            }
-            m.push(row);
+        for (let y = 0; y < this.height; y++) {
+            m.push(new Float32Array(this.width));
         }
 
         // It looks like in some common js engines, multiplication by a
@@ -69,8 +75,8 @@ export default class GaussDrawer {
             let v = this.points[i];
             let a = this.weights[i];
 
-            for (let x = 0; x < this.width; x++) {
-                for (let y = 0; y < this.height; y++) {
+            for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
                     // let v_x = (x - v.x) ** 2 / (2 * this.sigma ** 2);
                     // let v_y = (y - v.y) ** 2 / (2 * this.sigma ** 2);
                     let dx = x - v.x;
@@ -78,7 +84,7 @@ export default class GaussDrawer {
                     let v_xy = (dx * dx + dy * dy) * divisor;
                     let val = a * Math.exp(-v_xy);
 
-                    m[x][y] += val;
+                    m[y][x] += val;
                 }
             }
         }
@@ -89,14 +95,14 @@ export default class GaussDrawer {
             let max = -Number.MAX_SAFE_INTEGER;
             let min = Number.MAX_SAFE_INTEGER;
 
-            for (let x = 0; x < this.width; x++) {
-                for (let y = 0; y < this.height; y++) {
-                    if (m[x][y] < min) {
-                        min = m[x][y];
+            for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
+                    if (m[y][x] < min) {
+                        min = m[y][x];
                     }
 
-                    if (m[x][y] > max) {
-                        max = m[x][y];
+                    if (m[y][x] > max) {
+                        max = m[y][x];
                     }
                 }
             }
@@ -104,64 +110,53 @@ export default class GaussDrawer {
             abs_max = Math.max(Math.abs(min), Math.abs(max));
         }
 
-        const scale = chroma.scale(this.colormap).domain([-1.0, 1.0]);
+        const channelmap = buildChannelMap(this.colormap);
+        const imagedata  = new ImageData(this.width, this.height, {
+            colorSpace:  'srgb',
+            pixelFormat: 'rgba-unorm8',
+        });
 
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
+        const buffer = imagedata.data;
+        let   pixel  = 0;
+
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                let v = m[y][x];
+
                 if (!this.normalized) {
-                    m[x][y] = m[x][y] / abs_max;
+                    v = v / abs_max;
                 }
 
                 if (this.interval !== 0) {
-                    m[x][y] = Math.round(m[x][y] / this.interval) * this.interval;
+                    v = Math.round(v / this.interval) * this.interval;
                 }
 
-                let [r, g, b] = scale(m[x][y]).rgb();
-                this.setPixel(new Vector2(x, y), r, g, b);
+                // Scale from [-1, 1] to [0, channelmap.length)
+                let c = (v + 1) / 2 * (channelmap.length - 1);
+                c = Math.min(c, channelmap.length - 1);
+
+                const lo = channelmap[Math.floor(c)];
+                const hi = channelmap[Math.ceil(c)];
+                const p  = c - Math.floor(c);
+                const q  = 1.0 - p;
+
+                buffer[pixel + 0] = lo[0] * q + hi[0] * p;
+                buffer[pixel + 1] = lo[1] * q + hi[1] * p;
+                buffer[pixel + 2] = lo[2] * q + hi[2] * p;
+                buffer[pixel + 3] = this.opacity * 256;
+                pixel += 4;
             }
         }
+
+        this.context.putImageData(imagedata, 0, 0);
     }
 
     /**
-       * Get the canvas as an HTML image.
-       *
-       * @param {CallableFunction} callback
-       */
-    getImage(callback) {
-        let image = new Image();
-        image.onload = () => {
-            this.context.imageSmoothingEnabled = false;
-            this.context.drawImage(image, 0, 0, this.width, this.height);
-
-            if (callback) {
-                callback(image);
-            }
-        };
-
-        image.onerror = (err) => {
-            console.log(err);
-        };
-
-        image.src = this.canvas.toDataURL();
-    }
-
-    /**
-       * Get the canvas as an SVG element.
-       */
-    getSVG() {
-        return convertImage(this.context.getImageData(0, 0, this.width, this.height));
-    }
-
-    /**
-       * Set the colour at a specific point on the canvas.
-       *
-       * @param {Vector2} vec The pixel position on the canvas.
-       * @param {Number} r The red colour-component.
-       * @param {Number} g The green colour-component.
-       * @param {Number} b The blue colour-component.
-       */
-    setPixel(vec, r, g, b) {
-        this.context.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + this.opacity + ')';
-        this.context.fillRect(vec.x, vec.y, 1, 1);
+     * Get the content of the underlying canvas as a data URL.
+     *
+     * @returns {string} A data URL.
+     */
+    getDataURL() {
+        return this.canvas.toDataURL();
     }
 }
